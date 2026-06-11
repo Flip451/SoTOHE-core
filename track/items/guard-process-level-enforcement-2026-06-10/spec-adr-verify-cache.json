@@ -1,0 +1,693 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "b6f61a6f8dfae7fb4829a905875093678b70d003fed25fcb41ec9afbb70ad7e8",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D1: git hooks を git 書き込みの enforcement 点とする"
+      }
+    },
+    {
+      "claim_hash": "bf0e7f2feff82d16cd2ad548d51cf93dc0b4a5d6c7a52e9e91de915f91348973",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「環境変数 `SOTP_GUARDED_GIT` が提示されている → 許可 (guarded path)」および「fail mode が fail-closed (トークンがなければ block) に統一される」"
+      }
+    },
+    {
+      "claim_hash": "8a967348aac402a7424f499310644d9588fd8fa55515a143b3024015fbdc1338",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「文字列スキャン時代の一括 block (0080 由来 + CON-07) の撤廃」…「追加する: D3 のトークンキーワードスキャン。」"
+      }
+    },
+    {
+      "claim_hash": "9421b8251be14c5241eca93cc4810cccd7e02fda56edd2bffce5dc5422b7c07d",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reason 文字列を stdout ではなく stderr へ書き出す。"
+      }
+    },
+    {
+      "claim_hash": "7729b48bb3cd2651658558678e3f12dc832fd6e6c14c149dc7bd442ecd6a2af0",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath が未設定だと git hooks 層は不在になる。以下の三重で担保する:"
+      }
+    },
+    {
+      "claim_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「リポジトリ内 `.githooks/` に git hooks を配置し、`core.hooksPath` で有効化する。」「`reference-transaction` ... **`--no-verify` で迂回不可**」「`pre-push` | push | `--no-verify` で迂回可 (許容残余)」「hook 本体は 2 行程度のシェルシムとし、`bin/sotp hook dispatch` の新しい hook 名 (例: `git-ref-update` / `git-pre-push`) へ exec する。」"
+      }
+    },
+    {
+      "claim_hash": "598260ff3a40710f7fd19cf5283ea35cfa0d6283caa1d0cd9c9349c31c275f77",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **正規経路**: sotp の git 呼び出しは `libs/infrastructure/src/git_cli/` の `Command::new(\"git\")` に集約されている。この単一通過点で子プロセス環境に `SOTP_GUARDED_GIT` を設定する。`cargo make track-commit-message` / `track-add-paths` / `track-branch-create` / `track-pr-push` 等のラッパーはすべて sotp 経由なので自動的に通行証を持つ。"
+      }
+    },
+    {
+      "claim_hash": "8d9279d31733c5766ee6a4fb074c07acb1c437a14617c5e14a8d40eeea6b11f0",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Bash コマンド文字列に `SOTP_GUARDED_GIT` (exact match) が含まれていたら block」を追加する。実装上、スキャンは raw コマンド文字列と quote-strip 済み argv トークンの**両方**に適用する"
+      }
+    },
+    {
+      "claim_hash": "cec995b90aa42a289820e3e0fc656b50b9fff7f7c7b6c4bc39d3747bee3e16aa",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D4: Claude Code フックの縮小 — 文字列スキャン時代の一括 block (0080 由来 + CON-07) の撤廃"
+      }
+    },
+    {
+      "claim_hash": "6c3a9e6a1d3cddf85dfec5684c7960eabd163f25bd69f2cd17692483d2b84f68",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「**維持する** (誤発火ゼロかつ根拠が生きている精密チェック): - 直接 git サブコマンドチェック (`git add` / `commit` / `push` / `switch` / `merge` / `rebase` / `cherry-pick` / `reset` / `branch -d` / `checkout -b`) ... - launcher stripping (`sudo` / `nohup` / `timeout` 等 — `COMMAND_LAUNCHERS`)・`VAR=val` skip・`.exe` suffix strip ... - `bin/sotp` 上書き検出 (`is_bin_sotp_overwrite`) ... **追加する**: ... `block-test-file-deletion` にリダイレクト先チェックを追加 — リダイレクト解禁で可能になる `> tests/foo.rs` 形式のテストファイル truncation を ... block する」"
+      }
+    },
+    {
+      "claim_hash": "a8d2207bfce66175545410ac442896b37579b3cbb574d383165bc84df19ecdea",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `permissions.deny` と `FORBIDDEN_ALLOW` は現状維持"
+      }
+    },
+    {
+      "claim_hash": "f3158fdd80eb6d7d9decc8377931b1dd78fa90c9fa58721610672d4fbef8270a",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reason 文字列を stdout ではなく stderr へ書き出す。現状 `apps/cli-composition/src/hook.rs` は block verdict を `CommandOutcome { stdout: Some(reason), stderr: None, exit_code: 2 }` として返し、`apps/cli/src/commands/hook.rs` が stdout を `println!` で出すため"
+      }
+    },
+    {
+      "claim_hash": "d8b99afa6801c69feb0bc709a4bfca821efb7477c605a8ced20634c2279b652a",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1. **setup**: `cargo make bootstrap` / `/track:setup` が `git config core.hooksPath .githooks` を設定する。"
+      }
+    },
+    {
+      "claim_hash": "cd714c29d4a10e0494c5ded206f3369ab4ff2cb5431e59c7f5c426999f6b22ab",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "2. **CI verify**: `bin/sotp verify` 系サブコマンドが設定値を検査し、未設定 / 不一致なら `cargo make ci` を fail させる."
+      }
+    },
+    {
+      "claim_hash": "96309c5c83e57c0ee479e3dd5c06070e3da03407a818a23d40fec18dd61be678",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "3. **runtime fail-closed**: `block-direct-git-ops` フックが実行時に `core.hooksPath` 未設定を検知したら git コマンドを block する (fail-closed hooks の系譜 CN-04 と整合)."
+      }
+    },
+    {
+      "claim_hash": "b8dc3378a6cba69f54674b2e5a2c749fa9173702d4647bf097a8763d230a6623",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`has_output_redirect` 一括 block — `>`, `>>`, `>|`, `<>`, `2> file` の解禁 ... `FILE_WRITE_COMMANDS` (`tee`) と `sed -i` チェック — CON-07 の file-lock 保護という存在理由が消滅しているため。`knowledge/conventions/bash-write-guard.md` は本決定に合わせて改訂する。"
+      }
+    },
+    {
+      "claim_hash": "7bb1ecce05deaec2a49cd2b00ecf89379f7c1b4be4206727ccbf0f74de46ace1",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「は行わない。entry-point 列挙はフラグ変形に対して構造的に不完全であり、git hooks がプロセスレベルで同じ目的をより確実に達成する」"
+      }
+    },
+    {
+      "claim_hash": "05473d81ab403435c76a265e2e5142351f9372f1f44d9d7c35f77aeb591658da",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Write/Edit の content はスキャンしない」「スクリプトファイル間接実行 ... は ... 許容残余とする」"
+      }
+    },
+    {
+      "claim_hash": "a226b7a203da662138fefcc78c18415c395a05015d6b71fb462854c5b65bfe4b",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「人間 / AI の判別 (例: `CLAUDECODE` 環境変数の有無) は行わない。判定変数を 1 つに絞ることで、判別変数の unset 系操作 (`env -u` / 空代入) という対称な攻撃面が存在しなくなり、fail mode が fail-closed (トークンがなければ block) に統一される。」"
+      }
+    },
+    {
+      "claim_hash": "7b8c4184d7526da5bdd3c6af0c51f49964f64de71035c9899d56eef29c01c960",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[token-only-pass, claudecode-env-discrimination, nonce-file-token] chose:token-only-pass"
+      }
+    },
+    {
+      "claim_hash": "71e77dcd814280715703fe498216a9ac63aea5232a3da4c0bc5441526b0bd89f",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 呼び出しは `libs/infrastructure/src/git_cli/` の `Command::new(\"git\")` に集約されている。この単一通過点で子プロセス環境に `SOTP_GUARDED_GIT` を設定する。`cargo make track-commit-message` / `track-add-paths` / `track-branch-create` / `track-pr-push` 等のラッパーはすべて sotp 経由なので自動的に通行証を持つ。"
+      }
+    },
+    {
+      "claim_hash": "cd069e236bff8d2cdd314d7cf49a2002f204984a4a43cde5ac32a860be5cd893",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `env` 無条件 block (`2026-03-11-0080` Decision 1) — 根拠は「`env -S` 等の引数形式を文字列スキャンが解析しきれない」という文字列スキャン方式の盲点保護だった。token-only fail-closed モデル (D2) では環境操作はトークンを**消す**方向にしか働かず (消えれば block 側)、トークンの**付与**は D3 のキーワードスキャンが塞ぐため、根拠が消滅している。\n- `$` / バッククォート展開 block (`command_contains_expansion`、`2026-03-11-0080` Decision 2) — 根拠は「`$CMD` の展開先を文字列スキャンが知り得ない」という同種の盲点保護。"
+      }
+    },
+    {
+      "claim_hash": "e8be48812caa9784f9d9af2524963bca96049390d00c0433a4dbff570b99d68c",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook 本体は 2 行程度のシェルシムとし、`bin/sotp hook dispatch` の新しい hook 名 (例: `git-ref-update` / `git-pre-push`) へ exec する。判定ロジックは既存の Rust hook アーキテクチャ (domain 層 policy + usecase 層 dispatch) に乗せ、`policy.rs` のルール別 remediation メッセージ定数を再利用する。"
+      }
+    },
+    {
+      "claim_hash": "37cba1bcecdb6a2ae8972d79f9ae8dea5e0b8fe6777d1d2133c40367f07a7fd3",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "環境変数 `SOTP_GUARDED_GIT` が提示されている → 許可 (guarded path)\n- それ以外 → block (remediation メッセージ付き)\n\n人間 / AI の判別 (例: `CLAUDECODE` 環境変数の有無) は行わない。"
+      }
+    },
+    {
+      "claim_hash": "029081f2578faf384433a9b5e340f6e78db98039ed1fa16b3eb882279326affe",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「sotp の git 呼び出しは `libs/infrastructure/src/git_cli/` の `Command::new(\"git\")` に集約されている。この単一通過点で子プロセス環境に `SOTP_GUARDED_GIT` を設定する。」"
+      }
+    },
+    {
+      "claim_hash": "a199d585564bca83f1bb5f67fdc70ad3ed7da1fd2e3429751f7781e226a08c20",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "適用範囲は **Bash コマンド文字列のみ**。Write/Edit の content はスキャンしない — ガード実装自体 (`git_cli/`、hook 実装、テスト) がこの文字列を正当に含み、保守のたびに誤発火するため。\n- スクリプトファイル間接実行 (Write でトークンを含むスクリプトを書いて `bash script.sh` で実行) は複数ステップの意図的回避であり、許容残余とする"
+      }
+    },
+    {
+      "claim_hash": "c0a6c0920838b474799c9b0a218c4f0296a94ac6552e95da3d68b4e6fd200af1",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装上、スキャンは raw コマンド文字列と quote-strip 済み argv トークンの**両方**に適用する (`SOTP_GUARDED_GI\"T\"=1` のようなクォート分割による回避を防ぐ)。"
+      }
+    },
+    {
+      "claim_hash": "49581e4cc6d56f7e4b8ff2c66aacc1f6a55185986261b9fe20b6332d4977ee4c",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "runtime fail-closed: `block-direct-git-ops` フックが実行時に `core.hooksPath` 未設定を検知したら git コマンドを block する (fail-closed hooks の系譜 CN-04 と整合)。"
+      }
+    },
+    {
+      "claim_hash": "ccaf7062e90f00194373c74117d4892c0effac5ce53d0486bf53534863a3a9ae",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`block-test-file-deletion` にリダイレクト先チェックを追加 — リダイレクト解禁で可能になる `> tests/foo.rs` 形式のテストファイル truncation を block する"
+      }
+    },
+    {
+      "claim_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新しい hook 名 (例: `git-ref-update` / `git-pre-push`) へ exec する。判定ロジックは既存の Rust hook アーキテクチャ (domain 層 policy + usecase 層 dispatch) に乗せ」"
+      }
+    },
+    {
+      "claim_hash": "7d7c91f153e23a5c5114849ef30506d873c963dbf5b4d99fa686c6f1cd6f620a",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リポジトリ内 `.githooks/` に git hooks を配置し、`core.hooksPath` で有効化する。\n\n| git hook | 捕捉対象 | 備考 |\n| --- | --- | --- |\n| `reference-transaction` (prepared state) | ローカル ref 更新すべて — commit、branch 作成/削除、merge、rebase、cherry-pick、`reset <rev>`、stash、notes、fetch (remote-tracking) | non-zero exit でトランザクション abort。**`--no-verify` で迂回不可** |\n| `pre-push` | push | `--no-verify` で迂回可 (許容残余) |\n\nhook 本体は 2 行程度のシェルシムとし、`bin/sotp hook dispatch` の新しい hook 名 (例: `git-ref-update` / `git-pre-push`) へ exec する。"
+      }
+    },
+    {
+      "claim_hash": "25948e1710be84eca5290337a1dc843c6bc23a5fe10096f14f6db7acd3d08be0",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この単一通過点で子プロセス環境に `SOTP_GUARDED_GIT` を設定する。`cargo make track-commit-message` / `track-add-paths` / `track-branch-create` / `track-pr-push` 等のラッパーはすべて sotp 経由なので自動的に通行証を持つ」「それ以外 → block」"
+      }
+    },
+    {
+      "claim_hash": "1d9f78f25e98fa8c0763fa338c12dda592685b407d9f0274d1b4dcada24144fe",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Bash コマンド文字列に `SOTP_GUARDED_GIT` (exact match) が含まれていたら block」「raw コマンド文字列と quote-strip 済み argv トークンの両方に適用する」"
+      }
+    },
+    {
+      "claim_hash": "7e8945ac787196fa62bd038e60d604a835432be800945b753cb271592b949805",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`env` 無条件 block、`$` / バッククォート展開 block、`has_output_redirect` 一括 block、`FILE_WRITE_COMMANDS` (`tee`) と `sed -i` チェック — 解禁"
+      }
+    },
+    {
+      "claim_hash": "f46e0d28bbe82de74971a2ce0e9c4d26045f5262e2949395040a5e83d168b262",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `直接 git サブコマンドチェック (`git add` / `commit` / `push` / `switch` / `merge` / `rebase` / `cherry-pick` / `reset` / `branch -d` / `checkout -b`)` — 特に `git add` は index 更新に発火する git hook が存在しないため、Claude Code フックが引き続き一次防御となる.\n- `bin/sotp` 上書き検出 (`is_bin_sotp_overwrite`) — 出自は CON-07 ではなく glibc 不一致防止 (`cargo make build-sotp` への誘導) であり根拠が生きている."
+      }
+    },
+    {
+      "claim_hash": "9698b63a579952a972e71fa6d33c6bef7ee947d33b1bc15ac2951cac78b1d6b2",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `block-test-file-deletion` にリダイレクト先チェックを追加 — リダイレクト解禁で可能になる `> tests/foo.rs` 形式のテストファイル truncation を、redirect ターゲットのテストファイルパターン照合で block する (`SimpleCommand.redirect_texts` は既に取得済み)."
+      }
+    },
+    {
+      "claim_hash": "48f9ad7521d17ab8ead7abe3f54f36f2d910e7fb86543a8b8e2fae92ad8a6b40",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `permissions.deny` と `FORBIDDEN_ALLOW` は現状維持。"
+      }
+    },
+    {
+      "claim_hash": "3fa6c24a3d94417dbf662e124edb0884cef19c6b199299b1c69d6de5424ffd31",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reason 文字列を stdout ではなく stderr へ書き出す"
+      }
+    },
+    {
+      "claim_hash": "7c051808e4a8e06b64942acfb5aaf56783c8c7dd7b8168a0e9ed5b84f4c24118",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`setup`: `cargo make bootstrap` / `/track:setup` が `git config core.hooksPath .githooks` を設定する。"
+      }
+    },
+    {
+      "claim_hash": "bb25288c6966ab995757e46ee2b5db3842d5683f415ef174cdaf863e1d6103c7",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "2. **CI verify**: `bin/sotp verify` 系サブコマンドが設定値を検査し、未設定 / 不一致なら `cargo make ci` を fail させる."
+      }
+    },
+    {
+      "claim_hash": "f26ecf1fc46bc90785b972175a3946bc966a5164c296ba5bb73db17a0a453cba",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "3. **runtime fail-closed**: `block-direct-git-ops` フックが実行時に `core.hooksPath` 未設定を検知したら git コマンドを block する (fail-closed hooks の系譜 CN-04 と整合)."
+      }
+    },
+    {
+      "claim_hash": "7519fc4ae90ad353e56d50d0f1e8cc33716139ce851b88c621e1820dfabb6c70",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`has_output_redirect` 一括 block — `>`, `>>`, `>|`, `<>`, `2> file` の解禁 ... `FILE_WRITE_COMMANDS` (`tee`) と `sed -i` チェック — CON-07 の file-lock 保護という存在理由が消滅しているため。`knowledge/conventions/bash-write-guard.md` は本決定に合わせて改訂する。"
+      }
+    },
+    {
+      "claim_hash": "50994b8a6365f97bd2e11a9cb8da431ab4b472a32f3260b6dc01e5be96c54951",
+      "evidence_hash": "2893ebd3889d69cdf35610a7a9750cf1ad773745c82a179ce28af6d87f8edbf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D4: Claude Code フックの縮小 — 文字列スキャン時代の一括 block (0080 由来 + CON-07) の撤廃\n\n**撤廃する**:\n\n...\n\n**追加する**:\n\n- D3 のトークンキーワードスキャン。\n- `block-test-file-deletion` にリダイレクト先チェックを追加"
+      }
+    },
+    {
+      "claim_hash": "7c38a38e8782dd77e4459a4fca5cf22894a67301b3bd9e72896ec509700215cf",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reference-transaction` (prepared state) | ローカル ref 更新すべて — commit、branch 作成/削除、merge、rebase、cherry-pick、`reset <rev>`、stash、notes、fetch (remote-tracking) | non-zero exit でトランザクション abort。**`--no-verify` で迂回不可**\n\n`pre-push` | push | `--no-verify` で迂回可 (許容残余)"
+      }
+    },
+    {
+      "claim_hash": "bf0e7f2feff82d16cd2ad548d51cf93dc0b4a5d6c7a52e9e91de915f91348973",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「環境変数 `SOTP_GUARDED_GIT` が提示されている → 許可」; 「fail mode が fail-closed (トークンがなければ block) に統一される」; 「単一通過点で子プロセス環境に `SOTP_GUARDED_GIT` を設定する」"
+      }
+    },
+    {
+      "claim_hash": "8a967348aac402a7424f499310644d9588fd8fa55515a143b3024015fbdc1338",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「文字列スキャン時代の一括 block (0080 由来 + CON-07) の撤廃」; 「D3 のトークンキーワードスキャン」"
+      }
+    },
+    {
+      "claim_hash": "9421b8251be14c5241eca93cc4810cccd7e02fda56edd2bffce5dc5422b7c07d",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「reason 文字列を stdout ではなく stderr へ書き出す」"
+      }
+    },
+    {
+      "claim_hash": "7729b48bb3cd2651658558678e3f12dc832fd6e6c14c149dc7bd442ecd6a2af0",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`core.hooksPath` が未設定だと git hooks 層は不在になる。以下の三重で担保する: 1. **setup**: `cargo make bootstrap` / `/track:setup` が `git config core.hooksPath .githooks` を設定する。 2. **CI verify**: `bin/sotp verify` 系サブコマンドが設定値を検査し、未設定 / 不一致なら `cargo make ci` を fail させる。 3. **runtime fail-closed**: `block-direct-git-ops` フックが実行時に `core.hooksPath` 未設定を検知したら git コマンドを block する"
+      }
+    },
+    {
+      "claim_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リポジトリ内 `.githooks/` に git hooks を配置し、`core.hooksPath` で有効化する。\n\n| git hook | 捕捉対象 | 備考 |\n| --- | --- | --- |\n| `reference-transaction` (prepared state) | ローカル ref 更新すべて — commit、branch 作成/削除、merge、rebase、cherry-pick、`reset <rev>`、stash、notes、fetch (remote-tracking) | non-zero exit でトランザクション abort。**`--no-verify` で迂回不可** |\n| `pre-push` | push | `--no-verify` で迂回可 (許容残余) |\n\nhook 本体は 2 行程度のシェルシムとし、`bin/sotp hook dispatch` の新しい hook 名 (例: `git-ref-update` / `git-pre-push`) へ exec する。"
+      }
+    },
+    {
+      "claim_hash": "598260ff3a40710f7fd19cf5283ea35cfa0d6283caa1d0cd9c9349c31c275f77",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 呼び出しは `libs/infrastructure/src/git_cli/` の `Command::new(\"git\")` に集約されている。この単一通過点で子プロセス環境に `SOTP_GUARDED_GIT` を設定する。`cargo make track-commit-message` / `track-add-paths` / `track-branch-create` / `track-pr-push` 等のラッパーはすべて sotp 経由なので自動的に通行証を持つ。"
+      }
+    },
+    {
+      "claim_hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Bash コマンド文字列に `SOTP_GUARDED_GIT` (exact match) が含まれていたら block` / `raw コマンド文字列と quote-strip 済み argv トークンの両方に適用する`"
+      }
+    },
+    {
+      "claim_hash": "cec995b90aa42a289820e3e0fc656b50b9fff7f7c7b6c4bc39d3747bee3e16aa",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「文字列スキャン時代の一括 block (0080 由来 + CON-07) の撤廃」"
+      }
+    },
+    {
+      "claim_hash": "6c3a9e6a1d3cddf85dfec5684c7960eabd163f25bd69f2cd17692483d2b84f68",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**維持する** (誤発火ゼロかつ根拠が生きている精密チェック):\n\n- 直接 git サブコマンドチェック (`git add` / `commit` / `push` / `switch` / `merge` / `rebase` / `cherry-pick` / `reset` / `branch -d` / `checkout -b`) ...\n- launcher stripping (`sudo` / `nohup` / `timeout` 等 — `COMMAND_LAUNCHERS`)・`VAR=val` skip・`.exe` suffix strip (`2026-03-11-0080` Decision 3) ...\n- `bin/sotp` 上書き検出 (`is_bin_sotp_overwrite`) ...\n\n**追加する**:\n\n- `block-test-file-deletion` にリダイレクト先チェックを追加 — リダイレクト解禁で可能になる `> tests/foo.rs` 形式のテストファイル truncation を、redirect ターゲットのテストファイルパターン照合で block する"
+      }
+    },
+    {
+      "claim_hash": "a8d2207bfce66175545410ac442896b37579b3cbb574d383165bc84df19ecdea",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存の `permissions.deny` と `FORBIDDEN_ALLOW` は現状維持。」"
+      }
+    },
+    {
+      "claim_hash": "f3158fdd80eb6d7d9decc8377931b1dd78fa90c9fa58721610672d4fbef8270a",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "フックが block verdict を返す (終了コード 2) とき、reason 文字列を stdout ではなく stderr へ書き出す。現状 `apps/cli-composition/src/hook.rs` は block verdict を `CommandOutcome { stdout: Some(reason), stderr: None, exit_code: 2 }` として返し、`apps/cli/src/commands/hook.rs` が stdout を `println!` で出すため"
+      }
+    },
+    {
+      "claim_hash": "d8b99afa6801c69feb0bc709a4bfca821efb7477c605a8ced20634c2279b652a",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1. **setup**: `cargo make bootstrap` / `/track:setup` が `git config core.hooksPath .githooks` を設定する。"
+      }
+    },
+    {
+      "claim_hash": "cd714c29d4a10e0494c5ded206f3369ab4ff2cb5431e59c7f5c426999f6b22ab",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "2. **CI verify**: `bin/sotp verify` 系サブコマンドが設定値を検査し、未設定 / 不一致なら `cargo make ci` を fail させる."
+      }
+    },
+    {
+      "claim_hash": "96309c5c83e57c0ee479e3dd5c06070e3da03407a818a23d40fec18dd61be678",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "3. **runtime fail-closed**: `block-direct-git-ops` フックが実行時に `core.hooksPath` 未設定を検知したら git コマンドを block する (fail-closed hooks の系譜 CN-04 と整合)."
+      }
+    },
+    {
+      "claim_hash": "b8dc3378a6cba69f54674b2e5a2c749fa9173702d4647bf097a8763d230a6623",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `has_output_redirect` 一括 block — `>`, `>>`, `>|`, `<>`, `2> file` の解禁 (`2>&1` / `1>&2` の FD 複製は従来から block されていない)。\n- `FILE_WRITE_COMMANDS` (`tee`) と `sed -i` チェック — CON-07 の file-lock 保護という存在理由が消滅しているため。`knowledge/conventions/bash-write-guard.md` は本決定に合わせて改訂する。"
+      }
+    },
+    {
+      "claim_hash": "7bb1ecce05deaec2a49cd2b00ecf89379f7c1b4be4206727ccbf0f74de46ace1",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「permissions.deny は拡張しない】【。 entry-point 列挙はフラグ変形 (...) に対して構造的に不完全であり、git hooks がプロセスレベルで同じ目的をより確実に達成する」"
+      }
+    },
+    {
+      "claim_hash": "05473d81ab403435c76a265e2e5142351f9372f1f44d9d7c35f77aeb591658da",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「適用範囲は **Bash コマンド文字列のみ**。Write/Edit の content はスキャンしない — ガード実装自体 (`git_cli/`、hook 実装、テスト) がこの文字列を正当に含み、保守のたびに誤発火するため。」"
+      }
+    },
+    {
+      "claim_hash": "a226b7a203da662138fefcc78c18415c395a05015d6b71fb462854c5b65bfe4b",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「人間 / AI の判別 (例: `CLAUDECODE` 環境変数の有無) は行わない。判定変数を 1 つに絞ることで」"
+      }
+    },
+    {
+      "claim_hash": "7b8c4184d7526da5bdd3c6af0c51f49964f64de71035c9899d56eef29c01c960",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[token-only-pass, claudecode-env-discrimination, nonce-file-token] chose:token-only-pass"
+      }
+    },
+    {
+      "claim_hash": "71e77dcd814280715703fe498216a9ac63aea5232a3da4c0bc5441526b0bd89f",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 呼び出しは `libs/infrastructure/src/git_cli/` の `Command::new(\"git\")` に集約されている。この単一通過点で子プロセス環境に `SOTP_GUARDED_GIT` を設定する。`cargo make track-commit-message` / `track-add-paths` / `track-branch-create` / `track-pr-push` 等のラッパーはすべて sotp 経由なので自動的に通行証を持つ。"
+      }
+    },
+    {
+      "claim_hash": "cd069e236bff8d2cdd314d7cf49a2002f204984a4a43cde5ac32a860be5cd893",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`env` 無条件 block (...) — 根拠は「`env -S` 等の引数形式を文字列スキャンが解析しきれない」という文字列スキャン方式の盲点保護だった。`$` / バッククォート展開 block (...) — 根拠は「`$CMD` の展開先を文字列スキャンが知り得ない」という同種の盲点保護。"
+      }
+    },
+    {
+      "claim_hash": "e8be48812caa9784f9d9af2524963bca96049390d00c0433a4dbff570b99d68c",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook 本体は 2 行程度のシェルシムとし、`bin/sotp hook dispatch` の新しい hook 名 (例: `git-ref-update` / `git-pre-push`) へ exec する。判定ロジックは既存の Rust hook アーキテクチャ (domain 層 policy + usecase 層 dispatch) に乗せ、`policy.rs` のルール別 remediation メッセージ定数を再利用する。"
+      }
+    },
+    {
+      "claim_hash": "37cba1bcecdb6a2ae8972d79f9ae8dea5e0b8fe6777d1d2133c40367f07a7fd3",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "環境変数 `SOTP_GUARDED_GIT` が提示されている → 許可 (guarded path)\n- それ以外 → block (remediation メッセージ付き)"
+      }
+    },
+    {
+      "claim_hash": "bb553083d79a346e5a68ba30efe12f454d5bc80ecf174a1783a24b26edfdb899",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **正規経路**: sotp の git 呼び出しは `libs/infrastructure/src/git_cli/` の `Command::new(\"git\")` に集約されている。この単一通過点で子プロセス環境に `SOTP_GUARDED_GIT` を設定する。`cargo make track-commit-message` / `track-add-paths` / `track-branch-create` / `track-pr-push` 等のラッパーはすべて sotp 経由なので自動的に通行証を持つ。\n- **人間の ad-hoc 操作**: 自分のターミナルで `SOTP_GUARDED_GIT=1 git rebase …` のように通行証を自己提示する。D3 のキーワードスキャンは Claude Code の Bash tool にしか作用しないため、人間には制約がない。"
+      }
+    },
+    {
+      "claim_hash": "a199d585564bca83f1bb5f67fdc70ad3ed7da1fd2e3429751f7781e226a08c20",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「適用範囲は Bash コマンド文字列のみ。Write/Edit の content はスキャンしない」および「スクリプトファイル間接実行 ... は ... 許容残余とする」"
+      }
+    },
+    {
+      "claim_hash": "c0a6c0920838b474799c9b0a218c4f0296a94ac6552e95da3d68b4e6fd200af1",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装上、スキャンは raw コマンド文字列と quote-strip 済み argv トークンの**両方**に適用する"
+      }
+    },
+    {
+      "claim_hash": "49581e4cc6d56f7e4b8ff2c66aacc1f6a55185986261b9fe20b6332d4977ee4c",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "runtime fail-closed: `block-direct-git-ops` フックが実行時に `core.hooksPath` 未設定を検知したら git コマンドを block する"
+      }
+    },
+    {
+      "claim_hash": "ccaf7062e90f00194373c74117d4892c0effac5ce53d0486bf53534863a3a9ae",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「block-test-file-deletion にリダイレクト先チェックを追加 — リダイレクト解禁で可能になる `> tests/foo.rs` 形式のテストファイル truncation を、redirect ターゲットのテストファイルパターン照合で block する (`SimpleCommand.redirect_texts` は既に取得済み)」"
+      }
+    },
+    {
+      "claim_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook本体は 2 行程度のシェルシムとし、`bin/sotp hook dispatch` の新しい hook 名 (例: `git-ref-update` / `git-pre-push`) へ exec する。判定ロジックは既存の Rust hook アーキテクチャ (domain 層 policy + usecase 層 dispatch) に乗せ"
+      }
+    },
+    {
+      "claim_hash": "7d7c91f153e23a5c5114849ef30506d873c963dbf5b4d99fa686c6f1cd6f620a",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reference-transaction` ... **`--no-verify` で迂回不可**; hook 本体は 2 行程度のシェルシムとし、`bin/sotp hook dispatch` の新しい hook 名 (例: `git-ref-update` / `git-pre-push`) へ exec する。"
+      }
+    },
+    {
+      "claim_hash": "25948e1710be84eca5290337a1dc843c6bc23a5fe10096f14f6db7acd3d08be0",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この単一通過点で子プロセス環境に `SOTP_GUARDED_GIT` を設定する。... それ以外 → block」"
+      }
+    },
+    {
+      "claim_hash": "cc2139d7f6694f0d9d5d3fd7c19ea2702e2b2a3fc7683e9a7d2ff74f522d7c5a",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Bash コマンド文字列に `SOTP_GUARDED_GIT` (exact match) が含まれていたら block` … `スキャンは raw コマンド文字列と quote-strip 済み argv トークンの**両方**に適用する`"
+      }
+    },
+    {
+      "claim_hash": "7e8945ac787196fa62bd038e60d604a835432be800945b753cb271592b949805",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `env` 無条件 block\n- `$` / バッククォート展開 block (`command_contains_expansion`、`2026-03-11-0080` Decision 2)\n- `has_output_redirect` 一括 block — `>`, `>>`, `>|`, `<>`, `2> file` の解禁\n- `FILE_WRITE_COMMANDS` (`tee`) と `sed -i` チェック — CON-07 の file-lock 保護という存在理由が消滅しているため。"
+      }
+    },
+    {
+      "claim_hash": "f46e0d28bbe82de74971a2ce0e9c4d26045f5262e2949395040a5e83d168b262",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「直接 git サブコマンドチェック」; 「`bin/sotp` 上書き検出」"
+      }
+    },
+    {
+      "claim_hash": "9698b63a579952a972e71fa6d33c6bef7ee947d33b1bc15ac2951cac78b1d6b2",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `block-test-file-deletion` にリダイレクト先チェックを追加 — リダイレクト解禁で可能になる `> tests/foo.rs` 形式のテストファイル truncation を、redirect ターゲットのテストファイルパターン照合で block する (`SimpleCommand.redirect_texts` は既に取得済み)。"
+      }
+    },
+    {
+      "claim_hash": "48f9ad7521d17ab8ead7abe3f54f36f2d910e7fb86543a8b8e2fae92ad8a6b40",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D5: `permissions.deny` は拡張しない ... 既存の `permissions.deny` と `FORBIDDEN_ALLOW` は現状維持。"
+      }
+    },
+    {
+      "claim_hash": "787e541b5cbb0946d72f7f95d22ab2d2965d37577f27c17675cbd559c21ad496",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reason 文字列を stdout ではなく stderr へ書き出す。"
+      }
+    },
+    {
+      "claim_hash": "7c051808e4a8e06b64942acfb5aaf56783c8c7dd7b8168a0e9ed5b84f4c24118",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1. **setup**: `cargo make bootstrap` / `/track:setup` が `git config core.hooksPath .githooks` を設定する。"
+      }
+    },
+    {
+      "claim_hash": "bb25288c6966ab995757e46ee2b5db3842d5683f415ef174cdaf863e1d6103c7",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CI verify: `bin/sotp verify` 系サブコマンドが設定値を検査し、未設定 / 不一致なら `cargo make ci` を fail させる。"
+      }
+    },
+    {
+      "claim_hash": "f26ecf1fc46bc90785b972175a3946bc966a5164c296ba5bb73db17a0a453cba",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`core.hooksPath` が未設定だと git hooks 層は不在になる。... 3. **runtime fail-closed**: `block-direct-git-ops` フックが実行時に `core.hooksPath` 未設定を検知したら git コマンドを block する"
+      }
+    },
+    {
+      "claim_hash": "7519fc4ae90ad353e56d50d0f1e8cc33716139ce851b88c621e1820dfabb6c70",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `has_output_redirect` 一括 block — `>`, `>>`, `>|`, `<>`, `2> file` の解禁 (`2>&1` / `1>&2` の FD 複製は従来から block されていない)。\n- `FILE_WRITE_COMMANDS` (`tee`) と `sed -i` チェック — CON-07 の file-lock 保護という存在理由が消滅しているため。`knowledge/conventions/bash-write-guard.md` は本決定に合わせて改訂する。"
+      }
+    },
+    {
+      "claim_hash": "50994b8a6365f97bd2e11a9cb8da431ab4b472a32f3260b6dc01e5be96c54951",
+      "evidence_hash": "5617151898dc4ca012321f3e390cba5c9153e314a3dcae712b153460dfbc2b1e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「維持する (誤発火ゼロかつ根拠が生きている精密チェック)」および「追加する: - D3 のトークンキーワードスキャン。」"
+      }
+    }
+  ]
+}

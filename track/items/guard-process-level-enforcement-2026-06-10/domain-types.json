@@ -1,0 +1,342 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "HookName": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "BlockDirectGitOps",     "payload": { "kind": "unit" } },
+          { "name": "BlockTestFileDeletion", "payload": { "kind": "unit" } },
+          { "name": "GitRefUpdate",          "payload": { "kind": "unit" } },
+          { "name": "GitPrePush",            "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook::types",
+      "docs": "Names of security-critical hooks dispatched via Rust. GitRefUpdate and GitPrePush variants added (D1/CN-08) for the new process-level git hook shims.",
+      "spec_refs": [
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-01",
+          "hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36"
+        },
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "CN-08",
+          "hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "HookContext": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "project_dir", "ty": "Option<std::path::PathBuf>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "hook::types",
+      "docs": "Context for hook execution. No change in this track; carried for contract-map edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookInput": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "tool_name",  "ty": "String" },
+            { "name": "command",    "ty": "Option<String>" },
+            { "name": "file_path",  "ty": "Option<std::path::PathBuf>" },
+            { "name": "content",    "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "hook::types",
+      "docs": "Framework-free hook input extracted from Claude Code hook JSON. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookVerdict": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "decision", "ty": "Decision" },
+            { "name": "reason",   "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "hook::verdict",
+      "docs": "Verdict returned by a HookHandler. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Input",       "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "Guard",       "payload": { "kind": "tuple", "fields": ["ParseError"] } },
+          { "name": "Unsupported", "payload": { "kind": "tuple", "fields": ["HookName"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook::error",
+      "docs": "Errors that can occur during hook dispatch. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SimpleCommand": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "argv",               "ty": "Vec<String>" },
+            { "name": "redirect_texts",     "ty": "Vec<String>" },
+            { "name": "has_output_redirect", "ty": "bool" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "guard::types",
+      "docs": "Pre-parsed simple command. No change in this track; carried for contract-map edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GuardVerdict": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "reason", "ty": "String" }
+          ],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "guard::verdict",
+      "docs": "Verdict returned by policy::check_commands. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ParseError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NestingDepthExceeded",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "depth", "ty": "u8" }
+              ]
+            }
+          },
+          { "name": "UnmatchedQuote", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "guard::verdict",
+      "docs": "Parse error from shell command parsing. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "ShellParser": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "split_shell",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "&str" }
+          ],
+          "returns": "Result<Vec<SimpleCommand>, ParseError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "guard::port",
+      "docs": "Secondary port for shell command parsing. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "domain::guard::policy::check_commands": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "commands", "ty": "&[SimpleCommand]" }
+      ],
+      "returns": "GuardVerdict",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Checks pre-parsed simple commands against the guard policy. Modified: (1) D3/IN-03: adds SOTP_GUARDED_GIT exact-match keyword scan over quote-stripped argv tokens (SimpleCommand.argv elements); the raw command string scan for the same keyword is performed by GuardHookHandler (usecase layer) before calling this function, since SimpleCommand does not carry the original raw string; (2) D4/IN-04: removes env unconditional block, command_contains_expansion, has_output_redirect blanket block, FILE_WRITE_COMMANDS (tee), and sed -i check. Retained: direct git subcommand checks, launcher stripping, is_bin_sotp_overwrite, and the new redirect-target test-file pattern check delegated to block-test-file-deletion (CN-07/IN-05).",
+      "spec_refs": [
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-03",
+          "hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c"
+        },
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-04",
+          "hash": "cec995b90aa42a289820e3e0fc656b50b9fff7f7c7b6c4bc39d3747bee3e16aa"
+        },
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-05",
+          "hash": "6c3a9e6a1d3cddf85dfec5684c7960eabd163f25bd69f2cd17692483d2b84f68"
+        },
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "CN-05",
+          "hash": "c0a6c0920838b474799c9b0a218c4f0296a94ac6552e95da3d68b4e6fd200af1"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "domain::guard::policy::block_on_parse_error": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "err", "ty": "&ParseError" }
+      ],
+      "returns": "GuardVerdict",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Converts a parse error into a fail-closed block verdict. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookName"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookName"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "HookName"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "HookName"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "HookName"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookContext"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookContext"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookInput"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookInput"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "HookError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "HookError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<ParseError>",
+      "for_type": "HookError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ParseError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GuardVerdict"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SimpleCommand"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SimpleCommand"
+    }
+  ]
+}

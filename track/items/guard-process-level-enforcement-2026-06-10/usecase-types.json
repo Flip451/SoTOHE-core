@@ -1,0 +1,420 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "HookDispatchCommand": {
+      "action": "reference",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "tool_name",  "ty": "String" },
+            { "name": "command",    "ty": "Option<String>" },
+            { "name": "file_path",  "ty": "Option<std::path::PathBuf>" },
+            { "name": "content",    "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "hook_dispatch",
+      "docs": "CQRS command object for the hook dispatch use case. No change in this track; carried for contract-map edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookVerdictDecision": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Allow", "payload": { "kind": "unit" } },
+          { "name": "Block", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook_dispatch",
+      "docs": "Enum representing the hook verdict outcome at the usecase boundary. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookVerdictOutput": {
+      "action": "reference",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "decision", "ty": "HookVerdictDecision" },
+            { "name": "reason",   "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "hook_dispatch",
+      "docs": "DTO returned by the hook dispatch service to the CLI. No change in this track; carried for contract-map edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookDispatchError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "UnknownHookName", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "HandlerFailed",   "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook_dispatch",
+      "docs": "Error type for HookDispatchService. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookDispatchInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "hook_dispatch",
+      "docs": "Concrete struct implementing HookDispatchService. Modified in this track (CN-08/D1/T002/T006): resolve_handler gains git-ref-update and git-pre-push arms that instantiate GitRefUpdateHandler and GitPrePushHandler. Constructor gains two new injected flags: guarded_git_token_present (bool, from CLI composition std::env::var check, used by GitRefUpdateHandler/GitPrePushHandler) and hooks_path_configured (bool, from CLI composition git-config read, used by GuardHookHandler runtime fail-closed). Private implementation fields carry these flags.",
+      "spec_refs": [
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "CN-08",
+          "hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "GitRefUpdateHandler": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "hook",
+      "docs": "Hook handler for the git-ref-update hook (reference-transaction git hook shim). Returns allow if the injected guarded_git_token_present flag is true (CLI composition root reads SOTP_GUARDED_GIT env-var and injects the result); returns block with remediation message otherwise (CN-02). The usecase handler never calls std::env::var directly. Private field: guarded_git_token_present: bool.",
+      "spec_refs": [
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-01",
+          "hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36"
+        },
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "CN-08",
+          "hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "GitPrePushHandler": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "hook",
+      "docs": "Hook handler for the git-pre-push hook (pre-push git hook shim). Returns allow if the injected guarded_git_token_present flag is true (CLI composition root reads SOTP_GUARDED_GIT env-var and injects the result); returns block with remediation message otherwise (CN-02). The usecase handler never calls std::env::var directly. Private field: guarded_git_token_present: bool.",
+      "spec_refs": [
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-01",
+          "hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36"
+        },
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "CN-08",
+          "hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "GuardHookHandler": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "parser", "ty": "std::sync::Arc<dyn domain::guard::ShellParser>" }
+          ],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "hook",
+      "docs": "Guard hook handler for block-direct-git-ops. Modified in this track in two ways: (1) T001/IN-03 stage (a): handle scans the raw HookInput.command string for SOTP_GUARDED_GIT (exact match) before calling check_commands, and returns block early if the token is found — SimpleCommand does not carry the raw string, so this scan must happen at the usecase layer; (2) T006/CN-06: gains a hooks_path_configured: bool private field injected by HookDispatchInteractor, used to implement runtime fail-closed behavior — when hooks_path_configured is false and a git command is detected, handle returns block before checking normal policy. Private fields: hooks_path_configured: bool.",
+      "spec_refs": [
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-03",
+          "hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c"
+        },
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "CN-06",
+          "hash": "49581e4cc6d56f7e4b8ff2c66aacc1f6a55185986261b9fe20b6332d4977ee4c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TestFileDeletionGuardHandler": {
+      "action": "reference",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "parser", "ty": "std::sync::Arc<dyn domain::guard::ShellParser>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "hook",
+      "docs": "Test-file deletion guard handler. Body of handle gains redirect-target test-file pattern matching (CN-07/IN-05) but struct fields and HookHandler::handle signature are unchanged. action=reference is correct: B==C at rustdoc level.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "HookDispatchService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "dispatch",
+          "receiver": "&self",
+          "params": [
+            { "name": "hook_name", "ty": "String" },
+            { "name": "command",   "ty": "HookDispatchCommand" }
+          ],
+          "returns": "Result<HookVerdictOutput, HookDispatchError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "hook_dispatch",
+      "docs": "Application service trait for the hook dispatch use case. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookShellParserPort": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "split_shell",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "&str" }
+          ],
+          "returns": "Result<Vec<domain::guard::SimpleCommand>, domain::guard::ParseError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "hook_dispatch",
+      "docs": "Usecase-owned secondary port for faithful shell command parsing. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookHandler": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            { "name": "ctx",   "ty": "&domain::hook::HookContext" },
+            { "name": "input", "ty": "&domain::hook::HookInput" }
+          ],
+          "returns": "Result<domain::hook::HookVerdict, domain::hook::HookError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "hook",
+      "docs": "Port for individual hook logic. No change in this track; carried so that GitRefUpdateHandler and GitPrePushHandler impl edges are visible.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "usecase::hook::dispatch": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "_name",   "ty": "domain::hook::HookName" },
+        { "name": "handler", "ty": "&dyn HookHandler" },
+        { "name": "ctx",     "ty": "&domain::hook::HookContext" },
+        { "name": "input",   "ty": "&domain::hook::HookInput" }
+      ],
+      "returns": "Result<domain::hook::HookVerdict, domain::hook::HookError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Free function that delegates to a HookHandler. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "HookDispatchInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "parser_port",               "ty": "std::sync::Arc<dyn HookShellParserPort>" },
+            { "name": "project_dir",               "ty": "Option<std::path::PathBuf>" },
+            { "name": "guarded_git_token_present", "ty": "bool" },
+            { "name": "hooks_path_configured",     "ty": "bool" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookDispatchCommand"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookDispatchCommand"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookVerdictOutput"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookVerdictOutput"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "HookVerdictOutput"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "HookVerdictOutput"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookDispatchError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "HookDispatchError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "HookDispatchError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "HookDispatchService",
+      "for_type": "HookDispatchInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "HookHandler",
+      "for_type": "GitRefUpdateHandler"
+    },
+    {
+      "action": "add",
+      "trait_ref": "HookHandler",
+      "for_type": "GitPrePushHandler"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "HookHandler",
+      "for_type": "GuardHookHandler"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "HookHandler",
+      "for_type": "TestFileDeletionGuardHandler"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "branch": "track/guard-process-level-enforcement-2026-06-10",
+  "created_at": "2026-06-10T16:53:59Z",
+  "id": "guard-process-level-enforcement-2026-06-10",
+  "schema_version": 5,
+  "title": "git 書き込みガードの enforcement を git hooks 層へ移行する",
+  "updated_at": "2026-06-10T16:53:59Z"
+}

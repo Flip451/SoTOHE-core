@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "03690cd945538cb49e7ad2a6152a995c2ccf89e8f7cd1f3116d4aca8352a55a0",
+  "signals": [
+    {
+      "type_name": "GitError",
+      "signal": "blue",
+      "entry_hash": "f32f3d833a976db70bac3e3db2f3a5f307d073cef757e764dcfbd396b3136c66"
+    },
+    {
+      "type_name": "SystemGitRepo",
+      "signal": "blue",
+      "entry_hash": "9fcc86acbab1ed1185d459b15b0f450eabf753dfb99ec605fe49f01baad98678"
+    },
+    {
+      "type_name": "TrackBranchRecord",
+      "signal": "blue",
+      "entry_hash": "b8298b9e0fb90ea1332039db6b063f3b8e32ae3cfafa2b3dd99bb178dad7fe0b"
+    },
+    {
+      "type_name": "infrastructure::git_cli::collect_track_branch_claims",
+      "signal": "blue",
+      "entry_hash": "655b6898520d8b92b40001cc097a98524db6dcb4ef6f372908e033bff45e0ba6"
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch",
+      "signal": "blue",
+      "entry_hash": "63fa78c53f3a3b2c540e9bcebf16d27a7c850ef03a3e29db0d32a706fc910f7f"
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch_from_items_dir",
+      "signal": "blue",
+      "entry_hash": "396c9d0b328c32df7bd1ea7d70a7e7f06d7a1efde51962222d3fe2c960ca1380"
+    },
+    {
+      "type_name": "infrastructure::git_cli::resolve_repo_path",
+      "signal": "blue",
+      "entry_hash": "de9ac9d70138f616b2585c925216cedf5bf7df616f0d63339fda58fd84eacf2d"
+    },
+    {
+      "type_name": "infrastructure::verify::hooks_path::verify",
+      "signal": "blue",
+      "entry_hash": "a02cd2d97d7d3f902d1b7067b588725d4403523d186ac1e57db02c5e15249b9d"
+    }
+  ]
+}

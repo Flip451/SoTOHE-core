@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-11T01:13:47Z",
+  "declaration_hash": "03690cd945538cb49e7ad2a6152a995c2ccf89e8f7cd1f3116d4aca8352a55a0",
+  "signals": [
+    {
+      "type_name": "infrastructure::verify::hooks_path::verify",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "GitError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SystemGitRepo",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackBranchRecord",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::collect_track_branch_claims",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch_from_items_dir",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::resolve_repo_path",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

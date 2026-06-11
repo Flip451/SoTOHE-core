@@ -1,0 +1,413 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f619ce0abe18ff0b95fdadafc0afbcd7c076df3e90fdd19aacf33c8926cb883",
+          "at": "2026-06-10T17:11:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR overclaims that git-hook enforcement closes the external-subprocess gap for all nested paths: this line says heredoc/find-exec/multi-nesting/external subprocess routes are captured whenever git starts, but the same ADR later admits `git add` and non-ref worktree mutations are not captured by git hooks and remain a residual risk when invoked through external subprocesses. That contradiction matters because the design intent is process-level enforcement of raw git writes, while index/worktree writes still depend only on the Claude Code hook path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
+              "line": 173,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0f619ce0abe18ff0b95fdadafc0afbcd7c076df3e90fdd19aacf33c8926cb883",
+          "at": "2026-06-10T17:15:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR overstates the fallback coverage provided by the retained Claude Code hook checks. D1 says plain `git checkout <branch>` would still be covered if `reference-transaction` misses it, and the Negative section says `git checkout -- <path>` and `git clean -f` are covered by the D4-maintained direct checks, but D4 only retains checks for add/commit/push/switch/merge/rebase/cherry-pick/reset/branch delete/checkout -b. This makes the residual-risk model internally inconsistent; either those operations need to be included in D4 or described as uncovered residuals.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
+              "line": 73,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5173faa83e38ee48ae79a9f930c2929ed9f65ac7fe003281131999d9275baa1b",
+          "at": "2026-06-10T17:17:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4e4a8b831060709b210a5c8baf9f88bdc67658f5391fef26ff3a48a42b63ce1",
+          "at": "2026-06-10T17:22:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is scoped as domain-only here, but the same task text explicitly pushes the redirect-target test-file check into `TestFileDeletionGuardHandler` / usecase-side logic. That makes the layer boundary inconsistent and understates the actual files that need to change.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 15,
+              "category": "contradiction"
+            },
+            {
+              "message": "T002 says the new git-ref-update / git-pre-push handlers should determine `SOTP_GUARDED_GIT` by inspecting `HookInput.command` raw text, but the surrounding requirement says the decision is env-var presence only. The raw command string is not the token source, so following this text literally would implement the wrong gate and can make the hook block everything.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 25,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1853e11371ba527b0c5fae3572aa743501f2b00f719913ae252948ab53b83431",
+          "at": "2026-06-10T23:35:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 gives two mutually exclusive instructions for the hooks-path read path: it says not to use `Command::new(\"git\")` to read `core.hooksPath`, then immediately says to use `Command::new(\"git\").args([\"config\", \"--local\", \"core.hooksPath\"])` directly. The task needs one explicit implementation route, otherwise the verify step is ambiguous.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 41,
+              "category": "contradiction"
+            },
+            {
+              "message": "T005 overstates the stderr fix by requiring that no `CommandOutcome.stdout`→`println!` path remain in the hook CLI at all. D6 only moves the block-verdict reason to stderr; the requirement should be narrowed to the block branch so the dispatcher does not lose non-block stdout paths.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 49,
+              "category": "contradiction"
+            },
+            {
+              "message": "T009 is internally inconsistent about the CI gate set: the section header and S4 add `verify-hooks-path` to CI, but the concrete task text omits it from the list of gates to run and verify. That leaves the final validation step not actually covering the new gate it introduced.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 81,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e6c5c682f7247c367ac6d5207d172ab688ea669aa6b46f901deaf647c9d7df91",
+          "at": "2026-06-10T23:41:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002` is not executable as written: it tells `HookDispatchInteractor::resolve_handler` to return `Box::new(GitRefUpdateHandler)` and `Box::new(GitPrePushHandler)`, but the type catalogue marks both handlers as having stripped/private fields and documents a required `parser: Arc<dyn ShellParser>` dependency. The plan needs an explicit constructor or wiring step for that dependency; otherwise the new handlers cannot be instantiated.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:177b446e621be59fca44891359d078e91f62d23bdb6948c9fc65dba159741f9d",
+          "at": "2026-06-10T23:48:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e3df412a71f6e81ce634c6593fff4afbab8963c6bef7bee8be2b6389ffcb853",
+          "at": "2026-06-10T23:53:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 places the token check directly inside the usecase handlers via `std::env::var(\"SOTP_GUARDED_GIT\")`. That conflicts with the hexagonal/usecase-purity contract referenced by this scope: usecase interactors should not read process environment directly, so the plan should route the token presence through CLI input or a port/adapter boundary instead of implementing env access in `GitRefUpdateHandler` / `GitPrePushHandler`.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 25,
+              "category": "architecture violation"
+            },
+            {
+              "message": "T006 assigns the runtime `core.hooksPath` check to `libs/domain/src/guard/policy.rs` or a usecase handler and explicitly suggests `std::process::Command::new(\"git\")` there. That places process I/O and git-config access in inner layers rather than behind a trait/infrastructure adapter, so the plan violates the repository's hexagonal boundary and will steer implementation toward a usecase/domain purity failure.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 57,
+              "category": "architecture violation"
+            },
+            {
+              "message": "The domain catalogue says `HookName` is a `modify` item that must gain `GitRefUpdate` and `GitPrePush`, but T002 says those variants are already present and no task actually performs the domain enum modification. This is an internal plan/catalogue contradiction that can leave the dispatch tasks without the required domain hook names.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e3df412a71f6e81ce634c6593fff4afbab8963c6bef7bee8be2b6389ffcb853",
+          "at": "2026-06-10T23:57:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The type catalogue leaves `HookDispatchInteractor::new` with only `parser_port` and `project_dir`, but the implementation plan requires `guarded_git_token_present` in T002 and `hooks_path_configured` in T006 to be injected through this constructor. As written, the catalogue contract cannot carry the state that both new git hook handlers and runtime fail-closed behavior depend on, so implementers would have to either violate the catalogue or skip required behavior.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/usecase-types.json",
+              "line": 297,
+              "category": "contradiction"
+            },
+            {
+              "message": "`check_commands` is still declared as taking only `&[SimpleCommand]`, while the same entry says it will scan the raw command string and AC-03 requires raw Bash command strings such as `SOTP_GUARDED_GIT=1 git commit` to be blocked by `check_commands`. `SimpleCommand` carries argv/redirects but not the original raw command, so this contract cannot satisfy the raw-string scan unless the signature changes or the raw scan is moved to another handler and the spec/catalogue text is aligned.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/domain-types.json",
+              "line": 207,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The new `GitRefUpdateHandler` catalogue text says it checks `SOTP_GUARDED_GIT` env-var presence, mentions `CN-06 fail-closed if hooks path unset`, and says it does so \"via policy\". That contradicts the spec/plan: T002 says CLI composition reads the env var and injects a boolean, and CN-06 is the separate `block-direct-git-ops` runtime hooksPath fail-closed behavior from T006. This points the handler at the wrong responsibility and layer boundary.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/usecase-types.json",
+              "line": 116,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9480ee38e06dbe010016a1085dd620de712b61b7930da21ea5bb880081932db2",
+          "at": "2026-06-11T00:06:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 requires `HookDispatchInteractor` to inject `hooks_path_configured` into `GuardHookHandler` so `handle` can fail closed when hooksPath is missing, but the usecase catalogue declares `GuardHookHandler` as `action: reference`, with only the `parser` field and “No structural change”. Following the catalogue leaves no planned field/constructor change to carry the injected flag, making CN-06/AC-11 unimplementable without an unplanned catalogue revision.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/usecase-types.json",
+              "line": 159,
+              "category": "contradiction"
+            },
+            {
+              "message": "T002’s implementation plan says the new `GitRefUpdateHandler` / `GitPrePushHandler` catalogue docs declare `Private field: parser: Arc<dyn ShellParser>` and instructs construction like `GuardHookHandler`, but the actual catalogue documents `Private field: guarded_git_token_present: bool` for those handlers. This contradicts the intended token-only handler design and can send implementation toward adding an unused parser dependency instead of the required injected token flag.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3a99924f04d771f27d7d40ef8d9232c09053a6f615c06553577c0b1bb32b7788",
+          "at": "2026-06-11T00:11:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-03 assigns both the raw Bash command string scan and the quote-stripped argv scan to `policy.rs`, but T001 later says raw command strings must be scanned in `GuardHookHandler` before `check_commands` because `SimpleCommand` does not retain the raw string, with only argv scanning left in `domain::guard::policy::check_commands`. These are conflicting implementation contracts for the same requirement; following the spec literally pushes raw-string handling into a function that lacks the needed input, while following the plan means IN-03 is misstated. Align the spec/AC wording with the two-stage layer split before implementation.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.md",
+              "line": 22,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-03 states that token injection outside the Rust binary is structurally prevented, but the ADR's D2 explicitly preserves a human escape hatch where a person may run `SOTP_GUARDED_GIT=1 git ...` directly from their terminal. Both cannot be true as written: the design can prevent Claude Code Bash inline injection via D3, but it cannot also structurally prevent all non-Rust token presentation while allowing human self-presentation. Narrow CN-03 to the automatic/AI-controlled injection path or update the ADR escape hatch.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.md",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b84b0132aa7a224f4acd2aa7b49edfdcd18294a8db8d8506d27b82e3f155e7a6",
+          "at": "2026-06-11T00:16:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 adds `verify-hooks-path` to `cargo make ci` and defines an unset or non-`.githooks` `core.hooksPath` as a CI failure, but the plan does not add the setup step that configures `core.hooksPath .githooks` until T006. That ordering makes the T004 commit unable to satisfy the plan’s per-task CI-green expectation on a fresh checkout or CI runner without local git config. Move the setup before the CI gate, or defer wiring the gate into `ci` until the setup task lands.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 43,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-08 says `apps/cli/src/commands/hook.rs` should not `println!` `CommandOutcome.stdout`, but T005 says the change is limited to the block verdict and that allow or other non-block stdout paths must remain unchanged. Those are conflicting implementation contracts for the CLI output path; narrow AC-08 to the block-verdict reason path so implementers do not remove legitimate stdout handling globally.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.md",
+              "line": 58,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:236cc042cf37b5b4af8caf4d496d2ef69ba4c35b7074f854a9f1edd1ff631ad8",
+          "at": "2026-06-11T00:20:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is scheduled before T006, but the task both adds `verify-hooks-path` to the CI gate and says that CI integration must wait until T006-A has added the bootstrap `core.hooksPath` setup. Implementing T004 as written breaks per-task `cargo make ci` on a fresh checkout; deferring the gate means T004 does not satisfy IN-09/AC-10. Split the verify implementation from CI wiring, or move the bootstrap setup before the gate is enabled.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 43,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T007 treats `chmod +x` and `gitattributes` as equivalent ways to guarantee executable hook shims. Git attributes do not set the executable bit for hooks; if the implementation follows that branch, `.githooks/reference-transaction` or `.githooks/pre-push` may be present but not executable, so Git will not run the enforcement hook. Require an executable index mode and/or an explicit bootstrap `chmod +x` step instead.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 68,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:11a2fbe731f3be096514d72d11002e9c953203a0e6716c016d8bc3cea83188d7",
+          "at": "2026-06-11T00:26:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 says the SOTP_GUARDED_GIT injection model relies on `libs/infrastructure/src/git_cli/` as the single `Command::new(\"git\")` passage point for sotp-originated git calls, but T004 explicitly adds a second direct `std::process::Command::new(\"git\")` path for `git config --local core.hooksPath` and treats it as an allowed residual; T006 repeats the same direct CLI-composition git call. That makes the single-passage constraint semantically false unless the spec/ADR is narrowed to write-only git calls or these read-only hooksPath reads are modeled as an explicit exception/adapter.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-03/T001 assign the raw `SOTP_GUARDED_GIT` command-string scan to `GuardHookHandler`, but the usecase type catalogue describes `GuardHookHandler` as modified only for T006/CN-06 runtime fail-closed and only references CN-06. The catalogue therefore contradicts the spec/plan about this handler's usecase-layer responsibility, so a catalogue-driven implementation can miss the raw token scan even though the spec requires it.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/usecase-types.json",
+              "line": 174,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0d4a64b554783a00cd31bfb67d7a5eea5ec59340b09c5dcc908ddc6ff9462999",
+          "at": "2026-06-11T00:37:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-10 is mapped only to T004, but T004 explicitly stops short of wiring the hooks-path verifier into ci-local and defers that CI gate to T006. The plan itself describes T006 as the task that adds `verify-hooks-path-local` to the ci-local dependency chain, so the current coverage lets the D7 CI-verify layer appear covered before the task that actually makes CI fail on bad `core.hooksPath` runs. Add T006 to the AC-10/IN-09 coverage, or move the CI wiring into T004 and align the plan text.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/task-coverage.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b6c89556763953c5ffa62669b67732330d5a503835776f528de98ef196842414",
+          "at": "2026-06-11T00:42:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 configures `core.hooksPath=.githooks` and treats `hooks_path_configured == true` as disabling the runtime fail-closed block before T007 creates the actual `.githooks/reference-transaction` and `.githooks/pre-push` shims. That leaves an intermediate state where verify can pass and GuardHookHandler will not fail closed, while the git hook files still do not exist, contradicting the stated guarantee that runtime fail-closed protects when the git hooks layer is absent. Reorder T007 before T006, or make the T006 check/flag require the hook files to exist and be executable before considering the hooks layer configured.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 59,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6196734a781830221a6f9cae1dbb27762e6b1e421190ba516aaf21ce04a74b99",
+          "at": "2026-06-11T00:46:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated task order is internally infeasible: S6/T006 is listed before S7/T007, but S6 explicitly says T006 depends on T007 and must run after the `.githooks/reference-transaction` and `.githooks/pre-push` files exist. Following the plan top-to-bottom would create the exact unprotected window the plan says must be avoided. Reorder T007 before T006 or split the bootstrap/CI wiring so the declared dependency order is executable.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 52,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-03 assigns `SOTP_GUARDED_GIT` Bash command-string blocking to `policy.rs::check_commands`, but IN-03 says raw command strings must be scanned in usecase `GuardHookHandler` before `check_commands` because `SimpleCommand` does not retain raw text; `check_commands` only scans quote-stripped argv tokens. As written, the acceptance criterion contradicts the layer split and could drive an API/layering violation. Split AC-03 into raw-string coverage for `GuardHookHandler` and argv-token coverage for `policy.rs::check_commands`.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.md",
+              "line": 53,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a786736541d6eceaad58120ab4a3c5ebde30adaf117250195e5dd6b367db32",
+          "at": "2026-06-11T00:50:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 adds `verify-hooks-path-local` to `ci-local` while instructing the bootstrap change to add `git config core.hooksPath .githooks` only after the existing Step 5. The current bootstrap flow runs `ci-local` before that point, so a fresh `cargo make bootstrap` would execute the new hooks-path verifier before `core.hooksPath` is configured and fail. Move the hooksPath setup before the bootstrap CI step, or defer the CI gate until after that setup has run.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 69,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:81ae09ac4e4403c70109107da5c6949e351e952181bf0aa4f10a93f2966a8769",
+          "at": "2026-06-11T00:55:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 still says the external-subprocess gap is structurally resolved, but the ADR narrows that closure to ref-updating operations and explicitly leaves `git add` and non-ref worktree mutations via external subprocess as residual risks. That contradiction overstates the feature goal and can make the plan appear to satisfy a class of raw git writes it intentionally does not cover; narrow GO-01 to the ref-update/push gap or record the residual classes here too.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3d58667b798870b6c1f067ee0dda8537aaadaf683e242422b707176c1dda9dd8",
+          "at": "2026-06-11T00:59:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 says that if `reference-transaction` does not catch `git switch` / `git checkout <branch>` HEAD symbolic-ref changes, the D4-maintained direct git subcommand check will cover direct invocations. But D4's maintained list only includes `checkout -b`, and the implementation plan/ACs likewise never require blocking `git checkout <existing-branch>`. If the implementation-time verification finds the hook does not fire for this case, the plan has no task or acceptance criterion to add the promised fallback, leaving a direct branch checkout outside the stated guard coverage. Either include `checkout <branch>` in the maintained direct checks/tests or weaken D1 to record it as residual risk.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
+              "line": 73,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f1309f75dd81cfe906d7ef0830b4e267e0842eed3fa86328c4b4fa683142db97",
+          "at": "2026-06-11T01:03:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1 says existing-branch switching is not covered by the retained D4 direct git subcommand checks, but D4/spec/AC-05 explicitly retain `git switch` as a direct command that must be blocked. This leaves the plan internally inconsistent about whether AI `git switch`/existing branch switching is a protected direct-check path or an accepted residual risk if `reference-transaction` misses the HEAD symbolic-ref change.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
+              "line": 73,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:00eb190fc2ae72a0e788e02b3b2d800796f4e341019a27d7195668f073c189c4",
+          "at": "2026-06-11T01:07:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a83d43f177acbd13a82b1d5c81cf65120cc5dc71b9a51519f9a1e38f0ca21731",
+          "at": "2026-06-11T01:11:39Z"
+        }
+      ]
+    }
+  }
+}

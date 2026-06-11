@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "fa94c12b4b2ea3cff9a7123d986d2b89a881249cb97035180dfc7e45a33527aa",
+      "evidence_hash": "cd714c29d4a10e0494c5ded206f3369ab4ff2cb5431e59c7f5c426999f6b22ab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin/sotp verify サブコマンド（または新規サブコマンド）が core.hooksPath の設定値を検査し、未設定または .githooks 以外に設定されている場合に cargo make ci を fail させる（D7 の CI verify 層）"
+      }
+    },
+    {
+      "claim_hash": "a02cd2d97d7d3f902d1b7067b588725d4403523d186ac1e57db02c5e15249b9d",
+      "evidence_hash": "cd714c29d4a10e0494c5ded206f3369ab4ff2cb5431e59c7f5c426999f6b22ab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin/sotp verify サブコマンド（または新規サブコマンド）が core.hooksPath の設定値を検査し、未設定または .githooks 以外に設定されている場合に cargo make ci を fail させる（D7 の CI verify 層）"
+      }
+    }
+  ]
+}
