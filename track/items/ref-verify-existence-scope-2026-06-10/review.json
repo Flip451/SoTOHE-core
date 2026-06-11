@@ -1,6 +1,46 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_ref_verify_run_phase0_no_artifacts_exits_zero` is not hermetic: it does not put a fake `claude` binary on `PATH`, so if the zero-pair assumption regresses the test can escape to a host-installed verifier instead of failing deterministically. Keep the external verifier mocked even for the phase-0 case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/ref_verify.rs",
+              "line": 955,
+              "category": "testing"
+            },
+            {
+              "message": "`test_ref_verify_check_approved_phase0_no_artifacts_exits_zero` only checks `exit_code == 0`; it does not assert the user-visible success message that identifies the intended `No production reference pairs found` path. That leaves a coverage gap where a different success path could regress without this test failing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/ref_verify.rs",
+              "line": 984,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7d9627ae6ff100e6bc9c0ac80aee5d339a2fdfa57c4ceb03a65c6cb5c638ad46",
+          "at": "2026-06-10T17:23:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45e4a8a36bc572efc28ebe733bae49c5bc061a9f602ae11fd655d3484f6c2707",
+          "at": "2026-06-10T17:33:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d29e624f0fd981bc41f02743974aeef4ecbcc7a78386db4dfaf18166107031d0",
+          "at": "2026-06-10T17:45:27Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -208,6 +248,24 @@
           "findings": [],
           "hash": "rvw1:sha256:61afd416f86824b4a79b564cf28a737ee3dbbab5ecd53886b9b235570ec11f67",
           "at": "2026-06-11T00:10:46Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fc06e78bb71454a8a5186096ddfaec1bbe68c1708f7c2e031af4c4d71e16a4e",
+          "at": "2026-06-10T17:22:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fc06e78bb71454a8a5186096ddfaec1bbe68c1708f7c2e031af4c4d71e16a4e",
+          "at": "2026-06-10T17:44:43Z"
         }
       ]
     },
@@ -424,64 +482,38 @@
           "findings": [],
           "hash": "rvw1:sha256:7b0f6da1f9452dc454128dfd55cd62c81aaaab694c76653c515c4cf09307c281",
           "at": "2026-06-10T17:44:57Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_ref_verify_run_phase0_no_artifacts_exits_zero` is not hermetic: it does not put a fake `claude` binary on `PATH`, so if the zero-pair assumption regresses the test can escape to a host-installed verifier instead of failing deterministically. Keep the external verifier mocked even for the phase-0 case.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/ref_verify.rs",
-              "line": 955,
-              "category": "testing"
-            },
-            {
-              "message": "`test_ref_verify_check_approved_phase0_no_artifacts_exits_zero` only checks `exit_code == 0`; it does not assert the user-visible success message that identifies the intended `No production reference pairs found` path. That leaves a coverage gap where a different success path could regress without this test failing.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/ref_verify.rs",
-              "line": 984,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:7d9627ae6ff100e6bc9c0ac80aee5d339a2fdfa57c4ceb03a65c6cb5c638ad46",
-          "at": "2026-06-10T17:23:52Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:45e4a8a36bc572efc28ebe733bae49c5bc061a9f602ae11fd655d3484f6c2707",
-          "at": "2026-06-10T17:33:21Z"
+          "hash": "rvw1:sha256:3e5312abcfdc9dce813ef41393f1f2025dfa899669031d4f428f2742243313a0",
+          "at": "2026-06-11T00:23:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d29e624f0fd981bc41f02743974aeef4ecbcc7a78386db4dfaf18166107031d0",
-          "at": "2026-06-10T17:45:27Z"
+          "hash": "rvw1:sha256:3e5312abcfdc9dce813ef41393f1f2025dfa899669031d4f428f2742243313a0",
+          "at": "2026-06-11T00:27:35Z"
         }
       ]
     },
-    "cli": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4fc06e78bb71454a8a5186096ddfaec1bbe68c1708f7c2e031af4c4d71e16a4e",
-          "at": "2026-06-10T17:22:11Z"
+          "hash": "rvw1:sha256:00fbe9d578c47ec56d7ec6987cc9124689ae406bb1beedaccc4b463afbbc22ae",
+          "at": "2026-06-11T00:25:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4fc06e78bb71454a8a5186096ddfaec1bbe68c1708f7c2e031af4c4d71e16a4e",
-          "at": "2026-06-10T17:44:43Z"
+          "hash": "rvw1:sha256:00fbe9d578c47ec56d7ec6987cc9124689ae406bb1beedaccc4b463afbbc22ae",
+          "at": "2026-06-11T00:27:50Z"
         }
       ]
     }
