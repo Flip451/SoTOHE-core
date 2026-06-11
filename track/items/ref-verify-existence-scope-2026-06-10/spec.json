@@ -1,0 +1,406 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "ref-verify のスコープ解決を artifact 存在ベースに一本化する — --context / --layer の削除と Phase 0 コミットゲート誤爆の解消",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "RefVerifyScopeResolver の artifact 存在ベース一本化によって、Phase 0（spec.json 不在）で bin/sotp ref-verify run を呼び出してもコミットゲートが通過できるようにする。これにより pre-track-adr-authoring が想定する「init 直後に ADR + metadata.json を review → commit する」標準フローが全新規トラックで機能する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "--context / --layer CLI 引数と RefVerifyInvocationContext 内部型を削除することで、発火面の申告とスコープ解決機構の二重化を解消し、bin/sotp ref-verify run 一形態に CLI 表面を簡素化する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "整合的な不在（spec.json 不在、catalogue 全不在）のみを skip とし、不整合な不在（部分 catalogue、catalogue 存在 + spec.json 不在、存在するが壊れた artifact）については fail-closed を維持する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "RefVerifyScopeResolver がスコープ（検証ペア集合）を、呼び出し元が申告するコンテキストからではなく track ディレクトリの SoT artifact 存在有無から導出する。spec.json 不在 → Chain① zero pairs（Chain② が zero pairs の場合と合わせてゲート通過）、catalogue 全不在 → Chain② zero pairs（既存挙動の追認）、両方存在 → 両 Chain",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "bin/sotp ref-verify run の CLI 引数から --context と --layer を削除する。RefVerifyInvocationContext 型および CommitGate / Standalone の各 variant を含む翻訳ロジックを削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "check-approved 内部の CommitGate コンテキスト固定呼び出しを削除し、引数なしの bin/sotp ref-verify run 一形態に統一する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "plan.md（Phase 1 / Phase 2 の first-line 発火面）、Makefile の track-commit-message における bin/sotp ref-verify run と bin/sotp ref-verify check-approved の両呼び出し、/track:ref-verify skill を --context / --layer なしの一形態 ref-verify run に簡素化する。track-active-gate は ref-verify を呼び出さないため変更対象外。Phase 2 の per-layer N 回実行を 1 回に削減する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "部分 catalogue（ある層だけ catalogue が存在し他の層は不在）の場合は fail とする。整合的な不在（全 catalogue 不在）のみ skip とし、部分的な存在は SoT Chain の不整合として fail-closed に扱う",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "catalogue が存在しているにもかかわらず spec.json が不在の場合は fail とする。SoT Chain の上下関係（spec → catalogue）違反として fail-closed に扱う",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "存在するが parse 不能（壊れた）artifact（spec.json / catalogue ファイル）は fail とする。artifact の存在確認後に読み込み・パース失敗が発生した場合は fail-closed に扱う",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "spec.json 不在時の zero pairs skip を SKIP 理由付きで標準出力に表示する。「spec.json が存在しないため Chain① をスキップ」という旨のメッセージを出力し、誤認（本来は fail になるべきところを誤って通過したと思わせる）を緩和する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "--context / --layer を維持したまま CommitGate arm の検証だけ緩和する実装（Rejected Alternative D）。最小修正として成立するが原則への準拠を徹底するなら削除が自然であるとして却下された",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "Makefile / シェル側で phase 判定して ref-verify を skip する実装（Rejected Alternative C）。ゲート挙動の判定ロジックが Rust resolver とシェルに分散し SSoT が壊れるため却下された",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "metadata.json への phase マーカー追加（Rejected Alternative B）。2026-04-27-0324-phase-aware-verify-gates.md で既に却下された anti-pattern（人工状態・形骸化リスク）であり再却下された",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "発火面ごとに検証の厳しさ（モデル tier、probe 率等）を変える仕組みの導入。その要求が実証された場合は context 引数の再導入を検討する（Reassess When 条件）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "一部レイヤーのみ catalogue を作る track 運用（部分 catalogue が正当な状態となる設計）の導入。その運用が導入されるときは fail-closed 判定（D3）の再設計が必要（Reassess When 条件）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "Chain 別 verifier capability / prompt template（2026-05-27-1601 D11）の変更。cache_scope で決まるため本トラックの変更の影響を受けない。probe 床ロジックもペア存在ベースのためそのまま機能する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+            "anchor": "D11"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "スコープ解決はトラックディレクトリの SoT artifact 存在チェックのみを根拠とする。呼び出しコンテキスト（CLI フラグ、環境変数、呼び出し元の識別子）を一切参照しない。これにより発火面に依存しない一意な挙動を保証する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "差分キャッシュ（(claim_hash, evidence_hash) ペアによる増分再レビュー）はスコープ解決機構（RefVerifyInvocationContext）とは独立した層として定義されており、スコープ解決の変更はこのキャッシュ層の契約に触れない。キャッシュキーの定義・凍結・再走トリガーの判定は変更後も D4 の定義通りに動作する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "各 Chain のスキップ可否は独立して判定する。spec.json 不在は Chain① のみを zero pairs にし、catalogue 全不在は Chain② のみを zero pairs にする。一方が skip でも他方が active であれば、active な Chain は通常どおり評価する。fail-closed が適用される不整合な状態は次の通り: 部分 catalogue（ある層だけ存在）、catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）、存在するが parse 不能な artifact。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "2026-05-27-1601 D9 の「専用 /track:ref-verify コマンド surface と差分キャッシュ」は本変更後も維持しなければならない。削除の対象は D9 内の「呼び出しコンテキストからのスコープ自動解決」部分のみであり、専用コマンド surface 自体は残す",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D9"
+        },
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "Phase 2 の ref-verify 発火は per-layer N 回実行から 1 回に簡素化してよい。1 回の bin/sotp ref-verify run で両 Chain の全ペアを一括評価する。差分キャッシュが再レビューを増分に限定するため、probe 本数は floor 2 本（Chain① 用 calibration probe 1 本 + Chain② 用 calibration probe 1 本）に減少する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "Phase 0（spec.json 不在、catalogue 不在）のトラックで bin/sotp ref-verify run を実行すると、Chain① と Chain② がともに zero pairs としてスキップされ、コマンドが exit code 0 で終了する。SKIP 理由が標準出力に表示されること",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "Phase 0 のトラックで track-commit-message（コミットゲート）が bin/sotp ref-verify run を内部で呼び出した場合に、ref-verify が非ゼロ終了してゲートをブロックしない。ADR + metadata.json のみを含む初回コミットが通過できること",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "bin/sotp ref-verify run コマンドが --context および --layer の CLI 引数を受け付けない。これらの引数を指定した場合はエラーとなる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "RefVerifyInvocationContext 型が削除されており、CommitGate / Standalone の variant も存在しない。このコードを参照するすべての依存箇所が削除または更新されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "check-approved が内部で bin/sotp ref-verify run を呼び出す場合、CommitGate コンテキスト固定の引数を渡さない。引数なしの一形態で呼び出される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "catalogue が全不在（すべての層で catalogue ファイルが存在しない）の場合、Chain② が zero pairs としてスキップされ、bin/sotp ref-verify run が exit code 0 で終了する。この挙動は既存の実装が追認されたものであり、変更後も継続して成立すること",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "spec.json と全 catalogue が両方存在する場合、両 Chain の全検証ペアが評価対象となる。どちらの Chain もスキップされない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "部分 catalogue（ある層の catalogue が存在し別の層は不在）の場合、bin/sotp ref-verify run が非ゼロ終了でエラーを報告する。fail-closed として扱われること",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "catalogue が存在するにもかかわらず spec.json が不在の場合、bin/sotp ref-verify run が非ゼロ終了でエラーを報告する。SoT Chain 上下関係違反として fail-closed に扱われること",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "存在するが parse 不能な spec.json または catalogue ファイルがある場合、bin/sotp ref-verify run が非ゼロ終了でエラーを報告する。artifact の存在確認後に読み込み・パース失敗が発生した場合は fail-closed に扱われること",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "差分キャッシュ（(claim_hash, evidence_hash) ペアによる増分再レビュー）が --context / --layer の削除後も正常に動作する。以前キャッシュされたペアが引き続き cache hit として扱われ、変更されたペアのみが再レビューされること",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "/track:ref-verify skill の説明、および Makefile の track-commit-message における bin/sotp ref-verify run と bin/sotp ref-verify check-approved の両呼び出しから --context / --layer 引数が削除されている。track-active-gate は ref-verify を呼び出さないため変更対象外。Phase 2 の per-layer N 回発火が 1 回に簡素化されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "Phase 2（spec.json 存在、catalogue も存在）のトラックで bin/sotp ref-verify run を実行したとき、Chain① が spec.json の spec element を対象として評価され、Chain② が catalogue を対象として評価される。Phase 2 中に spec.json が変更されていた場合も Chain① の再検証が Phase 2 発火時点で拾われること",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "Lifecycle: pre-merge draft vs post-merge record"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "Error Handling: Result and ? Operator"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "Make Illegal States Unrepresentable"
+    }
+  ],
+  "signals": {
+    "blue": 35,
+    "yellow": 0,
+    "red": 0
+  }
+}

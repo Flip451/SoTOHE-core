@@ -1,8 +1,9 @@
 //! CLI subcommands for `sotp ref-verify`: semantic reference verification.
 //!
 //! Provides:
-//! - `run`: execute the semantic review pipeline (scope auto-resolved from
-//!   context — Chain1 after spec-design, Chain2 after type-design, All otherwise).
+//! - `run`: execute the semantic review pipeline (scope resolved from track
+//!   artifact existence — spec.json absent → Chain-1 zero pairs, all
+//!   catalogues absent → Chain-2 zero pairs, both present → both chains).
 //! - `check-approved`: gate that exits 0 only when all current production
 //!   reference pairs have a Pass cache entry.
 //!
@@ -25,8 +26,9 @@ use crate::commands::outcome_to_exit;
 pub enum RefVerifyCommand {
     /// Execute the semantic reference review pipeline (Chain1 / Chain2 / All).
     ///
-    /// Scope is auto-resolved from the active track's phase context:
-    /// spec-design → Chain1, type-design → Chain2, otherwise All.
+    /// Scope is resolved from track artifact existence: spec.json absent →
+    /// Chain-1 has zero pairs (a SKIP reason is printed), all catalogues
+    /// absent → Chain-2 has zero pairs, both present → both chains.
     /// Configuration (known-bad rates, parallelism) is read from
     /// `.harness/config/ref-verify.json`; defaults are used when the file is absent.
     Run(RunArgs),
@@ -52,16 +54,6 @@ pub struct RunArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
     pub items_dir: PathBuf,
-
-    /// Firing-surface context: which phase or gate is invoking the run.
-    /// `spec-design` → Chain1, `type-design` (with --layer) → Chain2 for that
-    /// layer, `commit-gate` / `standalone` → both chains, all layers.
-    #[arg(long, value_parser = ["spec-design", "type-design", "commit-gate", "standalone"], default_value = "standalone")]
-    pub context: String,
-
-    /// Target layer id; required when `--context type-design` is given.
-    #[arg(long)]
-    pub layer: Option<String>,
 }
 
 // ── sotp ref-verify check-approved ───────────────────────────────────────────
@@ -98,12 +90,10 @@ fn execute_run(args: &RunArgs) -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    outcome_to_exit(CliApp::new().ref_verify_run(RefVerifyRunInput {
-        track_id,
-        items_dir: args.items_dir.clone(),
-        context: args.context.clone(),
-        layer: args.layer.clone(),
-    }))
+    outcome_to_exit(
+        CliApp::new()
+            .ref_verify_run(RefVerifyRunInput { track_id, items_dir: args.items_dir.clone() }),
+    )
 }
 
 fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
@@ -150,36 +140,25 @@ mod tests {
             RefVerifyCommand::Run(args) => {
                 assert!(args.track_id.is_none(), "track_id must be None when omitted");
                 assert_eq!(args.items_dir, PathBuf::from("track/items"));
-                assert_eq!(args.context, "standalone", "default context must be standalone");
-                assert!(args.layer.is_none(), "layer must be None when omitted");
             }
             other => panic!("expected Run, got {other:?}"),
         }
     }
 
     #[test]
-    fn test_ref_verify_run_parses_context_and_layer() {
-        let cmd = parse_ref_verify(&[
-            "ref-verify",
-            "run",
-            "--context",
-            "type-design",
-            "--layer",
-            "usecase",
-        ]);
-        match cmd {
-            RefVerifyCommand::Run(args) => {
-                assert_eq!(args.context, "type-design");
-                assert_eq!(args.layer.as_deref(), Some("usecase"));
-            }
-            other => panic!("expected Run, got {other:?}"),
-        }
+    fn test_ref_verify_run_rejects_removed_context_arg() {
+        // Regression (AC-03): the firing-surface context flag was removed —
+        // passing it must be a clap error, not a silently ignored argument.
+        let result = TestCli::try_parse_from(["ref-verify", "run", "--context", "commit-gate"]);
+        assert!(result.is_err(), "removed --context flag must be rejected by clap");
     }
 
     #[test]
-    fn test_ref_verify_run_rejects_unknown_context() {
-        let result = TestCli::try_parse_from(["ref-verify", "run", "--context", "approval-mode"]);
-        assert!(result.is_err(), "unknown --context value must be rejected by clap");
+    fn test_ref_verify_run_rejects_removed_layer_arg() {
+        // Regression (AC-03): the per-layer narrowing flag was removed —
+        // passing it must be a clap error, not a silently ignored argument.
+        let result = TestCli::try_parse_from(["ref-verify", "run", "--layer", "domain"]);
+        assert!(result.is_err(), "removed --layer flag must be rejected by clap");
     }
 
     #[test]
