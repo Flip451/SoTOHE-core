@@ -10,7 +10,8 @@
     {
       "id": "T002",
       "description": "Remove hash-transcription documentation from .claude/agents/type-designer.md: remove the spec_refs[].hash transcription procedure; update spec_refs examples to show only { file, anchor } 2-field structure; retain sotp track spec-element-hash as a debugging utility with no transcription framing",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "8002e0f7cd3943a5d11f0d9b24158fc5c66c58e7"
     }
   ],
   "plan": {

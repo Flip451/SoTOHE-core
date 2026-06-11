@@ -1,21 +1,36 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
-          "at": "2026-06-11T14:04:31Z"
+          "hash": "rvw1:sha256:4bf963afcb033852c552faea95f3a03775550a9518f3d04e4edf80f87e37148d",
+          "at": "2026-06-11T14:03:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `CatalogueSpecSignal` docs still say per-ref hash validation is reported separately as a `SpecRefFinding`, but this change removes `SpecRef.hash` and the `HashMismatch` finding. This leaves the domain API documentation describing behavior that no longer exists and violates the T001 requirement to remove stale `spec_refs` hash references from this layer.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 96,
+              "category": "stale_doc"
+            }
+          ],
+          "hash": "rvw1:sha256:4bf963afcb033852c552faea95f3a03775550a9518f3d04e4edf80f87e37148d",
+          "at": "2026-06-11T14:05:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
-          "at": "2026-06-11T14:07:18Z"
+          "hash": "rvw1:sha256:6b84ba033a46f0f9d1345eacbd84db35e35470476604be8b382f78d5ffddb5a5",
+          "at": "2026-06-11T14:08:03Z"
         }
       ]
     },
@@ -51,36 +66,147 @@
         }
       ]
     },
-    "domain": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4bf963afcb033852c552faea95f3a03775550a9518f3d04e4edf80f87e37148d",
-          "at": "2026-06-11T14:03:40Z"
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T10:36:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T10:38:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T10:57:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T10:58:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10d48d7419c36f111f012d49a81e38bf6b9d8c416b6510aca0d47fde05514061",
+          "at": "2026-06-11T15:02:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10d48d7419c36f111f012d49a81e38bf6b9d8c416b6510aca0d47fde05514061",
+          "at": "2026-06-11T15:04:56Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
+          "at": "2026-06-11T14:04:04Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The `CatalogueSpecSignal` docs still say per-ref hash validation is reported separately as a `SpecRefFinding`, but this change removes `SpecRef.hash` and the `HashMismatch` finding. This leaves the domain API documentation describing behavior that no longer exists and violates the T001 requirement to remove stale `spec_refs` hash references from this layer.",
+              "message": "The Yellow remediation still tells users to promote `informal_grounds[]` to `spec_refs[]` with an `anchor + canonical SHA-256 hash`. After this change `SpecRef` is `{ file, anchor }` and hash-bearing refs are invalid, so a Chain 2 failure now gives users stale instructions that conflict with the new schema. Update the message to reference the hashless spec_ref shape/regeneration path.",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 96,
-              "category": "stale_doc"
+              "file": "libs/usecase/src/merge_gate/chain2_gate.rs",
+              "line": 266,
+              "category": "stale_hash_reference"
+            },
+            {
+              "message": "The verifier docs still describe emitted findings as `anchor/hash` violations and the inline check as `DanglingAnchor / HashMismatch`. `HashMismatch` was removed in this track, so these comments leave stale hash-verification behavior documented inside the usecase layer. Update them to describe dangling-anchor checks plus stale signal detection only.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 9,
+              "category": "stale_hash_reference"
             }
           ],
-          "hash": "rvw1:sha256:4bf963afcb033852c552faea95f3a03775550a9518f3d04e4edf80f87e37148d",
-          "at": "2026-06-11T14:05:36Z"
+          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
+          "at": "2026-06-11T14:06:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b84ba033a46f0f9d1345eacbd84db35e35470476604be8b382f78d5ffddb5a5",
-          "at": "2026-06-11T14:08:03Z"
+          "hash": "rvw1:sha256:09b1af144cb3d21761c0f328de2980f01ccce92e64bf593f05b8720a93aa046b",
+          "at": "2026-06-11T14:11:59Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
+          "at": "2026-06-11T14:04:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
+          "at": "2026-06-11T14:07:18Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e3b2d5996cd8d359970b16742b0ad1b8d1fa247fbd72a85904cb82a125eac77",
+          "at": "2026-06-11T14:06:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e3b2d5996cd8d359970b16742b0ad1b8d1fa247fbd72a85904cb82a125eac77",
+          "at": "2026-06-11T14:11:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `encode()` still delegates to `domain_to_dto`, which serializes the `CatalogueDocument`'s existing `schema_version` instead of pinning the codec's `SCHEMA_VERSION`. After this change the decoder rejects v3 catalogues, so any caller that constructs a document with the still-possible old value can write a catalogue this same codec will fail to read. Pin or validate the encoded schema version to 4 here.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+              "line": 263,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0bef931fa17299a3a7aec474795ae6ba85c661691bc45e7e9ef4d4c2f7034581",
+          "at": "2026-06-11T14:28:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b00d59fb1bc696ef906c28d6047232981d3eae2c86841bd2eba48acc5990ea3",
+          "at": "2026-06-11T14:37:12Z"
         }
       ]
     },
@@ -238,132 +364,20 @@
           "findings": [],
           "hash": "rvw1:sha256:479d3f7961229360834796feb0e8b54636a21671f874a9a0fc74074b4761405a",
           "at": "2026-06-11T15:05:58Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
-          "at": "2026-06-11T14:04:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Yellow remediation still tells users to promote `informal_grounds[]` to `spec_refs[]` with an `anchor + canonical SHA-256 hash`. After this change `SpecRef` is `{ file, anchor }` and hash-bearing refs are invalid, so a Chain 2 failure now gives users stale instructions that conflict with the new schema. Update the message to reference the hashless spec_ref shape/regeneration path.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate/chain2_gate.rs",
-              "line": 266,
-              "category": "stale_hash_reference"
-            },
-            {
-              "message": "The verifier docs still describe emitted findings as `anchor/hash` violations and the inline check as `DanglingAnchor / HashMismatch`. `HashMismatch` was removed in this track, so these comments leave stale hash-verification behavior documented inside the usecase layer. Update them to describe dangling-anchor checks plus stale signal detection only.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 9,
-              "category": "stale_hash_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
-          "at": "2026-06-11T14:06:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:09b1af144cb3d21761c0f328de2980f01ccce92e64bf593f05b8720a93aa046b",
-          "at": "2026-06-11T14:11:59Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e3b2d5996cd8d359970b16742b0ad1b8d1fa247fbd72a85904cb82a125eac77",
-          "at": "2026-06-11T14:06:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e3b2d5996cd8d359970b16742b0ad1b8d1fa247fbd72a85904cb82a125eac77",
-          "at": "2026-06-11T14:11:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `encode()` still delegates to `domain_to_dto`, which serializes the `CatalogueDocument`'s existing `schema_version` instead of pinning the codec's `SCHEMA_VERSION`. After this change the decoder rejects v3 catalogues, so any caller that constructs a document with the still-possible old value can write a catalogue this same codec will fail to read. Pin or validate the encoded schema version to 4 here.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-              "line": 263,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0bef931fa17299a3a7aec474795ae6ba85c661691bc45e7e9ef4d4c2f7034581",
-          "at": "2026-06-11T14:28:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b00d59fb1bc696ef906c28d6047232981d3eae2c86841bd2eba48acc5990ea3",
-          "at": "2026-06-11T14:37:12Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T10:36:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T10:38:13Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T10:57:13Z"
+          "hash": "rvw1:sha256:a47d95117a046815605073d6dda28bfc880fad6de5a04f64081447fd7a99df4d",
+          "at": "2026-06-11T15:09:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T10:58:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:10d48d7419c36f111f012d49a81e38bf6b9d8c416b6510aca0d47fde05514061",
-          "at": "2026-06-11T15:02:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:10d48d7419c36f111f012d49a81e38bf6b9d8c416b6510aca0d47fde05514061",
-          "at": "2026-06-11T15:04:56Z"
+          "hash": "rvw1:sha256:a47d95117a046815605073d6dda28bfc880fad6de5a04f64081447fd7a99df4d",
+          "at": "2026-06-11T15:10:58Z"
         }
       ]
     }

@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # SoT 本体への参照 hash 埋め込みを廃止し、新鮮度判定を verify-cache の実行時突合に一元化する
 
-## Tasks (1/2 resolved)
+## Tasks (2/2 resolved)
 
 ### S1 — Core compile-atomic change: SpecRef hash removal across all layers
 
@@ -17,4 +17,4 @@
 > This section covers: .claude/agents/type-designer.md (remove spec_refs[].hash transcription step from the internal pipeline description and any catalogue pattern examples that show the hash field). The sotp track spec-element-hash command is retained as a debugging utility and already has no transcription framing.
 > These changes have no compile-time effect and are independent of T001.
 
-- [~] **T002**: Remove hash-transcription documentation from .claude/agents/type-designer.md: remove the spec_refs[].hash transcription procedure; update spec_refs examples to show only { file, anchor } 2-field structure; retain sotp track spec-element-hash as a debugging utility with no transcription framing
+- [x] **T002**: Remove hash-transcription documentation from .claude/agents/type-designer.md: remove the spec_refs[].hash transcription procedure; update spec_refs examples to show only { file, anchor } 2-field structure; retain sotp track spec-element-hash as a debugging utility with no transcription framing (`8002e0f7cd3943a5d11f0d9b24158fc5c66c58e7`)
