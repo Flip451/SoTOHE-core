@@ -554,6 +554,97 @@
       "base_commit": "d123b8f2f3aca8a25e8b38e3e8de9071a2d2baf7",
       "rationale": "The fragments share ordinary test scaffolding (environment lock, TempDir, temp_env::with_vars, assert None) but exercise distinct behavioral conditions: telemetry kill switch suppresses writer creation even with a track id, while missing track id suppresses writer creation regardless of telemetry being enabled. The repeated setup is small, readable, and test-local, and extracting it would likely obscure the separate test intent more than reduce meaningful duplication.",
       "recorded_at": "2026-06-10T17:49:42Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/verify.rs",
+      "low_hash": "ab1fe7e265d1a1e217ea9678b9918297df1a93a1bc20ff22dfc333f7823d8450",
+      "high_path": "apps/cli/src/commands/verify.rs",
+      "high_hash": "dc48480e184c045e8213a65f94376eaccaf866841959e91b3966bbb38e868c2f",
+      "changed_path": "apps/cli/src/commands/verify.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9081306457519532,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d1d4d89f0e2327d664c0c3e72de638abbda164c7",
+      "rationale": "The fragments are similar accessor methods, but they expose different domain states: one struct has a required `spec_path` and returns `&Path`, while the other has an optional `spec_path` and returns `Option<&Path>` via `as_deref()`. This is trivial accessor duplication rather than repeated logic with a shared invariant or behavior to centralize.",
+      "recorded_at": "2026-06-10T18:06:19Z"
+    },
+    {
+      "low_path": "apps/cli/src/main.rs",
+      "low_hash": "9ec4ab49b4524a083d429bf0b176a87d93ac1c7be2f7868c14e6eecd731da854",
+      "high_path": "apps/cli/src/main.rs",
+      "high_hash": "9ef1017ac308843c62772f0836275e572139618fbc82808349ea185ee93c868c",
+      "changed_path": "apps/cli/src/main.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8620419502258301,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d1d4d89f0e2327d664c0c3e72de638abbda164c7",
+      "rationale": "The candidate fragment is a thin delegating wrapper around the changed `run_cli_with` function, supplying the production `commands::ref_verify::execute` implementation while preserving the existing `dry_execute` injection. It does not duplicate the command dispatch logic; it centralizes that logic in `run_cli_with` and provides a simpler public/internal entry point.",
+      "recorded_at": "2026-06-10T18:06:32Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/telemetry_wiring.rs",
+      "low_hash": "14c6c55b6f3b344f730f9c0ebf7ab5a8730b411e4c44c6c9b58d72ad7d5e8912",
+      "high_path": "apps/cli-composition/src/telemetry_wiring.rs",
+      "high_hash": "b374abee7daba51c597ea271c56fe1ce476d5474ad1274a5e40fcaa14158c35e",
+      "changed_path": "apps/cli-composition/src/telemetry_wiring.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9118342995643616,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d1d4d89f0e2327d664c0c3e72de638abbda164c7",
+      "rationale": "The fragments are similar test scaffolding around the same helper, but they assert different properties: determinism for identical input versus distinct digests for different inputs. The small amount of repeated setup is clearer than introducing a shared helper or table that would obscure the intent of each test.",
+      "recorded_at": "2026-06-10T18:06:46Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/track/mod.rs",
+      "low_hash": "b8af190e3c7d72f1db30fb995c4b85d25e2ef823bec1e0576f2eb883c62ee55c",
+      "high_path": "apps/cli/src/commands/verify.rs",
+      "high_hash": "8a42cfa53d66e97d71fb737adee743f053a4ccc7ff62ee8b66fa1d71466ed001",
+      "changed_path": "apps/cli/src/commands/verify.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9280259609222412,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d1d4d89f0e2327d664c0c3e72de638abbda164c7",
+      "rationale": "Both fragments implement an `items_dir` accessor, but they dispatch over different command enums with different argument layouts and command-specific anchoring rules. The repeated `join(\"track\").join(\"items\")` and `PathBuf::from(\"track/items\")` patterns are small shared path conventions, not substantial duplicated business logic between these fragments. Extracting a broad shared abstraction would likely make the enum-specific cases harder to follow without removing meaningful duplication.",
+      "recorded_at": "2026-06-11T02:32:08Z"
+    },
+    {
+      "low_path": "apps/cli/src/main.rs",
+      "low_hash": "7b1ef7d174692f54d5a205a470e9a7f6c6fda2b621e9a1cdaf62107d43978b7a",
+      "high_path": "apps/cli/src/main.rs",
+      "high_hash": "8fdb7505fa85296f3121d84f012a928d62d6b0c049b4d4dcf366cf9ec08d79c0",
+      "changed_path": "apps/cli/src/main.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.892730176448822,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d1d4d89f0e2327d664c0c3e72de638abbda164c7",
+      "rationale": "The fragments share a small test idiom (`Cli::try_parse_from`, `run_cli`, assert on exit), but they verify different command paths and different behavioral contracts: hook dispatch must force success, while verify tech-stack must not panic and must avoid the hook-block exit code. The repeated mechanics are minimal and do not duplicate domain logic or policy knowledge enough to justify abstraction.",
+      "recorded_at": "2026-06-11T02:32:22Z"
+    },
+    {
+      "low_path": "apps/cli/src/main.rs",
+      "low_hash": "76826f09dc6b8aab69241ffa0eabf156055767acb91f53d7cc80c0b5f13d0f47",
+      "high_path": "apps/cli/src/main.rs",
+      "high_hash": "8fdb7505fa85296f3121d84f012a928d62d6b0c049b4d4dcf366cf9ec08d79c0",
+      "changed_path": "apps/cli/src/main.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8724684715270996,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d1d4d89f0e2327d664c0c3e72de638abbda164c7",
+      "rationale": "The fragments are structurally similar tests, but they cover different CLI dispatch paths (`verify tech-stack` vs `verify layers`) with different required setup and failure modes. The repeated setup/run/assert pattern is ordinary test boilerplate rather than duplicated production logic or duplicated domain knowledge that would create a maintenance hazard.",
+      "recorded_at": "2026-06-11T02:32:41Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/telemetry_wiring.rs",
+      "low_hash": "633e6b5a9a0f76b0cfd506931884a9587317a56b44a18d00692b061db79cfd01",
+      "high_path": "apps/cli-composition/src/telemetry_wiring.rs",
+      "high_hash": "d3faffb5ede7c1f83f73e1f7754c611ee0f71bd864697689b02b17c18cd58891",
+      "changed_path": "apps/cli-composition/src/telemetry_wiring.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.8505346179008484,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d1d4d89f0e2327d664c0c3e72de638abbda164c7",
+      "rationale": "The fragments repeat a small telemetry-emitter pattern: construct a specific `TelemetryEvent`, add shared metadata such as `schema_version`, `track_id`, and `timestamp`, then fire-and-forget `writer.write(event)`. This is boilerplate, but each function encodes a distinct public event API with different required fields and call-site semantics. Extracting the whole pattern would likely obscure the event-specific construction for little gain. A tiny helper for suppressed writes could be reasonable if this pattern grows, but these two fragments alone do not justify treating it as a DRY violation.",
+      "recorded_at": "2026-06-11T02:33:00Z"
     }
   ]
 }

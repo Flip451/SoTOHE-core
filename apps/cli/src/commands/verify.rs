@@ -143,51 +143,181 @@ pub struct VerifyArgs {
     project_root: PathBuf,
 }
 
-#[allow(clippy::too_many_lines)]
-pub fn execute(cmd: VerifyCommand) -> ExitCode {
-    let app = CliApp::new();
-    match cmd {
-        VerifyCommand::TechStack(args) => run(app.verify_tech_stack(args.project_root)),
-        VerifyCommand::LatestTrack(args) => run(app.verify_latest_track(args.project_root)),
-        VerifyCommand::ArchDocs(args) => run(app.verify_arch_docs(args.project_root)),
-        VerifyCommand::Layers(args) => run(app.verify_layers(args.project_root)),
-        VerifyCommand::Orchestra(args) => run(app.verify_orchestra(args.project_root)),
-        VerifyCommand::SpecAttribution(args) => run(app.verify_spec_attribution(args.spec_path)),
-        VerifyCommand::SpecFrontmatter(args) => run(app.verify_spec_frontmatter(args.spec_path)),
-        VerifyCommand::CanonicalModules(args) => {
-            run(app.verify_canonical_modules(args.project_root))
+impl VerifyCommand {
+    /// Returns the `track/items` path that the underlying command would use as its items root.
+    ///
+    /// Used by `execute_verify_with_telemetry` to anchor the telemetry writer to the same
+    /// base directory as the underlying command, so that non-default `--project-root`,
+    /// `--workspace-root`, or `--items-dir` invocations write telemetry to the correct
+    /// location (P1 fix: was hardcoded `"track/items"` relative to CWD).
+    pub fn items_dir(&self) -> PathBuf {
+        match self {
+            // Project-root–based commands: derive items_dir from project_root.
+            VerifyCommand::TechStack(a)
+            | VerifyCommand::LatestTrack(a)
+            | VerifyCommand::ArchDocs(a)
+            | VerifyCommand::Layers(a)
+            | VerifyCommand::Orchestra(a)
+            | VerifyCommand::CanonicalModules(a)
+            | VerifyCommand::ModuleSize(a)
+            | VerifyCommand::DomainPurity(a)
+            | VerifyCommand::DomainStrings(a)
+            | VerifyCommand::UsecasePurity(a)
+            | VerifyCommand::DocLinks(a)
+            | VerifyCommand::ViewFreshness(a)
+            | VerifyCommand::AdrSignals(a) => a.project_root.join("track").join("items"),
+
+            // Workspace-root–based commands: the explicit --items-dir field is the
+            // primary artifact root.  Only rewrite to `<workspace_root>/track/items`
+            // when items_dir still holds the CLI default value ("track/items") AND
+            // --workspace-root was set to a non-default value.  An explicit non-default
+            // --items-dir must be passed through unchanged so that resolve_telemetry_writer
+            // anchors to the path the caller actually supplied.
+            VerifyCommand::CatalogueSpecRefs(a) => {
+                if a.items_dir.as_os_str() == "track/items" && a.workspace_root.as_os_str() != "." {
+                    a.workspace_root.join("track").join("items")
+                } else {
+                    a.items_dir.clone()
+                }
+            }
+            // CatalogueSpecSignals is CWD-anchored for branch gating: the underlying
+            // command uses --workspace-root for file I/O but git branch discovery
+            // always runs against the CWD repo.  Passing the workspace_root-joined
+            // path to resolve_telemetry_writer would anchor branch discovery to a
+            // different checkout, causing GateEval misattribution.  Return the raw
+            // items_dir field (defaulting to "track/items") so that
+            // resolve_telemetry_writer uses CWD for branch discovery.
+            VerifyCommand::CatalogueSpecSignals(a) => a.items_dir.clone(),
+
+            // Spec-path–based commands: derive items_dir from the spec path when
+            // the path is deep enough (spec.md → <track_id>/ → track/items/).
+            // Only trust the derived path when it has more than one component
+            // (i.e., it is not the filesystem root "/").  A spec_path outside the
+            // canonical `track/items/<id>/` tree (e.g. `/tmp/spec.md`) would
+            // yield "/" via parent().parent(), causing resolve_telemetry_writer to
+            // return None and silently drop the GateEval event.  Fall back to the
+            // CWD-relative "track/items" in that case so git branch discovery can
+            // still identify the track.
+            VerifyCommand::SpecAttribution(a) | VerifyCommand::SpecFrontmatter(a) => a
+                .spec_path
+                .parent()
+                .and_then(|p| p.parent())
+                .filter(|p| p.components().count() > 1)
+                .map(|p| p.to_path_buf())
+                .unwrap_or_else(|| PathBuf::from("track/items")),
+            VerifyCommand::SpecSignals(a) => a
+                .spec_path
+                .parent()
+                .and_then(|p| p.parent())
+                .filter(|p| p.components().count() > 1)
+                .map(|p| p.to_path_buf())
+                .unwrap_or_else(|| PathBuf::from("track/items")),
+            VerifyCommand::SpecStates(a) => a
+                .spec_path
+                .as_deref()
+                .and_then(|p| p.parent())
+                .and_then(|p| p.parent())
+                .filter(|p| p.components().count() > 1)
+                .map(|p| p.to_path_buf())
+                // No explicit spec path: use CWD-relative "track/items" (the same
+                // layout resolve_telemetry_writer expects). The underlying command
+                // also does git discovery from CWD, so both anchor to the same root.
+                .unwrap_or_else(|| PathBuf::from("track/items")),
+            // PlanArtifactRefs: track_dir is track/items/<track_id>/, so .parent() =
+            // track/items/. When omitted, use the same CWD-relative fallback.
+            VerifyCommand::PlanArtifactRefs(a) => a
+                .track_dir
+                .as_deref()
+                .and_then(|p| p.parent())
+                .map(|p| p.to_path_buf())
+                .unwrap_or_else(|| PathBuf::from("track/items")),
         }
-        VerifyCommand::ModuleSize(args) => run(app.verify_module_size(args.project_root)),
-        VerifyCommand::DomainPurity(args) => run(app.verify_domain_purity(args.project_root)),
-        VerifyCommand::DomainStrings(args) => run(app.verify_domain_strings(args.project_root)),
-        VerifyCommand::UsecasePurity(args) => run(app.verify_usecase_purity(args.project_root)),
-        VerifyCommand::DocLinks(args) => run(app.verify_doc_links(args.project_root)),
-        VerifyCommand::ViewFreshness(args) => run(app.verify_view_freshness(args.project_root)),
-        VerifyCommand::SpecSignals(args) => run(app.verify_spec_signals(args.spec_path)),
-        VerifyCommand::SpecStates(args) => run(app.verify_spec_states(args.spec_path, args.strict)),
-        VerifyCommand::PlanArtifactRefs(args) => run(app.verify_plan_artifact_refs(args.track_dir)),
-        VerifyCommand::CatalogueSpecRefs(args) => run(app.verify_catalogue_spec_refs(
+    }
+}
+
+/// Dispatches `cmd` to the appropriate `CliApp` method and returns the raw `Result<CommandOutcome,
+/// String>` without printing anything.
+///
+/// `execute_with_summary` delegates here so the 20-arm match is not duplicated.
+#[allow(clippy::too_many_lines)]
+fn dispatch_to_outcome(
+    app: &CliApp,
+    cmd: VerifyCommand,
+) -> Result<cli_composition::CommandOutcome, String> {
+    match cmd {
+        VerifyCommand::TechStack(args) => app.verify_tech_stack(args.project_root),
+        VerifyCommand::LatestTrack(args) => app.verify_latest_track(args.project_root),
+        VerifyCommand::ArchDocs(args) => app.verify_arch_docs(args.project_root),
+        VerifyCommand::Layers(args) => app.verify_layers(args.project_root),
+        VerifyCommand::Orchestra(args) => app.verify_orchestra(args.project_root),
+        VerifyCommand::SpecAttribution(args) => app.verify_spec_attribution(args.spec_path),
+        VerifyCommand::SpecFrontmatter(args) => app.verify_spec_frontmatter(args.spec_path),
+        VerifyCommand::CanonicalModules(args) => app.verify_canonical_modules(args.project_root),
+        VerifyCommand::ModuleSize(args) => app.verify_module_size(args.project_root),
+        VerifyCommand::DomainPurity(args) => app.verify_domain_purity(args.project_root),
+        VerifyCommand::DomainStrings(args) => app.verify_domain_strings(args.project_root),
+        VerifyCommand::UsecasePurity(args) => app.verify_usecase_purity(args.project_root),
+        VerifyCommand::DocLinks(args) => app.verify_doc_links(args.project_root),
+        VerifyCommand::ViewFreshness(args) => app.verify_view_freshness(args.project_root),
+        VerifyCommand::SpecSignals(args) => app.verify_spec_signals(args.spec_path),
+        VerifyCommand::SpecStates(args) => app.verify_spec_states(args.spec_path, args.strict),
+        VerifyCommand::PlanArtifactRefs(args) => app.verify_plan_artifact_refs(args.track_dir),
+        VerifyCommand::CatalogueSpecRefs(args) => app.verify_catalogue_spec_refs(
             args.track_id,
             args.items_dir,
             args.workspace_root,
             args.skip_stale,
-        )),
+        ),
         VerifyCommand::CatalogueSpecSignals(args) => {
-            run(app.verify_catalogue_spec_signals(args.items_dir, args.workspace_root, args.strict))
+            app.verify_catalogue_spec_signals(args.items_dir, args.workspace_root, args.strict)
         }
-        VerifyCommand::AdrSignals(args) => run(app.verify_adr_signals(args.project_root)),
+        VerifyCommand::AdrSignals(args) => app.verify_adr_signals(args.project_root),
     }
 }
 
-/// Dispatch a `CommandOutcome` result to an `ExitCode`.
+/// Dispatch `cmd`, print its outcome, and return both the exit code and the raw stdout text.
 ///
-/// Prints stdout (if present) and stderr (if present), then returns the exit code.
-pub(super) fn run(result: Result<cli_composition::CommandOutcome, String>) -> ExitCode {
+/// The stdout text is used by `execute_verify_with_telemetry` as the `reason_summary` field
+/// in the emitted `TelemetryEvent::GateEval` (T005 contract: `reason_summary` should reflect
+/// actual findings rather than a static label).
+pub fn execute_with_summary(cmd: VerifyCommand) -> (ExitCode, Option<String>) {
+    let app = CliApp::new();
+    run_capturing(dispatch_to_outcome(&app, cmd))
+}
+
+/// Dispatch `cmd`, print its outcome, and return the exit code.
+///
+/// Test-only convenience wrapper around [`execute_with_summary`] that discards
+/// the stdout text. Production code goes through [`execute_with_summary`] directly
+/// (called by `execute_verify_with_telemetry` in `main.rs`).
+#[cfg(test)]
+pub(super) fn execute(cmd: VerifyCommand) -> ExitCode {
+    execute_with_summary(cmd).0
+}
+
+/// Dispatch a `CommandOutcome` result to an `(ExitCode, Option<String>)`.
+///
+/// Prints stdout (if present) and stderr (if present), then returns the exit code and the
+/// summary text. The summary is stdout when present; falls back to stderr when stdout is absent
+/// (some gates, e.g. `catalogue-spec-refs`, report findings on stderr only). The caller can use
+/// the summary text as `reason_summary` for telemetry events.
+pub(super) fn run_capturing(
+    result: Result<cli_composition::CommandOutcome, String>,
+) -> (ExitCode, Option<String>) {
     match result {
-        Ok(outcome) => print_outcome(&outcome),
+        Ok(outcome) => {
+            // Prefer stdout; fall back to stderr so stderr-only gates (e.g.
+            // catalogue-spec-refs) still populate reason_summary in telemetry.
+            let summary = outcome.stdout.clone().or_else(|| outcome.stderr.clone());
+            let exit = print_outcome(&outcome);
+            (exit, summary)
+        }
         Err(msg) => {
             eprintln!("{msg}");
-            ExitCode::FAILURE
+            // Return the error message as the summary so reason_summary in
+            // GateEval telemetry reflects the actual failure rather than
+            // falling back to the static gate name.
+            (ExitCode::FAILURE, Some(msg))
         }
     }
 }

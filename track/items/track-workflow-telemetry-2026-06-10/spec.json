@@ -64,7 +64,7 @@
       },
       {
         "id": "IN-03",
-        "text": "記録対象とするイベント種別: track 操作 subcommand（command・exit code・所要時間・track_id）/ gate 評価（gate 名・verdict・理由要約・入力 hash）/ review・dry round（provider・model・round 種別・所要時間・findings 件数）/ 外部 subprocess（所要時間・retry 回数・verdict parse 失敗）/ hook dispatch の block 時および advisory（注入型）hook の発火時 / 非ゼロ exit（error chain）",
+        "text": "記録対象とするイベント種別: track 操作 subcommand（command・exit code・所要時間・track_id）/ gate 評価（gate 名・verdict・理由要約）/ review・dry round（provider・model・round 種別・所要時間・findings 件数）/ 外部 subprocess（所要時間・retry 回数・verdict parse 失敗）/ hook dispatch の block 時および advisory（注入型）hook の発火時 / 非ゼロ exit（error chain）。ここで理由要約は gate 出力の人が読める要約（D3 の 4096 バイト行上限が長さを規定）であり、D1 の false-positive 内訳分析を JSONL 直読みで行うために記録する",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
@@ -156,7 +156,7 @@
       },
       {
         "id": "OS-04",
-        "text": "純表示系コマンド・findings / briefing 本文の複製・プロンプト本文等の機密になりうる引数の記録。SoT への参照のみを持ち、コンテンツ本文は記録しない",
+        "text": "純表示系コマンド・findings / briefing 本文の複製・プロンプト本文等の機密になりうる引数の記録。SoT への参照のみを持ち、コンテンツ本文は記録しない。なお、リポジトリ内のファイル path は gitignored のローカル診断ログ（D3）における「機密になりうる引数」に該当しないため、gate 評価イベントへの path 記録は行ってよく redaction は行わない",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
@@ -327,7 +327,7 @@
     },
     {
       "id": "AC-03",
-      "text": "gate 評価イベントが gate 名・verdict・理由要約・入力 hash を含んで記録される。review / dry round イベントが provider・model・round 種別・所要時間・findings 件数を含んで記録される",
+      "text": "gate 評価イベントが gate 名・verdict・理由要約を含んで記録される（入力 hash は記録されない）。review / dry round イベントが provider・model・round 種別・所要時間・findings 件数を含んで記録される",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",

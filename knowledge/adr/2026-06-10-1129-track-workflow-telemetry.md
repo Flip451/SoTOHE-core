@@ -13,7 +13,7 @@ decisions:
     candidate_selection: "from:[tmp-dir,top-level-logs,track-dir-colocation] chose:track-dir-colocation"
     status: proposed
   - id: D4
-    user_decision_ref: "chat:2026-06-10:block-and-advisory-only"
+    user_decision_ref: "chat:2026-06-11:reason-summary-path-allowed"
     candidate_selection: "from:[hook-full-recording,block-and-advisory-only] chose:block-and-advisory-only"
     status: proposed
   - id: D5
@@ -82,17 +82,28 @@ subscriber 初期化は apps/cli-composition の composition root のみ。domai
 
 ### D4: 記録範囲
 
+元の候補選択（`chat:2026-06-10:block-and-advisory-only`）および
+`chat:2026-06-11:drop-input-hash` / `chat:2026-06-11:reason-summary-path-allowed`
+の合意に基づく。
+
 記録する: track 操作 subcommand（command・exit code・所要時間・track_id）/
-gate 評価（gate 名・verdict・理由要約・入力 hash）/ review・dry round
+gate 評価（gate 名・verdict・理由要約）/ review・dry round
 （provider・model・round 種別・所要時間・findings 件数）/ 外部 subprocess
 （所要時間・retry 回数・verdict parse 失敗）/ hook dispatch の block 時および
 advisory（注入型）hook の発火時 / 非ゼロ exit（error chain）。
+
+ここで **理由要約** は gate 出力の人が読める要約（D3 の 4096 バイト行上限が長さを規定）
+であり、D1 の false-positive 内訳分析を JSONL 直読みで行うために記録する。
 
 記録しない: track を解決できないコマンド実行（目的が track ワークフロー観測のため、
 全量を記録する `_global` ファイルは設けない）/ hook の素通り（block も advisory 注入も
 ない allow）/
 純表示系コマンド / 関数レベルの細粒度 span / findings・briefing 本文の複製
 （SoT への参照のみ）/ プロンプト本文等の機密になりうる引数。
+
+telemetry は gitignored の track dir 配下のローカル診断ログ（D3）であり、
+リポジトリ内のファイル path はここで言う「機密になりうる引数」に該当しない。
+gate 評価イベントへの path の記録は行ってよく、redaction は行わない。
 
 track 帰属は branch-bound に解決する（現在の git ブランチに紐づく track）。track 引数を
 取らないリポジトリ全域ゲート（layers / orchestra 等）も、track ブランチ上での実行は当該
@@ -188,6 +199,7 @@ gitignored ランタイム成果物」という既存パターンにも沿う。
 - track を解決できないイベント（track 外コマンド）の可視性が必要になったとき
 - tech-stack で async runtime が採用されたとき（exporter の選択肢が変わる）
 - 記録範囲がボトルネック分析に不足すると判明したとき
+- gate 評価の入力同一性の相関（flaky gate 検出）が実際に必要になったとき（入力 hash フィールドの再導入を検討）
 
 ## Related
 

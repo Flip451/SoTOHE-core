@@ -7,8 +7,6 @@
 //!
 //! PreToolUse hooks: any internal error → exit 2 (fail-closed).
 
-use std::process::ExitCode;
-
 use cli_composition::CliApp;
 
 /// Hook names as CLI value enum (clap layer only — DIP).
@@ -24,7 +22,7 @@ pub enum CliHookName {
 
 impl CliHookName {
     /// Returns the hook name string used by `CliApp::hook_dispatch`.
-    fn hook_name(self) -> &'static str {
+    pub fn hook_name(self) -> &'static str {
         match self {
             Self::BlockDirectGitOps => "block-direct-git-ops",
             Self::BlockTestFileDeletion => "block-test-file-deletion",
@@ -47,27 +45,19 @@ pub enum HookCommand {
     },
 }
 
-/// Executes a hook subcommand.
-pub fn execute(cmd: HookCommand) -> ExitCode {
+/// Executes a hook subcommand and returns the raw `CommandOutcome` without
+/// printing or converting to `ExitCode`.
+///
+/// Used by the telemetry wrapper in `main.rs` to observe the verdict before
+/// printing (T005 / AC-04).
+///
+/// # Errors
+/// Returns `Err(msg)` when the underlying composition logic fails.
+pub fn execute_inner(cmd: HookCommand) -> Result<cli_composition::CommandOutcome, String> {
     match cmd {
         HookCommand::Dispatch { hook } => {
             let hook_name = hook.hook_name().to_owned();
-            match CliApp::new().hook_dispatch(hook_name) {
-                Ok(outcome) => {
-                    if let Some(stdout) = outcome.stdout {
-                        println!("{stdout}");
-                    }
-                    if let Some(stderr) = outcome.stderr {
-                        eprintln!("{stderr}");
-                    }
-                    ExitCode::from(outcome.exit_code)
-                }
-                Err(msg) => {
-                    eprintln!("{msg}");
-                    // Fail-closed: hook error → block (exit 2)
-                    ExitCode::from(2u8)
-                }
-            }
+            CliApp::new().hook_dispatch(hook_name)
         }
     }
 }

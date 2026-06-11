@@ -125,14 +125,14 @@ fn run_cli_with(
         Some(CliCommand::Conventions { cmd }) => commands::conventions::execute(cmd),
         Some(CliCommand::Domain { cmd }) => commands::domain::execute(cmd),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
-        Some(CliCommand::Hook { cmd }) => commands::hook::execute(cmd),
+        Some(CliCommand::Hook { cmd }) => execute_hook_with_telemetry(cmd),
         Some(CliCommand::Track { cmd }) => execute_track_with_telemetry(cmd),
         Some(CliCommand::Git { cmd }) => commands::git::execute(cmd),
         Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
         Some(CliCommand::Plan { cmd }) => commands::plan::execute(cmd),
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
-        Some(CliCommand::Verify { cmd }) => commands::verify::execute(cmd),
+        Some(CliCommand::Verify { cmd }) => execute_verify_with_telemetry(cmd),
         Some(CliCommand::FindSimilar(args)) => commands::semantic_dup::execute_find_similar(args),
         Some(CliCommand::DupIndex { cmd }) => commands::semantic_dup::execute_dup_index(cmd),
         Some(CliCommand::DupCheck(args)) => commands::semantic_dup::execute_dup_check(args),
@@ -215,6 +215,174 @@ fn execute_track_with_telemetry(cmd: commands::track::TrackCommand) -> ExitCode 
     }
 
     exit_code
+}
+
+// ---------------------------------------------------------------------------
+// Hook dispatch with telemetry (T005)
+// ---------------------------------------------------------------------------
+
+/// Dispatch a `HookCommand` with telemetry instrumentation.
+///
+/// Hooks are instrumented per AC-04 / OS-03:
+/// - PreToolUse block (exit code 2) → emit `TelemetryEvent::HookBlock`.
+/// - Advisory `skill-compliance` that produces a non-empty stdout injection →
+///   emit `TelemetryEvent::AdvisoryHookFired`.
+/// - All allow / pass-through paths emit NOTHING and have no file IO (OS-03 /
+///   AC-06).
+///
+/// The telemetry writer is resolved using the default items_dir (`"track/items"`
+/// relative to CWD), consistent with the hook execution context.
+fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
+    use cli_composition::telemetry_wiring::{
+        emit_advisory_hook_fired, emit_hook_block, resolve_telemetry_writer,
+    };
+
+    // Capture the hook name before consuming the command.
+    let hook_name = hook_command_hook_name(&cmd).to_owned();
+
+    // Classify: is this an advisory (UserPromptSubmit) hook?
+    let is_advisory = is_advisory_hook_command(&cmd);
+
+    // Execute the hook via the existing dispatch path.
+    let outcome_result = commands::hook::execute_inner(cmd);
+
+    // Determine outcome and emit telemetry.
+    //
+    // `resolve_telemetry_writer` (branch discovery + file IO) is called only on
+    // the two paths that actually emit events (block / advisory-fired) so that
+    // allow-path and pass-through invocations incur zero I/O (OS-03 / AC-06).
+    match &outcome_result {
+        Ok(outcome) => {
+            // Block verdict: exit code 2 for PreToolUse hooks.
+            let is_block = !is_advisory && outcome.exit_code == 2;
+
+            if is_block {
+                let items_dir = std::path::PathBuf::from("track/items");
+                if let Some((ref w, ref track_id)) = resolve_telemetry_writer(&items_dir) {
+                    emit_hook_block(w, track_id, &hook_name);
+                }
+            } else if is_advisory && outcome.stdout.is_some() {
+                // Advisory hook fired (non-empty context injection) — OS-03:
+                // only emit when advisory actually produced output.
+                let items_dir = std::path::PathBuf::from("track/items");
+                if let Some((ref w, ref track_id)) = resolve_telemetry_writer(&items_dir) {
+                    emit_advisory_hook_fired(w, track_id, &hook_name);
+                }
+            }
+            // All other paths (allow, advisory with no injection): no emit (OS-03).
+
+            // Print outcome and return exit code (same as commands::hook::execute).
+            if let Some(ref stdout) = outcome.stdout {
+                println!("{stdout}");
+            }
+            if let Some(ref stderr) = outcome.stderr {
+                eprintln!("{stderr}");
+            }
+            ExitCode::from(outcome.exit_code)
+        }
+        Err(msg) => {
+            eprintln!("{msg}");
+            // Fail-closed for hooks: internal error → block (exit 2).
+            // Emit HookBlock so internal failures are visible in telemetry
+            // (same as a deliberate block verdict from the dispatch logic).
+            let items_dir = std::path::PathBuf::from("track/items");
+            if let Some((ref w, ref track_id)) = resolve_telemetry_writer(&items_dir) {
+                emit_hook_block(w, track_id, &hook_name);
+            }
+            ExitCode::from(2u8)
+        }
+    }
+}
+
+/// Returns the hook name string for the given `HookCommand` variant.
+fn hook_command_hook_name(cmd: &commands::hook::HookCommand) -> &'static str {
+    match cmd {
+        commands::hook::HookCommand::Dispatch { hook } => hook.hook_name(),
+    }
+}
+
+/// Returns `true` when the hook is an advisory (UserPromptSubmit / injection)
+/// hook rather than a PreToolUse guard.
+fn is_advisory_hook_command(cmd: &commands::hook::HookCommand) -> bool {
+    use commands::hook::{CliHookName, HookCommand};
+    matches!(cmd, HookCommand::Dispatch { hook: CliHookName::SkillCompliance })
+}
+
+// ---------------------------------------------------------------------------
+// Verify dispatch with telemetry (T005)
+// ---------------------------------------------------------------------------
+
+/// Dispatch a `VerifyCommand` with telemetry instrumentation.
+///
+/// Emits `TelemetryEvent::GateEval` after every gate evaluation with:
+/// - `gate_name`: the verify subcommand name label.
+/// - `verdict`: `"ok"` (exit 0) or `"error"` (exit ≠ 0).
+/// - `reason_summary`: leading output text (stdout when present, stderr otherwise; first 256 bytes).
+/// - `duration_ms`: wall-clock time of the gate evaluation (GO-01).
+///
+/// Telemetry is only emitted when on a `track/*` branch (AC-11 / IN-04).
+fn execute_verify_with_telemetry(cmd: commands::verify::VerifyCommand) -> ExitCode {
+    use cli_composition::telemetry_wiring::{emit_gate_eval, resolve_telemetry_writer};
+    use std::time::Instant;
+
+    let gate_name = verify_command_gate_name(&cmd);
+
+    // Resolve telemetry writer using the command's own items_dir so non-default
+    // --project-root / --workspace-root / --items-dir invocations anchor telemetry
+    // to the correct repository (P1 fix: was hardcoded "track/items" relative to CWD).
+    let items_dir = cmd.items_dir();
+    let telemetry = resolve_telemetry_writer(&items_dir);
+
+    let start = Instant::now();
+    // execute_with_summary prints output and returns (exit_code, Option<stdout_text>)
+    // so that reason_summary carries the actual gate findings (P1 fix: was static label).
+    let (exit_code, stdout_text) = commands::verify::execute_with_summary(cmd);
+
+    if let Some((ref w, ref track_id)) = telemetry {
+        let verdict = if exit_code == ExitCode::SUCCESS { "ok" } else { "error" };
+        // reason_summary: leading text from the gate output (first 256 bytes,
+        // rounded down to a valid UTF-8 boundary). Falls back to the gate name
+        // when the output text is absent.
+        // reason_summary: full gate output text trimmed of surrounding whitespace.
+        // The TelemetryWriter enforces the 4096-byte JSONL line cap and truncates
+        // variable-length fields (including reason_summary) only when the serialized
+        // line would exceed that budget (CN-05).  Pre-truncating here would drop
+        // human-readable diagnostics before the writer has a chance to fit them in.
+        let reason_summary = stdout_text
+            .as_deref()
+            .map(|s| s.trim().to_owned())
+            .unwrap_or_else(|| format!("gate: {gate_name}"));
+        emit_gate_eval(w, track_id, gate_name, verdict, &reason_summary, start);
+    }
+
+    exit_code
+}
+
+/// Returns a static label for the given `VerifyCommand` variant used as `gate_name`.
+fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static str {
+    use commands::verify::VerifyCommand;
+    match cmd {
+        VerifyCommand::TechStack(_) => "verify-tech-stack",
+        VerifyCommand::LatestTrack(_) => "verify-latest-track",
+        VerifyCommand::ArchDocs(_) => "verify-arch-docs",
+        VerifyCommand::Layers(_) => "verify-layers",
+        VerifyCommand::Orchestra(_) => "verify-orchestra",
+        VerifyCommand::SpecAttribution(_) => "verify-spec-attribution",
+        VerifyCommand::SpecFrontmatter(_) => "verify-spec-frontmatter",
+        VerifyCommand::CanonicalModules(_) => "verify-canonical-modules",
+        VerifyCommand::ModuleSize(_) => "verify-module-size",
+        VerifyCommand::DomainPurity(_) => "verify-domain-purity",
+        VerifyCommand::DomainStrings(_) => "verify-domain-strings",
+        VerifyCommand::UsecasePurity(_) => "verify-usecase-purity",
+        VerifyCommand::DocLinks(_) => "verify-doc-links",
+        VerifyCommand::ViewFreshness(_) => "verify-view-freshness",
+        VerifyCommand::SpecSignals(_) => "verify-spec-signals",
+        VerifyCommand::SpecStates(_) => "verify-spec-states",
+        VerifyCommand::PlanArtifactRefs(_) => "verify-plan-artifact-refs",
+        VerifyCommand::CatalogueSpecRefs(_) => "verify-catalogue-spec-refs",
+        VerifyCommand::CatalogueSpecSignals(_) => "verify-catalogue-spec-signals",
+        VerifyCommand::AdrSignals(_) => "verify-adr-signals",
+    }
 }
 
 /// Returns a static label string for the given `TrackCommand` variant.
@@ -550,5 +718,76 @@ mod tests {
         .unwrap();
         let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
         assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    // ── Hook telemetry wrapper paths ─────────────────────────────────────────
+
+    /// `sotp hook dispatch skill-compliance` routes through `execute_hook_with_telemetry`.
+    /// With empty stdin the advisory hook sees no prompt → no injection → exits 0.
+    /// Telemetry is silently skipped (not on a track branch in CI) — no panic.
+    #[test]
+    fn test_hook_dispatch_skill_compliance_via_run_cli_exits_zero() {
+        let cli = Cli::try_parse_from(["sotp", "hook", "dispatch", "skill-compliance"]).unwrap();
+        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    // ── Verify telemetry wrapper paths ───────────────────────────────────────
+
+    /// `sotp verify tech-stack` routes through `execute_verify_with_telemetry`.
+    /// With a CWD that has no tech-stack.md the command exits non-zero (findings),
+    /// but the wrapper itself must not panic and must forward the exit code.
+    #[test]
+    fn test_verify_tech_stack_dispatch_via_run_cli_does_not_panic() {
+        let dir = TempDir::new().unwrap();
+        let project_root = dir.path().to_str().unwrap();
+        let cli =
+            Cli::try_parse_from(["sotp", "verify", "tech-stack", "--project-root", project_root])
+                .unwrap();
+        // Non-zero exit is expected (no tech-stack.md). The wrapper must not panic.
+        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        assert_ne!(exit, ExitCode::from(2u8), "exit 2 reserved for hook blocks");
+    }
+
+    /// `sotp verify layers` routes through `execute_verify_with_telemetry`.
+    /// With a temp dir (no Cargo.toml) cargo-metadata fails → non-zero exit, but
+    /// the wrapper must not panic and must not return exit code 2 (reserved for
+    /// hook blocks), confirming gate failures are not conflated with blocks.
+    #[test]
+    fn test_verify_layers_dispatch_via_run_cli_does_not_panic() {
+        let dir = TempDir::new().unwrap();
+        fs::write(dir.path().join("architecture-rules.json"), MINIMAL_RULES).unwrap();
+        let project_root = dir.path().to_str().unwrap();
+        let cli = Cli::try_parse_from(["sotp", "verify", "layers", "--project-root", project_root])
+            .unwrap();
+        // Non-zero exit expected (no Cargo.toml for cargo-metadata). Must not panic.
+        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        assert_ne!(exit, ExitCode::from(2u8), "exit 2 reserved for hook blocks");
+    }
+
+    // ── verify_command_gate_name coverage ────────────────────────────────────
+
+    /// Each `VerifyCommand` variant parsed from CLI args must map to a stable
+    /// gate name starting with "verify-".
+    #[test]
+    fn test_verify_command_gate_name_uses_verify_prefix() {
+        use super::verify_command_gate_name;
+
+        let subcommands = [
+            ["sotp", "verify", "tech-stack"],
+            ["sotp", "verify", "latest-track"],
+            ["sotp", "verify", "arch-docs"],
+            ["sotp", "verify", "layers"],
+        ];
+        for args in &subcommands {
+            let cli = Cli::try_parse_from(*args).unwrap();
+            if let Some(CliCommand::Verify { cmd }) = cli.command {
+                let name = verify_command_gate_name(&cmd);
+                assert!(
+                    name.starts_with("verify-"),
+                    "gate name '{name}' does not start with 'verify-'"
+                );
+            }
+        }
     }
 }

@@ -288,7 +288,6 @@ fn truncate_variable_fields(event: TelemetryEvent) -> TelemetryEvent {
             gate_name,
             verdict,
             reason_summary,
-            input_hash,
             duration_ms,
             timestamp,
         } => TelemetryEvent::GateEval {
@@ -297,7 +296,6 @@ fn truncate_variable_fields(event: TelemetryEvent) -> TelemetryEvent {
             gate_name,
             verdict,
             reason_summary: truncate_utf8(reason_summary, TRUNCATED_FIELD_CAP),
-            input_hash,
             duration_ms,
             timestamp,
         },
@@ -545,7 +543,6 @@ mod tests {
             gate_name: "verify-adr-signals".to_string(),
             verdict: "error".to_string(),
             reason_summary: big_summary,
-            input_hash: "abc123".to_string(),
             duration_ms: 100,
             timestamp: "2026-06-10T00:00:00Z".to_string(),
         };

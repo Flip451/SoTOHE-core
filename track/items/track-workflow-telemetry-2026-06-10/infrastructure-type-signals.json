@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-10T17:51:06Z",
-  "declaration_hash": "8fd50f32b8c6534f0d0cc2aab0e5ec76c21275b3a2f285bb47ba59ed4ce98326",
+  "generated_at": "2026-06-11T03:00:29Z",
+  "declaration_hash": "88f0540f061fa1894f949d2f8c13c132625a0b1d325063199515ac55bc0eef55",
   "signals": [
     {
       "type_name": "PhaseDurationSummary",

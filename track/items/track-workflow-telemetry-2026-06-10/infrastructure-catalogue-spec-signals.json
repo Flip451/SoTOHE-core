@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8fd50f32b8c6534f0d0cc2aab0e5ec76c21275b3a2f285bb47ba59ed4ce98326",
+  "catalogue_declaration_hash": "88f0540f061fa1894f949d2f8c13c132625a0b1d325063199515ac55bc0eef55",
   "signals": [
     {
       "type_name": "PhaseDurationSummary",
@@ -20,7 +20,7 @@
     {
       "type_name": "TelemetryEvent",
       "signal": "blue",
-      "entry_hash": "d4013ea6b7a16071a7be74b07e6ff83d7794a65daa38b62b236a495fc8cb1959"
+      "entry_hash": "5840f40be1505ffc9c7ba5e5abe5a6b13f9395c6e11c03374b6314c367910523"
     },
     {
       "type_name": "TelemetryHookBlockEntry",

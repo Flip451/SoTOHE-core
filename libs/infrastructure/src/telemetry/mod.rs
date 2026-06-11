@@ -68,8 +68,6 @@ pub enum TelemetryEvent {
         verdict: String,
         /// Short summary of findings (leading N findings, ≤ 4096 bytes).
         reason_summary: String,
-        /// SHA-256 hex digest of the evaluated artifact.
-        input_hash: String,
         /// Wall-clock duration of the gate evaluation in milliseconds (GO-01).
         duration_ms: u64,
         /// ISO-8601 timestamp of the event.
@@ -259,7 +257,6 @@ mod tests {
             gate_name: "verify-adr-signals".to_string(),
             verdict: "ok".to_string(),
             reason_summary: "".to_string(),
-            input_hash: "abc123".to_string(),
             duration_ms: 500,
             timestamp: "2026-06-10T00:00:00Z".to_string(),
         };
@@ -288,7 +285,6 @@ mod tests {
             gate_name: "g".to_string(),
             verdict: "ok".to_string(),
             reason_summary: "".to_string(),
-            input_hash: "h".to_string(),
             duration_ms: 1,
             timestamp: "2026-06-10T00:00:00Z".to_string(),
         };

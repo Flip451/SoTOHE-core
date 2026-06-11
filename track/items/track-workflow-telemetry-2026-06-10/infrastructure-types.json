@@ -33,7 +33,6 @@
                 { "name": "gate_name", "ty": "String" },
                 { "name": "verdict", "ty": "String" },
                 { "name": "reason_summary", "ty": "String" },
-                { "name": "input_hash", "ty": "String" },
                 { "name": "duration_ms", "ty": "u64" },
                 { "name": "timestamp", "ty": "String" }
               ]
@@ -112,12 +111,22 @@
       },
       "methods": [],
       "module_path": "telemetry",
-      "docs": "Wire format (serde DTO) for a single JSONL event line in `track/items/<id>/logs/telemetry.jsonl`. Each variant carries the event-specific fields plus a per-line `schema_version` field per D7 (IN-08, CN-09). All categorical String fields (command, gate_name, provider, model, hook_name, error_chain, timestamp, verdict, round_type) are free-form log labels or opaque values — not domain-constrained. round_type carries 'fast' or 'final' as a lowercase string rather than an enum to keep the serde DTO self-contained at the JSONL boundary and avoid coupling to the agent_profiles::RoundType enum which lacks serde derives. track_id is recorded as a plain String for the same DTO-boundary reason.",
+      "docs": "Wire format (serde DTO) for a single JSONL event line in `track/items/<id>/logs/telemetry.jsonl`. Each variant carries the event-specific fields plus a per-line `schema_version` field per D7 (IN-08, CN-09). GateEval records gate_name, verdict, reason_summary, and duration_ms; input_hash is not recorded (AC-03, D4 user decision). reason_summary is a human-readable truncated gate-output summary bounded by the 4096-byte line limit (D3/CN-05); repository file paths may appear without redaction per OS-04 (gitignored local diagnostic log). All categorical String fields (command, gate_name, provider, model, hook_name, error_chain, timestamp, verdict, round_type) are free-form log labels or opaque values — not domain-constrained. round_type carries 'fast' or 'final' as a lowercase string rather than an enum to keep the serde DTO self-contained at the JSONL boundary and avoid coupling to the agent_profiles::RoundType enum which lacks serde derives. track_id is recorded as a plain String for the same DTO-boundary reason.",
       "spec_refs": [
         {
           "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
           "anchor": "IN-03",
-          "hash": "3068d1c6b91c316da61a10477195ac6b66d9550334317c88a4974e4a58294925"
+          "hash": "3bd61acc22681276ce208e4c60281e631051039ced95ddc23bb346727e6758ac"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-03",
+          "hash": "ccc66f345eb641853038fbb59c3a34bdc4914fd95c99ed472c265c70289640d5"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "OS-04",
+          "hash": "5b8a28681b1e0c000ccde1f88b87e04504d953e5c085cdeab5544e662a7c40dd"
         },
         {
           "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",

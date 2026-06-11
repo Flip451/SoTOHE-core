@@ -305,6 +305,54 @@
         "kind": "pass",
         "citation": "イベントが 1 件も発生しない実行パス（例: 純表示系コマンド、hook の allow 経路）では `logs/` ディレクトリへのファイル open が行われない（lazy 初期化）"
       }
+    },
+    {
+      "claim_hash": "5840f40be1505ffc9c7ba5e5abe5a6b13f9395c6e11c03374b6314c367910523",
+      "evidence_hash": "3bd61acc22681276ce208e4c60281e631051039ced95ddc23bb346727e6758ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録対象とするイベント種別: track 操作 subcommand（command・exit code・所要時間・track_id）/ gate 評価（gate 名・verdict・理由要約）/ review・dry round（provider・model・round 種別・所要時間・findings 件数）/ 外部 subprocess（所要時間・retry 回数・verdict parse 失敗）/ hook dispatch の block 時および advisory（注入型）hook の発火時 / 非ゼロ exit（error chain）。ここで理由要約は gate 出力の人が読める要約（D3 の 4096 バイト行上限が長さを規定）であり、D1 の false-positive 内訳分析を JSONL 直読みで行うために記録する"
+      }
+    },
+    {
+      "claim_hash": "5840f40be1505ffc9c7ba5e5abe5a6b13f9395c6e11c03374b6314c367910523",
+      "evidence_hash": "ccc66f345eb641853038fbb59c3a34bdc4914fd95c99ed472c265c70289640d5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "gate 評価イベントが gate 名・verdict・理由要約を含んで記録される（入力 hash は記録されない）。review / dry round イベントが provider・model・round 種別・所要時間・findings 件数を含んで記録される"
+      }
+    },
+    {
+      "claim_hash": "5840f40be1505ffc9c7ba5e5abe5a6b13f9395c6e11c03374b6314c367910523",
+      "evidence_hash": "5b8a28681b1e0c000ccde1f88b87e04504d953e5c085cdeab5544e662a7c40dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "なお、リポジトリ内のファイル path は gitignored のローカル診断ログ（D3）における「機密になりうる引数」に該当しないため、gate 評価イベントへの path 記録は行ってよく redaction は行わない"
+      }
+    },
+    {
+      "claim_hash": "5840f40be1505ffc9c7ba5e5abe5a6b13f9395c6e11c03374b6314c367910523",
+      "evidence_hash": "de18711db7ea5d7a6fff0a1b8f4403d6bcc223aa6d87607cac2e681d81012c81",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行（JSONL の 1 行）に `schema_version` フィールドを持たせる。スキーマ変更時の互換性判定が行単位で可能であり、file header イベント方式は採用しない"
+      }
+    },
+    {
+      "claim_hash": "5840f40be1505ffc9c7ba5e5abe5a6b13f9395c6e11c03374b6314c367910523",
+      "evidence_hash": "a476070845ac1b903f0a3a8b397f24167fc1430d870ea414452c79f3bdfb2e3b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行に `schema_version` フィールドを必須とする。file header イベント方式（並行 append 時の初回書き込み競合あり）は採用しない。スキーマ変更時の互換性判定は行単位で行う"
+      }
+    },
+    {
+      "claim_hash": "5840f40be1505ffc9c7ba5e5abe5a6b13f9395c6e11c03374b6314c367910523",
+      "evidence_hash": "59305ffe5c90ed46d6364f83b837a406ded7f4edfa7d27388d2bd9bbfc446adc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry.jsonl の各イベント行が `schema_version` フィールドを含む。file header イベント方式は採用されておらず、スキーマ互換性の判定は行単位で可能である"
+      }
     }
   ]
 }
