@@ -353,6 +353,14 @@
         "kind": "pass",
         "citation": "telemetry.jsonl の各イベント行が `schema_version` フィールドを含む。file header イベント方式は採用されておらず、スキーマ互換性の判定は行単位で可能である"
       }
+    },
+    {
+      "claim_hash": "4b20acdfa53e207836675fd43b8dab0be7766613848947459ab54df4f1683b5e",
+      "evidence_hash": "3bd61acc22681276ce208e4c60281e631051039ced95ddc23bb346727e6758ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review・dry round（provider・model・round 種別・所要時間・findings 件数）"
+      }
     }
   ]
 }

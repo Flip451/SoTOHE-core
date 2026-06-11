@@ -2,10 +2,17 @@
 
 #![allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
 
-fn sotp_bin() -> Command {
-    Command::new(env!("CARGO_BIN_EXE_sotp"))
+fn spawn_write_atomic(path: &str) -> Child {
+    let mut cmd = Command::new(env!("CARGO_BIN_EXE_sotp"));
+    cmd.env("SOTP_TELEMETRY", "0");
+    cmd.args(["file", "write-atomic", "--path", path])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap()
 }
 
 #[test]
@@ -13,13 +20,7 @@ fn test_write_atomic_creates_file_with_correct_content() {
     let dir = tempfile::tempdir().unwrap();
     let target = dir.path().join("output.txt");
 
-    let mut child = sotp_bin()
-        .args(["file", "write-atomic", "--path", target.to_str().unwrap()])
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .unwrap();
+    let mut child = spawn_write_atomic(target.to_str().unwrap());
 
     {
         use std::io::Write;
@@ -38,13 +39,7 @@ fn test_write_atomic_overwrites_existing_file() {
     let target = dir.path().join("existing.txt");
     std::fs::write(&target, "old content").unwrap();
 
-    let mut child = sotp_bin()
-        .args(["file", "write-atomic", "--path", target.to_str().unwrap()])
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .unwrap();
+    let mut child = spawn_write_atomic(target.to_str().unwrap());
 
     {
         use std::io::Write;
@@ -62,13 +57,7 @@ fn test_write_atomic_no_temp_files_remain() {
     let dir = tempfile::tempdir().unwrap();
     let target = dir.path().join("clean.txt");
 
-    let mut child = sotp_bin()
-        .args(["file", "write-atomic", "--path", target.to_str().unwrap()])
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .unwrap();
+    let mut child = spawn_write_atomic(target.to_str().unwrap());
 
     {
         use std::io::Write;
@@ -86,13 +75,7 @@ fn test_write_atomic_no_temp_files_remain() {
 
 #[test]
 fn test_write_atomic_fails_for_nonexistent_parent() {
-    let mut child = sotp_bin()
-        .args(["file", "write-atomic", "--path", "/nonexistent/dir/file.txt"])
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .unwrap();
+    let mut child = spawn_write_atomic("/nonexistent/dir/file.txt");
 
     {
         use std::io::Write;

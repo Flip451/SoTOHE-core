@@ -428,6 +428,28 @@
       ],
       "informal_grounds": []
     },
+    "RoundType": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Final", "payload": { "kind": "unit" } },
+          { "name": "Fast",  "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "docs": "Selects which model tier to resolve for a capability. Infrastructure-tier selection discriminant used in AgentProfiles resolution; no domain validation constraint. Modified in this track: impl FromStr added to provide a canonical lowercase string parser ('fast' / 'final'), deduplicating parsing previously repeated across cli-composition callers. Supports IN-03 ReviewRound event recording where round_type is a lowercase string.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-03",
+          "hash": "3bd61acc22681276ce208e4c60281e631051039ced95ddc23bb346727e6758ac"
+        }
+      ],
+      "informal_grounds": []
+    },
     "TelemetryReportError": {
       "action": "add",
       "role": "ErrorType",
@@ -677,6 +699,36 @@
       "action": "add",
       "trait_ref": "core::error::Error",
       "for_type": "TelemetryReportError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RoundType"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RoundType"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "RoundType"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RoundType"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RoundType"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::str::traits::FromStr",
+      "for_type": "RoundType"
     }
   ]
 }

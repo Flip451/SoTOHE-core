@@ -3,6 +3,9 @@
 pub(crate) mod approved;
 pub(crate) mod briefing;
 pub(crate) mod commit_hash;
+mod helpers;
+#[cfg(test)]
+pub(crate) use helpers::process_guards;
 mod inputs;
 pub(crate) mod null_reviewer;
 pub(crate) mod results;
@@ -27,17 +30,76 @@ pub use shared::{CodexReviewOutcome, build_review_v2_str};
 // Crate-internal helpers used only by the CliApp impl methods in this file.
 use approved::check_approved_str;
 use briefing::get_briefing_for_scope_str;
+use helpers::{
+    build_base_prompt_from_input, is_safe_briefing_path, outcome_to_command_outcome,
+    resolve_track_id_or_branch, resolve_track_id_or_branch_write, validate_all_paths,
+};
 use results::render_review_results_str;
 use run::{run_claude_review_str, run_codex_review_str};
 use scope::validate_scope_for_track_str;
 use shared::{build_scope_query_interactor_no_diff_str, build_scope_query_interactor_str};
 
 use std::path::PathBuf;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
 
 use crate::{CliApp, CommandOutcome};
+
+struct ReviewTelemetry<'a> {
+    findings_count: u32,
+    round_type: &'a str,
+    verdict_parse_failed: bool,
+    emit_subprocess: bool,
+    subprocess_started_at: Option<Instant>,
+}
+
+fn review_telemetry_for_outcome<'a>(
+    run_result: &'a Result<CodexReviewOutcome, String>,
+    requested_round_type: &'a str,
+) -> Option<ReviewTelemetry<'a>> {
+    match run_result {
+        Ok(CodexReviewOutcome::FinalCompleted {
+            findings_count, subprocess_started_at, ..
+        }) => Some(ReviewTelemetry {
+            findings_count: *findings_count,
+            round_type: "final",
+            verdict_parse_failed: false,
+            emit_subprocess: true,
+            subprocess_started_at: Some(*subprocess_started_at),
+        }),
+        Ok(CodexReviewOutcome::FastCompleted { findings_count, subprocess_started_at, .. }) => {
+            Some(ReviewTelemetry {
+                findings_count: *findings_count,
+                round_type: "fast",
+                verdict_parse_failed: false,
+                emit_subprocess: true,
+                subprocess_started_at: Some(*subprocess_started_at),
+            })
+        }
+        Ok(CodexReviewOutcome::Skipped { .. }) => Some(ReviewTelemetry {
+            findings_count: 0,
+            round_type: requested_round_type,
+            verdict_parse_failed: false,
+            emit_subprocess: false,
+            subprocess_started_at: None,
+        }),
+        Ok(CodexReviewOutcome::SubprocessFailed {
+            round_type,
+            verdict_parse_failed,
+            findings_count,
+            subprocess_started_at,
+            ..
+        }) => Some(ReviewTelemetry {
+            findings_count: *findings_count,
+            round_type,
+            verdict_parse_failed: *verdict_parse_failed,
+            emit_subprocess: true,
+            subprocess_started_at: Some(*subprocess_started_at),
+        }),
+        Err(_) => None,
+    }
+}
 
 impl CliApp {
     /// Run the local Codex-backed reviewer and auto-record verdict to review.json.
@@ -81,10 +143,42 @@ impl CliApp {
         let reviewer =
             CodexReviewer::new(&input.model, timeout, base_prompt).with_scope_label(&group);
 
-        let outcome =
-            run_codex_review_str(&track_id, &input.items_dir, &group, &input.round_type, reviewer)?;
+        let round_start = std::time::Instant::now();
+        let run_result =
+            run_codex_review_str(&track_id, &input.items_dir, &group, &input.round_type, reviewer);
 
-        outcome_to_command_outcome(outcome)
+        // Emit ReviewRound telemetry at the composition layer (T006 / AC-03 /
+        // IN-03). Completed and SubprocessFailed outcomes also emit
+        // ExternalSubprocess because the reviewer process was launched. Skipped
+        // emits only ReviewRound with zero findings. Err remains a pre-subprocess
+        // composition failure and does not emit.
+        if let Some((ref w, ref tid)) =
+            crate::telemetry_wiring::resolve_telemetry_writer_for_track(&input.items_dir, &track_id)
+        {
+            if let Some(telemetry) = review_telemetry_for_outcome(&run_result, &input.round_type) {
+                crate::telemetry_wiring::emit_review_round(
+                    w,
+                    tid,
+                    "codex",
+                    &input.model,
+                    telemetry.round_type,
+                    telemetry.findings_count,
+                    round_start,
+                );
+                if telemetry.emit_subprocess {
+                    crate::telemetry_wiring::emit_external_subprocess(
+                        w,
+                        tid,
+                        "codex",
+                        0,
+                        telemetry.verdict_parse_failed,
+                        telemetry.subprocess_started_at.unwrap_or(round_start),
+                    );
+                }
+            }
+        }
+
+        outcome_to_command_outcome(run_result?)
     }
 
     /// Run the local Claude-backed reviewer and auto-record verdict to review.json.
@@ -128,15 +222,39 @@ impl CliApp {
         let reviewer =
             ClaudeReviewer::new(&input.model, timeout, base_prompt).with_scope_label(&group);
 
-        let outcome = run_claude_review_str(
-            &track_id,
-            &input.items_dir,
-            &group,
-            &input.round_type,
-            reviewer,
-        )?;
+        let round_start = std::time::Instant::now();
+        let run_result =
+            run_claude_review_str(&track_id, &input.items_dir, &group, &input.round_type, reviewer);
 
-        outcome_to_command_outcome(outcome)
+        // Emit review telemetry (T006 / AC-03 / IN-03).
+        // See review_run_codex for the full rationale.
+        if let Some((ref w, ref tid)) =
+            crate::telemetry_wiring::resolve_telemetry_writer_for_track(&input.items_dir, &track_id)
+        {
+            if let Some(telemetry) = review_telemetry_for_outcome(&run_result, &input.round_type) {
+                crate::telemetry_wiring::emit_review_round(
+                    w,
+                    tid,
+                    "claude",
+                    &input.model,
+                    telemetry.round_type,
+                    telemetry.findings_count,
+                    round_start,
+                );
+                if telemetry.emit_subprocess {
+                    crate::telemetry_wiring::emit_external_subprocess(
+                        w,
+                        tid,
+                        "claude",
+                        0,
+                        telemetry.verdict_parse_failed,
+                        telemetry.subprocess_started_at.unwrap_or(round_start),
+                    );
+                }
+            }
+        }
+
+        outcome_to_command_outcome(run_result?)
     }
 
     /// Run the local reviewer with provider auto-resolved from agent-profiles.json.
@@ -150,24 +268,8 @@ impl CliApp {
     /// Returns `Err` when profile loading, provider resolution, arg validation,
     /// or the review cycle fails.
     pub fn review_run_local(&self, input: ReviewRunLocalInput) -> Result<CommandOutcome, String> {
-        use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
-        use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-
-        let repo = SystemGitRepo::discover()
-            .map_err(|e| format!("[ERROR] failed to discover git repository root: {e}"))?;
-        let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path)
-            .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
-
-        let infra_round_type = match input.round_type.as_str() {
-            "fast" => RoundType::Fast,
-            "final" => RoundType::Final,
-            other => {
-                return Err(format!(
-                    "[ERROR] unknown round type '{other}' (expected 'fast' or 'final')"
-                ));
-            }
-        };
+        let profiles = shared::load_agent_profiles_from_repo(Some(&input.items_dir))?;
+        let infra_round_type = shared::parse_round_type(&input.round_type)?;
         let mut resolved =
             profiles.resolve_execution("reviewer", infra_round_type).ok_or_else(|| {
                 "[ERROR] reviewer capability not defined in agent-profiles.json".to_owned()
@@ -210,7 +312,8 @@ impl CliApp {
 
         let timeout = Duration::from_secs(input.timeout_seconds);
 
-        let outcome = match resolved.provider.as_str() {
+        let round_start = std::time::Instant::now();
+        let (run_result, provider_name, effective_model) = match resolved.provider.as_str() {
             "codex" => {
                 let model = resolved.model.ok_or_else(|| {
                     "[ERROR] codex reviewer requires a model (set model in agent-profiles.json)"
@@ -218,13 +321,14 @@ impl CliApp {
                 })?;
                 let reviewer =
                     CodexReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
-                run_codex_review_str(
+                let result = run_codex_review_str(
                     &track_id,
                     &input.items_dir,
                     &group,
                     &input.round_type,
                     reviewer,
-                )?
+                );
+                (result, "codex".to_owned(), model)
             }
             "claude" => {
                 let model = resolved.model.ok_or_else(|| {
@@ -233,13 +337,14 @@ impl CliApp {
                 })?;
                 let reviewer =
                     ClaudeReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
-                run_claude_review_str(
+                let result = run_claude_review_str(
                     &track_id,
                     &input.items_dir,
                     &group,
                     &input.round_type,
                     reviewer,
-                )?
+                );
+                (result, "claude".to_owned(), model)
             }
             other => {
                 return Err(format!(
@@ -249,7 +354,35 @@ impl CliApp {
             }
         };
 
-        outcome_to_command_outcome(outcome)
+        // Emit review telemetry (T006 / AC-03 / IN-03).
+        // See review_run_codex for the full rationale.
+        if let Some((ref w, ref tid)) =
+            crate::telemetry_wiring::resolve_telemetry_writer_for_track(&input.items_dir, &track_id)
+        {
+            if let Some(telemetry) = review_telemetry_for_outcome(&run_result, &input.round_type) {
+                crate::telemetry_wiring::emit_review_round(
+                    w,
+                    tid,
+                    &provider_name,
+                    &effective_model,
+                    telemetry.round_type,
+                    telemetry.findings_count,
+                    round_start,
+                );
+                if telemetry.emit_subprocess {
+                    crate::telemetry_wiring::emit_external_subprocess(
+                        w,
+                        tid,
+                        &provider_name,
+                        0,
+                        telemetry.verdict_parse_failed,
+                        telemetry.subprocess_started_at.unwrap_or(round_start),
+                    );
+                }
+            }
+        }
+
+        outcome_to_command_outcome(run_result?)
     }
 
     /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
@@ -482,197 +615,6 @@ impl CliApp {
 }
 
 // ---------------------------------------------------------------------------
-// Private helpers shared across CliApp review_v2 methods
-// ---------------------------------------------------------------------------
-
-/// Resolves a track ID: uses the provided string if `Some`, otherwise
-/// resolves from the current git branch name (`track/<id>`).
-///
-/// # Errors
-/// Returns `Err` when branch detection fails or the branch is not a track branch.
-fn resolve_track_id_or_branch(
-    track_id: Option<String>,
-    items_dir: &std::path::Path,
-) -> Result<String, String> {
-    if let Some(id) = track_id {
-        return Ok(id);
-    }
-    resolve_track_id_from_branch(items_dir)
-}
-
-/// Resolves a track ID for write operations (branch-guard variant).
-///
-/// When `track_id` is `Some`, validates that it matches the current branch.
-/// When `None`, resolves from the current branch. Fail-closed on non-track
-/// branches.
-///
-/// Git discovery is anchored to the repository root derived from `items_dir`
-/// (stripping the trailing `track/items` segments), so that a relative
-/// `items_dir` like `"track/items"` discovers the correct repo root even when
-/// the process is invoked from a repo subdirectory.
-///
-/// # Errors
-/// Returns `Err` when the explicit track ID does not match the current branch,
-/// or when the current branch is not a track branch.
-fn resolve_track_id_or_branch_write(
-    track_id: Option<String>,
-    items_dir: &std::path::Path,
-) -> Result<String, String> {
-    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-
-    let project_root = crate::track::resolve_project_root(items_dir)?;
-    let branch = SystemGitRepo::discover_from(&project_root)
-        .and_then(|r| r.output(&["rev-parse", "--abbrev-ref", "HEAD"]))
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
-        .map_err(|e| format!("failed to detect current branch: {e}"))?;
-
-    let resolved_from_branch =
-        branch.strip_prefix("track/").map(str::to_owned).ok_or_else(|| {
-            format!(
-                "current branch '{branch}' is not a track branch \
-                 (expected 'track/<id>')"
-            )
-        })?;
-
-    if let Some(explicit) = track_id {
-        if explicit != resolved_from_branch {
-            return Err(format!(
-                "explicit --track-id '{explicit}' does not match current branch \
-                 track '{resolved_from_branch}'. Run from the correct track branch."
-            ));
-        }
-        return Ok(explicit);
-    }
-
-    Ok(resolved_from_branch)
-}
-
-/// Resolves the current track ID from the active git branch (`track/<id>`).
-///
-/// Git discovery is anchored to the repository root derived from `items_dir`
-/// (stripping the trailing `track/items` segments), matching the same anchor
-/// strategy used by the write-guard variant and the pre-migration resolver.
-///
-/// # Errors
-/// Returns `Err` when git discovery fails or the branch is not a track branch.
-fn resolve_track_id_from_branch(items_dir: &std::path::Path) -> Result<String, String> {
-    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-
-    let project_root = crate::track::resolve_project_root(items_dir)?;
-    let output = SystemGitRepo::discover_from(&project_root)
-        .and_then(|r| r.output(&["rev-parse", "--abbrev-ref", "HEAD"]))
-        .map_err(|e| format!("failed to detect current branch: {e}"))?;
-
-    let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    branch.strip_prefix("track/").map(str::to_owned).ok_or_else(|| {
-        format!(
-            "current branch '{branch}' is not a track branch \
-                 (expected 'track/<id>')"
-        )
-    })
-}
-
-/// Builds the base prompt from an optional briefing file path or inline prompt.
-///
-/// # Errors
-/// Returns `Err` when neither is provided or the briefing file does not exist.
-fn build_base_prompt_from_input(
-    briefing_file: Option<PathBuf>,
-    prompt: Option<String>,
-) -> Result<String, String> {
-    if let Some(path) = briefing_file {
-        if !path.is_file() {
-            return Err(format!("briefing file not found: {}", path.display()));
-        }
-        Ok(format!("Read {} and perform the task described there.", path.display()))
-    } else {
-        prompt.ok_or_else(|| "either --briefing-file or --prompt is required".to_owned())
-    }
-}
-
-/// Converts a `CodexReviewOutcome` into a `CommandOutcome`.
-///
-/// The verdict JSON is written to stdout; the exit code is propagated directly.
-///
-/// # Errors
-/// Always returns `Ok` — the outcome variants only differ in exit code.
-fn outcome_to_command_outcome(outcome: CodexReviewOutcome) -> Result<CommandOutcome, String> {
-    match outcome {
-        CodexReviewOutcome::Skipped { scope_label } => {
-            eprintln!("[auto-record] Scope '{scope_label}' is empty, skipping");
-            Ok(CommandOutcome {
-                stdout: Some(r#"{"verdict":"zero_findings","findings":[]}"#.to_owned()),
-                stderr: None,
-                exit_code: 0,
-            })
-        }
-        CodexReviewOutcome::FinalCompleted { verdict_json, exit_code } => {
-            Ok(CommandOutcome { stdout: Some(verdict_json), stderr: None, exit_code })
-        }
-        CodexReviewOutcome::FastCompleted { verdict_json, exit_code } => {
-            Ok(CommandOutcome { stdout: Some(verdict_json), stderr: None, exit_code })
-        }
-    }
-}
-
-/// Returns `true` if `path` is safe to inject into a reviewer prompt.
-///
-/// Rejects: empty strings, control characters, line separators (U+2028/U+2029),
-/// backticks, absolute paths (Unix/Windows/UNC), Windows drive-letter prefixes,
-/// and `..` traversal components.
-fn is_safe_briefing_path(path: &str) -> bool {
-    if path.is_empty() {
-        return false;
-    }
-    if path.chars().any(|c| c == '`' || c.is_control() || matches!(c, '\u{2028}' | '\u{2029}')) {
-        return false;
-    }
-    if path.starts_with('/') || path.starts_with('\\') {
-        return false;
-    }
-    if let (Some(first), Some(second)) = (path.as_bytes().first(), path.as_bytes().get(1)) {
-        if *second == b':' && first.is_ascii_alphabetic() {
-            return false;
-        }
-    }
-    if path.split(['/', '\\']).any(|component| component == "..") {
-        return false;
-    }
-    true
-}
-
-/// Validates all paths and returns a joined error if any fail.
-///
-/// Mirrors `domain::FilePath::new` validation: empty, absolute, and `..`
-/// traversal paths are rejected.
-///
-/// # Errors
-/// Returns a newline-joined string of all validation errors when any path fails.
-fn validate_all_paths(paths: &[String]) -> Result<(), String> {
-    let mut errors: Vec<String> = Vec::new();
-    for raw in paths {
-        if raw.is_empty() {
-            errors.push("invalid path: empty string".to_owned());
-        } else if raw.starts_with('/')
-            || raw.starts_with('\\')
-            || raw.get(1..3).is_some_and(|p| p == ":\\" || p == ":/")
-        {
-            errors.push(format!(
-                "invalid path '{raw}': absolute paths are not allowed (use repo-relative)"
-            ));
-        } else {
-            let has_traversal = raw.split(&['/', '\\'][..]).any(|seg| seg == "..");
-            if has_traversal {
-                errors.push(format!(
-                    "invalid path '{raw}': '..' traversal components are not allowed"
-                ));
-            }
-        }
-    }
-    if errors.is_empty() { Ok(()) } else { Err(errors.join("\n")) }
-}
-
-// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -684,6 +626,8 @@ mod tests {
     use std::path::PathBuf;
     use std::process::Command;
 
+    use crate::review_v2::process_guards::{CwdGuard, EnvGuard, run_git};
+
     /// Serializes tests in this module that mutate the process CWD.
     /// Note: nextest runs each test in its own process, so this lock guards
     /// against races only when tests run in a shared process (e.g., `cargo test`).
@@ -691,56 +635,67 @@ mod tests {
         crate::test_support::process_env_lock()
     }
 
-    /// RAII guard: restores the process CWD to `saved` when dropped, even on panic.
-    struct CwdGuard(PathBuf);
-    impl Drop for CwdGuard {
-        fn drop(&mut self) {
-            let _ = std::env::set_current_dir(&self.0);
-        }
+    fn git_stdout(root: &std::path::Path, args: &[&str]) -> String {
+        let output = Command::new("git").args(args).current_dir(root).output().unwrap();
+        assert!(
+            output.status.success(),
+            "git command failed: git {}: {}",
+            args.join(" "),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        String::from_utf8_lossy(&output.stdout).trim().to_owned()
     }
 
-    struct EnvGuard {
-        key: &'static str,
-        value: Option<OsString>,
-    }
-    impl EnvGuard {
-        fn set(key: &'static str, value: OsString) -> Self {
-            let previous = std::env::var_os(key);
-            // Safety: tests that mutate process environment hold process_env_lock
-            // for the full guard lifetime, so this mutation is serialized with
-            // the other cwd/env-mutating tests in this crate.
-            unsafe {
-                std::env::set_var(key, value);
-            }
-            Self { key, value: previous }
-        }
-
-        fn remove(key: &'static str) -> Self {
-            let previous = std::env::var_os(key);
-            // Safety: see EnvGuard::set; the same process-wide lock is held while
-            // removing and later restoring this variable.
-            unsafe {
-                std::env::remove_var(key);
-            }
-            Self { key, value: previous }
-        }
-    }
-    impl Drop for EnvGuard {
-        fn drop(&mut self) {
-            // Safety: see EnvGuard::set; the guard is dropped before releasing
-            // the process-wide env/cwd lock.
-            unsafe {
-                match &self.value {
-                    Some(value) => std::env::set_var(self.key, value),
-                    None => std::env::remove_var(self.key),
-                }
-            }
-        }
+    struct ReviewEntrypointRepo {
+        _dir: tempfile::TempDir,
+        items_dir: PathBuf,
+        track_dir: PathBuf,
+        track_id: String,
     }
 
-    fn run_git(root: &std::path::Path, args: &[&str]) {
-        let status = Command::new("git").args(args).current_dir(root).status().unwrap();
-        assert!(status.success(), "git command failed: git {}", args.join(" "));
+    fn setup_review_entrypoint_repo(track_id: &str) -> ReviewEntrypointRepo {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init", "-b", "main"]);
+        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
+        run_git(dir.path(), &["config", "user.name", "Test"]);
+
+        let track_root = dir.path().join("track");
+        fs::create_dir_all(track_root.join("items")).unwrap();
+        fs::write(
+            track_root.join("review-scope.json"),
+            r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]}}}"#,
+        )
+        .unwrap();
+        fs::write(dir.path().join("README.md"), "init\n").unwrap();
+        run_git(dir.path(), &["add", "."]);
+        run_git(dir.path(), &["commit", "-m", "base"]);
+        let base_sha = git_stdout(dir.path(), &["rev-parse", "HEAD"]);
+
+        run_git(dir.path(), &["checkout", "-b", &format!("track/{track_id}")]);
+        fs::create_dir_all(dir.path().join("src")).unwrap();
+        fs::write(dir.path().join("src/lib.rs"), "pub fn changed() {}\n").unwrap();
+        run_git(dir.path(), &["add", "src/lib.rs"]);
+        run_git(dir.path(), &["commit", "-m", "change src"]);
+
+        let items_dir = track_root.join("items");
+        let track_dir = items_dir.join(track_id);
+        fs::create_dir_all(&track_dir).unwrap();
+        fs::write(track_dir.join(".commit_hash"), base_sha).unwrap();
+
+        ReviewEntrypointRepo { _dir: dir, items_dir, track_dir, track_id: track_id.to_owned() }
+    }
+
+    #[test]
+    fn test_review_telemetry_for_outcome_skipped_returns_zero_findings_without_subprocess() {
+        let run_result =
+            Ok(super::CodexReviewOutcome::Skipped { scope_label: "cli_composition".to_owned() });
+
+        let telemetry = super::review_telemetry_for_outcome(&run_result, "fast").unwrap();
+
+        assert_eq!(telemetry.findings_count, 0);
+        assert_eq!(telemetry.round_type, "fast");
+        assert!(!telemetry.verdict_parse_failed);
+        assert!(!telemetry.emit_subprocess);
     }
 
     #[cfg(unix)]
@@ -762,6 +717,12 @@ mod tests {
     "{provider}": {{ "label": "Test Provider" }}
   }},
   "capabilities": {{
+    "reviewer": {{
+      "provider": "{provider}",
+      "model": "review-final",
+      "fast_provider": "{provider}",
+      "fast_model": "review-fast"
+    }},
     "review-fix-lead": {{
       "provider": "{provider}",
       "model": "gpt-final",
@@ -776,10 +737,11 @@ mod tests {
     }
 
     #[cfg(unix)]
-    fn write_fake_codex_bin(bin_dir: &std::path::Path) {
+    fn write_fake_codex_bin_with_body(bin_dir: &std::path::Path, body: &str) {
         fs::create_dir_all(bin_dir).unwrap();
         let codex = bin_dir.join("codex");
-        let script = r#"#!/bin/sh
+        let script = format!(
+            r#"#!/bin/sh
 if [ "$1" = "--version" ]; then
   echo "codex 0.125.0"
   exit 0
@@ -803,13 +765,90 @@ if [ -z "$out" ]; then
   exit 9
 fi
 
-cat >/dev/null
+{body}
+"#
+        );
+        fs::write(&codex, script).unwrap();
+        make_executable(&codex);
+    }
+
+    #[cfg(unix)]
+    fn write_fake_codex_bin(bin_dir: &std::path::Path) {
+        write_fake_codex_bin_with_body(
+            bin_dir,
+            r#"cat >/dev/null
 printf 'REVIEW_FIX_STATUS: completed\n' > "$out"
 printf 'fake stdout\n'
 exit 0
+"#,
+        );
+    }
+
+    #[cfg(unix)]
+    fn write_fake_codex_reviewer_bin(bin_dir: &std::path::Path) {
+        write_fake_codex_bin_with_body(
+            bin_dir,
+            r#"
+printf '{"verdict":"zero_findings","findings":[]}\n' > "$out"
+exit 0
+"#,
+        );
+    }
+
+    #[cfg(unix)]
+    fn write_fake_claude_reviewer_bin(bin_dir: &std::path::Path) {
+        fs::create_dir_all(bin_dir).unwrap();
+        let claude = bin_dir.join("claude");
+        let script = r#"#!/bin/sh
+printf '%s\n' '{"type":"result","structured_output":{"verdict":"zero_findings","findings":[]}}'
+exit 0
 "#;
-        fs::write(&codex, script).unwrap();
-        make_executable(&codex);
+        fs::write(&claude, script).unwrap();
+        make_executable(&claude);
+    }
+
+    fn prepend_path(bin_dir: &std::path::Path) -> EnvGuard {
+        let previous_path = std::env::var_os("PATH").unwrap_or_default();
+        let mut test_path = bin_dir.as_os_str().to_os_string();
+        test_path.push(":");
+        test_path.push(previous_path);
+        EnvGuard::set("PATH", test_path)
+    }
+
+    fn assert_review_telemetry(
+        track_dir: &std::path::Path,
+        provider: &str,
+        model: &str,
+        command: &str,
+        round_type: &str,
+    ) {
+        let telemetry_path = track_dir.join("logs/telemetry.jsonl");
+        let content = fs::read_to_string(&telemetry_path).unwrap();
+        let events: Vec<serde_json::Value> =
+            content.lines().map(|line| serde_json::from_str(line).unwrap()).collect();
+
+        assert!(
+            events.iter().any(|event| {
+                event.get("event_type").and_then(serde_json::Value::as_str) == Some("ReviewRound")
+                    && event.get("provider").and_then(serde_json::Value::as_str) == Some(provider)
+                    && event.get("model").and_then(serde_json::Value::as_str) == Some(model)
+                    && event.get("round_type").and_then(serde_json::Value::as_str)
+                        == Some(round_type)
+                    && event.get("findings_count").and_then(serde_json::Value::as_u64) == Some(0)
+            }),
+            "ReviewRound telemetry missing from {content}"
+        );
+        assert!(
+            events.iter().any(|event| {
+                event.get("event_type").and_then(serde_json::Value::as_str)
+                    == Some("ExternalSubprocess")
+                    && event.get("command").and_then(serde_json::Value::as_str) == Some(command)
+                    && event.get("retry_count").and_then(serde_json::Value::as_u64) == Some(0)
+                    && event.get("verdict_parse_failed").and_then(serde_json::Value::as_bool)
+                        == Some(false)
+            }),
+            "ExternalSubprocess telemetry missing from {content}"
+        );
     }
 
     fn run_review_fix_input(briefing_file: PathBuf) -> crate::review_v2::RunReviewFixLocalInput {
@@ -858,13 +897,111 @@ exit 0
         fs::create_dir_all(&subdir).unwrap();
 
         // Restore CWD on drop, even if an assertion panics.
-        let _cwd_guard = CwdGuard(std::env::current_dir().unwrap());
+        let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(&subdir).unwrap();
 
         // Pass the relative path — the function must succeed by anchoring to CWD (".").
-        let result = super::resolve_track_id_from_branch(std::path::Path::new("track/items"));
+        let result =
+            super::helpers::resolve_track_id_from_branch(std::path::Path::new("track/items"));
 
         assert_eq!(result.unwrap(), "test-track");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn review_run_codex_happy_path_writes_verdict_and_telemetry() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-codex-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-codex");
+        write_fake_codex_reviewer_bin(&bin_dir);
+        let _path_guard = prepend_path(&bin_dir);
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = crate::CliApp::new()
+            .review_run_codex(crate::review_v2::ReviewRunCodexInput {
+                model: "codex-review-model".to_owned(),
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stdout.as_deref().unwrap_or("").contains("zero_findings"));
+        assert!(repo.track_dir.join("review.json").exists());
+        assert_review_telemetry(&repo.track_dir, "codex", "codex-review-model", "codex", "fast");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn review_run_claude_happy_path_writes_verdict_and_telemetry() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-claude-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-claude");
+        write_fake_claude_reviewer_bin(&bin_dir);
+        let _path_guard = prepend_path(&bin_dir);
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = crate::CliApp::new()
+            .review_run_claude(crate::review_v2::ReviewRunClaudeInput {
+                model: "claude-review-model".to_owned(),
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stdout.as_deref().unwrap_or("").contains("zero_findings"));
+        assert!(repo.track_dir.join("review.json").exists());
+        assert_review_telemetry(&repo.track_dir, "claude", "claude-review-model", "claude", "fast");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn review_run_local_resolves_profile_happy_path_writes_verdict_and_telemetry() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-2026");
+        write_agent_profiles(repo._dir.path(), "claude");
+        let bin_dir = repo.track_dir.join("fake-bin-local");
+        write_fake_claude_reviewer_bin(&bin_dir);
+        let _path_guard = prepend_path(&bin_dir);
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = crate::CliApp::new()
+            .review_run_local(crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stdout.as_deref().unwrap_or("").contains("zero_findings"));
+        assert!(repo.track_dir.join("review.json").exists());
+        assert_review_telemetry(&repo.track_dir, "claude", "review-fast", "claude", "fast");
     }
 
     #[cfg(unix)]
@@ -887,7 +1024,7 @@ exit 0
         let _path_guard = EnvGuard::set("PATH", test_path);
         let _sandbox_guard = EnvGuard::remove("CODEX_SANDBOX");
 
-        let _cwd_guard = CwdGuard(std::env::current_dir().unwrap());
+        let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
         let outcome =
@@ -908,7 +1045,7 @@ exit 0
         let briefing = dir.path().join("briefing.md");
         fs::write(&briefing, "# Briefing\n").unwrap();
 
-        let _cwd_guard = CwdGuard(std::env::current_dir().unwrap());
+        let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
         let result = crate::CliApp::new().review_run_fix_local(run_review_fix_input(briefing));
@@ -921,13 +1058,73 @@ exit 0
         );
     }
 
+    #[test]
+    fn review_run_claude_returns_branch_error_not_discovery_error_for_non_track_branch() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init", "-b", "main"]);
+        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
+        run_git(dir.path(), &["config", "user.name", "Test"]);
+        fs::write(dir.path().join("README.md"), "init\n").unwrap();
+        run_git(dir.path(), &["add", "README.md"]);
+        run_git(dir.path(), &["commit", "-m", "init"]);
+        let items_dir = dir.path().join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
+
+        let result =
+            crate::CliApp::new().review_run_claude(crate::review_v2::ReviewRunClaudeInput {
+                model: "test-model".to_owned(),
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: None,
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir,
+            });
+
+        assert!(result.is_err(), "expected Err on non-track branch, got Ok");
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("not a track branch") || msg.contains("main"),
+            "expected branch error, got: {msg}"
+        );
+    }
+
+    #[test]
+    fn review_run_local_unsupported_provider_returns_error() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-unsupported-2026");
+        write_agent_profiles(repo._dir.path(), "gemini");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let result = crate::CliApp::new().review_run_local(crate::review_v2::ReviewRunLocalInput {
+            model: None,
+            timeout_seconds: 10,
+            briefing_file: None,
+            prompt: Some("Review.".to_owned()),
+            track_id: Some(repo.track_id.clone()),
+            round_type: "fast".to_owned(),
+            group: "cli_composition".to_owned(),
+            items_dir: repo.items_dir.clone(),
+        });
+
+        assert!(result.is_err(), "expected unsupported provider error, got: {result:?}");
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("unsupported reviewer provider 'gemini'"),
+            "expected unsupported provider error, got: {msg}"
+        );
+    }
+
     /// Pin that `resolve_track_id_from_branch` returns an error for a relative
     /// `items_dir` that does not follow the `*/track/items` structure.
     #[test]
     fn resolve_track_id_from_branch_rejects_non_canonical_items_dir() {
         // A path like "wrong/path" does not end in "track/items", so
         // resolve_project_root should return an error before any git I/O.
-        let result = super::resolve_track_id_from_branch(std::path::Path::new("wrong/path"));
+        let result =
+            super::helpers::resolve_track_id_from_branch(std::path::Path::new("wrong/path"));
         assert!(result.is_err(), "expected error for non-canonical items_dir, got: {result:?}");
         let msg = result.unwrap_err();
         assert!(msg.contains("track/items"), "error should mention 'track/items', got: {msg}");
@@ -950,7 +1147,7 @@ exit 0
         fs::create_dir_all(&items_dir).unwrap();
 
         // Pass the absolute path directly — no CWD dependency.
-        let result = super::resolve_track_id_from_branch(&items_dir);
+        let result = super::helpers::resolve_track_id_from_branch(&items_dir);
 
         assert_eq!(result.unwrap(), "abs-track");
     }
@@ -976,7 +1173,7 @@ exit 0
         let items_dir = dir.path().join("track/items");
         fs::create_dir_all(&items_dir).unwrap();
 
-        let result = super::resolve_track_id_from_branch(&items_dir);
+        let result = super::helpers::resolve_track_id_from_branch(&items_dir);
 
         assert!(result.is_err());
         let msg = result.unwrap_err();
@@ -988,64 +1185,55 @@ exit 0
     }
 
     #[test]
-    fn resolve_track_id_uses_provided_id_without_git_discovery() {
-        // When an explicit track ID is provided, no git I/O should occur.
-        // A non-existent items_dir is fine here because track_id shortcircuits.
-        let result = super::resolve_track_id_or_branch(
-            Some("explicit-id".to_owned()),
-            std::path::Path::new("track/items"),
-        );
-        assert_eq!(result.unwrap(), "explicit-id");
-    }
-
-    #[test]
     fn validate_all_paths_accepts_clean_relative_paths() {
-        let result =
-            super::validate_all_paths(&["src/lib.rs".to_owned(), "apps/cli/mod.rs".to_owned()]);
+        let result = super::helpers::validate_all_paths(&[
+            "src/lib.rs".to_owned(),
+            "apps/cli/mod.rs".to_owned(),
+        ]);
         assert!(result.is_ok());
     }
 
     #[test]
     fn validate_all_paths_rejects_absolute_paths() {
-        let result = super::validate_all_paths(&["/etc/passwd".to_owned()]);
+        let result = super::helpers::validate_all_paths(&["/etc/passwd".to_owned()]);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("absolute paths"));
     }
 
     #[test]
+    fn validate_all_paths_rejects_windows_drive_prefixed_paths() {
+        for raw in ["C:", "C:foo", "C:/foo", "C:\\foo", "z:relative"] {
+            let result = super::helpers::validate_all_paths(&[raw.to_owned()]);
+            assert!(result.is_err(), "expected drive-prefixed path to be rejected: {raw}");
+            assert!(result.unwrap_err().contains("absolute paths"));
+        }
+    }
+
+    #[test]
     fn validate_all_paths_rejects_traversal_components() {
-        let result = super::validate_all_paths(&["../../etc/passwd".to_owned()]);
+        let result = super::helpers::validate_all_paths(&["../../etc/passwd".to_owned()]);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("traversal"));
     }
 
     #[test]
-    fn resolve_track_id_from_branch_returns_project_root_error_for_nested_dir() {
-        // items_dir path "some/nested/dir" is not valid `*/track/items`
-        let result = super::resolve_track_id_from_branch(std::path::Path::new("some/nested/dir"));
-        assert!(result.is_err());
-        let msg = result.unwrap_err();
-        assert!(msg.contains("track/items"), "error should mention 'track/items', got: {msg}");
-    }
-
-    #[test]
     fn is_safe_briefing_path_rejects_empty() {
-        assert!(!super::is_safe_briefing_path(""));
+        assert!(!super::helpers::is_safe_briefing_path(""));
     }
 
     #[test]
     fn is_safe_briefing_path_rejects_absolute_unix() {
-        assert!(!super::is_safe_briefing_path("/tmp/brief.md"));
+        assert!(!super::helpers::is_safe_briefing_path("/tmp/brief.md"));
     }
 
     #[test]
     fn is_safe_briefing_path_rejects_traversal() {
-        assert!(!super::is_safe_briefing_path("../some/brief.md"));
+        assert!(!super::helpers::is_safe_briefing_path("../some/brief.md"));
     }
 
     #[test]
     fn is_safe_briefing_path_accepts_relative_clean_path() {
-        assert!(super::is_safe_briefing_path("track/items/my-track/briefing.md"));
+        assert!(super::helpers::is_safe_briefing_path("track/items/my-track/briefing.md"));
     }
 
     /// Confirm that `PathBuf` passed as `items_dir` is handled correctly for
@@ -1054,7 +1242,7 @@ exit 0
     #[test]
     fn resolve_track_id_or_branch_explicit_id_bypasses_items_dir_validation() {
         // Even a clearly non-canonical items_dir is ignored when track_id is explicit.
-        let result = super::resolve_track_id_or_branch(
+        let result = super::helpers::resolve_track_id_or_branch(
             Some("my-track".to_owned()),
             std::path::Path::new("not/track/items"),
         );
@@ -1065,8 +1253,10 @@ exit 0
     fn resolve_track_id_or_branch_none_id_validates_items_dir_structure() {
         // When track_id is None, items_dir must follow the canonical `*/track/items` structure.
         // Use a path that genuinely does NOT end in `track/items`.
-        let result =
-            super::resolve_track_id_or_branch(None, std::path::Path::new("wrong/path/here"));
+        let result = super::helpers::resolve_track_id_or_branch(
+            None,
+            std::path::Path::new("wrong/path/here"),
+        );
         assert!(result.is_err());
         let msg = result.unwrap_err();
         assert!(msg.contains("track/items"), "expected items-dir error, got: {msg}");

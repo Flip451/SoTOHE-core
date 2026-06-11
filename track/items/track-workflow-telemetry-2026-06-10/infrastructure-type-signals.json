@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-11T03:00:29Z",
-  "declaration_hash": "88f0540f061fa1894f949d2f8c13c132625a0b1d325063199515ac55bc0eef55",
+  "generated_at": "2026-06-11T13:41:34Z",
+  "declaration_hash": "ef3004722fc0631e871b7fbddc5422665ae9087a7565c2ca01c045b746707773",
   "signals": [
     {
       "type_name": "PhaseDurationSummary",
@@ -11,6 +11,20 @@
       "missing_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RoundType",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy",
+        "core::str::traits::FromStr"
       ]
     },
     {

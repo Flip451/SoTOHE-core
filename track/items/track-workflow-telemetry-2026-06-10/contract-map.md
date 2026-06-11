@@ -31,6 +31,15 @@ subgraph usecase["usecase"]
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_agent_profiles["infrastructure::agent_profiles"]
+    direction TB
+  subgraph T39_infrastructure_infrastructure_RoundType["agent_profiles::RoundType"]
+    direction TB
+    T39_infrastructure_infrastructure_RoundType__self[RoundType]
+    T39_infrastructure_infrastructure_RoundType_Final[Final]
+    T39_infrastructure_infrastructure_RoundType_Fast[Fast]
+  end
+  end
   subgraph infrastructure_infrastructure_module_telemetry["infrastructure::telemetry"]
     direction TB
   subgraph T50_infrastructure_infrastructure_PhaseDurationSummary["telemetry::PhaseDurationSummary"]
@@ -103,6 +112,9 @@ T45_infrastructure_infrastructure_TelemetryWriter_new --o T45_infrastructure_inf
 T45_infrastructure_infrastructure_TelemetryWriter_new --> T45_infrastructure_infrastructure_TelemetryWriter__self
 T45_infrastructure_infrastructure_TelemetryWriter_write --o T44_infrastructure_infrastructure_TelemetryEvent__self
 T45_infrastructure_infrastructure_TelemetryWriter_write --> T49_infrastructure_infrastructure_TelemetryWriteError__self
+class T39_infrastructure_infrastructure_RoundType_Final variant_node
+class T39_infrastructure_infrastructure_RoundType_Fast variant_node
+class T39_infrastructure_infrastructure_RoundType__self dto
 class T50_infrastructure_infrastructure_PhaseDurationSummary__self dto
 class T45_infrastructure_infrastructure_TelemetryConfig_from_env method_node
 class T45_infrastructure_infrastructure_TelemetryConfig_is_enabled method_node

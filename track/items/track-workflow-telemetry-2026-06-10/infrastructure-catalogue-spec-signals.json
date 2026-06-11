@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "88f0540f061fa1894f949d2f8c13c132625a0b1d325063199515ac55bc0eef55",
+  "catalogue_declaration_hash": "ef3004722fc0631e871b7fbddc5422665ae9087a7565c2ca01c045b746707773",
   "signals": [
     {
       "type_name": "PhaseDurationSummary",
       "signal": "blue",
       "entry_hash": "d5b7a7c8cf532dbbcacfac224e46ff2d61420f0775ca2c6d1ee09d4d1ccd0b64"
+    },
+    {
+      "type_name": "RoundType",
+      "signal": "blue",
+      "entry_hash": "4b20acdfa53e207836675fd43b8dab0be7766613848947459ab54df4f1683b5e"
     },
     {
       "type_name": "TelemetryConfig",

@@ -6,14 +6,13 @@
 
 use std::sync::Arc;
 
-use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
-use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 use infrastructure::review_v2::CodexReviewFixRunner;
 use usecase::review_v2::run_review_fix::{
     ReviewFixRunner as _, ReviewFixRunnerError, RunReviewFixCommand, RunReviewFixError,
     RunReviewFixInteractor, RunReviewFixService as _,
 };
 
+use super::shared::{parse_round_type, resolve_agent_execution};
 use super::{RunReviewFixLocalInput, validate_review_group_name_str, validate_track_id_str};
 use crate::CommandOutcome;
 
@@ -28,41 +27,16 @@ use crate::CommandOutcome;
 /// Returns `Err` when profile loading, provider resolution, arg validation,
 /// or the fix runner fails.
 pub(crate) fn run_fix_local(input: RunReviewFixLocalInput) -> Result<CommandOutcome, String> {
-    let repo = SystemGitRepo::discover()
-        .map_err(|e| format!("[ERROR] failed to discover git repository root: {e}"))?;
-    let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
-    let profiles = AgentProfiles::load(&profiles_path)
-        .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
-
     let track_id = input.track_id.trim().to_owned();
     validate_track_id_str(&track_id).map_err(|e| format!("invalid --track-id: {e}"))?;
 
     let scope = input.scope.trim().to_owned();
     validate_review_group_name_str(&scope).map_err(|e| format!("invalid --scope: {e}"))?;
 
-    let infra_round_type = match input.round_type.as_str() {
-        "fast" => RoundType::Fast,
-        "final" => RoundType::Final,
-        other => {
-            return Err(format!(
-                "[ERROR] unknown round type '{other}' (expected 'fast' or 'final')"
-            ));
-        }
-    };
+    let infra_round_type = parse_round_type(&input.round_type)?;
     let resolved =
-        profiles.resolve_execution("review-fix-lead", infra_round_type).ok_or_else(|| {
-            "[ERROR] review-fix-lead capability not defined in agent-profiles.json".to_owned()
-        })?;
-
-    // Honor an explicit --model override; fall back to the profile model.
-    // `input.model` is `None` when the flag was omitted, meaning "use the
-    // profile default".  `resolved.model` is the profile model (may also be
-    // `None` when the profile entry has no model field).
-    let model = input.model.clone().or_else(|| resolved.model.clone()).ok_or_else(|| {
-        "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
-         review-fix-lead capability"
-            .to_owned()
-    })?;
+        resolve_agent_execution(None, "review-fix-lead", infra_round_type, input.model.as_deref())?;
+    let model = resolved.model;
 
     eprintln!("[sotp review fix-local] provider={} model={}", resolved.provider, &model);
 

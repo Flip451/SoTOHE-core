@@ -10,9 +10,11 @@
 //! - `emit_gate_eval`: fire-and-forget `TelemetryEvent::GateEval` emit (T005).
 //! - `emit_hook_block`: fire-and-forget `TelemetryEvent::HookBlock` emit (T005).
 //! - `emit_advisory_hook_fired`: fire-and-forget `TelemetryEvent::AdvisoryHookFired` emit (T005).
+//! - `emit_review_round`: fire-and-forget `TelemetryEvent::ReviewRound` emit (T006).
+//! - `emit_external_subprocess`: fire-and-forget `TelemetryEvent::ExternalSubprocess` emit (T006).
 //! - `now_timestamp`: ISO-8601 UTC timestamp helper.
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::time::Instant;
 
@@ -66,7 +68,21 @@ pub fn init_tracing_subscriber() {
 /// Returns both the `TelemetryWriter` and the resolved `track_id` so the
 /// caller does not need to perform a second branch lookup.
 pub fn resolve_telemetry_writer(items_dir: &Path) -> Option<(TelemetryWriter, String)> {
-    resolve_telemetry_writer_inner(resolve_track_id_from_branch(items_dir), items_dir)
+    let (track_id, anchored_items_dir) = resolve_telemetry_context_from_branch(items_dir)?;
+    resolve_telemetry_writer_inner(Some(track_id), &anchored_items_dir)
+}
+
+/// Constructs a telemetry writer from an already-resolved command track context.
+///
+/// This avoids re-reading the current branch after a long command finishes. The
+/// caller is responsible for resolving / validating the track id at command
+/// start.
+pub(crate) fn resolve_telemetry_writer_for_track(
+    items_dir: &Path,
+    track_id: &str,
+) -> Option<(TelemetryWriter, String)> {
+    let anchored_items_dir = resolve_anchored_items_dir(items_dir)?;
+    resolve_telemetry_writer_inner(Some(track_id.to_owned()), &anchored_items_dir)
 }
 
 /// Inner implementation of `resolve_telemetry_writer`, accepting a pre-resolved
@@ -103,17 +119,34 @@ pub(crate) fn resolve_telemetry_writer_inner(
 /// Returns `None` for non-`track/*` branches, detached HEAD, or git failures.
 /// Git failure is intentionally silent (fire-and-forget: telemetry is disabled
 /// if we cannot determine the branch — AC-11).
-fn resolve_track_id_from_branch(items_dir: &Path) -> Option<String> {
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+fn resolve_telemetry_context_from_branch(items_dir: &Path) -> Option<(String, PathBuf)> {
+    use infrastructure::git_cli::GitRepository as _;
     use usecase::track_resolution::resolve_track_id_from_branch as resolve_fn;
 
     // Derive the project root from items_dir so discovery is anchored to the
     // correct repo regardless of the process CWD (P1 fix: was discover()).
-    let project_root = crate::track::resolve_project_root(items_dir).ok()?;
-    let repo = SystemGitRepo::discover_from(&project_root).ok()?;
+    let repo = discover_telemetry_repo(items_dir)?;
     let branch = repo.current_branch().ok().flatten()?;
+    let track_id = resolve_fn(Some(&branch)).ok()?;
+    let anchored_items_dir = anchor_items_dir_to_repo(items_dir, repo.root());
 
-    resolve_fn(Some(&branch)).ok()
+    Some((track_id, anchored_items_dir))
+}
+
+fn resolve_anchored_items_dir(items_dir: &Path) -> Option<PathBuf> {
+    use infrastructure::git_cli::GitRepository as _;
+
+    let repo = discover_telemetry_repo(items_dir)?;
+    Some(anchor_items_dir_to_repo(items_dir, repo.root()))
+}
+
+fn discover_telemetry_repo(items_dir: &Path) -> Option<infrastructure::git_cli::SystemGitRepo> {
+    let project_root = crate::track::resolve_project_root(items_dir).ok()?;
+    infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).ok()
+}
+
+fn anchor_items_dir_to_repo(items_dir: &Path, repo_root: &Path) -> PathBuf {
+    if items_dir.is_absolute() { items_dir.to_path_buf() } else { repo_root.join(items_dir) }
 }
 
 // ---------------------------------------------------------------------------
@@ -228,6 +261,89 @@ pub fn emit_hook_block(writer: &TelemetryWriter, track_id: &str, hook_name: &str
     let _ = writer.write(event);
 }
 
+/// Emits a `TelemetryEvent::ReviewRound` event via fire-and-forget (T006 / AC-03).
+///
+/// Emitted after a review or dry round completes with the round result known.
+/// For dry rounds `round_type` should be `"dry"`.
+///
+/// # Arguments
+/// - `writer`: the writer constructed at startup.
+/// - `track_id`: the branch-bound track id.
+/// - `provider`: the provider name, e.g. `"codex"` or `"claude"`.
+/// - `model`: the model name used.
+/// - `round_type`: `"fast"`, `"final"`, or `"dry"`.
+/// - `findings_count`: number of findings / violations in the completed round.
+/// - `start`: the `Instant` captured before the round started.
+///
+/// Suppresses any `TelemetryWriteError` (CN-01 / diagnostic-only).
+pub fn emit_review_round(
+    writer: &TelemetryWriter,
+    track_id: &str,
+    provider: &str,
+    model: &str,
+    round_type: &str,
+    findings_count: u32,
+    start: Instant,
+) {
+    let duration_ms = start.elapsed().as_millis().try_into().unwrap_or(u64::MAX);
+    let event = TelemetryEvent::ReviewRound {
+        schema_version: 1,
+        track_id: track_id.to_string(),
+        provider: provider.to_string(),
+        model: model.to_string(),
+        round_type: round_type.to_string(),
+        duration_ms,
+        findings_count,
+        timestamp: now_timestamp(),
+    };
+    // Fire-and-forget: suppress errors per CN-01.
+    let _ = writer.write(event);
+}
+
+/// Emits a `TelemetryEvent::ExternalSubprocess` event via fire-and-forget
+/// (T006 / AC-03).
+///
+/// Emitted after an external subprocess (codex/claude/gemini) completes.
+/// The `start` instant should be captured before the subprocess was launched.
+///
+/// Placement rationale: emitted at the composition layer (`apps/cli-composition`)
+/// after `run_codex_review_str` / `run_claude_review_str` / `dry_write` return.
+/// This avoids threading the writer into `libs/infrastructure`; the composition
+/// layer has all required data (command name, timing, retry_count=0, parse failure
+/// flag). `retry_count` is 0 because the current implementation has no retry loop;
+/// `verdict_parse_failed` is derived from whether the round returned an error.
+///
+/// # Arguments
+/// - `writer`: the writer constructed at startup.
+/// - `track_id`: the branch-bound track id.
+/// - `command`: the subprocess binary name (e.g. `"codex"`, `"claude"`).
+/// - `retry_count`: number of retries attempted (currently always 0).
+/// - `verdict_parse_failed`: `true` when the round returned a parse / verdict error.
+/// - `start`: the `Instant` captured before the subprocess was launched.
+///
+/// Suppresses any `TelemetryWriteError` (CN-01 / diagnostic-only).
+pub fn emit_external_subprocess(
+    writer: &TelemetryWriter,
+    track_id: &str,
+    command: &str,
+    retry_count: u32,
+    verdict_parse_failed: bool,
+    start: Instant,
+) {
+    let duration_ms = start.elapsed().as_millis().try_into().unwrap_or(u64::MAX);
+    let event = TelemetryEvent::ExternalSubprocess {
+        schema_version: 1,
+        track_id: track_id.to_string(),
+        command: command.to_string(),
+        duration_ms,
+        retry_count,
+        verdict_parse_failed,
+        timestamp: now_timestamp(),
+    };
+    // Fire-and-forget: suppress errors per CN-01.
+    let _ = writer.write(event);
+}
+
 /// Emits a `TelemetryEvent::AdvisoryHookFired` event via fire-and-forget
 /// (T005 / AC-04).
 ///
@@ -255,30 +371,50 @@ pub fn emit_advisory_hook_fired(writer: &TelemetryWriter, track_id: &str, hook_n
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::path::Path;
     use std::time::Instant;
 
     use infrastructure::telemetry::{TelemetryConfig, TelemetryWriter};
     use tempfile::TempDir;
 
-    use super::{emit_non_zero_exit, emit_track_subcommand};
+    use crate::review_v2::process_guards::{CwdGuard, run_git};
 
-    // -----------------------------------------------------------------------
-    // resolve_track_id_from_branch: branch-parse coverage lives in
-    // libs/usecase/src/track_resolution.rs; tests here cover only the
-    // telemetry wiring composition path.
-    // -----------------------------------------------------------------------
+    use super::{
+        emit_external_subprocess, emit_non_zero_exit, emit_review_round, emit_track_subcommand,
+    };
 
-    #[test]
-    fn test_detached_head_yields_no_track_id() {
-        use usecase::track_resolution::{TrackResolutionError, resolve_track_id_from_branch};
-        // None branch = detached HEAD or NoBranch
-        let result = resolve_track_id_from_branch(None);
-        match result {
-            Err(TrackResolutionError::NoBranch) => {}
-            Err(TrackResolutionError::DetachedHead) => {}
-            Err(_) => {} // Any error is acceptable
-            Ok(id) => panic!("expected no track id for None branch, got {id:?}"),
-        }
+    fn temp_repo_on_track_branch(track_id: &str) -> TempDir {
+        let repo = TempDir::new().unwrap();
+        run_git(repo.path(), &["init", "-q"]);
+        set_git_head_ref(repo.path(), &format!("track/{track_id}"));
+        repo
+    }
+
+    fn set_git_head_ref(repo_root: &Path, branch: &str) {
+        let branch_ref_path = repo_root.join(".git/refs/heads").join(branch);
+        std::fs::create_dir_all(branch_ref_path.parent().unwrap()).unwrap();
+        std::fs::write(&branch_ref_path, "0000000000000000000000000000000000000001\n").unwrap();
+        std::fs::write(repo_root.join(".git/HEAD"), format!("ref: refs/heads/{branch}\n")).unwrap();
+    }
+
+    fn emit_test_track_subcommand<F>(resolve_writer: F) -> String
+    where
+        F: FnOnce() -> Option<(TelemetryWriter, String)>,
+    {
+        temp_env::with_vars(
+            [("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None::<&str>)],
+            || {
+                let (writer, resolved_track_id) = resolve_writer().unwrap();
+                emit_track_subcommand(
+                    &writer,
+                    &resolved_track_id,
+                    "track transition",
+                    0,
+                    Instant::now(),
+                );
+                resolved_track_id
+            },
+        )
     }
 
     // -----------------------------------------------------------------------
@@ -319,6 +455,80 @@ mod tests {
             let result = super::resolve_telemetry_writer_inner(None, tmp.path());
             assert!(result.is_none(), "None track_id (non-track branch) must yield None writer");
         });
+    }
+
+    #[test]
+    fn test_resolve_telemetry_writer_relative_items_dir_anchors_at_repo_root() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let track_id = "telemetry-anchor-2026-06-11";
+        let repo = temp_repo_on_track_branch(track_id);
+        std::fs::create_dir_all(repo.path().join("track/items")).unwrap();
+
+        let subdir = repo.path().join("nested");
+        std::fs::create_dir_all(&subdir).unwrap();
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(&subdir).unwrap();
+
+        let resolved_track_id = emit_test_track_subcommand(|| {
+            super::resolve_telemetry_writer(Path::new("track/items"))
+        });
+        assert_eq!(resolved_track_id, track_id);
+
+        let repo_telemetry_path =
+            repo.path().join("track/items").join(track_id).join("logs/telemetry.jsonl");
+        let subdir_telemetry_path =
+            subdir.join("track/items").join(track_id).join("logs/telemetry.jsonl");
+        assert!(repo_telemetry_path.exists(), "telemetry must be written under repo track/items");
+        assert!(
+            !subdir_telemetry_path.exists(),
+            "relative items_dir must not write telemetry under the process cwd"
+        );
+    }
+
+    #[test]
+    fn test_resolve_telemetry_writer_preserves_custom_items_dir() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let track_id = "telemetry-custom-items-2026-06-11";
+        let repo = temp_repo_on_track_branch(track_id);
+
+        let custom_items_dir = repo.path().join("custom/track/items");
+        std::fs::create_dir_all(&custom_items_dir).unwrap();
+
+        let resolved_track_id =
+            emit_test_track_subcommand(|| super::resolve_telemetry_writer(&custom_items_dir));
+        assert_eq!(resolved_track_id, track_id);
+
+        let custom_telemetry_path = custom_items_dir.join(track_id).join("logs/telemetry.jsonl");
+        let default_telemetry_path =
+            repo.path().join("track/items").join(track_id).join("logs/telemetry.jsonl");
+        assert!(custom_telemetry_path.exists(), "telemetry must use the supplied items_dir");
+        assert!(
+            !default_telemetry_path.exists(),
+            "custom items_dir must not be rewritten to the default track/items path"
+        );
+    }
+
+    #[test]
+    fn test_resolve_telemetry_writer_for_track_does_not_reread_branch() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let track_id = "telemetry-captured-track-2026-06-11";
+        let repo = temp_repo_on_track_branch(track_id);
+        std::fs::create_dir_all(repo.path().join("track/items")).unwrap();
+        set_git_head_ref(repo.path(), "main");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo.path()).unwrap();
+
+        let resolved_track_id = emit_test_track_subcommand(|| {
+            super::resolve_telemetry_writer_for_track(Path::new("track/items"), track_id)
+        });
+        assert_eq!(resolved_track_id, track_id);
+
+        let telemetry_path =
+            repo.path().join("track/items").join(track_id).join("logs/telemetry.jsonl");
+        assert!(
+            telemetry_path.exists(),
+            "pre-resolved telemetry must use the captured track id even after a branch switch"
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -477,6 +687,131 @@ mod tests {
     // -----------------------------------------------------------------------
     // emit_advisory_hook_fired: AdvisoryHookFired emitted for advisory hooks (AC-04)
     // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+    // emit_review_round: ReviewRound event with required fields (AC-03 / T006)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_emit_review_round_writes_review_round_event_with_required_fields() {
+        // Safety: writer_in_tempdir mutates process environment via temp_env.
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let tmp = TempDir::new().unwrap();
+        let (writer, track_id) = writer_in_tempdir(&tmp);
+        let start = Instant::now();
+
+        emit_review_round(&writer, &track_id, "codex", "gpt-5.4-mini", "fast", 3, start);
+
+        let output_path = tmp.path().join("telemetry.jsonl");
+        assert!(output_path.exists(), "telemetry.jsonl must exist after emit_review_round");
+        let content = std::fs::read_to_string(&output_path).unwrap();
+        // Required fields per AC-03 / infrastructure-types.json
+        assert!(content.contains("ReviewRound"), "event_type must be ReviewRound; got: {content}");
+        assert!(
+            content.contains("\"provider\":\"codex\""),
+            "provider must be present; got: {content}"
+        );
+        assert!(
+            content.contains("\"model\":\"gpt-5.4-mini\""),
+            "model must be present; got: {content}"
+        );
+        assert!(
+            content.contains("\"round_type\":\"fast\""),
+            "round_type must be present; got: {content}"
+        );
+        assert!(
+            content.contains("\"findings_count\":3"),
+            "findings_count must be present; got: {content}"
+        );
+        assert!(content.contains("\"duration_ms\""), "duration_ms must be present; got: {content}");
+        assert!(content.contains("\"schema_version\":1"), "schema_version must be present (AC-09)");
+        assert!(content.contains(&track_id), "track_id must be present");
+        // Findings body must NOT be present (OS-04).
+        assert!(!content.contains("message"), "findings body must not be recorded (OS-04)");
+    }
+
+    #[test]
+    fn test_emit_review_round_dry_round_type_is_recorded() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let tmp = TempDir::new().unwrap();
+        let (writer, track_id) = writer_in_tempdir(&tmp);
+        let start = Instant::now();
+
+        emit_review_round(&writer, &track_id, "codex", "gpt-5.4-mini", "dry", 0, start);
+
+        let content = std::fs::read_to_string(tmp.path().join("telemetry.jsonl")).unwrap();
+        assert!(
+            content.contains("\"round_type\":\"dry\""),
+            "dry round_type must be recorded; got: {content}"
+        );
+        assert!(
+            content.contains("\"findings_count\":0"),
+            "zero findings must be recorded; got: {content}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // emit_external_subprocess: ExternalSubprocess event (AC-03 / T006)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_emit_external_subprocess_success_path_writes_event() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let tmp = TempDir::new().unwrap();
+        let (writer, track_id) = writer_in_tempdir(&tmp);
+        let start = Instant::now();
+
+        // verdict_parse_failed = false: normal completion
+        emit_external_subprocess(&writer, &track_id, "codex", 0, false, start);
+
+        let output_path = tmp.path().join("telemetry.jsonl");
+        assert!(output_path.exists(), "telemetry.jsonl must exist after emit_external_subprocess");
+        let content = std::fs::read_to_string(&output_path).unwrap();
+        assert!(
+            content.contains("ExternalSubprocess"),
+            "event_type must be ExternalSubprocess; got: {content}"
+        );
+        assert!(
+            content.contains("\"command\":\"codex\""),
+            "command must be present; got: {content}"
+        );
+        assert!(
+            content.contains("\"retry_count\":0"),
+            "retry_count must be present; got: {content}"
+        );
+        assert!(
+            content.contains("\"verdict_parse_failed\":false"),
+            "verdict_parse_failed false must be present; got: {content}"
+        );
+        assert!(content.contains("\"duration_ms\""), "duration_ms must be present; got: {content}");
+        assert!(content.contains("\"schema_version\":1"), "schema_version must be present (AC-09)");
+        assert!(content.contains(&track_id), "track_id must be present");
+    }
+
+    #[test]
+    fn test_emit_external_subprocess_failure_path_records_verdict_parse_failed_true() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let tmp = TempDir::new().unwrap();
+        let (writer, track_id) = writer_in_tempdir(&tmp);
+        let start = Instant::now();
+
+        // verdict_parse_failed = true: subprocess failed / verdict could not be parsed
+        emit_external_subprocess(&writer, &track_id, "claude", 0, true, start);
+
+        let content = std::fs::read_to_string(tmp.path().join("telemetry.jsonl")).unwrap();
+        assert!(
+            content.contains("ExternalSubprocess"),
+            "event_type must be ExternalSubprocess; got: {content}"
+        );
+        assert!(
+            content.contains("\"command\":\"claude\""),
+            "command must be claude; got: {content}"
+        );
+        assert!(
+            content.contains("\"verdict_parse_failed\":true"),
+            "verdict_parse_failed true must be present; got: {content}"
+        );
+    }
 
     #[test]
     fn test_emit_advisory_hook_fired_writes_advisory_hook_fired_event() {

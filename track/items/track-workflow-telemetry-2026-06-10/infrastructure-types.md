@@ -4,6 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| RoundType | enum | modify | Final, Fast | 🔵 | 🔵 |
 | TelemetryEvent | enum | — | TrackSubcommand, GateEval, ReviewRound, ExternalSubprocess, HookBlock, AdvisoryHookFired, NonZeroExit | 🔵 | 🔵 |
 
 ## Error Types
