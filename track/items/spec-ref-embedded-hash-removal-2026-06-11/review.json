@@ -1,6 +1,56 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
+          "at": "2026-06-11T14:04:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
+          "at": "2026-06-11T14:07:18Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T10:47:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T10:54:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd10d108026a8823acb93d6e23512bbcca7a2949f4fb13fbd3ed76db2d2804b",
+          "at": "2026-06-11T14:05:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd10d108026a8823acb93d6e23512bbcca7a2949f4fb13fbd3ed76db2d2804b",
+          "at": "2026-06-11T14:07:28Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -159,38 +209,75 @@
           "findings": [],
           "hash": "rvw1:sha256:53c66ef9ffbe5a090af83838bc2e1ed61bfd639d0819b2913d206fe640b99834",
           "at": "2026-06-11T14:09:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d9a4451dcea58cc9dac9c8521524ac521c6845f84174173cc26813d0c7a81d7",
+          "at": "2026-06-11T15:01:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 still assigns work to update `sotp track spec-element-hash` help/doc comments to remove a transcription purpose, but the briefing states that CLI help already has no transcription framing and should simply remain as a debugging utility. This makes the remaining in-progress task semantically inaccurate and can send the implementer to change the wrong surface; narrow T002/S2 to the type-designer documentation/examples only, or explicitly state that the CLI command is retained without transcription framing.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 12,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:5d9a4451dcea58cc9dac9c8521524ac521c6845f84174173cc26813d0c7a81d7",
+          "at": "2026-06-11T15:03:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:479d3f7961229360834796feb0e8b54636a21671f874a9a0fc74074b4761405a",
+          "at": "2026-06-11T15:05:58Z"
         }
       ]
     },
-    "cli_composition": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
-          "at": "2026-06-11T10:47:41Z"
+          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
+          "at": "2026-06-11T14:04:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Yellow remediation still tells users to promote `informal_grounds[]` to `spec_refs[]` with an `anchor + canonical SHA-256 hash`. After this change `SpecRef` is `{ file, anchor }` and hash-bearing refs are invalid, so a Chain 2 failure now gives users stale instructions that conflict with the new schema. Update the message to reference the hashless spec_ref shape/regeneration path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate/chain2_gate.rs",
+              "line": 266,
+              "category": "stale_hash_reference"
+            },
+            {
+              "message": "The verifier docs still describe emitted findings as `anchor/hash` violations and the inline check as `DanglingAnchor / HashMismatch`. `HashMismatch` was removed in this track, so these comments leave stale hash-verification behavior documented inside the usecase layer. Update them to describe dangling-anchor checks plus stale signal detection only.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 9,
+              "category": "stale_hash_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
+          "at": "2026-06-11T14:06:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
-          "at": "2026-06-11T10:54:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4fd10d108026a8823acb93d6e23512bbcca7a2949f4fb13fbd3ed76db2d2804b",
-          "at": "2026-06-11T14:05:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4fd10d108026a8823acb93d6e23512bbcca7a2949f4fb13fbd3ed76db2d2804b",
-          "at": "2026-06-11T14:07:28Z"
+          "hash": "rvw1:sha256:09b1af144cb3d21761c0f328de2980f01ccce92e64bf593f05b8720a93aa046b",
+          "at": "2026-06-11T14:11:59Z"
         }
       ]
     },
@@ -263,64 +350,20 @@
           "findings": [],
           "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
           "at": "2026-06-11T10:58:21Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
-          "at": "2026-06-11T14:04:31Z"
+          "hash": "rvw1:sha256:10d48d7419c36f111f012d49a81e38bf6b9d8c416b6510aca0d47fde05514061",
+          "at": "2026-06-11T15:02:55Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
-          "at": "2026-06-11T14:07:18Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
-          "at": "2026-06-11T14:04:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Yellow remediation still tells users to promote `informal_grounds[]` to `spec_refs[]` with an `anchor + canonical SHA-256 hash`. After this change `SpecRef` is `{ file, anchor }` and hash-bearing refs are invalid, so a Chain 2 failure now gives users stale instructions that conflict with the new schema. Update the message to reference the hashless spec_ref shape/regeneration path.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate/chain2_gate.rs",
-              "line": 266,
-              "category": "stale_hash_reference"
-            },
-            {
-              "message": "The verifier docs still describe emitted findings as `anchor/hash` violations and the inline check as `DanglingAnchor / HashMismatch`. `HashMismatch` was removed in this track, so these comments leave stale hash-verification behavior documented inside the usecase layer. Update them to describe dangling-anchor checks plus stale signal detection only.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 9,
-              "category": "stale_hash_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
-          "at": "2026-06-11T14:06:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:09b1af144cb3d21761c0f328de2980f01ccce92e64bf593f05b8720a93aa046b",
-          "at": "2026-06-11T14:11:59Z"
+          "hash": "rvw1:sha256:10d48d7419c36f111f012d49a81e38bf6b9d8c416b6510aca0d47fde05514061",
+          "at": "2026-06-11T15:04:56Z"
         }
       ]
     }
