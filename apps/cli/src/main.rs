@@ -89,6 +89,11 @@ enum CliCommand {
     },
     /// Check diff fragments for semantic near-duplicates (soft gate, exit 0).
     DupCheck(commands::semantic_dup::DupCheckArgs),
+    /// Telemetry tools: aggregate and display workflow telemetry for a track.
+    Telemetry {
+        #[command(subcommand)]
+        cmd: commands::telemetry::TelemetryCommand,
+    },
     /// DRY violation detection: write, results, check-approved.
     Dry {
         #[command(subcommand)]
@@ -136,6 +141,7 @@ fn run_cli_with(
         Some(CliCommand::FindSimilar(args)) => commands::semantic_dup::execute_find_similar(args),
         Some(CliCommand::DupIndex { cmd }) => commands::semantic_dup::execute_dup_index(cmd),
         Some(CliCommand::DupCheck(args)) => commands::semantic_dup::execute_dup_check(args),
+        Some(CliCommand::Telemetry { cmd }) => commands::telemetry::execute(cmd),
         Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
         Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
         Some(CliCommand::Demo) | None => match CliApp::new().demo() {
@@ -675,6 +681,31 @@ mod tests {
     fn test_ref_verify_dispatch_unknown_subcommand_is_rejected() {
         let result = Cli::try_parse_from(["sotp", "ref-verify", "unknown-subcmd"]);
         assert!(result.is_err(), "unrecognized ref-verify subcommand must be rejected by clap");
+    }
+
+    // ── CliCommand::Telemetry entrypoint dispatch routing ───────────────────
+
+    /// `sotp telemetry report <track-id>` must be registered at the public CLI
+    /// entrypoint and dispatch through `run_cli` to the report command.
+    #[test]
+    fn test_telemetry_report_dispatch_via_run_cli_succeeds_with_existing_track() {
+        let dir = TempDir::new().unwrap();
+        let track_id = "telemetry-route-track";
+        fs::create_dir_all(dir.path().join(track_id)).unwrap();
+        let items_dir = dir.path().to_str().unwrap();
+
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "telemetry",
+            "report",
+            track_id,
+            "--items-dir",
+            items_dir,
+        ])
+        .unwrap();
+
+        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        assert_eq!(exit, ExitCode::SUCCESS);
     }
 
     // ── CliCommand::Conventions entrypoint dispatch routing ──────────────────
