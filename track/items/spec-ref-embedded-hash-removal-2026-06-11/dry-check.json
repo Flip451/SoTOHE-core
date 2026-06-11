@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "29d696674498d49275b472f5150afda505031b1e75a0e413e1e5454f396e1d2a",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "5efbc4b3badfb3589442a46f93882c8a714665a94558cd94afc8d88406c8971d",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9472528696060181,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b76e94832c5c67b359340e40ba17d18c987e8f5a",
+      "rationale": "The fragments are related test cases for two distinct behavioral paths: `model: None` must fall back to the profile model, while `model: Some(...)` must bypass that fallback. The shared setup and provider-dispatch assertion are incidental test scaffolding, and the branch-specific assertions are different enough to preserve separate test intent. Extracting this into a helper would likely reduce clarity more than it reduces meaningful duplication.",
+      "recorded_at": "2026-06-11T11:00:34Z"
+    }
+  ]
+}

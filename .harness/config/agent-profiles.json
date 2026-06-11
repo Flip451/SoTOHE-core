@@ -45,16 +45,16 @@
       "provider": "gemini"
     },
     "review-fix-lead": {
-      "provider": "claude",
-      "model": "claude-fable-5"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "dry-checker": {
       "provider": "codex",
       "model": "gpt-5.5"
     },
     "dry-fix-lead": {
-      "provider": "claude",
-      "model": "claude-fable-5"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "pr-reviewer": {
       "provider": "codex"

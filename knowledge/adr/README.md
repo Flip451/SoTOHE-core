@@ -127,6 +127,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [spec-states commit ゲートを spec 成果物未生成の段階でも通す — トラック解決時のシグナル評価を欠損入力に寛容にする](2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md) | Proposed | 2026-06-03 |
 | [cargo make ラッパー層の解体 — bin/sotp 直叩きへの一本化](2026-06-05-1535-cargo-make-teardown.md) | Proposed | 2026-06-05 |
 | [ref-verify のスコープ解決を artifact 存在ベースに一本化する — --context / --layer の削除と Phase 0 コミットゲート誤爆の解消](2026-06-10-1335-ref-verify-existence-based-scope-resolution.md) | Proposed | 2026-06-10 |
+| [SoT 本体への参照 hash 埋め込みを廃止し、新鮮度判定を verify-cache の実行時突合に一元化する — spec_refs[].hash の撤去](2026-06-11-1018-spec-ref-embedded-hash-removal.md) | Proposed | 2026-06-11 |
 
 ### ADR 運用
 

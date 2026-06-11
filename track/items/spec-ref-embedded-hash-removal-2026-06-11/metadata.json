@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "spec-ref-embedded-hash-removal-2026-06-11",
+  "title": "SoT 本体への参照 hash 埋め込みを廃止し、新鮮度判定を verify-cache の実行時突合に一元化する",
+  "branch": "track/spec-ref-embedded-hash-removal-2026-06-11",
+  "created_at": "2026-06-11T10:34:13Z",
+  "updated_at": "2026-06-11T10:34:13Z"
+}

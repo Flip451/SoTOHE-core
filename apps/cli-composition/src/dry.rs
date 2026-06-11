@@ -946,8 +946,8 @@ exit 0
     /// git discover → agent-profiles load → track_id validation → profile resolution
     /// → model fallback from profiles → provider dispatch.
     ///
-    /// The `dry-fix-lead` capability in agent-profiles.json defines `provider = "claude"`
-    /// and a non-empty model.  The test verifies that:
+    /// The fixture's `agent-profiles.json` defines `provider = "claude"` and a non-empty
+    /// model (independent of the live repo profiles).  The test verifies that:
     ///   - Profiles are loaded successfully (no "failed to load agent-profiles" error).
     ///   - The capability is resolved (no "capability not defined" error).
     ///   - The profile model fills the `None` input, so "no model specified" is NOT triggered.
@@ -957,19 +957,19 @@ exit 0
     ///
     /// A regression that broke profile loading or model-fallback would produce a different
     /// error message from an earlier stage, causing the assertions below to fail.
+    #[cfg(unix)]
     #[test]
     fn test_dry_run_fix_local_none_model_falls_back_to_profile_model_and_reaches_dispatch() {
         // Hold process_env_lock: dry_run_fix_local calls SystemGitRepo::discover() which
         // reads PATH, and other tests in this module mutate PATH (fake git/claude injection).
         // The lock serializes all env-mutating tests to prevent nondeterministic failure.
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        let dir = tempfile::tempdir().unwrap();
-        let briefing_file = dir.path().join("briefing.md");
-        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+        let fixture = DryRunFixLocalFixture::new_with_provider("claude", "claude-test-model");
+        let _guards = fixture.path_guard();
 
         let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
             track_id: "dry-track".to_owned(),
-            briefing_file: briefing_file.clone(),
+            briefing_file: fixture.briefing_file.clone(),
             model: None,
         });
 
@@ -1010,17 +1010,17 @@ exit 0
     /// a bug that ignored `input.model` and fell through to `resolved.model` would not be
     /// caught here, but a regression that broke the OR-logic so that explicit model
     /// triggered "no model specified" WOULD be caught.
+    #[cfg(unix)]
     #[test]
     fn test_dry_run_fix_local_explicit_model_bypasses_profile_model_and_reaches_dispatch() {
         // Hold process_env_lock: same reason as the None-model variant above.
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        let dir = tempfile::tempdir().unwrap();
-        let briefing_file = dir.path().join("briefing.md");
-        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+        let fixture = DryRunFixLocalFixture::new_with_provider("claude", "claude-test-model");
+        let _guards = fixture.path_guard();
 
         let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
             track_id: "dry-track".to_owned(),
-            briefing_file: briefing_file.clone(),
+            briefing_file: fixture.briefing_file.clone(),
             model: Some("gpt-explicit-override".to_owned()),
         });
 
@@ -1063,8 +1063,15 @@ exit 0
 
     #[cfg(unix)]
     impl DryRunFixLocalFixture {
-        /// Build the fixture with `profile_model` written into `agent-profiles.json`.
+        /// Build the fixture with `profile_model` written into `agent-profiles.json`
+        /// (provider fixed to `codex`).
         fn new(profile_model: &str) -> Self {
+            Self::new_with_provider("codex", profile_model)
+        }
+
+        /// Build the fixture with an explicit `dry-fix-lead` provider, so wrapper tests
+        /// stay deterministic regardless of the live repo's `agent-profiles.json`.
+        fn new_with_provider(provider: &str, profile_model: &str) -> Self {
             let project_dir = tempfile::tempdir().unwrap();
             let config_dir = project_dir.path().join(".harness").join("config");
             std::fs::create_dir_all(&config_dir).unwrap();
@@ -1073,10 +1080,10 @@ exit 0
                 format!(
                     r#"{{
   "schema_version": 1,
-  "providers": {{ "codex": {{ "label": "Codex" }} }},
+  "providers": {{ "{provider}": {{ "label": "Test Provider" }} }},
   "capabilities": {{
     "dry-fix-lead": {{
-      "provider": "codex",
+      "provider": "{provider}",
       "model": "{profile_model}"
     }}
   }}
@@ -1118,6 +1125,17 @@ exit 0
                 capture_file,
                 briefing_file,
             }
+        }
+
+        /// Prepend the fixture's fake-bin dir to PATH so `SystemGitRepo::discover()`
+        /// resolves the temp project root via the fake git.
+        fn path_guard(&self) -> Vec<EnvGuard> {
+            let mut path_entries = vec![self.fake_bin_dir.clone()];
+            if let Some(existing) = std::env::var_os("PATH") {
+                path_entries.extend(std::env::split_paths(&existing));
+            }
+            let new_path = std::env::join_paths(path_entries).unwrap();
+            vec![EnvGuard::set("PATH", new_path)]
         }
 
         /// Install the fake codex script, set PATH/CODEX_BIN/CODEX_HOME guards, and call
