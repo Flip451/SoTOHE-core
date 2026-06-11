@@ -21,7 +21,9 @@ use domain::ValidationError;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::CatalogueDocument;
 
-use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
+use crate::tddd::catalogue_document_codec::{
+    CatalogueDocumentCodec, CatalogueDocumentCodecError, derive_filename_stem,
+};
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers::{self, LoadTdddLayersError, TdddLayerBinding};
 
@@ -160,9 +162,7 @@ pub fn load_all_catalogues_native(
                 let json = std::fs::read_to_string(&catalogue_path).map_err(|source| {
                     LoadAllCataloguesNativeError::Io { path: catalogue_path.clone(), source }
                 })?;
-                let stem = derive_filename_stem(&catalogue_path).unwrap_or_else(|| {
-                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_owned()
-                });
+                let stem = derive_filename_stem(&catalogue_path);
                 // CN-11: fail-closed — non-v3 catalogues are a hard error.
                 let doc = CatalogueDocumentCodec::decode(&json, &stem).map_err(|source| {
                     LoadAllCataloguesNativeError::Decode {
@@ -374,21 +374,6 @@ fn topological_sort(
     Ok(result)
 }
 
-/// Derives the crate name from a catalogue file path by stripping the
-/// `-types.json` suffix.
-///
-/// For `domain-types.json`, returns `Some("domain")`.
-/// For files not matching the `<crate>-types.json` pattern, falls back to
-/// `file_stem()` (strips only the last extension).
-/// Returns `None` if the path has no file name or the name is not valid UTF-8.
-pub(crate) fn derive_filename_stem(path: &Path) -> Option<String> {
-    let name = path.file_name().and_then(|n| n.to_str())?;
-    if let Some(crate_name) = name.strip_suffix("-types.json") {
-        return Some(crate_name.to_owned());
-    }
-    path.file_stem().and_then(|s| s.to_str()).map(|s| s.to_owned())
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
@@ -436,11 +421,11 @@ mod tests {
       ]
     }"#;
 
-    /// Minimal valid v3 catalogues (schema_version=3) for each layer, for use
+    /// Minimal valid v4 catalogues (schema_version=4) for each layer, for use
     /// with `load_all_catalogues_native`.  The codec validates `crate_name` and
     /// `layer` against the file stem, so each layer needs its own constant.
     const V3_DOMAIN_JSON: &str = r#"{
-      "schema_version": 3,
+      "schema_version": 4,
       "crate_name": "domain",
       "layer": "domain",
       "types": {},
@@ -449,7 +434,7 @@ mod tests {
     }"#;
 
     const V3_USECASE_JSON: &str = r#"{
-      "schema_version": 3,
+      "schema_version": 4,
       "crate_name": "usecase",
       "layer": "usecase",
       "types": {},
@@ -458,7 +443,7 @@ mod tests {
     }"#;
 
     const V3_INFRASTRUCTURE_JSON: &str = r#"{
-      "schema_version": 3,
+      "schema_version": 4,
       "crate_name": "infrastructure",
       "layer": "infrastructure",
       "types": {},
@@ -642,7 +627,7 @@ mod tests {
         // infrastructure-types.json declares `"layer": "domain"` instead of
         // `"layer": "infrastructure"` — binding key mismatch.
         let mismatch_json = r#"{
-          "schema_version": 3,
+          "schema_version": 4,
           "crate_name": "infrastructure",
           "layer": "domain",
           "types": {},

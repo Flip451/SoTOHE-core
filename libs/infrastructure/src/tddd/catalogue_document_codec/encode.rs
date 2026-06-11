@@ -13,6 +13,7 @@ use domain::tddd::catalogue_v2::{
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
 
 use super::CatalogueDocumentCodecError;
+use super::SCHEMA_VERSION;
 use super::dto::{
     BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
     MethodDeclarationDto, MethodGenericParamDto, ParamDto, StructShapeDto, TraitEntryDto,
@@ -47,7 +48,7 @@ pub(super) fn domain_to_dto(
     let trait_impls =
         doc.trait_impls.iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     Ok(CatalogueDocumentDto {
-        schema_version: doc.schema_version,
+        schema_version: SCHEMA_VERSION,
         crate_name: doc.crate_name.as_str().to_owned(),
         layer: doc.layer.as_ref().to_owned(),
         types,

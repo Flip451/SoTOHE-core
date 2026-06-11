@@ -6,7 +6,6 @@
 //!   `related_conventions`, and per-catalogue-entry `spec_refs` / `informal_grounds`
 //! - File existence for file-based refs (`AdrRef.file`, `ConventionRef.file`, `SpecRef.file`)
 //! - `SpecRef.anchor` must resolve to a real element id inside the target `spec.json`
-//! - `SpecRef.hash` must match the SHA-256 of the canonical JSON subtree
 //! - `AdrRef.anchor` must exist in the ADR front-matter's `decisions[].id` list (D3 / AC-05)
 //! - `AdrAnchor` / `ConventionAnchor` loose non-empty validation (already enforced by newtypes)
 //! - `InformalGroundRef` newtype validation (kind variant + non-empty summary)
@@ -43,6 +42,10 @@ pub(crate) use spec_refs::{
 ///
 /// These are surfaced as `VerifyFinding::error` entries in the outcome,
 /// not propagated directly to callers.
+///
+/// After spec-ref-embedded-hash-removal (IN-03): the `SpecHashMismatch` variant is
+/// removed. Hash mismatch detection via `SpecRef.hash` is superseded by verify-cache
+/// runtime recomputation (D2).
 #[derive(Debug, Error)]
 pub enum PlanArtifactRefsError {
     /// JSON parse failure.
@@ -56,13 +59,6 @@ pub enum PlanArtifactRefsError {
     /// A `SpecRef.anchor` does not resolve to any element in the target spec.
     #[error("unresolved SpecRef anchor '{anchor}' in file '{}'", file.display())]
     UnresolvedSpecRef { file: PathBuf, anchor: String },
-
-    /// `SpecRef.hash` does not match the actual SHA-256 of the element subtree.
-    #[error(
-        "SpecRef hash mismatch for anchor '{anchor}' in '{}': expected {expected}, actual {actual}",
-        file.display()
-    )]
-    SpecHashMismatch { file: PathBuf, anchor: String, expected: String, actual: String },
 
     /// An anchor value failed validation (non-empty check).
     #[error("invalid anchor '{anchor}' in file '{}'", file.display())]
@@ -85,7 +81,6 @@ pub enum PlanArtifactRefsError {
 /// - Schema decode of every ref field (malformed refs → error finding)
 /// - File existence for file-based refs
 /// - `SpecRef.anchor` resolution in the target spec.json
-/// - `SpecRef.hash` matching the canonical JSON subtree SHA-256
 /// - `AdrAnchor` / `ConventionAnchor` loose validation (non-empty, enforced by newtype)
 /// - `InformalGroundRef` newtype validation (kind + non-empty summary)
 ///
@@ -336,29 +331,16 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                     }
                 };
 
-                // Anchor resolution: SpecRef.anchor must map to an element in the spec
+                // Anchor resolution: SpecRef.anchor must map to an element in the spec.
+                // Hash verification is removed (spec-ref-embedded-hash-removal IN-03):
+                // staleness is detected by verify-cache runtime recomputation.
                 let anchor_str = spec_ref.anchor.as_ref();
-                match element_map.get(anchor_str) {
-                    None => {
-                        findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{entry_name}': unresolved SpecRef anchor \
-                             '{anchor_str}' in '{}'",
-                            spec_ref.file.display()
-                        )));
-                    }
-                    Some(subtree_json) => {
-                        // Hash verification: compare stored hash to actual SHA-256
-                        let actual_hash = spec_refs::canonical_json_sha256(subtree_json);
-                        let expected_hash = spec_ref.hash.to_hex();
-                        if actual_hash != expected_hash {
-                            findings.push(VerifyFinding::error(format!(
-                                "{catalogue_name} entry '{entry_name}': SpecRef hash mismatch for \
-                                 anchor '{anchor_str}' in '{}': expected {expected_hash}, actual \
-                                 {actual_hash}",
-                                spec_ref.file.display()
-                            )));
-                        }
-                    }
+                if element_map.get(anchor_str).is_none() {
+                    findings.push(VerifyFinding::error(format!(
+                        "{catalogue_name} entry '{entry_name}': unresolved SpecRef anchor \
+                         '{anchor_str}' in '{}'",
+                        spec_ref.file.display()
+                    )));
                 }
             }
             // InformalGroundRef: kind+summary already validated by codec

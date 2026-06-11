@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-11T12:05:55Z",
-  "declaration_hash": "9658e2f102e696bc6d7d9ec615c453e920e75d9964863628861b4365d5fe00aa",
+  "generated_at": "2026-06-11T14:43:17Z",
+  "declaration_hash": "e9a4687f655b6a92e145d232d6d7bded3fcea6b48beb9a92f0d8cf47a12b207f",
   "signals": [
     {
       "type_name": "SpecRef",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -19,7 +19,7 @@
     {
       "type_name": "SpecRefFindingKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

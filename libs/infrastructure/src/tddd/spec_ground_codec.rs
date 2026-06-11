@@ -14,8 +14,7 @@
 use std::path::PathBuf;
 
 use domain::{
-    ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary, SpecElementId,
-    SpecRef,
+    InformalGroundKind, InformalGroundRef, InformalGroundSummary, SpecElementId, SpecRef,
 };
 use serde::{Deserialize, Serialize};
 
@@ -39,6 +38,8 @@ pub(crate) struct GroundingDecodeError {
 /// DTO for a single `SpecRef` (SoT Chain ② — catalogue→spec).
 ///
 /// `deny_unknown_fields` ensures stale field names are caught at decode time.
+/// After spec-ref-embedded-hash-removal (IN-01): the `hash` field is removed.
+/// Schema version bumped from 3 to 4 at the codec level.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct SpecRefDto {
@@ -46,8 +47,6 @@ pub(crate) struct SpecRefDto {
     pub(crate) file: String,
     /// Spec element identifier (e.g. `"IN-01"`, `"AC-02"`).
     pub(crate) anchor: String,
-    /// 64-character lowercase SHA-256 hex of the canonical JSON subtree.
-    pub(crate) hash: String,
 }
 
 /// DTO for a single `InformalGroundRef` (unpersisted rationale).
@@ -91,15 +90,7 @@ pub(crate) fn spec_refs_from_dtos(
                 reason: format!("duplicate anchor '{}' in spec_refs[]", anchor.as_ref()),
             });
         }
-        let hash = ContentHash::try_from_hex(&dto.hash).map_err(|_| GroundingDecodeError {
-            field: "spec_refs[].hash",
-            reason: format!(
-                "'{}' is not a valid SHA-256 hex string \
-                     (expected 64 lowercase hex characters)",
-                dto.hash
-            ),
-        })?;
-        out.push(SpecRef::new(PathBuf::from(&dto.file), anchor, hash));
+        out.push(SpecRef::new(PathBuf::from(&dto.file), anchor));
     }
     Ok(out)
 }
@@ -152,7 +143,6 @@ pub(crate) fn spec_refs_to_dtos(refs: &[SpecRef]) -> Vec<SpecRefDto> {
         .map(|r| SpecRefDto {
             file: r.file.to_string_lossy().into_owned(),
             anchor: r.anchor.as_ref().to_owned(),
-            hash: r.hash.to_hex(),
         })
         .collect()
 }
@@ -177,16 +167,11 @@ pub(crate) fn informal_grounds_to_dtos(grounds: &[InformalGroundRef]) -> Vec<Inf
 mod tests {
     use super::*;
 
-    fn make_valid_hash_str() -> String {
-        "0".repeat(64)
-    }
-
     #[test]
     fn test_spec_refs_from_dtos_with_valid_input_succeeds() {
         let dtos = vec![SpecRefDto {
             file: "track/items/x/spec.json".to_owned(),
             anchor: "IN-01".to_owned(),
-            hash: make_valid_hash_str(),
         }];
         let result = spec_refs_from_dtos(&dtos).unwrap();
         assert_eq!(result.len(), 1);
@@ -196,28 +181,12 @@ mod tests {
 
     #[test]
     fn test_spec_refs_from_dtos_with_invalid_anchor_returns_error() {
-        let dtos = vec![SpecRefDto {
-            file: "spec.json".to_owned(),
-            anchor: "bad-anchor".to_owned(),
-            hash: make_valid_hash_str(),
-        }];
+        let dtos =
+            vec![SpecRefDto { file: "spec.json".to_owned(), anchor: "bad-anchor".to_owned() }];
         let result = spec_refs_from_dtos(&dtos);
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert_eq!(err.field, "spec_refs[].anchor");
-    }
-
-    #[test]
-    fn test_spec_refs_from_dtos_with_invalid_hash_returns_error() {
-        let dtos = vec![SpecRefDto {
-            file: "spec.json".to_owned(),
-            anchor: "IN-01".to_owned(),
-            hash: "notahexhash".to_owned(),
-        }];
-        let result = spec_refs_from_dtos(&dtos);
-        assert!(result.is_err());
-        let err = result.unwrap_err();
-        assert_eq!(err.field, "spec_refs[].hash");
     }
 
     #[test]
@@ -260,9 +229,7 @@ mod tests {
     #[test]
     fn test_spec_refs_round_trip_encode_decode() {
         let anchor = SpecElementId::try_new("AC-02").unwrap();
-        let hash = ContentHash::from_bytes([0xabu8; 32]);
-        let spec_ref =
-            SpecRef::new(PathBuf::from("track/items/x/spec.json"), anchor.clone(), hash.clone());
+        let spec_ref = SpecRef::new(PathBuf::from("track/items/x/spec.json"), anchor.clone());
 
         let dtos = spec_refs_to_dtos(std::slice::from_ref(&spec_ref));
         let decoded = spec_refs_from_dtos(&dtos).unwrap();

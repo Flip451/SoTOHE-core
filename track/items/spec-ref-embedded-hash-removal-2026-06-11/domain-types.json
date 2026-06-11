@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
@@ -23,13 +23,11 @@
       "spec_refs": [
         {
           "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
-          "anchor": "IN-01",
-          "hash": "c60a2e4c0ae527c6b5701b1638fd6bec4a946d5538e1d49106518b6ffb64b0f0"
+          "anchor": "IN-01"
         },
         {
           "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
-          "anchor": "AC-01",
-          "hash": "b74524a2d09f8a93fe182be7dccb624107be8ae52d93df1bbf018339dd3f1631"
+          "anchor": "AC-01"
         }
       ],
       "informal_grounds": []
@@ -70,13 +68,11 @@
       "spec_refs": [
         {
           "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
-          "anchor": "IN-04",
-          "hash": "6ee5e8acb16dd31fba2ba3072818519d278ee58b7edbb542553d01e802e91a71"
+          "anchor": "IN-04"
         },
         {
           "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
-          "anchor": "AC-05",
-          "hash": "95fc19480ec73d21d982cba9a9dc89572540c33dfc61f72f20ee22674206b6b2"
+          "anchor": "AC-05"
         }
       ],
       "informal_grounds": []

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-11T12:05:59Z",
-  "declaration_hash": "c9d967da0969156989ee7b688026da783f4229cf2fd71abf9c043570cffe3b48",
+  "generated_at": "2026-06-11T14:43:22Z",
+  "declaration_hash": "0d1843877314c37162761046557bd8ad6dd75e4fce7acf44ba38bf80efe4b334",
   "signals": [
     {
       "type_name": "PlanArtifactRefsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::convert::From<Error>",

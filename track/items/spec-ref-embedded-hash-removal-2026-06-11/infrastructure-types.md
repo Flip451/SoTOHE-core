@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PlanArtifactRefsError | error_type | modify | Json, Io, UnresolvedSpecRef, InvalidAnchor, CoverageViolation | 🟡 | 🔵 |
+| PlanArtifactRefsError | error_type | modify | Json, Io, UnresolvedSpecRef, InvalidAnchor, CoverageViolation | 🔵 | 🔵 |
 

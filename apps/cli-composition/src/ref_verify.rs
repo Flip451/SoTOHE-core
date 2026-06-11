@@ -406,11 +406,9 @@ mod tests {
         .unwrap();
 
         // Write a minimal catalogue with one type entry that references GO-01 in spec.json.
-        // The `hash` field is required by the DTO codec; the exact value is irrelevant for
-        // semantic verification (the pair_source re-computes the evidence hash from spec.json).
         let spec_ref_path = format!("track/items/{track_id}/spec.json");
         let catalogue = serde_json::json!({
-            "schema_version": 3,
+            "schema_version": 4,
             "crate_name": "test_domain",
             "layer": "test_domain",
             "types": {
@@ -422,8 +420,7 @@ mod tests {
                     "module_path": "test_domain",
                     "spec_refs": [{
                         "file": spec_ref_path,
-                        "anchor": "GO-01",
-                        "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+                        "anchor": "GO-01"
                     }],
                     "informal_grounds": []
                 }
@@ -929,7 +926,7 @@ exit 64
         std::fs::write(
             track_dir.join("domain-types.json"),
             r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},

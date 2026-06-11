@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "infrastructure",
   "layer": "infrastructure",
   "types": {
@@ -49,18 +49,15 @@
       "spec_refs": [
         {
           "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
-          "anchor": "IN-03",
-          "hash": "d37582b34de0ab87d057cb7b1d6fdb93aba6ab946ba3d2bfbb3b585b5e7af16c"
+          "anchor": "IN-03"
         },
         {
           "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
-          "anchor": "AC-03",
-          "hash": "88176228f7d7b7ea538a6cae4fab3dfb001b419bac4a40e0c8dc68dabc0a6db6"
+          "anchor": "AC-03"
         },
         {
           "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
-          "anchor": "AC-06",
-          "hash": "2c63b218beeb2ce72377ab209e7a433527edda6cd5b07671a44aad570caf7890"
+          "anchor": "AC-06"
         }
       ],
       "informal_grounds": []

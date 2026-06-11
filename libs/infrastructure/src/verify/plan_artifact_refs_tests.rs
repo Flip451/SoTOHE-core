@@ -67,6 +67,32 @@ fn write_spec_with_adr_ref(track_dir: &Path, adr_file: &str, anchor: &str) {
     write_file(track_dir, "spec.json", &spec);
 }
 
+fn write_domain_catalogue_with_spec_ref(track_dir: &Path, file: &str, anchor: &str) {
+    let catalogue = format!(
+        r#"{{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {{
+    "MyType": {{
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {{ "kind": "struct", "shape": {{ "kind": "unit" }} }},
+      "spec_refs": [
+        {{
+          "file": "{file}",
+          "anchor": "{anchor}"
+        }}
+      ]
+    }}
+  }},
+  "traits": {{}},
+  "functions": {{}}
+}}"#
+    );
+    write_file(track_dir, "domain-types.json", &catalogue);
+}
+
 // -----------------------------------------------------------------------
 // Happy-path: all refs valid
 // -----------------------------------------------------------------------
@@ -194,37 +220,7 @@ fn test_spec_ref_with_valid_anchor_passes() {
     // Write spec.json with one in_scope element.
     write_file(&track_dir, "spec.json", MINIMAL_SPEC);
 
-    // Compute the expected hash for IN-01 element.
-    let spec_value: serde_json::Value = serde_json::from_str(MINIMAL_SPEC).unwrap();
-    let element = &spec_value["scope"]["in_scope"][0];
-    let canonical = canonical_json(element);
-    let hash = canonical_json_sha256(&canonical);
-
-    // Write a domain-types.json with a SpecRef pointing at IN-01 (v3-native).
-    let catalogue = format!(
-        r#"{{
-  "schema_version": 3,
-  "crate_name": "domain",
-  "layer": "domain",
-  "types": {{
-    "MyType": {{
-      "action": "add",
-      "role": "ValueObject",
-      "kind": {{ "kind": "struct", "shape": {{ "kind": "unit" }} }},
-      "spec_refs": [
-        {{
-          "file": "track/items/test-track/spec.json",
-          "anchor": "IN-01",
-          "hash": "{hash}"
-        }}
-      ]
-    }}
-  }},
-  "traits": {{}},
-  "functions": {{}}
-}}"#
-    );
-    write_file(&track_dir, "domain-types.json", &catalogue);
+    write_domain_catalogue_with_spec_ref(&track_dir, "track/items/test-track/spec.json", "IN-01");
 
     let outcome = verify(&track_dir);
     assert!(outcome.is_ok(), "valid SpecRef must pass: {:?}", outcome);
@@ -236,28 +232,7 @@ fn test_spec_ref_with_missing_spec_file_reports_error() {
     let track_dir = setup_repo(tmp.path(), "test-track");
     write_file(&track_dir, "spec.json", MINIMAL_SPEC);
 
-    let catalogue = r#"{
-  "schema_version": 3,
-  "crate_name": "domain",
-  "layer": "domain",
-  "types": {
-    "MyType": {
-      "action": "add",
-      "role": "ValueObject",
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
-      "spec_refs": [
-        {
-          "file": "track/items/nonexistent/spec.json",
-          "anchor": "IN-01",
-          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      ]
-    }
-  },
-  "traits": {},
-  "functions": {}
-}"#;
-    write_file(&track_dir, "domain-types.json", catalogue);
+    write_domain_catalogue_with_spec_ref(&track_dir, "track/items/nonexistent/spec.json", "IN-01");
 
     let outcome = verify(&track_dir);
     assert!(outcome.has_errors(), "missing spec file must produce error: {:?}", outcome);
@@ -269,76 +244,13 @@ fn test_spec_ref_with_unresolved_anchor_reports_error() {
     let track_dir = setup_repo(tmp.path(), "test-track");
     write_file(&track_dir, "spec.json", MINIMAL_SPEC);
 
-    let catalogue = r#"{
-  "schema_version": 3,
-  "crate_name": "domain",
-  "layer": "domain",
-  "types": {
-    "MyType": {
-      "action": "add",
-      "role": "ValueObject",
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
-      "spec_refs": [
-        {
-          "file": "track/items/test-track/spec.json",
-          "anchor": "IN-99",
-          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      ]
-    }
-  },
-  "traits": {},
-  "functions": {}
-}"#;
-    write_file(&track_dir, "domain-types.json", catalogue);
+    write_domain_catalogue_with_spec_ref(&track_dir, "track/items/test-track/spec.json", "IN-99");
 
     let outcome = verify(&track_dir);
     assert!(outcome.has_errors(), "unresolved anchor must produce error: {:?}", outcome);
     assert!(
         outcome.findings()[0].message().contains("IN-99"),
         "error must mention the missing anchor"
-    );
-}
-
-#[test]
-fn test_spec_ref_with_hash_mismatch_reports_error() {
-    let tmp = TempDir::new().unwrap();
-    let track_dir = setup_repo(tmp.path(), "test-track");
-    write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-    // Use a deliberately wrong hash.
-    let wrong_hash = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
-    let catalogue = format!(
-        r#"{{
-  "schema_version": 3,
-  "crate_name": "domain",
-  "layer": "domain",
-  "types": {{
-    "MyType": {{
-      "action": "add",
-      "role": "ValueObject",
-      "kind": {{ "kind": "struct", "shape": {{ "kind": "unit" }} }},
-      "spec_refs": [
-        {{
-          "file": "track/items/test-track/spec.json",
-          "anchor": "IN-01",
-          "hash": "{wrong_hash}"
-        }}
-      ]
-    }}
-  }},
-  "traits": {{}},
-  "functions": {{}}
-}}"#
-    );
-    write_file(&track_dir, "domain-types.json", &catalogue);
-
-    let outcome = verify(&track_dir);
-    assert!(outcome.has_errors(), "hash mismatch must produce error: {:?}", outcome);
-    assert!(
-        outcome.findings()[0].message().contains("mismatch"),
-        "error must mention 'mismatch': {}",
-        outcome.findings()[0].message()
     );
 }
 
@@ -350,7 +262,7 @@ fn test_empty_spec_refs_on_catalogue_entry_passes() {
 
     // Catalogue entry with no spec_refs → nothing to validate.
     let catalogue = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
@@ -769,10 +681,10 @@ fn test_canonical_block_exactly_10_lines_no_warning() {
 }
 
 // -----------------------------------------------------------------------
-// v3 catalogue tests
+// Schema version rejection tests
 // -----------------------------------------------------------------------
 
-/// Minimal valid v3 domain catalogue.
+/// schema_version 3 catalogue — must now be rejected with an unsupported schema version error.
 const V3_CATALOGUE_DOMAIN: &str = r#"{
   "schema_version": 3,
   "crate_name": "domain",
@@ -789,18 +701,10 @@ const V3_CATALOGUE_DOMAIN: &str = r#"{
   "functions": {}
 }"#;
 
-/// Malformed v3 catalogue (missing required `layer` field).
-const V3_CATALOGUE_MISSING_LAYER: &str = r#"{
-  "schema_version": 3,
-  "crate_name": "domain"
-}"#;
-
 #[test]
-fn test_v3_catalogue_with_no_spec_refs_produces_no_error() {
-    // A well-formed v3 catalogue whose entries have no spec_refs[] must
-    // produce zero error-level findings. Per-entry spec_refs[] and
-    // informal_grounds[] are now validated for v3 exactly as for v2
-    // (D1/D3 restoration); an empty spec_refs[] means nothing to check.
+fn test_v3_catalogue_produces_error_finding() {
+    // schema_version 3 is no longer supported (bumped to 4 in T001).
+    // The codec must reject it with an unsupported schema version error.
     let tmp = TempDir::new().unwrap();
     let track_dir = setup_repo(tmp.path(), "test-track");
     write_file(&track_dir, "spec.json", MINIMAL_SPEC);
@@ -808,31 +712,11 @@ fn test_v3_catalogue_with_no_spec_refs_produces_no_error() {
 
     let outcome = verify(&track_dir);
 
-    // Must not produce any error-level finding.
-    let has_error =
-        outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
-    assert!(
-        !has_error,
-        "v3 catalogue with empty spec_refs must not produce error findings; findings: {:?}",
-        outcome.findings()
-    );
-}
-
-#[test]
-fn test_v3_catalogue_malformed_produces_error_finding() {
-    let tmp = TempDir::new().unwrap();
-    let track_dir = setup_repo(tmp.path(), "test-track");
-    write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-    write_file(&track_dir, "domain-types.json", V3_CATALOGUE_MISSING_LAYER);
-
-    let outcome = verify(&track_dir);
-
-    // Malformed v3 catalogue must produce an error finding.
     let has_error =
         outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
     assert!(
         has_error,
-        "malformed v3 catalogue must produce an error finding; findings: {:?}",
+        "schema_version 3 catalogue must produce an error finding; findings: {:?}",
         outcome.findings()
     );
 }

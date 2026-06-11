@@ -23,7 +23,7 @@ use crate::catalogue_traversal::iter_catalogue_entries;
 ///
 /// # Parameters
 /// - `reader`: port implementation, used to fetch the signals document and the
-///   v3-native catalogue document for `layer_id`.
+///   catalogue document for `layer_id`.
 /// - `branch`: the PR branch ref (e.g. `"track/foo-2026-06-07"`).
 /// - `track_id`: the track slug derived from `branch` (e.g. `"foo-2026-06-07"`).
 /// - `layer_id`: the TDDD layer being evaluated (e.g. `"domain"`, `"usecase"`).
@@ -63,7 +63,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
             }
         };
 
-    // Step 2: read catalogue (v3-native CatalogueDocument) + hash.
+    // Step 2: read catalogue document + hash.
     //
     // Opted-in layers are also `tddd.enabled` (the set is a strict subset),
     // so a missing catalogue on an opted-in layer is an integrity violation,
@@ -99,10 +99,10 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
         }
     };
 
-    // Step 3: integrity binary gate (dangling / mismatch / stale).
+    // Step 3: integrity binary gate (dangling / stale).
     //
     // Iterates types + traits + functions BTreeMaps and checks each entry's
-    // `spec_refs` for dangling anchors and hash mismatches. StaleSignals check
+    // `spec_refs` for dangling anchors. StaleSignals check
     // uses `signals_doc.catalogue_declaration_hash`.
     let catalogue_file = format!("{layer_id}-types.json");
     let mut integrity_errors: Vec<VerifyFinding> = Vec::new();
@@ -263,7 +263,8 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
         outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{catalogue_file}: {} catalogue entry/entries have Yellow catalogue-spec signal \
              — merge gate will block these until upgraded to Blue. Upgrade by promoting \
-             informal_grounds[] to spec_refs[] with anchor + canonical SHA-256 hash: {}",
+             informal_grounds[] to spec_refs[] entries with file + anchor, \
+             then regenerate catalogue-spec signals: {}",
             yellows.len(),
             yellows.join(", ")
         ))]));
@@ -282,24 +283,13 @@ fn check_spec_refs_for_entry(
     errors: &mut Vec<VerifyFinding>,
 ) {
     for (ref_index, spec_ref) in spec_refs.iter().enumerate() {
-        match spec_element_hashes.get(&spec_ref.anchor) {
-            None => {
-                errors.push(VerifyFinding::error(format!(
-                    "catalogue-spec integrity violation on layer '{layer_id}': \
-                     DanglingAnchor {{ catalogue_entry: {:?}, ref_index: {ref_index}, \
-                     spec_file: {:?}, anchor: {:?} }}",
-                    entry_name, spec_ref.file, spec_ref.anchor
-                )));
-            }
-            Some(actual_hash) if actual_hash != &spec_ref.hash => {
-                errors.push(VerifyFinding::error(format!(
-                    "catalogue-spec integrity violation on layer '{layer_id}': \
-                     HashMismatch {{ catalogue_entry: {:?}, ref_index: {ref_index}, \
-                     spec_file: {:?}, anchor: {:?}, declared: {:?}, actual: {:?} }}",
-                    entry_name, spec_ref.file, spec_ref.anchor, spec_ref.hash, actual_hash
-                )));
-            }
-            Some(_) => {} // anchor present + hash matches — no finding
+        if !spec_element_hashes.contains_key(&spec_ref.anchor) {
+            errors.push(VerifyFinding::error(format!(
+                "catalogue-spec integrity violation on layer '{layer_id}': \
+                 DanglingAnchor {{ catalogue_entry: {:?}, ref_index: {ref_index}, \
+                 spec_file: {:?}, anchor: {:?} }}",
+                entry_name, spec_ref.file, spec_ref.anchor
+            )));
         }
     }
 }

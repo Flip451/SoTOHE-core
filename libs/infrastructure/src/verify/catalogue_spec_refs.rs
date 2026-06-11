@@ -248,34 +248,20 @@ fn verify_one_layer(
     // T024: inline equivalent of `check_catalogue_spec_ref_integrity` over v3 `CatalogueDocument`.
     let mut findings: Vec<SpecRefFinding> = Vec::new();
 
+    // Hash verification is removed (spec-ref-embedded-hash-removal IN-04):
+    // staleness is detected by verify-cache runtime recomputation.
     let mut check_entry_refs = |entry_name: String, spec_refs: &[SpecRef]| {
         for (ref_index, spec_ref) in spec_refs.iter().enumerate() {
-            match spec_element_hashes.get(&spec_ref.anchor) {
-                None => {
-                    findings.push(SpecRefFinding::new(
-                        layer_id_newtype.clone(),
-                        SpecRefFindingKind::DanglingAnchor {
-                            catalogue_entry: entry_name.clone(),
-                            ref_index,
-                            spec_file: spec_ref.file.clone(),
-                            anchor: spec_ref.anchor.clone(),
-                        },
-                    ));
-                }
-                Some(actual_hash) if actual_hash != &spec_ref.hash => {
-                    findings.push(SpecRefFinding::new(
-                        layer_id_newtype.clone(),
-                        SpecRefFindingKind::HashMismatch {
-                            catalogue_entry: entry_name.clone(),
-                            ref_index,
-                            spec_file: spec_ref.file.clone(),
-                            anchor: spec_ref.anchor.clone(),
-                            declared: spec_ref.hash.clone(),
-                            actual: actual_hash.clone(),
-                        },
-                    ));
-                }
-                Some(_) => {} // anchor present + hash matches — no finding
+            if !spec_element_hashes.contains_key(&spec_ref.anchor) {
+                findings.push(SpecRefFinding::new(
+                    layer_id_newtype.clone(),
+                    SpecRefFindingKind::DanglingAnchor {
+                        catalogue_entry: entry_name.clone(),
+                        ref_index,
+                        spec_file: spec_ref.file.clone(),
+                        anchor: spec_ref.anchor.clone(),
+                    },
+                ));
             }
         }
     };
@@ -321,7 +307,6 @@ fn sanitize_line(s: &str) -> String {
 ///
 /// Output format follows ADR §D1.5:
 /// - `DanglingAnchor`: `[layer=<L>] <entry>[ref=<i>] <file>: dangling anchor '<anchor>'`
-/// - `HashMismatch`: `[layer=<L>] <entry>[ref=<i>] <file>: hash mismatch for '<anchor>' (declared=<hex>, actual=<hex>)`
 /// - `StaleSignals`: `[layer=<L>] stale catalogue-spec-signals (declared=<hex>, actual=<hex>)`
 pub fn format_finding(finding: &SpecRefFinding) -> String {
     let layer = finding.layer.as_ref();
@@ -334,21 +319,6 @@ pub fn format_finding(finding: &SpecRefFinding) -> String {
                 anchor.as_ref()
             )
         }
-        SpecRefFindingKind::HashMismatch {
-            catalogue_entry,
-            ref_index,
-            spec_file,
-            anchor,
-            declared,
-            actual,
-        } => format!(
-            "[layer={layer}] {}[ref={ref_index}] {}: hash mismatch for '{}' (declared={}, actual={})",
-            sanitize_line(catalogue_entry),
-            sanitize_line(&spec_file.display().to_string()),
-            anchor.as_ref(),
-            declared.to_hex(),
-            actual.to_hex()
-        ),
         SpecRefFindingKind::StaleSignals { declared_catalogue_hash, actual_catalogue_hash } => {
             format!(
                 "[layer={layer}] stale catalogue-spec-signals (declared={}, actual={})",
@@ -563,35 +533,26 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // Test: well-formed v3 catalogue → Info finding (not Error)
+    // Test: schema_version 3 catalogue → Error finding (unsupported schema)
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_v3_catalogue_well_formed_produces_info_finding() {
+    fn test_v3_catalogue_produces_error_finding() {
+        // schema_version 3 is no longer supported (bumped to 4 in T001).
+        // The codec rejects it, so check_v3_catalogue_finding must return an Error.
         let tmp = TempDir::new().unwrap();
         write_file(tmp.path(), "domain-types.json", V3_CATALOGUE_DOMAIN);
         let path = tmp.path().join("domain-types.json");
 
         let finding_opt = check_v3_catalogue_finding(&path).unwrap();
 
-        // Must produce Some(Info) finding with the "v3 catalogue" text.
         let finding =
-            finding_opt.expect("well-formed v3 catalogue must produce a Some(VerifyFinding)");
+            finding_opt.expect("schema_version 3 catalogue must produce a Some(VerifyFinding)");
         assert_eq!(
             finding.severity(),
-            Severity::Info,
-            "well-formed v3 catalogue must produce Info severity, got: {:?}",
+            Severity::Error,
+            "schema_version 3 catalogue must produce Error severity, got: {:?}",
             finding.severity()
-        );
-        assert!(
-            finding.message().contains("v3 catalogue"),
-            "Info finding must contain 'v3 catalogue'; message: {}",
-            finding.message()
-        );
-        assert!(
-            finding.message().contains("verify-spec-states-current"),
-            "Info finding must reference 'verify-spec-states-current'; message: {}",
-            finding.message()
         );
     }
 

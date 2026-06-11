@@ -597,9 +597,9 @@ fn write_matching_domain_catalogue_with_single_entry(
     track_dir: &std::path::Path,
     entry_name: &str,
 ) {
-    // v3-native format required by CatalogueDocumentCodec::decode.
+    // v4-native format required by CatalogueDocumentCodec::decode.
     let catalogue = serde_json::json!({
-        "schema_version": 3,
+        "schema_version": 4,
         "crate_name": "domain",
         "layer": "domain",
         "types": {

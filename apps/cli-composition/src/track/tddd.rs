@@ -741,9 +741,9 @@ mod tests {
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
 
-        // Write a minimal v3 catalogue with a Red-signal entry.
+        // Write a minimal v4 catalogue with a Red-signal entry.
         let v3_catalogue = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "domain",
   "layer": "domain",
   "types": {

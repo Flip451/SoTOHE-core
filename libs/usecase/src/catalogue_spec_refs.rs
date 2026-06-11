@@ -4,9 +4,10 @@
 //! [`VerifyCatalogueSpecRefsInteractor`]. Composes the T006
 //! [`TrackBlobReader`] extension with a new [`SpecElementHashReader`]
 //! secondary port that supplies canonical SHA-256 digests per spec element.
-//! Ref integrity check logic is inlined in `execute` (T024 v3-native migration):
+//! Ref integrity check logic is inlined in `execute` (T024 catalogue-native migration):
 //! iterates `CatalogueDocument` types/traits/functions BTreeMaps and emits
-//! `SpecRefFinding` for each detected anchor/hash violation.
+//! `SpecRefFinding` for dangling spec anchors; stale signal findings are
+//! appended separately.
 //!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
 //! §D1.5 / §D3.2 / §D3.6 / IN-06.
@@ -120,7 +121,7 @@ pub trait VerifyCatalogueSpecRefs: Send + Sync {
     ///    track_id mismatch.
     /// 2. Read catalogue + raw-bytes hash (T006 port); optionally read
     ///    spec + element hashes + signals (skipped when `cmd.skip_stale`).
-    /// 3. Inline spec-ref integrity check over v3 `CatalogueDocument` and return
+    /// 3. Inline spec-ref integrity check over `CatalogueDocument` and return
     ///    the resulting `Vec<SpecRefFinding>` (empty = pass).
     ///
     /// # Errors
@@ -237,7 +238,7 @@ where
                 BlobFetchResult::NotFound => {
                     // No signals file yet — treat as "nothing to compare against"
                     // rather than an error. Stale detection is a no-op in this
-                    // case; dangling / mismatch checks still run.
+                    // case; dangling-anchor checks still run.
                     (None, None)
                 }
                 BlobFetchResult::FetchError(message) => {
@@ -249,43 +250,29 @@ where
             }
         };
 
-        // 3. Inline spec-ref integrity check over v3 `CatalogueDocument`.
+        // 3. Inline spec-ref integrity check over `CatalogueDocument`.
         //
         // T024: equivalent of `check_catalogue_spec_ref_integrity` over the
-        // v3-native `CatalogueDocument`. Iterates types → traits → functions
-        // (BTreeMap order) and checks each entry's `spec_refs` for
-        // DanglingAnchor / HashMismatch. StaleSignals check appended last.
+        // catalogue-native `CatalogueDocument`. Iterates types → traits →
+        // functions (BTreeMap order) and checks each entry's `spec_refs` for
+        // DanglingAnchor. StaleSignals check appended last.
         let mut findings: Vec<SpecRefFinding> = Vec::new();
 
         // Helper closure: check spec_refs for one (name, spec_refs_slice) pair.
+        // Hash verification is removed (spec-ref-embedded-hash-removal IN-04):
+        // staleness is detected by verify-cache runtime recomputation.
         let mut check_entry_refs = |entry_name: String, spec_refs: &[SpecRef]| {
             for (ref_index, spec_ref) in spec_refs.iter().enumerate() {
-                match spec_element_hashes.get(&spec_ref.anchor) {
-                    None => {
-                        findings.push(SpecRefFinding::new(
-                            cmd.layer_id.clone(),
-                            SpecRefFindingKind::DanglingAnchor {
-                                catalogue_entry: entry_name.clone(),
-                                ref_index,
-                                spec_file: spec_ref.file.clone(),
-                                anchor: spec_ref.anchor.clone(),
-                            },
-                        ));
-                    }
-                    Some(actual_hash) if actual_hash != &spec_ref.hash => {
-                        findings.push(SpecRefFinding::new(
-                            cmd.layer_id.clone(),
-                            SpecRefFindingKind::HashMismatch {
-                                catalogue_entry: entry_name.clone(),
-                                ref_index,
-                                spec_file: spec_ref.file.clone(),
-                                anchor: spec_ref.anchor.clone(),
-                                declared: spec_ref.hash.clone(),
-                                actual: actual_hash.clone(),
-                            },
-                        ));
-                    }
-                    Some(_) => {} // anchor present + hash matches — no finding
+                if !spec_element_hashes.contains_key(&spec_ref.anchor) {
+                    findings.push(SpecRefFinding::new(
+                        cmd.layer_id.clone(),
+                        SpecRefFindingKind::DanglingAnchor {
+                            catalogue_entry: entry_name.clone(),
+                            ref_index,
+                            spec_file: spec_ref.file.clone(),
+                            anchor: spec_ref.anchor.clone(),
+                        },
+                    ));
                 }
             }
         };
@@ -336,14 +323,14 @@ mod tests {
 
     use super::*;
 
-    /// Build an empty v3 `CatalogueDocument` with the given layer id.
+    /// Build an empty schema-v4 `CatalogueDocument` with the given layer id.
     fn empty_catalogue(layer_id: &str) -> CatalogueDocument {
         let crate_name = CrateName::new(layer_id).unwrap();
         let layer = LayerId::try_new(layer_id).unwrap();
-        CatalogueDocument::new(3, crate_name, layer)
+        CatalogueDocument::new(4, crate_name, layer)
     }
 
-    /// Add a `TypeEntry` with the given name and spec_refs to a v3 `CatalogueDocument`.
+    /// Add a `TypeEntry` with the given name and spec_refs to a `CatalogueDocument`.
     fn add_type_entry(doc: &mut CatalogueDocument, name: &str, spec_refs: Vec<SpecRef>) {
         let entry = TypeEntry {
             action: ItemAction::Add,
@@ -680,10 +667,9 @@ mod tests {
         s
     }
 
-    /// Build a v3 `CatalogueDocument` with one type entry that has a single spec_ref.
-    fn catalogue_with_ref(name: &str, anchor_id: &str, hash_byte: u8) -> CatalogueDocument {
-        let spec_refs =
-            vec![SpecRef::new("track/items/x/spec.json", anchor(anchor_id), hash(hash_byte))];
+    /// Build a schema-v4 `CatalogueDocument` with one type entry that has a single spec_ref.
+    fn catalogue_with_ref(name: &str, anchor_id: &str) -> CatalogueDocument {
+        let spec_refs = vec![SpecRef::new("track/items/x/spec.json", anchor(anchor_id))];
         let mut doc = empty_catalogue("domain");
         add_type_entry(&mut doc, name, spec_refs);
         doc
@@ -705,7 +691,7 @@ mod tests {
 
     #[test]
     fn verify_returns_empty_when_everything_aligns() {
-        let cat = catalogue_with_ref("X", "IN-01", 0xab);
+        let cat = catalogue_with_ref("X", "IN-01");
         let mut hashes = BTreeMap::new();
         hashes.insert(anchor("IN-01"), hash(0xab));
         let signals = CatalogueSpecSignalsDocument::new(
@@ -722,7 +708,7 @@ mod tests {
 
     #[test]
     fn verify_reports_dangling_anchor() {
-        let cat = catalogue_with_ref("X", "IN-99", 0xab);
+        let cat = catalogue_with_ref("X", "IN-99");
         let hashes = BTreeMap::new(); // empty — anchor missing
         let reader = FixedReader::new(cat, hex_pattern(0xcd), None);
         let interactor = VerifyCatalogueSpecRefsInteractor::new(reader, FixedHashReader { hashes });
@@ -731,20 +717,6 @@ mod tests {
             interactor.execute(&cmd("track/my-track", "my-track", "domain", false)).unwrap();
         assert_eq!(findings.len(), 1);
         assert!(matches!(findings[0].kind, SpecRefFindingKind::DanglingAnchor { .. }));
-    }
-
-    #[test]
-    fn verify_reports_hash_mismatch() {
-        let cat = catalogue_with_ref("X", "IN-01", 0xab);
-        let mut hashes = BTreeMap::new();
-        hashes.insert(anchor("IN-01"), hash(0xcd)); // actual 0xcd, declared 0xab
-        let reader = FixedReader::new(cat, hex_pattern(0xcd), None);
-        let interactor = VerifyCatalogueSpecRefsInteractor::new(reader, FixedHashReader { hashes });
-
-        let findings =
-            interactor.execute(&cmd("track/my-track", "my-track", "domain", false)).unwrap();
-        assert_eq!(findings.len(), 1);
-        assert!(matches!(findings[0].kind, SpecRefFindingKind::HashMismatch { .. }));
     }
 
     #[test]
@@ -770,7 +742,7 @@ mod tests {
 
     #[test]
     fn verify_skip_stale_bypasses_signals_read() {
-        let cat = catalogue_with_ref("X", "IN-01", 0xab);
+        let cat = catalogue_with_ref("X", "IN-01");
         let mut hashes = BTreeMap::new();
         hashes.insert(anchor("IN-01"), hash(0xab));
         // PanicOnSignalsReader panics if the signals port is accessed — proving
