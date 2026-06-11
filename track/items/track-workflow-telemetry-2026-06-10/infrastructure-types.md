@@ -11,23 +11,23 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TelemetryReportError | error_type | — | Io, TrackNotFound | 🟡 | 🔵 |
+| TelemetryReportError | error_type | — | Io, TrackNotFound | 🔵 | 🔵 |
 | TelemetryWriteError | error_type | — | Serialize, Io | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PhaseDurationSummary | dto | — | — | 🟡 | 🔵 |
+| PhaseDurationSummary | dto | — | — | 🔵 | 🔵 |
 | TelemetryConfig | dto | — | — | 🔵 | 🔵 |
-| TelemetryErrorEntry | dto | — | — | 🟡 | 🔵 |
-| TelemetryHookBlockEntry | dto | — | — | 🟡 | 🔵 |
-| TelemetryReportOutput | dto | — | — | 🟡 | 🔵 |
+| TelemetryErrorEntry | dto | — | — | 🔵 | 🔵 |
+| TelemetryHookBlockEntry | dto | — | — | 🔵 | 🔵 |
+| TelemetryReportOutput | dto | — | — | 🔵 | 🔵 |
 
 ## Secondary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TelemetryReport | secondary_adapter | — | impl Debug | 🟡 | 🔵 |
+| TelemetryReport | secondary_adapter | — | impl Debug | 🔵 | 🔵 |
 | TelemetryWriter | secondary_adapter | — | impl Debug | 🔵 | 🔵 |
 

@@ -1,711 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This says telemetry on `main` is intentionally not recorded, but [track/workflow.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/workflow.md#L218-L219) still defines a `main`-branch fallback that resolves the latest track. As written, telemetry attribution would disagree with the current track-resolution model on the branch where ad hoc commands are commonly run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
-              "line": 92,
-              "category": "contradiction"
-            },
-            {
-              "message": "The lock-free append plan leans on a 4096-byte `PIPE_BUF` cap, but `PIPE_BUF` is defined for pipes/FIFOs, not regular files; see https://man7.org/linux/man-pages/man7/pipe.7.html and https://man7.org/linux/man-pages/man2/write.2.html. For `telemetry.jsonl`, that does not guarantee whole-record atomic writes, so the no-lock strategy is under-specified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
-              "line": 74,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:7527d1f76fdc5afc35606fd2fd22043c55ee75ef8f2cb91c5b0c7383787a0023",
-          "at": "2026-06-10T11:50:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The 4 KiB cap is justified with `PIPE_BUF`, but `PIPE_BUF` only constrains atomic writes to pipes/FIFOs, not regular files like `telemetry.jsonl`. As written, the no-lock append strategy does not guarantee whole-record atomicity for the target file.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
-              "line": 74,
-              "category": "factual error"
-            },
-            {
-              "message": "This says `main`-branch executions are not recorded, but `track/workflow.md` still defines a `main` fallback that resolves the latest track. Telemetry attribution would therefore disagree with the current track-resolution model on the branch where ad hoc commands are commonly run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
-              "line": 92,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:7527d1f76fdc5afc35606fd2fd22043c55ee75ef8f2cb91c5b0c7383787a0023",
-          "at": "2026-06-10T11:51:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56299805f18318b860d7d6ca2523d1807b394ad173818fe52aa4a5d1ebc1e8ee",
-          "at": "2026-06-10T11:53:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56299805f18318b860d7d6ca2523d1807b394ad173818fe52aa4a5d1ebc1e8ee",
-          "at": "2026-06-10T11:56:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0644e0ea5574ce35f017b428f56a407176e3c3d57fd6d7b772652a3e2fcf50bc",
-          "at": "2026-06-10T12:18:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-01 is internally inconsistent with the scope. IN-01/OS-02 and the ADR say the domain layer is not instrumented, but AC-01 only bans subscriber initialization and observation code other than tracing macros in `domain / usecase`, which would allow domain-level tracing spans/events to pass the acceptance gate. Tighten this criterion so domain-layer telemetry is forbidden outright and any allowed tracing macros are limited to the intended non-domain boundaries.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
-              "line": 310,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0644e0ea5574ce35f017b428f56a407176e3c3d57fd6d7b772652a3e2fcf50bc",
-          "at": "2026-06-10T12:22:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6eda035fb0f3b046162237979bb281cd7a333787d648e084a03b52b1566aaa04",
-          "at": "2026-06-10T12:25:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T002 introduces a new `RoundType` in `telemetry::mod`, but the telemetry contract already says `ReviewRound.round_type` uses the shared infrastructure `RoundType` enum. This splits one semantic type into two definitions and will force unnecessary conversions or duplicate serde behavior.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 20,
-              "category": "contradiction"
-            },
-            {
-              "message": "S2 says T002 and T003 are independently implementable/testable before composition-root wiring, but T003 explicitly depends on T002 (`前提: T002`) and its constructor/tests require `TelemetryEvent`/`TelemetryWriteError`. The dependency ordering claim is therefore false.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 17,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b9d9f47a1048d60eaf6abdac6aa383693c8be2120f6f6ca929928311dbd72efe",
-          "at": "2026-06-10T12:52:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 claims CN-05 will be satisfied by using `write_all` as a single append write, but `write_all` is a retrying convenience API and is not a guarantee of one write syscall. Since the design relies on one O_APPEND write per <=4096-byte JSONL record, following this plan can violate the plan's own atomicity/record-boundary constraint.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
-              "line": 18,
-              "category": "factual error (semantic)"
-            },
-            {
-              "message": "T008 says unknown `schema_version` rows are skipped when `serde_json::from_str::<TelemetryEvent>` fails, but T002 defines `schema_version` as a plain `u32` field with derived deserialization. A future/unknown numeric version will deserialize successfully unless the plan adds explicit version validation, so AC-08/CN-08 is not actually implemented by the described algorithm.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
-              "line": 48,
-              "category": "contradiction"
-            },
-            {
-              "message": "`ReviewRound.round_type` is typed as `RoundType`, and the docs/task text describe an infrastructure `RoundType` enum with `Fast`/`Final`, but the infrastructure catalogue does not declare any `RoundType` type. That leaves implementers with a referenced type that is absent from the catalogue contract.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/infrastructure-types.json",
-              "line": 50,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b9d9f47a1048d60eaf6abdac6aa383693c8be2120f6f6ca929928311dbd72efe",
-          "at": "2026-06-10T12:56:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T004 requires emitting TrackSubcommand at both command start and completion, but the TelemetryEvent schema only has completed-command fields: exit_code and duration_ms, with no phase/kind field and no nullable values. A start event cannot populate those fields truthfully, and emitting two indistinguishable TrackSubcommand rows would also make the report's duration aggregation ambiguous. Align the task with AC-02's post-execution event, or add an explicit lifecycle field/schema for start vs finish.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 30,
-              "category": "contradiction"
-            },
-            {
-              "message": "T003 fixes the default output path to items_dir/track_id/logs/telemetry.jsonl and mandates opening it with OpenOptions::append(true).create(true).open(path), but no task creates the logs parent directory. create(true) creates only the file, not missing directories, so the first default-path write for a normal track dir will fail and then be suppressed by the fire-and-forget caller, breaking AC-02/AC-05. Add parent directory creation to the writer task before opening the file.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 21,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:3bd40a825788aeea0cc72f3d70d39b5e6843825cd364348fd2e0e4591c55df67",
-          "at": "2026-06-10T13:05:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T004 tells implementers to emit `TelemetryEvent::TrackSubcommand` after every CLI dispatch once a track branch is resolved, but the spec explicitly excludes pure display commands and AC-06 requires eventless paths such as pure display commands to avoid opening `logs/`. Since task coverage maps AC-06 only to T003's lazy writer behavior, no task actually prevents T004 from recording those display commands, so following the plan can violate OS-04/AC-06.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 30,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0d5fd6359f43ff5b5da168caf02132eda3e3220c9e40f33c74b4f76c4979057b",
-          "at": "2026-06-10T13:09:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T008 requires the report reader to extract `schema_version` from each raw JSON line before typed deserialization, but the catalogue defines `schema_version` only inside each `TelemetryEvent` variant payload and T002 asks for a derived serde struct-payload enum. With serde's default enum representation, the raw line is variant-wrapped, so a top-level version check will not find `schema_version` and valid events can be skipped or become unreadable. The plan needs an explicit wire format, such as top-level `schema_version` plus event type, or a reader that intentionally inspects the nested variant payload.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 55,
-              "category": "contradiction"
-            },
-            {
-              "message": "`TelemetryWriteError` is documented as errors that `TelemetryWriter` suppresses rather than propagates, but T003 defines `TelemetryWriter::write` as returning `Result<(), TelemetryWriteError>`, says IO/serialize errors are returned and suppressed by the caller, and requires a test that observes `TelemetryWriteError::Io`. These are incompatible contracts; following the catalogue would make the T003 API/tests impossible to satisfy.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/infrastructure-types.json",
-              "line": 206,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:21ecae39b5e292aa95ec4c1b700931a6bf3fc414c2af45afef86c9ea685e7e93",
-          "at": "2026-06-10T13:13:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T008 makes the schema-version compatibility check optional even though CN-08/AC-08 require lines with unknown `schema_version` to be skipped and counted. With the planned externally tagged `TelemetryEvent`, a known variant carrying a future `schema_version` can deserialize successfully, so an implementation may aggregate incompatible future rows instead of skipping them. Make the payload `schema_version` check mandatory before aggregation.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 55,
-              "category": "contradiction"
-            },
-            {
-              "message": "The writer plan requires a single `std::io::Write::write` call but does not require checking the returned byte count. `write` may return `Ok(n)` with `n < buffer.len()`, which would leave a truncated JSONL row while `TelemetryWriter::write` could still return success; this undermines the valid-JSONL and line-boundary guarantees. The task should require treating short writes as `TelemetryWriteError::Io` or otherwise explicitly handling them.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 22,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:0d0fa38c4ad7b3254bf5fc4069a7bc7305302175ee3099967202b1a6870a25a1",
-          "at": "2026-06-10T13:17:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-03 is covered only by T001, but CN-03 includes the archive-retention requirement that gitignored `logs/` move with archived tracks; T001 only adds the `.gitignore` entry and T010 only rechecks that entry. The plan can therefore satisfy its mapped tasks while leaving GO-03's active-to-archive retention behavior unimplemented or unverified.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/task-coverage.json",
-              "line": 26,
-              "category": "coverage_gap"
-            },
-            {
-              "message": "The plan records gate evaluations without any duration field, while the ADR goal explicitly includes finding which gates took time. T008 then aggregates phase durations only from `TrackSubcommand` events, so individual slow gates cannot be reconstructed from the planned telemetry.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/infrastructure-types.json",
-              "line": 27,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:9f611a29e77482d4160b656bb3440055b738f3b98855722a871d9b3aa107ecda",
-          "at": "2026-06-10T13:23:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-03/GO-03 require telemetry logs to follow the track lifecycle by moving gitignored `logs/` during archive, and task coverage maps CN-03 to T001/T010. However T010 explicitly excludes the archive-tool change as a separate future track and only verifies the `.gitignore` entry, so completing the plan can leave the stated retention/archive requirement unmet while the artifacts claim CN-03 is covered.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 64,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:eab8f74f00564715abf5302b2ff20e2046938965aed464d718b70329b6ea984d",
-          "at": "2026-06-10T13:27:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 narrows CN-03 to only adding the gitignore entry and explicitly defers archive-tool handling to a separate track, but the spec/ADR make archive movement part of the same retention requirement: GO-03 says retention follows the active to archive lifecycle, and CN-03 says the archive tool must move gitignored `logs/` with the track directory. Since `task-coverage.json` maps CN-03 only to T001 and T010 only verifies AC-10, this plan can complete while leaving the declared CN-03/GO-03 behavior unimplemented.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
-              "line": 11,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:39a11bdabc98e85b87304d2f756a23c4d567e60ea209c5d099fcc4a898d63a2c",
-          "at": "2026-06-10T13:31:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a89b0816f72effb784da7a101e082108508bb3f4d90163d48f01045cb58a13d3",
-          "at": "2026-06-10T13:37:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b1af0babb1e016bb4ae86eccd6efa4dc1ee3c87f68f40cf979cdde7f1f756fc5",
-          "at": "2026-06-10T13:46:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b1af0babb1e016bb4ae86eccd6efa4dc1ee3c87f68f40cf979cdde7f1f756fc5",
-          "at": "2026-06-10T13:49:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T008 still specifies `TelemetryReport` as if `TelemetryEvent` were externally-tagged and `schema_version` lived inside the variant payload. That contradicts the wire-format already being used for T002 in this track (internally-tagged with top-level `schema_version`), so the report adapter would be specified against the wrong JSON shape and would skip valid rows.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
-              "line": 42,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:da1ad32cd3cd15bc56e0b684d60cec4bf394c9faee87d16d3a57703aba805b5f",
-          "at": "2026-06-10T14:12:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c14672c52d93baa4829af67a0ce84e2a3795842b3fab9c7f210324227b564e4d",
-          "at": "2026-06-10T14:15:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c14672c52d93baa4829af67a0ce84e2a3795842b3fab9c7f210324227b564e4d",
-          "at": "2026-06-10T14:18:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4133afc3160ea76c4d0a74fa1be67f847ac85f1d816a645cfb0fd4fa6e36ff30",
-          "at": "2026-06-10T14:49:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4133afc3160ea76c4d0a74fa1be67f847ac85f1d816a645cfb0fd4fa6e36ff30",
-          "at": "2026-06-10T14:52:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c3d27429a8f0ecee548979df28c7ebd6a56dd486ea31152923bb6a770ceb1eb",
-          "at": "2026-06-10T16:03:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c3d27429a8f0ecee548979df28c7ebd6a56dd486ea31152923bb6a770ceb1eb",
-          "at": "2026-06-10T16:05:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d080a4b51a44f37821c7b15bc81aad4012d6c4a84a9c31247ea472316509e5c4",
-          "at": "2026-06-10T18:16:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d080a4b51a44f37821c7b15bc81aad4012d6c4a84a9c31247ea472316509e5c4",
-          "at": "2026-06-10T18:18:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T005 still instructs gate evaluation emitters to include `input_hash`, but the updated ADR/spec/DTO explicitly removed that field and say it must not be recorded. This makes the implementation plan conflict with the accepted requirement set. The same stale requirement also appears in `plan.md` for T005.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
-              "line": 30,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:79efefbc73bf014b7165ab1c818bb11264565ab73ae90343acbd25309e7b2d7c",
-          "at": "2026-06-11T02:40:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GateEval's payload description is stale: it still defines `reason_summary` as a shortened list of findings, but the amended ADR/spec now define it as a truncated human-readable gate-output summary. The same block also omits the required `track_id` field that `infrastructure-types.json` still includes for `GateEval`, so the plan is describing the wrong JSONL shape.",
-              "severity": "P1",
-              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
-              "line": 30,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:1e87079a32f13c0b02c1c20567e3e34da3b886544862dff4da2d9d0bed5a314e",
-          "at": "2026-06-11T02:46:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1463106a3855ff256886ac75b86b300e09cd3a836433953a22cf0eb657f26a5f",
-          "at": "2026-06-11T02:49:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1463106a3855ff256886ac75b86b300e09cd3a836433953a22cf0eb657f26a5f",
-          "at": "2026-06-11T02:52:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:176be9b60672aeb099520bcb496f446a0ebe3d0f23dd88e735596e73684913d0",
-          "at": "2026-06-11T03:34:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:176be9b60672aeb099520bcb496f446a0ebe3d0f23dd88e735596e73684913d0",
-          "at": "2026-06-11T03:35:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08c475da269c4d1f002f23e9c070449b4a08907737374833994af9d03b45d803",
-          "at": "2026-06-11T13:21:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08c475da269c4d1f002f23e9c070449b4a08907737374833994af9d03b45d803",
-          "at": "2026-06-11T13:23:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8105aeaaaa4a973736bef8897fdab89bba877ee7ff0fd8bef37697b752974575",
-          "at": "2026-06-11T13:35:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8105aeaaaa4a973736bef8897fdab89bba877ee7ff0fd8bef37697b752974575",
-          "at": "2026-06-11T13:40:08Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
-          "at": "2026-06-10T16:04:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
-          "at": "2026-06-10T16:08:24Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
-          "at": "2026-06-10T14:13:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new DTO tests only cover successful serialization/round-trips. The briefing explicitly asks for error-case coverage, and the later report path relies on `serde_json::from_str::<TelemetryEvent>` rejecting malformed rows, unknown `event_type` values, or rows missing required fields such as `schema_version`. Add at least one negative deserialization test so the tagged JSONL contract is guarded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/mod.rs",
-              "line": 184,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
-          "at": "2026-06-10T14:17:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec5de587869142997f00ac11b04f9a447dd87cf5bebe94e959a7bcc94e38c527",
-          "at": "2026-06-10T14:21:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryWriter::new` trusts the raw `track_id` string and joins it directly into `items_dir`, so a value containing path separators or `..` can escape `track/items` and write telemetry outside the intended workspace. This constructor should take a validated track-id type or reject non-slug input before building the path.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/writer.rs",
-              "line": 97,
-              "category": "Security"
-            },
-            {
-              "message": "The 4096-byte guard only checks the pre-truncation serialization result, then returns `line2` without verifying that the truncated JSON still fits. A long `track_id`/`command`, or JSON escaping that expands the encoded output, can still produce an oversized row while `write()` returns `Ok(())`. Recheck the second serialization length and fail if it still exceeds the cap.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/writer.rs",
-              "line": 185,
-              "category": "Correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e5e69793169aa8faee8a20dd15a718611fbccfa5d37179dbae781c9e9188e71c",
-          "at": "2026-06-10T14:53:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`safe_path_component` does not actually reduce `track_id` to a single path component: it keeps every normal component and rejoins them with `/`. A `track_id` like `foo/bar` will therefore write to `items_dir/foo/bar/logs/telemetry.jsonl` instead of the intended single-track directory, which can make later report/archive code miss the file.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
-              "line": 238,
-              "category": "correctness"
-            },
-            {
-              "message": "The oversized-line fallback truncates raw bytes and appends `\\n`. If the event contains multibyte UTF-8 or JSON escape sequences, this can emit invalid UTF-8/JSONL, so downstream readers that use text parsing will fail on the whole file instead of just skipping the oversized row.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
-              "line": 212,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4dc59c26e108c84dca04c4921fee6b693d3e50fd09bca7d0f4ef6e510e44f125",
-          "at": "2026-06-10T15:02:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryWriter::new` silently rewrites invalid `track_id` strings by taking the last normal path segment (or `unknown`). If a path-like or otherwise invalid ID reaches this constructor, distinct logical tracks can be merged into the same `telemetry.jsonl` instead of failing fast, which is a data-corruption risk.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
-              "line": 93,
-              "category": "correctness"
-            },
-            {
-              "message": "`SOTP_TELEMETRY_DIR` is read with `std::env::var`, so a valid non-UTF8 filesystem path is treated as absent. On Unix this silently falls back to the default track directory and makes the override knob unreliable for a real path value.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/config.rs",
-              "line": 40,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
-          "at": "2026-06-10T15:17:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
-          "at": "2026-06-10T15:19:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
-          "at": "2026-06-10T15:24:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
-          "at": "2026-06-11T02:39:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
-          "at": "2026-06-11T02:41:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "New public `RoundType::from_str` has no unit tests covering either the valid `fast`/`final` parses or the unknown-value error path, so a regression in the canonical round-type parser could ship unnoticed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 53,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:02bb83f3b4d845d37a85ee79a528d1bbbcc9afd198d14782952c5c19210146bf",
-          "at": "2026-06-11T03:35:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
-          "at": "2026-06-11T03:38:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
-          "at": "2026-06-11T03:42:14Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0af5e58601d0189697c8f1d54823d96cb2e179e4f645910b3d4600360d27a05e",
-          "at": "2026-06-10T13:45:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0af5e58601d0189697c8f1d54823d96cb2e179e4f645910b3d4600360d27a05e",
-          "at": "2026-06-10T13:47:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
-          "at": "2026-06-10T14:48:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
-          "at": "2026-06-10T14:51:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:298a274d3590653946a5ccbbbf50a9548a10e99699dc0d3d1b4d79d45a8e7d74",
-          "at": "2026-06-10T16:02:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:298a274d3590653946a5ccbbbf50a9548a10e99699dc0d3d1b4d79d45a8e7d74",
-          "at": "2026-06-10T16:05:40Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T08:09:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T08:12:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:089ce2a84fbbf95f031e4773fbf584fa6ff94cca61ec1e1f38f428e0181fdeeb",
-          "at": "2026-06-11T13:15:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:089ce2a84fbbf95f031e4773fbf584fa6ff94cca61ec1e1f38f428e0181fdeeb",
-          "at": "2026-06-11T13:17:06Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -1295,6 +590,38 @@
           "findings": [],
           "hash": "rvw1:sha256:2022de17a5ec221fc658d052bddb7ccd14e50970cf1ece5287fd23cf70864caf",
           "at": "2026-06-11T13:10:44Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T08:09:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T08:12:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:089ce2a84fbbf95f031e4773fbf584fa6ff94cca61ec1e1f38f428e0181fdeeb",
+          "at": "2026-06-11T13:15:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:089ce2a84fbbf95f031e4773fbf584fa6ff94cca61ec1e1f38f428e0181fdeeb",
+          "at": "2026-06-11T13:17:06Z"
         }
       ]
     },
@@ -1982,6 +1309,773 @@
           "findings": [],
           "hash": "rvw1:sha256:9951521e4a9f7e69a985bdef96f4678f75a08467128a82753955d67af42d65b4",
           "at": "2026-06-11T11:34:44Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0af5e58601d0189697c8f1d54823d96cb2e179e4f645910b3d4600360d27a05e",
+          "at": "2026-06-10T13:45:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0af5e58601d0189697c8f1d54823d96cb2e179e4f645910b3d4600360d27a05e",
+          "at": "2026-06-10T13:47:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
+          "at": "2026-06-10T14:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
+          "at": "2026-06-10T14:51:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:298a274d3590653946a5ccbbbf50a9548a10e99699dc0d3d1b4d79d45a8e7d74",
+          "at": "2026-06-10T16:02:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:298a274d3590653946a5ccbbbf50a9548a10e99699dc0d3d1b4d79d45a8e7d74",
+          "at": "2026-06-10T16:05:40Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
+          "at": "2026-06-10T14:13:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new DTO tests only cover successful serialization/round-trips. The briefing explicitly asks for error-case coverage, and the later report path relies on `serde_json::from_str::<TelemetryEvent>` rejecting malformed rows, unknown `event_type` values, or rows missing required fields such as `schema_version`. Add at least one negative deserialization test so the tagged JSONL contract is guarded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/mod.rs",
+              "line": 184,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
+          "at": "2026-06-10T14:17:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec5de587869142997f00ac11b04f9a447dd87cf5bebe94e959a7bcc94e38c527",
+          "at": "2026-06-10T14:21:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter::new` trusts the raw `track_id` string and joins it directly into `items_dir`, so a value containing path separators or `..` can escape `track/items` and write telemetry outside the intended workspace. This constructor should take a validated track-id type or reject non-slug input before building the path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 97,
+              "category": "Security"
+            },
+            {
+              "message": "The 4096-byte guard only checks the pre-truncation serialization result, then returns `line2` without verifying that the truncated JSON still fits. A long `track_id`/`command`, or JSON escaping that expands the encoded output, can still produce an oversized row while `write()` returns `Ok(())`. Recheck the second serialization length and fail if it still exceeds the cap.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 185,
+              "category": "Correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e5e69793169aa8faee8a20dd15a718611fbccfa5d37179dbae781c9e9188e71c",
+          "at": "2026-06-10T14:53:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`safe_path_component` does not actually reduce `track_id` to a single path component: it keeps every normal component and rejoins them with `/`. A `track_id` like `foo/bar` will therefore write to `items_dir/foo/bar/logs/telemetry.jsonl` instead of the intended single-track directory, which can make later report/archive code miss the file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 238,
+              "category": "correctness"
+            },
+            {
+              "message": "The oversized-line fallback truncates raw bytes and appends `\\n`. If the event contains multibyte UTF-8 or JSON escape sequences, this can emit invalid UTF-8/JSONL, so downstream readers that use text parsing will fail on the whole file instead of just skipping the oversized row.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 212,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4dc59c26e108c84dca04c4921fee6b693d3e50fd09bca7d0f4ef6e510e44f125",
+          "at": "2026-06-10T15:02:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter::new` silently rewrites invalid `track_id` strings by taking the last normal path segment (or `unknown`). If a path-like or otherwise invalid ID reaches this constructor, distinct logical tracks can be merged into the same `telemetry.jsonl` instead of failing fast, which is a data-corruption risk.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 93,
+              "category": "correctness"
+            },
+            {
+              "message": "`SOTP_TELEMETRY_DIR` is read with `std::env::var`, so a valid non-UTF8 filesystem path is treated as absent. On Unix this silently falls back to the default track directory and makes the override knob unreliable for a real path value.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/config.rs",
+              "line": 40,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:17:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:19:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:24:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
+          "at": "2026-06-11T02:39:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
+          "at": "2026-06-11T02:41:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "New public `RoundType::from_str` has no unit tests covering either the valid `fast`/`final` parses or the unknown-value error path, so a regression in the canonical round-type parser could ship unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 53,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:02bb83f3b4d845d37a85ee79a528d1bbbcc9afd198d14782952c5c19210146bf",
+          "at": "2026-06-11T03:35:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
+          "at": "2026-06-11T03:38:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
+          "at": "2026-06-11T03:42:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Empty/whitespace-only lines are dropped before parsing, so they are neither counted nor reported in `skipped_lines`. That violates the fail-open contract for invalid JSON lines: a blank line is malformed JSON and should be skipped and counted rather than silently ignored. The accompanying test also codifies the undercounting behavior.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 206,
+              "category": "spec mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2549660a63fd9fb7417071d4aad698a4a9453dd1144c0844050125b9a484a0c5",
+          "at": "2026-06-11T13:56:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`aggregate` accepts a raw `&str` and joins it directly onto `items_dir` without validating it as a `TrackId`. A caller can pass `../...` segments and make the reader walk outside `track/items/<id>`, which violates the domain validation rule and creates a path-traversal read risk. Validate with `domain::TrackId::try_new` (or take `TrackId`) before building the path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
+              "line": 166,
+              "category": "security"
+            },
+            {
+              "message": "The `exists()` pre-checks collapse filesystem errors into absence: `Path::exists()` returns `false` for inaccessible paths, so a permission/metadata failure on the track directory is misreported as `TrackNotFound`, and the same problem on `telemetry.jsonl` returns an empty report instead of `Io`. That silently swallows real I/O failures. Distinguish `NotFound` from other errors via `metadata`/`open` error handling instead of using `exists()` as the gate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
+              "line": 170,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5fb8a1a6e06200e388aea5df9c41aa7da75dc1a5bbb32b6d5a12cfe6dc35554e",
+          "at": "2026-06-11T14:01:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
+          "at": "2026-06-11T14:09:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reader.lines()` decodes each line as UTF-8 before the JSON parser sees it, and any decode failure is returned as `TelemetryReportError::Io`. That breaks the required fail-open reader behavior for invalid JSON lines: a single corrupted/non-UTF-8 JSONL line will fail the whole report instead of incrementing `skipped_lines` and continuing. Read raw lines with `read_until(b'\\n')`/`serde_json::from_slice` or otherwise treat UTF-8/JSON parse failures as skipped lines.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 222,
+              "category": "fail_open"
+            }
+          ],
+          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
+          "at": "2026-06-11T14:13:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dcc71e2d83c3d61a49a5c7fa5b9fdf608c59a1f2f870806936991b3077ec95f",
+          "at": "2026-06-11T14:18:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
+          "at": "2026-06-11T14:39:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
+          "at": "2026-06-11T14:43:24Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This says telemetry on `main` is intentionally not recorded, but [track/workflow.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/workflow.md#L218-L219) still defines a `main`-branch fallback that resolves the latest track. As written, telemetry attribution would disagree with the current track-resolution model on the branch where ad hoc commands are commonly run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+              "line": 92,
+              "category": "contradiction"
+            },
+            {
+              "message": "The lock-free append plan leans on a 4096-byte `PIPE_BUF` cap, but `PIPE_BUF` is defined for pipes/FIFOs, not regular files; see https://man7.org/linux/man-pages/man7/pipe.7.html and https://man7.org/linux/man-pages/man2/write.2.html. For `telemetry.jsonl`, that does not guarantee whole-record atomic writes, so the no-lock strategy is under-specified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+              "line": 74,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:7527d1f76fdc5afc35606fd2fd22043c55ee75ef8f2cb91c5b0c7383787a0023",
+          "at": "2026-06-10T11:50:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The 4 KiB cap is justified with `PIPE_BUF`, but `PIPE_BUF` only constrains atomic writes to pipes/FIFOs, not regular files like `telemetry.jsonl`. As written, the no-lock append strategy does not guarantee whole-record atomicity for the target file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+              "line": 74,
+              "category": "factual error"
+            },
+            {
+              "message": "This says `main`-branch executions are not recorded, but `track/workflow.md` still defines a `main` fallback that resolves the latest track. Telemetry attribution would therefore disagree with the current track-resolution model on the branch where ad hoc commands are commonly run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+              "line": 92,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7527d1f76fdc5afc35606fd2fd22043c55ee75ef8f2cb91c5b0c7383787a0023",
+          "at": "2026-06-10T11:51:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56299805f18318b860d7d6ca2523d1807b394ad173818fe52aa4a5d1ebc1e8ee",
+          "at": "2026-06-10T11:53:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56299805f18318b860d7d6ca2523d1807b394ad173818fe52aa4a5d1ebc1e8ee",
+          "at": "2026-06-10T11:56:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0644e0ea5574ce35f017b428f56a407176e3c3d57fd6d7b772652a3e2fcf50bc",
+          "at": "2026-06-10T12:18:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 is internally inconsistent with the scope. IN-01/OS-02 and the ADR say the domain layer is not instrumented, but AC-01 only bans subscriber initialization and observation code other than tracing macros in `domain / usecase`, which would allow domain-level tracing spans/events to pass the acceptance gate. Tighten this criterion so domain-layer telemetry is forbidden outright and any allowed tracing macros are limited to the intended non-domain boundaries.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+              "line": 310,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0644e0ea5574ce35f017b428f56a407176e3c3d57fd6d7b772652a3e2fcf50bc",
+          "at": "2026-06-10T12:22:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6eda035fb0f3b046162237979bb281cd7a333787d648e084a03b52b1566aaa04",
+          "at": "2026-06-10T12:25:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 introduces a new `RoundType` in `telemetry::mod`, but the telemetry contract already says `ReviewRound.round_type` uses the shared infrastructure `RoundType` enum. This splits one semantic type into two definitions and will force unnecessary conversions or duplicate serde behavior.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 20,
+              "category": "contradiction"
+            },
+            {
+              "message": "S2 says T002 and T003 are independently implementable/testable before composition-root wiring, but T003 explicitly depends on T002 (`前提: T002`) and its constructor/tests require `TelemetryEvent`/`TelemetryWriteError`. The dependency ordering claim is therefore false.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b9d9f47a1048d60eaf6abdac6aa383693c8be2120f6f6ca929928311dbd72efe",
+          "at": "2026-06-10T12:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 claims CN-05 will be satisfied by using `write_all` as a single append write, but `write_all` is a retrying convenience API and is not a guarantee of one write syscall. Since the design relies on one O_APPEND write per <=4096-byte JSONL record, following this plan can violate the plan's own atomicity/record-boundary constraint.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
+              "line": 18,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "T008 says unknown `schema_version` rows are skipped when `serde_json::from_str::<TelemetryEvent>` fails, but T002 defines `schema_version` as a plain `u32` field with derived deserialization. A future/unknown numeric version will deserialize successfully unless the plan adds explicit version validation, so AC-08/CN-08 is not actually implemented by the described algorithm.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            },
+            {
+              "message": "`ReviewRound.round_type` is typed as `RoundType`, and the docs/task text describe an infrastructure `RoundType` enum with `Fast`/`Final`, but the infrastructure catalogue does not declare any `RoundType` type. That leaves implementers with a referenced type that is absent from the catalogue contract.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/infrastructure-types.json",
+              "line": 50,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b9d9f47a1048d60eaf6abdac6aa383693c8be2120f6f6ca929928311dbd72efe",
+          "at": "2026-06-10T12:56:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 requires emitting TrackSubcommand at both command start and completion, but the TelemetryEvent schema only has completed-command fields: exit_code and duration_ms, with no phase/kind field and no nullable values. A start event cannot populate those fields truthfully, and emitting two indistinguishable TrackSubcommand rows would also make the report's duration aggregation ambiguous. Align the task with AC-02's post-execution event, or add an explicit lifecycle field/schema for start vs finish.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 30,
+              "category": "contradiction"
+            },
+            {
+              "message": "T003 fixes the default output path to items_dir/track_id/logs/telemetry.jsonl and mandates opening it with OpenOptions::append(true).create(true).open(path), but no task creates the logs parent directory. create(true) creates only the file, not missing directories, so the first default-path write for a normal track dir will fail and then be suppressed by the fire-and-forget caller, breaking AC-02/AC-05. Add parent directory creation to the writer task before opening the file.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 21,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:3bd40a825788aeea0cc72f3d70d39b5e6843825cd364348fd2e0e4591c55df67",
+          "at": "2026-06-10T13:05:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 tells implementers to emit `TelemetryEvent::TrackSubcommand` after every CLI dispatch once a track branch is resolved, but the spec explicitly excludes pure display commands and AC-06 requires eventless paths such as pure display commands to avoid opening `logs/`. Since task coverage maps AC-06 only to T003's lazy writer behavior, no task actually prevents T004 from recording those display commands, so following the plan can violate OS-04/AC-06.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0d5fd6359f43ff5b5da168caf02132eda3e3220c9e40f33c74b4f76c4979057b",
+          "at": "2026-06-10T13:09:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 requires the report reader to extract `schema_version` from each raw JSON line before typed deserialization, but the catalogue defines `schema_version` only inside each `TelemetryEvent` variant payload and T002 asks for a derived serde struct-payload enum. With serde's default enum representation, the raw line is variant-wrapped, so a top-level version check will not find `schema_version` and valid events can be skipped or become unreadable. The plan needs an explicit wire format, such as top-level `schema_version` plus event type, or a reader that intentionally inspects the nested variant payload.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 55,
+              "category": "contradiction"
+            },
+            {
+              "message": "`TelemetryWriteError` is documented as errors that `TelemetryWriter` suppresses rather than propagates, but T003 defines `TelemetryWriter::write` as returning `Result<(), TelemetryWriteError>`, says IO/serialize errors are returned and suppressed by the caller, and requires a test that observes `TelemetryWriteError::Io`. These are incompatible contracts; following the catalogue would make the T003 API/tests impossible to satisfy.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/infrastructure-types.json",
+              "line": 206,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:21ecae39b5e292aa95ec4c1b700931a6bf3fc414c2af45afef86c9ea685e7e93",
+          "at": "2026-06-10T13:13:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 makes the schema-version compatibility check optional even though CN-08/AC-08 require lines with unknown `schema_version` to be skipped and counted. With the planned externally tagged `TelemetryEvent`, a known variant carrying a future `schema_version` can deserialize successfully, so an implementation may aggregate incompatible future rows instead of skipping them. Make the payload `schema_version` check mandatory before aggregation.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 55,
+              "category": "contradiction"
+            },
+            {
+              "message": "The writer plan requires a single `std::io::Write::write` call but does not require checking the returned byte count. `write` may return `Ok(n)` with `n < buffer.len()`, which would leave a truncated JSONL row while `TelemetryWriter::write` could still return success; this undermines the valid-JSONL and line-boundary guarantees. The task should require treating short writes as `TelemetryWriteError::Io` or otherwise explicitly handling them.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 22,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:0d0fa38c4ad7b3254bf5fc4069a7bc7305302175ee3099967202b1a6870a25a1",
+          "at": "2026-06-10T13:17:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 is covered only by T001, but CN-03 includes the archive-retention requirement that gitignored `logs/` move with archived tracks; T001 only adds the `.gitignore` entry and T010 only rechecks that entry. The plan can therefore satisfy its mapped tasks while leaving GO-03's active-to-archive retention behavior unimplemented or unverified.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/task-coverage.json",
+              "line": 26,
+              "category": "coverage_gap"
+            },
+            {
+              "message": "The plan records gate evaluations without any duration field, while the ADR goal explicitly includes finding which gates took time. T008 then aggregates phase durations only from `TrackSubcommand` events, so individual slow gates cannot be reconstructed from the planned telemetry.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/infrastructure-types.json",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9f611a29e77482d4160b656bb3440055b738f3b98855722a871d9b3aa107ecda",
+          "at": "2026-06-10T13:23:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03/GO-03 require telemetry logs to follow the track lifecycle by moving gitignored `logs/` during archive, and task coverage maps CN-03 to T001/T010. However T010 explicitly excludes the archive-tool change as a separate future track and only verifies the `.gitignore` entry, so completing the plan can leave the stated retention/archive requirement unmet while the artifacts claim CN-03 is covered.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 64,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eab8f74f00564715abf5302b2ff20e2046938965aed464d718b70329b6ea984d",
+          "at": "2026-06-10T13:27:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 narrows CN-03 to only adding the gitignore entry and explicitly defers archive-tool handling to a separate track, but the spec/ADR make archive movement part of the same retention requirement: GO-03 says retention follows the active to archive lifecycle, and CN-03 says the archive tool must move gitignored `logs/` with the track directory. Since `task-coverage.json` maps CN-03 only to T001 and T010 only verifies AC-10, this plan can complete while leaving the declared CN-03/GO-03 behavior unimplemented.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 11,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:39a11bdabc98e85b87304d2f756a23c4d567e60ea209c5d099fcc4a898d63a2c",
+          "at": "2026-06-10T13:31:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a89b0816f72effb784da7a101e082108508bb3f4d90163d48f01045cb58a13d3",
+          "at": "2026-06-10T13:37:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1af0babb1e016bb4ae86eccd6efa4dc1ee3c87f68f40cf979cdde7f1f756fc5",
+          "at": "2026-06-10T13:46:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1af0babb1e016bb4ae86eccd6efa4dc1ee3c87f68f40cf979cdde7f1f756fc5",
+          "at": "2026-06-10T13:49:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 still specifies `TelemetryReport` as if `TelemetryEvent` were externally-tagged and `schema_version` lived inside the variant payload. That contradicts the wire-format already being used for T002 in this track (internally-tagged with top-level `schema_version`), so the report adapter would be specified against the wrong JSON shape and would skip valid rows.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
+              "line": 42,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:da1ad32cd3cd15bc56e0b684d60cec4bf394c9faee87d16d3a57703aba805b5f",
+          "at": "2026-06-10T14:12:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c14672c52d93baa4829af67a0ce84e2a3795842b3fab9c7f210324227b564e4d",
+          "at": "2026-06-10T14:15:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c14672c52d93baa4829af67a0ce84e2a3795842b3fab9c7f210324227b564e4d",
+          "at": "2026-06-10T14:18:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4133afc3160ea76c4d0a74fa1be67f847ac85f1d816a645cfb0fd4fa6e36ff30",
+          "at": "2026-06-10T14:49:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4133afc3160ea76c4d0a74fa1be67f847ac85f1d816a645cfb0fd4fa6e36ff30",
+          "at": "2026-06-10T14:52:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c3d27429a8f0ecee548979df28c7ebd6a56dd486ea31152923bb6a770ceb1eb",
+          "at": "2026-06-10T16:03:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c3d27429a8f0ecee548979df28c7ebd6a56dd486ea31152923bb6a770ceb1eb",
+          "at": "2026-06-10T16:05:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d080a4b51a44f37821c7b15bc81aad4012d6c4a84a9c31247ea472316509e5c4",
+          "at": "2026-06-10T18:16:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d080a4b51a44f37821c7b15bc81aad4012d6c4a84a9c31247ea472316509e5c4",
+          "at": "2026-06-10T18:18:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 still instructs gate evaluation emitters to include `input_hash`, but the updated ADR/spec/DTO explicitly removed that field and say it must not be recorded. This makes the implementation plan conflict with the accepted requirement set. The same stale requirement also appears in `plan.md` for T005.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:79efefbc73bf014b7165ab1c818bb11264565ab73ae90343acbd25309e7b2d7c",
+          "at": "2026-06-11T02:40:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GateEval's payload description is stale: it still defines `reason_summary` as a shortened list of findings, but the amended ADR/spec now define it as a truncated human-readable gate-output summary. The same block also omits the required `track_id` field that `infrastructure-types.json` still includes for `GateEval`, so the plan is describing the wrong JSONL shape.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
+              "line": 30,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1e87079a32f13c0b02c1c20567e3e34da3b886544862dff4da2d9d0bed5a314e",
+          "at": "2026-06-11T02:46:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1463106a3855ff256886ac75b86b300e09cd3a836433953a22cf0eb657f26a5f",
+          "at": "2026-06-11T02:49:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1463106a3855ff256886ac75b86b300e09cd3a836433953a22cf0eb657f26a5f",
+          "at": "2026-06-11T02:52:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:176be9b60672aeb099520bcb496f446a0ebe3d0f23dd88e735596e73684913d0",
+          "at": "2026-06-11T03:34:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:176be9b60672aeb099520bcb496f446a0ebe3d0f23dd88e735596e73684913d0",
+          "at": "2026-06-11T03:35:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08c475da269c4d1f002f23e9c070449b4a08907737374833994af9d03b45d803",
+          "at": "2026-06-11T13:21:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08c475da269c4d1f002f23e9c070449b4a08907737374833994af9d03b45d803",
+          "at": "2026-06-11T13:23:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8105aeaaaa4a973736bef8897fdab89bba877ee7ff0fd8bef37697b752974575",
+          "at": "2026-06-11T13:35:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8105aeaaaa4a973736bef8897fdab89bba877ee7ff0fd8bef37697b752974575",
+          "at": "2026-06-11T13:40:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a50b8e5ec8d658da81d11a86598e245c359dd89a547e6b8dacb7cc7f542f6079",
+          "at": "2026-06-11T14:21:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a50b8e5ec8d658da81d11a86598e245c359dd89a547e6b8dacb7cc7f542f6079",
+          "at": "2026-06-11T14:24:30Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
+          "at": "2026-06-10T16:04:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
+          "at": "2026-06-10T16:08:24Z"
         }
       ]
     }

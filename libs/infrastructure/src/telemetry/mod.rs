@@ -12,9 +12,14 @@
 //! (CN-09 / AC-09 / IN-08).
 
 pub mod config;
+pub mod report;
 pub mod writer;
 
 pub use config::TelemetryConfig;
+pub use report::{
+    PhaseDurationSummary, TelemetryErrorEntry, TelemetryHookBlockEntry, TelemetryReport,
+    TelemetryReportError, TelemetryReportOutput,
+};
 pub use writer::TelemetryWriter;
 
 use serde::{Deserialize, Serialize};
