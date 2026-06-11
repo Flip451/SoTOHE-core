@@ -181,6 +181,7 @@ fn execute_track_with_telemetry(cmd: commands::track::TrackCommand) -> ExitCode 
     // per OS-04 (IN-03, AC-06).
     let command_label = track_command_label(&cmd);
     let is_display_only = is_display_only_track_command(&cmd);
+    let is_archive = matches!(&cmd, commands::track::TrackCommand::Archive { .. });
 
     if is_display_only {
         // Pure display command: dispatch directly, no telemetry IO.
@@ -206,10 +207,20 @@ fn execute_track_with_telemetry(cmd: commands::track::TrackCommand) -> ExitCode 
     // exact code > 1 is preserved when ExitCode stabilises numeric access).
     let exit_code_i32: i32 = if exit_code == ExitCode::SUCCESS { 0 } else { 1 };
 
-    // Emit telemetry on completion — NOT at start (exit_code/duration are only
+    // Emit telemetry on completion - NOT at start (exit_code/duration are only
     // known after dispatch completes; IN-03 / T004 description).
     if let Some((ref w, ref track_id)) = telemetry {
-        emit_track_subcommand(w, track_id, command_label, exit_code_i32, start);
+        if is_archive && exit_code == ExitCode::SUCCESS && !telemetry_dir_override_is_set() {
+            let _ = emit_archived_track_subcommand(
+                &items_dir,
+                track_id,
+                command_label,
+                exit_code_i32,
+                start,
+            );
+        } else {
+            emit_track_subcommand(w, track_id, command_label, exit_code_i32, start);
+        }
 
         if exit_code_i32 != 0 {
             // Populate error_chain from the dispatch error (IN-03).
@@ -221,6 +232,79 @@ fn execute_track_with_telemetry(cmd: commands::track::TrackCommand) -> ExitCode 
     }
 
     exit_code
+}
+
+fn telemetry_dir_override_is_set() -> bool {
+    std::env::var("SOTP_TELEMETRY_DIR").ok().is_some_and(|value| !value.is_empty())
+}
+
+fn emit_archived_track_subcommand(
+    items_dir: &std::path::Path,
+    track_id: &str,
+    command_label: &str,
+    exit_code: i32,
+    start: std::time::Instant,
+) -> Result<(), String> {
+    use std::io::Write as _;
+
+    let repo_root = repo_root_for_items_dir(items_dir)?;
+    let path =
+        repo_root.join("track").join("archive").join(track_id).join("logs").join("telemetry.jsonl");
+    let duration_ms = u64::try_from(start.elapsed().as_millis()).unwrap_or(u64::MAX);
+    let event = serde_json::json!({
+        "event_type": "TrackSubcommand",
+        "schema_version": 1,
+        "track_id": track_id,
+        "command": command_label,
+        "exit_code": exit_code,
+        "duration_ms": duration_ms,
+        "timestamp": chrono::Utc::now().to_rfc3339(),
+    });
+    let mut bytes = serde_json::to_vec(&event).map_err(|e| e.to_string())?;
+    bytes.push(b'\n');
+
+    let parent = path
+        .parent()
+        .ok_or_else(|| format!("archive telemetry path has no parent: {}", path.display()))?;
+    std::fs::create_dir_all(parent)
+        .map_err(|e| format!("failed to create telemetry directory {}: {e}", parent.display()))?;
+    let mut file = std::fs::OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(&path)
+        .map_err(|e| format!("failed to open telemetry file {}: {e}", path.display()))?;
+    let written = file
+        .write(&bytes)
+        .map_err(|e| format!("failed to write telemetry file {}: {e}", path.display()))?;
+    if written != bytes.len() {
+        return Err(format!(
+            "short write for telemetry file {}: wrote {written} of {} bytes",
+            path.display(),
+            bytes.len()
+        ));
+    }
+
+    Ok(())
+}
+
+fn repo_root_for_items_dir(items_dir: &std::path::Path) -> Result<std::path::PathBuf, String> {
+    let project_root = commands::track::resolve_project_root(items_dir)?;
+    let output = std::process::Command::new("git")
+        .args(["rev-parse", "--show-toplevel"])
+        .current_dir(&project_root)
+        .output()
+        .map_err(|e| format!("failed to run git rev-parse --show-toplevel: {e}"))?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+        let code = output.status.code().unwrap_or(-1);
+        return Err(format!("git rev-parse --show-toplevel failed (exit {code}): {stderr}"));
+    }
+    let root = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+    if root.is_empty() {
+        return Err("git rev-parse --show-toplevel returned an empty path".to_owned());
+    }
+
+    Ok(std::path::PathBuf::from(root))
 }
 
 // ---------------------------------------------------------------------------
@@ -399,6 +483,7 @@ fn track_command_label(cmd: &commands::track::TrackCommand) -> &'static str {
     use commands::track::{BranchAction, TrackCommand, ViewAction};
 
     match cmd {
+        TrackCommand::Archive { .. } => "track archive",
         TrackCommand::Transition { .. } => "track transition",
         TrackCommand::Branch { action: BranchAction::Create(_) } => "track branch create",
         TrackCommand::Branch { action: BranchAction::Switch(_) } => "track branch switch",
@@ -465,6 +550,7 @@ mod tests {
     use super::{Cli, CliCommand, run_cli};
     use crate::commands::dry::DryCommand;
     use crate::commands::ref_verify::RefVerifyCommand;
+    use crate::commands::track::test_support::{process_env_lock, run_in_dir, seed_repo};
 
     const MINIMAL_RULES: &str = r#"{
   "layers": [
@@ -706,6 +792,56 @@ mod tests {
 
         let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
         assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_archive_telemetry_emit_writes_to_archived_track_logs() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = TempDir::new().unwrap();
+        let root = dir.path();
+        let track_id = "archive-telemetry-track";
+        seed_repo(root, &format!("track/{track_id}"));
+        let items_dir = std::path::PathBuf::from("track/items");
+        let archived_track_dir = root.join("track").join("archive").join(track_id);
+        fs::create_dir_all(&archived_track_dir).unwrap();
+        let nested_cwd = root.join("nested").join("workdir");
+        fs::create_dir_all(&nested_cwd).unwrap();
+
+        run_in_dir(&nested_cwd, || {
+            super::emit_archived_track_subcommand(
+                &items_dir,
+                track_id,
+                "track archive",
+                0,
+                std::time::Instant::now(),
+            )
+            .unwrap();
+        });
+
+        let active_log =
+            root.join("track").join("items").join(track_id).join("logs").join("telemetry.jsonl");
+        let nested_archive_log = nested_cwd
+            .join("track")
+            .join("archive")
+            .join(track_id)
+            .join("logs")
+            .join("telemetry.jsonl");
+        let archived_log = archived_track_dir.join("logs").join("telemetry.jsonl");
+        assert!(
+            !active_log.exists(),
+            "archive telemetry must not recreate the active track log: {active_log:?}"
+        );
+        assert!(
+            !nested_archive_log.exists(),
+            "relative items_dir must be anchored at the repo root, not cwd: {nested_archive_log:?}"
+        );
+
+        let line = fs::read_to_string(&archived_log).unwrap();
+        let value: serde_json::Value = serde_json::from_str(line.trim()).unwrap();
+        assert_eq!(value["event_type"], "TrackSubcommand");
+        assert_eq!(value["track_id"], track_id);
+        assert_eq!(value["command"], "track archive");
+        assert_eq!(value["exit_code"], 0);
     }
 
     // ── CliCommand::Conventions entrypoint dispatch routing ──────────────────

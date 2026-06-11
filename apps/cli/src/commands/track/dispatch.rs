@@ -7,7 +7,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use super::{
-    TrackCommand, branch_ops, resolve, set_commit_hash, signals, state_ops, tddd, transition, views,
+    TrackCommand, archive, branch_ops, resolve, set_commit_hash, signals, state_ops, tddd,
+    transition, views,
 };
 use crate::commands::track::{
     resolve_track_id, resolve_track_id_for_write, resolve_track_id_from_root,
@@ -51,6 +52,11 @@ fn dispatch_track_cmd(cmd: TrackCommand) -> Result<ExitCode, crate::CliError> {
     use crate::CliError;
 
     match cmd {
+        TrackCommand::Archive { items_dir, track_id } => {
+            resolve_track_id_for_write(track_id, &items_dir)
+                .map_err(CliError::Message)
+                .and_then(|tid| archive::execute_archive(items_dir, tid))
+        }
         TrackCommand::Transition { items_dir, track_id, task_id, target_status, commit_hash } => {
             resolve_track_id_for_write(track_id, &items_dir).map_err(CliError::Message).and_then(
                 |tid| {

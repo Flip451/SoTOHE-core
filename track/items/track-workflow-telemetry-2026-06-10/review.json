@@ -508,6 +508,256 @@
           "findings": [],
           "hash": "rvw1:sha256:a01c276b6972d764ab95038419bb99c0ba806795ee774d04d4b27b6a1a496259",
           "at": "2026-06-11T15:42:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3099af745f6763e5d35d3968e86202de2493a403fbdc83b06a9a5421b6906099",
+          "at": "2026-06-11T16:06:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3099af745f6763e5d35d3968e86202de2493a403fbdc83b06a9a5421b6906099",
+          "at": "2026-06-11T16:08:35Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
+          "at": "2026-06-10T14:13:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new DTO tests only cover successful serialization/round-trips. The briefing explicitly asks for error-case coverage, and the later report path relies on `serde_json::from_str::<TelemetryEvent>` rejecting malformed rows, unknown `event_type` values, or rows missing required fields such as `schema_version`. Add at least one negative deserialization test so the tagged JSONL contract is guarded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/mod.rs",
+              "line": 184,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
+          "at": "2026-06-10T14:17:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec5de587869142997f00ac11b04f9a447dd87cf5bebe94e959a7bcc94e38c527",
+          "at": "2026-06-10T14:21:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter::new` trusts the raw `track_id` string and joins it directly into `items_dir`, so a value containing path separators or `..` can escape `track/items` and write telemetry outside the intended workspace. This constructor should take a validated track-id type or reject non-slug input before building the path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 97,
+              "category": "Security"
+            },
+            {
+              "message": "The 4096-byte guard only checks the pre-truncation serialization result, then returns `line2` without verifying that the truncated JSON still fits. A long `track_id`/`command`, or JSON escaping that expands the encoded output, can still produce an oversized row while `write()` returns `Ok(())`. Recheck the second serialization length and fail if it still exceeds the cap.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 185,
+              "category": "Correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e5e69793169aa8faee8a20dd15a718611fbccfa5d37179dbae781c9e9188e71c",
+          "at": "2026-06-10T14:53:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`safe_path_component` does not actually reduce `track_id` to a single path component: it keeps every normal component and rejoins them with `/`. A `track_id` like `foo/bar` will therefore write to `items_dir/foo/bar/logs/telemetry.jsonl` instead of the intended single-track directory, which can make later report/archive code miss the file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 238,
+              "category": "correctness"
+            },
+            {
+              "message": "The oversized-line fallback truncates raw bytes and appends `\\n`. If the event contains multibyte UTF-8 or JSON escape sequences, this can emit invalid UTF-8/JSONL, so downstream readers that use text parsing will fail on the whole file instead of just skipping the oversized row.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 212,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4dc59c26e108c84dca04c4921fee6b693d3e50fd09bca7d0f4ef6e510e44f125",
+          "at": "2026-06-10T15:02:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter::new` silently rewrites invalid `track_id` strings by taking the last normal path segment (or `unknown`). If a path-like or otherwise invalid ID reaches this constructor, distinct logical tracks can be merged into the same `telemetry.jsonl` instead of failing fast, which is a data-corruption risk.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 93,
+              "category": "correctness"
+            },
+            {
+              "message": "`SOTP_TELEMETRY_DIR` is read with `std::env::var`, so a valid non-UTF8 filesystem path is treated as absent. On Unix this silently falls back to the default track directory and makes the override knob unreliable for a real path value.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/config.rs",
+              "line": 40,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:17:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:19:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:24:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
+          "at": "2026-06-11T02:39:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
+          "at": "2026-06-11T02:41:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "New public `RoundType::from_str` has no unit tests covering either the valid `fast`/`final` parses or the unknown-value error path, so a regression in the canonical round-type parser could ship unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 53,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:02bb83f3b4d845d37a85ee79a528d1bbbcc9afd198d14782952c5c19210146bf",
+          "at": "2026-06-11T03:35:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
+          "at": "2026-06-11T03:38:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
+          "at": "2026-06-11T03:42:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Empty/whitespace-only lines are dropped before parsing, so they are neither counted nor reported in `skipped_lines`. That violates the fail-open contract for invalid JSON lines: a blank line is malformed JSON and should be skipped and counted rather than silently ignored. The accompanying test also codifies the undercounting behavior.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 206,
+              "category": "spec mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2549660a63fd9fb7417071d4aad698a4a9453dd1144c0844050125b9a484a0c5",
+          "at": "2026-06-11T13:56:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`aggregate` accepts a raw `&str` and joins it directly onto `items_dir` without validating it as a `TrackId`. A caller can pass `../...` segments and make the reader walk outside `track/items/<id>`, which violates the domain validation rule and creates a path-traversal read risk. Validate with `domain::TrackId::try_new` (or take `TrackId`) before building the path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
+              "line": 166,
+              "category": "security"
+            },
+            {
+              "message": "The `exists()` pre-checks collapse filesystem errors into absence: `Path::exists()` returns `false` for inaccessible paths, so a permission/metadata failure on the track directory is misreported as `TrackNotFound`, and the same problem on `telemetry.jsonl` returns an empty report instead of `Io`. That silently swallows real I/O failures. Distinguish `NotFound` from other errors via `metadata`/`open` error handling instead of using `exists()` as the gate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
+              "line": 170,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5fb8a1a6e06200e388aea5df9c41aa7da75dc1a5bbb32b6d5a12cfe6dc35554e",
+          "at": "2026-06-11T14:01:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
+          "at": "2026-06-11T14:09:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reader.lines()` decodes each line as UTF-8 before the JSON parser sees it, and any decode failure is returned as `TelemetryReportError::Io`. That breaks the required fail-open reader behavior for invalid JSON lines: a single corrupted/non-UTF-8 JSONL line will fail the whole report instead of incrementing `skipped_lines` and continuing. Read raw lines with `read_until(b'\\n')`/`serde_json::from_slice` or otherwise treat UTF-8/JSON parse failures as skipped lines.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 222,
+              "category": "fail_open"
+            }
+          ],
+          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
+          "at": "2026-06-11T14:13:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dcc71e2d83c3d61a49a5c7fa5b9fdf608c59a1f2f870806936991b3077ec95f",
+          "at": "2026-06-11T14:18:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
+          "at": "2026-06-11T14:39:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
+          "at": "2026-06-11T14:43:24Z"
         }
       ]
     },
@@ -526,627 +776,6 @@
           "findings": [],
           "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
           "at": "2026-06-10T16:08:24Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_track_with_telemetry` resolves telemetry against a hard-coded `track/items` path instead of the active command's `items_dir`/`workspace_root`. For any track subcommand run with a non-default track tree, the emitted `TrackSubcommand`/`NonZeroExit` records will be written under the wrong repository path or dropped entirely, so telemetry no longer follows the command's actual target track.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 186,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1da187ff65157c6fbaac183a4a474ada583d49494a32f8db6ba956ddd629d9a2",
-          "at": "2026-06-10T16:14:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_track_with_telemetry()` always resolves the telemetry writer from `cmd.items_dir()`, but `TrackCommand::items_dir()` returns the constant `track/items` for commands that are actually rooted at `project_root`/`workspace_root` (`Views::Sync`, `TypeSignals`, `BaselineCapture`, `Lint`, `CatalogueImplSignals`, etc.). If one of those commands is run with a non-default root, telemetry will be written under the wrong track tree or dropped entirely.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 187,
-              "category": "correctness"
-            },
-            {
-              "message": "`NonZeroExit` is emitted with `error_chain` hard-coded to `\"\"`, so every failing track command loses the human-readable failure chain required by the telemetry schema/brief. The current telemetry log already shows empty `error_chain` values, which makes these failure events ineffective for debugging.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 204,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:77a39600a9e0882bca2dcb156e7e0bd37e8212ee3f7f78629d1e51f73d0d5577",
-          "at": "2026-06-10T16:25:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Telemetry attribution is still anchored to the process CWD. `execute_track_with_telemetry()` now passes the right `items_dir`, but `resolve_telemetry_writer()` still discovers the branch from `SystemGitRepo::discover()`, so running a track command with `--project-root`/`--workspace-root` pointing at another repo or worktree can either suppress telemetry or write it under the wrong `track_id`. That breaks the branch-bound telemetry requirement.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 190,
-              "category": "correctness"
-            },
-            {
-              "message": "`execute_with_error_chain()` only produces a chain for `CliError`, but the common track failure path is a non-zero `ExitCode` returned from downstream composition. Those failures still reach `emit_non_zero_exit()` with `error_chain = \"\"`, so the recorded `NonZeroExit` events do not carry the failure chain required by IN-03. The telemetry fixture already shows empty chains on the failing events.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
-              "line": 561,
-              "category": "missing error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:711ad45af42827ed221a3b4d1852ee0538d0b95f7b1b75940f85c897ad1f2fc3",
-          "at": "2026-06-10T16:34:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:711ad45af42827ed221a3b4d1852ee0538d0b95f7b1b75940f85c897ad1f2fc3",
-          "at": "2026-06-10T16:44:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SetCommitHash` is explicitly supported from nested working directories, but this accessor returns the relative `track/items` path. `execute_track_with_telemetry` uses that value to construct the telemetry writer before dispatch, so `bin/sotp track set-commit-hash` run from a subdirectory will append telemetry under `<subdir>/track/items/<id>/logs/telemetry.jsonl` while the command itself writes `.commit_hash` under the repo root. That breaks the track-local retention/output path contract and can create stray logs outside the real track directory. Resolve this variant's telemetry items dir from the discovered repo root instead of returning a CWD-relative default.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 501,
-              "category": "bug"
-            },
-            {
-              "message": "This generated runtime telemetry log is being added under `apps/cli/track/items/.../logs/telemetry.jsonl`, which is outside the intended `track/items/<id>/logs` tree and bypasses the repository ignore rule for `track/items/**/logs/`. Committing it pollutes the source tree with local command history and contradicts the requirement that telemetry logs are not checked in. Remove the generated log and make sure telemetry writes during local/test runs are either isolated or land under the ignored track log path.",
-              "severity": "P1",
-              "file": "apps/cli/track/items/track-workflow-telemetry-2026-06-10/logs/telemetry.jsonl",
-              "line": 1,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:711ad45af42827ed221a3b4d1852ee0538d0b95f7b1b75940f85c897ad1f2fc3",
-          "at": "2026-06-10T16:48:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This nested ignore rule hides `apps/cli/track/`, which is exactly the non-canonical telemetry tree the previous finding called out. The canonical and already-ignored path is repo-root `track/items/<id>/logs/`; adding an app-local ignore masks future stray telemetry writes under `apps/cli` instead of preventing or removing them, leaving local command history outside the intended track retention path.",
-              "severity": "P1",
-              "file": "apps/cli/.gitignore",
-              "line": 5,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:b7b6ea54593f0fefcb971bfc2dab2b4a0d30b3a39a83661fa3b0da04b91c595f",
-          "at": "2026-06-10T17:17:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`apps/cli/.gitignore` says no local ignore rule is needed because the root `track/items/**/logs/` rule covers telemetry logs, but that root-relative pattern does not ignore nested `apps/cli/track/...` logs. `git check-ignore` returns no match and the scoped `apps/cli/track/items/.../logs/telemetry.jsonl` file is currently addable, so telemetry artifacts can be committed from this crate path, violating AC-10 and risking log pollution. Add a local ignore rule for this nested track log path or remove the generated tree.",
-              "severity": "P1",
-              "file": "apps/cli/.gitignore",
-              "line": 9,
-              "category": "configuration"
-            }
-          ],
-          "hash": "rvw1:sha256:dc12c56eeedac2c26a7eae15bf8ba492e8884f69cb58cfbc25987a073c8631f5",
-          "at": "2026-06-10T17:23:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`apps/cli/src/commands/track/mod.rs` now has 730 production lines before the `#[cfg(test)]` section, up from 628 in HEAD, exceeding the repository's 700-line maximum for production module size. The new `TrackCommand::items_dir` implementation and dispatch refactor should be moved into narrower submodules or otherwise split so this module stays within the enforced architecture limit.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 442,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:c86dee030ea296b17b7d1f5feba3d7af376380e8ecb99b9fc54093fbb303622a",
-          "at": "2026-06-10T17:29:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track/` in this crate-local ignore file matches any directory named `track` below `apps/cli`, not just the stray runtime artifact path. This currently hides the new `apps/cli/src/commands/track/dispatch.rs` file (`git check-ignore` reports this rule), while `apps/cli/src/commands/track/mod.rs` now declares `mod dispatch;`. If committed as-is without force-adding that ignored source file, a clean checkout will fail to compile with the dispatch module missing. Narrow this ignore pattern, e.g. `/track/` or `/track/items/**/logs/`, and ensure `dispatch.rs` is tracked.",
-              "severity": "P0",
-              "file": "apps/cli/.gitignore",
-              "line": 12,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:e20dd0f1faebaddd37845da2e7f89047246ab8fa723311fda170d212f4a13ac0",
-          "at": "2026-06-10T17:36:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ce8cca663609210e3ddea208bb52fddd643afc538d4910da4d335e626b876e7",
-          "at": "2026-06-10T17:47:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`GateEval` telemetry is not carrying the evaluated result. `commands::verify::execute()` only returns an `ExitCode`, so this wrapper fabricates `reason_summary` as `gate: ...` and hashes the CLI path string / placeholder instead of the evaluated artifact. That violates the T005 contract: `reason_summary` should summarize findings and `input_hash` should identify the artifact, so branch-resolved verify variants collapse to the same hash and the event loses the actual failure context.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 331,
-              "category": "correctness"
-            },
-            {
-              "message": "Telemetry writer discovery is anchored to `PathBuf::from(\"track/items\")` from the process CWD. `verify.rs` accepts `--project-root`, `--workspace-root`, `--items-dir`, and `--track-dir`; when a user runs `sotp verify ...` from outside the repo root or against another checkout, `resolve_telemetry_writer` will look in the wrong place and silently drop or misattribute telemetry even though the command itself succeeds. The wrapper needs to derive the items dir from the command inputs or reuse the same root-resolution logic as the underlying command.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 327,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e5966305be4864f87bc70e917a8c9d6b4344771b8c8a1d03b08851f44cfd5cf6",
-          "at": "2026-06-10T18:20:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`GateEval` summaries fall back to `gate: ...` for `catalogue-spec-refs` failures because the wrapper only carries stdout, but that gate reports its findings on stderr. The emitted telemetry therefore loses the actual failure context instead of reflecting the evaluated result.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 341,
-              "category": "telemetry"
-            },
-            {
-              "message": "The 256-character truncation uses `t[..256]`, which can panic on valid UTF-8 stdout containing multibyte characters before byte 256. A verify result with non-ASCII text will crash the CLI instead of emitting telemetry.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 345,
-              "category": "correctness"
-            },
-            {
-              "message": "The `input_hash` for `CatalogueSpecRefs` and `CatalogueSpecSignals` is derived from a canonical string rather than the resolved command inputs. Custom `--items-dir` or alternate workspace roots therefore collapse to the same hash, so telemetry cannot distinguish distinct evaluations.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 422,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:ac2edaf401d4fb53c8c7d0b0ffcc664153d790559b94722c16c48a0b1b10d995",
-          "at": "2026-06-10T23:29:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_telemetry_writer()` runs before the hook outcome is inspected, so every hook invocation now does branch discovery / git filesystem work even when no telemetry will be emitted. That violates the stated allow-path contract of 'no file IO' and makes otherwise no-op hook executions pay an unnecessary I/O cost.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 249,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f4e0d9c45764fcb299aaca139a8927bde7689d715e652b9e41902919eba27995",
-          "at": "2026-06-10T23:35:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyCommand::items_dir()` now forwards the caller's explicit `--items-dir`/`--workspace-root` path, but `resolve_telemetry_writer()` still only resolves the canonical `<project-root>/track/items` layout. Any valid verify invocation that uses a custom items directory now returns `None` here, so `GateEval` telemetry is silently skipped for those runs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 331,
-              "category": "correctness"
-            },
-            {
-              "message": "For `CatalogueSpecRefs`, the branch-resolved case hardcodes `track/items/{track_id}` instead of reusing the actual `items_dir` passed to the verifier. With an absolute or non-default `--items-dir`, the emitted `input_hash` no longer identifies the same artifact path that `verify_catalogue_spec_refs` evaluated.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 363,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f7dc01b310a2e53a3990f91947860afae3e37cbe2ae16d003f680dcc9af46a79",
-          "at": "2026-06-10T23:43:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Fail-closed hook errors return exit code 2 in the `Err(msg)` branch, but that branch never calls `emit_hook_block`. Internal hook failures are therefore invisible in telemetry even though they satisfy the block verdict.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 283,
-              "category": "telemetry"
-            },
-            {
-              "message": "`verify_command_input_hash` hashes `Path::to_string_lossy()` output, so non-UTF-8 inputs are normalized before hashing. That violates the documented \"SHA-256 of the path bytes\" contract and can make distinct paths collide or produce different digests than the actual input bytes.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 410,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f7dc01b310a2e53a3990f91947860afae3e37cbe2ae16d003f680dcc9af46a79",
-          "at": "2026-06-10T23:43:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueSpecSignals` hashes `workspace_root` here, but the gate actually evaluates the contents under `--items-dir`. Two invocations against different items roots in the same workspace will therefore emit the same `input_hash`, so the GateEval record no longer identifies the primary evaluated artifact.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 457,
-              "category": "correctness"
-            },
-            {
-              "message": "The branch-resolved fallback collapses every path-less verify variant to `track/items/{track_id}`. That is not the resolved primary path for `SpecStates`, which chooses `track/items/<track_id>/spec.md` when `--spec-path` is omitted, so `verify spec-states` telemetry loses the file identity and collides with other branch-resolved gates.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 369,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4db87106b7e1b6ab0aa17d65765286c84938b8e5b85ed37f7d6008a485fe1ae3",
-          "at": "2026-06-10T23:51:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`GateEval` telemetry still loses the real failure context on composition errors. `run_capturing()` returns `None` for `Err(msg)`, so `execute_verify_with_telemetry()` falls back to `\"gate: {gate_name}\"` instead of the actual error text. That makes `reason_summary` misleading on the failure path and violates the brief’s requirement that it reflect the real output/findings.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 350,
-              "category": "correctness"
-            },
-            {
-              "message": "`input_hash` is computed from `String::from_utf8_lossy(...)` for every path-based verify variant. On Unix, any non-UTF-8 path bytes get replaced before hashing, so the digest is not over the real path bytes and can collide for distinct legal paths. Hash the raw path encoding instead of a lossy UTF-8 string.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 434,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0544a1c41f047962c7a3d79e6cc0da297acbdeee4feae9f7081d50499ff46957",
-          "at": "2026-06-10T23:58:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyCommand::items_dir()` returns a fixed relative `track/items` for the path-based variants (`SpecAttribution`, `SpecFrontmatter`, `SpecSignals`, `SpecStates`, `PlanArtifactRefs`). When those subcommands are invoked with absolute `--spec-path`/`--track-dir` values from outside the repo root, `execute_verify_with_telemetry()` resolves the writer against the wrong base directory and silently drops `GateEval` for a valid run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
-              "line": 200,
-              "category": "correctness"
-            },
-            {
-              "message": "The new CLI telemetry wrappers introduce several branching paths (`GateEval`, `HookBlock`, `AdvisoryHookFired`, success/error forwarding), but there are no tests covering the new entry points or the new success/failure branches. That leaves the telemetry emission logic and stdout/stderr forwarding unguarded against regressions.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 235,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:a76a324e199cf754221630dba3c16e6b6842cd9ceeb302641be8e4072bb50aaf",
-          "at": "2026-06-11T00:08:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Branch-resolved verify runs no longer hash the artifact alone: when `verify_command_input_hash()` falls back to the synthetic sentinel, `execute_verify_with_telemetry()` appends `:{gate_name}` before hashing. That makes `input_hash` differ across verify subcommands even when they evaluate the same underlying artifact, which breaks the contract that the field identify the artifact/path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 370,
-              "category": "correctness"
-            },
-            {
-              "message": "The new telemetry branches are effectively untested. The added tests only smoke-check `tech-stack`, `layers`, and the advisory hook allow path; none assert `GateEval`/`HookBlock`/`AdvisoryHookFired` emission or the spec/catalogue/branch-resolved verify paths. A regression in the new match arms or hash routing would ship without coverage.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 801,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:40b1b4dead5f700fb59490bdc8b263fe81de7baa0d23ab9a0b080d934a11b725",
-          "at": "2026-06-11T00:19:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueSpecRefs` without an explicit `--track-id` hashes a hardcoded `track/items/<track_id>` path here instead of the command's actual `items_dir`. That makes `input_hash` wrong for non-default `--items-dir` invocations, and it also bakes in a Unix separator instead of deriving the joined path from `a.items_dir()`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 375,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cb7c6644110c61b2540c4db6487be90d66de831b65f2ab74245816f693cd8fcd",
-          "at": "2026-06-11T00:27:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "For branch-resolved verify commands, `cmd.items_dir()` still falls back to the raw relative `track/items` path when the path arg is omitted (`SpecStates(None)` and `PlanArtifactRefs(None)`). Those commands resolve their real inputs from the discovered git repo root, so running `sotp verify spec-states` or `sotp verify plan-artifact-refs` from a repo subdirectory will make `resolve_telemetry_writer()` point at the wrong tree and silently skip or misplace `GateEval` telemetry even though the gate itself succeeds. Anchor the telemetry root to the resolved repo/project root instead of the CWD-relative fallback.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 337,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4fb5ab5c9d3f889ce2bc67305b6f994211fa1fd9e0761523f4d5e42dc0dc2370",
-          "at": "2026-06-11T00:33:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The branch-resolved `SpecStates` and `PlanArtifactRefs` cases fall back to `PathBuf::from(\".\")`, but `resolve_telemetry_writer()` only recognizes a `<project-root>/track/items` layout. As written, `execute_verify_with_telemetry()` will never emit `GateEval` for the no-argument `verify spec-states` / `verify plan-artifact-refs` paths, so two of the 20 verify variants are silently uninstrumented.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
-              "line": 247,
-              "category": "correctness"
-            },
-            {
-              "message": "For `CatalogueSpecRefs`, the branch-resolved path hashes only `items_dir` when `track_id` is omitted, even though the actual evaluated artifact is `items_dir/<track_id>`. On a `track/<id>` branch this collapses all catalogue-spec-ref runs onto the same `input_hash`, so the emitted `GateEval` no longer identifies the artifact being checked.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 459,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:719b3b6994cd7178f198d17efaa4fdc731a82f3f37a12e5721d9f374c6a2843e",
-          "at": "2026-06-11T00:40:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueSpecRefs` and `CatalogueSpecSignals` derive telemetry from `items_dir` alone, but both commands also accept `--workspace-root` and use it to resolve the actual repo/branch being evaluated. As written, `execute_verify_with_telemetry()` will still resolve the writer and build `input_hash` from the current CWD's `track/items` tree for a valid cross-worktree invocation, so GateEval gets misattributed or silently dropped for the real repository.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/verify.rs",
-              "line": 217,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:34ed697b20c0329dc77a7073df8be003eb1776fc7e4b500f58f96da78482a94b",
-          "at": "2026-06-11T00:48:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueSpecRefs` and `CatalogueSpecSignals` still hash the raw `items_dir` field here instead of the resolved `VerifyCommand::items_dir()`. When `--workspace-root` is non-default, the telemetry writer is anchored to the correct repository but `input_hash` is still derived from the current CWD's `track/items/...`, so cross-worktree/CI runs get the wrong artifact hash.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 460,
-              "category": "correctness"
-            },
-            {
-              "message": "The branch-resolved sentinels are plain ASCII strings, so a legitimate explicit `--spec-path` or `--track-dir` equal to `track-branch-resolved:spec` or `track-branch-resolved:track-dir` will be rewritten here before hashing. That changes `input_hash` for a legal input path instead of hashing the path the user actually supplied.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 371,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9cebf4cbb94199a54ab71b255f59dc97d7667902c4d22e07b1d5106159b2cc4b",
-          "at": "2026-06-11T00:55:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`items_dir()` for `SpecAttribution`, `SpecFrontmatter`, and `SpecSignals` only resolves telemetry when the supplied `spec_path` already sits under `track/items/...`. Valid invocations with a bare or differently rooted spec path (for example `spec.md` from the track directory) fall back to `.` here, `resolve_telemetry_writer()` returns `None`, and `execute_verify_with_telemetry()` silently skips `GateEval` on a track branch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
-              "line": 225,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:cbb7a3e9f8e5f28ca2f03583ad646006ea10414b0f687e2874b900d0fdffe07d",
-          "at": "2026-06-11T01:09:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Relative `--items-dir` values are rewritten to `<workspace_root>/track/items` whenever `workspace_root != \".\"`. That changes the telemetry anchor for legitimate non-default relative paths, so `catalogue-spec-refs` / `catalogue-spec-signals` can record telemetry under the wrong repository instead of the path actually used by the verifier.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
-              "line": 211,
-              "category": "correctness"
-            },
-            {
-              "message": "The branch-resolved hash cases use synthetic relative strings (`track/items/<track_id>/spec.md` and `track/items/<track_id>`) rather than the actual resolved filesystem path that the command evaluates. The same gate invoked from a different working directory will therefore produce a different `input_hash` for the same artifact, so the telemetry no longer identifies the real input bytes.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 371,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4de57b475eafc60353afbb4eadb8ec3d17d15db04651fad79ad5efb2485218e7",
-          "at": "2026-06-11T01:15:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GateEval.reason_summary is derived from the raw verify output/error text, so failed runs can persist unredacted filesystem paths and other internal details into telemetry JSONL logs. Sanitize or redact the summary before emitting it.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 350,
-              "category": "security"
-            },
-            {
-              "message": "The CatalogueSpecRefs/CatalogueSpecSignals input hash only fingerprints items_dir (plus track_id for refs), so distinct evaluations that differ by workspace_root or skip_stale collapse to the same GateEval.input_hash. That makes the new telemetry ambiguous for different workspaces using the same track tree.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 462,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1592ed4e748970ecfae2aeebe1c78cc2f5a400bad8da57acf4b37f99e3c58627",
-          "at": "2026-06-11T01:26:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueSpecSignals` now switches telemetry anchoring to `workspace_root`, but this command is still CWD-anchored for branch gating. When `--workspace-root` points at a different checkout/worktree, `execute_verify_with_telemetry()` can resolve the writer and `input_hash` against a different repo/branch than the command actually used, so `GateEval` can be misattributed or emitted for a skipped run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
-              "line": 230,
-              "category": "correctness"
-            },
-            {
-              "message": "The spec-path variants derive the telemetry root from `spec_path.parent().parent()`. That only works for canonical `track/items/<id>/spec.md`; a valid explicit path outside that tree (for example `/tmp/spec.md`) resolves to a non-`track/items` directory, so `resolve_telemetry_writer()` returns `None` and `GateEval` is silently dropped even though the verify command ran.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
-              "line": 244,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9f05d1467c18b774fbaeb6d0135ab7cd7a4a8c196320e03b3a4d01a3857c2fc5",
-          "at": "2026-06-11T01:39:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueSpecRefs` computes two different `input_hash` values for the same resolved artifact depending on whether `--track-id` was passed. In the explicit case the `workspace_root` suffix is appended after the track id, but in the implicit branch-resolved case it is embedded before the resolved id when the sentinel is expanded. On non-default `--workspace-root` runs that breaks hash stability and makes identical evaluations look different to telemetry consumers.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 523,
-              "category": "correctness"
-            },
-            {
-              "message": "`VerifyCommand::items_dir()` returns raw relative paths for the branch-resolved verify paths (`SpecStates(None)`, `PlanArtifactRefs(None)`, and `CatalogueSpecSignals`). `execute_verify_with_telemetry()` then passes that path verbatim into `resolve_telemetry_writer()`, so when the CLI is launched from a subdirectory or with a non-default `--workspace-root`, the gate itself resolves the repo root correctly but telemetry is written under the wrong `track/items` tree or dropped entirely.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
-              "line": 230,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ff0a1f47bd05e4f9c650bbb8447d415f7cb5d05e928a6abf3da69089d02e4d96",
-          "at": "2026-06-11T01:49:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:303d3b3334c026b762511df8c59f44492da0381842f8d283c727b8e72bab092c",
-          "at": "2026-06-11T02:50:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`reason_summary` is always truncated to 256 bytes before emitting `GateEval`, even though the accepted contract says the D3 4096-byte JSONL line cap defines this field's length budget and the telemetry writer already enforces that cap. For gates with longer failure output, the event will drop most of the human-readable diagnostics instead of recording the agreed gate-output summary.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 346,
-              "category": "contract"
-            }
-          ],
-          "hash": "rvw1:sha256:303d3b3334c026b762511df8c59f44492da0381842f8d283c727b8e72bab092c",
-          "at": "2026-06-11T02:54:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0169ca99b11d94fe9ec9dc11143e96c075d2fdb0832ac28b2488a5543f49fb39",
-          "at": "2026-06-11T02:58:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2022de17a5ec221fc658d052bddb7ccd14e50970cf1ece5287fd23cf70864caf",
-          "at": "2026-06-11T13:08:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2022de17a5ec221fc658d052bddb7ccd14e50970cf1ece5287fd23cf70864caf",
-          "at": "2026-06-11T13:10:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new top-level `Telemetry` route is not covered by an end-to-end test that exercises `Cli::try_parse_from([\"sotp\", \"telemetry\", ...])` and `run_cli`, so a regression in the public CLI registration or dispatch path would ship unnoticed. The tests in `telemetry.rs` only cover a synthetic parser, not the actual binary entrypoint.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 92,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:b97f628756c68f45c63f17404c064c337cc54811c444c6af1145735d0c40fcc5",
-          "at": "2026-06-11T14:58:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0ccd3428f6d9e278f5b202c0f5f2d8df53b74a6b6696ead374041b0e1cf988d",
-          "at": "2026-06-11T15:03:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0ccd3428f6d9e278f5b202c0f5f2d8df53b74a6b6696ead374041b0e1cf988d",
-          "at": "2026-06-11T15:07:34Z"
         }
       ]
     },
@@ -1863,6 +1492,796 @@
           "findings": [],
           "hash": "rvw1:sha256:47815e1b3ad921c06425c7b0775cdde599e80f5dc056cb95e7c208eb33c0cfc0",
           "at": "2026-06-11T15:20:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These filesystem operations still use `items_dir`/`project_root` as relative paths (`src_dir`, `archive_root`, `src_logs`, `dst_logs`), so if the command is invoked from anywhere other than the repo root it will look for and move the wrong paths. Only `git mv` is anchored to `repo.root()`, which makes the source check and `logs/` rename inconsistent with the discovered repository root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "line": 641,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:1cd2a4dd70e399a73a9eeb547c50a801e2ffabbcb6c90ae073171971b36f518e",
+          "at": "2026-06-11T16:10:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new public `track_archive` flow is only covered by the happy-path test added here. There is no test for the documented failure cases or for the normal no-`logs/` path, so regressions in error propagation or the conditional `logs/` move would slip through.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "line": 853,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b4199b48ab69ae2dd905ee36ddbd005b17d375a7ed353ffd9211e6d3df73966c",
+          "at": "2026-06-11T16:19:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track_archive` mutates the worktree before the operation is known to have succeeded, and it never रोलs back. If `std::fs::rename(&src_logs, &dst_logs)` fails after `git mv` has already moved the tracked files, the function returns `Err` with the repository left half-archived: the source track dir is gone, the archive dir exists, and the logs remain behind. A retry cannot complete cleanly from the original source path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "line": 666,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ef8965295124ebeae274541ba0030301ccc025d07cdc52b9f554ee6959be5435",
+          "at": "2026-06-11T16:26:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:499b4e5515d9cc9aa0a4551e591d6f3b804ef560ca7f0a7a1747a9d9b2dcd6e3",
+          "at": "2026-06-11T16:38:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The production portion of this module now extends to line 793 before the `#[cfg(test)]` block, exceeding the AGENTS.md hard limit of 700 production lines. The base version was below the limit at 683 lines, so adding `track_archive` and its rollback helper here creates a new module-size/architecture violation; move the archive implementation into a submodule such as `track::ops`/`track::archive` and keep this composition module under the cap.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/mod.rs",
+              "line": 661,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:499b4e5515d9cc9aa0a4551e591d6f3b804ef560ca7f0a7a1747a9d9b2dcd6e3",
+          "at": "2026-06-11T16:42:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7dc587c852d03c217238c117f0af4eee67a0f464d29c9cc4189aec54aef17ed0",
+          "at": "2026-06-11T16:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If `std::fs::rename(&src_logs, &dst_logs)` fails after `git mv` has already moved the track directory, the function returns an error with the archive left half-complete. Because the command also rejects any later retry once `track/archive/<id>` exists, a transient logs-move failure becomes unrecoverable through this API and leaves the repository in an inconsistent state.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/mod.rs",
+              "line": 629,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:669c411a165514b6898ce9a9f6de1ae9705ca2fbc1da07384c089fd2ff07fbe8",
+          "at": "2026-06-11T17:13:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The production portion of this module now runs through line 771 before `#[cfg(test)]`, so it contains 771 non-test lines and exceeds the 700-line hard cap in AGENTS.md. This is an architecture violation; split the archive logic into a submodule instead of keeping it in `track/mod.rs`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "line": 771,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:38ac6ca793abd3e4d07a40332b225b2c22a870a89b369f9cf91c84da5f988ca4",
+          "at": "2026-06-11T17:23:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa32356f0a3e61841ef79d61727dfdac83e09a9b8c6b188d4e33a43a41e4254a",
+          "at": "2026-06-11T17:31:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa32356f0a3e61841ef79d61727dfdac83e09a9b8c6b188d4e33a43a41e4254a",
+          "at": "2026-06-11T17:34:43Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_track_with_telemetry` resolves telemetry against a hard-coded `track/items` path instead of the active command's `items_dir`/`workspace_root`. For any track subcommand run with a non-default track tree, the emitted `TrackSubcommand`/`NonZeroExit` records will be written under the wrong repository path or dropped entirely, so telemetry no longer follows the command's actual target track.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 186,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1da187ff65157c6fbaac183a4a474ada583d49494a32f8db6ba956ddd629d9a2",
+          "at": "2026-06-10T16:14:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_track_with_telemetry()` always resolves the telemetry writer from `cmd.items_dir()`, but `TrackCommand::items_dir()` returns the constant `track/items` for commands that are actually rooted at `project_root`/`workspace_root` (`Views::Sync`, `TypeSignals`, `BaselineCapture`, `Lint`, `CatalogueImplSignals`, etc.). If one of those commands is run with a non-default root, telemetry will be written under the wrong track tree or dropped entirely.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 187,
+              "category": "correctness"
+            },
+            {
+              "message": "`NonZeroExit` is emitted with `error_chain` hard-coded to `\"\"`, so every failing track command loses the human-readable failure chain required by the telemetry schema/brief. The current telemetry log already shows empty `error_chain` values, which makes these failure events ineffective for debugging.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 204,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:77a39600a9e0882bca2dcb156e7e0bd37e8212ee3f7f78629d1e51f73d0d5577",
+          "at": "2026-06-10T16:25:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Telemetry attribution is still anchored to the process CWD. `execute_track_with_telemetry()` now passes the right `items_dir`, but `resolve_telemetry_writer()` still discovers the branch from `SystemGitRepo::discover()`, so running a track command with `--project-root`/`--workspace-root` pointing at another repo or worktree can either suppress telemetry or write it under the wrong `track_id`. That breaks the branch-bound telemetry requirement.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 190,
+              "category": "correctness"
+            },
+            {
+              "message": "`execute_with_error_chain()` only produces a chain for `CliError`, but the common track failure path is a non-zero `ExitCode` returned from downstream composition. Those failures still reach `emit_non_zero_exit()` with `error_chain = \"\"`, so the recorded `NonZeroExit` events do not carry the failure chain required by IN-03. The telemetry fixture already shows empty chains on the failing events.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "line": 561,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:711ad45af42827ed221a3b4d1852ee0538d0b95f7b1b75940f85c897ad1f2fc3",
+          "at": "2026-06-10T16:34:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:711ad45af42827ed221a3b4d1852ee0538d0b95f7b1b75940f85c897ad1f2fc3",
+          "at": "2026-06-10T16:44:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SetCommitHash` is explicitly supported from nested working directories, but this accessor returns the relative `track/items` path. `execute_track_with_telemetry` uses that value to construct the telemetry writer before dispatch, so `bin/sotp track set-commit-hash` run from a subdirectory will append telemetry under `<subdir>/track/items/<id>/logs/telemetry.jsonl` while the command itself writes `.commit_hash` under the repo root. That breaks the track-local retention/output path contract and can create stray logs outside the real track directory. Resolve this variant's telemetry items dir from the discovered repo root instead of returning a CWD-relative default.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 501,
+              "category": "bug"
+            },
+            {
+              "message": "This generated runtime telemetry log is being added under `apps/cli/track/items/.../logs/telemetry.jsonl`, which is outside the intended `track/items/<id>/logs` tree and bypasses the repository ignore rule for `track/items/**/logs/`. Committing it pollutes the source tree with local command history and contradicts the requirement that telemetry logs are not checked in. Remove the generated log and make sure telemetry writes during local/test runs are either isolated or land under the ignored track log path.",
+              "severity": "P1",
+              "file": "apps/cli/track/items/track-workflow-telemetry-2026-06-10/logs/telemetry.jsonl",
+              "line": 1,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:711ad45af42827ed221a3b4d1852ee0538d0b95f7b1b75940f85c897ad1f2fc3",
+          "at": "2026-06-10T16:48:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This nested ignore rule hides `apps/cli/track/`, which is exactly the non-canonical telemetry tree the previous finding called out. The canonical and already-ignored path is repo-root `track/items/<id>/logs/`; adding an app-local ignore masks future stray telemetry writes under `apps/cli` instead of preventing or removing them, leaving local command history outside the intended track retention path.",
+              "severity": "P1",
+              "file": "apps/cli/.gitignore",
+              "line": 5,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:b7b6ea54593f0fefcb971bfc2dab2b4a0d30b3a39a83661fa3b0da04b91c595f",
+          "at": "2026-06-10T17:17:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`apps/cli/.gitignore` says no local ignore rule is needed because the root `track/items/**/logs/` rule covers telemetry logs, but that root-relative pattern does not ignore nested `apps/cli/track/...` logs. `git check-ignore` returns no match and the scoped `apps/cli/track/items/.../logs/telemetry.jsonl` file is currently addable, so telemetry artifacts can be committed from this crate path, violating AC-10 and risking log pollution. Add a local ignore rule for this nested track log path or remove the generated tree.",
+              "severity": "P1",
+              "file": "apps/cli/.gitignore",
+              "line": 9,
+              "category": "configuration"
+            }
+          ],
+          "hash": "rvw1:sha256:dc12c56eeedac2c26a7eae15bf8ba492e8884f69cb58cfbc25987a073c8631f5",
+          "at": "2026-06-10T17:23:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`apps/cli/src/commands/track/mod.rs` now has 730 production lines before the `#[cfg(test)]` section, up from 628 in HEAD, exceeding the repository's 700-line maximum for production module size. The new `TrackCommand::items_dir` implementation and dispatch refactor should be moved into narrower submodules or otherwise split so this module stays within the enforced architecture limit.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 442,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:c86dee030ea296b17b7d1f5feba3d7af376380e8ecb99b9fc54093fbb303622a",
+          "at": "2026-06-10T17:29:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/` in this crate-local ignore file matches any directory named `track` below `apps/cli`, not just the stray runtime artifact path. This currently hides the new `apps/cli/src/commands/track/dispatch.rs` file (`git check-ignore` reports this rule), while `apps/cli/src/commands/track/mod.rs` now declares `mod dispatch;`. If committed as-is without force-adding that ignored source file, a clean checkout will fail to compile with the dispatch module missing. Narrow this ignore pattern, e.g. `/track/` or `/track/items/**/logs/`, and ensure `dispatch.rs` is tracked.",
+              "severity": "P0",
+              "file": "apps/cli/.gitignore",
+              "line": 12,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:e20dd0f1faebaddd37845da2e7f89047246ab8fa723311fda170d212f4a13ac0",
+          "at": "2026-06-10T17:36:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ce8cca663609210e3ddea208bb52fddd643afc538d4910da4d335e626b876e7",
+          "at": "2026-06-10T17:47:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GateEval` telemetry is not carrying the evaluated result. `commands::verify::execute()` only returns an `ExitCode`, so this wrapper fabricates `reason_summary` as `gate: ...` and hashes the CLI path string / placeholder instead of the evaluated artifact. That violates the T005 contract: `reason_summary` should summarize findings and `input_hash` should identify the artifact, so branch-resolved verify variants collapse to the same hash and the event loses the actual failure context.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 331,
+              "category": "correctness"
+            },
+            {
+              "message": "Telemetry writer discovery is anchored to `PathBuf::from(\"track/items\")` from the process CWD. `verify.rs` accepts `--project-root`, `--workspace-root`, `--items-dir`, and `--track-dir`; when a user runs `sotp verify ...` from outside the repo root or against another checkout, `resolve_telemetry_writer` will look in the wrong place and silently drop or misattribute telemetry even though the command itself succeeds. The wrapper needs to derive the items dir from the command inputs or reuse the same root-resolution logic as the underlying command.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 327,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e5966305be4864f87bc70e917a8c9d6b4344771b8c8a1d03b08851f44cfd5cf6",
+          "at": "2026-06-10T18:20:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GateEval` summaries fall back to `gate: ...` for `catalogue-spec-refs` failures because the wrapper only carries stdout, but that gate reports its findings on stderr. The emitted telemetry therefore loses the actual failure context instead of reflecting the evaluated result.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 341,
+              "category": "telemetry"
+            },
+            {
+              "message": "The 256-character truncation uses `t[..256]`, which can panic on valid UTF-8 stdout containing multibyte characters before byte 256. A verify result with non-ASCII text will crash the CLI instead of emitting telemetry.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 345,
+              "category": "correctness"
+            },
+            {
+              "message": "The `input_hash` for `CatalogueSpecRefs` and `CatalogueSpecSignals` is derived from a canonical string rather than the resolved command inputs. Custom `--items-dir` or alternate workspace roots therefore collapse to the same hash, so telemetry cannot distinguish distinct evaluations.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 422,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:ac2edaf401d4fb53c8c7d0b0ffcc664153d790559b94722c16c48a0b1b10d995",
+          "at": "2026-06-10T23:29:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_telemetry_writer()` runs before the hook outcome is inspected, so every hook invocation now does branch discovery / git filesystem work even when no telemetry will be emitted. That violates the stated allow-path contract of 'no file IO' and makes otherwise no-op hook executions pay an unnecessary I/O cost.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 249,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f4e0d9c45764fcb299aaca139a8927bde7689d715e652b9e41902919eba27995",
+          "at": "2026-06-10T23:35:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyCommand::items_dir()` now forwards the caller's explicit `--items-dir`/`--workspace-root` path, but `resolve_telemetry_writer()` still only resolves the canonical `<project-root>/track/items` layout. Any valid verify invocation that uses a custom items directory now returns `None` here, so `GateEval` telemetry is silently skipped for those runs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 331,
+              "category": "correctness"
+            },
+            {
+              "message": "For `CatalogueSpecRefs`, the branch-resolved case hardcodes `track/items/{track_id}` instead of reusing the actual `items_dir` passed to the verifier. With an absolute or non-default `--items-dir`, the emitted `input_hash` no longer identifies the same artifact path that `verify_catalogue_spec_refs` evaluated.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 363,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f7dc01b310a2e53a3990f91947860afae3e37cbe2ae16d003f680dcc9af46a79",
+          "at": "2026-06-10T23:43:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Fail-closed hook errors return exit code 2 in the `Err(msg)` branch, but that branch never calls `emit_hook_block`. Internal hook failures are therefore invisible in telemetry even though they satisfy the block verdict.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 283,
+              "category": "telemetry"
+            },
+            {
+              "message": "`verify_command_input_hash` hashes `Path::to_string_lossy()` output, so non-UTF-8 inputs are normalized before hashing. That violates the documented \"SHA-256 of the path bytes\" contract and can make distinct paths collide or produce different digests than the actual input bytes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 410,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f7dc01b310a2e53a3990f91947860afae3e37cbe2ae16d003f680dcc9af46a79",
+          "at": "2026-06-10T23:43:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueSpecSignals` hashes `workspace_root` here, but the gate actually evaluates the contents under `--items-dir`. Two invocations against different items roots in the same workspace will therefore emit the same `input_hash`, so the GateEval record no longer identifies the primary evaluated artifact.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 457,
+              "category": "correctness"
+            },
+            {
+              "message": "The branch-resolved fallback collapses every path-less verify variant to `track/items/{track_id}`. That is not the resolved primary path for `SpecStates`, which chooses `track/items/<track_id>/spec.md` when `--spec-path` is omitted, so `verify spec-states` telemetry loses the file identity and collides with other branch-resolved gates.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 369,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4db87106b7e1b6ab0aa17d65765286c84938b8e5b85ed37f7d6008a485fe1ae3",
+          "at": "2026-06-10T23:51:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GateEval` telemetry still loses the real failure context on composition errors. `run_capturing()` returns `None` for `Err(msg)`, so `execute_verify_with_telemetry()` falls back to `\"gate: {gate_name}\"` instead of the actual error text. That makes `reason_summary` misleading on the failure path and violates the brief’s requirement that it reflect the real output/findings.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 350,
+              "category": "correctness"
+            },
+            {
+              "message": "`input_hash` is computed from `String::from_utf8_lossy(...)` for every path-based verify variant. On Unix, any non-UTF-8 path bytes get replaced before hashing, so the digest is not over the real path bytes and can collide for distinct legal paths. Hash the raw path encoding instead of a lossy UTF-8 string.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 434,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0544a1c41f047962c7a3d79e6cc0da297acbdeee4feae9f7081d50499ff46957",
+          "at": "2026-06-10T23:58:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyCommand::items_dir()` returns a fixed relative `track/items` for the path-based variants (`SpecAttribution`, `SpecFrontmatter`, `SpecSignals`, `SpecStates`, `PlanArtifactRefs`). When those subcommands are invoked with absolute `--spec-path`/`--track-dir` values from outside the repo root, `execute_verify_with_telemetry()` resolves the writer against the wrong base directory and silently drops `GateEval` for a valid run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "line": 200,
+              "category": "correctness"
+            },
+            {
+              "message": "The new CLI telemetry wrappers introduce several branching paths (`GateEval`, `HookBlock`, `AdvisoryHookFired`, success/error forwarding), but there are no tests covering the new entry points or the new success/failure branches. That leaves the telemetry emission logic and stdout/stderr forwarding unguarded against regressions.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 235,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a76a324e199cf754221630dba3c16e6b6842cd9ceeb302641be8e4072bb50aaf",
+          "at": "2026-06-11T00:08:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Branch-resolved verify runs no longer hash the artifact alone: when `verify_command_input_hash()` falls back to the synthetic sentinel, `execute_verify_with_telemetry()` appends `:{gate_name}` before hashing. That makes `input_hash` differ across verify subcommands even when they evaluate the same underlying artifact, which breaks the contract that the field identify the artifact/path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 370,
+              "category": "correctness"
+            },
+            {
+              "message": "The new telemetry branches are effectively untested. The added tests only smoke-check `tech-stack`, `layers`, and the advisory hook allow path; none assert `GateEval`/`HookBlock`/`AdvisoryHookFired` emission or the spec/catalogue/branch-resolved verify paths. A regression in the new match arms or hash routing would ship without coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 801,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:40b1b4dead5f700fb59490bdc8b263fe81de7baa0d23ab9a0b080d934a11b725",
+          "at": "2026-06-11T00:19:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueSpecRefs` without an explicit `--track-id` hashes a hardcoded `track/items/<track_id>` path here instead of the command's actual `items_dir`. That makes `input_hash` wrong for non-default `--items-dir` invocations, and it also bakes in a Unix separator instead of deriving the joined path from `a.items_dir()`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 375,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cb7c6644110c61b2540c4db6487be90d66de831b65f2ab74245816f693cd8fcd",
+          "at": "2026-06-11T00:27:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "For branch-resolved verify commands, `cmd.items_dir()` still falls back to the raw relative `track/items` path when the path arg is omitted (`SpecStates(None)` and `PlanArtifactRefs(None)`). Those commands resolve their real inputs from the discovered git repo root, so running `sotp verify spec-states` or `sotp verify plan-artifact-refs` from a repo subdirectory will make `resolve_telemetry_writer()` point at the wrong tree and silently skip or misplace `GateEval` telemetry even though the gate itself succeeds. Anchor the telemetry root to the resolved repo/project root instead of the CWD-relative fallback.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 337,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4fb5ab5c9d3f889ce2bc67305b6f994211fa1fd9e0761523f4d5e42dc0dc2370",
+          "at": "2026-06-11T00:33:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The branch-resolved `SpecStates` and `PlanArtifactRefs` cases fall back to `PathBuf::from(\".\")`, but `resolve_telemetry_writer()` only recognizes a `<project-root>/track/items` layout. As written, `execute_verify_with_telemetry()` will never emit `GateEval` for the no-argument `verify spec-states` / `verify plan-artifact-refs` paths, so two of the 20 verify variants are silently uninstrumented.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "line": 247,
+              "category": "correctness"
+            },
+            {
+              "message": "For `CatalogueSpecRefs`, the branch-resolved path hashes only `items_dir` when `track_id` is omitted, even though the actual evaluated artifact is `items_dir/<track_id>`. On a `track/<id>` branch this collapses all catalogue-spec-ref runs onto the same `input_hash`, so the emitted `GateEval` no longer identifies the artifact being checked.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 459,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:719b3b6994cd7178f198d17efaa4fdc731a82f3f37a12e5721d9f374c6a2843e",
+          "at": "2026-06-11T00:40:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueSpecRefs` and `CatalogueSpecSignals` derive telemetry from `items_dir` alone, but both commands also accept `--workspace-root` and use it to resolve the actual repo/branch being evaluated. As written, `execute_verify_with_telemetry()` will still resolve the writer and build `input_hash` from the current CWD's `track/items` tree for a valid cross-worktree invocation, so GateEval gets misattributed or silently dropped for the real repository.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 217,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:34ed697b20c0329dc77a7073df8be003eb1776fc7e4b500f58f96da78482a94b",
+          "at": "2026-06-11T00:48:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueSpecRefs` and `CatalogueSpecSignals` still hash the raw `items_dir` field here instead of the resolved `VerifyCommand::items_dir()`. When `--workspace-root` is non-default, the telemetry writer is anchored to the correct repository but `input_hash` is still derived from the current CWD's `track/items/...`, so cross-worktree/CI runs get the wrong artifact hash.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 460,
+              "category": "correctness"
+            },
+            {
+              "message": "The branch-resolved sentinels are plain ASCII strings, so a legitimate explicit `--spec-path` or `--track-dir` equal to `track-branch-resolved:spec` or `track-branch-resolved:track-dir` will be rewritten here before hashing. That changes `input_hash` for a legal input path instead of hashing the path the user actually supplied.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 371,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9cebf4cbb94199a54ab71b255f59dc97d7667902c4d22e07b1d5106159b2cc4b",
+          "at": "2026-06-11T00:55:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`items_dir()` for `SpecAttribution`, `SpecFrontmatter`, and `SpecSignals` only resolves telemetry when the supplied `spec_path` already sits under `track/items/...`. Valid invocations with a bare or differently rooted spec path (for example `spec.md` from the track directory) fall back to `.` here, `resolve_telemetry_writer()` returns `None`, and `execute_verify_with_telemetry()` silently skips `GateEval` on a track branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "line": 225,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:cbb7a3e9f8e5f28ca2f03583ad646006ea10414b0f687e2874b900d0fdffe07d",
+          "at": "2026-06-11T01:09:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Relative `--items-dir` values are rewritten to `<workspace_root>/track/items` whenever `workspace_root != \".\"`. That changes the telemetry anchor for legitimate non-default relative paths, so `catalogue-spec-refs` / `catalogue-spec-signals` can record telemetry under the wrong repository instead of the path actually used by the verifier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "line": 211,
+              "category": "correctness"
+            },
+            {
+              "message": "The branch-resolved hash cases use synthetic relative strings (`track/items/<track_id>/spec.md` and `track/items/<track_id>`) rather than the actual resolved filesystem path that the command evaluates. The same gate invoked from a different working directory will therefore produce a different `input_hash` for the same artifact, so the telemetry no longer identifies the real input bytes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 371,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4de57b475eafc60353afbb4eadb8ec3d17d15db04651fad79ad5efb2485218e7",
+          "at": "2026-06-11T01:15:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GateEval.reason_summary is derived from the raw verify output/error text, so failed runs can persist unredacted filesystem paths and other internal details into telemetry JSONL logs. Sanitize or redact the summary before emitting it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 350,
+              "category": "security"
+            },
+            {
+              "message": "The CatalogueSpecRefs/CatalogueSpecSignals input hash only fingerprints items_dir (plus track_id for refs), so distinct evaluations that differ by workspace_root or skip_stale collapse to the same GateEval.input_hash. That makes the new telemetry ambiguous for different workspaces using the same track tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 462,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1592ed4e748970ecfae2aeebe1c78cc2f5a400bad8da57acf4b37f99e3c58627",
+          "at": "2026-06-11T01:26:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueSpecSignals` now switches telemetry anchoring to `workspace_root`, but this command is still CWD-anchored for branch gating. When `--workspace-root` points at a different checkout/worktree, `execute_verify_with_telemetry()` can resolve the writer and `input_hash` against a different repo/branch than the command actually used, so `GateEval` can be misattributed or emitted for a skipped run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "line": 230,
+              "category": "correctness"
+            },
+            {
+              "message": "The spec-path variants derive the telemetry root from `spec_path.parent().parent()`. That only works for canonical `track/items/<id>/spec.md`; a valid explicit path outside that tree (for example `/tmp/spec.md`) resolves to a non-`track/items` directory, so `resolve_telemetry_writer()` returns `None` and `GateEval` is silently dropped even though the verify command ran.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "line": 244,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9f05d1467c18b774fbaeb6d0135ab7cd7a4a8c196320e03b3a4d01a3857c2fc5",
+          "at": "2026-06-11T01:39:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueSpecRefs` computes two different `input_hash` values for the same resolved artifact depending on whether `--track-id` was passed. In the explicit case the `workspace_root` suffix is appended after the track id, but in the implicit branch-resolved case it is embedded before the resolved id when the sentinel is expanded. On non-default `--workspace-root` runs that breaks hash stability and makes identical evaluations look different to telemetry consumers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 523,
+              "category": "correctness"
+            },
+            {
+              "message": "`VerifyCommand::items_dir()` returns raw relative paths for the branch-resolved verify paths (`SpecStates(None)`, `PlanArtifactRefs(None)`, and `CatalogueSpecSignals`). `execute_verify_with_telemetry()` then passes that path verbatim into `resolve_telemetry_writer()`, so when the CLI is launched from a subdirectory or with a non-default `--workspace-root`, the gate itself resolves the repo root correctly but telemetry is written under the wrong `track/items` tree or dropped entirely.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "line": 230,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ff0a1f47bd05e4f9c650bbb8447d415f7cb5d05e928a6abf3da69089d02e4d96",
+          "at": "2026-06-11T01:49:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:303d3b3334c026b762511df8c59f44492da0381842f8d283c727b8e72bab092c",
+          "at": "2026-06-11T02:50:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reason_summary` is always truncated to 256 bytes before emitting `GateEval`, even though the accepted contract says the D3 4096-byte JSONL line cap defines this field's length budget and the telemetry writer already enforces that cap. For gates with longer failure output, the event will drop most of the human-readable diagnostics instead of recording the agreed gate-output summary.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 346,
+              "category": "contract"
+            }
+          ],
+          "hash": "rvw1:sha256:303d3b3334c026b762511df8c59f44492da0381842f8d283c727b8e72bab092c",
+          "at": "2026-06-11T02:54:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0169ca99b11d94fe9ec9dc11143e96c075d2fdb0832ac28b2488a5543f49fb39",
+          "at": "2026-06-11T02:58:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2022de17a5ec221fc658d052bddb7ccd14e50970cf1ece5287fd23cf70864caf",
+          "at": "2026-06-11T13:08:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2022de17a5ec221fc658d052bddb7ccd14e50970cf1ece5287fd23cf70864caf",
+          "at": "2026-06-11T13:10:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new top-level `Telemetry` route is not covered by an end-to-end test that exercises `Cli::try_parse_from([\"sotp\", \"telemetry\", ...])` and `run_cli`, so a regression in the public CLI registration or dispatch path would ship unnoticed. The tests in `telemetry.rs` only cover a synthetic parser, not the actual binary entrypoint.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 92,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b97f628756c68f45c63f17404c064c337cc54811c444c6af1145735d0c40fcc5",
+          "at": "2026-06-11T14:58:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0ccd3428f6d9e278f5b202c0f5f2d8df53b74a6b6696ead374041b0e1cf988d",
+          "at": "2026-06-11T15:03:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0ccd3428f6d9e278f5b202c0f5f2d8df53b74a6b6696ead374041b0e1cf988d",
+          "at": "2026-06-11T15:07:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track archive` is now routed through the generic telemetry path, but that path resolves the writer from the pre-archive `items_dir` and emits after dispatch. Since the archive command moves `track/items/<id>` into `track/archive/<id>` before `emit_track_subcommand`, the telemetry write will recreate `track/items/<id>/logs/telemetry.jsonl` instead of landing with the archived track, so the retention behavior this change is meant to add is broken for the archive command itself.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 195,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fa91c0078c04094f05debd8165e3672cf784b62496789b3e5465270a8f4b8b3f",
+          "at": "2026-06-11T16:10:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`matches!(cmd, ...)` moves `cmd` here, so the later `commands::track::execute_with_error_chain(cmd)` is a use-after-move compile error. Match on `&cmd` (or clone first) so the command can still be dispatched.",
+              "severity": "P0",
+              "file": "apps/cli/src/main.rs",
+              "line": 184,
+              "category": "build break"
+            },
+            {
+              "message": "`emit_archived_track_subcommand` derives the archive log path from `items_dir.parent()` without re-anchoring to the repository root. When `sotp track archive` is run from a subdirectory with the default relative `track/items`, telemetry will be written under the current working directory instead of `<repo-root>/track/archive/<id>/logs`, diverging from the actual archive location.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 250,
+              "category": "telemetry path resolution"
+            }
+          ],
+          "hash": "rvw1:sha256:add565c5317a6776f6f199b3820ae31431075f3f95d1bb089577f6a73977f4d5",
+          "at": "2026-06-11T16:19:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:566063b44e89bf104eb3d18ee0455c58fba48d2e943e3e6cf2cfe2e348f0e2b2",
+          "at": "2026-06-11T16:26:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:566063b44e89bf104eb3d18ee0455c58fba48d2e943e3e6cf2cfe2e348f0e2b2",
+          "at": "2026-06-11T16:30:28Z"
         }
       ]
     },
@@ -1941,242 +2360,6 @@
           "findings": [],
           "hash": "rvw1:sha256:298a274d3590653946a5ccbbbf50a9548a10e99699dc0d3d1b4d79d45a8e7d74",
           "at": "2026-06-10T16:05:40Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
-          "at": "2026-06-10T14:13:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new DTO tests only cover successful serialization/round-trips. The briefing explicitly asks for error-case coverage, and the later report path relies on `serde_json::from_str::<TelemetryEvent>` rejecting malformed rows, unknown `event_type` values, or rows missing required fields such as `schema_version`. Add at least one negative deserialization test so the tagged JSONL contract is guarded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/mod.rs",
-              "line": 184,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
-          "at": "2026-06-10T14:17:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec5de587869142997f00ac11b04f9a447dd87cf5bebe94e959a7bcc94e38c527",
-          "at": "2026-06-10T14:21:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryWriter::new` trusts the raw `track_id` string and joins it directly into `items_dir`, so a value containing path separators or `..` can escape `track/items` and write telemetry outside the intended workspace. This constructor should take a validated track-id type or reject non-slug input before building the path.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/writer.rs",
-              "line": 97,
-              "category": "Security"
-            },
-            {
-              "message": "The 4096-byte guard only checks the pre-truncation serialization result, then returns `line2` without verifying that the truncated JSON still fits. A long `track_id`/`command`, or JSON escaping that expands the encoded output, can still produce an oversized row while `write()` returns `Ok(())`. Recheck the second serialization length and fail if it still exceeds the cap.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/writer.rs",
-              "line": 185,
-              "category": "Correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e5e69793169aa8faee8a20dd15a718611fbccfa5d37179dbae781c9e9188e71c",
-          "at": "2026-06-10T14:53:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`safe_path_component` does not actually reduce `track_id` to a single path component: it keeps every normal component and rejoins them with `/`. A `track_id` like `foo/bar` will therefore write to `items_dir/foo/bar/logs/telemetry.jsonl` instead of the intended single-track directory, which can make later report/archive code miss the file.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
-              "line": 238,
-              "category": "correctness"
-            },
-            {
-              "message": "The oversized-line fallback truncates raw bytes and appends `\\n`. If the event contains multibyte UTF-8 or JSON escape sequences, this can emit invalid UTF-8/JSONL, so downstream readers that use text parsing will fail on the whole file instead of just skipping the oversized row.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
-              "line": 212,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4dc59c26e108c84dca04c4921fee6b693d3e50fd09bca7d0f4ef6e510e44f125",
-          "at": "2026-06-10T15:02:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryWriter::new` silently rewrites invalid `track_id` strings by taking the last normal path segment (or `unknown`). If a path-like or otherwise invalid ID reaches this constructor, distinct logical tracks can be merged into the same `telemetry.jsonl` instead of failing fast, which is a data-corruption risk.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
-              "line": 93,
-              "category": "correctness"
-            },
-            {
-              "message": "`SOTP_TELEMETRY_DIR` is read with `std::env::var`, so a valid non-UTF8 filesystem path is treated as absent. On Unix this silently falls back to the default track directory and makes the override knob unreliable for a real path value.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/config.rs",
-              "line": 40,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
-          "at": "2026-06-10T15:17:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
-          "at": "2026-06-10T15:19:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
-          "at": "2026-06-10T15:24:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
-          "at": "2026-06-11T02:39:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
-          "at": "2026-06-11T02:41:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "New public `RoundType::from_str` has no unit tests covering either the valid `fast`/`final` parses or the unknown-value error path, so a regression in the canonical round-type parser could ship unnoticed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 53,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:02bb83f3b4d845d37a85ee79a528d1bbbcc9afd198d14782952c5c19210146bf",
-          "at": "2026-06-11T03:35:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
-          "at": "2026-06-11T03:38:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
-          "at": "2026-06-11T03:42:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Empty/whitespace-only lines are dropped before parsing, so they are neither counted nor reported in `skipped_lines`. That violates the fail-open contract for invalid JSON lines: a blank line is malformed JSON and should be skipped and counted rather than silently ignored. The accompanying test also codifies the undercounting behavior.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/report.rs",
-              "line": 206,
-              "category": "spec mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:2549660a63fd9fb7417071d4aad698a4a9453dd1144c0844050125b9a484a0c5",
-          "at": "2026-06-11T13:56:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`aggregate` accepts a raw `&str` and joins it directly onto `items_dir` without validating it as a `TrackId`. A caller can pass `../...` segments and make the reader walk outside `track/items/<id>`, which violates the domain validation rule and creates a path-traversal read risk. Validate with `domain::TrackId::try_new` (or take `TrackId`) before building the path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
-              "line": 166,
-              "category": "security"
-            },
-            {
-              "message": "The `exists()` pre-checks collapse filesystem errors into absence: `Path::exists()` returns `false` for inaccessible paths, so a permission/metadata failure on the track directory is misreported as `TrackNotFound`, and the same problem on `telemetry.jsonl` returns an empty report instead of `Io`. That silently swallows real I/O failures. Distinguish `NotFound` from other errors via `metadata`/`open` error handling instead of using `exists()` as the gate.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
-              "line": 170,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:5fb8a1a6e06200e388aea5df9c41aa7da75dc1a5bbb32b6d5a12cfe6dc35554e",
-          "at": "2026-06-11T14:01:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
-          "at": "2026-06-11T14:09:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`reader.lines()` decodes each line as UTF-8 before the JSON parser sees it, and any decode failure is returned as `TelemetryReportError::Io`. That breaks the required fail-open reader behavior for invalid JSON lines: a single corrupted/non-UTF-8 JSONL line will fail the whole report instead of incrementing `skipped_lines` and continuing. Read raw lines with `read_until(b'\\n')`/`serde_json::from_slice` or otherwise treat UTF-8/JSON parse failures as skipped lines.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/report.rs",
-              "line": 222,
-              "category": "fail_open"
-            }
-          ],
-          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
-          "at": "2026-06-11T14:13:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9dcc71e2d83c3d61a49a5c7fa5b9fdf608c59a1f2f870806936991b3077ec95f",
-          "at": "2026-06-11T14:18:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
-          "at": "2026-06-11T14:39:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
-          "at": "2026-06-11T14:43:24Z"
         }
       ]
     }

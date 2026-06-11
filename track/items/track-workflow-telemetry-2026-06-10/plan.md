@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # track ワークフロー telemetry の導入 — tracing + JSONL による事後観測
 
-## Tasks (9/11 resolved)
+## Tasks (10/11 resolved)
 
 ### S1 — Repository Configuration — .gitignore Entry (T001)
 
@@ -61,7 +61,7 @@
 > telemetry の retention を track のライフサイクル（active → archive）に自動追随させるため、archive 時に gitignored の `logs/` もともに移動する。
 > このタスクは T001（gitignore エントリ）の後に実施する。
 
-- [ ] **T011**: `bin/sotp track archive` サブコマンドに `track/items/<id>/logs/` ディレクトリを移動対象に含める変更を追加する（CN-03 / GO-03）。実装内容: `libs/infrastructure/src/` または `apps/cli-composition/src/` の archive 処理で track dir をファイルシステム移動する際、gitignored であっても `logs/` サブディレクトリをともに移動するようにする（現在 gitignored ディレクトリを除外している場合は当該除外ロジックを修正する）。これにより archived track と telemetry.jsonl の突き合わせが可能になる（GO-03）。unit tests: archive 実行後に `logs/telemetry.jsonl` が移動先に存在すること / 移動元に残っていないこと。前提: T001（gitignore エントリ追加済み）。
+- [~] **T011**: `bin/sotp track archive` サブコマンドに `track/items/<id>/logs/` ディレクトリを移動対象に含める変更を追加する（CN-03 / GO-03）。実装内容: `libs/infrastructure/src/` または `apps/cli-composition/src/` の archive 処理で track dir をファイルシステム移動する際、gitignored であっても `logs/` サブディレクトリをともに移動するようにする（現在 gitignored ディレクトリを除外している場合は当該除外ロジックを修正する）。これにより archived track と telemetry.jsonl の突き合わせが可能になる（GO-03）。unit tests: archive 実行後に `logs/telemetry.jsonl` が移動先に存在すること / 移動元に残っていないこと。前提: T001（gitignore エントリ追加済み）。
 
 ### S8 — E2E Verification (T010)
 
@@ -69,4 +69,4 @@
 > AC-01 〜 AC-11 の全項目を実機確認または自動テストで検証する。
 > failing gate・clippy warning はこのタスク内で修正する。
 
-- [~] **T010**: E2E 検証: `cargo make ci` をすべての gate（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass することを確認し、全 acceptance criteria を満たすことを検証する（全 AC）。具体的に確認する AC: AC-01（`apps/cli-composition` に subscriber 初期化コードがあり、domain / usecase 層に計装コードがないこと）/ AC-02（track 操作 subcommand 後に `telemetry.jsonl` にイベント行が追記されること）/ AC-03（gate 評価・review round・外部 subprocess イベントが正しいフィールドで記録されること）/ AC-04（hook block および advisory hook 発火のみが記録され、素通りは記録されないこと）/ AC-05（`SOTP_TELEMETRY=0` でファイル書き込みがなく、`SOTP_TELEMETRY_DIR` で指定先に書き出されること）/ AC-06（純表示系コマンドで `logs/` ディレクトリへの file open がないこと）/ AC-07（Makefile test タスクに `SOTP_TELEMETRY=0` があり、テスト中に track dir の `logs/` が汚染されないこと）/ AC-08（`bin/sotp telemetry report <id>` がフェーズ別所要時間・エラー一覧・hook block 一覧・skip 件数を出力し、exit code 0 で完了すること）/ AC-09（`telemetry.jsonl` の各行に `schema_version` フィールドがあること）/ AC-10（`.gitignore` に `track/items/**/logs/` が追加されていること）/ AC-11（`track/*` 以外のブランチで telemetry が記録されないこと）。failing gate や clippy warning が発生した場合は同タスク内で修正する。前提: T001–T009 完了（T011 は archive retention の別タスクであり、AC-01〜AC-11 の E2E 検証の前提には含めない）。
+- [x] **T010**: E2E 検証: `cargo make ci` をすべての gate（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass することを確認し、全 acceptance criteria を満たすことを検証する（全 AC）。具体的に確認する AC: AC-01（`apps/cli-composition` に subscriber 初期化コードがあり、domain / usecase 層に計装コードがないこと）/ AC-02（track 操作 subcommand 後に `telemetry.jsonl` にイベント行が追記されること）/ AC-03（gate 評価・review round・外部 subprocess イベントが正しいフィールドで記録されること）/ AC-04（hook block および advisory hook 発火のみが記録され、素通りは記録されないこと）/ AC-05（`SOTP_TELEMETRY=0` でファイル書き込みがなく、`SOTP_TELEMETRY_DIR` で指定先に書き出されること）/ AC-06（純表示系コマンドで `logs/` ディレクトリへの file open がないこと）/ AC-07（Makefile test タスクに `SOTP_TELEMETRY=0` があり、テスト中に track dir の `logs/` が汚染されないこと）/ AC-08（`bin/sotp telemetry report <id>` がフェーズ別所要時間・エラー一覧・hook block 一覧・skip 件数を出力し、exit code 0 で完了すること）/ AC-09（`telemetry.jsonl` の各行に `schema_version` フィールドがあること）/ AC-10（`.gitignore` に `track/items/**/logs/` が追加されていること）/ AC-11（`track/*` 以外のブランチで telemetry が記録されないこと）。failing gate や clippy warning が発生した場合は同タスク内で修正する。前提: T001–T009 完了（T011 は archive retention の別タスクであり、AC-01〜AC-11 の E2E 検証の前提には含めない）。 (`3fca100adab3871b2b644aa893380a918c21ebee`)

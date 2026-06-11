@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 use clap::{Args, Subcommand};
 
+mod archive;
 mod branch_ops;
 mod dispatch;
 mod resolve;
@@ -23,6 +24,21 @@ pub(crate) use validate::{
 
 #[derive(Debug, Subcommand)]
 pub enum TrackCommand {
+    /// Archive a completed track: move it from `track/items/<id>/` to
+    /// `track/archive/<id>/` via `git mv`, and additionally move any gitignored
+    /// `logs/` subdirectory via a filesystem rename so that telemetry is
+    /// preserved alongside the archived track (CN-03 / GO-03).
+    Archive {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: std::path::PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
+    },
+
     /// Transition a task to a new status (atomic read-modify-write).
     Transition {
         /// Path to the track items root directory (e.g., `track/items`).
@@ -461,7 +477,8 @@ impl TrackCommand {
     /// internal resolution behaviour.
     pub fn items_dir(&self) -> PathBuf {
         match self {
-            TrackCommand::Transition { items_dir, .. }
+            TrackCommand::Archive { items_dir, .. }
+            | TrackCommand::Transition { items_dir, .. }
             | TrackCommand::AddTask { items_dir, .. }
             | TrackCommand::SetOverride { items_dir, .. }
             | TrackCommand::ClearOverride { items_dir, .. }
