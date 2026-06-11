@@ -111,24 +111,36 @@
       "informal_grounds": []
     },
     "SimpleCommand": {
-      "action": "reference",
+      "action": "modify",
       "role": "ValueObject",
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "argv",               "ty": "Vec<String>" },
-            { "name": "redirect_texts",     "ty": "Vec<String>" },
-            { "name": "has_output_redirect", "ty": "bool" }
+            { "name": "argv",                  "ty": "Vec<String>" },
+            { "name": "redirect_texts",        "ty": "Vec<String>" },
+            { "name": "output_redirect_texts", "ty": "Vec<String>" },
+            { "name": "has_output_redirect",   "ty": "bool" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "guard::types",
-      "docs": "Pre-parsed simple command. No change in this track; carried for contract-map edge visibility.",
-      "spec_refs": [],
+      "docs": "Pre-parsed simple command. Modified in this track (CN-07/IN-05): adds output_redirect_texts as the output-capable subset of existing redirect_texts for Write/Append/Clobber/ReadWrite redirect targets. CN-07 remains the redirect-target test-file matching rule over parsed redirect metadata; the subset keeps input redirects, FD duplication, and heredoc bodies out of the truncation-target check.",
+      "spec_refs": [
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "CN-07",
+          "hash": "ccaf7062e90f00194373c74117d4892c0effac5ce53d0486bf53534863a3a9ae"
+        },
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-05",
+          "hash": "6c3a9e6a1d3cddf85dfec5684c7960eabd163f25bd69f2cd17692483d2b84f68"
+        }
+      ],
       "informal_grounds": []
     },
     "GuardVerdict": {
@@ -329,13 +341,23 @@
       "for_type": "GuardVerdict"
     },
     {
-      "action": "reference",
+      "action": "modify",
       "trait_ref": "core::fmt::Debug",
       "for_type": "SimpleCommand"
     },
     {
-      "action": "reference",
+      "action": "modify",
       "trait_ref": "core::clone::Clone",
+      "for_type": "SimpleCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "SimpleCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
       "for_type": "SimpleCommand"
     }
   ]

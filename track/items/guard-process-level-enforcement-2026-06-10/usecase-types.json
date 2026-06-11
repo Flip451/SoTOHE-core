@@ -201,7 +201,7 @@
       },
       "methods": [],
       "module_path": "hook",
-      "docs": "Test-file deletion guard handler. Body of handle gains redirect-target test-file pattern matching (CN-07/IN-05) but struct fields and HookHandler::handle signature are unchanged. action=reference is correct: B==C at rustdoc level.",
+      "docs": "Test-file deletion guard handler. Body of handle gains redirect-target test-file pattern matching (CN-07/IN-05) over parsed redirect metadata, using SimpleCommand.output_redirect_texts as the output-capable subset of SimpleCommand.redirect_texts. Struct fields and HookHandler::handle signature are unchanged, so action=reference remains correct at the rustdoc contract level.",
       "spec_refs": [],
       "informal_grounds": []
     }

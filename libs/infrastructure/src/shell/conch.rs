@@ -60,7 +60,7 @@ impl ShellParserPort for ConchShellParser {
     /// **excluded** from the returned `Vec<String>`.  The `has_output_redirect`
     /// flag cannot be transmitted through the `Vec<String>` interface, so
     /// including an empty-string entry would cause the usecase adapter to
-    /// reconstruct a `SimpleCommand { argv: [], has_output_redirect: false }`
+    /// reconstruct a `SimpleCommand` with empty redirect metadata
     /// that the domain policy would incorrectly allow.  Excluding them is the
     /// correct behaviour for this interface boundary.
     ///
@@ -84,10 +84,10 @@ impl HookShellParserPort for ConchShellParser {
     /// Splits a shell command string into faithful [`SimpleCommand`] values.
     ///
     /// Delegates to the same `split_shell_inner` implementation as the
-    /// [`ShellParser`] trait impl, preserving `argv`, `redirect_texts`, and
-    /// `has_output_redirect` fields. This is the faithful, quote-preserving
-    /// variant required by `block-direct-git-ops` and `block-test-file-deletion`
-    /// hook guards.
+    /// [`ShellParser`] trait impl, preserving `argv`, `redirect_texts`,
+    /// `output_redirect_texts`, and `has_output_redirect` fields. This is the
+    /// faithful, quote-preserving variant required by `block-direct-git-ops`
+    /// and `block-test-file-deletion` hook guards.
     ///
     /// # Errors
     ///
@@ -242,24 +242,35 @@ fn collect_from_conch_simple(
 
     // Collect flattened text from redirect targets (including heredoc bodies)
     let mut redirect_texts = Vec::new();
+    let mut output_redirect_texts = Vec::new();
     let mut has_output_redirect = false;
     for item in &simple.redirects_or_env_vars {
         if let ast::RedirectOrEnvVar::Redirect(redirect) = item {
-            if is_output_redirect(redirect) {
+            let is_output = is_output_redirect(redirect);
+            if is_output {
                 has_output_redirect = true;
             }
             if let Some(word) = extract_redirect_word(redirect) {
-                redirect_texts.push(flatten_top_level_word(word));
+                let text = flatten_top_level_word(word);
+                if is_output {
+                    output_redirect_texts.push(text.clone());
+                }
+                redirect_texts.push(text);
             }
         }
     }
     for item in &simple.redirects_or_cmd_words {
         if let ast::RedirectOrCmdWord::Redirect(redirect) = item {
-            if is_output_redirect(redirect) {
+            let is_output = is_output_redirect(redirect);
+            if is_output {
                 has_output_redirect = true;
             }
             if let Some(word) = extract_redirect_word(redirect) {
-                redirect_texts.push(flatten_top_level_word(word));
+                let text = flatten_top_level_word(word);
+                if is_output {
+                    output_redirect_texts.push(text.clone());
+                }
+                redirect_texts.push(text);
             }
         }
     }
@@ -268,7 +279,12 @@ fn collect_from_conch_simple(
     // Redirect-only commands like `> /tmp/file` must reach policy evaluation
     // so the CON-07 file-write guard can block them.
     if !argv.is_empty() || has_output_redirect {
-        out.push(SimpleCommand { argv, redirect_texts, has_output_redirect });
+        out.push(SimpleCommand {
+            argv,
+            redirect_texts,
+            output_redirect_texts,
+            has_output_redirect,
+        });
     }
 
     // Recursively extract commands from command substitutions in all words,
@@ -329,20 +345,27 @@ fn collect_from_compound(
     // Flatten redirect texts from compound.io (including heredoc bodies)
     // and propagate them to all commands collected from inside the compound.
     // This ensures `{ bash; } <<'SH'\ngit add .\nSH` is detected.
-    // Also propagate has_output_redirect for CON-07 file-write guard.
+    // Also propagate output-only redirect targets for test-file truncation checks.
     let mut compound_redirect_texts = Vec::new();
+    let mut compound_output_redirect_texts = Vec::new();
     let mut compound_has_output_redirect = false;
     for redirect in &compound.io {
-        if is_output_redirect(redirect) {
+        let is_output = is_output_redirect(redirect);
+        if is_output {
             compound_has_output_redirect = true;
         }
         if let Some(word) = extract_redirect_word(redirect) {
-            compound_redirect_texts.push(flatten_top_level_word(word));
+            let text = flatten_top_level_word(word);
+            if is_output {
+                compound_output_redirect_texts.push(text.clone());
+            }
+            compound_redirect_texts.push(text);
         }
     }
     if !compound_redirect_texts.is_empty() || compound_has_output_redirect {
         for cmd in &mut out[before_len..] {
             cmd.redirect_texts.extend(compound_redirect_texts.iter().cloned());
+            cmd.output_redirect_texts.extend(compound_output_redirect_texts.iter().cloned());
             if compound_has_output_redirect {
                 cmd.has_output_redirect = true;
             }
@@ -539,6 +562,39 @@ mod tests {
         let cmds = ShellParser::split_shell(&parser(), "echo hi > /tmp/file.txt").unwrap();
         assert_eq!(cmds.len(), 1);
         assert_eq!(cmds[0].argv, vec!["echo", "hi"]);
+        assert_eq!(cmds[0].redirect_texts, vec!["/tmp/file.txt"]);
+        assert_eq!(cmds[0].output_redirect_texts, vec!["/tmp/file.txt"]);
+        assert!(cmds[0].has_output_redirect);
+    }
+
+    #[test]
+    fn test_split_shell_mixed_input_output_redirects_tracks_only_output_targets() {
+        let cmds = ShellParser::split_shell(&parser(), "cat < tests/foo.rs > /tmp/out").unwrap();
+        assert_eq!(cmds.len(), 1);
+        assert_eq!(cmds[0].argv, vec!["cat"]);
+        assert_eq!(cmds[0].redirect_texts, vec!["tests/foo.rs", "/tmp/out"]);
+        assert_eq!(cmds[0].output_redirect_texts, vec!["/tmp/out"]);
+        assert!(cmds[0].has_output_redirect);
+    }
+
+    #[test]
+    fn test_split_shell_input_redirect_excludes_output_targets() {
+        let cmds = ShellParser::split_shell(&parser(), "cat < tests/foo.rs").unwrap();
+        assert_eq!(cmds.len(), 1);
+        assert_eq!(cmds[0].argv, vec!["cat"]);
+        assert_eq!(cmds[0].redirect_texts, vec!["tests/foo.rs"]);
+        assert!(cmds[0].output_redirect_texts.is_empty());
+        assert!(!cmds[0].has_output_redirect);
+    }
+
+    #[test]
+    fn test_split_shell_heredoc_body_excludes_output_targets() {
+        let input = "cat <<EOF > /tmp/file.txt\ntests/foo.rs\nEOF";
+        let cmds = ShellParser::split_shell(&parser(), input).unwrap();
+        assert_eq!(cmds.len(), 1);
+        assert_eq!(cmds[0].argv, vec!["cat"]);
+        assert_eq!(cmds[0].output_redirect_texts, vec!["/tmp/file.txt"]);
+        assert!(cmds[0].has_output_redirect);
     }
 
     #[test]
@@ -575,7 +631,7 @@ mod tests {
     fn test_shell_parser_port_redirect_only_command_excluded() {
         // `> /tmp/file` has no argv tokens; it is excluded from the result because
         // including "" would cause the usecase adapter to reconstruct an incorrect
-        // `SimpleCommand { argv: [], has_output_redirect: false }` that the domain
+        // `SimpleCommand` with empty redirect metadata that the domain
         // policy would allow. Exclusion is the correct behaviour for this interface.
         let result = ShellParserPort::split_shell(&parser(), "> /tmp/file").unwrap();
         assert!(result.is_empty(), "redirect-only commands must be excluded, got: {result:?}");

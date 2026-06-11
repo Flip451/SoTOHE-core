@@ -109,11 +109,13 @@ pub trait HookDispatchService: Send + Sync {
 /// Unlike [`crate::guard::ShellParserPort`] — which returns `argv.join(" ")`
 /// strings and is intentionally lossy — this port requires implementations to
 /// produce [`SimpleCommand`] values with accurate `argv` (quote-stripped
-/// tokens), `redirect_texts`, and `has_output_redirect` fields.
+/// tokens), `redirect_texts`, `output_redirect_texts`, and
+/// `has_output_redirect` fields.
 ///
 /// Faithful parsing is required by the hook dispatch handlers:
 ///
 /// * `block-direct-git-ops` checks `has_output_redirect` / `redirect_texts`
+/// * `block-test-file-deletion` checks `output_redirect_texts`
 ///   to detect git operations hidden in output-redirect targets.
 /// * `block-test-file-deletion` recurses into shell re-entry payloads
 ///   (`bash -c '...'`); quoted multi-word arguments must remain single tokens
@@ -303,6 +305,7 @@ mod tests {
                 .map(|s| domain::guard::SimpleCommand {
                     argv: s.split_whitespace().map(str::to_owned).collect(),
                     redirect_texts: Vec::new(),
+                    output_redirect_texts: Vec::new(),
                     has_output_redirect: false,
                 })
                 .collect())

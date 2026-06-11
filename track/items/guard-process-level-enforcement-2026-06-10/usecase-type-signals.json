@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-11T01:13:42Z",
-  "declaration_hash": "8ece855ee410adc7d7d1847d4dd1af2eb9e5cac2ff4f7576b01c05f6a63a04a5",
+  "generated_at": "2026-06-11T17:47:29Z",
+  "declaration_hash": "d43ae67bcc07c2f6b6e6f4e170c24208e368b887995df15ab1ba3351163d463b",
   "signals": [
     {
       "type_name": "GitPrePushHandler",

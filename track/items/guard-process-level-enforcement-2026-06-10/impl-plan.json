@@ -3,57 +3,48 @@
   "tasks": [
     {
       "id": "T001",
-      "description": "domain 層 HookName enum への GitRefUpdate / GitPrePush variant 追加 + policy.rs のブランケットブロック撤廃 + SOTP_GUARDED_GIT キーワードスキャン追加（IN-01 / IN-03 / IN-04 / CN-04 / CN-05）、および usecase 層 TestFileDeletionGuardHandler へのリダイレクト先テストファイルパターン照合追加（IN-05 / CN-07）。変更対象層: domain（libs/domain/src/hook/types.rs の HookName enum 拡張 + libs/domain/src/guard/policy.rs のブランケットブロック撤廃 + SOTP_GUARDED_GIT スキャン追加）と usecase（libs/usecase/src/hook.rs 内 TestFileDeletionGuardHandler）の 2 層。追加 0（domain types.rs）: HookName enum に GitRefUpdate variant と GitPrePush variant を追加し、#[derive(Debug, Clone, Copy, PartialEq, Eq)] を維持する（CN-08: T002 の HookDispatchInteractor resolve_handler 拡張の前提）。撤廃対象（domain policy.rs）: command_contains_git 関数・NESTED_GIT_REFERENCE_MESSAGE 定数・非 git コマンドへの command_contains_git 呼び出し、env 無条件ブロック（ENV_COMMAND_MESSAGE 定数・effective_cmd == \"env\" 分岐）、command_contains_expansion（GIT_VARIABLE_BYPASS_MESSAGE 定数・command_contains_expansion 呼び出し）、has_output_redirect 一括ブロック（check_simple_command 冒頭の has_output_redirect guard と OUTPUT_REDIRECT_MESSAGE 定数）、FILE_WRITE_COMMANDS（tee）と FILE_WRITE_COMMAND_MESSAGE 定数、sed -i チェック（has_sed_inplace_flag 呼び出し）。追加 1（raw コマンド文字列スキャンは usecase/GuardHookHandler、argv トークンスキャンは domain policy.rs）: SOTP_GUARDED_GIT の exact-match キーワードスキャンは 2 段階で実装する。(a) raw コマンド文字列スキャン: GuardHookHandler（libs/usecase/src/hook.rs）が check_commands を呼ぶ前に input.command の raw 文字列に対して SOTP_GUARDED_GIT exact-match スキャンを実施し、含まれていれば HookVerdict::block を早期返却する（SimpleCommand は raw 文字列を保持しないため、usecase 層の GuardHookHandler で行う）。(b) argv トークンスキャン: domain::guard::policy::check_commands（libs/domain/src/guard/policy.rs）の中で SimpleCommand.argv の各要素（quote-strip 済みトークン）に SOTP_GUARDED_GIT exact-match スキャンを追加し、含まれていれば block GuardVerdict を返す。check_commands のシグネチャ（&[SimpleCommand] → GuardVerdict）は変更しない。スキャンは Bash コマンド文字列のみ対象（CN-04）。追加 2（usecase TestFileDeletionGuardHandler）: block-test-file-deletion 用のリダイレクト先テストファイルパターン照合 — TestFileDeletionGuardHandler の handle メソッドで SimpleCommand.redirect_texts に tests/ または /tests/ パスパターンが含まれる場合に GuardVerdict::block を返すロジックを追加する（CN-07: redirect_texts は既取得済み）。domain 層の policy::check_commands には redirect_texts パターン照合ロジックを追加せず、usecase 層のハンドラ側で完結させる。維持するチェック（domain policy.rs）: direct git subcommand checks（git add / commit / push / switch / merge / rebase / cherry-pick / reset / checkout -b / branch -d）・launcher stripping（COMMAND_LAUNCHERS / LAUNCHER_POSITIONAL_ARGS / LAUNCHER_SPECIFIC_OPTIONS_WITH_ARG / skip_var_assignments）・is_bin_sotp_overwrite。ユニットテスト: echo hello > /tmp/file.txt が allow になること（OUT-redirect 解禁 AC-04）/ ls | tee output.txt が allow になること（tee 解禁 AC-04）/ sed 's/a/b/' file.txt が allow になること（sed -i なし解禁 AC-04）/ env cargo test が allow になること（env 解禁 AC-04）/ $(pwd) を含むコマンドが allow になること（コマンド置換解禁 AC-04）/ SOTP_GUARDED_GIT=1 git commit が block されること（AC-03）/ quote-strip 後の argv に SOTP_GUARDED_GIT トークンが含まれる場合に block されること（AC-03）/ git add が引き続き block されること（AC-05）/ is_bin_sotp_overwrite が引き続き block されること（AC-05）/ tests/foo.rs をリダイレクト先に持つコマンドが TestFileDeletionGuardHandler で block されること（AC-06）。前提: なし（独立タスク）。",
-      "status": "todo",
-      "commit_hash": null
+      "description": "domain 層 HookName enum への GitRefUpdate / GitPrePush variant 追加 + policy.rs のブランケットブロック撤廃 + SOTP_GUARDED_GIT キーワードスキャン追加（IN-01 / IN-03 / IN-04 / CN-04 / CN-05）、および usecase 層 TestFileDeletionGuardHandler へのリダイレクト先テストファイルパターン照合追加（IN-05 / CN-07）。変更対象層: domain（libs/domain/src/hook/types.rs の HookName enum 拡張 + libs/domain/src/guard/policy.rs のブランケットブロック撤廃 + SOTP_GUARDED_GIT スキャン追加）と usecase（libs/usecase/src/hook.rs 内 TestFileDeletionGuardHandler）の 2 層。追加 0（domain types.rs）: HookName enum に GitRefUpdate variant と GitPrePush variant を追加し、#[derive(Debug, Clone, Copy, PartialEq, Eq)] を維持する（CN-08: T002 の HookDispatchInteractor resolve_handler 拡張の前提）。撤廃対象（domain policy.rs）: command_contains_git 関数・NESTED_GIT_REFERENCE_MESSAGE 定数・非 git コマンドへの command_contains_git 呼び出し、env 無条件ブロック（ENV_COMMAND_MESSAGE 定数・effective_cmd == \"env\" 分岐）、command_contains_expansion（GIT_VARIABLE_BYPASS_MESSAGE 定数・command_contains_expansion 呼び出し）、has_output_redirect 一括ブロック（check_simple_command 冒頭の has_output_redirect guard と OUTPUT_REDIRECT_MESSAGE 定数）、FILE_WRITE_COMMANDS（tee）と FILE_WRITE_COMMAND_MESSAGE 定数、sed -i チェック（has_sed_inplace_flag 呼び出し）。追加 1（raw コマンド文字列スキャンは usecase/GuardHookHandler、argv トークンスキャンは domain policy.rs）: SOTP_GUARDED_GIT の exact-match キーワードスキャンは 2 段階で実装する。(a) raw コマンド文字列スキャン: GuardHookHandler（libs/usecase/src/hook.rs）が check_commands を呼ぶ前に input.command の raw 文字列に対して SOTP_GUARDED_GIT exact-match スキャンを実施し、含まれていれば HookVerdict::block を早期返却する（SimpleCommand は raw 文字列を保持しないため、usecase 層の GuardHookHandler で行う）。(b) argv トークンスキャン: domain::guard::policy::check_commands（libs/domain/src/guard/policy.rs）の中で SimpleCommand.argv の各要素（quote-strip 済みトークン）に SOTP_GUARDED_GIT exact-match スキャンを追加し、含まれていれば block GuardVerdict を返す。check_commands のシグネチャ（&[SimpleCommand] → GuardVerdict）は変更しない。スキャンは Bash コマンド文字列のみ対象（CN-04）。追加 2（usecase TestFileDeletionGuardHandler）: block-test-file-deletion 用のリダイレクト先テストファイルパターン照合 — TestFileDeletionGuardHandler の handle メソッドで、SimpleCommand.redirect_texts のうち出力リダイレクト対象のみを表す SimpleCommand.output_redirect_texts に tests/ または /tests/ パスパターンが含まれる場合に GuardVerdict::block を返すロジックを追加する（CN-07: redirect_texts の redirect-target 契約を、方向判定済み subset の output_redirect_texts で実装する）。domain 層の policy::check_commands にはリダイレクト先パターン照合ロジックを追加せず、usecase 層のハンドラ側で完結させる。維持するチェック（domain policy.rs）: direct git subcommand checks（git add / commit / push / switch / merge / rebase / cherry-pick / reset / checkout -b / branch -d）・launcher stripping（COMMAND_LAUNCHERS / LAUNCHER_POSITIONAL_ARGS / LAUNCHER_SPECIFIC_OPTIONS_WITH_ARG / skip_var_assignments）・is_bin_sotp_overwrite。ユニットテスト: echo hello > /tmp/file.txt が allow になること（OUT-redirect 解禁 AC-04）/ ls | tee output.txt が allow になること（tee 解禁 AC-04）/ sed 's/a/b/' file.txt が allow になること（sed -i なし解禁 AC-04）/ env cargo test が allow になること（env 解禁 AC-04）/ $(pwd) を含むコマンドが allow になること（コマンド置換解禁 AC-04）/ SOTP_GUARDED_GIT=1 git commit が block されること（AC-03）/ quote-strip 後の argv に SOTP_GUARDED_GIT トークンが含まれる場合に block されること（AC-03）/ git add が引き続き block されること（AC-05）/ is_bin_sotp_overwrite が引き続き block されること（AC-05）/ tests/foo.rs をリダイレクト先に持つコマンドが TestFileDeletionGuardHandler で block されること（AC-06）。前提: なし（独立タスク）。",
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "usecase 層に GitRefUpdateHandler と GitPrePushHandler を実装し、HookDispatchInteractor.resolve_handler に git-ref-update と git-pre-push エントリを追加する (IN-01 / CN-08)。実装内容: libs/usecase/src/hook.rs（または hook 関連モジュール）に GitRefUpdateHandler struct と GitPrePushHandler struct を追加し、それぞれ HookHandler trait を impl する。両ハンドラのロジック: SOTP_GUARDED_GIT トークンの有無はヘキサゴナルアーキテクチャの境界を守るため usecase 層で直接 std::env::var を呼ばない。代わりに、CLI 合成ルート（apps/cli-composition/）が起動時に std::env::var(\"SOTP_GUARDED_GIT\").is_ok() を評価し、その結果を bool フラグ（guarded_git_token_present）として HookDispatchInteractor::new() に注入する。HookDispatchInteractor はこのフラグを内部フィールドとして保持し、resolve_handler 呼び出し時に GitRefUpdateHandler / GitPrePushHandler のコンストラクタ引数として渡す。両ハンドラは注入されたフラグが true であれば HookVerdict::allow()、false であれば HookVerdict::block（policy.rs の remediation メッセージ定数を再利用）を返す。HookInput.command の raw 文字列は参照しない（command 文字列は block-direct-git-ops ハンドラの SOTP_GUARDED_GIT キーワードスキャン（IN-03）の対象であり、git-ref-update / git-pre-push ハンドラの通行証判定とは別物）（CN-02: SOTP_GUARDED_GIT 環境変数の有無のみで判定・人間/AI 判別なし）。libs/usecase/src/hook_dispatch.rs の HookDispatchInteractor::resolve_handler に「git-ref-update」と「git-pre-push」の match arm を追加する。両ハンドラは type-catalogue において has_stripped_fields: true かつ docs に \"Private field: guarded_git_token_present: bool\" と宣言されているため、Box::new(GitRefUpdateHandler { guarded_git_token_present }) と Box::new(GitPrePushHandler { guarded_git_token_present }) の形で構築する（CN-08）。これらのハンドラは shell コマンドを解析しないため parser フィールドは持たない（GuardHookHandler とは異なる）。domain 層の HookName enum の GitRefUpdate / GitPrePush variant は T001 で追加されるため（type-catalogue の action: modify と整合）、T001 完了を前提とした形で実装する。ユニットテスト: HookDispatchInteractor::new(...).dispatch(\"git-ref-update\", ...) が HookDispatchError::UnknownHookName を返さないこと（ハンドラが登録されていること）/ guarded_git_token_present: true で構築した HookDispatchInteractor が git-ref-update で allow を返すこと / guarded_git_token_present: false で構築した HookDispatchInteractor が git-ref-update で block を返すこと / git-pre-push も同様に allow/block が正しいこと。前提: T001（HookName::GitRefUpdate / GitPrePush の追加と policy.rs の SOTP_GUARDED_GIT スキャン実装後、メッセージ定数が確定していること）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T003",
       "description": "infrastructure/git_cli 層の Command::new(\"git\") 単一通過点で子プロセス環境に SOTP_GUARDED_GIT を設定する (IN-02 / CN-03)。変更対象: libs/infrastructure/src/git_cli/ 内の git コマンドを起動するコード（SystemGitRepo の output() メソッドまたは同等の Command 構築箇所）。.env(\"SOTP_GUARDED_GIT\", \"1\") を Command::new(\"git\") の直後に追加し、sotp 経由のすべての git 呼び出し（cargo make track-commit-message / track-add-paths / track-branch-create / track-pr-push 等）が自動的に通行証を持つようにする（CN-03: 注入点は Rust コード内の単一通過点のみ）。ユニットテスト: SystemGitRepo が git コマンドを起動する際に子プロセス環境に SOTP_GUARDED_GIT が含まれることを確認するユニットテスト（Command の envs を検査するか、テスト用の git ラッパーを使って env 変数の存在を確認）。integration 観点: cargo make track-commit-message が reference-transaction フックを通過し（SOTP_GUARDED_GIT あり → allow）、ターミナルから直接 git commit を実行すると block されること（SOTP_GUARDED_GIT なし → block）を想定した記述をコメントで残す（実際の E2E テストは T009 に委ねる）。前提: T001（policy.rs の変更完了）、T002（GitRefUpdateHandler / GitPrePushHandler 実装完了）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T004",
       "description": "infrastructure/verify 層に hooks_path::verify 関数を追加し bin/sotp verify hooks-path サブコマンドとして公開する (IN-09)。ci-local への verify gate 組み込みは T006 で行う（T004 単独では ci-local へ組み込まない）。変更内容: libs/infrastructure/src/verify/ に hooks_path.rs モジュールを新規追加し、infrastructure::verify::hooks_path::verify(root: &std::path::Path) -> VerifyOutcome を実装する。verify 関数は git config --local core.hooksPath の値を読み取り、.githooks に等しければ pass / 未設定または異なる値であれば non-zero VerifyOutcome を返す。git config の読み取りは std::process::Command::new(\"git\").args([\"config\", \"--local\", \"core.hooksPath\"]) を直接使用する（verify は read-only であり SOTP_GUARDED_GIT が注入される SystemGitRepo を経由する必要はなく、許容残余として扱う）。libs/infrastructure/src/verify/mod.rs に pub mod hooks_path を追加する。apps/cli/src/commands/verify.rs の VerifyCommand enum に HooksPath(VerifyArgs) variant を追加し、bin/sotp verify hooks-path として呼び出せるようにする（IN-09）。apps/cli-composition/src/verify.rs（または相当ファイル）に hooks_path verify 呼び出しを追加する。Makefile.toml に verify-hooks-path-local タスク（cargo run --quiet -p cli -- verify hooks-path）と compose ラッパータスクを追加するが、この時点では ci-local の依存チェーンに組み込まない（ci-local への組み込みは T006 で bootstrap ステップと同時に実施して per-task CI を維持する）。ユニットテスト: core.hooksPath が .githooks の場合に pass VerifyOutcome を返すこと / 未設定の場合に non-zero（error）VerifyOutcome を返すこと / .githooks 以外の値の場合に non-zero VerifyOutcome を返すこと。前提: T001（policy.rs 変更により verify 専用 git read は independent パスで可）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T005",
       "description": "apps/cli-composition/src/hook.rs の block verdict 生成を stdout から stderr へ変更する (IN-07 / AC-08)。変更箇所: block 分岐で生成する CommandOutcome { stdout: if reason.is_empty() { None } else { Some(reason) }, stderr: None, exit_code: 2 } を CommandOutcome { stdout: None, stderr: if reason.is_empty() { None } else { Some(reason) }, exit_code: 2 } に変更する（D6 の stdout → stderr 移行）。変更対象は block 分岐のみであり、allow や他の非 block stdout パスは変更しない（D6 は block reason の出力先変更のみを規定する）。apps/cli/src/commands/hook.rs の execute 関数が CommandOutcome.stderr を eprintln! で出力していることを確認し、block verdict に対して block 理由が確実に stderr に届く経路が機能していることを確認する。必要であれば hook.rs 側の block 経路の出力コードも修正するが、allow や他の分岐の出力コードは変更しない。ユニットテスト: block verdict を返す場合の CommandOutcome が stdout: None / stderr: Some(reason) / exit_code: 2 であること / allow の場合は CommandOutcome::success を返すこと（allow 分岐は変更しないことを確認）。前提: なし（cli-composition 層の独立変更）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T007",
       "description": ".githooks/ ディレクトリに reference-transaction フックと pre-push フックを配置する (IN-01 / AC-01)。変更内容: .githooks/reference-transaction（実行可能属性付き shell ファイル）を新規作成する。内容: #!/bin/sh / exec \"$(git rev-parse --show-toplevel)/bin/sotp\" hook dispatch git-ref-update \"$@\" の 2 行シム。.githooks/pre-push（実行可能属性付き shell ファイル）を新規作成する。内容: #!/bin/sh / exec \"$(git rev-parse --show-toplevel)/bin/sotp\" hook dispatch git-pre-push \"$@\" の 2 行シム。実行可能属性の保証: gitattributes はファイルのテキスト / バイナリ属性等を制御するが git hook ファイルの実行可能 bit を設定する機能を持たない。そのため、両ファイルは git index に実行可能属性で登録する必要がある。具体的には (1) ファイル作成後 git update-index --chmod=+x .githooks/reference-transaction .githooks/pre-push を実行してリポジトリに実行可能 bit でコミットする方法、または (2) bootstrap ステップ（T006）で chmod +x .githooks/reference-transaction .githooks/pre-push を実行する方法のいずれかで保証する。両方を組み合わせて用いてもよい（リポジトリに実行可能属性でコミット + 新規チェックアウト後の bootstrap で chmod +x）。core.hooksPath を有効化した後にフックが実行されるためにはファイルが実行可能である必要がある。AC-01 の確認: reference-transaction フックが --no-verify で迂回できないことが git のドキュメントで確認でき、フック本体が bin/sotp hook dispatch git-ref-update へ exec するシムとして実装されていること。前提: T002（git-ref-update / git-pre-push ハンドラが実装済みであること。フック本体は 2 行だが、dispatch 先が存在しないと runtime で HookDispatchError::UnknownHookName になる）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T006",
       "description": "bootstrap hooksPath 設定ステップ追加 + ci-local への verify-hooks-path gate 組み込み + block-direct-git-ops の runtime fail-closed 実装 (IN-08 / IN-09 の ci-local 統合 / IN-10 / CN-06 / AC-09 / AC-10 / AC-11)。変更内容 (A) bootstrap: Makefile.toml の bootstrap タスクに「git config core.hooksPath .githooks」を設定するステップを追加する。このステップは bootstrap タスク内の cargo make ci / cargo make ci-local が実行されるステップよりも前に配置しなければならない（core.hooksPath 未設定の状態で verify-hooks-path-local が実行されると CI が fail するため）。git config core.hooksPath が既に .githooks に設定済みの場合は \"[OK] core.hooksPath already set\" と出力してスキップする（AC-09）。変更内容 (A2) ci-local 統合: T004 で実装した verify-hooks-path-local タスクを ci-local の依存チェーンに組み込む。bootstrap ステップ（A）と同一コミットに含めることで、ci-local 組み込み後も cargo make ci が bootstrap 済み環境で green を維持する。なお bootstrap タスク内のステップ順が「core.hooksPath 設定 → ci-local 実行」となっていることを確認する（順序が逆だと新規チェックアウト後の cargo make bootstrap が verify-hooks-path-local で fail する）（AC-10）。変更内容 (B) runtime fail-closed: ヘキサゴナルアーキテクチャの境界を守るため、domain 層 / usecase 層内で直接 std::process::Command::new(\"git\") を呼び出して core.hooksPath を読み取ってはならない。代わりに CLI 合成ルート（apps/cli-composition/）が起動時に std::process::Command::new(\"git\").args([\"config\", \"--local\", \"core.hooksPath\"]) を実行し（これは T002 で HookDispatchInteractor::new に追加した guarded_git_token_present と同様の注入パターン）、「.githooks に設定済みかどうか」を bool フラグ（hooks_path_configured）として HookDispatchInteractor::new() に注入する。HookDispatchInteractor は GuardHookHandler のコンストラクタにこのフラグを渡し、GuardHookHandler.handle が git コマンドを検知したときに hooks_path_configured == false であれば block する追加ロジックを実装する（CN-06: core.hooksPath 未設定時は fail-closed）。core.hooksPath が .githooks に設定済み（hooks_path_configured == true）の場合はこの追加ブロックは発火しない（AC-11）。ユニットテスト: bootstrap タスクの追加ステップを含む Makefile.toml の変更が cargo make ci を break しないことを T009 で確認する / hooks_path_configured: false で構築した HookDispatchInteractor が block-direct-git-ops で git コマンドを block すること（AC-11）/ hooks_path_configured: true で構築した HookDispatchInteractor で git コマンドへの追加ブロックが発火しないこと（AC-11）。前提: T001（policy.rs 変更完了）、T002（handler 実装完了）、T004（verify-hooks-path-local タスク実装完了）、T007（.githooks/reference-transaction と .githooks/pre-push の実際のフックファイル作成完了 — core.hooksPath を .githooks に設定する前にフックファイルが存在しなければならない。フック不在状態で core.hooksPath を有効化すると runtime fail-closed が無効化された状態でフック層が保護しない窓が生まれるため）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T008",
       "description": "knowledge/conventions/bash-write-guard.md（CON-07）を D4 に合わせて改訂する (IN-11 / AC-12)。改訂内容: Layer 2 節（Output/writable redirects ブロック・tee ブロック・sed -i ブロック）を削除または「撤廃済み」として記録する。Overview 節と Layer 1 節は維持する（permissions.deny の touch / cp / mv 等は引き続き有効）。Layer 2 撤廃の動機として「file-lock hooks（file-lock-acquire / file-lock-release）の撤去により保護対象が消滅したこと（D4 supersede）」を記述する。Accepted Residual Risks 節の file-write ベクターのうち Layer 2 撤廃に伴い不要になった行（redirect / tee / sed -i 関連の記述）を削除または更新する。Design Decision 節を D4 の内容を反映した記述に書き換える（コマンド文字列スキャン方式から git hooks プロセスレベル enforcement へ移行したことを反映）。AC-12 の確認: 改訂後のドキュメントに Layer-2 ブロック撤廃と file-lock hooks 撤去という動機の消滅が記述されていること。前提: T001（撤廃対象のコードが実際に削除されていることをドキュメントと整合させる）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T009",
       "description": "CI グリーン確認 + 全 acceptance criteria の横断検証 (AC-13)。cargo make ci を実行し、fmt-check / clippy / nextest / deny / check-layers / verify-arch-docs / verify-orchestra / verify-hooks-path を含むすべての gate が pass することを確認する（verify-hooks-path は T004 で ci-local 依存チェーンに追加される新規 gate）。T001-T008 完了後に実施する。確認する AC: AC-01（.githooks/reference-transaction と .githooks/pre-push の存在と内容）/ AC-02（SOTP_GUARDED_GIT 注入により cargo make track-commit-message が reference-transaction を通過することの E2E 確認）/ AC-03（policy.rs の SOTP_GUARDED_GIT スキャン動作）/ AC-04（ブランケットブロック撤廃後の正当な操作 allow）/ AC-05（精密チェックが引き続き機能すること）/ AC-06（redirect 先テストファイルパターン照合が機能すること）/ AC-07（permissions.deny と FORBIDDEN_ALLOW に新規エントリが追加されていないこと）/ AC-08（block verdict の reason が stderr に出力されること）/ AC-09（bootstrap の core.hooksPath 設定ステップ）/ AC-10（bin/sotp verify hooks-path が core.hooksPath 未設定時に CI を fail させること、verify-hooks-path gate が cargo make ci に含まれることを確認）/ AC-11（block-direct-git-ops の runtime fail-closed）/ AC-12（bash-write-guard.md の改訂内容）/ AC-13（cargo make ci の全 gate pass）。clippy warnings が発生した場合は同タスク内で修正する。前提: T001-T008 完了。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {
@@ -71,7 +62,9 @@
           "テスト: AC-03 / AC-04 / AC-05 / AC-06 をカバーするユニットテストを同タスクで追加・更新する。",
           "変更対象層: domain（libs/domain/src/hook/types.rs の HookName 拡張 + libs/domain/src/guard/policy.rs のブランケットブロック撤廃 + SOTP_GUARDED_GIT スキャン追加）と、usecase（libs/usecase/src/hook.rs の TestFileDeletionGuardHandler）へのリダイレクト先テストファイルパターン照合追加の 2 層にまたがる。"
         ],
-        "task_ids": ["T001"]
+        "task_ids": [
+          "T001"
+        ]
       },
       {
         "id": "S2",
@@ -82,7 +75,9 @@
           "既存の GuardHookHandler / TestFileDeletionGuardHandler の dispatch パスを壊さずに拡張する (CN-08)。",
           "T001 で追加された HookName::GitRefUpdate / GitPrePush variant を前提とする。"
         ],
-        "task_ids": ["T002"]
+        "task_ids": [
+          "T002"
+        ]
       },
       {
         "id": "S3",
@@ -92,7 +87,9 @@
           "cargo make track-commit-message 等 sotp 経由のすべての書き込み git 呼び出しが自動的に通行証を持つ設計（single-point injection）。CN-03 の対象は書き込み git 呼び出しであり、T004 / T006 の read-only git config 読み取りは明示的例外として CN-03 の対象外。",
           "AI（Claude Code Bash tool）によるインライン注入は D3 キーワードスキャン（IN-03）が阻止する。"
         ],
-        "task_ids": ["T003"]
+        "task_ids": [
+          "T003"
+        ]
       },
       {
         "id": "S4",
@@ -101,7 +98,9 @@
           "infrastructure/verify/hooks_path.rs に core.hooksPath 検査関数を追加し、bin/sotp verify hooks-path として公開する (IN-09)。",
           "未設定または .githooks 以外の値の場合に non-zero VerifyOutcome を返す関数とサブコマンドを実装する（ci-local への gate 組み込みは T006 で bootstrap ステップと同時に実施）。"
         ],
-        "task_ids": ["T004"]
+        "task_ids": [
+          "T004"
+        ]
       },
       {
         "id": "S5",
@@ -111,7 +110,9 @@
           "apps/cli/src/commands/hook.rs が CommandOutcome.stderr を eprintln! で出力していることを確認する。",
           "この変更は小さいが重要: block が silent になっている現状を解消し、remediation 指示が AI に届くようになる。"
         ],
-        "task_ids": ["T005"]
+        "task_ids": [
+          "T005"
+        ]
       },
       {
         "id": "S7",
@@ -122,7 +123,9 @@
           "実行可能属性の保証: gitattributes はファイルの実行可能 bit を設定する機能を持たないため、git update-index --chmod=+x による index への実行可能属性でのコミットか、bootstrap ステップ（T006）での chmod +x のいずれかで保証する。",
           "判定ロジックは Rust hook アーキテクチャ（T002 の GitRefUpdateHandler / GitPrePushHandler）に委譲し、シム自体は 2 行のみ。"
         ],
-        "task_ids": ["T007"]
+        "task_ids": [
+          "T007"
+        ]
       },
       {
         "id": "S6",
@@ -134,7 +137,9 @@
           "三重担保の構成: setup（bootstrap / T006-A）+ CI verify（bin/sotp verify hooks-path / T004 実装 + T006 ci-local 統合）+ runtime fail-closed（T006-B）。",
           "runtime fail-closed は git hooks 層が不在の状態でも Claude Code フックが最低限の防御を維持することを保証する。"
         ],
-        "task_ids": ["T006"]
+        "task_ids": [
+          "T006"
+        ]
       },
       {
         "id": "S8",
@@ -144,7 +149,9 @@
           "Layer 2（output redirect 一括 / tee / sed -i）撤廃と file-lock hooks 撤去による動機消滅を記述する。",
           "Layer 1（permissions.deny: touch / cp / mv 等）は維持する。"
         ],
-        "task_ids": ["T008"]
+        "task_ids": [
+          "T008"
+        ]
       },
       {
         "id": "S9",
@@ -154,7 +161,9 @@
           "clippy warnings が発生した場合は同タスク内で修正する。",
           "全 acceptance criteria（AC-01 through AC-13）の横断確認を行い、残存する問題を修正する。"
         ],
-        "task_ids": ["T009"]
+        "task_ids": [
+          "T009"
+        ]
       }
     ]
   }

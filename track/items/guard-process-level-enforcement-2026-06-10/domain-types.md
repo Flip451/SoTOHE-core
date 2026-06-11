@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| HookName | enum | modify | BlockDirectGitOps, BlockTestFileDeletion, GitRefUpdate, GitPrePush | 🟡 | 🔵 |
+| HookName | enum | modify | BlockDirectGitOps, BlockTestFileDeletion, GitRefUpdate, GitPrePush | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -14,7 +14,7 @@
 | HookContext | value_object | reference | — | 🔵 | 🔵 |
 | HookInput | value_object | reference | — | 🔵 | 🔵 |
 | HookVerdict | value_object | reference | — | 🔵 | 🔵 |
-| SimpleCommand | value_object | reference | — | 🔵 | 🔵 |
+| SimpleCommand | value_object | modify | — | 🔵 | 🔵 |
 
 ## Error Types
 

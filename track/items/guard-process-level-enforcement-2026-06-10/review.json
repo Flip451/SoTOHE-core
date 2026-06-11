@@ -1,6 +1,1045 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T16:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T16:26:07Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:27:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:29:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:22:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:24:33Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect scan treats every `redirect_texts` entry as an output target, but this field also carries input-redirect words and heredoc bodies in the parser. As written, benign commands like `cat < tests/foo.rs` or a heredoc that mentions `tests/foo.rs` will be blocked even though they do not truncate a test file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 155,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:8419ea8749755d722a4da9a969d720b4671570c0d5017790dca0417a14ebe683",
+          "at": "2026-06-11T01:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new test-file redirect check only runs on the top-level `commands` slice after `check_commands_for_test_deletion` returns. Shell re-entry payloads (`bash -c`, `sh -c`, etc.) are only recursed for `rm` detection in `check_commands_for_test_deletion`, so a command like `bash -c 'echo hi > tests/foo.rs'` bypasses this guard and can still truncate a test file. The redirect check needs to be applied inside the recursive path as well.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 155,
+              "category": "security"
+            },
+            {
+              "message": "`redirect_texts` includes flattened heredoc bodies as well as actual redirect destinations, but this loop treats every entry as a filesystem path. That means a benign command with an output redirect and a heredoc containing `tests/foo.rs` can be blocked even though no redirect targets a test file. The redirect-target predicate needs to distinguish real output destinations from heredoc content.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 157,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:55cf57be253002cd997cb57a5726bff50ab2c712305cbc2312fb7fef3e6b1d83",
+          "at": "2026-06-11T01:59:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Skipping any redirect target that contains whitespace lets quoted output targets bypass the new test-file guard. A command like `echo hi > 'tests/foo bar.rs'` would be treated as a non-path heredoc/body and allowed, even though it can still truncate a test file.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 197,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f36afd505e8028961ab043371a643dfae9aebd7680d3332e540e96b2575edc27",
+          "at": "2026-06-11T02:06:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new raw-token guard is too broad: `command.contains(SOTP_GUARDED_TOKEN)` blocks any command string that merely contains `SOTP_GUARDED_GIT` as a substring, including benign literals such as comments, echoed text, or filenames like `SOTP_GUARDED_GITX`. The downstream domain check uses exact token/assignment matching specifically to avoid this class of false positive, so the pre-parse scan should use token boundaries rather than a plain substring search.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 54,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e79dcea6f7fc22930b8effba9e7e76afba1a2a64aa119d62c8f8e98df925ebdb",
+          "at": "2026-06-11T02:10:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect check is direction-blind: `redirect_texts` contains input-redirect targets and heredoc bodies as well as output targets, so any command that merely reads from a test file and also has an output redirect (or a heredoc body that looks like a test path) will be blocked even though it is not truncating the test file. This needs redirect-type filtering, not a flat scan of `redirect_texts`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 198,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0df90eb73acdb6720bc09448ee5bd35998cc63c90383b4d7bc3bebbe96064524",
+          "at": "2026-06-11T02:18:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Redirect-to-test-file blocking is only applied once to the top-level raw command string and only recognizes stdout-style operators. A nested payload like `bash -c 'echo hi > tests/foo.rs'` is never checked, and redirects such as `2>`, `1>` or `&>` are ignored, so the truncation bypass remains.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 185,
+              "category": "security"
+            },
+            {
+              "message": "`raw_command_contains_guarded_token` only checks the trailing boundary, so it also matches the token as a suffix inside longer identifiers like `MY_SOTP_GUARDED_GIT=1`. That contradicts the exact-match behavior in the domain policy and will falsely block unrelated commands.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 353,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c854f902dea07ab6f3c2a0a6ee19d945716ae14b5556cc2231f6da09cc10a1d6",
+          "at": "2026-06-11T02:25:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect guard depends on `tokenize(command)`, which only splits on whitespace and quotes. Shell-valid write forms like `echo hi>tests/foo.rs` or `echo hi > tests/foo.rs; true` keep the redirect operator/terminator attached to the target token, so `is_test_file` sees `hi>tests/foo.rs` or `tests/foo.rs;` and the test-file block is bypassed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 191,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:da4ad0159df591405004290139492a0e58a5073442641a1d71524bd691d07dfc",
+          "at": "2026-06-11T02:33:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d3627cccd10054e159bea941f520dce73a3f5b51ea98c3a1664f3292a59c2a8",
+          "at": "2026-06-11T02:41:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d3627cccd10054e159bea941f520dce73a3f5b51ea98c3a1664f3292a59c2a8",
+          "at": "2026-06-11T02:46:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect-to-test-file guard is bypassed on parser failures: the existing fail-closed path only checks `raw_mentions_rm`, so a valid Bash command that the parser rejects or refuses due to nesting depth can still run and truncate a test file with `> tests/foo.rs`. The same rm-only fallback is used for shell re-entry errors/depth limits, so the new AC-06 redirect protection is not fail-closed in the cases where parsing cannot produce `redirect_texts`. Block parse/depth failures that mention an output redirect to an `is_test_file` target, or fail closed for Bash parse errors in this hook.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 145,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7d3627cccd10054e159bea941f520dce73a3f5b51ea98c3a1664f3292a59c2a8",
+          "at": "2026-06-11T02:50:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fail-closed raw redirect scanner claims to catch `>|`, but this branch only advances past `>>`; for `>| tests/foo.rs` it starts tokenization at `|`, immediately stops on the pipe delimiter, and returns false. When parsing fails or the shell re-entry depth limit is hit, a clobber redirect to a test file can therefore be allowed instead of blocked.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 410,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0267ba8ae733ac2140a73faad15da2e1aaa176272dada63e3856504d111ddaba",
+          "at": "2026-06-11T02:57:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_mentions_output_redirect_to_test_file` treats every `>&` as fd duplication and skips it, but Bash also accepts `>& file` as a stdout+stderr file redirect. If the parser rejects that Bash extension, `echo hi >& tests/foo.rs` reaches this fail-closed fallback, `raw_mentions_rm` is false, this helper returns false, and the hook allows a valid truncating redirect to a test file. The fallback needs to distinguish numeric fd duplication (`2>&1`, `>&2`, `>&-`) from file targets and block `>& tests/...` targets.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 399,
+              "category": "data_loss"
+            }
+          ],
+          "hash": "rvw1:sha256:26499d32cfe0cc87a805bff825dee943659687874097d8846ce0f015d388cd7b",
+          "at": "2026-06-11T03:02:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0075da5b7fd2b70ca77fcca82d959216e8a4cd6abcf8560702947103adaa148",
+          "at": "2026-06-11T03:06:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect guard only compares the unevaluated `redirect_texts` / raw token text against `is_test_file`, so shell-expanded destinations are still a bypass. A command like `echo hi > $TEST_DIR/foo.rs`, `echo hi > ${VAR}/tests/foo.rs`, or `echo hi > $(printf tests/foo.rs)` will not match the literal test-file patterns here, and the parse-failure fallback at `raw_mentions_output_redirect_to_test_file` has the same blind spot. That leaves the test-file truncation vector open for dynamically constructed redirect targets.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 180,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7548b97be217da767bfbe609df68a2a3cccfbd3bc8188134ed5edc8e67c86401",
+          "at": "2026-06-11T06:59:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The parse-error fallback is not actually fail-closed for writable redirects because it explicitly skips `<>` as if it were read-only. A malformed command such as `echo foo <> tests/foo.rs` can therefore bypass the new guard and reach `allow()` even though `<>` is a write-capable redirect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 428,
+              "category": "security"
+            },
+            {
+              "message": "The raw redirect scanner tokenizes targets by raw whitespace and only trims outer quotes, so quoted or escaped redirect paths with spaces are missed in the parse-error fallback. For example, `echo foo > \"tests/foo bar.rs\"` or `echo foo > tests/foo\\ bar.rs` will not be recognized as test-file redirects after a parse failure, which breaks the intended fail-closed behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 446,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f9a76a0fc88b3156783c1fc08ea846e4156eace9c93cbd63aff5c7d4abc00fc9",
+          "at": "2026-06-11T07:09:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`redirect_target_has_shell_expansion()` only treats `$` and backticks as dynamic. That leaves Bash process substitution and other non-`$` expansion forms unblocked, so a command like `echo hi > >(cat > tests/foo.rs)` can still reach a test-file write path without tripping either the parsed redirect check or the raw fallback. This is a bypass of the new truncation guard.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 516,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b34938d310c6c162c39205436e94c8cc84be37fe9e32e108fcbe59d251e8ac40",
+          "at": "2026-06-11T07:18:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`redirect_texts` is not limited to output redirect targets here; the surrounding comment says it also carries input redirects and heredoc bodies. As a result, this loop can block harmless commands that merely read from a test file or contain a heredoc body mentioning a test-like path, even when the actual output target is safe. That makes the new guard broader than the intended test-file output truncation check.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 170,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d0715bf2dc8eb584dabfb6f5266df8472ee943c0517553a70176abc5d5d95940",
+          "at": "2026-06-11T07:27:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect guard only treats `$`, backticks, and `>(`/`<(` as dynamic. Bash brace/glob expansions are still accepted, so a command like `echo > {t,}ests/foo.rs` can expand to `tests/foo.rs` and bypass the block on both the parse-success and parse-error paths. This leaves a test-file truncation path open.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 651,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ec318a8ffdf5b03ea6f8d714f50314b16741ebc6a42b4438a1a0c1c60f10cc42",
+          "at": "2026-06-11T07:39:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_raw_redirect_target` only skips spaces and tabs before the target, so a writable redirect split across a newline (`echo foo >\\n tests/foo.rs`) is not recognized. That lets a test-file truncation bypass the new guard.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 591,
+              "category": "security"
+            },
+            {
+              "message": "The new raw-string redirect scan is applied to the entire shell input, so it cannot distinguish literal heredoc/comment text from a real redirect. A harmless heredoc like `cat <<EOF > /tmp/out.txt\\n> tests/foo.rs\\nEOF` will be blocked because the body line is rescanned as `>` + test-file target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 185,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:735a70c81261d1a4405155bb971676a99b99fa474ab63e5ad944918abc0c003d",
+          "at": "2026-06-11T07:47:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`guarded_output_redirect_target_in_chars` recurses on every nested `$(...)` it sees in a redirect target, but there is no depth cap or iterative limit. A deeply nested command-substitution payload can exhaust the stack and crash the hook before parsing, which is a denial-of-service risk on untrusted input.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 451,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:79fcc69ed2b8fe8509f845fb750bbe5505fb1fb165bea4327fd3e0d8d5cd5fa0",
+          "at": "2026-06-11T07:56:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`redirect_target_has_shell_expansion()` does not recognize tilde expansion or Bash extglob forms, so a command like `echo foo > ~/tests/foo.rs` can resolve to a protected test file without being blocked. Because `check_output_redirects_for_test_files()` relies on this helper for both parsed and fail-closed paths, this is a guard bypass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 808,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b46cfbe4fb4323baaacd128144ab1c7b2c07ccbd5f6bafb10532f71a7281d9e3",
+          "at": "2026-06-11T08:04:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect scanner dequotes the target before checking for shell expansion, so any quoted literal filename containing shell metacharacters is treated as dynamic and blocked. For example, `echo hi > '$HOME/out.txt'` or `echo hi > 'build/[1].txt'` would be rejected even though they are ordinary file names, which over-blocks the new redirect allowance path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 603,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d89b5164854eaeadcff2c4fb00fce72bb7f7dea53009b164ed960bac016f30f2",
+          "at": "2026-06-11T08:11:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `raw_command` branch returns before the parsed `redirect_texts` loop, so the normal path no longer uses the parser’s canonical redirect metadata. That makes the new guard rely on a heuristic string scan instead of the AST, which over-blocks valid redirects such as `echo > report{final}.txt` where braces are literal (no brace expansion).",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 186,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:67f09bef1ac857ac32bd18f38053391187bf3e71f8a7aa4c335bb96fcc54ab98",
+          "at": "2026-06-11T08:37:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:457c6107e564a54293aedebdcb140accdecfd0cd0d745fd85f00cb573fa0237e",
+          "at": "2026-06-11T08:49:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files` ignores the parser-provided `cmd.redirect_texts` whenever raw command text is available. That makes the guard depend solely on the raw heuristic; for example a Bash command substitution using backticks inside double quotes can still be parsed into a nested `SimpleCommand` with `has_output_redirect=true` and `redirect_texts=[\"tests/foo.rs\"]`, but the raw scanner skips the quoted backtick body and returns `None`, so the truncating redirect is allowed. Fall back to the parsed redirect targets when the raw scan finds nothing, or make the raw scanner cover these parsed cases.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 186,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:457c6107e564a54293aedebdcb140accdecfd0cd0d745fd85f00cb573fa0237e",
+          "at": "2026-06-11T08:53:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files` confirms parsed redirects by rescanning the entire raw command, and the raw scanner treats any unquoted `>` in that whole string as a writable redirect. Once a command has one real output redirect, valid non-redirect text later in the same command can cause a block; for example `echo ok > /tmp/out # > tests/foo.rs` has a safe redirect target, but the comment is scanned as if it were an output redirect to a test file. This violates the redirect-target-only behavior and can regress legitimate Bash commands. Restrict the raw confirmation to actual redirect spans/targets from the parser or make the raw scan shell-aware enough to ignore comments and other non-redirect contexts.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 186,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cafebef879b8a3477d298f0bb298cf8825e697753704a4d18a326fc4640fda46",
+          "at": "2026-06-11T09:01:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect guard now blocks any output target that contains shell expansion syntax, not just targets classified by `is_test_file`. That reintroduces the D4 expansion/redirect blanket block that this task is supposed to remove: legitimate commands such as `echo ok > \"$TMPDIR/out\"` will be blocked even when the target is not a test file. CN-07/AC-06 only require blocking redirect targets matching the test-file patterns.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 575,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e620a75da9029040f33f538b2ef5b0db4cb759dff779fbf7e7a081123f7e40fe",
+          "at": "2026-06-11T09:06:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw redirect target scanner does not stop a target at another redirection operator. A command like `echo data >/tmp/out>tests/foo.rs` is valid shell syntax with two output redirects, but `read_raw_redirect_target` consumes `/tmp/out>tests/foo.rs` as one non-test target and advances past the second `>`, so the write to `tests/foo.rs` is allowed. This bypasses the new test-file truncation guard for glued redirects; the target reader should terminate on unquoted `<`/`>` and continue scanning the next redirect.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 729,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:9efa5819fe2d4ee51b21327f238c5f46a0c9258f08b7d6c5b3117e0d5bf0b281",
+          "at": "2026-06-11T09:16:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Production code in `hook.rs` now runs through line 1028 before the test module, exceeding the AGENTS.md hard cap of 700 production lines per module. This change adds the raw redirect scanner and related helpers into an already shared hook dispatch module, so the module is now outside the required maintainability boundary; split the new redirect/raw-scan logic into a focused production submodule while keeping tests exempt from the count.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 406,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:ba38d09a3bc414d74ce833bdc7f0d7a05b16cf62004bd8099fca932b1799e03b",
+          "at": "2026-06-11T09:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw redirect word reader does not stop at `)`, so grouped commands can bypass the filename-based test-file patterns. For example, `(echo content > src/user_test.rs)` is a real output redirect to a test file, but the scanner reads the target as `src/user_test.rs)`, `is_test_file` returns false, and the handler allows the truncation because the parsed `redirect_texts` fallback is skipped when a raw command is present.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 434,
+              "category": "correctness"
+            },
+            {
+              "message": "`strip_heredoc_bodies` treats `<<` inside shell comments as an active heredoc delimiter. A command like `echo ok > /tmp/out # <<EOF\\n> src/user_test.rs\\nEOF` has a real redirect-only second line, but this code blanks that line before the raw scan; since `check_output_redirects_for_test_files` returns solely from the raw scan whenever `raw_command` is set, the parser's test-file redirect target is ignored and the guard allows the truncation.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 544,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:febb71ae207c73a420879f453b5782840a2cfd22724ad2f57334c47d19529193",
+          "at": "2026-06-11T09:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect guard can be bypassed with Bash dollar-quoted static targets. For example, `echo content > $'tests/foo.rs'` redirects to `tests/foo.rs` in Bash, but the raw scanner treats the leading `$` as part of the filename and does not classify it as a test file. Because this branch returns the raw-scan result instead of also checking `cmd.redirect_texts`, the Bash command is allowed and can still truncate a test file. Check the parser-provided redirect targets as well, or normalize dollar-quoted words in the raw scanner.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 115,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0a06a654ec7c97e9565cd2b1fa1183e3df14de41d3194c34e5a6d7eba0531268",
+          "at": "2026-06-11T09:48:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw redirect scanner treats Bash ANSI-C quoted targets as ordinary single-quoted text and does not decode escapes. Bash decodes these before opening the redirection target, so a command like `: > $'te\\x73ts/foo.rs'` writes to `tests/foo.rs`, while this scanner sees `te\\x73ts/foo.rs` and allows it. That leaves the new redirect-to-test-file truncation guard bypassable; decode ANSI-C quoted words or use parsed static redirect targets as a backstop.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 427,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:db4e5ce993ced1eab98c4cd8a566b3f7180563012b94ae2a90cd6c731f028cc6",
+          "at": "2026-06-11T09:54:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: `read_raw_word` treats an escaped newline in a redirect target as a literal newline. Bash removes backslash-newline before parsing, so `echo x > src/user_\\\ntest.rs` writes to `src/user_test.rs`, but this scanner builds `src/user_\\ntest.rs`, `is_test_file` returns false, and the raw scan path prevents falling back to `SimpleCommand.redirect_texts`. This lets the test-file redirect guard be bypassed for `*_test.rs`/`test_*.rs` targets split with a line continuation.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 406,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:22a65ac7ca66b2655b626e67f970e3314cea14c8f2ae58a9145a38c0449489cb",
+          "at": "2026-06-11T10:04:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_heredoc_delimiters` treats any unquoted `<<` as a heredoc opener, including Bash arithmetic left shifts. A valid command like `echo $((1 << 2))\n> tests/foo.rs` will mark `2` as a pending heredoc delimiter, blank the following redirect-only line in `strip_heredoc_bodies`, and then `guarded_output_redirect_target_in_raw_command` misses the test-file truncation. Because parsed redirects are bypassed whenever the raw command path is used, this leaves an AC-06 redirect-to-test-file bypass.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 592,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:447a82f90b71b530bbf859b524375e8909b499f9bd9cb664a0a283a612fada46",
+          "at": "2026-06-11T10:15:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files` ignores the parser's redirect targets whenever a raw command is available and instead scans the whole command string for any unquoted `>`. That makes non-redirection syntax block as soon as the same Bash command has any safe output redirect; for example `[[ foo > tests/foo.rs ]] > /tmp/out` does not write to `tests/foo.rs`, but this raw scan returns `tests/foo.rs` and blocks. For parsed commands, use `SimpleCommand.redirect_texts` for actual output targets and keep raw scanning only for parse-error or otherwise unparsed fallback paths.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 112,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:bac83fd23d7ccc15e7e6c1a8100bd280b89670d5800de392d3005779597e17ce",
+          "at": "2026-06-11T10:24:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw redirect scanner skips the entire `[[ ... ]]` conditional before looking for command substitutions. Bash still executes substitutions inside `[[ ]]`, so a command like `[[ $(echo x > tests/foo.rs) == x ]] > /tmp/out` advances past the inner `> tests/foo.rs`; the remaining outer redirect is safe, and the handler can allow a test-file truncation. Scan substitutions inside conditionals before skipping comparison operators, or fall back to parsed `redirect_texts` for extracted commands.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 310,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4ae86a96579b8e0d97e76710282d62d5e1b2d07b52e2fa78fd0574366eaf3cb5",
+          "at": "2026-06-11T10:33:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The raw redirect scanner does not pass the recursive scan start into the conditional/arithmetic skip helpers, so backtick command substitutions that begin with `[[ ... ]]` are not recognized as conditionals. For example, a safe command such as `echo \u001b[[ foo > tests/foo.rs ]]\u001b > /tmp/out` with backticks around the `[[ ... ]]` body will be raw-scanned because of the safe outer redirect, then the `>` comparison inside `[[ ]]` is treated as an output redirect to a test file and incorrectly blocked. Use the current scan start when checking raw boundaries in recursive scans.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 552,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c41d302e8f4718d4a274e03dd2bd8af2b4a3c14f68ce4bfe8f9b5088664591ab",
+          "at": "2026-06-11T10:39:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files` returns solely from the raw-command scan whenever raw text is available, so it never falls back to parser-discovered nested redirects. The raw scanner consumes a quoted redirect target as one word without scanning command substitutions inside it; for example `echo ok > \"$(echo x > tests/foo.rs)\"` executes the inner redirect and can truncate `tests/foo.rs`, but the raw scan returns `None` and the nested parsed `SimpleCommand` with `redirect_texts=[\"tests/foo.rs\"]` is ignored. This leaves an AC-06 test-file truncation bypass.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 108,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a6b7a3e13c987a3af67fd1589f58ebe021f3278ee5601342052ab59ff40b756c",
+          "at": "2026-06-11T10:46:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:214cca8ebd70217448171a994813245d792afb5e77ef14c939f34ba47aaf9510",
+          "at": "2026-06-11T10:52:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: The raw redirect scan treats arithmetic expansion as opaque and skips past it before checking for `$(...)`/backticks. Bash allows command substitutions inside `$((...))`, so a command like `echo $(( $(echo ok > tests/foo.rs) + 1 ))` can hide the test-file redirect from this guard. This is a security bypass in the new `block-test-file-deletion` path.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 318,
+              "category": "security"
+            },
+            {
+              "message": "P0: `scan_substitution_at` stops descending once `MAX_RAW_REDIRECT_SCAN_DEPTH` is reached and silently returns `None`, so deeply nested but valid command substitutions are not inspected at all. An attacker can wrap `> tests/foo.rs` in more than 16 nested `$()`/backticks and bypass the test-file redirect block.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 367,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d6117657dc9f0cd864fe59dd8f5cff07c011e73f5daff20146fc399f83d1a046",
+          "at": "2026-06-11T12:07:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files()` now short-circuits to the raw-string scanner for every parsed Bash command, but `read_raw_word()` stops at the first unquoted whitespace. A valid redirect such as `echo content > $(printf tests/foo.rs)` is therefore reduced to the literal target `$(printf)` and the nested substitution that yields `tests/foo.rs` is never examined, so the new test-file redirect guard can be bypassed on the main success path. This needs to inspect `cmd.redirect_texts` or recurse through substitution content instead of relying only on the raw substring.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 108,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8c8ba535ec36e7c4ccdbb35ea17b8d97d154143c4eeaab3e8fd0810b7f3c50cf",
+          "at": "2026-06-11T12:17:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Successful parses never consult `SimpleCommand.redirect_texts` here because the `Some(raw_command)` branch returns immediately after the raw scan. That makes the new redirect guard bypassable for valid test-file names that contain characters the raw scanner treats as terminators, such as `)` or `&` (for example, `echo > tests/foo(test).rs` or `echo > tests/foo&bar.rs`).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 108,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a1768b35c528e08f37b018af4db532fd12daf2a0ddac94662b72612301035d0b",
+          "at": "2026-06-11T12:28:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: `raw_text_substitution_mentions_test_file` only matches contiguous literals inside `$()`/backticks, so a redirect target assembled from pieces (for example `$(printf '%s%s' tests/ foo.rs)`) is missed and the guard can still allow writes to `tests/foo.rs`.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 545,
+              "category": "security"
+            },
+            {
+              "message": "P1: `scan_raw_redirect_targets` recurses into every command substitution in the whole command, not just the redirect target, so a harmless command like `echo \"$(printf 'tests/foo.rs')\" > /tmp/out` will be blocked even though the redirected file is safe.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 326,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f136d6f018789782395421806e7daa712567982d6dede8aae3c2c152de79cd88",
+          "at": "2026-06-11T12:43:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file` only rejoins up to 5 tokens. A command substitution can split `tests/foo.rs` across 6+ pieces and bypass the `tests/` detection, so a redirect like `> $(printf '%s%s%s%s%s%s' t e s t s /foo.rs)` can still truncate a test file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 545,
+              "category": "security"
+            },
+            {
+              "message": "The new raw redirect scan only runs when `cmd.has_output_redirect` is already true. If the shell parser successfully tokenizes a command but misses an output-redirect classification, this guard never runs and the truncation bypass remains open for any redirect syntax the parser does not recognize.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 106,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:5f1289a2bebc1db438104552cfce6db40343880058ba5f513799fd619e9390a7",
+          "at": "2026-06-11T12:58:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file()` only reconstructs a candidate path by concatenating literal tokens, so it misses command substitutions that synthesize a test-file target through format strings or shell variables. For example, `echo content > $(printf '%s/%s' tests foo.rs)` can still resolve to `tests/foo.rs` but will not match `is_test_file()`, so the new redirect guard can be bypassed.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 545,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:5561e0b98cbaea3b9ef1e1e0fb25bb4ba9b5f35b4845bd365d5048ba61788e8d",
+          "at": "2026-06-11T13:08:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file()` returns `Some(\"dynamic command substitution redirect target\")` even when no test-file path was found, and its callers treat any `Some` as a block. That means safe redirect targets that use `$()`/backticks (for example `> $(mktemp)` or a quoted literal backtick filename) are rejected, not just redirects to test files. This regresses the D4 redirect liberalization and should only block when an actual test-file path is detected.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 545,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4d73d1b13e4b4e7432cb0afbfc5b36646ef0ccb2888bd1cf8b6de9cc211f1a14",
+          "at": "2026-06-11T13:16:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect guard still only catches literal targets and a narrow subset of substitutions. A redirect like `echo foo > $OUT`, `echo foo > ${DIR}/tests/foo.rs`, or `echo foo > \"$(echo tests/foo.rs)\"` can still resolve to a test file and bypass this check, so the truncation/deletion vector remains open.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 107,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ebdaf0369e5b41657ce5b6cefa476a9c81f779bffe7da9fca5ae1e1b2bc67994",
+          "at": "2026-06-11T13:26:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-parse redirect scanner treats every bare `>` outside `[[...]]`/arithmetic/substitution as an output redirection. That means valid POSIX `[` comparisons such as `[ \"$a\" > tests/foo.rs ]` are now blocked even though no file is being written. This is a correctness regression in the hook’s Bash handling.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 333,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:935224c037cc8ef76d5bfd7ed7039986fdf3345453417050a347164404097df6",
+          "at": "2026-06-11T13:33:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file()` does not model inline parameter expansion inside a path fragment, so redirects like `echo content > te${X}sts/foo.rs` (or `tes${X}t_user.rs`) can expand to a test file without matching `is_test_file()` or the current tokenization heuristics. Because `check_output_redirects_for_test_files()` relies on this helper for both parse-success and parse-error paths, this is a bypass of the new redirect-to-test-file guard.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 549,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8ea73c57c161c7a880b2a9c94bc59744e14ffb548487c0e34e3b2711d965f4b8",
+          "at": "2026-06-11T13:43:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file()` only simulates command substitutions through token joining and `%s`-style `printf` rendering. A redirect target synthesized with other common `printf` forms such as `%b`/``-style escapes is not recognized, so a command like `echo > $(printf '%b' '\\164\\145\\163\\164\\163/\\146\\157\\157\\.\\162\\163')` can still write to `tests/foo.rs` without being blocked.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 552,
+              "category": "security"
+            },
+            {
+              "message": "The production portion of this module is now 706 lines, which exceeds the repository's 700-line maximum for a module. This pushes `libs/usecase/src/hook.rs` over the allowed size threshold and makes the hook layer harder to reason about safely.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 706,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:5aa5d4a3e13de1e2c101e0971bb8f8821675090ee19ef60008d6c685788d9cb0",
+          "at": "2026-06-11T13:57:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7d2f05965056dbb6904d1f048ac03664564a82bacbeb825658c0801610be67f",
+          "at": "2026-06-11T14:08:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`strip_single_bracket_tests` blanks every `[ ... ]` span before redirect scanning, but `[ ... ]` can also be ordinary words in a simple command. A valid command such as `echo [ > tests/foo.rs ]` writes to `tests/foo.rs`; the raw scan erases the redirect, and `check_output_redirects_for_test_files` then checks parser `redirect_texts` against that stripped raw string and allows the truncation. The same pattern can hide redirects inside command substitutions within a single-bracket test. This reopens the test-file truncation bypass AC-06 is trying to close.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 529,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d7d2f05965056dbb6904d1f048ac03664564a82bacbeb825658c0801610be67f",
+          "at": "2026-06-11T14:13:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect scanner can miss a test-file target embedded as the literal fallback of a braced parameter expansion. For example, `echo content > ${OUT:-tests/foo.rs}` reaches `raw_text_substitution_mentions_test_file`, but because the target contains `/` it is not treated as an opaque variable, `raw_inline_parameter_expansion_mentions_test_file` treats the whole `${...}` as a parameter with no literal text, and the function returns `None`. If `OUT` is unset, Bash redirects to `tests/foo.rs`, bypassing the test-file truncation guard this change is meant to enforce. The braced expansion body needs to be inspected for test-file literals or fail-closed when it can produce a test path.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 543,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e8068013b3a2d3c8081b0905a95b4ffa3f2b65c43e6be1ac598487134c60312b",
+          "at": "2026-06-11T14:21:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:232f65974954ea1b0434fcf331524713c5c53a5c5775e0bdc93201cb7b33d368",
+          "at": "2026-06-11T14:32:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_commands_for_test_deletion` now blocks every shell re-entry once `depth >= MAX_REENTRY_DEPTH`, even when the nested payload is harmless. The previous logic only failed closed at the cap when the inner payload still mentioned `rm`, so this change will false-positive legitimate deeply nested `bash -c` / `sh -c` wrappers.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 85,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0ab8a73c4dd6df6fb1df6ff3e5e82f804333610fc278d3edc3b4a4d22e882076",
+          "at": "2026-06-11T16:25:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: once `depth >= MAX_REENTRY_DEPTH`, nested shell payloads are silently skipped instead of being checked or failed closed. That reopens a bypass where a 4-level `bash -c` / `sh -c` chain can hide `rm` or an output redirect to `tests/**` beyond the cap and this guard will allow it. The previous implementation fail-closed at the depth limit; this version no longer protects the cap boundary.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 85,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ef66f9062288d91ecadfedd256973fd06ff6309542d5d966881e18eb2d9f25b3",
+          "at": "2026-06-11T16:31:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:998559273fd2b5ae646a4dd8ebe37e3062526e020090c5614e27ab075a9ab836",
+          "at": "2026-06-11T16:36:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_file_rm_arg` scans the entire argv for an `rm` token instead of stopping once it has seen the actual command. As a result, benign commands like `echo rm tests/foo.rs` or `git rm tests/foo.rs` are treated as direct `rm` invocations and blocked, even though the `rm` token is only an argument/subcommand. The previous implementation only accepted `rm` at command position after assignments/launchers; this refactor should restore that distinction and add a negative test for an argv where `rm` is not the command.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 123,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:998559273fd2b5ae646a4dd8ebe37e3062526e020090c5614e27ab075a9ab836",
+          "at": "2026-06-11T16:40:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_file_rm_arg` skips launcher tokens but immediately returns `None` on the launcher’s own flags/operands, so wrapped deletions such as `env -i rm tests/foo.rs`, `timeout 5 rm tests/foo.rs`, or `sudo -u root rm tests/foo.rs` are allowed. These launchers are explicitly modeled as transparent prefixes, so their arguments need to be skipped until the real command token is reached; otherwise the test-file deletion guard can be bypassed.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 131,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:30bfb9e8a7a4efd362d768e15399555e380345247ccd5bc0ee847c0e424037e1",
+          "at": "2026-06-11T16:45:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`git diff` for this scope only contains the deletion of `hook.rs`; the replacement `hook/` module files are untracked, so they would not be part of the submitted patch. As committed, `libs/usecase/src/lib.rs`'s `pub mod hook;` would have no tracked `hook.rs` or `hook/mod.rs`, breaking compilation and removing the public hook API. Add the new module files to the change set with the deletion.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 1,
+              "category": "build"
+            },
+            {
+              "message": "`test_file_output_redirect_target` treats every `redirect_texts` entry as a writable target whenever `has_output_redirect` is true, but `SimpleCommand.redirect_texts` also includes input redirect targets and heredoc delimiters. A command like `cat < tests/foo.rs > /tmp/out` would have `has_output_redirect = true` and include `tests/foo.rs` in `redirect_texts`, so this blocks a permitted read from a test file while writing only to `/tmp`. Track output redirect targets separately or filter by redirect direction before applying `is_test_file`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 155,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c5af360f4c1fcc9eb5c3fdf3568081b6ce63bcc3f28f63b57f09f3b5b9e3917f",
+          "at": "2026-06-11T16:52:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:605e3ea1a97bd041d1587bb28396df8507f96b0ec9a8c227211cd6bb3f3ea10a",
+          "at": "2026-06-11T17:38:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:605e3ea1a97bd041d1587bb28396df8507f96b0ec9a8c227211cd6bb3f3ea10a",
+          "at": "2026-06-11T17:43:00Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`argv_contains_guarded_token` only blocks tokens that are exactly `SOTP_GUARDED_GIT`. A quote-split assignment like `SOTP_GUARDED_GI\"T\"=1` is tokenized to `SOTP_GUARDED_GIT=1`, then falls through `skip_var_assignments` and is allowed, so the D3 quote-splitting bypass is still open. The added tests only cover the bare token and an unrelated partial-token allow case; add a regression for the quoted-assignment form and broaden the predicate so that the guarded token cannot be reintroduced as an assignment token.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 543,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:950e2f404da1efa751e3dc0aa1022c11e749ed320d1d5b39ee7ff9479e8497c1",
+          "at": "2026-06-11T01:53:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
+          "at": "2026-06-11T01:58:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
+          "at": "2026-06-11T02:00:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
+          "at": "2026-06-11T17:38:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
+          "at": "2026-06-11T17:41:39Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:39:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:42:41Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -406,6 +1445,49 @@
           "findings": [],
           "hash": "rvw1:sha256:a83d43f177acbd13a82b1d5c81cf65120cc5dc71b9a51519f9a1e38f0ca21731",
           "at": "2026-06-11T01:11:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4f82c3771929da12267f366089eafd3e9c59f76b5e02ab20232acaa41102eac",
+          "at": "2026-06-11T01:51:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4f82c3771929da12267f366089eafd3e9c59f76b5e02ab20232acaa41102eac",
+          "at": "2026-06-11T01:54:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect-target contract is split across the plan artifacts: this file introduces `SimpleCommand.output_redirect_texts` as the field to scan, but `plan.md`/`impl-plan.json` and the scope spec still describe CN-07/IN-05 in terms of `SimpleCommand.redirect_texts`. That leaves two competing source-of-truth field names for the same behavior, so implementers cannot tell which contract is canonical.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/guard-process-level-enforcement-2026-06-10/domain-types.json",
+              "line": 131,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f153ab04a1cfd6c0d6c2f5c096fd5eefce547989751c99c3cbf5f0cf9cd8b4f3",
+          "at": "2026-06-11T17:37:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b704ba8ee739fd2ab500815d6e8d9dbdcb2660191df85086874510a8847a954",
+          "at": "2026-06-11T17:43:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b704ba8ee739fd2ab500815d6e8d9dbdcb2660191df85086874510a8847a954",
+          "at": "2026-06-11T17:46:15Z"
         }
       ]
     }

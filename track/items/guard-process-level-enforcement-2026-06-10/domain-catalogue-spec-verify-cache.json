@@ -129,6 +129,22 @@
         "kind": "pass",
         "citation": "D3 の quote-strip 済み argv トークンスキャンも同パーサー経由で実施し、独自トークナイザーの実装を禁止する"
       }
+    },
+    {
+      "claim_hash": "db5e4ff3368748a2273701da494457c8bd431e9e7a73fc6a87275db4a4dc7f7b",
+      "evidence_hash": "ccaf7062e90f00194373c74117d4892c0effac5ce53d0486bf53534863a3a9ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リダイレクト解禁（D4）により可能になる「> tests/foo.rs」形式の truncation を SimpleCommand.redirect_texts に対するパターンマッチで block する"
+      }
+    },
+    {
+      "claim_hash": "db5e4ff3368748a2273701da494457c8bd431e9e7a73fc6a87275db4a4dc7f7b",
+      "evidence_hash": "6c3a9e6a1d3cddf85dfec5684c7960eabd163f25bd69f2cd17692483d2b84f68",
+      "verdict": {
+        "kind": "pass",
+        "citation": "block-test-file-deletion にリダイレクト先ターゲットのテストファイルパターン照合を追加し、リダイレクト解禁後の「> tests/foo.rs」形式の truncation を block する"
+      }
     }
   ]
 }

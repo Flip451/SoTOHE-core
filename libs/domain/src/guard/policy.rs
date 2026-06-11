@@ -115,33 +115,15 @@ const GIT_CHERRY_PICK_MESSAGE: &str = "[Git Policy] Direct `git cherry-pick` is 
 const GIT_RESET_MESSAGE: &str = "[Git Policy] Direct `git reset` is blocked. Resetting must be \
      done manually by the user.";
 
-const GIT_VARIABLE_BYPASS_MESSAGE: &str = "[Git Policy] Shell variable or command substitution is blocked. \
-     Use literal values only. This pattern is not needed in the template workflow.";
-
-const ENV_COMMAND_MESSAGE: &str = "[Git Policy] `env` command is blocked. \
-     Use `VAR=val command` shell syntax instead. \
-     The `env` command creates bypass vectors and is not needed in the template workflow.";
-
-const NESTED_GIT_REFERENCE_MESSAGE: &str = "[Git Policy] Non-git command contains a git reference in its arguments. \
-     Git operations must use literal `git` commands, not wrappers or nested invocations.";
+const SOTP_GUARDED_TOKEN_MESSAGE: &str = "[Git Policy] The guarded-git token is present in the Bash command string. \
+     The token must not be passed inline — it is injected only by the sotp binary via its git_cli layer.";
 
 const BIN_SOTP_OVERWRITE_MESSAGE: &str = "[Build Policy] Direct copy to `bin/sotp` is blocked. \
      Use `cargo make build-sotp` which includes runtime verification to prevent glibc mismatch.";
 
-const OUTPUT_REDIRECT_MESSAGE: &str = "[File-Write Policy] Output redirect (>, >>, >|, <>) is blocked. \
-     Use the Write/Edit tool for file modifications, or `cargo make` wrappers for controlled writes.";
-
-const FILE_WRITE_COMMAND_MESSAGE: &str = "[File-Write Policy] File-write command is blocked. \
-     Use the Write/Edit tool for file modifications, or `cargo make` wrappers for controlled writes.";
-
-/// Commands that write to files (blocked in direct Bash).
-const FILE_WRITE_COMMANDS: &[&str] = &["tee"];
-
-/// Known shells for recursive `-c` payload inspection.
-/// Used by the existing recursive parse in `split_shell` which already handles
-/// `bash -c` / `sh -c`. Listed here for future generalization to other shells.
-#[allow(dead_code)]
-const KNOWN_SHELLS: &[&str] = &["bash", "sh", "dash", "zsh", "ash"];
+/// The exact token string scanned in argv to block inline token injection (D3/IN-03).
+/// This must be an exact-match scan so that normal words containing substrings are not affected.
+const GUARDED_GIT_TOKEN: &str = "SOTP_GUARDED_GIT";
 
 /// Converts a parse error into a fail-closed block verdict.
 ///
@@ -172,16 +154,25 @@ pub fn check_commands(commands: &[SimpleCommand]) -> GuardVerdict {
 }
 
 /// Checks a single simple command against the policy.
+///
+/// Blanket blocks from ADR 0080 (D1/D2/D4) and CON-07 (output redirect, tee, sed -i)
+/// have been retired per ADR 2026-06-10-1630-git-hooks-process-level-enforcement D4.
+/// Enforcement of git write operations is now handled at the process level via
+/// git hooks (reference-transaction / pre-push). The retained checks are:
+///   - D3: SOTP_GUARDED_GIT exact-match scan over quote-stripped argv tokens
+///   - D4 (maintained): direct git subcommand checks, launcher stripping, is_bin_sotp_overwrite
 fn check_simple_command(cmd: &SimpleCommand) -> GuardVerdict {
-    // Check output redirects first — even redirect-only commands (empty argv)
-    // like `> /tmp/file` must be blocked.
-    if cmd.has_output_redirect {
-        return GuardVerdict::block(OUTPUT_REDIRECT_MESSAGE);
-    }
-
     let argv = &cmd.argv;
     if argv.is_empty() {
         return GuardVerdict::allow();
+    }
+
+    // D3/IN-03 (b): argv-token exact-match scan for the guarded-git token.
+    // Blocks attempts to inject the token via quote-splitting (e.g., SOTP_GUARDED_GI"T"=1).
+    // The raw-string scan (stage a) is performed by GuardHookHandler (usecase layer) before
+    // calling this function, since SimpleCommand does not carry the original raw string.
+    if argv_contains_guarded_token(argv) {
+        return GuardVerdict::block(SOTP_GUARDED_TOKEN_MESSAGE);
     }
 
     // Skip VAR=val assignments and command launchers to find the effective command
@@ -194,33 +185,6 @@ fn check_simple_command(cmd: &SimpleCommand) -> GuardVerdict {
 
     let effective_cmd = basename(&argv[effective_start]).to_lowercase();
 
-    // Block `env` command unconditionally.
-    if effective_cmd == "env" {
-        return GuardVerdict::block(ENV_COMMAND_MESSAGE);
-    }
-
-    // Block variable/command substitution ANYWHERE in argv or redirect texts.
-    // The template workflow never needs $VAR, $(cmd), or `cmd` in any position.
-    if command_contains_expansion(cmd) {
-        return GuardVerdict::block(GIT_VARIABLE_BYPASS_MESSAGE);
-    }
-
-    // --- File-write guards (CON-07) ---
-    // Note: output redirect check is at the top of check_simple_command
-    // (before the empty-argv short-circuit) to catch redirect-only commands.
-
-    // Block known file-write commands (tee).
-    if FILE_WRITE_COMMANDS.contains(&effective_cmd.as_str()) {
-        return GuardVerdict::block(FILE_WRITE_COMMAND_MESSAGE);
-    }
-
-    // Block `sed` with `-i` flag (in-place edit).
-    if effective_cmd == "sed" && has_sed_inplace_flag(argv, effective_start) {
-        return GuardVerdict::block(FILE_WRITE_COMMAND_MESSAGE);
-    }
-
-    // --- End file-write guards ---
-
     // Direct git command — check specific subcommands
     if effective_cmd == "git" {
         return check_git_command(argv, effective_start);
@@ -229,14 +193,6 @@ fn check_simple_command(cmd: &SimpleCommand) -> GuardVerdict {
     // Block `cp` (or `mv`) targeting `bin/sotp` — must use `cargo make build-sotp`.
     if is_bin_sotp_overwrite(argv, effective_start) {
         return GuardVerdict::block(BIN_SOTP_OVERWRITE_MESSAGE);
-    }
-
-    // Non-git command: block if any argv token or redirect text (including
-    // heredoc bodies) contains "git" (case-insensitive). This catches ALL
-    // nesting patterns (shell -c, python -c, find -exec, xargs, heredocs,
-    // etc.) without per-tool option parsing.
-    if command_contains_git(cmd) {
-        return GuardVerdict::block(NESTED_GIT_REFERENCE_MESSAGE);
     }
 
     GuardVerdict::allow()
@@ -460,42 +416,6 @@ fn skip_command_launchers(argv: &[String], start: usize) -> usize {
     i
 }
 
-/// Checks if `sed` is invoked with the `-i` (in-place edit) flag.
-///
-/// Scans ALL tokens (not just until the first non-flag) because `-i` can
-/// appear after `-e expr` or `-f script` which consume the next token.
-fn has_sed_inplace_flag(argv: &[String], effective_start: usize) -> bool {
-    let tokens = argv.get(effective_start + 1..).unwrap_or_default();
-    let mut skip_next = false;
-    for token in tokens {
-        if skip_next {
-            skip_next = false;
-            continue;
-        }
-        // Stop at `--` end-of-options marker — anything after is a positional filename
-        if token == "--" {
-            break;
-        }
-        // `-e` and `-f` consume the next token (expression / script file).
-        // Skip it to avoid treating the operand as a flag.
-        if token == "-e" || token == "-f" {
-            skip_next = true;
-            continue;
-        }
-        if token == "-i"
-            || token.starts_with("-i=")
-            || token == "--in-place"
-            || token.starts_with("--in-place=")
-        {
-            return true;
-        }
-        // Note: combined short flags like -ni/-Ei are NOT checked here to
-        // avoid false positives (e.g., `sed -finit.sed` where `-f` consumes
-        // the rest of the token as a filename). This is an accepted trade-off.
-    }
-    false
-}
-
 /// Checks if a command is `cp`, `mv`, or `install` targeting `bin/sotp` as
 /// the **destination**.
 ///
@@ -613,25 +533,37 @@ fn normalize_path(path: &str) -> String {
     parts.join("/")
 }
 
-/// Checks if any token in a slice contains "git" (case-insensitive).
-fn tokens_contain_git(tokens: &[String]) -> bool {
-    tokens.iter().any(|token| token.to_lowercase().contains("git"))
-}
-
-/// Checks if any argv token or redirect text contains expansion markers ($, backtick).
-fn command_contains_expansion(cmd: &SimpleCommand) -> bool {
-    cmd.argv.iter().any(|t| has_expansion_marker(t))
-        || cmd.redirect_texts.iter().any(|t| has_expansion_marker(t))
-}
-
-/// Checks if any argv token or redirect text contains "git" (case-insensitive).
+/// Checks whether any quote-stripped argv token contains the guarded-git token
+/// (D3/IN-03 stage b).
 ///
-/// Used to catch ALL nesting patterns (shell -c, python -c, find -exec, xargs,
-/// heredocs, etc.) without per-tool option parsing. False positives on words
-/// containing "git" (e.g. "digit", "legit") are acceptable — the template
-/// workflow does not need to pass git references through wrapper commands.
-fn command_contains_git(cmd: &SimpleCommand) -> bool {
-    tokens_contain_git(&cmd.argv) || tokens_contain_git(&cmd.redirect_texts)
+/// Blocks both the bare token (`SOTP_GUARDED_GIT`) and the assignment form
+/// (`SOTP_GUARDED_GIT=...`), so that quote-splitting bypasses such as
+/// `SOTP_GUARDED_GI"T"=1` — which the shell parser normalizes to `SOTP_GUARDED_GIT=1`
+/// — are also caught before `skip_var_assignments` has a chance to silently skip them.
+///
+/// Exact-match semantics on the token (or the variable-name portion of an assignment)
+/// prevent false positives on unrelated tokens whose names merely contain substrings
+/// of the guarded token.
+///
+/// The raw-command-string scan (stage a) is performed upstream in `GuardHookHandler`
+/// before `check_commands` is called, because `SimpleCommand` does not retain the
+/// original raw string.
+fn argv_contains_guarded_token(argv: &[String]) -> bool {
+    argv.iter().any(|token| {
+        // Bare token: exact match.
+        if token == GUARDED_GIT_TOKEN {
+            return true;
+        }
+        // Assignment form: the variable name (left of `=`) is exactly the guarded token.
+        // This catches `SOTP_GUARDED_GIT=1` produced by quote-splitting of
+        // `SOTP_GUARDED_GI"T"=1`.
+        if let Some(rest) = token.strip_prefix(GUARDED_GIT_TOKEN) {
+            if rest.starts_with('=') {
+                return true;
+            }
+        }
+        false
+    })
 }
 
 /// Returns the basename of a path-like token, stripping `.exe`/`.EXE`/`.Exe` suffix.
@@ -670,11 +602,6 @@ fn is_var_assignment(token: &str) -> bool {
     }
 }
 
-/// Checks if a token contains shell expansion markers ($, backtick).
-fn has_expansion_marker(token: &str) -> bool {
-    token.contains('$') || token.contains('`')
-}
-
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
@@ -694,6 +621,7 @@ mod tests {
                 let tokens: Vec<&str> = part.split_whitespace().collect();
                 let mut argv = Vec::new();
                 let mut redirect_texts = Vec::new();
+                let mut output_redirect_texts = Vec::new();
                 let mut has_output_redirect = false;
                 let mut skip_next = false;
                 for (i, &tok) in tokens.iter().enumerate() {
@@ -705,6 +633,7 @@ mod tests {
                         has_output_redirect = true;
                         if let Some(target) = tokens.get(i + 1) {
                             redirect_texts.push((*target).to_string());
+                            output_redirect_texts.push((*target).to_string());
                             skip_next = true;
                         }
                     } else if tok.contains('>') && !tok.starts_with('-') && !tok.contains(">&") {
@@ -712,25 +641,25 @@ mod tests {
                         has_output_redirect = true;
                         if let Some(target) = tokens.get(i + 1) {
                             redirect_texts.push((*target).to_string());
+                            output_redirect_texts.push((*target).to_string());
                             skip_next = true;
                         }
                     } else {
                         argv.push(tok.to_string());
                     }
                 }
-                SimpleCommand { argv, redirect_texts, has_output_redirect }
+                SimpleCommand { argv, redirect_texts, output_redirect_texts, has_output_redirect }
             })
             .filter(|cmd| !cmd.argv.is_empty() || cmd.has_output_redirect)
             .collect();
         check_commands(&commands)
     }
 
-    // -- Blocked git subcommands --
+    // -- AC-05: Blocked git subcommands (maintained precise checks) --
 
     #[rstest]
     #[case::git_add("git add .", "git add")]
     #[case::git_push("git push", "git push")]
-    #[case::git_commit_via_env_nohup("env VAR=val nohup git commit -m msg", "env")]
     #[case::git_branch_delete_upper_d("git branch -D feature", "branch")]
     #[case::git_branch_d_lowercase("git branch -d feature", "branch")]
     #[case::git_branch_delete_long_flag("git branch --delete feature", "branch")]
@@ -743,7 +672,7 @@ mod tests {
     #[case::git_cherry_pick("git cherry-pick abc1234", "cherry-pick")]
     #[case::git_reset("git reset HEAD~1", "reset")]
     #[case::git_reset_hard("git reset --hard HEAD~1", "reset")]
-    fn test_blocked_git_subcommands_contain_reason(
+    fn test_blocked_git_subcommands_with_direct_invocation_contain_reason(
         #[case] cmd: &str,
         #[case] reason_fragment: &str,
     ) {
@@ -758,31 +687,23 @@ mod tests {
         );
     }
 
+    // AC-05: launcher-wrapped direct git subcommands are still blocked
+    // Note: `&&`-chained commands (e.g. `cargo test && git add .`) are NOT tested here
+    // because the test helper only splits on `;` and `|`. The ConchShellParser (infrastructure)
+    // handles `&&` and produces two SimpleCommands; the policy-layer check correctly blocks
+    // the `git add` command when it arrives as a separate SimpleCommand.
     #[rstest]
     #[case::git_push_plain("git push")]
     #[case::git_with_global_options_add("git -C /tmp add .")]
     #[case::semicolon_chained_git_commit("echo hi; git commit -m msg")]
-    #[case::and_chained_git_add("cargo test && git add .")]
     #[case::piped_git_push("echo y | git push")]
     #[case::timeout_git_commit("timeout 30 git commit -m msg")]
     #[case::nice_git_add("nice -n 10 git add .")]
-    #[case::xargs_git_add("echo file.txt | xargs git add")]
-    #[case::sh_c_git_add("sh -c 'git add .'")]
-    #[case::zsh_c_git_commit("zsh -c 'git commit -m test'")]
-    #[case::find_exec_git_add("find . -exec git add {} \\;")]
-    #[case::find_exec_timeout_git_add("find . -exec timeout 30 git add {} \\;")]
-    #[case::find_exec_nice_git_commit("find . -exec nice -n 10 git commit -m msg {} \\;")]
-    #[case::xargs_nohup_git_push("echo file | xargs nohup git push")]
-    #[case::xargs_timeout_git_add("echo file | xargs timeout 30 git add")]
     #[case::git_checkout_upper_b("git checkout -B new-branch")]
     #[case::git_checkout_orphan("git checkout --orphan new-branch")]
     #[case::git_exe_add("git.exe add .")]
     #[case::absolute_path_git_exe("/usr/bin/git.exe add .")]
     #[case::git_upper_exe("git.EXE add .")]
-    #[case::bash_exe_c_git_push("bash.exe -c 'git push'")]
-    #[case::bash_mixed_exe("bash.Exe -c 'git push'")]
-    #[case::bash_rcfile_c_git_add("bash --rcfile /dev/null -c 'git add .'")]
-    #[case::bash_init_file_c_git_push("bash --init-file /etc/profile -c 'git push'")]
     #[case::timeout_signal_eq_kill_git_add("timeout --signal=KILL 30 git add .")]
     #[case::taskset_c_git_add("taskset -c 0 git add .")]
     #[case::taskset_plain_mask_git_add("taskset ff git add .")]
@@ -792,142 +713,19 @@ mod tests {
     #[case::command_p_git_add("command -p git add .")]
     #[case::exec_c_git_add("exec -c git add .")]
     #[case::exec_a_name_git_add("exec -a myname git add .")]
-    #[case::bash_heredoc_git_add("bash <<'SH'\ngit add .\nSH")]
-    #[case::python_heredoc_git_subprocess(
-        "python3 - <<'PY'\nimport subprocess; subprocess.run(['git','add','.'])\nPY"
-    )]
-    #[case::brace_group_heredoc_git_add("{ bash; } <<'SH'\ngit add .\nSH")]
-    #[case::subshell_heredoc_git_add("( bash ) <<'SH'\ngit add .\nSH")]
-    fn test_blocked_git_operations(#[case] cmd: &str) {
+    fn test_blocked_direct_git_operations_with_launchers(#[case] cmd: &str) {
         let v = check(cmd);
         assert!(v.is_blocked(), "expected blocked: {cmd}");
     }
 
-    // Special case: absolute_path_git has a label and different cmd value
+    // AC-05: absolute path git is still blocked
     #[test]
     fn test_absolute_path_git_is_blocked() {
         let v = check("/usr/bin/git add .");
         assert!(v.is_blocked());
     }
 
-    // -- Blocked: bash -c with git reference --
-
-    #[test]
-    fn test_bash_c_git_push_is_blocked() {
-        let v = check("bash -c 'git push origin main'");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("git reference"));
-    }
-
-    // -- Blocked: variable/command substitution --
-
-    #[rstest]
-    #[case::dollar_cmd_add("$CMD add")]
-    #[case::command_substitution_git("$(git_path) add .")]
-    #[case::dollar_cmd_status("$CMD status")]
-    #[case::which_ls_substitution("$(which ls) -la")]
-    #[case::backtick_substitution("`which cat` file.txt")]
-    #[case::redirect_to_cmd_sub_git_add("echo hi > $(git add .)")]
-    #[case::redirect_to_cmd_sub_git_push("cat foo >> $(git push)")]
-    #[case::find_exec_variable_bypass("find . -exec $CMD add \\;")]
-    #[case::xargs_variable_bypass("echo x | xargs $CMD commit")]
-    #[case::variable_bypass_branch_delete_uppercase("$CMD branch -D feature")]
-    #[case::variable_bypass_branch_delete_lowercase("$CMD branch -d feature")]
-    #[case::variable_bypass_branch_delete_long_flag("$CMD branch --delete feature")]
-    #[case::variable_bypass_branch_dr("$CMD branch -dr feature")]
-    #[case::variable_bypass_branch_double_dash("$CMD branch -- -dev")]
-    #[case::subshell_redirect_cmd_sub_git_add("(echo hi) > $(git add .)")]
-    #[case::for_iterator_cmd_sub_git_add("for x in $(git add .); do echo hi; done")]
-    #[case::case_subject_cmd_sub_git_add("case $(git add .) in foo) echo hi;; esac")]
-    fn test_blocked_variable_substitution(#[case] cmd: &str) {
-        let v = check(cmd);
-        assert!(v.is_blocked(), "expected blocked: {cmd}");
-    }
-
-    #[rstest]
-    #[case::dollar_cmd_add("$CMD add")]
-    #[case::command_substitution_git("$(git_path) add .")]
-    #[case::dollar_cmd_status("$CMD status")]
-    #[case::which_ls_substitution("$(which ls) -la")]
-    #[case::backtick_substitution("`which cat` file.txt")]
-    #[case::variable_bypass_branch_create("$CMD branch feature-x")]
-    fn test_blocked_variable_substitution_contains_reason(#[case] cmd: &str) {
-        let v = check(cmd);
-        assert!(v.is_blocked(), "expected blocked: {cmd}");
-        assert!(
-            v.reason.contains("variable or command substitution"),
-            "reason {:?} should contain 'variable or command substitution' for cmd {:?}",
-            v.reason,
-            cmd
-        );
-    }
-
-    // -- Blocked: env command (unconditional) --
-
-    #[rstest]
-    #[case::env_git_add("env git add .")]
-    #[case::env_s_git_add("env -S 'git add .'")]
-    #[case::env_split_string_git_push("env --split-string 'git push'")]
-    #[case::env_cargo_test("env cargo test")]
-    #[case::env_with_flags("env -i FOO=bar ls")]
-    #[case::timeout_env("timeout 30 env git status")]
-    #[case::env_with_combined_flags("env -iS'git add .'")]
-    #[case::env_with_escape("env -iSgit\\ push")]
-    #[case::env_with_separate_arg("env -iS 'git commit -m msg'")]
-    #[case::env_u_then_s_git_add("env -u FOO -S 'git add .'")]
-    #[case::env_c_dir("env -C /tmp git status")]
-    #[case::env_u_shell("env -uSHELL git status")]
-    #[case::env_u_s("env -uS git status")]
-    fn test_blocked_env_command_contains_reason(#[case] cmd: &str) {
-        let v = check(cmd);
-        assert!(v.is_blocked(), "expected blocked: {cmd}");
-        assert!(
-            v.reason.contains("env"),
-            "reason {:?} should contain 'env' for cmd {:?}",
-            v.reason,
-            cmd
-        );
-    }
-
-    // -- Blocked: python/shell with git reference --
-
-    #[rstest]
-    #[case::python3_c_git_subprocess(
-        r#"python3 -c "import subprocess; subprocess.run(['git', 'add', '.'])""#
-    )]
-    #[case::python3_12_c_git_subprocess(
-        r#"python3.12 -c "import subprocess; subprocess.run(['git', 'add', '.'])""#
-    )]
-    #[case::python_c_absolute_path_git(r#"python3 -c "subprocess.run(['/usr/bin/git', 'push'])""#)]
-    #[case::python_c_git_exe_subprocess(r#"python3 -c "subprocess.run(['git.exe', 'add', '.'])""#)]
-    #[case::xargs_python_c_git_push(
-        r#"echo x | xargs python3 -c "import os; os.system('git push')""#
-    )]
-    #[case::find_exec_python_c_git_add(
-        r#"find . -exec python3 -c "import subprocess; subprocess.run(['git', 'add', '.'])" \;"#
-    )]
-    #[case::python_c_git_branch_bundled_dr(
-        r#"python3 -c "subprocess.run(['git','branch','-dr','feature'])""#
-    )]
-    #[case::python_c_git_branch_bundled_r_upper_d(
-        r#"python3 -c "subprocess.run(['git','branch','-rD','feature'])""#
-    )]
-    #[case::python_c_git_branch_create(
-        r#"python3 -c "subprocess.run(['git','branch','feature'])""#
-    )]
-    #[case::python_c_git_branch_delete(
-        r#"python3 -c "subprocess.run(['git','branch','-D','feature'])""#
-    )]
-    #[case::python3_long_opt_c_git(
-        r#"python3 --check-hash-based-pycs always -c "import subprocess; subprocess.run(['git','add','.'])""#
-    )]
-    fn test_blocked_shell_with_git_reference(#[case] cmd: &str) {
-        let v = check(cmd);
-        assert!(v.is_blocked(), "expected blocked: {cmd}");
-    }
-
-    // -- Blocked: git checkout -b (branch create) --
-
+    // AC-05: git checkout branch-create variants are blocked; reason must mention "switch" or "checkout"
     #[rstest]
     #[case::checkout_b("git checkout -b new-branch")]
     #[case::checkout_upper_b("git checkout -B new-branch")]
@@ -935,20 +733,96 @@ mod tests {
     fn test_blocked_git_checkout_branch_create(#[case] cmd: &str) {
         let v = check(cmd);
         assert!(v.is_blocked(), "expected blocked: {cmd}");
+        assert!(
+            v.reason.contains("switch") || v.reason.contains("checkout"),
+            "reason {:?} should mention 'switch' or 'checkout' for cmd {:?}",
+            v.reason,
+            cmd
+        );
+    }
+
+    // -- AC-03: SOTP_GUARDED_GIT argv token exact-match scan (D3/IN-03 stage b) --
+
+    // AC-03/D3: exact-match argv-token scan — any argv position containing the bare
+    // SOTP_GUARDED_GIT token must be blocked, with a reason mentioning "guarded-git token".
+    #[rstest]
+    #[case::bare_solo_token(vec!["SOTP_GUARDED_GIT".to_string()])]
+    #[case::bare_token_as_first_arg(vec!["SOTP_GUARDED_GIT".to_string(), "git".to_string(), "commit".to_string()])]
+    fn test_argv_containing_bare_guarded_token_is_blocked(#[case] argv: Vec<String>) {
+        // Exact-match: only the bare token "SOTP_GUARDED_GIT" blocks.
+        // A value-suffix variant (e.g., "SOTP_GUARDED_GIT=1") is tested separately below.
+        let cmd = SimpleCommand {
+            argv,
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+        let v = check_commands(&[cmd]);
+        assert!(v.is_blocked(), "bare SOTP_GUARDED_GIT token in argv must be blocked");
+        assert!(v.reason.contains("guarded-git token"), "reason should mention guarded-git token");
+    }
+
+    #[rstest]
+    #[case::assignment_with_value(vec!["SOTP_GUARDED_GIT=1".to_string(), "ls".to_string()])]
+    #[case::assignment_empty_value(vec!["SOTP_GUARDED_GIT=".to_string()])]
+    fn test_argv_containing_guarded_token_as_assignment_var_is_blocked(#[case] argv: Vec<String>) {
+        // Regression for the quote-split bypass: SOTP_GUARDED_GI"T"=1 is parsed by the shell
+        // into the token SOTP_GUARDED_GIT=1 — which must be blocked before skip_var_assignments
+        // has a chance to silently discard it.
+        let cmd = SimpleCommand {
+            argv,
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+        let v = check_commands(&[cmd]);
+        assert!(v.is_blocked(), "SOTP_GUARDED_GIT=... assignment token in argv must be blocked");
+        assert!(v.reason.contains("guarded-git token"), "reason should mention guarded-git token");
     }
 
     #[test]
-    fn test_git_checkout_b_reason_contains_switch_or_checkout() {
-        let v = check("git checkout -b new-branch");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("switch") || v.reason.contains("checkout"));
+    fn test_argv_containing_partial_guarded_token_is_allowed() {
+        // Substring match must NOT block — exact match only
+        let cmd = SimpleCommand {
+            argv: vec!["SOTP_GUARDED".to_string(), "ls".to_string()],
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+        let v = check_commands(&[cmd]);
+        assert!(!v.is_blocked(), "partial match of SOTP_GUARDED_GIT token must be allowed");
     }
 
-    #[test]
-    fn test_git_checkout_orphan_reason_contains_switch_or_checkout() {
-        let v = check("git checkout --orphan new-branch");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("switch") || v.reason.contains("checkout"));
+    // -- AC-04: Retired blanket blocks are now allowed --
+
+    #[rstest]
+    #[case::output_redirect("echo hello > /tmp/file.txt")]
+    #[case::tee_pipeline("ls | tee output.txt")]
+    #[case::sed_without_inplace("sed 's/a/b/' file.txt")]
+    #[case::env_cargo_test("env cargo test")]
+    #[case::command_substitution_pwd("echo $(pwd)")]
+    #[case::dollar_home("echo $HOME")]
+    #[case::redirect_append("echo hi >> /tmp/file.txt")]
+    #[case::redirect_clobber("echo hi >| /tmp/file.txt")]
+    #[case::tee_standalone("tee output.txt")]
+    #[case::sed_inplace("sed -i 's/a/b/' file.txt")]
+    #[case::env_ls("env ls -la")]
+    fn test_retired_blanket_blocks_are_now_allowed(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(!v.is_blocked(), "expected allowed after D4 blanket block removal: {cmd}");
+    }
+
+    // -- AC-04 more: bash/python with git reference are now allowed (blanket gone) --
+
+    #[rstest]
+    #[case::bash_c_git_push_allowed("bash -c 'git push origin main'")]
+    #[case::python_c_no_git_reference(r#"python3 -c "print('hello world')""#)]
+    #[case::python_c_with_git_reference(
+        r#"python3 -c "import subprocess; subprocess.run(['git', 'add', '.'])""#
+    )]
+    fn test_non_direct_git_invocations_are_allowed_after_d4(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(!v.is_blocked(), "expected allowed after D4: {cmd}");
     }
 
     // -- Allowed commands --
@@ -960,14 +834,11 @@ mod tests {
     #[case::git_branch_create("git branch feature-x")]
     #[case::cargo_make_test("cargo make test")]
     #[case::empty_command("")]
-    // redirect_to_normal_file and redirect_to_file_without_git moved to blocked
-    // tests — output redirects are now blocked by CON-07 file-write guard.
     #[case::git_checkout_file_restore("git checkout -- file.txt")]
     #[case::git_branch_double_dash_dev("git branch -- -dev")]
     #[case::taskset_git_status("taskset -c 0 git status")]
     #[case::taskset_plain_mask_git_status("taskset ff git status")]
     #[case::taskset_cpu_list_eq_git_status("taskset --cpu-list=0 git status")]
-    #[case::python_c_no_git_reference(r#"python3 -c "print('hello world')""#)]
     #[case::bash_heredoc_without_git("bash <<'SH'\necho hello\nSH")]
     #[case::taskset_trailing_option_no_panic("taskset -o")]
     #[case::timeout_trailing_signal_no_panic("timeout -s")]
@@ -1023,7 +894,7 @@ mod tests {
         assert!(!v.is_blocked(), "expected allowed: {cmd}");
     }
 
-    // -- Blocked: file-write operations (CON-07) --
+    // -- Allowed: redirects and file-write operations (D4 — CON-07 blanket blocks retired) --
 
     #[rstest]
     #[case::redirect_stdout("echo hi > /tmp/file.txt")]
@@ -1036,16 +907,8 @@ mod tests {
     #[case::sed_inplace_suffix("sed --in-place=.bak 's/a/b/' file.txt")]
     #[case::sed_e_then_inplace("sed -e 's/a/b/' -i file.txt")]
     #[case::sed_f_then_inplace("sed -f script.sed -i file.txt")]
-    #[case::compound_redirect("{ echo hi; } > file.txt")]
-    #[case::subshell_redirect("(echo hi) >> file.txt")]
     #[case::redirect_only("> /tmp/file.txt")]
     #[case::readwrite_redirect("cmd <> file.txt")]
-    fn test_blocked_file_write_operations(#[case] cmd: &str) {
-        let v = check(cmd);
-        assert!(v.is_blocked(), "expected blocked: {cmd}");
-    }
-
-    #[rstest]
     #[case::input_redirect("sort < input.txt")]
     #[case::fd_dup_stderr_to_stdout("ls 2>&1")]
     #[case::fd_dup_stdout_to_stderr("echo err 1>&2")]
@@ -1053,9 +916,9 @@ mod tests {
     #[case::sed_f_script("sed -finit.sed file.txt")]
     #[case::sed_e_with_i_as_expr("sed -e -i input.txt")]
     #[case::sed_f_with_inplace_as_script("sed -f --in-place input.txt")]
-    fn test_allowed_non_write_redirects(#[case] cmd: &str) {
+    fn test_allowed_redirect_and_file_write_operations_after_d4(#[case] cmd: &str) {
         let v = check(cmd);
-        assert!(!v.is_blocked(), "expected allowed: {cmd}");
+        assert!(!v.is_blocked(), "expected allowed after D4: {cmd}");
     }
 
     // -- Helper: basename --
@@ -1082,16 +945,5 @@ mod tests {
     #[case::flag("-c", false)]
     fn test_is_var_assignment(#[case] input: &str, #[case] expected: bool) {
         assert_eq!(is_var_assignment(input), expected);
-    }
-
-    // -- Helper: has_expansion_marker --
-
-    #[rstest]
-    #[case::dollar_var("$HOME", true)]
-    #[case::dollar_paren("$(cmd)", true)]
-    #[case::backtick("`cmd`", true)]
-    #[case::plain_word("git", false)]
-    fn test_has_expansion_marker(#[case] input: &str, #[case] expected: bool) {
-        assert_eq!(has_expansion_marker(input), expected);
     }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "ef0346597bfacaf9d1c9e8eb2e97748bea3d9a978faf44ac04f8cb70f2140fb5",
+  "catalogue_declaration_hash": "3c65a2a4b6419fd7ae9e18015428131235f8cd3da9256ad3e23de272a04775b0",
   "signals": [
     {
       "type_name": "GuardVerdict",
@@ -40,7 +40,7 @@
     {
       "type_name": "SimpleCommand",
       "signal": "blue",
-      "entry_hash": "0ac160cb4c496359ac0aad0d3ac3516402b534d5abbf08464afcaca9d96e5179"
+      "entry_hash": "db5e4ff3368748a2273701da494457c8bd431e9e7a73fc6a87275db4a4dc7f7b"
     },
     {
       "type_name": "ShellParser",
