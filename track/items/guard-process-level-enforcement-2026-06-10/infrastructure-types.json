@@ -1,0 +1,223 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "SystemGitRepo": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "git_cli",
+      "docs": "Git repository implementation. In this track, SystemGitRepo::output() body gains SOTP_GUARDED_GIT env injection (D2/IN-02), but struct fields and all public method signatures are unchanged. action=reference is correct: B==C at rustdoc level.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GitError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "CurrentDir",    "payload": { "kind": "tuple", "fields": ["std::io::Error"] } },
+          { "name": "Spawn",         "payload": { "kind": "struct", "fields": [{ "name": "command", "ty": "String" }, { "name": "source", "ty": "std::io::Error" }] } },
+          { "name": "CommandFailed", "payload": { "kind": "struct", "fields": [{ "name": "command", "ty": "String" }, { "name": "code", "ty": "i32" }, { "name": "stderr", "ty": "String" }] } },
+          { "name": "EmptyRepoRoot", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_cli",
+      "docs": "Structured error type for git CLI operations. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TrackBranchRecord": {
+      "action": "reference",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "display_path", "ty": "String" },
+            { "name": "track_name",   "ty": "String" },
+            { "name": "branch",       "ty": "Option<String>" },
+            { "name": "status",       "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "git_cli",
+      "docs": "DTO holding track branch metadata. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::verify::hooks_path::verify": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Verifies that core.hooksPath is set to .githooks in the git config. Returns a non-zero VerifyOutcome when unset or set to a different value, causing cargo make ci to fail. Implements D7 CI verify layer (IN-09/AC-10).",
+      "spec_refs": [
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-09",
+          "hash": "cd714c29d4a10e0494c5ded206f3369ab4ff2cb5431e59c7f5c426999f6b22ab"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::git_cli::resolve_repo_path": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" },
+        { "name": "path", "ty": "&std::path::Path" }
+      ],
+      "returns": "std::path::PathBuf",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Resolves a path relative to the repo root. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "infrastructure::git_cli::load_explicit_track_branch": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root",      "ty": "&std::path::Path" },
+        { "name": "track_dir", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<TrackBranchRecord, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Loads explicit track branch record from the standard items dir. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "infrastructure::git_cli::load_explicit_track_branch_from_items_dir": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root",      "ty": "&std::path::Path" },
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_dir", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<TrackBranchRecord, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Loads explicit track branch record from a custom items dir. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "infrastructure::git_cli::collect_track_branch_claims": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<Vec<TrackBranchRecord>, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Collects all track branch records from items and archive directories. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "SystemGitRepo",
+      "methods": [
+        {
+          "name": "discover",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<Self, GitError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "discover_from",
+          "receiver": null,
+          "params": [
+            { "name": "start_dir", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<Self, GitError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SystemGitRepo"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "GitRepository",
+      "for_type": "SystemGitRepo"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GitError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "GitError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "GitError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TrackBranchRecord"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TrackBranchRecord"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TrackBranchRecord"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TrackBranchRecord"
+    }
+  ]
+}

@@ -377,7 +377,7 @@ mod tests {
     use infrastructure::telemetry::{TelemetryConfig, TelemetryWriter};
     use tempfile::TempDir;
 
-    use crate::review_v2::process_guards::{CwdGuard, run_git};
+    use crate::review_v2::process_guards::{CwdGuard, GitRunner};
 
     use super::{
         emit_external_subprocess, emit_non_zero_exit, emit_review_round, emit_track_subcommand,
@@ -385,7 +385,7 @@ mod tests {
 
     fn temp_repo_on_track_branch(track_id: &str) -> TempDir {
         let repo = TempDir::new().unwrap();
-        run_git(repo.path(), &["init", "-q"]);
+        GitRunner::at(repo.path()).assert_success(&["init", "-q"]);
         set_git_head_ref(repo.path(), &format!("track/{track_id}"));
         repo
     }

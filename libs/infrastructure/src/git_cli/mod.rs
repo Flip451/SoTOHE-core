@@ -8,6 +8,15 @@ use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
 pub(crate) mod show;
 
+const GUARDED_GIT_ENV: &str = "SOTP_GUARDED_GIT";
+const GUARDED_GIT_VALUE: &str = "1";
+
+pub(crate) fn guarded_git_command() -> Command {
+    let mut command = Command::new("git");
+    command.env(GUARDED_GIT_ENV, GUARDED_GIT_VALUE);
+    command
+}
+
 /// Structured error type for git CLI operations.
 #[derive(Debug, Error)]
 pub enum GitError {
@@ -159,7 +168,7 @@ impl SystemGitRepo {
     /// (e.g. `start_dir` is not inside a git repository), or the root path
     /// returned by git is empty.
     pub fn discover_from(start_dir: &Path) -> Result<Self, GitError> {
-        let output = Command::new("git")
+        let output = guarded_git_command()
             .args(["rev-parse", "--show-toplevel"])
             .current_dir(start_dir)
             .output()
@@ -192,7 +201,7 @@ impl GitRepository for SystemGitRepo {
     }
 
     fn status(&self, args: &[&str]) -> Result<i32, GitError> {
-        let status = Command::new("git")
+        let status = guarded_git_command()
             .args(args)
             .current_dir(&self.root)
             .status()
@@ -201,7 +210,7 @@ impl GitRepository for SystemGitRepo {
     }
 
     fn output(&self, args: &[&str]) -> Result<Output, GitError> {
-        Command::new("git")
+        guarded_git_command()
             .args(args)
             .current_dir(&self.root)
             .output()
@@ -376,6 +385,7 @@ fn read_metadata(path: &Path) -> Result<BranchMetadata, String> {
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::ffi::OsStr;
     use std::fs;
     use std::path::PathBuf;
     use std::process::Command;
@@ -384,7 +394,8 @@ mod tests {
     use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
     use super::{
-        GitRepository, SystemGitRepo, collect_track_branch_claims, load_explicit_track_branch,
+        GUARDED_GIT_ENV, GUARDED_GIT_VALUE, GitRepository, SystemGitRepo,
+        collect_track_branch_claims, guarded_git_command, load_explicit_track_branch,
         load_explicit_track_branch_from_items_dir, resolve_repo_path,
     };
 
@@ -414,6 +425,19 @@ mod tests {
     fn run_git(root: &std::path::Path, args: &[&str]) {
         let status = Command::new("git").args(args).current_dir(root).status().unwrap();
         assert!(status.success(), "git command failed: git {}", args.join(" "));
+    }
+
+    #[test]
+    fn test_guarded_git_command_injects_sotp_guarded_git_env() {
+        let command = guarded_git_command();
+
+        let has_guarded_env = command.get_envs().any(|(key, value)| {
+            key == OsStr::new(GUARDED_GIT_ENV) && value == Some(OsStr::new(GUARDED_GIT_VALUE))
+        });
+
+        // Integration perspective deferred to T009: wrapper git calls should
+        // pass reference-transaction with this token while bare git is blocked.
+        assert!(has_guarded_env);
     }
 
     #[test]

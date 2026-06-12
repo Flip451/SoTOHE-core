@@ -286,7 +286,10 @@ mod tests {
     use std::ffi::OsString;
     use std::path::{Path, PathBuf};
 
-    use crate::{CliApp, CommandOutcome, RefVerifyCheckApprovedInput, RefVerifyRunInput};
+    use crate::{
+        CliApp, CommandOutcome, RefVerifyCheckApprovedInput, RefVerifyRunInput,
+        test_support::repo_root_for_tests,
+    };
 
     fn with_env_var<T>(key: &'static str, value: OsString, run: impl FnOnce() -> T) -> T {
         let previous = std::env::var_os(key);
@@ -306,14 +309,6 @@ mod tests {
             Ok(v) => v,
             Err(payload) => std::panic::resume_unwind(payload),
         }
-    }
-
-    fn repo_root_for_tests() -> PathBuf {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(std::path::Path::parent)
-            .expect("cli-composition manifest must be under apps/")
-            .to_path_buf()
     }
 
     fn temp_project_with_items_dir() -> (tempfile::TempDir, PathBuf) {

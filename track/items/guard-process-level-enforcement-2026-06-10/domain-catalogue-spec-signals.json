@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "3c65a2a4b6419fd7ae9e18015428131235f8cd3da9256ad3e23de272a04775b0",
+  "signals": [
+    {
+      "type_name": "GuardVerdict",
+      "signal": "blue",
+      "entry_hash": "5557fc06fede280b775d12b4118007fc8c576a29976783a55f7e5441dcc6841a"
+    },
+    {
+      "type_name": "HookContext",
+      "signal": "blue",
+      "entry_hash": "614cfde9dcc77f386c56e7da3d4bee3eada3b3954e7766212c980aa9713e508b"
+    },
+    {
+      "type_name": "HookError",
+      "signal": "blue",
+      "entry_hash": "5b811acd989d2052f396019ec94e3affadbe33eedccd35da7549167e8fb20648"
+    },
+    {
+      "type_name": "HookInput",
+      "signal": "blue",
+      "entry_hash": "50a0c7ec9a087f9c04102f4dce3fd5a87c98b9ceba2674cb0c60a09337da3f52"
+    },
+    {
+      "type_name": "HookName",
+      "signal": "blue",
+      "entry_hash": "372758e3b500c237b886784f0dd48e2b5d3684c2c4f2e74f3002ebbd73386e27"
+    },
+    {
+      "type_name": "HookVerdict",
+      "signal": "blue",
+      "entry_hash": "562f0ace056fb1fc3595952d86f261f1f1ec55e28ac74d86d6670691cc9285c7"
+    },
+    {
+      "type_name": "ParseError",
+      "signal": "blue",
+      "entry_hash": "22e53b869e1f1a935fcc25084de01c42cf1b5960eaa1fcc884c7fef71a9d36ff"
+    },
+    {
+      "type_name": "SimpleCommand",
+      "signal": "blue",
+      "entry_hash": "db5e4ff3368748a2273701da494457c8bd431e9e7a73fc6a87275db4a4dc7f7b"
+    },
+    {
+      "type_name": "ShellParser",
+      "signal": "blue",
+      "entry_hash": "581319f448fd33e7472ce76cc0ae08afcbda57bcb651912aa295cec2fbff92cd"
+    },
+    {
+      "type_name": "domain::guard::policy::block_on_parse_error",
+      "signal": "blue",
+      "entry_hash": "1a9e9ca09a4c9ca1f8e9f50ccac5c9bbbfce1b51e9f07d255d41088878f938fd"
+    },
+    {
+      "type_name": "domain::guard::policy::check_commands",
+      "signal": "blue",
+      "entry_hash": "bb902f31cdf8ec11ef0f62e3c057d4cae540aec2e6520001eaa9b650d03f3d1c"
+    }
+  ]
+}

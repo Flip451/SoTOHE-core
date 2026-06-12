@@ -367,6 +367,32 @@ fn test_verify_hook_paths_passes_when_all_fragments_present() {
 }
 
 #[test]
+fn test_verify_hook_paths_reports_forbidden_cargo_run_fallback() {
+    let tmp = TempDir::new().unwrap();
+
+    let mut big_cmd = String::new();
+    for (_, fragments) in EXPECTED_HOOK_COMMANDS {
+        for f in *fragments {
+            big_cmd.push_str(f);
+            big_cmd.push(' ');
+        }
+    }
+    big_cmd.push_str("cargo run --quiet -p cli -- hook dispatch block-direct-git-ops");
+
+    let commands = vec![big_cmd];
+    let mut outcome = VerifyOutcome::pass();
+    verify_hook_paths(&commands, tmp.path(), &mut outcome);
+
+    assert!(outcome.has_errors());
+    assert!(
+        outcome
+            .findings()
+            .iter()
+            .any(|finding| finding.message().contains("cargo run --quiet -p cli --"))
+    );
+}
+
+#[test]
 fn test_verify_hook_paths_does_not_require_any_python_hook_scripts() {
     // Post RV2-17: EXPECTED_HOOK_PATHS must be empty so that no .claude/hooks/*.py
     // files are required to exist on disk. Verifying with an absent .claude/hooks/

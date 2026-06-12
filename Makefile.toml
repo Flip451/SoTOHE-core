@@ -33,7 +33,7 @@ echo "=== Bootstrap: development environment setup ==="
 
 # 1. Check prerequisites
 echo ""
-echo "--- Step 1/5: Check prerequisites ---"
+echo "--- Step 1/6: Check prerequisites ---"
 if ! command -v docker >/dev/null 2>&1; then
   echo "[FAIL] docker not found. Install Docker first."
   exit 1
@@ -52,26 +52,37 @@ echo "[OK] cargo available"
 
 # 2. Docker images
 echo ""
-echo "--- Step 2/5: Build Docker images ---"
+echo "--- Step 2/6: Build Docker images ---"
 mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home
 docker compose build tools
 echo "[OK] Docker tools image built"
 
 # 3. Build sotp CLI binary
 echo ""
-echo "--- Step 3/5: Build sotp CLI binary ---"
+echo "--- Step 3/6: Build sotp CLI binary ---"
 cargo make build-sotp
 echo "[OK] bin/sotp built and installed"
 
-# 4. CI
+# 4. Git hooks path
 echo ""
-echo "--- Step 4/5: Run CI ---"
+echo "--- Step 4/6: Configure git hooks path ---"
+if [ "$(git config --local core.hooksPath 2>/dev/null || true)" = ".githooks" ]; then
+  echo "[OK] core.hooksPath already set"
+else
+  git config --local core.hooksPath .githooks
+  echo "[OK] core.hooksPath set to .githooks"
+fi
+chmod +x .githooks/reference-transaction .githooks/pre-push 2>/dev/null || true
+
+# 5. CI
+echo ""
+echo "--- Step 5/6: Run CI ---"
 docker compose run --rm tools cargo make --allow-private ci-local
 echo "[OK] CI passed"
 
-# 5. Git notes fetch refspec
+# 6. Git notes fetch refspec
 echo ""
-echo "--- Step 5/5: Configure git notes fetch refspec ---"
+echo "--- Step 6/6: Configure git notes fetch refspec ---"
 if git remote get-url origin >/dev/null 2>&1; then
   if git config --get-all remote.origin.fetch | grep -q 'refs/notes'; then
     echo "[OK] git notes refspec already configured"
@@ -252,6 +263,12 @@ description = "[internal] Verify orchestra hooks, delegation, and agent definiti
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- verify orchestra']
 
+[tasks.verify-hooks-path-local]
+private = true
+description = "[internal] Verify local Git config core.hooksPath points at .githooks"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify hooks-path']
+
 [tasks.verify-track-registry-local]
 private = true
 description = "[internal] Verify track registry.md is in sync with metadata.json"
@@ -338,7 +355,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -346,7 +363,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -468,6 +485,12 @@ description = "[gate] Verify orchestra hooks and agent definitions (docker compo
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-orchestra-local"]
+
+[tasks.verify-hooks-path]
+description = "[gate] Verify local Git config core.hooksPath points at .githooks (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-hooks-path-local"]
 
 # Note: unlike verify-orchestra (docker compose), this task runs directly on the
 # host because it only uses bash/find and needs no Rust toolchain. When called via

@@ -7,12 +7,13 @@
 
 use std::collections::HashMap;
 use std::io::{self, BufRead};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use domain::TrackId;
 use thiserror::Error;
 
 use crate::telemetry::TelemetryEvent;
+use crate::track::symlink_guard::reject_symlinks_below;
 
 // ---------------------------------------------------------------------------
 // Output DTOs
@@ -170,7 +171,11 @@ impl TelemetryReport {
         let track_id = valid_track_id.as_ref();
         let track_dir = self.items_dir.join(track_id);
 
-        match std::fs::metadata(&track_dir) {
+        if !self.guard_path(&track_dir)? {
+            return Err(TelemetryReportError::TrackNotFound { track_id: track_id.to_owned() });
+        }
+
+        match std::fs::symlink_metadata(&track_dir) {
             Ok(metadata) if metadata.is_dir() => {}
             Ok(_) => {
                 return Err(TelemetryReportError::Io {
@@ -189,27 +194,45 @@ impl TelemetryReport {
             }
         }
 
-        let log_path = track_dir.join("logs").join("telemetry.jsonl");
+        let logs_dir = track_dir.join("logs");
+        let log_path = logs_dir.join("telemetry.jsonl");
 
         // Missing log file is a normal state (no events written yet) — return
         // empty output (CN-08 / fail-open).
-        let file = match std::fs::File::open(&log_path) {
-            Ok(file) => file,
-            Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                return Ok(TelemetryReportOutput {
-                    phase_durations: Vec::new(),
-                    errors: Vec::new(),
-                    hook_blocks: Vec::new(),
-                    skipped_lines: 0,
-                });
-            }
-            Err(e) => {
+        let empty_output = || TelemetryReportOutput {
+            phase_durations: Vec::new(),
+            errors: Vec::new(),
+            hook_blocks: Vec::new(),
+            skipped_lines: 0,
+        };
+
+        if !self.guard_path(&logs_dir)? {
+            return Ok(empty_output());
+        }
+        match std::fs::symlink_metadata(&logs_dir) {
+            Ok(metadata) if metadata.is_dir() => {}
+            Ok(_) => {
                 return Err(TelemetryReportError::Io {
                     path: log_path.display().to_string(),
+                    message: "not a directory".to_owned(),
+                });
+            }
+            Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(empty_output()),
+            Err(e) => {
+                return Err(TelemetryReportError::Io {
+                    path: logs_dir.display().to_string(),
                     message: e.to_string(),
                 });
             }
-        };
+        }
+
+        if !self.guard_path(&log_path)? {
+            return Ok(empty_output());
+        }
+        let file = open_read_no_follow(&log_path).map_err(|e| TelemetryReportError::Io {
+            path: log_path.display().to_string(),
+            message: e.to_string(),
+        })?;
 
         let mut reader = io::BufReader::new(file);
 
@@ -284,6 +307,24 @@ impl TelemetryReport {
 
         Ok(TelemetryReportOutput { phase_durations, errors, hook_blocks, skipped_lines })
     }
+
+    fn guard_path(&self, path: &Path) -> Result<bool, TelemetryReportError> {
+        reject_symlinks_below(path, &self.items_dir).map_err(|e| TelemetryReportError::Io {
+            path: path.display().to_string(),
+            message: e.to_string(),
+        })
+    }
+}
+
+fn open_read_no_follow(path: &Path) -> io::Result<std::fs::File> {
+    let mut options = std::fs::OpenOptions::new();
+    options.read(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC);
+    }
+    options.open(path)
 }
 
 // ---------------------------------------------------------------------------
@@ -471,6 +512,41 @@ mod tests {
         assert!(
             matches!(result, Err(TelemetryReportError::Io { ref path, ref message }) if path.ends_with("/t") && message == "not a directory"),
             "expected Io for non-directory track path; got: {result:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_aggregate_symlinked_track_dir_returns_io_error() {
+        let tmp = TempDir::new().unwrap();
+        let outside = TempDir::new().unwrap();
+        write_jsonl(outside.path(), "ignored", &[SUBCOMMAND_LINE]);
+        std::os::unix::fs::symlink(outside.path().join("ignored"), tmp.path().join("t")).unwrap();
+
+        let report = TelemetryReport::new(tmp.path().to_path_buf());
+        let result = report.aggregate("t");
+
+        assert!(
+            matches!(result, Err(TelemetryReportError::Io { .. })),
+            "symlinked track dir must be rejected before reading telemetry: {result:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_aggregate_symlinked_logs_dir_returns_io_error() {
+        let tmp = TempDir::new().unwrap();
+        let outside = TempDir::new().unwrap();
+        make_track_dir(tmp.path(), "t");
+        std::fs::create_dir_all(outside.path().join("logs")).unwrap();
+        std::os::unix::fs::symlink(outside.path(), tmp.path().join("t").join("logs")).unwrap();
+
+        let report = TelemetryReport::new(tmp.path().to_path_buf());
+        let result = report.aggregate("t");
+
+        assert!(
+            matches!(result, Err(TelemetryReportError::Io { .. })),
+            "symlinked logs dir must be rejected before reading telemetry: {result:?}"
         );
     }
 

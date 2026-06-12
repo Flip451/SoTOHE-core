@@ -115,10 +115,11 @@ pub trait GuardCheckService: Send + Sync {
 /// # Known limitation (accepted design trade-off)
 ///
 /// The reconstruction only restores `argv` from each command string
-/// (whitespace-split). `redirect_texts` and `has_output_redirect` are **not**
-/// preserved through the [`ShellParserPort`] interface. As a result, the domain
-/// guard policy cannot detect git operations hidden in output-redirect targets
-/// or heredoc bodies when commands are evaluated through this adapter.
+/// (whitespace-split). Redirect metadata (`redirect_texts`,
+/// `output_redirect_texts`, and `has_output_redirect`) is **not** preserved
+/// through the [`ShellParserPort`] interface. As a result, the domain guard
+/// policy cannot detect git operations hidden in output-redirect targets or
+/// heredoc bodies when commands are evaluated through this adapter.
 ///
 /// This is an intentional boundary simplification: the `ShellParserPort`
 /// abstraction preserves only the argv information needed for basic command
@@ -143,6 +144,7 @@ impl ShellParserPortAdapter<'_> {
             .map(|s| SimpleCommand {
                 argv: s.split_whitespace().map(str::to_owned).collect(),
                 redirect_texts: Vec::new(),
+                output_redirect_texts: Vec::new(),
                 has_output_redirect: false,
             })
             .collect())

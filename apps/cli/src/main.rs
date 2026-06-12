@@ -387,7 +387,7 @@ fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
 /// Returns the hook name string for the given `HookCommand` variant.
 fn hook_command_hook_name(cmd: &commands::hook::HookCommand) -> &'static str {
     match cmd {
-        commands::hook::HookCommand::Dispatch { hook } => hook.hook_name(),
+        commands::hook::HookCommand::Dispatch { hook, .. } => hook.hook_name(),
     }
 }
 
@@ -395,7 +395,7 @@ fn hook_command_hook_name(cmd: &commands::hook::HookCommand) -> &'static str {
 /// hook rather than a PreToolUse guard.
 fn is_advisory_hook_command(cmd: &commands::hook::HookCommand) -> bool {
     use commands::hook::{CliHookName, HookCommand};
-    matches!(cmd, HookCommand::Dispatch { hook: CliHookName::SkillCompliance })
+    matches!(cmd, HookCommand::Dispatch { hook: CliHookName::SkillCompliance, .. })
 }
 
 // ---------------------------------------------------------------------------
@@ -457,6 +457,7 @@ fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static s
         VerifyCommand::ArchDocs(_) => "verify-arch-docs",
         VerifyCommand::Layers(_) => "verify-layers",
         VerifyCommand::Orchestra(_) => "verify-orchestra",
+        VerifyCommand::HooksPath(_) => "verify-hooks-path",
         VerifyCommand::SpecAttribution(_) => "verify-spec-attribution",
         VerifyCommand::SpecFrontmatter(_) => "verify-spec-frontmatter",
         VerifyCommand::CanonicalModules(_) => "verify-canonical-modules",

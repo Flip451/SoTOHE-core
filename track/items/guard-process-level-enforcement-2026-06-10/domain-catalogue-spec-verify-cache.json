@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "eab82f0ae36466a2dc2e56ec8e914851daa2cf48dfab70aa04010839f2bd5894",
+      "evidence_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "verdict": {
+        "kind": "pass",
+        "citation": ".githooks/ ディレクトリに reference-transaction フック（--no-verify 迂回不可）と pre-push フックを配置する。各フックは bin/sotp hook dispatch の新しいフック名（git-ref-update / git-pre-push）へ exec する 2 行程度のシェルシムとして実装する"
+      }
+    },
+    {
+      "claim_hash": "eab82f0ae36466a2dc2e56ec8e914851daa2cf48dfab70aa04010839f2bd5894",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "73a28843c23ff7ce204a4acb6d8b169804a25376aa06d4507a8d2da5b8a99dd9",
+      "evidence_hash": "8d9279d31733c5766ee6a4fb074c07acb1c437a14617c5e14a8d40eeea6b11f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Bash コマンド文字列に SOTP_GUARDED_GIT（exact match）が含まれていたら block」するキーワードスキャンを追加する。スキャンは raw コマンド文字列と quote-strip 済み argv トークンの両方に適用し、クォート分割による回避を防ぐ。Bash コマンド文字列のみが対象であり Write/Edit の content はスキャンしない"
+      }
+    },
+    {
+      "claim_hash": "73a28843c23ff7ce204a4acb6d8b169804a25376aa06d4507a8d2da5b8a99dd9",
+      "evidence_hash": "cec995b90aa42a289820e3e0fc656b50b9fff7f7c7b6c4bc39d3747bee3e16aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "policy.rs から撤廃するブランケットブロック: command_contains_git（非 git コマンドへの \"git\" 部分文字列スキャン）、env 無条件ブロック、command_contains_expansion（$ / バッククート展開ブロック）、has_output_redirect 一括ブロック（>/>>/> |/<>）、FILE_WRITE_COMMANDS（tee）、sed -i チェック。これらは 0080 D1/D2/D4 および CON-07 に由来し、本 ADR の D4 が supersede する"
+      }
+    },
+    {
+      "claim_hash": "73a28843c23ff7ce204a4acb6d8b169804a25376aa06d4507a8d2da5b8a99dd9",
+      "evidence_hash": "6c3a9e6a1d3cddf85dfec5684c7960eabd163f25bd69f2cd17692483d2b84f68",
+      "verdict": {
+        "kind": "pass",
+        "citation": "policy.rs で維持する精密チェック: 直接 git サブコマンドチェック（git add / commit / push / switch / merge / rebase / cherry-pick / reset / branch -d / checkout -b）、launcher stripping（sudo / nohup / timeout 等）・VAR=val skip・.exe suffix strip（解析基盤）、bin/sotp 上書き検出（is_bin_sotp_overwrite）。また block-test-file-deletion にリダイレクト先ターゲットのテストファイルパターン照合を追加し、リダイレクト解禁後の「> tests/foo.rs」形式の truncation を block する"
+      }
+    },
+    {
+      "claim_hash": "73a28843c23ff7ce204a4acb6d8b169804a25376aa06d4507a8d2da5b8a99dd9",
+      "evidence_hash": "c0a6c0920838b474799c9b0a218c4f0296a94ac6552e95da3d68b4e6fd200af1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "shell コマンド解析は既存の ShellParser port（domain::guard::ShellParser）と ConchShellParser adapter（infrastructure::shell::ConchShellParser）を引き続き使用する。D3 の quote-strip 済み argv トークンスキャンも同パーサー経由で実施し、独自トークナイザーの実装を禁止する"
+      }
+    },
+    {
+      "claim_hash": "372758e3b500c237b886784f0dd48e2b5d3684c2c4f2e74f3002ebbd73386e27",
+      "evidence_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各フックは bin/sotp hook dispatch の新しいフック名（git-ref-update / git-pre-push）へ exec する 2 行程度のシェルシムとして実装する"
+      }
+    },
+    {
+      "claim_hash": "372758e3b500c237b886784f0dd48e2b5d3684c2c4f2e74f3002ebbd73386e27",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "329fb15e5166df6da25803077ca61691aa2d8751196d8126a0bd71857b9d79b9",
+      "evidence_hash": "8d9279d31733c5766ee6a4fb074c07acb1c437a14617c5e14a8d40eeea6b11f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Bash コマンド文字列に SOTP_GUARDED_GIT（exact match）が含まれていたら block」するキーワードスキャンを追加する。スキャンは raw コマンド文字列と quote-strip 済み argv トークンの両方に適用し、クォート分割による回避を防ぐ。Bash コマンド文字列のみが対象であり Write/Edit の content はスキャンしない"
+      }
+    },
+    {
+      "claim_hash": "329fb15e5166df6da25803077ca61691aa2d8751196d8126a0bd71857b9d79b9",
+      "evidence_hash": "cec995b90aa42a289820e3e0fc656b50b9fff7f7c7b6c4bc39d3747bee3e16aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "policy.rs から撤廃するブランケットブロック: command_contains_git（非 git コマンドへの \"git\" 部分文字列スキャン）、env 無条件ブロック、command_contains_expansion（$ / バッククォート展開ブロック）、has_output_redirect 一括ブロック（>/>>/> |/<>）、FILE_WRITE_COMMANDS（tee）、sed -i チェック。これらは 0080 D1/D2/D4 および CON-07 に由来し、本 ADR の D4 が supersede する"
+      }
+    },
+    {
+      "claim_hash": "329fb15e5166df6da25803077ca61691aa2d8751196d8126a0bd71857b9d79b9",
+      "evidence_hash": "6c3a9e6a1d3cddf85dfec5684c7960eabd163f25bd69f2cd17692483d2b84f68",
+      "verdict": {
+        "kind": "pass",
+        "citation": "policy.rs で維持する精密チェック: 直接 git サブコマンドチェック（git add / commit / push / switch / merge / rebase / cherry-pick / reset / branch -d / checkout -b）、launcher stripping（sudo / nohup / timeout 等）・VAR=val skip・.exe suffix strip（解析基盤）、bin/sotp 上書き検出（is_bin_sotp_overwrite）。また block-test-file-deletion にリダイレクト先ターゲットのテストファイルパターン照合を追加し、リダイレクト解禁後の「> tests/foo.rs」形式の truncation を block する"
+      }
+    },
+    {
+      "claim_hash": "329fb15e5166df6da25803077ca61691aa2d8751196d8126a0bd71857b9d79b9",
+      "evidence_hash": "c0a6c0920838b474799c9b0a218c4f0296a94ac6552e95da3d68b4e6fd200af1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の quote-strip 済み argv トークンスキャンも同パーサー経由で実施し、独自トークナイザーの実装を禁止する"
+      }
+    },
+    {
+      "claim_hash": "bb902f31cdf8ec11ef0f62e3c057d4cae540aec2e6520001eaa9b650d03f3d1c",
+      "evidence_hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GuardHookHandler（usecase 層）が check_commands 呼び出し前に raw コマンド文字列をスキャンし、(b) policy.rs の check_commands（domain 層）が quote-strip 済み argv トークン（SimpleCommand.argv）をスキャンする。両段階を合わせてクォート分割による回避を防ぐ（SimpleCommand は raw 文字列を保持しないため段階 a を usecase 層で実施）。Bash コマンド文字列のみが対象であり Write/Edit の content はスキャンしない"
+      }
+    },
+    {
+      "claim_hash": "bb902f31cdf8ec11ef0f62e3c057d4cae540aec2e6520001eaa9b650d03f3d1c",
+      "evidence_hash": "cec995b90aa42a289820e3e0fc656b50b9fff7f7c7b6c4bc39d3747bee3e16aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "policy.rs から撤廃するブランケットブロック: command_contains_git（非 git コマンドへの \"git\" 部分文字列スキャン）、env 無条件ブロック、command_contains_expansion（$ / バッククォート展開ブロック）、has_output_redirect 一括ブロック（>/>>/> |/<>）、FILE_WRITE_COMMANDS（tee）、sed -i チェック。これらは 0080 D1/D2/D4 および CON-07 に由来し、本 ADR の D4 が supersede する"
+      }
+    },
+    {
+      "claim_hash": "bb902f31cdf8ec11ef0f62e3c057d4cae540aec2e6520001eaa9b650d03f3d1c",
+      "evidence_hash": "6c3a9e6a1d3cddf85dfec5684c7960eabd163f25bd69f2cd17692483d2b84f68",
+      "verdict": {
+        "kind": "pass",
+        "citation": "直接 git サブコマンドチェック（git add / commit / push / switch / merge / rebase / cherry-pick / reset / branch -d / checkout -b）、launcher stripping（sudo / nohup / timeout 等）・VAR=val skip・.exe suffix strip（解析基盤）、bin/sotp 上書き検出（is_bin_sotp_overwrite）。また block-test-file-deletion にリダイレクト先ターゲットのテストファイルパターン照合を追加し、リダイレクト解禁後の「> tests/foo.rs」形式の truncation を block する"
+      }
+    },
+    {
+      "claim_hash": "bb902f31cdf8ec11ef0f62e3c057d4cae540aec2e6520001eaa9b650d03f3d1c",
+      "evidence_hash": "c0a6c0920838b474799c9b0a218c4f0296a94ac6552e95da3d68b4e6fd200af1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の quote-strip 済み argv トークンスキャンも同パーサー経由で実施し、独自トークナイザーの実装を禁止する"
+      }
+    },
+    {
+      "claim_hash": "db5e4ff3368748a2273701da494457c8bd431e9e7a73fc6a87275db4a4dc7f7b",
+      "evidence_hash": "ccaf7062e90f00194373c74117d4892c0effac5ce53d0486bf53534863a3a9ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リダイレクト解禁（D4）により可能になる「> tests/foo.rs」形式の truncation を SimpleCommand.redirect_texts に対するパターンマッチで block する"
+      }
+    },
+    {
+      "claim_hash": "db5e4ff3368748a2273701da494457c8bd431e9e7a73fc6a87275db4a4dc7f7b",
+      "evidence_hash": "6c3a9e6a1d3cddf85dfec5684c7960eabd163f25bd69f2cd17692483d2b84f68",
+      "verdict": {
+        "kind": "pass",
+        "citation": "block-test-file-deletion にリダイレクト先ターゲットのテストファイルパターン照合を追加し、リダイレクト解禁後の「> tests/foo.rs」形式の truncation を block する"
+      }
+    },
+    {
+      "claim_hash": "336d0a181300485ba5501abcbfb67dbc73021c5e9e8256e35be60c40ba6bb944",
+      "evidence_hash": "49581e4cc6d56f7e4b8ff2c66aacc1f6a55185986261b9fe20b6332d4977ee4c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath が未設定の場合に runtime fail-closed（git コマンドを block）で動作する。git hooks 層が不在の状態でも CC フックが最低限の防御を維持する"
+      }
+    },
+    {
+      "claim_hash": "336d0a181300485ba5501abcbfb67dbc73021c5e9e8256e35be60c40ba6bb944",
+      "evidence_hash": "f26ecf1fc46bc90785b972175a3946bc966a5164c296ba5bb73db17a0a453cba",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath 未設定を検知した場合に git コマンドを block する（runtime fail-closed）。core.hooksPath が設定済みの場合はこの追加 block は発火しない"
+      }
+    },
+    {
+      "claim_hash": "970616680a0643963d08b96bc5320708d8103fb3cd7fa74e64b70a04c8870b6e",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "block-direct-git-ops は直接 git 操作 policy に集中させる"
+      }
+    },
+    {
+      "claim_hash": "970616680a0643963d08b96bc5320708d8103fb3cd7fa74e64b70a04c8870b6e",
+      "evidence_hash": "38e624181c4451a3877a53f9be1f7e490120d154a6aaeb2075c3183516270f57",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath が .githooks に設定済みの場合は通常の Bash を allow し、後続の block-direct-git-ops が直接 git 操作 policy を判定する"
+      }
+    }
+  ]
+}

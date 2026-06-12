@@ -9,6 +9,13 @@ pub enum HookName {
     BlockDirectGitOps,
     /// Guard hook: blocks `rm` commands targeting test files.
     BlockTestFileDeletion,
+    /// Process-level git hook: reference-transaction (D1/CN-08).
+    /// Fires for all ref-updating operations (commit, merge, rebase, etc.).
+    /// Cannot be bypassed with `--no-verify`.
+    GitRefUpdate,
+    /// Process-level git hook: pre-push (D1/CN-08).
+    /// Fires before git push operations.
+    GitPrePush,
 }
 
 /// Context for hook execution. Built by the CLI layer from:

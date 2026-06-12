@@ -1,11 +1,12 @@
 //! `hook` command family — CliApp impl methods.
 //!
-//! The composition root owns stdin reading (CN-02): the CLI layer passes only
-//! the hook name; the method reads the hook JSON envelope from stdin and
-//! dispatches via `HookDispatchInteractor`.
+//! The composition root owns stdin reading (CN-02): the CLI layer passes the
+//! hook name plus any git hook positional arguments. Claude Code hook JSON
+//! envelopes are read from stdin here before dispatching via
+//! `HookDispatchInteractor`.
 
 use std::io::Read as _;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use crate::{CliApp, CommandOutcome};
@@ -100,16 +101,37 @@ fn is_post_tool_use(_hook_name: &str) -> bool {
     false
 }
 
+/// Returns `true` if the hook name is dispatched from git's process-level hooks.
+fn is_git_process_hook(hook_name: &str) -> bool {
+    matches!(hook_name, "git-ref-update" | "git-pre-push")
+}
+
+/// Returns `true` when git is sending a reference-transaction notification that
+/// cannot affect the transaction outcome and must not run the guarded-git verdict.
+fn is_git_ref_update_final_notification(hook_name: &str, hook_args: &[String]) -> bool {
+    hook_name == "git-ref-update"
+        && hook_args.first().is_some_and(|state| matches!(state.as_str(), "committed" | "aborted"))
+}
+
+fn hooks_path_configured() -> bool {
+    infrastructure::verify::hooks_path::verify(Path::new(".")).is_ok()
+}
+
 impl CliApp {
     /// Dispatch a security-critical hook via Rust logic.
     ///
-    /// Reads Claude Code hook JSON from stdin.
+    /// Reads Claude Code hook JSON from stdin for Claude Code hooks.
+    /// Uses positional hook arguments for process-level git hooks.
     /// Exit code 0 = allow, exit code 2 = block (Claude Code hook protocol).
     /// PreToolUse hooks: any internal error → exit code 2 (fail-closed).
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn hook_dispatch(&self, hook_name: String) -> Result<CommandOutcome, String> {
+    pub fn hook_dispatch(
+        &self,
+        hook_name: String,
+        hook_args: Vec<String>,
+    ) -> Result<CommandOutcome, String> {
         use infrastructure::shell::ConchShellParser;
         use usecase::hook_dispatch::{
             HookDispatchCommand, HookDispatchInteractor, HookDispatchService, HookVerdictDecision,
@@ -120,35 +142,58 @@ impl CliApp {
             return self.hook_dispatch_user_prompt_submit();
         }
 
+        if is_git_ref_update_final_notification(&hook_name, &hook_args) {
+            return Ok(CommandOutcome::success(None));
+        }
+
         let is_post = is_post_tool_use(&hook_name);
+        let guarded_git_token_present = std::env::var("SOTP_GUARDED_GIT").is_ok();
+        let hooks_path_configured = hooks_path_configured();
 
-        // Read stdin JSON
-        let mut stdin_buf = String::new();
-        if let Err(e) = std::io::stdin().read_to_string(&mut stdin_buf) {
-            return make_hook_error(is_post, &format!("failed to read stdin: {e}"));
-        }
-
-        if stdin_buf.trim().is_empty() {
-            return make_hook_error(is_post, "hook received empty stdin — no envelope to check");
-        }
-
-        let envelope: HookEnvelope = match serde_json::from_str(&stdin_buf) {
-            Ok(env) => env,
-            Err(e) => {
-                return make_hook_error(is_post, &format!("failed to parse hook JSON: {e}"));
+        let dispatch_cmd = if is_git_process_hook(&hook_name) {
+            HookDispatchCommand {
+                tool_name: "Git".to_owned(),
+                command: None,
+                file_path: None,
+                content: None,
             }
-        };
+        } else {
+            // Read stdin JSON
+            let mut stdin_buf = String::new();
+            if let Err(e) = std::io::stdin().read_to_string(&mut stdin_buf) {
+                return make_hook_error(is_post, &format!("failed to read stdin: {e}"));
+            }
 
-        let dispatch_cmd = HookDispatchCommand {
-            tool_name: envelope.tool_name,
-            command: envelope.tool_input.command,
-            file_path: envelope.tool_input.file_path,
-            content: envelope.tool_input.content,
+            if stdin_buf.trim().is_empty() {
+                return make_hook_error(
+                    is_post,
+                    "hook received empty stdin — no envelope to check",
+                );
+            }
+
+            let envelope: HookEnvelope = match serde_json::from_str(&stdin_buf) {
+                Ok(env) => env,
+                Err(e) => {
+                    return make_hook_error(is_post, &format!("failed to parse hook JSON: {e}"));
+                }
+            };
+
+            HookDispatchCommand {
+                tool_name: envelope.tool_name,
+                command: envelope.tool_input.command,
+                file_path: envelope.tool_input.file_path,
+                content: envelope.tool_input.content,
+            }
         };
 
         let parser_port = Arc::new(ConchShellParser);
         let project_dir = std::env::var("CLAUDE_PROJECT_DIR").ok().map(PathBuf::from);
-        let service = HookDispatchInteractor::new(parser_port, project_dir);
+        let service = HookDispatchInteractor::new(
+            parser_port,
+            project_dir,
+            guarded_git_token_present,
+            hooks_path_configured,
+        );
 
         let result = service.dispatch(hook_name, dispatch_cmd);
 
@@ -158,8 +203,8 @@ impl CliApp {
                 if is_block {
                     let reason = verdict.reason.unwrap_or_default();
                     Ok(CommandOutcome {
-                        stdout: if reason.is_empty() { None } else { Some(reason) },
-                        stderr: None,
+                        stdout: None,
+                        stderr: if reason.is_empty() { None } else { Some(reason) },
                         exit_code: 2,
                     })
                 } else {

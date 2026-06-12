@@ -30,6 +30,7 @@ use usecase::dry_check::{
     DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _,
 };
 
+use crate::review_v2::record_instant_once;
 use crate::{CliApp, CommandOutcome};
 
 mod manifest;
@@ -533,11 +534,7 @@ impl DryAgentRunRecorder {
     }
 
     fn record_started(&self) {
-        if let Ok(mut started_at) = self.started_at.lock() {
-            if started_at.is_none() {
-                *started_at = Some(Instant::now());
-            }
-        }
+        record_instant_once(&self.started_at);
     }
 
     fn record_completed(&self) {
@@ -685,15 +682,10 @@ mod tests {
         dry_fix_build_smoke_env, dry_fix_smoke_test_codex_version, dry_fix_spawn_and_collect,
         resolve_codex_bin, run_dry_fix_codex,
     };
-    use crate::review_v2::process_guards::{CwdGuard, EnvGuard, run_git};
-
-    fn repo_root_for_tests() -> PathBuf {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(Path::parent)
-            .expect("cli-composition manifest must be under apps/")
-            .to_path_buf()
-    }
+    use crate::review_v2::process_guards::{EnvGuard, GitRunner};
+    #[cfg(unix)]
+    use crate::test_support::make_executable;
+    use crate::test_support::repo_root_for_tests;
 
     fn temp_items_dir_under_repo() -> tempfile::TempDir {
         let base = repo_root_for_tests().join("target").join("dry-cli-composition-tests");
@@ -708,26 +700,16 @@ mod tests {
         "a".repeat(40)
     }
 
-    /// Initialize a minimal bare git repo (no commits required for discover()).
-    fn run_git_init(root: &Path) {
-        let status = std::process::Command::new("git")
-            .args(["init", "-b", "main"])
-            .current_dir(root)
-            .status()
-            .unwrap();
-        assert!(status.success(), "git init failed");
-    }
-
     fn setup_dry_telemetry_repo(root: &Path) -> PathBuf {
-        run_git(root, &["init", "-b", "main"]);
-        run_git(root, &["config", "user.email", "test@example.com"]);
-        run_git(root, &["config", "user.name", "Test"]);
-        run_git(root, &["config", "commit.gpgsign", "false"]);
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
         let items_dir = root.join("track/items");
         std::fs::create_dir_all(&items_dir).unwrap();
         std::fs::write(root.join("README.md"), "init\n").unwrap();
-        run_git(root, &["add", "."]);
-        run_git(root, &["commit", "--no-gpg-sign", "-m", "init"]);
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
         items_dir
     }
 
@@ -751,7 +733,11 @@ mod tests {
         let repo = tempfile::tempdir().unwrap();
         let items_dir = setup_dry_telemetry_repo(repo.path());
         let branch_track_id = "dry-telemetry-branch-2026-06-11";
-        run_git(repo.path(), &["checkout", "-b", &format!("track/{branch_track_id}")]);
+        GitRunner::at(repo.path()).assert_success(&[
+            "checkout",
+            "-b",
+            &format!("track/{branch_track_id}"),
+        ]);
         let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", "1");
         let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
 
@@ -764,15 +750,6 @@ mod tests {
         let (_writer, resolved_track_id) =
             resolve_dry_write_telemetry_writer(&items_dir, branch_track_id).unwrap();
         assert_eq!(resolved_track_id, branch_track_id);
-    }
-
-    #[cfg(unix)]
-    fn make_executable(script: &Path) {
-        use std::os::unix::fs::PermissionsExt;
-
-        let mut perms = std::fs::metadata(script).unwrap().permissions();
-        perms.set_mode(0o755);
-        std::fs::set_permissions(script, perms).unwrap();
     }
 
     #[cfg(unix)]
@@ -1307,65 +1284,32 @@ exit 0
 
     // ── CliApp::dry_run_fix_local: wrapper logic (agent-profile loading + provider dispatch) ──
 
-    /// Helper: write a fixture agent-profiles.json with `dry-fix-lead.provider = "claude"`.
-    ///
-    /// This ensures the two dispatch-path tests below remain isolated from the live
-    /// `.harness/config/agent-profiles.json` — the 'claude' provider is unsupported by
-    /// `dry_run_fix_local`, so it reliably produces the sentinel error at provider-dispatch.
-    fn write_dry_fix_lead_claude_profiles(root: &std::path::Path) {
-        let config_dir = root.join(".harness/config");
-        std::fs::create_dir_all(&config_dir).unwrap();
-        let content = r#"{
-  "schema_version": 1,
-  "providers": {
-    "claude": { "label": "Claude" }
-  },
-  "capabilities": {
-    "dry-fix-lead": {
-      "provider": "claude",
-      "model": "claude-profile-model"
-    }
-  }
-}
-"#;
-        std::fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
-    }
-
     /// Exercises the full `dry_run_fix_local` wrapper with `model: None`:
     /// git discover → agent-profiles load → track_id validation → profile resolution
     /// → model fallback from profiles → provider dispatch.
     ///
-    /// Uses a fixture `agent-profiles.json` that sets `dry-fix-lead.provider = "claude"`.
-    /// The 'claude' provider is unsupported by `dry_run_fix_local` (only 'codex' is), so
-    /// the test deterministically reaches the provider-dispatch error without spawning any
-    /// subprocess.  This ensures the test is isolated from the live configuration.
-    ///
-    /// Verifies that:
+    /// The fixture's `agent-profiles.json` defines `provider = "claude"` and a non-empty
+    /// model (independent of the live repo profiles).  The test verifies that:
     ///   - Profiles are loaded successfully (no "failed to load agent-profiles" error).
     ///   - The capability is resolved (no "capability not defined" error).
-    ///   - The profile model fills the `None` input ("no model specified" NOT triggered).
-    ///   - Execution reaches the provider-dispatch sentinel error for 'claude'.
+    ///   - The profile model fills the `None` input, so "no model specified" is NOT triggered.
+    ///   - Execution reaches the provider-dispatch arm with the error
+    ///     "[ERROR] unsupported dry-fix-lead provider 'claude' (supported: 'codex')",
+    ///     proving the wrapper traversed every stage up to dispatch.
+    ///
+    /// A regression that broke profile loading or model-fallback would produce a different
+    /// error message from an earlier stage, causing the assertions below to fail.
+    #[cfg(unix)]
     #[test]
     fn test_dry_run_fix_local_none_model_falls_back_to_profile_model_and_reaches_dispatch() {
-        // Hold process_env_lock: changes CWD, which races with other env-mutating tests.
+        // Hold process_env_lock: updates PATH, which races with other env-mutating tests.
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        let dir = tempfile::tempdir().unwrap();
-
-        // Write a minimal git repo so SystemGitRepo::discover() succeeds.
-        run_git_init(dir.path());
-        // Write fixture profiles that use 'claude' (unsupported → deterministic error).
-        write_dry_fix_lead_claude_profiles(dir.path());
-
-        let briefing_file = dir.path().join("briefing.md");
-        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
-
-        // Set CWD to the fixture repo so discover() reads the fixture profiles.
-        let _cwd = CwdGuard::save_current();
-        std::env::set_current_dir(dir.path()).unwrap();
+        let fixture = DryRunFixLocalFixture::new_with_provider("claude", "claude-test-model");
+        let _guards = fixture.path_guard();
 
         let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
             track_id: "dry-track".to_owned(),
-            briefing_file: briefing_file.clone(),
+            briefing_file: fixture.briefing_file.clone(),
             model: None,
         });
 
@@ -1401,27 +1345,21 @@ exit 0
     /// short-circuits `or_else(|| resolved.model.clone())` so the profile model is NOT
     /// consulted for model selection.  Profiles are still loaded to resolve the provider.
     ///
-    /// Verifies that:
-    ///   - "no model specified" is NOT triggered (explicit model bypasses profile-model fallback).
-    ///   - The provider-dispatch sentinel error is reached, proving the wrapper ran end-to-end.
+    /// Difference from the `model: None` variant: this path never reads `resolved.model`;
+    /// a bug that ignored `input.model` and fell through to `resolved.model` would not be
+    /// caught here, but a regression that broke the OR-logic so that explicit model
+    /// triggered "no model specified" WOULD be caught.
+    #[cfg(unix)]
     #[test]
     fn test_dry_run_fix_local_explicit_model_bypasses_profile_model_and_reaches_dispatch() {
-        // Hold process_env_lock: changes CWD.
+        // Hold process_env_lock: updates PATH.
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        let dir = tempfile::tempdir().unwrap();
-
-        run_git_init(dir.path());
-        write_dry_fix_lead_claude_profiles(dir.path());
-
-        let briefing_file = dir.path().join("briefing.md");
-        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
-
-        let _cwd = CwdGuard::save_current();
-        std::env::set_current_dir(dir.path()).unwrap();
+        let fixture = DryRunFixLocalFixture::new_with_provider("claude", "claude-test-model");
+        let _guards = fixture.path_guard();
 
         let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
             track_id: "dry-track".to_owned(),
-            briefing_file: briefing_file.clone(),
+            briefing_file: fixture.briefing_file.clone(),
             model: Some("gpt-explicit-override".to_owned()),
         });
 
@@ -1464,8 +1402,15 @@ exit 0
 
     #[cfg(unix)]
     impl DryRunFixLocalFixture {
-        /// Build the fixture with `profile_model` written into `agent-profiles.json`.
+        /// Build the fixture with `profile_model` written into `agent-profiles.json`
+        /// (provider fixed to `codex`).
         fn new(profile_model: &str) -> Self {
+            Self::new_with_provider("codex", profile_model)
+        }
+
+        /// Build the fixture with an explicit `dry-fix-lead` provider, so wrapper tests
+        /// stay deterministic regardless of the live repo's `agent-profiles.json`.
+        fn new_with_provider(provider: &str, profile_model: &str) -> Self {
             let project_dir = tempfile::tempdir().unwrap();
             let config_dir = project_dir.path().join(".harness").join("config");
             std::fs::create_dir_all(&config_dir).unwrap();
@@ -1474,10 +1419,10 @@ exit 0
                 format!(
                     r#"{{
   "schema_version": 1,
-  "providers": {{ "codex": {{ "label": "Codex" }} }},
+  "providers": {{ "{provider}": {{ "label": "Test Provider" }} }},
   "capabilities": {{
     "dry-fix-lead": {{
-      "provider": "codex",
+      "provider": "{provider}",
       "model": "{profile_model}"
     }}
   }}
@@ -1519,6 +1464,17 @@ exit 0
                 capture_file,
                 briefing_file,
             }
+        }
+
+        /// Prepend the fixture's fake-bin dir to PATH so `SystemGitRepo::discover()`
+        /// resolves the temp project root via the fake git.
+        fn path_guard(&self) -> Vec<EnvGuard> {
+            let mut path_entries = vec![self.fake_bin_dir.clone()];
+            if let Some(existing) = std::env::var_os("PATH") {
+                path_entries.extend(std::env::split_paths(&existing));
+            }
+            let new_path = std::env::join_paths(path_entries).unwrap();
+            vec![EnvGuard::set("PATH", new_path)]
         }
 
         /// Install the fake codex script, set PATH/CODEX_BIN/CODEX_HOME guards, and call

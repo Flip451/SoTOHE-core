@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-12T20:09:25Z",
+  "declaration_hash": "d5c5dd31765d404d57831344691d3e269e8f1697f730e74307c9116474b80d85",
+  "signals": [
+    {
+      "type_name": "GitPrePushHandler",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "HookHandler"
+      ]
+    },
+    {
+      "type_name": "GitRefUpdateHandler",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "HookHandler"
+      ]
+    },
+    {
+      "type_name": "HookDispatchInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "HookDispatchService"
+      ]
+    },
+    {
+      "type_name": "HooksPathSetupHandler",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "HookHandler"
+      ]
+    },
+    {
+      "type_name": "GuardHookHandler",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookDispatchCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookDispatchError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookDispatchService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookHandler",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookShellParserPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookVerdictDecision",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookVerdictOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TestFileDeletionGuardHandler",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::hook::dispatch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

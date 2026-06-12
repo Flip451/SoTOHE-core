@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "7a4972e3bf950915323e6a89f06a543f33150c78aa00c85b50f91996c96c2a62",
+      "evidence_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "verdict": {
+        "kind": "pass",
+        "citation": " .githooks/ ディレクトリに reference-transaction フック（--no-verify 迂回不可）と pre-push フックを配置する。各フックは bin/sotp hook dispatch の新しいフック名（git-ref-update / git-pre-push）へ exec する 2 行程度のシェルシムとして実装する"
+      }
+    },
+    {
+      "claim_hash": "7a4972e3bf950915323e6a89f06a543f33150c78aa00c85b50f91996c96c2a62",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "bb91dee149d6b0b492a7aab837f0dd41b044f32b28eabd568851835eb41da009",
+      "evidence_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各フックは bin/sotp hook dispatch の新しいフック名（git-ref-update / git-pre-push）へ exec する 2 行程度のシェルシムとして実装する"
+      }
+    },
+    {
+      "claim_hash": "bb91dee149d6b0b492a7aab837f0dd41b044f32b28eabd568851835eb41da009",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "013471f493c41091fe5361b72d577da471696e62610ef7e554f37eae501a669b",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "33302743a0d44548d224ce695c2eded6f14b4825f9024e26c25cc379d661a5e7",
+      "evidence_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "verdict": {
+        "kind": "pass",
+        "citation": ".githooks/ ディレクトリに ... pre-push フックを配置する。各フックは bin/sotp hook dispatch の新しいフック名（git-ref-update / git-pre-push）へ exec する 2 行程度のシェルシムとして実装する"
+      }
+    },
+    {
+      "claim_hash": "33302743a0d44548d224ce695c2eded6f14b4825f9024e26c25cc379d661a5e7",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。"
+      }
+    },
+    {
+      "claim_hash": "af413745148dea82bd81817d91295e3515d7b43d8d4fef690a9591676e1c11f5",
+      "evidence_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reference-transaction フック（--no-verify 迂回不可）と pre-push フックを配置する。各フックは bin/sotp hook dispatch の新しいフック名（git-ref-update / git-pre-push）へ exec する 2 行程度のシェルシムとして実装する"
+      }
+    },
+    {
+      "claim_hash": "af413745148dea82bd81817d91295e3515d7b43d8d4fef690a9591676e1c11f5",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "dc25af15effa9cb053b1d3363387a7ed4b854757e8e0694dadf88b208b51b6fc",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "72af8f7dec7c069f4878af503434a012523d3593c62ddbc9f61f3ff9ba515c13",
+      "evidence_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-push フックを配置する。各フックは bin/sotp hook dispatch の新しいフック名（git-ref-update / git-pre-push）へ exec する 2 行程度のシェルシムとして実装する"
+      }
+    },
+    {
+      "claim_hash": "72af8f7dec7c069f4878af503434a012523d3593c62ddbc9f61f3ff9ba515c13",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "00f9dbc1d1a4da2938d72b1e4b5c7730b015cda683de68aa2cee3a260fdfc840",
+      "evidence_hash": "75db2f3a3a26553b03a0341edb69d22b89a4c929915f5c9d5a85fa1bc965be36",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各フックは bin/sotp hook dispatch の新しいフック名（git-ref-update / git-pre-push）へ exec する 2 行程度のシェルシムとして実装する"
+      }
+    },
+    {
+      "claim_hash": "00f9dbc1d1a4da2938d72b1e4b5c7730b015cda683de68aa2cee3a260fdfc840",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "58e9ef241ec18335a05520d6c4baeb4b9b1ae5673103449fba885c0aa382eb67",
+      "evidence_hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "block-direct-git-ops フックに「Bash コマンド文字列に SOTP_GUARDED_GIT（exact match）が含まれていたら block」するキーワードスキャンを追加する。スキャンは 2 段階で実施する: (a) GuardHookHandler（usecase 層）が check_commands 呼び出し前に raw コマンド文字列をスキャンし"
+      }
+    },
+    {
+      "claim_hash": "58e9ef241ec18335a05520d6c4baeb4b9b1ae5673103449fba885c0aa382eb67",
+      "evidence_hash": "49581e4cc6d56f7e4b8ff2c66aacc1f6a55185986261b9fe20b6332d4977ee4c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "block-direct-git-ops フックは core.hooksPath が未設定の場合に runtime fail-closed（git コマンドを block）で動作する。git hooks 層が不在の状態でも CC フックが最低限の防御を維持する"
+      }
+    },
+    {
+      "claim_hash": "3abad7012c9e4b4990a6554af2dfd848ecb41aef0093548ec7545984cecf3251",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "9e4064c7f78de0282a9b6b4274a2ebab4d768b17b7e3e18c6ac0b64dfd81a23f",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "9e4064c7f78de0282a9b6b4274a2ebab4d768b17b7e3e18c6ac0b64dfd81a23f",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "setup preflight は hooksPath 設定済みなら allow、未設定なら setup コマンドだけ allow、それ以外の Bash は block する。block-direct-git-ops は直接 git 操作 policy に集中させる"
+      }
+    },
+    {
+      "claim_hash": "7682f83d7b71589ee49f80cdbab7dcf6752d6cfbc6d0c86c74de884c003effcc",
+      "evidence_hash": "5f085555da4981ea40ce42441deb7fffb5a927bf7065e62a7bd4db775c680f0a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "任意 Bash 実行前に core.hooksPath が .githooks を指すことを確認し、未設定または不一致の場合は setup 用の最小コマンド（cargo make bootstrap / git config --local core.hooksPath .githooks）だけを許可して他の Bash を block する runtime setup preflight"
+      }
+    },
+    {
+      "claim_hash": "7682f83d7b71589ee49f80cdbab7dcf6752d6cfbc6d0c86c74de884c003effcc",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath 未設定時の runtime fail-closed は block-direct-git-ops とは別責務の setup preflight として実装する。setup preflight は hooksPath 設定済みなら allow、未設定なら setup コマンドだけ allow、それ以外の Bash は block する。block-direct-git-ops は直接 git 操作 policy に集中させる"
+      }
+    },
+    {
+      "claim_hash": "909349f9d8e0dfff1a8dfa3a6adaf7d01c928728d756314b7d030f51d01a70dc",
+      "evidence_hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GuardHookHandler（usecase 層）が check_commands 呼び出し前に raw コマンド文字列をスキャンし"
+      }
+    },
+    {
+      "claim_hash": "909349f9d8e0dfff1a8dfa3a6adaf7d01c928728d756314b7d030f51d01a70dc",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: CN-06 states that runtime fail-closed when core.hooksPath is unset must be implemented as a separate setup preflight responsibility, and that block-direct-git-ops should focus on direct git operation policy. The claim instead places hooks_path_configured fail-closed behavior inside GuardHookHandler for block-direct-git-ops, blocking before normal policy when a git command is detected."
+      }
+    },
+    {
+      "claim_hash": "9ecdab27e54f34dc5d8596468662b63df2dd92b153d67b40a500f14db1123f75",
+      "evidence_hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GuardHookHandler（usecase 層）が check_commands 呼び出し前に raw コマンド文字列をスキャンし"
+      }
+    },
+    {
+      "claim_hash": "7b95ae5792aafa2c50dcee9dc79df16767d18c764812479a615f5f93c89dcc4e",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "7b95ae5792aafa2c50dcee9dc79df16767d18c764812479a615f5f93c89dcc4e",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath 未設定時の runtime fail-closed は block-direct-git-ops とは別責務の setup preflight として実装する。setup preflight は hooksPath 設定済みなら allow、未設定なら setup コマンドだけ allow、それ以外の Bash は block する。block-direct-git-ops は直接 git 操作 policy に集中させる"
+      }
+    }
+  ]
+}

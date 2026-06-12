@@ -403,11 +403,7 @@ impl ReviewFindingsRecorder {
     }
 
     fn record_subprocess_started(&self) {
-        if let Ok(mut started_at) = self.subprocess_started_at.lock() {
-            if started_at.is_none() {
-                *started_at = Some(Instant::now());
-            }
-        }
+        super::record_instant_once(&self.subprocess_started_at);
     }
 
     fn record(&self, count: u32) {
@@ -635,6 +631,39 @@ mod tests {
     }
 
     #[cfg(unix)]
+    fn run_claude_review_with_fake_script(
+        script_name: &str,
+        envelope_json: &str,
+        track_id: &str,
+        round_type: &str,
+        expect_message: &str,
+    ) -> CodexReviewOutcome {
+        let _guard = env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let base_sha = setup_test_git_repo(dir.path());
+        let _cwd = CwdGuard::save_current();
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        let script = dir.path().join(script_name);
+        write_fake_claude_script(&script, envelope_json);
+
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join(".commit_hash"), &base_sha).unwrap();
+
+        let reviewer = make_reviewer_with_bin(&script);
+        let outcome = run_claude_review_str(track_id, &items_dir, "infra", round_type, reviewer)
+            .expect(expect_message);
+
+        assert!(
+            track_dir.join("review.json").exists(),
+            "review.json must be written (write-first contract)"
+        );
+        outcome
+    }
+
+    #[cfg(unix)]
     #[test]
     fn test_run_claude_review_str_accepts_absolute_items_dir_from_outside_repo() {
         let _guard = env_lock().lock().unwrap();
@@ -674,29 +703,14 @@ mod tests {
     fn test_run_claude_review_str_fast_zero_findings_writes_verdict_and_returns_outcome() {
         // AC-03 / write-first / fail-closed: after a zero-findings verdict the verdict is
         // written to review.json before being returned, and a FastCompleted outcome is produced.
-        let _guard = env_lock().lock().unwrap();
-        let dir = tempfile::tempdir().unwrap();
-        let base_sha = setup_test_git_repo(dir.path());
-        let _cwd = CwdGuard::save_current();
-        std::env::set_current_dir(dir.path()).unwrap();
-
-        let script = dir.path().join("fake-claude.sh");
-        write_fake_claude_script(
-            &script,
+        let outcome = run_claude_review_with_fake_script(
+            "fake-claude.sh",
             r#"{"type":"result","structured_output":{"verdict":"zero_findings","findings":[]}}"#,
+            "my-test-track-2026",
+            "fast",
+            "fast zero-findings review must succeed",
         );
 
-        let items_dir = dir.path().join("track/items");
-        let track_id = "my-test-track-2026";
-        let track_dir = items_dir.join(track_id);
-        std::fs::create_dir_all(&track_dir).unwrap();
-        // Write diff base pointing to the first commit so `src/lib.rs` appears in the diff.
-        std::fs::write(track_dir.join(".commit_hash"), &base_sha).unwrap();
-
-        let reviewer = make_reviewer_with_bin(&script);
-        let result = run_claude_review_str(track_id, &items_dir, "infra", "fast", reviewer);
-
-        let outcome = result.expect("fast zero-findings review must succeed");
         assert!(
             matches!(
                 outcome,
@@ -704,47 +718,24 @@ mod tests {
             ),
             "expected FastCompleted with exit_code 0 and findings_count 0"
         );
-
-        // write-first: review.json must have been written (fail-closed guarantee).
-        let review_json = track_dir.join("review.json");
-        assert!(review_json.exists(), "review.json must be written (write-first contract)");
     }
 
     #[cfg(unix)]
     #[test]
     fn test_run_claude_review_str_fast_findings_remain_writes_verdict_and_returns_outcome() {
         // AC-03: findings_remain case also writes review.json (write-first / fail-closed).
-        let _guard = env_lock().lock().unwrap();
-        let dir = tempfile::tempdir().unwrap();
-        let base_sha = setup_test_git_repo(dir.path());
-        let _cwd = CwdGuard::save_current();
-        std::env::set_current_dir(dir.path()).unwrap();
-
-        let script = dir.path().join("fake-claude-findings.sh");
-        write_fake_claude_script(
-            &script,
+        let outcome = run_claude_review_with_fake_script(
+            "fake-claude-findings.sh",
             r#"{"type":"result","structured_output":{"verdict":"findings_remain","findings":[{"message":"A finding","severity":"P2","file":"src/lib.rs","line":1,"category":"style"}]}}"#,
+            "my-test-track-2026",
+            "fast",
+            "fast findings_remain review must succeed",
         );
 
-        let items_dir = dir.path().join("track/items");
-        let track_id = "my-test-track-2026";
-        let track_dir = items_dir.join(track_id);
-        std::fs::create_dir_all(&track_dir).unwrap();
-        // Write diff base pointing to the first commit so `src/lib.rs` appears in the diff.
-        std::fs::write(track_dir.join(".commit_hash"), &base_sha).unwrap();
-
-        let reviewer = make_reviewer_with_bin(&script);
-        let result = run_claude_review_str(track_id, &items_dir, "infra", "fast", reviewer);
-
-        let outcome = result.expect("fast findings_remain review must succeed");
         assert!(
             matches!(outcome, CodexReviewOutcome::FastCompleted { exit_code: 2, .. }),
             "expected FastCompleted with exit_code 2 (findings_count may be nonzero)"
         );
-
-        // write-first: review.json must have been written before returning the outcome.
-        let review_json = track_dir.join("review.json");
-        assert!(review_json.exists(), "review.json must be written (write-first contract)");
     }
 
     #[cfg(unix)]
@@ -752,28 +743,14 @@ mod tests {
     fn test_run_claude_review_str_final_zero_findings_writes_verdict_and_returns_outcome() {
         // AC-03 / final-round path: a zero-findings final verdict writes review.json
         // and returns FinalCompleted with exit_code 0.
-        let _guard = env_lock().lock().unwrap();
-        let dir = tempfile::tempdir().unwrap();
-        let base_sha = setup_test_git_repo(dir.path());
-        let _cwd = CwdGuard::save_current();
-        std::env::set_current_dir(dir.path()).unwrap();
-
-        let script = dir.path().join("fake-claude-final.sh");
-        write_fake_claude_script(
-            &script,
+        let outcome = run_claude_review_with_fake_script(
+            "fake-claude-final.sh",
             r#"{"type":"result","structured_output":{"verdict":"zero_findings","findings":[]}}"#,
+            "my-test-track-final-2026",
+            "final",
+            "final zero-findings review must succeed",
         );
 
-        let items_dir = dir.path().join("track/items");
-        let track_id = "my-test-track-final-2026";
-        let track_dir = items_dir.join(track_id);
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join(".commit_hash"), &base_sha).unwrap();
-
-        let reviewer = make_reviewer_with_bin(&script);
-        let result = run_claude_review_str(track_id, &items_dir, "infra", "final", reviewer);
-
-        let outcome = result.expect("final zero-findings review must succeed");
         assert!(
             matches!(
                 outcome,
@@ -781,10 +758,6 @@ mod tests {
             ),
             "expected FinalCompleted with exit_code 0 and findings_count 0"
         );
-
-        // write-first: review.json must have been written (fail-closed guarantee).
-        let review_json = track_dir.join("review.json");
-        assert!(review_json.exists(), "review.json must be written (write-first contract)");
     }
 
     #[test]

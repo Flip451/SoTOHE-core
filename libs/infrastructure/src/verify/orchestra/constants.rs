@@ -56,12 +56,35 @@ pub(crate) const EXPECTED_HOOK_PATHS: &[(&str, &str)] = &[];
 
 pub(crate) const EXPECTED_HOOK_COMMANDS: &[(&str, &[&str])] = &[
     (
+        "hooksPath setup preflight hook",
+        &[
+            "SOTP_CLI_BINARY:-",
+            "$CLAUDE_PROJECT_DIR/bin/sotp",
+            "command -v sotp",
+            "hook dispatch hooks-path-setup",
+            "else echo '[Git Policy] sotp CLI is not available. Install sotp or set SOTP_CLI_BINARY, then configure hooks with `git config --local core.hooksPath .githooks`.' >&2; exit 2; fi",
+            "|| exit 2",
+        ],
+    ),
+    (
         "direct git ops block hook",
         &[
             "SOTP_CLI_BINARY:-",
             "$CLAUDE_PROJECT_DIR/bin/sotp",
-            "cargo run --quiet -p cli --",
+            "command -v sotp",
             "hook dispatch block-direct-git-ops",
+            "else echo '[Git Policy] sotp CLI is not available. Install sotp or set SOTP_CLI_BINARY before running Bash commands.' >&2; exit 2; fi",
+            "|| exit 2",
+        ],
+    ),
+    (
+        "test file deletion block hook",
+        &[
+            "SOTP_CLI_BINARY:-",
+            "$CLAUDE_PROJECT_DIR/bin/sotp",
+            "command -v sotp",
+            "hook dispatch block-test-file-deletion",
+            "else echo '[Git Policy] sotp CLI is not available. Install sotp or set SOTP_CLI_BINARY before running Bash or Write guard checks.' >&2; exit 2; fi",
             "|| exit 2",
         ],
     ),
@@ -75,6 +98,11 @@ pub(crate) const EXPECTED_HOOK_COMMANDS: &[(&str, &[&str])] = &[
         ],
     ),
 ];
+
+pub(crate) const FORBIDDEN_HOOK_COMMAND_FRAGMENTS: &[(&str, &str)] = &[(
+    "source checkout cargo fallback in distributed hook command",
+    "cargo run --quiet -p cli --",
+)];
 
 // ---------------------------------------------------------------------------
 // Constants: expected allow (entry -> label)

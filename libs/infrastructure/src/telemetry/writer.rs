@@ -29,12 +29,13 @@
 
 use std::fs::{File, OpenOptions};
 use std::io::Write as _;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 use super::TelemetryEvent;
 use super::TelemetryWriteError;
 use crate::telemetry::config::TelemetryConfig;
+use crate::track::symlink_guard::reject_symlinks_below;
 
 /// Maximum byte length of a single JSONL event line (including the trailing
 /// newline) per CN-05 / IN-02.
@@ -70,6 +71,12 @@ pub struct TelemetryWriter {
     enabled: bool,
     /// Resolved path to `telemetry.jsonl`.
     output_path: PathBuf,
+    /// Trusted root for the default `items_dir/<track>/logs` output path.
+    ///
+    /// `None` when `SOTP_TELEMETRY_DIR` explicitly overrides the output
+    /// directory; that override is intentionally outside the track-items trust
+    /// boundary.
+    guard_root: Option<PathBuf>,
     /// Lazily-opened file handle.  `None` until the first `write` call.
     file: Mutex<Option<File>>,
 }
@@ -98,17 +105,20 @@ impl TelemetryWriter {
     /// No file I/O is performed at construction time (AC-06).
     #[must_use]
     pub fn new(config: TelemetryConfig, track_id: String, items_dir: PathBuf) -> Self {
-        let output_path = match config.output_dir_override() {
-            Some(override_dir) => override_dir.join("telemetry.jsonl"),
+        let (output_path, guard_root) = match config.output_dir_override() {
+            Some(override_dir) => (override_dir.join("telemetry.jsonl"), None),
             None => {
                 // Sanitize track_id: collect only Normal components to prevent
                 // path-traversal via `..` or absolute prefixes in the string.
                 let safe_track_id = safe_path_component(&track_id);
-                items_dir.join(safe_track_id).join("logs").join("telemetry.jsonl")
+                (
+                    items_dir.join(safe_track_id).join("logs").join("telemetry.jsonl"),
+                    Some(items_dir),
+                )
             }
         };
 
-        Self { enabled: config.is_enabled(), output_path, file: Mutex::new(None) }
+        Self { enabled: config.is_enabled(), output_path, guard_root, file: Mutex::new(None) }
     }
 
     /// Writes a single telemetry event as a JSONL line.
@@ -150,17 +160,17 @@ impl TelemetryWriter {
                 path: self.output_path.display().to_string(),
                 message: "output path has no parent directory".to_string(),
             })?;
+            self.reject_symlinked_default_path(dir)?;
             std::fs::create_dir_all(dir).map_err(|e| TelemetryWriteError::Io {
                 path: dir.display().to_string(),
                 message: e.to_string(),
             })?;
+            self.reject_symlinked_default_path(&self.output_path)?;
             let file =
-                OpenOptions::new().append(true).create(true).open(&self.output_path).map_err(
-                    |e| TelemetryWriteError::Io {
-                        path: self.output_path.display().to_string(),
-                        message: e.to_string(),
-                    },
-                )?;
+                open_append_no_follow(&self.output_path).map_err(|e| TelemetryWriteError::Io {
+                    path: self.output_path.display().to_string(),
+                    message: e.to_string(),
+                })?;
             *guard = Some(file);
         }
 
@@ -184,6 +194,16 @@ impl TelemetryWriter {
         }
 
         Ok(())
+    }
+
+    fn reject_symlinked_default_path(&self, path: &Path) -> Result<(), TelemetryWriteError> {
+        let Some(root) = &self.guard_root else {
+            return Ok(());
+        };
+        reject_symlinks_below(path, root).map(|_| ()).map_err(|e| TelemetryWriteError::Io {
+            path: path.display().to_string(),
+            message: e.to_string(),
+        })
     }
 
     /// Serializes `event` into JSONL bytes (JSON + `\n`).
@@ -248,6 +268,17 @@ fn safe_path_component(raw: &str) -> String {
         .filter_map(|c| if let Component::Normal(s) = c { s.to_str() } else { None })
         .next_back();
     last.unwrap_or("unknown").to_string()
+}
+
+fn open_append_no_follow(path: &Path) -> std::io::Result<File> {
+    let mut options = OpenOptions::new();
+    options.append(true).create(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC);
+    }
+    options.open(path)
 }
 
 /// Serializes a `TelemetryEvent` to `JSON\n` bytes.
@@ -359,6 +390,14 @@ mod tests {
         cfg.unwrap()
     }
 
+    fn enabled_default_config() -> TelemetryConfig {
+        let mut cfg = None;
+        temp_env::with_vars([("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)], || {
+            cfg = Some(TelemetryConfig::from_env());
+        });
+        cfg.unwrap()
+    }
+
     /// Builds a writer that writes directly to `tmp.path()/telemetry.jsonl`
     /// (via SOTP_TELEMETRY_DIR override pointing to `tmp.path()`).
     fn writer_in_tempdir(tmp: &TempDir) -> TelemetryWriter {
@@ -413,6 +452,32 @@ mod tests {
         assert!(!content.is_empty(), "telemetry.jsonl must not be empty after write");
         // Must end with newline (JSONL convention).
         assert!(content.ends_with('\n'), "line must end with newline");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_write_default_path_rejects_symlinked_track_dir() {
+        let tmp = TempDir::new().unwrap();
+        let outside = TempDir::new().unwrap();
+        let items_dir = tmp.path().join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::os::unix::fs::symlink(outside.path(), items_dir.join("test-track-2026")).unwrap();
+
+        let writer = TelemetryWriter::new(
+            enabled_default_config(),
+            "test-track-2026".to_string(),
+            items_dir,
+        );
+        let result = writer.write(sample_hook_block_event());
+
+        assert!(
+            matches!(result, Err(TelemetryWriteError::Io { .. })),
+            "symlinked track dir must be rejected before writing telemetry: {result:?}"
+        );
+        assert!(
+            !outside.path().join("logs").join("telemetry.jsonl").exists(),
+            "writer must not follow a symlinked track dir outside items_dir"
+        );
     }
 
     // -----------------------------------------------------------------------

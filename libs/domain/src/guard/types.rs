@@ -8,7 +8,10 @@ pub struct SimpleCommand {
     /// Flattened text from redirect targets (including heredoc bodies).
     /// Used by policy to detect git references hidden in heredocs.
     pub redirect_texts: Vec<String>,
-    /// Whether this command has any output redirect (Write/Append/Clobber).
+    /// Flattened target text from redirects that can open a writable file.
+    /// Excludes input redirects, FD duplication, and heredoc bodies.
+    pub output_redirect_texts: Vec<String>,
+    /// Whether this command has any output redirect (Write/Append/Clobber/ReadWrite).
     /// Does NOT include DupWrite (`>&fd`) or Read (`<`).
     pub has_output_redirect: bool,
 }

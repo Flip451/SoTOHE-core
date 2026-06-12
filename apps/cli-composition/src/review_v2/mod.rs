@@ -6,6 +6,7 @@ pub(crate) mod commit_hash;
 mod helpers;
 #[cfg(test)]
 pub(crate) use helpers::process_guards;
+pub(crate) use helpers::record_instant_once;
 mod inputs;
 pub(crate) mod null_reviewer;
 pub(crate) mod results;
@@ -626,7 +627,9 @@ mod tests {
     use std::path::PathBuf;
     use std::process::Command;
 
-    use crate::review_v2::process_guards::{CwdGuard, EnvGuard, run_git};
+    use crate::review_v2::process_guards::{CwdGuard, EnvGuard, GitRunner};
+    #[cfg(unix)]
+    use crate::test_support::make_executable;
 
     /// Serializes tests in this module that mutate the process CWD.
     /// Note: nextest runs each test in its own process, so this lock guards
@@ -655,9 +658,9 @@ mod tests {
 
     fn setup_review_entrypoint_repo(track_id: &str) -> ReviewEntrypointRepo {
         let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init", "-b", "main"]);
-        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
-        run_git(dir.path(), &["config", "user.name", "Test"]);
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.name", "Test"]);
 
         let track_root = dir.path().join("track");
         fs::create_dir_all(track_root.join("items")).unwrap();
@@ -667,15 +670,15 @@ mod tests {
         )
         .unwrap();
         fs::write(dir.path().join("README.md"), "init\n").unwrap();
-        run_git(dir.path(), &["add", "."]);
-        run_git(dir.path(), &["commit", "-m", "base"]);
+        GitRunner::at(dir.path()).assert_success(&["add", "."]);
+        GitRunner::at(dir.path()).assert_success(&["commit", "-m", "base"]);
         let base_sha = git_stdout(dir.path(), &["rev-parse", "HEAD"]);
 
-        run_git(dir.path(), &["checkout", "-b", &format!("track/{track_id}")]);
+        GitRunner::at(dir.path()).assert_success(&["checkout", "-b", &format!("track/{track_id}")]);
         fs::create_dir_all(dir.path().join("src")).unwrap();
         fs::write(dir.path().join("src/lib.rs"), "pub fn changed() {}\n").unwrap();
-        run_git(dir.path(), &["add", "src/lib.rs"]);
-        run_git(dir.path(), &["commit", "-m", "change src"]);
+        GitRunner::at(dir.path()).assert_success(&["add", "src/lib.rs"]);
+        GitRunner::at(dir.path()).assert_success(&["commit", "-m", "change src"]);
 
         let items_dir = track_root.join("items");
         let track_dir = items_dir.join(track_id);
@@ -683,6 +686,27 @@ mod tests {
         fs::write(track_dir.join(".commit_hash"), base_sha).unwrap();
 
         ReviewEntrypointRepo { _dir: dir, items_dir, track_dir, track_id: track_id.to_owned() }
+    }
+
+    struct TrackBranchRepo {
+        _dir: tempfile::TempDir,
+        items_dir: PathBuf,
+    }
+
+    fn setup_track_branch_repo(track_id: &str) -> TrackBranchRepo {
+        let dir = tempfile::tempdir().unwrap();
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.name", "Test"]);
+        fs::write(dir.path().join("README.md"), "init\n").unwrap();
+        GitRunner::at(dir.path()).assert_success(&["add", "README.md"]);
+        GitRunner::at(dir.path()).assert_success(&["commit", "-m", "init"]);
+        GitRunner::at(dir.path()).assert_success(&["checkout", "-b", &format!("track/{track_id}")]);
+
+        let items_dir = dir.path().join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
+
+        TrackBranchRepo { _dir: dir, items_dir }
     }
 
     #[test]
@@ -696,14 +720,6 @@ mod tests {
         assert_eq!(telemetry.round_type, "fast");
         assert!(!telemetry.verdict_parse_failed);
         assert!(!telemetry.emit_subprocess);
-    }
-
-    #[cfg(unix)]
-    fn make_executable(script: &std::path::Path) {
-        use std::os::unix::fs::PermissionsExt;
-        let mut perms = std::fs::metadata(script).unwrap().permissions();
-        perms.set_mode(0o755);
-        std::fs::set_permissions(script, perms).unwrap();
     }
 
     fn write_agent_profiles(root: &std::path::Path, provider: &str) {
@@ -742,24 +758,13 @@ mod tests {
         let codex = bin_dir.join("codex");
         let script = format!(
             r#"#!/bin/sh
-if [ "$1" = "--version" ]; then
-  echo "codex 0.125.0"
-  exit 0
-fi
-
-out=""
-while [ "$#" -gt 0 ]; do
-  case "$1" in
-    --output-last-message)
-      out="$2"
-      shift 2
-      ;;
-    *)
-      shift
-      ;;
-  esac
-done
-
+case "$1" in
+  --version)
+    echo "codex 0.125.0"
+    exit 0
+    ;;
+esac
+out="${{11}}"
 if [ -z "$out" ]; then
   echo "missing output-last-message" >&2
   exit 9
@@ -876,24 +881,12 @@ exit 0
     fn resolve_track_id_from_branch_relative_items_dir_works_from_subdirectory() {
         let _lock = cwd_lock().lock().unwrap();
 
-        // Set up a real git repo with a track branch.
-        let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init", "-b", "main"]);
-        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
-        run_git(dir.path(), &["config", "user.name", "Test"]);
-        fs::write(dir.path().join("README.md"), "init\n").unwrap();
-        run_git(dir.path(), &["add", "README.md"]);
-        run_git(dir.path(), &["commit", "-m", "init"]);
-        run_git(dir.path(), &["checkout", "-b", "track/test-track"]);
-
-        // Create `<repo>/track/items` so `resolve_project_root` finds a valid structure.
-        let items_dir = dir.path().join("track/items");
-        fs::create_dir_all(&items_dir).unwrap();
+        let repo = setup_track_branch_repo("test-track");
 
         // Create a subdirectory inside the repo.  From this path, the relative string
         // "track/items" does NOT point to an existing directory, so the pre-fix code
         // (`discover_from("track/items")`) would run `git -C track/items …` and fail.
-        let subdir = dir.path().join("src");
+        let subdir = repo._dir.path().join("src");
         fs::create_dir_all(&subdir).unwrap();
 
         // Restore CWD on drop, even if an assertion panics.
@@ -1010,7 +1003,7 @@ exit 0
         let _lock = cwd_lock().lock().unwrap();
 
         let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init", "-b", "main"]);
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
         write_agent_profiles(dir.path(), "codex");
         let briefing = dir.path().join("briefing.md");
         fs::write(&briefing, "# Briefing\n").unwrap();
@@ -1040,7 +1033,7 @@ exit 0
         let _lock = cwd_lock().lock().unwrap();
 
         let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init", "-b", "main"]);
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
         write_agent_profiles(dir.path(), "claude");
         let briefing = dir.path().join("briefing.md");
         fs::write(&briefing, "# Briefing\n").unwrap();
@@ -1061,12 +1054,12 @@ exit 0
     #[test]
     fn review_run_claude_returns_branch_error_not_discovery_error_for_non_track_branch() {
         let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init", "-b", "main"]);
-        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
-        run_git(dir.path(), &["config", "user.name", "Test"]);
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.name", "Test"]);
         fs::write(dir.path().join("README.md"), "init\n").unwrap();
-        run_git(dir.path(), &["add", "README.md"]);
-        run_git(dir.path(), &["commit", "-m", "init"]);
+        GitRunner::at(dir.path()).assert_success(&["add", "README.md"]);
+        GitRunner::at(dir.path()).assert_success(&["commit", "-m", "init"]);
         let items_dir = dir.path().join("track/items");
         fs::create_dir_all(&items_dir).unwrap();
 
@@ -1134,20 +1127,10 @@ exit 0
     /// git discovery to the derived project root, not directly to `items_dir`.
     #[test]
     fn resolve_track_id_from_branch_works_with_absolute_items_dir() {
-        let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init", "-b", "main"]);
-        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
-        run_git(dir.path(), &["config", "user.name", "Test"]);
-        fs::write(dir.path().join("README.md"), "init\n").unwrap();
-        run_git(dir.path(), &["add", "README.md"]);
-        run_git(dir.path(), &["commit", "-m", "init"]);
-        run_git(dir.path(), &["checkout", "-b", "track/abs-track"]);
-
-        let items_dir = dir.path().join("track/items");
-        fs::create_dir_all(&items_dir).unwrap();
+        let repo = setup_track_branch_repo("abs-track");
 
         // Pass the absolute path directly — no CWD dependency.
-        let result = super::helpers::resolve_track_id_from_branch(&items_dir);
+        let result = super::helpers::resolve_track_id_from_branch(&repo.items_dir);
 
         assert_eq!(result.unwrap(), "abs-track");
     }
@@ -1162,12 +1145,12 @@ exit 0
     #[test]
     fn resolve_track_id_from_branch_returns_branch_error_on_non_track_branch() {
         let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init", "-b", "main"]);
-        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
-        run_git(dir.path(), &["config", "user.name", "Test"]);
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.name", "Test"]);
         fs::write(dir.path().join("README.md"), "init\n").unwrap();
-        run_git(dir.path(), &["add", "README.md"]);
-        run_git(dir.path(), &["commit", "-m", "init"]);
+        GitRunner::at(dir.path()).assert_success(&["add", "README.md"]);
+        GitRunner::at(dir.path()).assert_success(&["commit", "-m", "init"]);
         // Stay on `main` (not a track branch).
 
         let items_dir = dir.path().join("track/items");
@@ -1275,12 +1258,12 @@ exit 0
     #[test]
     fn review_run_codex_returns_branch_error_not_discovery_error_for_non_track_branch() {
         let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init", "-b", "main"]);
-        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
-        run_git(dir.path(), &["config", "user.name", "Test"]);
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.name", "Test"]);
         fs::write(dir.path().join("README.md"), "init\n").unwrap();
-        run_git(dir.path(), &["add", "README.md"]);
-        run_git(dir.path(), &["commit", "-m", "init"]);
+        GitRunner::at(dir.path()).assert_success(&["add", "README.md"]);
+        GitRunner::at(dir.path()).assert_success(&["commit", "-m", "init"]);
         // Stay on `main` (not a track branch).
 
         let items_dir = dir.path().join("track/items");

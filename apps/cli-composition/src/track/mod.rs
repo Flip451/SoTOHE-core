@@ -677,7 +677,7 @@ mod tests {
         resolve_project_root, resolve_track_id_for_write,
         rollback_archive_contents_after_logs_error,
     };
-    use crate::review_v2::process_guards::{CwdGuard, run_git};
+    use crate::review_v2::process_guards::{CwdGuard, GitRunner};
 
     fn change_to(path: &Path) -> CwdGuard {
         let guard = CwdGuard::save_current();
@@ -686,10 +686,10 @@ mod tests {
     }
 
     fn init_git_repo(root: &Path) {
-        run_git(root, &["init", "-q"]);
-        run_git(root, &["config", "user.email", "test@test.com"]);
-        run_git(root, &["config", "user.name", "Test"]);
-        run_git(root, &["checkout", "-B", "main"]);
+        GitRunner::at(root).assert_success(&["init", "-q"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@test.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["checkout", "-B", "main"]);
     }
 
     /// `resolve_project_root` strips the trailing `track/items` from a relative path.
@@ -764,8 +764,12 @@ mod tests {
         std::fs::write(logs_dir.join("telemetry.jsonl"), "{}\n").unwrap();
 
         init_git_repo(root);
-        run_git(root, &["add", ".gitignore", "track/items/my-track-2026/tracked.txt"]);
-        run_git(root, &["commit", "-m", "add track", "--no-gpg-sign"]);
+        GitRunner::at(root).assert_success(&[
+            "add",
+            ".gitignore",
+            "track/items/my-track-2026/tracked.txt",
+        ]);
+        GitRunner::at(root).assert_success(&["commit", "-m", "add track", "--no-gpg-sign"]);
 
         let subdir = root.join("nested").join("workdir");
         std::fs::create_dir_all(&subdir).unwrap();
@@ -793,8 +797,8 @@ mod tests {
         std::fs::write(track_dir.join("tracked.txt"), "archive fixture\n").unwrap();
 
         init_git_repo(root);
-        run_git(root, &["add", "track/items/no-logs-track-2026/tracked.txt"]);
-        run_git(root, &["commit", "-m", "add track", "--no-gpg-sign"]);
+        GitRunner::at(root).assert_success(&["add", "track/items/no-logs-track-2026/tracked.txt"]);
+        GitRunner::at(root).assert_success(&["commit", "-m", "add track", "--no-gpg-sign"]);
 
         let subdir = root.join("nested").join("workdir");
         std::fs::create_dir_all(&subdir).unwrap();
@@ -866,13 +870,18 @@ mod tests {
         std::fs::write(src_dir.join("tracked.txt"), "archive fixture\n").unwrap();
 
         init_git_repo(root);
-        run_git(root, &["add", ".gitignore", "track/items/rollback-track-2026/tracked.txt"]);
-        run_git(root, &["commit", "-m", "add track", "--no-gpg-sign"]);
+        GitRunner::at(root).assert_success(&[
+            "add",
+            ".gitignore",
+            "track/items/rollback-track-2026/tracked.txt",
+        ]);
+        GitRunner::at(root).assert_success(&["commit", "-m", "add track", "--no-gpg-sign"]);
         std::fs::create_dir_all(root.join("track").join("archive")).unwrap();
-        run_git(
-            root,
-            &["mv", "track/items/rollback-track-2026", "track/archive/rollback-track-2026"],
-        );
+        GitRunner::at(root).assert_success(&[
+            "mv",
+            "track/items/rollback-track-2026",
+            "track/archive/rollback-track-2026",
+        ]);
 
         let logs_dir = src_dir.join("logs");
         std::fs::create_dir_all(&logs_dir).unwrap();

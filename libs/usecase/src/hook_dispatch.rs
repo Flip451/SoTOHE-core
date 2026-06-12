@@ -11,7 +11,10 @@ use domain::Decision;
 use domain::guard::{ParseError, SimpleCommand};
 use domain::hook::{HookContext, HookInput, HookVerdict};
 
-use crate::hook::{GuardHookHandler, HookHandler, TestFileDeletionGuardHandler};
+use crate::hook::{
+    GitPrePushHandler, GitRefUpdateHandler, GuardHookHandler, HookHandler, HooksPathSetupHandler,
+    TestFileDeletionGuardHandler,
+};
 
 // ---------------------------------------------------------------------------
 // Public boundary types
@@ -109,11 +112,13 @@ pub trait HookDispatchService: Send + Sync {
 /// Unlike [`crate::guard::ShellParserPort`] — which returns `argv.join(" ")`
 /// strings and is intentionally lossy — this port requires implementations to
 /// produce [`SimpleCommand`] values with accurate `argv` (quote-stripped
-/// tokens), `redirect_texts`, and `has_output_redirect` fields.
+/// tokens), `redirect_texts`, `output_redirect_texts`, and
+/// `has_output_redirect` fields.
 ///
 /// Faithful parsing is required by the hook dispatch handlers:
 ///
 /// * `block-direct-git-ops` checks `has_output_redirect` / `redirect_texts`
+/// * `block-test-file-deletion` checks `output_redirect_texts`
 ///   to detect git operations hidden in output-redirect targets.
 /// * `block-test-file-deletion` recurses into shell re-entry payloads
 ///   (`bash -c '...'`); quoted multi-word arguments must remain single tokens
@@ -187,6 +192,10 @@ impl HookHandler for SkillComplianceHandler {
 ///
 /// `project_dir` is injected at construction time by the CLI composition root
 /// (from `$CLAUDE_PROJECT_DIR`) so that environment access stays in the CLI layer.
+/// `guarded_git_token_present` is also injected by the CLI composition root
+/// from `SOTP_GUARDED_GIT` presence so usecase code never reads process env.
+/// `hooks_path_configured` is injected from the CLI composition root after it
+/// reads local git config, keeping process calls out of the usecase layer.
 ///
 /// Injects a [`HookShellParserPort`] (usecase-owned faithful parser port)
 /// for both `block-direct-git-ops` and `block-test-file-deletion`. Both
@@ -200,6 +209,10 @@ pub struct HookDispatchInteractor {
     parser_port: Arc<dyn HookShellParserPort>,
     /// Project directory injected from `$CLAUDE_PROJECT_DIR` by the CLI.
     project_dir: Option<std::path::PathBuf>,
+    /// Whether the guarded git token was present when the CLI composition root started.
+    guarded_git_token_present: bool,
+    /// Whether local git config points `core.hooksPath` at `.githooks`.
+    hooks_path_configured: bool,
 }
 
 impl HookDispatchInteractor {
@@ -212,12 +225,19 @@ impl HookDispatchInteractor {
     /// * `project_dir` — should be supplied by the CLI composition root from
     ///   `$CLAUDE_PROJECT_DIR`. Passing `None` is valid when the directory is
     ///   not available or not needed.
+    /// * `guarded_git_token_present` — should be supplied by the CLI composition
+    ///   root from the process environment check for `SOTP_GUARDED_GIT`. It is
+    ///   consumed only by process-level git hook handlers.
+    /// * `hooks_path_configured` — should be supplied by the CLI composition
+    ///   root from a local `core.hooksPath` git config check.
     #[must_use]
     pub fn new(
         parser_port: Arc<dyn HookShellParserPort>,
         project_dir: Option<std::path::PathBuf>,
+        guarded_git_token_present: bool,
+        hooks_path_configured: bool,
     ) -> Self {
-        Self { parser_port, project_dir }
+        Self { parser_port, project_dir, guarded_git_token_present, hooks_path_configured }
     }
 
     /// Builds the appropriate domain handler for the given hook name.
@@ -226,13 +246,21 @@ impl HookDispatchInteractor {
     fn resolve_handler(&self, hook_name: &str) -> Option<Box<dyn HookHandler>> {
         let domain_parser: Arc<dyn domain::guard::ShellParser> =
             Arc::new(HookShellParserPortAdapter { port: Arc::clone(&self.parser_port) });
+        let guarded_git_token_present = self.guarded_git_token_present;
+        let hooks_path_configured = self.hooks_path_configured;
         match hook_name {
             "block-direct-git-ops" => {
-                Some(Box::new(GuardHookHandler { parser: Arc::clone(&domain_parser) }))
+                Some(Box::new(GuardHookHandler::new(Arc::clone(&domain_parser))))
             }
+            "hooks-path-setup" => Some(Box::new(HooksPathSetupHandler::new(
+                Arc::clone(&domain_parser),
+                hooks_path_configured,
+            ))),
             "block-test-file-deletion" => {
                 Some(Box::new(TestFileDeletionGuardHandler { parser: domain_parser }))
             }
+            "git-ref-update" => Some(Box::new(GitRefUpdateHandler { guarded_git_token_present })),
+            "git-pre-push" => Some(Box::new(GitPrePushHandler { guarded_git_token_present })),
             "skill-compliance" => Some(Box::new(SkillComplianceHandler)),
             _ => None,
         }
@@ -303,6 +331,7 @@ mod tests {
                 .map(|s| domain::guard::SimpleCommand {
                     argv: s.split_whitespace().map(str::to_owned).collect(),
                     redirect_texts: Vec::new(),
+                    output_redirect_texts: Vec::new(),
                     has_output_redirect: false,
                 })
                 .collect())
@@ -310,13 +339,44 @@ mod tests {
     }
 
     fn make_interactor() -> HookDispatchInteractor {
-        HookDispatchInteractor::new(Arc::new(StubHookShellParserPort), None)
+        make_interactor_with_guarded_git_token(false)
+    }
+
+    fn make_interactor_with_guarded_git_token(
+        guarded_git_token_present: bool,
+    ) -> HookDispatchInteractor {
+        HookDispatchInteractor::new(
+            Arc::new(StubHookShellParserPort),
+            None,
+            guarded_git_token_present,
+            true,
+        )
+    }
+
+    fn make_interactor_with_hooks_path_configured(
+        hooks_path_configured: bool,
+    ) -> HookDispatchInteractor {
+        HookDispatchInteractor::new(
+            Arc::new(StubHookShellParserPort),
+            None,
+            false,
+            hooks_path_configured,
+        )
     }
 
     fn bash_command(cmd: &str) -> HookDispatchCommand {
         HookDispatchCommand {
             tool_name: "Bash".to_owned(),
             command: Some(cmd.to_owned()),
+            file_path: None,
+            content: None,
+        }
+    }
+
+    fn git_hook_command() -> HookDispatchCommand {
+        HookDispatchCommand {
+            tool_name: "Git".to_owned(),
+            command: None,
             file_path: None,
             content: None,
         }
@@ -371,6 +431,16 @@ mod tests {
     }
 
     #[test]
+    fn test_dispatch_block_direct_git_ops_allows_read_only_git_when_hooks_path_not_configured() {
+        let interactor = make_interactor_with_hooks_path_configured(false);
+        let cmd = bash_command("git status");
+        let result = interactor.dispatch("block-direct-git-ops".to_owned(), cmd);
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert_eq!(output.decision, HookVerdictDecision::Allow);
+    }
+
+    #[test]
     fn test_dispatch_block_direct_git_ops_missing_command_returns_handler_failed() {
         let interactor = make_interactor();
         let cmd = HookDispatchCommand {
@@ -381,6 +451,42 @@ mod tests {
         };
         let result = interactor.dispatch("block-direct-git-ops".to_owned(), cmd);
         assert!(matches!(result, Err(HookDispatchError::HandlerFailed(_))));
+    }
+
+    // --- hooks-path-setup ---
+
+    #[test]
+    fn test_dispatch_hooks_path_setup_allows_bootstrap_when_not_configured() {
+        let interactor = make_interactor_with_hooks_path_configured(false);
+        let result = interactor
+            .dispatch("hooks-path-setup".to_owned(), bash_command("cargo make bootstrap"));
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().decision, HookVerdictDecision::Allow);
+    }
+
+    #[test]
+    fn test_dispatch_hooks_path_setup_blocks_other_bash_when_not_configured() {
+        let interactor = make_interactor_with_hooks_path_configured(false);
+        let result = interactor
+            .dispatch("hooks-path-setup".to_owned(), bash_command("python3 -c 'print(1)'"));
+
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert_eq!(output.decision, HookVerdictDecision::Block);
+        assert!(output.reason.as_deref().is_some_and(|reason| {
+            reason.contains("core.hooksPath") && reason.contains("cargo make bootstrap")
+        }));
+    }
+
+    #[test]
+    fn test_dispatch_hooks_path_setup_allows_other_bash_when_configured() {
+        let interactor = make_interactor_with_hooks_path_configured(true);
+        let result = interactor
+            .dispatch("hooks-path-setup".to_owned(), bash_command("python3 -c 'print(1)'"));
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().decision, HookVerdictDecision::Allow);
     }
 
     // --- block-test-file-deletion ---
@@ -415,6 +521,60 @@ mod tests {
         let result = interactor.dispatch("block-test-file-deletion".to_owned(), cmd);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().decision, HookVerdictDecision::Block);
+    }
+
+    // --- git-ref-update ---
+
+    #[test]
+    fn test_dispatch_git_ref_update_registered_does_not_return_unknown_hook_name() {
+        let interactor = make_interactor();
+        let result = interactor.dispatch("git-ref-update".to_owned(), git_hook_command());
+        assert!(!matches!(result, Err(HookDispatchError::UnknownHookName(_))));
+    }
+
+    #[test]
+    fn test_dispatch_git_ref_update_with_guarded_git_token_allows() {
+        let interactor = make_interactor_with_guarded_git_token(true);
+        let result = interactor.dispatch("git-ref-update".to_owned(), git_hook_command());
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().decision, HookVerdictDecision::Allow);
+    }
+
+    #[test]
+    fn test_dispatch_git_ref_update_without_guarded_git_token_blocks() {
+        let interactor = make_interactor_with_guarded_git_token(false);
+        let result = interactor.dispatch("git-ref-update".to_owned(), git_hook_command());
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert_eq!(output.decision, HookVerdictDecision::Block);
+        assert!(output.reason.as_deref().is_some_and(|reason| reason.contains("sotp wrapper")));
+    }
+
+    // --- git-pre-push ---
+
+    #[test]
+    fn test_dispatch_git_pre_push_registered_does_not_return_unknown_hook_name() {
+        let interactor = make_interactor();
+        let result = interactor.dispatch("git-pre-push".to_owned(), git_hook_command());
+        assert!(!matches!(result, Err(HookDispatchError::UnknownHookName(_))));
+    }
+
+    #[test]
+    fn test_dispatch_git_pre_push_with_guarded_git_token_allows() {
+        let interactor = make_interactor_with_guarded_git_token(true);
+        let result = interactor.dispatch("git-pre-push".to_owned(), git_hook_command());
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().decision, HookVerdictDecision::Allow);
+    }
+
+    #[test]
+    fn test_dispatch_git_pre_push_without_guarded_git_token_blocks() {
+        let interactor = make_interactor_with_guarded_git_token(false);
+        let result = interactor.dispatch("git-pre-push".to_owned(), git_hook_command());
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert_eq!(output.decision, HookVerdictDecision::Block);
+        assert!(output.reason.as_deref().is_some_and(|reason| reason.contains("sotp wrapper")));
     }
 
     // --- skill-compliance ---

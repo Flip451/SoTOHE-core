@@ -1,0 +1,2762 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4775d4b0b73c07fc8c4eb9584e5e6adad0a36bc1535f5b0cef2540f327c7b80f",
+          "at": "2026-06-12T00:36:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4775d4b0b73c07fc8c4eb9584e5e6adad0a36bc1535f5b0cef2540f327c7b80f",
+          "at": "2026-06-12T00:38:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:148d7ae42cf4f06a5761fdb18c6bf04d8717ce8b0bd80b4564db56a6fae96876",
+          "at": "2026-06-12T13:18:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:148d7ae42cf4f06a5761fdb18c6bf04d8717ce8b0bd80b4564db56a6fae96876",
+          "at": "2026-06-12T13:24:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bf7d80cab2f4c6350cd3b6ed5a488d9454d620b885482046cd03af97c905b26",
+          "at": "2026-06-12T15:10:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38213834b82642569d97bac79bf050e1c79c642c113cf434e93d4ec00a301a30",
+          "at": "2026-06-12T17:16:41Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T16:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T16:26:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new git-process fast path is not reachable for real `reference-transaction`/`pre-push` executions. The hook shim forwards `\"$@\"`, but the `Hook` CLI subcommand still does not accept trailing positional args, so clap will reject the git hook invocation before `CliApp::hook_dispatch` runs. As written, the process-level handler added here will never see production hook calls.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/hook.rs",
+              "line": 131,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c8125f4e0c83c557e2fa6eee0ab5cd33783dcd95ef037958fe2cdcd962c6799a",
+          "at": "2026-06-11T18:10:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8125f4e0c83c557e2fa6eee0ab5cd33783dcd95ef037958fe2cdcd962c6799a",
+          "at": "2026-06-11T18:15:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172db5e52c10a01d3ce2bd9770cfcc9020d71847cd56a0bb8b1a36c3ce7cf2cb",
+          "at": "2026-06-11T18:24:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172db5e52c10a01d3ce2bd9770cfcc9020d71847cd56a0bb8b1a36c3ce7cf2cb",
+          "at": "2026-06-11T18:27:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new public `CliApp::verify_hooks_path` entry point is added without any corresponding happy-path or failure-path tests in this scope. That leaves the new `verify hooks-path` wiring unverified, which is a coverage gap for a public API and makes regressions in the adapter easy to miss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/verify.rs",
+              "line": 281,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:bde22b0268ec00333530da5a245ab2e54b2b64ad155985826250d562bed1dcbe",
+          "at": "2026-06-11T23:39:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cbe03c8f75962081e2c007f26deea160e63e7209fb30595ec2790b90825c0f8",
+          "at": "2026-06-11T23:43:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cbe03c8f75962081e2c007f26deea160e63e7209fb30595ec2790b90825c0f8",
+          "at": "2026-06-11T23:45:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a948cbc8dbb77fb8d2707f5e35846c9a836f18c174ac9be9353026a91365639",
+          "at": "2026-06-12T00:20:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a948cbc8dbb77fb8d2707f5e35846c9a836f18c174ac9be9353026a91365639",
+          "at": "2026-06-12T00:23:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da7650d9e96fc7e93bc183ad15f57ba977b14dc8711f8902080a8d937231db32",
+          "at": "2026-06-12T01:11:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da7650d9e96fc7e93bc183ad15f57ba977b14dc8711f8902080a8d937231db32",
+          "at": "2026-06-12T02:26:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:766cb9aae8805f77e3646d35e4d01f856178578ad21ff8419eb91da41b22e14a",
+          "at": "2026-06-12T17:20:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:766cb9aae8805f77e3646d35e4d01f856178578ad21ff8419eb91da41b22e14a",
+          "at": "2026-06-12T17:20:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb32fb664e3177af1229a7b305ceadd8a1d497822faceb23924d312e295b08f3",
+          "at": "2026-06-12T19:29:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb32fb664e3177af1229a7b305ceadd8a1d497822faceb23924d312e295b08f3",
+          "at": "2026-06-12T19:36:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c2633f10d08a4303999f305734aa3255d9e4aa14f40ccd1899d381be67c0d9b",
+          "at": "2026-06-12T19:54:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c2633f10d08a4303999f305734aa3255d9e4aa14f40ccd1899d381be67c0d9b",
+          "at": "2026-06-12T19:56:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb8d94a1437dba5ba2052f0c58c2b0f478b6e730cc991b1b4be3478520e0b7ff",
+          "at": "2026-06-12T20:05:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb8d94a1437dba5ba2052f0c58c2b0f478b6e730cc991b1b4be3478520e0b7ff",
+          "at": "2026-06-12T20:08:18Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
+          "at": "2026-06-11T18:07:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Dispatch` still accepts only the hook enum, but the new git hook shims are intended to invoke `bin/sotp hook dispatch git-ref-update \"$@\"` / `git-pre-push \"$@\"`. Real `reference-transaction` and `pre-push` hooks supply positional arguments, so clap will reject those extra args before `CliApp::hook_dispatch` runs. That makes normal guarded git operations fail even when `SOTP_GUARDED_GIT` is set; the dispatch command needs to accept and ignore or forward trailing git-hook args while preserving the existing Claude-envelope behavior for the other hooks.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 49,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
+          "at": "2026-06-11T18:09:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The dispatch CLI now changes security-critical public parsing behavior by accepting trailing positional args for git hooks and rejecting them for Claude-envelope hooks, but this scope adds no CLI-level tests for either path. The briefing specifically depends on git hooks being reachable without a Claude JSON envelope while existing Claude hooks still fail closed; without a regression test around this clap boundary, a future parse or dispatch change could break the git shims or weaken the existing hook behavior without being caught. Add happy-path tests for `git-ref-update`/`git-pre-push` with positional args and an error-case test that extra args on non-git hooks return exit 2.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 60,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:26156ae2ce16bdee659229429c994c1cb8e056ee022c2f9f80a2ae2b3bc75c93",
+          "at": "2026-06-11T18:15:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `git-pre-push` CLI dispatch path only has an allow-case integration test with `SOTP_GUARDED_GIT` set. Because this hook is security-critical and must block direct pushes when the guarded token is absent, add the missing error-case test for `sotp hook dispatch git-pre-push ...` without the token returning exit 2.",
+              "severity": "P1",
+              "file": "apps/cli/tests/hook_dispatch.rs",
+              "line": 73,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:22d1581fb17d3afbec62841771c8c44409bad2c6aba31f5937122fe8a3c7d6ef",
+          "at": "2026-06-11T18:21:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
+          "at": "2026-06-11T18:24:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
+          "at": "2026-06-11T18:27:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI integration coverage only exercises the git process hooks. It does not cover the briefing's required invariant that existing Claude-envelope hooks still fail closed on bad stdin after adding the no-envelope git path. Please add CLI-level tests for `block-direct-git-ops` and `block-test-file-deletion` with empty or malformed stdin asserting exit code 2, so a future regression cannot accidentally route those hooks through the git no-envelope path while this suite still passes.",
+              "severity": "P1",
+              "file": "apps/cli/tests/hook_dispatch.rs",
+              "line": 26,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e9679ad779709e995f47bd5ea54f7311fa920537e137df559551296948eb8e50",
+          "at": "2026-06-11T18:38:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58197fc5e01d7287c0b24d65ac728368925016e8148c5db435a0adf744f9c655",
+          "at": "2026-06-11T18:41:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c94f26a8830d84d89e632ca92c7f268012dcf6be52ba1ea238b19eed72302ed",
+          "at": "2026-06-11T18:49:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: This adds a new public `verify hooks-path` subcommand and dispatch arm, but there is no matching parser/dispatch coverage in the verify test suite. The existing `verify_tests.rs` file exercises the other `VerifyCommand` variants; without success/failure tests for `HooksPath`, a clap rename or dispatch regression here could ship unnoticed. See [apps/cli/src/commands/verify.rs:45](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L45) and [apps/cli/src/commands/verify.rs:157](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L157).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs",
+              "line": 45,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
+          "at": "2026-06-11T23:39:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "New public `verify hooks-path` CLI surface is added without CLI-layer parser/dispatch coverage. The existing composition tests cover `CliApp::verify_hooks_path`, but nothing in this scope proves clap parses `verify hooks-path` into `VerifyCommand::HooksPath` or guards the dispatch arm against future miswiring, which is a P1 test gap for a new public subcommand.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 46,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
+          "at": "2026-06-11T23:42:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbf15221fcbd20f9fb5b4bd440986ac8bc5e41a2649c4861b88d3fd437743ee6",
+          "at": "2026-06-11T23:45:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0d3cd25c856c185d3910153a29caa98f0a309fc4b0d7f9b214aabde5afec543",
+          "at": "2026-06-12T00:19:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0d3cd25c856c185d3910153a29caa98f0a309fc4b0d7f9b214aabde5afec543",
+          "at": "2026-06-12T00:21:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54358dd4257ab4795edd3e76a2f78d551ef17e6421297e5f0761a634d0b91852",
+          "at": "2026-06-12T15:10:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d29a6e9c80c71474a0bcd41e87e283f321f44760ae1c9a23a2acc6160943fad0",
+          "at": "2026-06-12T17:12:35Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`argv_contains_guarded_token` only blocks tokens that are exactly `SOTP_GUARDED_GIT`. A quote-split assignment like `SOTP_GUARDED_GI\"T\"=1` is tokenized to `SOTP_GUARDED_GIT=1`, then falls through `skip_var_assignments` and is allowed, so the D3 quote-splitting bypass is still open. The added tests only cover the bare token and an unrelated partial-token allow case; add a regression for the quoted-assignment form and broaden the predicate so that the guarded token cannot be reintroduced as an assignment token.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 543,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:950e2f404da1efa751e3dc0aa1022c11e749ed320d1d5b39ee7ff9479e8497c1",
+          "at": "2026-06-11T01:53:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
+          "at": "2026-06-11T01:58:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
+          "at": "2026-06-11T02:00:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
+          "at": "2026-06-11T17:38:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
+          "at": "2026-06-11T17:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `contains_git_invocation` misses `env`-prefixed invocations because `env` is not in `COMMAND_LAUNCHERS`. That leaves a fail-closed bypass in `GuardHookHandler`: `env git ...` and `sudo env git ...` are parsed as `env`, not `git`, so the new hooks-path gate will not trip even though the command still executes git. `env` is already treated as a wrapper elsewhere in the repo, so this needs to be handled here and regression-tested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "line": 14,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: The new public API `contains_git_invocation` was added without any unit tests in this module. That leaves the launcher-stripping behavior and the new git-detection path unverified, which conflicts with the repo policy that public APIs need happy-path and error/bypass coverage. Add regression tests for direct git, launcher-wrapped git, and at least one non-git case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "line": 143,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6f11052f82ad3e52b175e383a103800e3bef2816d685d51c0e93abe76d35cbe1",
+          "at": "2026-06-12T01:00:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contains_git_invocation()` only strips tokens in `COMMAND_LAUNCHERS`, and `env` is not included there. As a result, `env git status`, `env -i git status`, and `sudo env git status` are parsed as `env` here and return `false`, which bypasses the new fail-closed hooks-path gate even though git still executes.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "line": 143,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:6f11052f82ad3e52b175e383a103800e3bef2816d685d51c0e93abe76d35cbe1",
+          "at": "2026-06-12T01:09:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -i` is still treated as an arg-consuming launcher option here because the final `LAUNCHER_OPTIONS_WITH_ARG` check returns `true` after the `env` special-case. That makes `skip_command_launchers()` skip the real `git` token in `env -i git add`, so the direct-git block is bypassed.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "line": 443,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:771a4974ef9bcb485b587590da53e58159b629a86dd3f8dc299aabe2ebfb8e40",
+          "at": "2026-06-12T01:14:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `env` as a launcher does not cover the `-S/--split-string` form, so a quoted command like `env -S 'git add .'` or `env --split-string='git add .'` is left as a single non-git token and `contains_git_invocation()` returns false. That creates a policy bypass for the hooks-path fail-closed check.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 53,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:359e2ba359d94ef5e965667cc958acec5a438c78cc3b0655efeb151e77893361",
+          "at": "2026-06-12T01:18:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MAX_ENV_SPLIT_DEPTH` caps `env -S` expansion at 3 levels, so a command nested one level deeper stops being inspected for an inner `git` invocation. Once the limit is hit, the code falls back to the plain launcher scan and can silently allow a crafted nested `env -S ... git add` chain.",
+              "severity": "P1",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 136,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:6383e874ffde4a327793c61dc7ce22628620e518945a1043fae9f3ec94f5855c",
+          "at": "2026-06-12T01:28:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24c0fe7f6e8ab1a5c38daf84b9a3d01686740b85e3b8279283606457e9f7a24f",
+          "at": "2026-06-12T01:36:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_env_string` treats every backslash escape as a literal next character, but GNU `env -S` gives `\\_` special meaning as an argument separator. A command like `env -S 'git\\_add .'` is parsed here as executable `git_add` and is allowed, while real `env` executes `git add .`; this bypasses the retained direct-git policy for `git add` and also makes `contains_git_invocation` miss the runtime fail-closed case. The `env -S` splitter needs to model `\\_` as a split boundary, with a regression for `git\\_add`/`git\\_status`.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 495,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:24c0fe7f6e8ab1a5c38daf84b9a3d01686740b85e3b8279283606457e9f7a24f",
+          "at": "2026-06-12T02:25:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GNU `env` accepts clustered short options where `S` carries the split string, for example `env -vSgit add .` is parsed as `env -v -S git add .` and executes `git add .`. This parser only recognizes `-S` when it is the whole token or the first characters of the token, so `-vSgit`/`-ivSgit` are treated as ordinary env options and the effective command becomes `add`, allowing the guarded direct git operation to bypass the policy. Handle clustered env short options containing `S` before skipping them.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 461,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:298274472c05c0076d5a4dc21e3d087cd1776dbf5115366443b8f709f1b54b71",
+          "at": "2026-06-12T02:31:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new env launcher handling misses clustered short options that consume the next argument. For example, GNU `env -iu FOO git add .` is parsed as `env -i -u FOO git add .` and runs `git add`, but this code does not treat `-iu` as consuming `FOO`, so policy inspection stops at `FOO` and allows the command. This reopens a direct-git-operation bypass for both `check_commands` and `contains_git_invocation`.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 630,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:969e2dbb8c1cad54fb081dff1a733366528308dd2e57065f0269dd07c9ee97ec",
+          "at": "2026-06-12T02:36:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_env_string` does not model GNU `env -S` variable expansion, so a command like `GIT=git env -S '${GIT} add .'` is split by policy as `${GIT} add .` and allowed, while real `env` expands `${GIT}` and executes `git add .`. This bypasses the retained direct git-write block and also makes `contains_git_invocation` return false for the runtime git process.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 535,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:c2b9a2ba9ba4a67d5302f2e8a0975df94ee6326515a51d8118301e1e5c0c53ee",
+          "at": "2026-06-12T02:39:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env_split_string_argv_at_env` gives up as soon as it sees an `env` assignment, but `skip_command_launcher_at` later skips that assignment and continues treating a following nested `env` as a launcher. This lets `env FOO=git env -S '${FOO} add .'` through as allowed even though it executes `git add`: the first `env` returns `None`, then launcher skipping consumes `FOO=git` and skips the nested `env -S` string instead of expanding/checking it. The split-string handling needs to carry env-assigned variables forward or otherwise inspect the nested env rather than returning `None` here.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 466,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:4191a489c993ef7eec891a96fa19fcc10463effc521a511ce910fab610d904e5",
+          "at": "2026-06-12T02:45:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_env_string` treats every backslash escape as a literal next character, but GNU `env -S` gives `\\c` special meaning: it terminates parsing and ignores the rest of the split string while keeping the token built so far. A command like `env -S 'git push\\c ignored'` is parsed here as `git pushc ignored`, so `check_git_command` sees subcommand `pushc` and allows it; real `env` executes `git push`. That reopens a direct git write bypass for protected subcommands such as push/commit. Model `\\c` and add a regression test.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 664,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a3956dd8d8c9dbac42e10b283d366de62211dc47f45be8d2d45451239dfd39c8",
+          "at": "2026-06-12T02:56:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_env_string` marks a token as present after every `${...}` expansion even when the variable is unset and appends no text. For `env -S '${MISSING} git add .'` with `MISSING` unset, this code produces an argv like `[\"\", \"git\", \"add\", \".\"]`; `check_argv` then treats the empty string as the effective command and allows it. GNU `env -S` drops the unquoted empty expansion and actually runs `git add .`, so this bypasses the direct git-write block and also makes `contains_git_invocation` return false. The splitter should not create an unquoted empty token for an unset expansion at a token boundary.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 689,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ffe2ee7b3ba52c3f4b638d409dfae8545047f992cc747ff78816c33ffb3e378d",
+          "at": "2026-06-12T03:01:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GNU `env -S` treats an unescaped `#` in the split string as a comment, and if that leaves the split string with no argv entries, the remaining command-line args become the command. This parser keeps `#` as argv[0`, so `env -S '# noop' git add .` is allowed by the policy even though `/usr/bin/env` executes `git add .`, bypassing the direct-git block.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 646,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:3d3900a5f1bb4710d581c9df727e0b376c02aca1fd86636950baac050e54bcae",
+          "at": "2026-06-12T03:08:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -S` split tokens are rechecked as the child command argv, but GNU `env` continues parsing those split tokens as `env` options before executing the command. For example, `env -S '-i' git add .` yields split argv `['-i', 'git', 'add', '.']`; this code then treats `-i` as the effective command and allows it, while real `env` consumes `-i` and executes `git add .`. The same bypass affects `contains_git_invocation`, so guarded direct git operations can evade the policy whenever the split string starts with env options.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 197,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:9c80982d8456b7d6111657beee72fc4da2eb4bade239c88735cce2457ce38043",
+          "at": "2026-06-12T03:13:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -S` is only expanded if it appears before any `NAME=value` assignments for that `env`. When `env_split_string_argv_at_env` sees an assignment, it records the variable and immediately returns to `env_split_string_argv_after_launchers_from` at the next token; that helper only looks for another launcher, so `env GIT=git -S \"git add .\"` falls through to the normal launcher skip path and treats `-S` as the effective command. GNU `env` accepts assignments before `-S`, so this bypasses the direct `git add` block and `contains_git_invocation` fail-closed detection.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 476,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:5ed5bfed8945f93e665581680831458fd1c9c4f583ff17d1461560dcdc537d60",
+          "at": "2026-06-12T03:18:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`policy.rs` now has 1,038 production lines before the `#[cfg(test)]` block, up from 605, which exceeds the AGENTS.md hard maximum of 700 non-test lines per module. The new `env -S` parsing helpers should be split into a smaller module so this domain policy module stays within the required size boundary.",
+              "severity": "P1",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 426,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:01f5ee1e9820f848abfc98a3f6fe5f5abe1e27a994bf99ce6e4817817c3d3741",
+          "at": "2026-06-12T03:33:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -S` expansion silently treats variables that were not assigned in the same argv as empty. In a real shell, an earlier command can export that variable before the guarded command runs, e.g. `export G=git; env -S '${G} add .'`. The parser will hand this policy the second command with only `env -S ${G} add .`; `expand_env_var` drops `${G}`, so `check_commands` and `contains_git_invocation` see `add .` and allow it, while GNU `env` executes `git add .`. This bypasses the retained direct-git block and the hooks-path fail-closed check.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 450,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:78e44f87307c97b6ac2674119e14ea74b98b58150d8d339af3b2b4b782e2cae3",
+          "at": "2026-06-12T03:43:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55996d6b21fe60e40f4a7f1c54e1a30ef19845d1491528fb950cd2b06bd910e9",
+          "at": "2026-06-12T04:07:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3df37bf44d1f620b06a55a339277bad177b1e2acfe60969e204ebc82f84c48",
+          "at": "2026-06-12T11:18:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3df37bf44d1f620b06a55a339277bad177b1e2acfe60969e204ebc82f84c48",
+          "at": "2026-06-12T11:22:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f483922ae1ee54b3fe015469370f7de105103f85af0156b5b88696d637e951e3",
+          "at": "2026-06-12T16:06:29Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:27:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:29:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:22:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:24:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
+          "at": "2026-06-11T23:38:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
+          "at": "2026-06-11T23:40:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify-hooks-path-local` is wired into both `ci-local` and `ci-container`, turning a new repository-local config check into a core CI gate. The briefing says this hooks-path verification is not supposed to land in `ci-local` yet, so clean checkouts that have not been bootstrapped will start failing before the later rollout step.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 354,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
+          "at": "2026-06-12T01:09:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4056d58f2c240bd68c04e40e75c0e02381567e8648cc19711e07f5826c3420cd",
+          "at": "2026-06-12T01:12:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4056d58f2c240bd68c04e40e75c0e02381567e8648cc19711e07f5826c3420cd",
+          "at": "2026-06-12T02:24:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45d1aec4aba0ba009180d834a8a309ef44d7fd7262ffef79e254203ea166d1da",
+          "at": "2026-06-12T11:46:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45d1aec4aba0ba009180d834a8a309ef44d7fd7262ffef79e254203ea166d1da",
+          "at": "2026-06-12T11:48:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `verify-hooks-path-local` here makes `cargo make ci-container` require `core.hooksPath` to already be set, but the GitHub Actions workflow still invokes `cargo make ci-container` directly on a fresh checkout and does not run the bootstrap step that sets it. Because the container mounts `.git` read-only, the new verifier will see the default unset config and fail every CI run.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 362,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
+          "at": "2026-06-12T13:06:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
+          "at": "2026-06-12T13:19:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
+          "at": "2026-06-12T13:25:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2040cb2e2ab4fc9790ebb7a4a7d58f08f5a554bdf7160e349462929fc727e6ad",
+          "at": "2026-06-12T15:10:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9466a53ab9792aebe62f12792036b06f7726a05b4c1be72f9701a4bdbabb077",
+          "at": "2026-06-12T17:17:10Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f619ce0abe18ff0b95fdadafc0afbcd7c076df3e90fdd19aacf33c8926cb883",
+          "at": "2026-06-10T17:11:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR overclaims that git-hook enforcement closes the external-subprocess gap for all nested paths: this line says heredoc/find-exec/multi-nesting/external subprocess routes are captured whenever git starts, but the same ADR later admits `git add` and non-ref worktree mutations are not captured by git hooks and remain a residual risk when invoked through external subprocesses. That contradiction matters because the design intent is process-level enforcement of raw git writes, while index/worktree writes still depend only on the Claude Code hook path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
+              "line": 173,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0f619ce0abe18ff0b95fdadafc0afbcd7c076df3e90fdd19aacf33c8926cb883",
+          "at": "2026-06-10T17:15:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR overstates the fallback coverage provided by the retained Claude Code hook checks. D1 says plain `git checkout <branch>` would still be covered if `reference-transaction` misses it, and the Negative section says `git checkout -- <path>` and `git clean -f` are covered by the D4-maintained direct checks, but D4 only retains checks for add/commit/push/switch/merge/rebase/cherry-pick/reset/branch delete/checkout -b. This makes the residual-risk model internally inconsistent; either those operations need to be included in D4 or described as uncovered residuals.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
+              "line": 73,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5173faa83e38ee48ae79a9f930c2929ed9f65ac7fe003281131999d9275baa1b",
+          "at": "2026-06-10T17:17:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4e4a8b831060709b210a5c8baf9f88bdc67658f5391fef26ff3a48a42b63ce1",
+          "at": "2026-06-10T17:22:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is scoped as domain-only here, but the same task text explicitly pushes the redirect-target test-file check into `TestFileDeletionGuardHandler` / usecase-side logic. That makes the layer boundary inconsistent and understates the actual files that need to change.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 15,
+              "category": "contradiction"
+            },
+            {
+              "message": "T002 says the new git-ref-update / git-pre-push handlers should determine `SOTP_GUARDED_GIT` by inspecting `HookInput.command` raw text, but the surrounding requirement says the decision is env-var presence only. The raw command string is not the token source, so following this text literally would implement the wrong gate and can make the hook block everything.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 25,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1853e11371ba527b0c5fae3572aa743501f2b00f719913ae252948ab53b83431",
+          "at": "2026-06-10T23:35:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 gives two mutually exclusive instructions for the hooks-path read path: it says not to use `Command::new(\"git\")` to read `core.hooksPath`, then immediately says to use `Command::new(\"git\").args([\"config\", \"--local\", \"core.hooksPath\"])` directly. The task needs one explicit implementation route, otherwise the verify step is ambiguous.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 41,
+              "category": "contradiction"
+            },
+            {
+              "message": "T005 overstates the stderr fix by requiring that no `CommandOutcome.stdout`→`println!` path remain in the hook CLI at all. D6 only moves the block-verdict reason to stderr; the requirement should be narrowed to the block branch so the dispatcher does not lose non-block stdout paths.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 49,
+              "category": "contradiction"
+            },
+            {
+              "message": "T009 is internally inconsistent about the CI gate set: the section header and S4 add `verify-hooks-path` to CI, but the concrete task text omits it from the list of gates to run and verify. That leaves the final validation step not actually covering the new gate it introduced.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 81,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e6c5c682f7247c367ac6d5207d172ab688ea669aa6b46f901deaf647c9d7df91",
+          "at": "2026-06-10T23:41:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002` is not executable as written: it tells `HookDispatchInteractor::resolve_handler` to return `Box::new(GitRefUpdateHandler)` and `Box::new(GitPrePushHandler)`, but the type catalogue marks both handlers as having stripped/private fields and documents a required `parser: Arc<dyn ShellParser>` dependency. The plan needs an explicit constructor or wiring step for that dependency; otherwise the new handlers cannot be instantiated.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:177b446e621be59fca44891359d078e91f62d23bdb6948c9fc65dba159741f9d",
+          "at": "2026-06-10T23:48:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e3df412a71f6e81ce634c6593fff4afbab8963c6bef7bee8be2b6389ffcb853",
+          "at": "2026-06-10T23:53:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 places the token check directly inside the usecase handlers via `std::env::var(\"SOTP_GUARDED_GIT\")`. That conflicts with the hexagonal/usecase-purity contract referenced by this scope: usecase interactors should not read process environment directly, so the plan should route the token presence through CLI input or a port/adapter boundary instead of implementing env access in `GitRefUpdateHandler` / `GitPrePushHandler`.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 25,
+              "category": "architecture violation"
+            },
+            {
+              "message": "T006 assigns the runtime `core.hooksPath` check to `libs/domain/src/guard/policy.rs` or a usecase handler and explicitly suggests `std::process::Command::new(\"git\")` there. That places process I/O and git-config access in inner layers rather than behind a trait/infrastructure adapter, so the plan violates the repository's hexagonal boundary and will steer implementation toward a usecase/domain purity failure.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 57,
+              "category": "architecture violation"
+            },
+            {
+              "message": "The domain catalogue says `HookName` is a `modify` item that must gain `GitRefUpdate` and `GitPrePush`, but T002 says those variants are already present and no task actually performs the domain enum modification. This is an internal plan/catalogue contradiction that can leave the dispatch tasks without the required domain hook names.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e3df412a71f6e81ce634c6593fff4afbab8963c6bef7bee8be2b6389ffcb853",
+          "at": "2026-06-10T23:57:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The type catalogue leaves `HookDispatchInteractor::new` with only `parser_port` and `project_dir`, but the implementation plan requires `guarded_git_token_present` in T002 and `hooks_path_configured` in T006 to be injected through this constructor. As written, the catalogue contract cannot carry the state that both new git hook handlers and runtime fail-closed behavior depend on, so implementers would have to either violate the catalogue or skip required behavior.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/usecase-types.json",
+              "line": 297,
+              "category": "contradiction"
+            },
+            {
+              "message": "`check_commands` is still declared as taking only `&[SimpleCommand]`, while the same entry says it will scan the raw command string and AC-03 requires raw Bash command strings such as `SOTP_GUARDED_GIT=1 git commit` to be blocked by `check_commands`. `SimpleCommand` carries argv/redirects but not the original raw command, so this contract cannot satisfy the raw-string scan unless the signature changes or the raw scan is moved to another handler and the spec/catalogue text is aligned.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/domain-types.json",
+              "line": 207,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The new `GitRefUpdateHandler` catalogue text says it checks `SOTP_GUARDED_GIT` env-var presence, mentions `CN-06 fail-closed if hooks path unset`, and says it does so \"via policy\". That contradicts the spec/plan: T002 says CLI composition reads the env var and injects a boolean, and CN-06 is the separate `block-direct-git-ops` runtime hooksPath fail-closed behavior from T006. This points the handler at the wrong responsibility and layer boundary.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/usecase-types.json",
+              "line": 116,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9480ee38e06dbe010016a1085dd620de712b61b7930da21ea5bb880081932db2",
+          "at": "2026-06-11T00:06:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 requires `HookDispatchInteractor` to inject `hooks_path_configured` into `GuardHookHandler` so `handle` can fail closed when hooksPath is missing, but the usecase catalogue declares `GuardHookHandler` as `action: reference`, with only the `parser` field and “No structural change”. Following the catalogue leaves no planned field/constructor change to carry the injected flag, making CN-06/AC-11 unimplementable without an unplanned catalogue revision.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/usecase-types.json",
+              "line": 159,
+              "category": "contradiction"
+            },
+            {
+              "message": "T002’s implementation plan says the new `GitRefUpdateHandler` / `GitPrePushHandler` catalogue docs declare `Private field: parser: Arc<dyn ShellParser>` and instructs construction like `GuardHookHandler`, but the actual catalogue documents `Private field: guarded_git_token_present: bool` for those handlers. This contradicts the intended token-only handler design and can send implementation toward adding an unused parser dependency instead of the required injected token flag.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3a99924f04d771f27d7d40ef8d9232c09053a6f615c06553577c0b1bb32b7788",
+          "at": "2026-06-11T00:11:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-03 assigns both the raw Bash command string scan and the quote-stripped argv scan to `policy.rs`, but T001 later says raw command strings must be scanned in `GuardHookHandler` before `check_commands` because `SimpleCommand` does not retain the raw string, with only argv scanning left in `domain::guard::policy::check_commands`. These are conflicting implementation contracts for the same requirement; following the spec literally pushes raw-string handling into a function that lacks the needed input, while following the plan means IN-03 is misstated. Align the spec/AC wording with the two-stage layer split before implementation.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.md",
+              "line": 22,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-03 states that token injection outside the Rust binary is structurally prevented, but the ADR's D2 explicitly preserves a human escape hatch where a person may run `SOTP_GUARDED_GIT=1 git ...` directly from their terminal. Both cannot be true as written: the design can prevent Claude Code Bash inline injection via D3, but it cannot also structurally prevent all non-Rust token presentation while allowing human self-presentation. Narrow CN-03 to the automatic/AI-controlled injection path or update the ADR escape hatch.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.md",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b84b0132aa7a224f4acd2aa7b49edfdcd18294a8db8d8506d27b82e3f155e7a6",
+          "at": "2026-06-11T00:16:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 adds `verify-hooks-path` to `cargo make ci` and defines an unset or non-`.githooks` `core.hooksPath` as a CI failure, but the plan does not add the setup step that configures `core.hooksPath .githooks` until T006. That ordering makes the T004 commit unable to satisfy the plan’s per-task CI-green expectation on a fresh checkout or CI runner without local git config. Move the setup before the CI gate, or defer wiring the gate into `ci` until the setup task lands.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 43,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-08 says `apps/cli/src/commands/hook.rs` should not `println!` `CommandOutcome.stdout`, but T005 says the change is limited to the block verdict and that allow or other non-block stdout paths must remain unchanged. Those are conflicting implementation contracts for the CLI output path; narrow AC-08 to the block-verdict reason path so implementers do not remove legitimate stdout handling globally.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.md",
+              "line": 58,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:236cc042cf37b5b4af8caf4d496d2ef69ba4c35b7074f854a9f1edd1ff631ad8",
+          "at": "2026-06-11T00:20:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is scheduled before T006, but the task both adds `verify-hooks-path` to the CI gate and says that CI integration must wait until T006-A has added the bootstrap `core.hooksPath` setup. Implementing T004 as written breaks per-task `cargo make ci` on a fresh checkout; deferring the gate means T004 does not satisfy IN-09/AC-10. Split the verify implementation from CI wiring, or move the bootstrap setup before the gate is enabled.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 43,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T007 treats `chmod +x` and `gitattributes` as equivalent ways to guarantee executable hook shims. Git attributes do not set the executable bit for hooks; if the implementation follows that branch, `.githooks/reference-transaction` or `.githooks/pre-push` may be present but not executable, so Git will not run the enforcement hook. Require an executable index mode and/or an explicit bootstrap `chmod +x` step instead.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 68,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:11a2fbe731f3be096514d72d11002e9c953203a0e6716c016d8bc3cea83188d7",
+          "at": "2026-06-11T00:26:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 says the SOTP_GUARDED_GIT injection model relies on `libs/infrastructure/src/git_cli/` as the single `Command::new(\"git\")` passage point for sotp-originated git calls, but T004 explicitly adds a second direct `std::process::Command::new(\"git\")` path for `git config --local core.hooksPath` and treats it as an allowed residual; T006 repeats the same direct CLI-composition git call. That makes the single-passage constraint semantically false unless the spec/ADR is narrowed to write-only git calls or these read-only hooksPath reads are modeled as an explicit exception/adapter.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-03/T001 assign the raw `SOTP_GUARDED_GIT` command-string scan to `GuardHookHandler`, but the usecase type catalogue describes `GuardHookHandler` as modified only for T006/CN-06 runtime fail-closed and only references CN-06. The catalogue therefore contradicts the spec/plan about this handler's usecase-layer responsibility, so a catalogue-driven implementation can miss the raw token scan even though the spec requires it.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/usecase-types.json",
+              "line": 174,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0d4a64b554783a00cd31bfb67d7a5eea5ec59340b09c5dcc908ddc6ff9462999",
+          "at": "2026-06-11T00:37:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-10 is mapped only to T004, but T004 explicitly stops short of wiring the hooks-path verifier into ci-local and defers that CI gate to T006. The plan itself describes T006 as the task that adds `verify-hooks-path-local` to the ci-local dependency chain, so the current coverage lets the D7 CI-verify layer appear covered before the task that actually makes CI fail on bad `core.hooksPath` runs. Add T006 to the AC-10/IN-09 coverage, or move the CI wiring into T004 and align the plan text.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/task-coverage.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b6c89556763953c5ffa62669b67732330d5a503835776f528de98ef196842414",
+          "at": "2026-06-11T00:42:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 configures `core.hooksPath=.githooks` and treats `hooks_path_configured == true` as disabling the runtime fail-closed block before T007 creates the actual `.githooks/reference-transaction` and `.githooks/pre-push` shims. That leaves an intermediate state where verify can pass and GuardHookHandler will not fail closed, while the git hook files still do not exist, contradicting the stated guarantee that runtime fail-closed protects when the git hooks layer is absent. Reorder T007 before T006, or make the T006 check/flag require the hook files to exist and be executable before considering the hooks layer configured.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 59,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6196734a781830221a6f9cae1dbb27762e6b1e421190ba516aaf21ce04a74b99",
+          "at": "2026-06-11T00:46:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated task order is internally infeasible: S6/T006 is listed before S7/T007, but S6 explicitly says T006 depends on T007 and must run after the `.githooks/reference-transaction` and `.githooks/pre-push` files exist. Following the plan top-to-bottom would create the exact unprotected window the plan says must be avoided. Reorder T007 before T006 or split the bootstrap/CI wiring so the declared dependency order is executable.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 52,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-03 assigns `SOTP_GUARDED_GIT` Bash command-string blocking to `policy.rs::check_commands`, but IN-03 says raw command strings must be scanned in usecase `GuardHookHandler` before `check_commands` because `SimpleCommand` does not retain raw text; `check_commands` only scans quote-stripped argv tokens. As written, the acceptance criterion contradicts the layer split and could drive an API/layering violation. Split AC-03 into raw-string coverage for `GuardHookHandler` and argv-token coverage for `policy.rs::check_commands`.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.md",
+              "line": 53,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a786736541d6eceaad58120ab4a3c5ebde30adaf117250195e5dd6b367db32",
+          "at": "2026-06-11T00:50:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 adds `verify-hooks-path-local` to `ci-local` while instructing the bootstrap change to add `git config core.hooksPath .githooks` only after the existing Step 5. The current bootstrap flow runs `ci-local` before that point, so a fresh `cargo make bootstrap` would execute the new hooks-path verifier before `core.hooksPath` is configured and fail. Move the hooksPath setup before the bootstrap CI step, or defer the CI gate until after that setup has run.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/plan.md",
+              "line": 69,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:81ae09ac4e4403c70109107da5c6949e351e952181bf0aa4f10a93f2966a8769",
+          "at": "2026-06-11T00:55:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 still says the external-subprocess gap is structurally resolved, but the ADR narrows that closure to ref-updating operations and explicitly leaves `git add` and non-ref worktree mutations via external subprocess as residual risks. That contradiction overstates the feature goal and can make the plan appear to satisfy a class of raw git writes it intentionally does not cover; narrow GO-01 to the ref-update/push gap or record the residual classes here too.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3d58667b798870b6c1f067ee0dda8537aaadaf683e242422b707176c1dda9dd8",
+          "at": "2026-06-11T00:59:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 says that if `reference-transaction` does not catch `git switch` / `git checkout <branch>` HEAD symbolic-ref changes, the D4-maintained direct git subcommand check will cover direct invocations. But D4's maintained list only includes `checkout -b`, and the implementation plan/ACs likewise never require blocking `git checkout <existing-branch>`. If the implementation-time verification finds the hook does not fire for this case, the plan has no task or acceptance criterion to add the promised fallback, leaving a direct branch checkout outside the stated guard coverage. Either include `checkout <branch>` in the maintained direct checks/tests or weaken D1 to record it as residual risk.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
+              "line": 73,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f1309f75dd81cfe906d7ef0830b4e267e0842eed3fa86328c4b4fa683142db97",
+          "at": "2026-06-11T01:03:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1 says existing-branch switching is not covered by the retained D4 direct git subcommand checks, but D4/spec/AC-05 explicitly retain `git switch` as a direct command that must be blocked. This leaves the plan internally inconsistent about whether AI `git switch`/existing branch switching is a protected direct-check path or an accepted residual risk if `reference-transaction` misses the HEAD symbolic-ref change.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
+              "line": 73,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:00eb190fc2ae72a0e788e02b3b2d800796f4e341019a27d7195668f073c189c4",
+          "at": "2026-06-11T01:07:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a83d43f177acbd13a82b1d5c81cf65120cc5dc71b9a51519f9a1e38f0ca21731",
+          "at": "2026-06-11T01:11:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4f82c3771929da12267f366089eafd3e9c59f76b5e02ab20232acaa41102eac",
+          "at": "2026-06-11T01:51:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4f82c3771929da12267f366089eafd3e9c59f76b5e02ab20232acaa41102eac",
+          "at": "2026-06-11T01:54:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect-target contract is split across the plan artifacts: this file introduces `SimpleCommand.output_redirect_texts` as the field to scan, but `plan.md`/`impl-plan.json` and the scope spec still describe CN-07/IN-05 in terms of `SimpleCommand.redirect_texts`. That leaves two competing source-of-truth field names for the same behavior, so implementers cannot tell which contract is canonical.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/guard-process-level-enforcement-2026-06-10/domain-types.json",
+              "line": 131,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f153ab04a1cfd6c0d6c2f5c096fd5eefce547989751c99c3cbf5f0cf9cd8b4f3",
+          "at": "2026-06-11T17:37:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b704ba8ee739fd2ab500815d6e8d9dbdcb2660191df85086874510a8847a954",
+          "at": "2026-06-11T17:43:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b704ba8ee739fd2ab500815d6e8d9dbdcb2660191df85086874510a8847a954",
+          "at": "2026-06-11T17:46:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06006512ede30db2070bbd61eaa6621d8f65e9def6d3c27a444fc313f2ccb91a",
+          "at": "2026-06-11T18:07:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06006512ede30db2070bbd61eaa6621d8f65e9def6d3c27a444fc313f2ccb91a",
+          "at": "2026-06-11T18:09:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:198c0be362e594859eee43a496d4cd53bc3d07fd184e13b03ad82f04b4dfaeb6",
+          "at": "2026-06-11T19:03:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:198c0be362e594859eee43a496d4cd53bc3d07fd184e13b03ad82f04b4dfaeb6",
+          "at": "2026-06-11T19:05:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0037fd423e899bd91e2f37ea6a264867488ca981c1893d0cbd58816b4c0a53a7",
+          "at": "2026-06-11T23:38:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0037fd423e899bd91e2f37ea6a264867488ca981c1893d0cbd58816b4c0a53a7",
+          "at": "2026-06-11T23:40:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74550b0605437051814f16541c49c47cf68a7a975bd2c5c615a16c71ea805d0",
+          "at": "2026-06-12T00:18:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74550b0605437051814f16541c49c47cf68a7a975bd2c5c615a16c71ea805d0",
+          "at": "2026-06-12T00:20:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b72e19f7cb9fb3f29db7e164625afc05127674288f93ca514959ae83222dad6",
+          "at": "2026-06-12T00:37:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b72e19f7cb9fb3f29db7e164625afc05127674288f93ca514959ae83222dad6",
+          "at": "2026-06-12T00:39:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af0d0a23178543d9e704deefbb2d524acef80526152bf76ff31cfe224fdf9571",
+          "at": "2026-06-12T01:08:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af0d0a23178543d9e704deefbb2d524acef80526152bf76ff31cfe224fdf9571",
+          "at": "2026-06-12T02:25:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80ac9b2192d5f2d55daf835814354326a3fff7fc0809f551109da3033a2473af",
+          "at": "2026-06-12T10:49:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80ac9b2192d5f2d55daf835814354326a3fff7fc0809f551109da3033a2473af",
+          "at": "2026-06-12T10:53:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2141cdb84e4cbc4f0a54b16b06f75627df01fa06a30aa5302bf48179361f8851",
+          "at": "2026-06-12T11:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2141cdb84e4cbc4f0a54b16b06f75627df01fa06a30aa5302bf48179361f8851",
+          "at": "2026-06-12T11:48:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f43761f08abd8ad9f336bb591bfa4d6652366afa2e5f02b6ce3be62947adc8a6",
+          "at": "2026-06-12T11:56:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 says `verify-hooks-path` was added to the `ci-local` dependency chain by T004, but the same plan states T004 explicitly does not add it to `ci-local` and that T006 performs that integration. This is a semantic contradiction in task ownership for the CI gate; update T009 to attribute the `ci-local` gate integration to T006 while leaving T004 as the verifier/subcommand implementation.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f43761f08abd8ad9f336bb591bfa4d6652366afa2e5f02b6ce3be62947adc8a6",
+          "at": "2026-06-12T11:59:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b3f21b31eec213197ae3fa8ed8963d8999a941e4e56812c5f400bac5fc43b19",
+          "at": "2026-06-12T12:02:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bedb36107d3c3a4fb92d97cca992936cdab7c05f46af007b8798cb23f56ef931",
+          "at": "2026-06-12T12:10:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bedb36107d3c3a4fb92d97cca992936cdab7c05f46af007b8798cb23f56ef931",
+          "at": "2026-06-12T12:13:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 is still defined as running after only T001-T008, but the same task now claims to verify AC-11 for the hooks-path-setup runtime fail-closed behavior. That behavior is introduced by T010, so this dependency/order makes the cross-cutting verification physically unable to cover the new AC-11 unless T009 is moved/updated to run after T010 or a separate post-T010 verification task is added.",
+              "severity": "P1",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
+              "line": 54,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:29a1a25ebd09a9d85ca3e2c2d131cee097058d19c27264bb833b3daac3b47bd9",
+          "at": "2026-06-12T16:08:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8c48f59ed8255f02f80c65529fe691dfe75defb865d50b75b5fd7df3d787edd",
+          "at": "2026-06-12T16:15:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc6b8278137914935421dffb2dbfa9b24797bfcd11aa63196ef23ef78cee9875",
+          "at": "2026-06-12T17:17:20Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect scan treats every `redirect_texts` entry as an output target, but this field also carries input-redirect words and heredoc bodies in the parser. As written, benign commands like `cat < tests/foo.rs` or a heredoc that mentions `tests/foo.rs` will be blocked even though they do not truncate a test file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 155,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:8419ea8749755d722a4da9a969d720b4671570c0d5017790dca0417a14ebe683",
+          "at": "2026-06-11T01:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new test-file redirect check only runs on the top-level `commands` slice after `check_commands_for_test_deletion` returns. Shell re-entry payloads (`bash -c`, `sh -c`, etc.) are only recursed for `rm` detection in `check_commands_for_test_deletion`, so a command like `bash -c 'echo hi > tests/foo.rs'` bypasses this guard and can still truncate a test file. The redirect check needs to be applied inside the recursive path as well.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 155,
+              "category": "security"
+            },
+            {
+              "message": "`redirect_texts` includes flattened heredoc bodies as well as actual redirect destinations, but this loop treats every entry as a filesystem path. That means a benign command with an output redirect and a heredoc containing `tests/foo.rs` can be blocked even though no redirect targets a test file. The redirect-target predicate needs to distinguish real output destinations from heredoc content.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 157,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:55cf57be253002cd997cb57a5726bff50ab2c712305cbc2312fb7fef3e6b1d83",
+          "at": "2026-06-11T01:59:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Skipping any redirect target that contains whitespace lets quoted output targets bypass the new test-file guard. A command like `echo hi > 'tests/foo bar.rs'` would be treated as a non-path heredoc/body and allowed, even though it can still truncate a test file.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 197,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f36afd505e8028961ab043371a643dfae9aebd7680d3332e540e96b2575edc27",
+          "at": "2026-06-11T02:06:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new raw-token guard is too broad: `command.contains(SOTP_GUARDED_TOKEN)` blocks any command string that merely contains `SOTP_GUARDED_GIT` as a substring, including benign literals such as comments, echoed text, or filenames like `SOTP_GUARDED_GITX`. The downstream domain check uses exact token/assignment matching specifically to avoid this class of false positive, so the pre-parse scan should use token boundaries rather than a plain substring search.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 54,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e79dcea6f7fc22930b8effba9e7e76afba1a2a64aa119d62c8f8e98df925ebdb",
+          "at": "2026-06-11T02:10:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect check is direction-blind: `redirect_texts` contains input-redirect targets and heredoc bodies as well as output targets, so any command that merely reads from a test file and also has an output redirect (or a heredoc body that looks like a test path) will be blocked even though it is not truncating the test file. This needs redirect-type filtering, not a flat scan of `redirect_texts`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 198,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0df90eb73acdb6720bc09448ee5bd35998cc63c90383b4d7bc3bebbe96064524",
+          "at": "2026-06-11T02:18:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Redirect-to-test-file blocking is only applied once to the top-level raw command string and only recognizes stdout-style operators. A nested payload like `bash -c 'echo hi > tests/foo.rs'` is never checked, and redirects such as `2>`, `1>` or `&>` are ignored, so the truncation bypass remains.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 185,
+              "category": "security"
+            },
+            {
+              "message": "`raw_command_contains_guarded_token` only checks the trailing boundary, so it also matches the token as a suffix inside longer identifiers like `MY_SOTP_GUARDED_GIT=1`. That contradicts the exact-match behavior in the domain policy and will falsely block unrelated commands.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 353,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c854f902dea07ab6f3c2a0a6ee19d945716ae14b5556cc2231f6da09cc10a1d6",
+          "at": "2026-06-11T02:25:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect guard depends on `tokenize(command)`, which only splits on whitespace and quotes. Shell-valid write forms like `echo hi>tests/foo.rs` or `echo hi > tests/foo.rs; true` keep the redirect operator/terminator attached to the target token, so `is_test_file` sees `hi>tests/foo.rs` or `tests/foo.rs;` and the test-file block is bypassed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 191,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:da4ad0159df591405004290139492a0e58a5073442641a1d71524bd691d07dfc",
+          "at": "2026-06-11T02:33:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d3627cccd10054e159bea941f520dce73a3f5b51ea98c3a1664f3292a59c2a8",
+          "at": "2026-06-11T02:41:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d3627cccd10054e159bea941f520dce73a3f5b51ea98c3a1664f3292a59c2a8",
+          "at": "2026-06-11T02:46:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect-to-test-file guard is bypassed on parser failures: the existing fail-closed path only checks `raw_mentions_rm`, so a valid Bash command that the parser rejects or refuses due to nesting depth can still run and truncate a test file with `> tests/foo.rs`. The same rm-only fallback is used for shell re-entry errors/depth limits, so the new AC-06 redirect protection is not fail-closed in the cases where parsing cannot produce `redirect_texts`. Block parse/depth failures that mention an output redirect to an `is_test_file` target, or fail closed for Bash parse errors in this hook.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 145,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7d3627cccd10054e159bea941f520dce73a3f5b51ea98c3a1664f3292a59c2a8",
+          "at": "2026-06-11T02:50:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fail-closed raw redirect scanner claims to catch `>|`, but this branch only advances past `>>`; for `>| tests/foo.rs` it starts tokenization at `|`, immediately stops on the pipe delimiter, and returns false. When parsing fails or the shell re-entry depth limit is hit, a clobber redirect to a test file can therefore be allowed instead of blocked.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 410,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0267ba8ae733ac2140a73faad15da2e1aaa176272dada63e3856504d111ddaba",
+          "at": "2026-06-11T02:57:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_mentions_output_redirect_to_test_file` treats every `>&` as fd duplication and skips it, but Bash also accepts `>& file` as a stdout+stderr file redirect. If the parser rejects that Bash extension, `echo hi >& tests/foo.rs` reaches this fail-closed fallback, `raw_mentions_rm` is false, this helper returns false, and the hook allows a valid truncating redirect to a test file. The fallback needs to distinguish numeric fd duplication (`2>&1`, `>&2`, `>&-`) from file targets and block `>& tests/...` targets.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 399,
+              "category": "data_loss"
+            }
+          ],
+          "hash": "rvw1:sha256:26499d32cfe0cc87a805bff825dee943659687874097d8846ce0f015d388cd7b",
+          "at": "2026-06-11T03:02:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0075da5b7fd2b70ca77fcca82d959216e8a4cd6abcf8560702947103adaa148",
+          "at": "2026-06-11T03:06:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect guard only compares the unevaluated `redirect_texts` / raw token text against `is_test_file`, so shell-expanded destinations are still a bypass. A command like `echo hi > $TEST_DIR/foo.rs`, `echo hi > ${VAR}/tests/foo.rs`, or `echo hi > $(printf tests/foo.rs)` will not match the literal test-file patterns here, and the parse-failure fallback at `raw_mentions_output_redirect_to_test_file` has the same blind spot. That leaves the test-file truncation vector open for dynamically constructed redirect targets.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 180,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7548b97be217da767bfbe609df68a2a3cccfbd3bc8188134ed5edc8e67c86401",
+          "at": "2026-06-11T06:59:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The parse-error fallback is not actually fail-closed for writable redirects because it explicitly skips `<>` as if it were read-only. A malformed command such as `echo foo <> tests/foo.rs` can therefore bypass the new guard and reach `allow()` even though `<>` is a write-capable redirect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 428,
+              "category": "security"
+            },
+            {
+              "message": "The raw redirect scanner tokenizes targets by raw whitespace and only trims outer quotes, so quoted or escaped redirect paths with spaces are missed in the parse-error fallback. For example, `echo foo > \"tests/foo bar.rs\"` or `echo foo > tests/foo\\ bar.rs` will not be recognized as test-file redirects after a parse failure, which breaks the intended fail-closed behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 446,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f9a76a0fc88b3156783c1fc08ea846e4156eace9c93cbd63aff5c7d4abc00fc9",
+          "at": "2026-06-11T07:09:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`redirect_target_has_shell_expansion()` only treats `$` and backticks as dynamic. That leaves Bash process substitution and other non-`$` expansion forms unblocked, so a command like `echo hi > >(cat > tests/foo.rs)` can still reach a test-file write path without tripping either the parsed redirect check or the raw fallback. This is a bypass of the new truncation guard.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 516,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b34938d310c6c162c39205436e94c8cc84be37fe9e32e108fcbe59d251e8ac40",
+          "at": "2026-06-11T07:18:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`redirect_texts` is not limited to output redirect targets here; the surrounding comment says it also carries input redirects and heredoc bodies. As a result, this loop can block harmless commands that merely read from a test file or contain a heredoc body mentioning a test-like path, even when the actual output target is safe. That makes the new guard broader than the intended test-file output truncation check.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 170,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d0715bf2dc8eb584dabfb6f5266df8472ee943c0517553a70176abc5d5d95940",
+          "at": "2026-06-11T07:27:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect guard only treats `$`, backticks, and `>(`/`<(` as dynamic. Bash brace/glob expansions are still accepted, so a command like `echo > {t,}ests/foo.rs` can expand to `tests/foo.rs` and bypass the block on both the parse-success and parse-error paths. This leaves a test-file truncation path open.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 651,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ec318a8ffdf5b03ea6f8d714f50314b16741ebc6a42b4438a1a0c1c60f10cc42",
+          "at": "2026-06-11T07:39:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_raw_redirect_target` only skips spaces and tabs before the target, so a writable redirect split across a newline (`echo foo >\\n tests/foo.rs`) is not recognized. That lets a test-file truncation bypass the new guard.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 591,
+              "category": "security"
+            },
+            {
+              "message": "The new raw-string redirect scan is applied to the entire shell input, so it cannot distinguish literal heredoc/comment text from a real redirect. A harmless heredoc like `cat <<EOF > /tmp/out.txt\\n> tests/foo.rs\\nEOF` will be blocked because the body line is rescanned as `>` + test-file target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 185,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:735a70c81261d1a4405155bb971676a99b99fa474ab63e5ad944918abc0c003d",
+          "at": "2026-06-11T07:47:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`guarded_output_redirect_target_in_chars` recurses on every nested `$(...)` it sees in a redirect target, but there is no depth cap or iterative limit. A deeply nested command-substitution payload can exhaust the stack and crash the hook before parsing, which is a denial-of-service risk on untrusted input.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 451,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:79fcc69ed2b8fe8509f845fb750bbe5505fb1fb165bea4327fd3e0d8d5cd5fa0",
+          "at": "2026-06-11T07:56:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`redirect_target_has_shell_expansion()` does not recognize tilde expansion or Bash extglob forms, so a command like `echo foo > ~/tests/foo.rs` can resolve to a protected test file without being blocked. Because `check_output_redirects_for_test_files()` relies on this helper for both parsed and fail-closed paths, this is a guard bypass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 808,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b46cfbe4fb4323baaacd128144ab1c7b2c07ccbd5f6bafb10532f71a7281d9e3",
+          "at": "2026-06-11T08:04:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect scanner dequotes the target before checking for shell expansion, so any quoted literal filename containing shell metacharacters is treated as dynamic and blocked. For example, `echo hi > '$HOME/out.txt'` or `echo hi > 'build/[1].txt'` would be rejected even though they are ordinary file names, which over-blocks the new redirect allowance path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 603,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d89b5164854eaeadcff2c4fb00fce72bb7f7dea53009b164ed960bac016f30f2",
+          "at": "2026-06-11T08:11:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `raw_command` branch returns before the parsed `redirect_texts` loop, so the normal path no longer uses the parser’s canonical redirect metadata. That makes the new guard rely on a heuristic string scan instead of the AST, which over-blocks valid redirects such as `echo > report{final}.txt` where braces are literal (no brace expansion).",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 186,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:67f09bef1ac857ac32bd18f38053391187bf3e71f8a7aa4c335bb96fcc54ab98",
+          "at": "2026-06-11T08:37:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:457c6107e564a54293aedebdcb140accdecfd0cd0d745fd85f00cb573fa0237e",
+          "at": "2026-06-11T08:49:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files` ignores the parser-provided `cmd.redirect_texts` whenever raw command text is available. That makes the guard depend solely on the raw heuristic; for example a Bash command substitution using backticks inside double quotes can still be parsed into a nested `SimpleCommand` with `has_output_redirect=true` and `redirect_texts=[\"tests/foo.rs\"]`, but the raw scanner skips the quoted backtick body and returns `None`, so the truncating redirect is allowed. Fall back to the parsed redirect targets when the raw scan finds nothing, or make the raw scanner cover these parsed cases.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 186,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:457c6107e564a54293aedebdcb140accdecfd0cd0d745fd85f00cb573fa0237e",
+          "at": "2026-06-11T08:53:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files` confirms parsed redirects by rescanning the entire raw command, and the raw scanner treats any unquoted `>` in that whole string as a writable redirect. Once a command has one real output redirect, valid non-redirect text later in the same command can cause a block; for example `echo ok > /tmp/out # > tests/foo.rs` has a safe redirect target, but the comment is scanned as if it were an output redirect to a test file. This violates the redirect-target-only behavior and can regress legitimate Bash commands. Restrict the raw confirmation to actual redirect spans/targets from the parser or make the raw scan shell-aware enough to ignore comments and other non-redirect contexts.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 186,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cafebef879b8a3477d298f0bb298cf8825e697753704a4d18a326fc4640fda46",
+          "at": "2026-06-11T09:01:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect guard now blocks any output target that contains shell expansion syntax, not just targets classified by `is_test_file`. That reintroduces the D4 expansion/redirect blanket block that this task is supposed to remove: legitimate commands such as `echo ok > \"$TMPDIR/out\"` will be blocked even when the target is not a test file. CN-07/AC-06 only require blocking redirect targets matching the test-file patterns.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 575,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e620a75da9029040f33f538b2ef5b0db4cb759dff779fbf7e7a081123f7e40fe",
+          "at": "2026-06-11T09:06:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw redirect target scanner does not stop a target at another redirection operator. A command like `echo data >/tmp/out>tests/foo.rs` is valid shell syntax with two output redirects, but `read_raw_redirect_target` consumes `/tmp/out>tests/foo.rs` as one non-test target and advances past the second `>`, so the write to `tests/foo.rs` is allowed. This bypasses the new test-file truncation guard for glued redirects; the target reader should terminate on unquoted `<`/`>` and continue scanning the next redirect.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 729,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:9efa5819fe2d4ee51b21327f238c5f46a0c9258f08b7d6c5b3117e0d5bf0b281",
+          "at": "2026-06-11T09:16:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Production code in `hook.rs` now runs through line 1028 before the test module, exceeding the AGENTS.md hard cap of 700 production lines per module. This change adds the raw redirect scanner and related helpers into an already shared hook dispatch module, so the module is now outside the required maintainability boundary; split the new redirect/raw-scan logic into a focused production submodule while keeping tests exempt from the count.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 406,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:ba38d09a3bc414d74ce833bdc7f0d7a05b16cf62004bd8099fca932b1799e03b",
+          "at": "2026-06-11T09:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw redirect word reader does not stop at `)`, so grouped commands can bypass the filename-based test-file patterns. For example, `(echo content > src/user_test.rs)` is a real output redirect to a test file, but the scanner reads the target as `src/user_test.rs)`, `is_test_file` returns false, and the handler allows the truncation because the parsed `redirect_texts` fallback is skipped when a raw command is present.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 434,
+              "category": "correctness"
+            },
+            {
+              "message": "`strip_heredoc_bodies` treats `<<` inside shell comments as an active heredoc delimiter. A command like `echo ok > /tmp/out # <<EOF\\n> src/user_test.rs\\nEOF` has a real redirect-only second line, but this code blanks that line before the raw scan; since `check_output_redirects_for_test_files` returns solely from the raw scan whenever `raw_command` is set, the parser's test-file redirect target is ignored and the guard allows the truncation.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 544,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:febb71ae207c73a420879f453b5782840a2cfd22724ad2f57334c47d19529193",
+          "at": "2026-06-11T09:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect guard can be bypassed with Bash dollar-quoted static targets. For example, `echo content > $'tests/foo.rs'` redirects to `tests/foo.rs` in Bash, but the raw scanner treats the leading `$` as part of the filename and does not classify it as a test file. Because this branch returns the raw-scan result instead of also checking `cmd.redirect_texts`, the Bash command is allowed and can still truncate a test file. Check the parser-provided redirect targets as well, or normalize dollar-quoted words in the raw scanner.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 115,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0a06a654ec7c97e9565cd2b1fa1183e3df14de41d3194c34e5a6d7eba0531268",
+          "at": "2026-06-11T09:48:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw redirect scanner treats Bash ANSI-C quoted targets as ordinary single-quoted text and does not decode escapes. Bash decodes these before opening the redirection target, so a command like `: > $'te\\x73ts/foo.rs'` writes to `tests/foo.rs`, while this scanner sees `te\\x73ts/foo.rs` and allows it. That leaves the new redirect-to-test-file truncation guard bypassable; decode ANSI-C quoted words or use parsed static redirect targets as a backstop.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 427,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:db4e5ce993ced1eab98c4cd8a566b3f7180563012b94ae2a90cd6c731f028cc6",
+          "at": "2026-06-11T09:54:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: `read_raw_word` treats an escaped newline in a redirect target as a literal newline. Bash removes backslash-newline before parsing, so `echo x > src/user_\\\ntest.rs` writes to `src/user_test.rs`, but this scanner builds `src/user_\\ntest.rs`, `is_test_file` returns false, and the raw scan path prevents falling back to `SimpleCommand.redirect_texts`. This lets the test-file redirect guard be bypassed for `*_test.rs`/`test_*.rs` targets split with a line continuation.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 406,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:22a65ac7ca66b2655b626e67f970e3314cea14c8f2ae58a9145a38c0449489cb",
+          "at": "2026-06-11T10:04:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_heredoc_delimiters` treats any unquoted `<<` as a heredoc opener, including Bash arithmetic left shifts. A valid command like `echo $((1 << 2))\n> tests/foo.rs` will mark `2` as a pending heredoc delimiter, blank the following redirect-only line in `strip_heredoc_bodies`, and then `guarded_output_redirect_target_in_raw_command` misses the test-file truncation. Because parsed redirects are bypassed whenever the raw command path is used, this leaves an AC-06 redirect-to-test-file bypass.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 592,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:447a82f90b71b530bbf859b524375e8909b499f9bd9cb664a0a283a612fada46",
+          "at": "2026-06-11T10:15:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files` ignores the parser's redirect targets whenever a raw command is available and instead scans the whole command string for any unquoted `>`. That makes non-redirection syntax block as soon as the same Bash command has any safe output redirect; for example `[[ foo > tests/foo.rs ]] > /tmp/out` does not write to `tests/foo.rs`, but this raw scan returns `tests/foo.rs` and blocks. For parsed commands, use `SimpleCommand.redirect_texts` for actual output targets and keep raw scanning only for parse-error or otherwise unparsed fallback paths.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 112,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:bac83fd23d7ccc15e7e6c1a8100bd280b89670d5800de392d3005779597e17ce",
+          "at": "2026-06-11T10:24:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw redirect scanner skips the entire `[[ ... ]]` conditional before looking for command substitutions. Bash still executes substitutions inside `[[ ]]`, so a command like `[[ $(echo x > tests/foo.rs) == x ]] > /tmp/out` advances past the inner `> tests/foo.rs`; the remaining outer redirect is safe, and the handler can allow a test-file truncation. Scan substitutions inside conditionals before skipping comparison operators, or fall back to parsed `redirect_texts` for extracted commands.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 310,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4ae86a96579b8e0d97e76710282d62d5e1b2d07b52e2fa78fd0574366eaf3cb5",
+          "at": "2026-06-11T10:33:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The raw redirect scanner does not pass the recursive scan start into the conditional/arithmetic skip helpers, so backtick command substitutions that begin with `[[ ... ]]` are not recognized as conditionals. For example, a safe command such as `echo \u001b[[ foo > tests/foo.rs ]]\u001b > /tmp/out` with backticks around the `[[ ... ]]` body will be raw-scanned because of the safe outer redirect, then the `>` comparison inside `[[ ]]` is treated as an output redirect to a test file and incorrectly blocked. Use the current scan start when checking raw boundaries in recursive scans.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 552,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c41d302e8f4718d4a274e03dd2bd8af2b4a3c14f68ce4bfe8f9b5088664591ab",
+          "at": "2026-06-11T10:39:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files` returns solely from the raw-command scan whenever raw text is available, so it never falls back to parser-discovered nested redirects. The raw scanner consumes a quoted redirect target as one word without scanning command substitutions inside it; for example `echo ok > \"$(echo x > tests/foo.rs)\"` executes the inner redirect and can truncate `tests/foo.rs`, but the raw scan returns `None` and the nested parsed `SimpleCommand` with `redirect_texts=[\"tests/foo.rs\"]` is ignored. This leaves an AC-06 test-file truncation bypass.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 108,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a6b7a3e13c987a3af67fd1589f58ebe021f3278ee5601342052ab59ff40b756c",
+          "at": "2026-06-11T10:46:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:214cca8ebd70217448171a994813245d792afb5e77ef14c939f34ba47aaf9510",
+          "at": "2026-06-11T10:52:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: The raw redirect scan treats arithmetic expansion as opaque and skips past it before checking for `$(...)`/backticks. Bash allows command substitutions inside `$((...))`, so a command like `echo $(( $(echo ok > tests/foo.rs) + 1 ))` can hide the test-file redirect from this guard. This is a security bypass in the new `block-test-file-deletion` path.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 318,
+              "category": "security"
+            },
+            {
+              "message": "P0: `scan_substitution_at` stops descending once `MAX_RAW_REDIRECT_SCAN_DEPTH` is reached and silently returns `None`, so deeply nested but valid command substitutions are not inspected at all. An attacker can wrap `> tests/foo.rs` in more than 16 nested `$()`/backticks and bypass the test-file redirect block.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 367,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d6117657dc9f0cd864fe59dd8f5cff07c011e73f5daff20146fc399f83d1a046",
+          "at": "2026-06-11T12:07:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_output_redirects_for_test_files()` now short-circuits to the raw-string scanner for every parsed Bash command, but `read_raw_word()` stops at the first unquoted whitespace. A valid redirect such as `echo content > $(printf tests/foo.rs)` is therefore reduced to the literal target `$(printf)` and the nested substitution that yields `tests/foo.rs` is never examined, so the new test-file redirect guard can be bypassed on the main success path. This needs to inspect `cmd.redirect_texts` or recurse through substitution content instead of relying only on the raw substring.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 108,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8c8ba535ec36e7c4ccdbb35ea17b8d97d154143c4eeaab3e8fd0810b7f3c50cf",
+          "at": "2026-06-11T12:17:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Successful parses never consult `SimpleCommand.redirect_texts` here because the `Some(raw_command)` branch returns immediately after the raw scan. That makes the new redirect guard bypassable for valid test-file names that contain characters the raw scanner treats as terminators, such as `)` or `&` (for example, `echo > tests/foo(test).rs` or `echo > tests/foo&bar.rs`).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 108,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a1768b35c528e08f37b018af4db532fd12daf2a0ddac94662b72612301035d0b",
+          "at": "2026-06-11T12:28:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: `raw_text_substitution_mentions_test_file` only matches contiguous literals inside `$()`/backticks, so a redirect target assembled from pieces (for example `$(printf '%s%s' tests/ foo.rs)`) is missed and the guard can still allow writes to `tests/foo.rs`.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 545,
+              "category": "security"
+            },
+            {
+              "message": "P1: `scan_raw_redirect_targets` recurses into every command substitution in the whole command, not just the redirect target, so a harmless command like `echo \"$(printf 'tests/foo.rs')\" > /tmp/out` will be blocked even though the redirected file is safe.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 326,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f136d6f018789782395421806e7daa712567982d6dede8aae3c2c152de79cd88",
+          "at": "2026-06-11T12:43:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file` only rejoins up to 5 tokens. A command substitution can split `tests/foo.rs` across 6+ pieces and bypass the `tests/` detection, so a redirect like `> $(printf '%s%s%s%s%s%s' t e s t s /foo.rs)` can still truncate a test file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 545,
+              "category": "security"
+            },
+            {
+              "message": "The new raw redirect scan only runs when `cmd.has_output_redirect` is already true. If the shell parser successfully tokenizes a command but misses an output-redirect classification, this guard never runs and the truncation bypass remains open for any redirect syntax the parser does not recognize.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 106,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:5f1289a2bebc1db438104552cfce6db40343880058ba5f513799fd619e9390a7",
+          "at": "2026-06-11T12:58:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file()` only reconstructs a candidate path by concatenating literal tokens, so it misses command substitutions that synthesize a test-file target through format strings or shell variables. For example, `echo content > $(printf '%s/%s' tests foo.rs)` can still resolve to `tests/foo.rs` but will not match `is_test_file()`, so the new redirect guard can be bypassed.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 545,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:5561e0b98cbaea3b9ef1e1e0fb25bb4ba9b5f35b4845bd365d5048ba61788e8d",
+          "at": "2026-06-11T13:08:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file()` returns `Some(\"dynamic command substitution redirect target\")` even when no test-file path was found, and its callers treat any `Some` as a block. That means safe redirect targets that use `$()`/backticks (for example `> $(mktemp)` or a quoted literal backtick filename) are rejected, not just redirects to test files. This regresses the D4 redirect liberalization and should only block when an actual test-file path is detected.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 545,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4d73d1b13e4b4e7432cb0afbfc5b36646ef0ccb2888bd1cf8b6de9cc211f1a14",
+          "at": "2026-06-11T13:16:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new redirect guard still only catches literal targets and a narrow subset of substitutions. A redirect like `echo foo > $OUT`, `echo foo > ${DIR}/tests/foo.rs`, or `echo foo > \"$(echo tests/foo.rs)\"` can still resolve to a test file and bypass this check, so the truncation/deletion vector remains open.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 107,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ebdaf0369e5b41657ce5b6cefa476a9c81f779bffe7da9fca5ae1e1b2bc67994",
+          "at": "2026-06-11T13:26:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-parse redirect scanner treats every bare `>` outside `[[...]]`/arithmetic/substitution as an output redirection. That means valid POSIX `[` comparisons such as `[ \"$a\" > tests/foo.rs ]` are now blocked even though no file is being written. This is a correctness regression in the hook’s Bash handling.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 333,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:935224c037cc8ef76d5bfd7ed7039986fdf3345453417050a347164404097df6",
+          "at": "2026-06-11T13:33:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file()` does not model inline parameter expansion inside a path fragment, so redirects like `echo content > te${X}sts/foo.rs` (or `tes${X}t_user.rs`) can expand to a test file without matching `is_test_file()` or the current tokenization heuristics. Because `check_output_redirects_for_test_files()` relies on this helper for both parse-success and parse-error paths, this is a bypass of the new redirect-to-test-file guard.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 549,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8ea73c57c161c7a880b2a9c94bc59744e14ffb548487c0e34e3b2711d965f4b8",
+          "at": "2026-06-11T13:43:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`raw_text_substitution_mentions_test_file()` only simulates command substitutions through token joining and `%s`-style `printf` rendering. A redirect target synthesized with other common `printf` forms such as `%b`/``-style escapes is not recognized, so a command like `echo > $(printf '%b' '\\164\\145\\163\\164\\163/\\146\\157\\157\\.\\162\\163')` can still write to `tests/foo.rs` without being blocked.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 552,
+              "category": "security"
+            },
+            {
+              "message": "The production portion of this module is now 706 lines, which exceeds the repository's 700-line maximum for a module. This pushes `libs/usecase/src/hook.rs` over the allowed size threshold and makes the hook layer harder to reason about safely.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "line": 706,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:5aa5d4a3e13de1e2c101e0971bb8f8821675090ee19ef60008d6c685788d9cb0",
+          "at": "2026-06-11T13:57:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7d2f05965056dbb6904d1f048ac03664564a82bacbeb825658c0801610be67f",
+          "at": "2026-06-11T14:08:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`strip_single_bracket_tests` blanks every `[ ... ]` span before redirect scanning, but `[ ... ]` can also be ordinary words in a simple command. A valid command such as `echo [ > tests/foo.rs ]` writes to `tests/foo.rs`; the raw scan erases the redirect, and `check_output_redirects_for_test_files` then checks parser `redirect_texts` against that stripped raw string and allows the truncation. The same pattern can hide redirects inside command substitutions within a single-bracket test. This reopens the test-file truncation bypass AC-06 is trying to close.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 529,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d7d2f05965056dbb6904d1f048ac03664564a82bacbeb825658c0801610be67f",
+          "at": "2026-06-11T14:13:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The redirect scanner can miss a test-file target embedded as the literal fallback of a braced parameter expansion. For example, `echo content > ${OUT:-tests/foo.rs}` reaches `raw_text_substitution_mentions_test_file`, but because the target contains `/` it is not treated as an opaque variable, `raw_inline_parameter_expansion_mentions_test_file` treats the whole `${...}` as a parameter with no literal text, and the function returns `None`. If `OUT` is unset, Bash redirects to `tests/foo.rs`, bypassing the test-file truncation guard this change is meant to enforce. The braced expansion body needs to be inspected for test-file literals or fail-closed when it can produce a test path.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 543,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e8068013b3a2d3c8081b0905a95b4ffa3f2b65c43e6be1ac598487134c60312b",
+          "at": "2026-06-11T14:21:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:232f65974954ea1b0434fcf331524713c5c53a5c5775e0bdc93201cb7b33d368",
+          "at": "2026-06-11T14:32:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_commands_for_test_deletion` now blocks every shell re-entry once `depth >= MAX_REENTRY_DEPTH`, even when the nested payload is harmless. The previous logic only failed closed at the cap when the inner payload still mentioned `rm`, so this change will false-positive legitimate deeply nested `bash -c` / `sh -c` wrappers.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 85,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0ab8a73c4dd6df6fb1df6ff3e5e82f804333610fc278d3edc3b4a4d22e882076",
+          "at": "2026-06-11T16:25:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: once `depth >= MAX_REENTRY_DEPTH`, nested shell payloads are silently skipped instead of being checked or failed closed. That reopens a bypass where a 4-level `bash -c` / `sh -c` chain can hide `rm` or an output redirect to `tests/**` beyond the cap and this guard will allow it. The previous implementation fail-closed at the depth limit; this version no longer protects the cap boundary.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 85,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ef66f9062288d91ecadfedd256973fd06ff6309542d5d966881e18eb2d9f25b3",
+          "at": "2026-06-11T16:31:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:998559273fd2b5ae646a4dd8ebe37e3062526e020090c5614e27ab075a9ab836",
+          "at": "2026-06-11T16:36:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_file_rm_arg` scans the entire argv for an `rm` token instead of stopping once it has seen the actual command. As a result, benign commands like `echo rm tests/foo.rs` or `git rm tests/foo.rs` are treated as direct `rm` invocations and blocked, even though the `rm` token is only an argument/subcommand. The previous implementation only accepted `rm` at command position after assignments/launchers; this refactor should restore that distinction and add a negative test for an argv where `rm` is not the command.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 123,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:998559273fd2b5ae646a4dd8ebe37e3062526e020090c5614e27ab075a9ab836",
+          "at": "2026-06-11T16:40:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_file_rm_arg` skips launcher tokens but immediately returns `None` on the launcher’s own flags/operands, so wrapped deletions such as `env -i rm tests/foo.rs`, `timeout 5 rm tests/foo.rs`, or `sudo -u root rm tests/foo.rs` are allowed. These launchers are explicitly modeled as transparent prefixes, so their arguments need to be skipped until the real command token is reached; otherwise the test-file deletion guard can be bypassed.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 131,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:30bfb9e8a7a4efd362d768e15399555e380345247ccd5bc0ee847c0e424037e1",
+          "at": "2026-06-11T16:45:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`git diff` for this scope only contains the deletion of `hook.rs`; the replacement `hook/` module files are untracked, so they would not be part of the submitted patch. As committed, `libs/usecase/src/lib.rs`'s `pub mod hook;` would have no tracked `hook.rs` or `hook/mod.rs`, breaking compilation and removing the public hook API. Add the new module files to the change set with the deletion.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook.rs",
+              "line": 1,
+              "category": "build"
+            },
+            {
+              "message": "`test_file_output_redirect_target` treats every `redirect_texts` entry as a writable target whenever `has_output_redirect` is true, but `SimpleCommand.redirect_texts` also includes input redirect targets and heredoc delimiters. A command like `cat < tests/foo.rs > /tmp/out` would have `has_output_redirect = true` and include `tests/foo.rs` in `redirect_texts`, so this blocks a permitted read from a test file while writing only to `/tmp`. Track output redirect targets separately or filter by redirect direction before applying `is_test_file`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 155,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c5af360f4c1fcc9eb5c3fdf3568081b6ce63bcc3f28f63b57f09f3b5b9e3917f",
+          "at": "2026-06-11T16:52:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:605e3ea1a97bd041d1587bb28396df8507f96b0ec9a8c227211cd6bb3f3ea10a",
+          "at": "2026-06-11T17:38:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:605e3ea1a97bd041d1587bb28396df8507f96b0ec9a8c227211cd6bb3f3ea10a",
+          "at": "2026-06-11T17:43:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb421cfa5ef47a4b320fd65ed1010792c8b0d67558c6d949a70a5b573ca23e93",
+          "at": "2026-06-11T18:09:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb421cfa5ef47a4b320fd65ed1010792c8b0d67558c6d949a70a5b573ca23e93",
+          "at": "2026-06-11T18:12:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fail-closed gate is still bypassable: `policy::contains_git_invocation()` only strips launchers from `COMMAND_LAUNCHERS`, which does not include `env`, so `env git status` / `env -i git status` reaches `check_commands()` as `env` and is allowed when `hooks_path_configured` is false. That leaves the runtime hooksPath enforcement circumventable.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook/guard.rs",
+              "line": 57,
+              "category": "security"
+            },
+            {
+              "message": "`hooks_path_configured` is exposed as a public field, but the contract for `GuardHookHandler` treats it as a private implementation detail. This changes the public struct shape and leaks an internal wiring flag into the API surface.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/guard.rs",
+              "line": 32,
+              "category": "api-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:7a2957f4e4298e948a0b78ee2b34d9fa5ee27d951abb3df964d867ec9686dcd5",
+          "at": "2026-06-12T01:02:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fail-closed check is bypassable with `env`-prefixed commands. `policy::contains_git_invocation()` only skips launchers in `COMMAND_LAUNCHERS`, and `env` is not one of them, so `env git status` / `env -i git status` falls through to `check_commands()` as an allowed `env` command. That means `hooks_path_configured == false` does not actually fail closed for a common git invocation pattern.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook/guard.rs",
+              "line": 57,
+              "category": "security"
+            },
+            {
+              "message": "`hooks_path_configured` is exposed as a public field on a public handler struct, but this flag is meant to be an internal injected detail. Any downstream caller can now construct `GuardHookHandler { ..., hooks_path_configured: true }` and opt out of the runtime fail-closed behavior, which violates the intended API boundary and weakens enforcement.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/guard.rs",
+              "line": 32,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:7a2957f4e4298e948a0b78ee2b34d9fa5ee27d951abb3df964d867ec9686dcd5",
+          "at": "2026-06-12T01:09:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`hooks_path_configured` is a public field on a public handler struct, but the type catalogue marks it as a private injected detail. Any downstream caller can now construct `GuardHookHandler { ..., hooks_path_configured: true }` and bypass the runtime fail-closed guard for git commands, which weakens the enforcement boundary.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/guard.rs",
+              "line": 32,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7a2957f4e4298e948a0b78ee2b34d9fa5ee27d951abb3df964d867ec9686dcd5",
+          "at": "2026-06-12T02:25:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8ffa069f21079ce3031633dad148e4dd65cfd355f54ef8a51c216a902fe5e57",
+          "at": "2026-06-12T02:29:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8ffa069f21079ce3031633dad148e4dd65cfd355f54ef8a51c216a902fe5e57",
+          "at": "2026-06-12T02:31:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3df5fa042ed357eaef01247ae043b394ba1ec751736467beecb4d6ad575a1d71",
+          "at": "2026-06-12T13:15:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env_split_string_payload_at_env` keeps scanning after an `env` NAME=VALUE assignment, so `env FOO=bar -S 'rm tests/foo_test.rs'` is treated as an `env -S` split-string and blocked. Coreutils `env` treats `-S` after NAME=VALUE as the command name, not an option, so this is a false positive and also violates the stated “only in launcher position” constraint.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 424,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3df5fa042ed357eaef01247ae043b394ba1ec751736467beecb4d6ad575a1d71",
+          "at": "2026-06-12T13:19:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env_split_string_payload_at_env` keeps scanning for `-S` after seeing an environment assignment. In real `env` argv, `env FOO=bar -S 'rm tests/foo_test.rs'` treats `-S` as the command name, not as an env option, so this should be allowed unless that command itself is a launcher. With the current code, a real parser will parse the later payload and block the command; the added test misses this because its mock parser returns an empty command list for the payload. Stop option scanning once env assignments begin, then recurse only from the first non-assignment command token so `env FOO=bar env -S ...` still works.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 424,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e4282097fb27fdb0b6d82ed16ba368dbe8d73eca8df1cc0f6bed5bcf1635bdad",
+          "at": "2026-06-12T13:24:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -S` is still bypassable when the split-string expands to only env options or no argv, because the remaining argv is either dropped (`env -S '' rm tests/foo_test.rs`) or appended behind an option token such as `--`/`-i` and then checked as if that token were the command (`env -S -- rm tests/foo_test.rs`). GNU `env` continues option processing after `-S`, so these forms execute the trailing `rm`, but the guard allows them. After parsing the payload, re-run the existing env launcher handling over the split payload plus `remaining`, or otherwise treat an empty/options-only payload as exposing the remaining command argv.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 196,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:676db41b87c8fa233e2f945d473cf0d733de92dec3bd921a6006c3cedc9dc3d1",
+          "at": "2026-06-12T13:29:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15c8c1d12465dc6787467a11093bcb070537a887971f0c0811af1a97b86a35be",
+          "at": "2026-06-12T13:37:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1eaf9256fc97a3a3777fe7f54b5157f40560fb8079d05beefa3ae8dc4f2adbdd",
+          "at": "2026-06-12T13:58:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d085f7ae40484e6f98b28a47944a8a4d2241ebe09de796cc30aed71e1e78f1e3",
+          "at": "2026-06-12T15:13:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6dfbf11d7a52d4ebb9fc822df2740e68305cf507d05047ec78667e9b5c16b892",
+          "at": "2026-06-12T16:07:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
+          "at": "2026-06-12T17:16:32Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:39:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:42:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
+          "at": "2026-06-11T19:04:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
+          "at": "2026-06-11T19:06:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Add coverage for the `Err(e)` path in `verify`. The current tests exercise the pass case plus two config-state failures, but they never force `Command::new(\"git\").output()` to fail. A missing `git` binary or PATH failure would therefore bypass unit coverage on this new public API.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/hooks_path.rs",
+              "line": 17,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:4e8172d33b7e473ccb7eba904b38d555bd9747b250e0489b7b4af846554dabe4",
+          "at": "2026-06-11T23:40:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
+          "at": "2026-06-11T23:43:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The verifier trims all leading/trailing whitespace from the configured hooks path before comparing it to `.githooks`. A value that Git can treat as a different path, such as a quoted `\".githooks \"` or `\" .githooks\"`, would be accepted here, so the new check can falsely pass even though hooks are not actually configured to the repository-managed directory. Strip only the command's line ending before the exact comparison.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/hooks_path.rs",
+              "line": 37,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
+          "at": "2026-06-11T23:45:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61c7e5703844b381e34e08b919e3a30a5bcbc4588109403b2ddc854799a2ec0",
+          "at": "2026-06-11T23:48:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated direct-git expectation no longer requires the old `cargo run --quiet -p cli --` fallback, but it still does not forbid it. `verify_hook_paths` only checks that one command contains all listed positive fragments, so a drifted command that includes `SOTP_CLI_BINARY:-`, `$CLAUDE_PROJECT_DIR/bin/sotp`, `command -v sotp`, `hook dispatch block-direct-git-ops`, the missing-CLI message, `|| exit 2`, and then still falls back to `cargo run --quiet -p cli -- hook dispatch block-direct-git-ops` would pass verification. That misses the briefing requirement that the direct-git hook fail closed when `sotp` is unavailable and not allow the cargo fallback.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra/constants.rs",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:db7fd6be57e830f82e271412d26cd7b4115fa7110879c12a57cb5e9520a08baf",
+          "at": "2026-06-12T15:11:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`EXPECTED_HOOK_COMMANDS` still does not include an entry for `hook dispatch block-test-file-deletion`, even though this file documents that Rust hooks are validated through this list and `verify_hook_paths` only checks these constants. As a result, `.claude/settings.json` can remove or drift the Write/Edit deletion guard entirely and `verify-orchestra` will not report it. Add the expected fragments for the `block-test-file-deletion` hook, including the installed-CLI resolution and fail-closed remediation shape.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra/constants.rs",
+              "line": 57,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:91e901de346f147f5936ca0290ccddc2a35a9cb1fa00d0c94957112faa2f5923",
+          "at": "2026-06-12T15:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The direct-git hook expectation now only lists positive fragments. `verify_hook_paths` treats `EXPECTED_HOOK_COMMANDS` as a contains-all check, so a command that includes the new installed-CLI path but also still contains `cargo run --quiet -p cli --` would pass verification. That misses the briefing requirement to not allow the cargo fallback, leaving the verifier unable to catch this policy drift. Add an explicit forbidden-fragment check for the direct-git hook fallback or an equivalent negative expectation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra/constants.rs",
+              "line": 71,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:93128f980328f843634a61157b22abdf0a8b12ac26009d2be3601a060a67f125",
+          "at": "2026-06-12T15:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66e28f4a3105f2b138cd7f22e1accb294d4065003832de786a543ccc06869735",
+          "at": "2026-06-12T16:07:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter` sanitizes the track id but then creates and opens the default `items_dir/<track>/logs/telemetry.jsonl` path with plain `create_dir_all`/`OpenOptions`, which follows symlinked path components. If `track/items/<track-id>` is a symlink, any instrumented command on that track branch will append telemetry outside the repository. This should reject symlinks below the trusted items/root path before creating/opening the log path, consistent with the existing infrastructure symlink guards.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 153,
+              "category": "security"
+            },
+            {
+              "message": "`TelemetryReport::aggregate` validates the track id but uses `std::fs::metadata` and `File::open` on `<items_dir>/<track-id>/logs/telemetry.jsonl`, both of which follow symlinks. A symlinked track directory can make `sotp telemetry report <track-id>` read and print JSONL data from outside `track/items`. Use the existing symlink guard/descriptor-pinned open pattern anchored at `items_dir` before accepting the track directory and log file.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 173,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:49206afbbc320dc97b34fb5f5a38010fc4cd3fdc3c050baa4b89d269538fb46e",
+          "at": "2026-06-12T17:19:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31e0566dd4fc3e8afd8653c8a33dd67c5236b7c6e54240e0ce6e4593bf071c10",
+          "at": "2026-06-12T17:28:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76a605f8bece6808971bce05dcbaf6820e909b0742c017a015efcefa0886c4de",
+          "at": "2026-06-12T19:26:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76a605f8bece6808971bce05dcbaf6820e909b0742c017a015efcefa0886c4de",
+          "at": "2026-06-12T19:31:51Z"
+        }
+      ]
+    }
+  }
+}

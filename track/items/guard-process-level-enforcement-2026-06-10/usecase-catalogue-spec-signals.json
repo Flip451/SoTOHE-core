@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "d5c5dd31765d404d57831344691d3e269e8f1697f730e74307c9116474b80d85",
+  "signals": [
+    {
+      "type_name": "GitPrePushHandler",
+      "signal": "blue",
+      "entry_hash": "72af8f7dec7c069f4878af503434a012523d3593c62ddbc9f61f3ff9ba515c13"
+    },
+    {
+      "type_name": "GitRefUpdateHandler",
+      "signal": "blue",
+      "entry_hash": "00f9dbc1d1a4da2938d72b1e4b5c7730b015cda683de68aa2cee3a260fdfc840"
+    },
+    {
+      "type_name": "GuardHookHandler",
+      "signal": "blue",
+      "entry_hash": "9ecdab27e54f34dc5d8596468662b63df2dd92b153d67b40a500f14db1123f75"
+    },
+    {
+      "type_name": "HookDispatchCommand",
+      "signal": "blue",
+      "entry_hash": "1bd67090a70ea1a460395bb276e013baf0bd9dd82c144e8804ccbef503b06ae6"
+    },
+    {
+      "type_name": "HookDispatchError",
+      "signal": "blue",
+      "entry_hash": "cfcc411d357a470d6044f355fcc93957c21078fd13f9f439f48e00abd101ed78"
+    },
+    {
+      "type_name": "HookDispatchInteractor",
+      "signal": "blue",
+      "entry_hash": "7b95ae5792aafa2c50dcee9dc79df16767d18c764812479a615f5f93c89dcc4e"
+    },
+    {
+      "type_name": "HookVerdictDecision",
+      "signal": "blue",
+      "entry_hash": "139f152781820311da38c499b4d408d23953e0e72babcfd947f5b2000663a9cd"
+    },
+    {
+      "type_name": "HookVerdictOutput",
+      "signal": "blue",
+      "entry_hash": "ddcb3d7dc79deccb010e570b353946e25c0d90dee4c823457472631f30fe2738"
+    },
+    {
+      "type_name": "HooksPathSetupHandler",
+      "signal": "blue",
+      "entry_hash": "7682f83d7b71589ee49f80cdbab7dcf6752d6cfbc6d0c86c74de884c003effcc"
+    },
+    {
+      "type_name": "TestFileDeletionGuardHandler",
+      "signal": "blue",
+      "entry_hash": "dab27da180a82bbbd733fb2adc1291e8d2f28512d215a44207a8d217f0412d2f"
+    },
+    {
+      "type_name": "HookDispatchService",
+      "signal": "blue",
+      "entry_hash": "3d3d83d3a95de6339cf135d4bcad81cae7ee006b44397ed6a6fa91ef2b6cdb75"
+    },
+    {
+      "type_name": "HookHandler",
+      "signal": "blue",
+      "entry_hash": "e7f1a7702322666e257f9c74d94321c6fb703648ffb55ea0f95fb27fe9e69325"
+    },
+    {
+      "type_name": "HookShellParserPort",
+      "signal": "blue",
+      "entry_hash": "5178e51da29d5c8da03eb6628302cc444d75056c383cafe4f2072f419195d2fa"
+    },
+    {
+      "type_name": "usecase::hook::dispatch",
+      "signal": "blue",
+      "entry_hash": "d3d5e6709253da6b51fba77734cb41a480efec4285c95f8ec8468cd0743ccc42"
+    }
+  ]
+}

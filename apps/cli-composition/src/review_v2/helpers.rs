@@ -1,10 +1,20 @@
 //! Private helpers shared across `CliApp` `review_v2` methods.
 
 use std::path::PathBuf;
+use std::sync::Mutex;
+use std::time::Instant;
 
 use crate::CommandOutcome;
 
 use super::shared::CodexReviewOutcome;
+
+pub(crate) fn record_instant_once(slot: &Mutex<Option<Instant>>) {
+    if let Ok(mut recorded_at) = slot.lock() {
+        if recorded_at.is_none() {
+            *recorded_at = Some(Instant::now());
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Track-ID resolution
@@ -184,7 +194,6 @@ pub(super) fn validate_all_paths(paths: &[String]) -> Result<(), String> {
 #[allow(clippy::unwrap_used)]
 pub(crate) mod process_guards {
     use std::ffi::{OsStr, OsString};
-    use std::path::Path;
     use std::process::Command;
 
     struct RestoreGuard {
@@ -205,22 +214,7 @@ pub(crate) mod process_guards {
         }
     }
 
-    /// Restores the process CWD when dropped.
-    pub(crate) struct CwdGuard {
-        _restore: RestoreGuard,
-    }
-
-    impl CwdGuard {
-        pub(crate) fn save_current() -> Self {
-            let original = std::env::current_dir().unwrap();
-            Self {
-                _restore: RestoreGuard::new(move || {
-                    let _ = std::env::set_current_dir(&original);
-                }),
-            }
-        }
-    }
-
+    pub(crate) type CwdGuard = ScopedOverride;
     pub(crate) type EnvGuard = ScopedOverride;
 
     pub(crate) struct ScopedOverride {
@@ -228,12 +222,23 @@ pub(crate) mod process_guards {
     }
 
     impl ScopedOverride {
+        pub(crate) fn save_current() -> Self {
+            let original = std::env::current_dir().unwrap();
+            Self::from_restore(move || {
+                let _ = std::env::set_current_dir(&original);
+            })
+        }
+
         pub(crate) fn set(key: &'static str, value: impl Into<OsString>) -> Self {
             Self { _restore: env_restore_guard(key, Some(value.into())) }
         }
 
         pub(crate) fn remove(key: &'static str) -> Self {
             Self { _restore: env_restore_guard(key, None) }
+        }
+
+        fn from_restore(restore: impl FnMut() + 'static) -> Self {
+            Self { _restore: RestoreGuard::new(restore) }
         }
     }
 
@@ -254,14 +259,18 @@ pub(crate) mod process_guards {
         }
     }
 
-    pub(crate) fn run_git(root: &Path, args: &[&str]) {
-        let output = Command::new("git").args(args).current_dir(root).output().unwrap();
-        assert!(
-            output.status.success(),
-            "git {:?} failed\nstdout:\n{}\nstderr:\n{}",
-            args,
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
-        );
+    pub(crate) struct GitRunner<'a> {
+        root: &'a std::path::Path,
+    }
+
+    impl<'a> GitRunner<'a> {
+        pub(crate) fn at(root: &'a std::path::Path) -> Self {
+            Self { root }
+        }
+
+        pub(crate) fn assert_success(self, args: &[&str]) {
+            let status = Command::new("git").current_dir(self.root).args(args).status().unwrap();
+            assert!(status.success(), "git {:?} exited with {status}", args);
+        }
     }
 }

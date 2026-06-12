@@ -7,9 +7,10 @@ use domain::verify::{VerifyFinding, VerifyOutcome};
 
 use super::constants::{
     AGENTS_DIR, ALLOWED_EXTRA_GIT_SUBCOMMANDS, EXPECTED_DENY, EXPECTED_HOOK_COMMANDS,
-    EXPECTED_HOOK_PATHS, HARDCODED_CODEX_MODEL_RE, MODEL_RESOLUTION_TARGETS,
-    PERMISSION_EXTENSIONS_PATH, REQUIRED_AGENT_FILES, REVIEW_WRAPPER_TARGETS, SETTINGS_LOCAL_PATH,
-    SETTINGS_PATH, SUBAGENT_MODEL_ALLOWLIST, TEAMMATE_IDLE_MARKERS,
+    EXPECTED_HOOK_PATHS, FORBIDDEN_HOOK_COMMAND_FRAGMENTS, HARDCODED_CODEX_MODEL_RE,
+    MODEL_RESOLUTION_TARGETS, PERMISSION_EXTENSIONS_PATH, REQUIRED_AGENT_FILES,
+    REVIEW_WRAPPER_TARGETS, SETTINGS_LOCAL_PATH, SETTINGS_PATH, SUBAGENT_MODEL_ALLOWLIST,
+    TEAMMATE_IDLE_MARKERS,
 };
 use super::helpers::{
     cargo_make_task_name, expected_allow_map, forbidden_allow_set, git_subcommand_name,
@@ -37,6 +38,14 @@ pub(crate) fn verify_hook_paths(commands: &[String], root: &Path, outcome: &mut 
             let frags = fragments.join(", ");
             outcome.add(VerifyFinding::error(format!(
                 "Missing in {SETTINGS_PATH}: {label} (expected fragments: {frags})"
+            )));
+        }
+    }
+
+    for (label, fragment) in FORBIDDEN_HOOK_COMMAND_FRAGMENTS {
+        if commands.iter().any(|c| c.contains(*fragment)) {
+            outcome.add(VerifyFinding::error(format!(
+                "{SETTINGS_PATH} contains forbidden hook command fragment for {label}: {fragment}"
             )));
         }
     }

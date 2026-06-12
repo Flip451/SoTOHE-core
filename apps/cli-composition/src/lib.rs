@@ -38,11 +38,26 @@ pub mod telemetry_wiring;
 
 #[cfg(test)]
 pub(crate) mod test_support {
+    use std::path::PathBuf;
     use std::sync::{Mutex, OnceLock};
 
     pub(crate) fn process_env_lock() -> &'static Mutex<()> {
         static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
         LOCK.get_or_init(|| Mutex::new(()))
+    }
+
+    pub(crate) fn repo_root_for_tests() -> PathBuf {
+        let mut root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        root.pop();
+        root.pop();
+        root
+    }
+
+    #[cfg(unix)]
+    pub(crate) fn make_executable(script: &std::path::Path) {
+        use std::os::unix::fs::PermissionsExt;
+        let result = std::fs::set_permissions(script, std::fs::Permissions::from_mode(0o755));
+        assert!(result.is_ok(), "failed to make {} executable: {result:?}", script.display());
     }
 }
 

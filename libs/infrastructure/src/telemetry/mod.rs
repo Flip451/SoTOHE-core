@@ -303,56 +303,44 @@ mod tests {
 
     // --- TelemetryEvent::ReviewRound (round_type as String) ---
 
-    #[test]
-    fn test_review_round_round_type_fast_round_trips_as_string() {
+    fn assert_review_round_type_round_trips_as_string(
+        round_type: &str,
+        duration_ms: u64,
+        findings_count: u32,
+    ) {
         let event = TelemetryEvent::ReviewRound {
             schema_version: 1,
             track_id: "t".to_string(),
             provider: "codex".to_string(),
             model: "o4-mini".to_string(),
-            round_type: "fast".to_string(),
-            duration_ms: 3_000,
-            findings_count: 2,
+            round_type: round_type.to_string(),
+            duration_ms,
+            findings_count,
             timestamp: "2026-06-10T00:00:00Z".to_string(),
         };
 
         let json = serde_json::to_string(&event).unwrap();
-        let decoded: TelemetryEvent = serde_json::from_str(&json).unwrap();
+        assert!(
+            json.contains(&format!("\"{round_type}\"")),
+            "round_type '{round_type}' must serialize as a string; got: {json}"
+        );
 
-        if let TelemetryEvent::ReviewRound { round_type, .. } = decoded {
-            assert_eq!(round_type, "fast");
+        let decoded: TelemetryEvent = serde_json::from_str(&json).unwrap();
+        if let TelemetryEvent::ReviewRound { round_type: decoded_round_type, .. } = decoded {
+            assert_eq!(decoded_round_type, round_type);
         } else {
             panic!("decoded to wrong variant");
         }
     }
 
     #[test]
+    fn test_review_round_round_type_fast_round_trips_as_string() {
+        assert_review_round_type_round_trips_as_string("fast", 3_000, 2);
+    }
+
+    #[test]
     fn test_review_round_round_type_final_round_trips_as_string() {
-        let event = TelemetryEvent::ReviewRound {
-            schema_version: 1,
-            track_id: "t".to_string(),
-            provider: "codex".to_string(),
-            model: "o4-mini".to_string(),
-            round_type: "final".to_string(),
-            duration_ms: 4_000,
-            findings_count: 0,
-            timestamp: "2026-06-10T00:00:00Z".to_string(),
-        };
-
-        let json = serde_json::to_string(&event).unwrap();
-
-        // The JSON should contain the literal string "final"
-        assert!(
-            json.contains("\"final\""),
-            "round_type 'final' must serialize as a string; got: {json}"
-        );
-
-        let decoded: TelemetryEvent = serde_json::from_str(&json).unwrap();
-        if let TelemetryEvent::ReviewRound { round_type, .. } = decoded {
-            assert_eq!(round_type, "final");
-        } else {
-            panic!("decoded to wrong variant");
-        }
+        assert_review_round_type_round_trips_as_string("final", 4_000, 0);
     }
 
     // --- TelemetryEvent: all other variants round-trip ---

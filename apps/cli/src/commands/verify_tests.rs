@@ -372,6 +372,7 @@ fn test_spec_states_subcommand_returns_failure_for_missing_section() {
 /// which both need the multilayer loop to find exactly one enabled layer
 /// that points at `domain-types.json`.
 fn write_minimal_arch_rules(dir: &std::path::Path) {
+    std::fs::create_dir_all(dir.join(".git")).unwrap();
     let content = r#"{
   "version": 2,
   "layers": [
