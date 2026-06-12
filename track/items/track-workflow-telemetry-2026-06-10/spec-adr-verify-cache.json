@@ -1,0 +1,653 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "5ec75b50c741f56e2a595015433e940e88f7d47bc6f19a3a0ad03bf1b6a8ab67",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ボトルネック発見 / false positive 検出 / テンプレートバグ洗い出しを目的とした telemetry を導入する。コンプライアンス監査ではない（イベントの稀な欠落は許容。SoT 成果物は telemetry と独立に無傷で残る）。"
+      }
+    },
+    {
+      "claim_hash": "10bb593a1aca1e52b9bd0b4f3dd702822b0bda5dc8540f4bc553a4b3efd51531",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "OpenTelemetry crate は導入しない。イベントに timestamp / duration / track_id 等の相関フィールドを持たせ、将来 OTel Collector（filelog receiver 等）へ接続する余地は残す。"
+      }
+    },
+    {
+      "claim_hash": "94a38ccc7135341ea459f894728ce46226c91201c9f2ec9a3b4cd48958f9a38c",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は track dir 配下の `logs/` に置く ... retention は track のライフサイクルに追随する: archive 時は gitignored の `logs/` も track dir と一緒にファイルシステム上で移動する"
+      }
+    },
+    {
+      "claim_hash": "b8cd907213126a998059c6d0a537a34e911848a21ad50ecdd561074e962d0cbf",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は apps/cli-composition の composition root のみ。domain 層は計装しない。"
+      }
+    },
+    {
+      "claim_hash": "86568cbe85a8d449f8242b33392cad602b3a9c3876aca63031a9435af8215925",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "並行 worker（Agent Teams）からの同時 append に備え、書き込みは O_APPEND フラグを立てた単発 write syscall で行う。1 イベント行の上限を 4096 バイトとする。ユーザーランドの lock 機構は使わない（fire-and-forget の書き込みにレイテンシを足さない）。… 本 telemetry は診断用途で稀な行の乱れは許容するため、この実装依存を意図的に受け入れる"
+      }
+    },
+    {
+      "claim_hash": "3068d1c6b91c316da61a10477195ac6b66d9550334317c88a4974e4a58294925",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録する: track 操作 subcommand（command・exit code・所要時間・track_id）/ gate 評価（gate 名・verdict・理由要約・入力 hash）/ review・dry round（provider・model・round 種別・所要時間・findings 件数）/ 外部 subprocess（所要時間・retry 回数・verdict parse 失敗）/ hook dispatch の block 時および advisory（注入型）hook の発火時 / 非ゼロ exit（error chain）。"
+      }
+    },
+    {
+      "claim_hash": "759b6c93969b2eb66280e2ea82c54e6bbbf23a27a9f4778bea69896ca28463d6",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 帰属は branch-bound に解決する（現在の git ブランチに紐づく track）。track 引数を取らないリポジトリ全域ゲート（layers / orchestra 等）も、track ブランチ上での実行は当該 track に帰属させる。`track/*` 以外のブランチ（`main` 等）では、`track_resolution.rs` の `updated_at` fallback で最新 track が解決される場合でも telemetry は記録しない（許容）。"
+      }
+    },
+    {
+      "claim_hash": "bd65f1758b690851c1ac4d3abba47454ee21529d6be6d6ec7453f9259859947f",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "env による opt-out を備える: `SOTP_TELEMETRY=0` で全記録を無効化（kill switch）、`SOTP_TELEMETRY_DIR` で書き出し先を差し替える。初期化は lazy とし、イベントが 1 件も発生しなければ file open を行わない"
+      }
+    },
+    {
+      "claim_hash": "20cc01411fc6072936be1d8ba112e31e56f62a2131d3576b3135055a0eb1c9ca",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SOTP_TELEMETRY=0` で全記録を無効化（kill switch）、`SOTP_TELEMETRY_DIR` で書き出し先を差し替える。テスト実行時は強制隔離とし、Makefile の test 系タスクと integration test helper の両方でこれらの env を設定する（spawn された実バイナリには `cfg(test)` が効かないため env で隔離する）。"
+      }
+    },
+    {
+      "claim_hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track-id 指定でフェーズ別所要時間・エラー一覧・hook block 一覧を集計する subcommand を初期スコープに含める（集計ロジックは Rust native。cargo make に置かない）。読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する"
+      }
+    },
+    {
+      "claim_hash": "de18711db7ea5d7a6fff0a1b8f4403d6bcc223aa6d87607cac2e681d81012c81",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行（JSONL の 1 行）に `schema_version` フィールドを持たせ、スキーマ変更時の互換性判定を行単位で可能にする。file header イベント方式は並行 append の初回書き込み競合があるため採らない。"
+      }
+    },
+    {
+      "claim_hash": "9e5dbe871a746ac9e6c0073c50884957a9f97eefef8e385f5fe0de48b2b84419",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「OpenTelemetry crate は導入しない。… 将来 OTel Collector（filelog receiver 等）へ接続する余地は残す。」"
+      }
+    },
+    {
+      "claim_hash": "15371ab4512aea6ad43f0e4d60b76f143b29e36e6ffebeee3babed8d9e9dee3a",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は apps/cli-composition の composition root のみ。domain 層は計装しない。"
+      }
+    },
+    {
+      "claim_hash": "207522d555aa16401d07983396c21e25c6f7a9143737c269485b9fcf3e6884d2",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録しない: track を解決できないコマンド実行（目的が track ワークフロー観測のため、全量を記録する `_global` ファイルは設けない）/ hook の素通り（block も advisory 注入もない allow）/"
+      }
+    },
+    {
+      "claim_hash": "8ebe5e01bbd7d3b2cd68ad334ed282124cf3104dcf7f251229c07f9a53ffde66",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録しない: 純表示系コマンド / ... findings・briefing 本文の複製（SoT への参照のみ）/ プロンプト本文等の機密になりうる引数。"
+      }
+    },
+    {
+      "claim_hash": "986b0c21fd577dd3b60d58e15aaef2d38b41becd9b0621eecd8368d4a89b0789",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は track dir 配下の `logs/` に置く（gitignore: `track/items/**/logs/`）。retention は track のライフサイクルに追随する"
+      }
+    },
+    {
+      "claim_hash": "7f78ced2f19a97a16d0af51eaaf0cb7e5fe57fee8a92e0aa763d933c9f2d1768",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ボトルネック発見 / false positive 検出 / テンプレートバグ洗い出しを目的とした telemetry を導入する。コンプライアンス監査ではない（イベントの稀な欠落は許容。SoT 成果物は telemetry と独立に無傷で残る）。"
+      }
+    },
+    {
+      "claim_hash": "ce4ff57db6ceaf0c352d6bfe5d48e606c420c9894c2826284a19ebe2d61595c9",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track `track/*` 以外のブランチ（`main` 等）では、`track_resolution.rs` の `updated_at` fallback で最新 track が解決される場合でも telemetry は記録しない（許容）。理由: telemetry の目的は track ワークフロー進行の時系列観測であり、main ブランチ上の作業は track フェーズに帰属しない操作（マージ後確認等）が混在する。branch-bound 帰属に絞ることで track 外ノイズを排除し"
+      }
+    },
+    {
+      "claim_hash": "cefb7614a664a98869a6acd3840f3a433c216d35a5a673677a398dd2d090a92b",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「コンプライアンス監査ではない（イベントの稀な欠落は許容。SoT 成果物は telemetry と独立に無傷で残る）」"
+      }
+    },
+    {
+      "claim_hash": "1739e8a9efe22c5472eb606007438c81ddcf02277b028c41f69cf28a6e94addd",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「tracing + tracing-subscriber のみ」「OpenTelemetry crate は導入しない。イベントに timestamp / duration / track_id 等の相関フィールドを持たせ、将来 OTel Collector（filelog receiver 等）へ接続する余地は残す。」"
+      }
+    },
+    {
+      "claim_hash": "91c1d1cba1da761d56532345366d5bc9741b96e2a9e475604a2887e76019a01a",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「telemetry は track dir 配下の `logs/` に置く（gitignore: `track/items/**/logs/`）。 archive 時は gitignored の `logs/` も track dir と一緒にファイルシステム上で移動する」"
+      }
+    },
+    {
+      "claim_hash": "4123122211fe7ef63e21eba770d6a03dd657b2494eca811812659962f510b137",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は apps/cli-composition の composition root のみ。domain 層は計装しない。"
+      }
+    },
+    {
+      "claim_hash": "9644f9dab83660b8dddd55802e8417b745a3872551e015c4275cae0e83e9a7bc",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "書き込みは O_APPEND フラグを立てた 単発 write syscall で行う。1 イベント行の上限を 4096 バイトとする。超過しうる可変長フィールド は要約して収める。ユーザーランドの lock 機構は使わない"
+      }
+    },
+    {
+      "claim_hash": "4975c7b0d368241c1f059924a54d00c332b0ee108d07054ab85bcffd085206ff",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "テスト実行時は強制隔離とし、Makefile の test 系タスクと integration test helper の両方でこれらの env を設定する（spawn された実バイナリには `cfg(test)` が効かないため env で隔離する）。"
+      }
+    },
+    {
+      "claim_hash": "a2ae5411f63ad47bdb53ae0f74197e2cc100ef898bb893856e944eeb74d0f53a",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "（集計ロジックは Rust native。cargo make に置かない）"
+      }
+    },
+    {
+      "claim_hash": "c131e43756ae77035b2dfc6a6040a5ee98cc7aaa1a749f36adcd891aec5959cb",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する（fail-open — lock なしの並行 append で稀に生じうる破損行を読み手側で吸収する）。"
+      }
+    },
+    {
+      "claim_hash": "a476070845ac1b903f0a3a8b397f24167fc1430d870ea414452c79f3bdfb2e3b",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行（JSONL の 1 行）に `schema_version` フィールドを持たせ、スキーマ変更時の互換性判定を行単位で可能にする。file header イベント方式は並行 append の初回書き込み競合があるため採らない。"
+      }
+    },
+    {
+      "claim_hash": "844c3de0d13f3b3cdb568a1fc03a6a95ec247e2df942e7388d472f8c767c529e",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は apps/cli-composition の composition root のみ。domain 層は計装しない."
+      }
+    },
+    {
+      "claim_hash": "e36448283a30426b7ecb84bcd15870221eb39e11ac01b992dc2590b77382774d",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録する: track 操作 subcommand（command・exit code・所要時間・track_id）"
+      }
+    },
+    {
+      "claim_hash": "2b76d946b75c92825d6cb9cd2494dac4bf34611b23076f03dd77b0406c95b58c",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "gate 評価（gate 名・verdict・理由要約・入力 hash）/ review・dry round（provider・model・round 種別・所要時間・findings 件数）"
+      }
+    },
+    {
+      "claim_hash": "128139907bb80feb4c328b03b8d6dc280acead065026e1a8b58a8a6853b6cabe",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「hook dispatch の block 時および advisory（注入型）hook の発火時」 / 「hook の素通り（block も advisory 注入もない allow）」"
+      }
+    },
+    {
+      "claim_hash": "74dc9826887caed7068fdcb62334fc22c6727b13fbfce5c83c3bbb379d412446",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SOTP_TELEMETRY=0` で全記録を無効化（kill switch）、`SOTP_TELEMETRY_DIR` で書き出し先を差し替える"
+      }
+    },
+    {
+      "claim_hash": "9c34ad711cfa5dbd8a0081da45d96bcc6c9dca220cd9d13bb51566cf0b51ddec",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初期化は lazy とし、イベントが 1 件も発生しなければ file open を行わない（hook の allow 経路にファイル IO を足さない）。"
+      }
+    },
+    {
+      "claim_hash": "e6a3e6f2de1d90d049bc09d4c2f46611d2d34fd5649ca20c87db127001ee8368",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "テスト実行時は強制隔離とし、Makefile の test 系タスクと integration test helper の両方でこれらの env を設定する（spawn された実バイナリには `cfg(test)` が効かないため env で隔離する）。"
+      }
+    },
+    {
+      "claim_hash": "7df03b6d7fc504a22ab2345741277d9be75ee2e4280aba7d2735819719510744",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「track-id 指定でフェーズ別所要時間・エラー一覧・hook block 一覧を集計する subcommand を初期スコープに含める」\n「読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する」"
+      }
+    },
+    {
+      "claim_hash": "48f18630ef7f34828a21a6d4a4078f3903876e69b1916583339f6714e006f060",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は track dir 配下の `logs/` に置く（gitignore: `track/items/**/logs/`）."
+      }
+    },
+    {
+      "claim_hash": "aef4689a8826b731ecfea46f34660655ef625a62c8ac4f05a252f8e3e6649eda",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track/* 以外のブランチ（`main` 等）では、`track_resolution.rs` の `updated_at` fallback で最新 track が解決される場合でも telemetry は記録しない（許容）."
+      }
+    },
+    {
+      "claim_hash": "5a47eadd898a9f7173a84de773b368def0f21dc7d191115ed2925de87183cbf8",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry を導入する。コンプライアンス監査ではない（イベントの稀な欠落は許容。"
+      }
+    },
+    {
+      "claim_hash": "d0549ee85123bae3ecb3e525f390a0d754d1d7670f19aa8acff997eed1fb3550",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the ADR supports putting `schema_version` on each JSONL event line and rejecting a file-header approach due to concurrent append first-write contention, but it does not require the `report` command to tolerate invalid JSON lines, exit with code 0, or report a skip count for corrupted lines."
+      }
+    },
+    {
+      "claim_hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track-id 指定でフェーズ別所要時間・エラー一覧・hook block 一覧を集計する subcommand を初期スコープに含める（集計ロジックは Rust native。cargo make に置かない）。読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する"
+      }
+    },
+    {
+      "claim_hash": "59305ffe5c90ed46d6364f83b837a406ded7f4edfa7d27388d2bd9bbfc446adc",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各イベント行（JSONL の 1 行）に `schema_version` フィールドを持たせ」「file header イベント方式は…採らない」"
+      }
+    },
+    {
+      "claim_hash": "5746aef83d638d833d0bed0a2ba879d753dbfccb675ff4dd350c2a97a40fc514",
+      "evidence_hash": "d6c980c0556e167cafe9e583238d21e31bdffc641cbba7b9809d288bf8dd7bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は apps/cli-composition の composition root のみ。domain 層は計装しない."
+      }
+    },
+    {
+      "claim_hash": "5ec75b50c741f56e2a595015433e940e88f7d47bc6f19a3a0ad03bf1b6a8ab67",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D1: 目的 — track ワークフローの事後観測\n\nボトルネック発見 / false positive 検出 / テンプレートバグ洗い出しを目的とした\ntelemetry を導入する。"
+      }
+    },
+    {
+      "claim_hash": "10bb593a1aca1e52b9bd0b4f3dd702822b0bda5dc8540f4bc553a4b3efd51531",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "OpenTelemetry crate は導入しない。イベントに timestamp / duration / track_id 等の相関フィールドを持たせ、将来 OTel Collector（filelog receiver 等）へ接続する余地は残す。"
+      }
+    },
+    {
+      "claim_hash": "94a38ccc7135341ea459f894728ce46226c91201c9f2ec9a3b4cd48958f9a38c",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は track dir 配下の `logs/` に置く ... retention は track のライフサイクルに追随する"
+      }
+    },
+    {
+      "claim_hash": "b8cd907213126a998059c6d0a537a34e911848a21ad50ecdd561074e962d0cbf",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は apps/cli-composition の composition root のみ。domain 層は計装しない。"
+      }
+    },
+    {
+      "claim_hash": "86568cbe85a8d449f8242b33392cad602b3a9c3876aca63031a9435af8215925",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "並行 worker（Agent Teams）からの同時 append に備え、書き込みは O_APPEND フラグを立てた単発 write syscall で行う。1 イベント行の上限を 4096 バイトとする... ユーザーランドの lock 機構は使わない（fire-and-forget の書き込みにレイテンシを足さない）。"
+      }
+    },
+    {
+      "claim_hash": "3bd61acc22681276ce208e4c60281e631051039ced95ddc23bb346727e6758ac",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録する: track 操作 subcommand（command・exit code・所要時間・track_id）/ gate 評価（gate 名・verdict・理由要約）/ review・dry round（provider・model・round 種別・所要時間・findings 件数）/ 外部 subprocess（所要時間・retry 回数・verdict parse 失敗）/ hook dispatch の block 時および advisory（注入型）hook の発火時 / 非ゼロ exit（error chain）。"
+      }
+    },
+    {
+      "claim_hash": "759b6c93969b2eb66280e2ea82c54e6bbbf23a27a9f4778bea69896ca28463d6",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 帰属は branch-bound に解決する（現在の git ブランチに紐づく track）。track 引数を取らないリポジトリ全域ゲート（layers / orchestra 等）も、track ブランチ上での実行は当該 track に帰属させる。`track/*` 以外のブランチ（`main` 等）では、`track_resolution.rs` の `updated_at` fallback で最新 track が解決される場合でも telemetry は記録しない（許容）。"
+      }
+    },
+    {
+      "claim_hash": "bd65f1758b690851c1ac4d3abba47454ee21529d6be6d6ec7453f9259859947f",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SOTP_TELEMETRY=0` で全記録を無効化（kill switch）、`SOTP_TELEMETRY_DIR` で書き出し先を差し替える。初期化は lazy"
+      }
+    },
+    {
+      "claim_hash": "20cc01411fc6072936be1d8ba112e31e56f62a2131d3576b3135055a0eb1c9ca",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「テスト実行時は強制隔離とし、Makefile の test 系タスクと integration test helper の両方でこれらの env を設定する」"
+      }
+    },
+    {
+      "claim_hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track-id 指定でフェーズ別所要時間・エラー一覧・hook block 一覧を集計する subcommand を初期スコープに含める（集計ロジックは Rust native。cargo make に置かない）。読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する"
+      }
+    },
+    {
+      "claim_hash": "de18711db7ea5d7a6fff0a1b8f4403d6bcc223aa6d87607cac2e681d81012c81",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行（JSONL の 1 行）に `schema_version` フィールドを持たせ、スキーマ変更時の互換性判定を行単位で可能にする。file header イベント方式は並行 append の初回書き込み競合があるため採らない。"
+      }
+    },
+    {
+      "claim_hash": "9e5dbe871a746ac9e6c0073c50884957a9f97eefef8e385f5fe0de48b2b84419",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "OpenTelemetry crate は導入しない。"
+      }
+    },
+    {
+      "claim_hash": "15371ab4512aea6ad43f0e4d60b76f143b29e36e6ffebeee3babed8d9e9dee3a",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は apps/cli-composition の composition root のみ。domain 層は計装しない。"
+      }
+    },
+    {
+      "claim_hash": "207522d555aa16401d07983396c21e25c6f7a9143737c269485b9fcf3e6884d2",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録しない: ... hook の素通り（block も advisory 注入もない allow）/"
+      }
+    },
+    {
+      "claim_hash": "5b8a28681b1e0c000ccde1f88b87e04504d953e5c085cdeab5544e662a7c40dd",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録しない: … 純表示系コマンド / 関数レベルの細粒度 span / findings・briefing 本文の複製（SoT への参照のみ）/ プロンプト本文等の機密になりうる引数。 telemetry は gitignored の track dir 配下のローカル診断ログ（D3）であり、リポジトリ内のファイル path はここで言う「機密になりうる引数」に該当しない。gate 評価イベントへの path の記録は行ってよく、redaction は行わない。"
+      }
+    },
+    {
+      "claim_hash": "986b0c21fd577dd3b60d58e15aaef2d38b41becd9b0621eecd8368d4a89b0789",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「telemetry は track dir 配下の `logs/` に置く」」「retention は track のライフサイクルに追随する」"
+      }
+    },
+    {
+      "claim_hash": "7f78ced2f19a97a16d0af51eaaf0cb7e5fe57fee8a92e0aa763d933c9f2d1768",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ボトルネック発見 / false positive 検出 / テンプレートバグ洗い出しを目的とした telemetry を導入する。コンプライアンス監査ではない（イベントの稀な欠落は許容。SoT 成果物は telemetry と独立に無傷で残る）。"
+      }
+    },
+    {
+      "claim_hash": "ce4ff57db6ceaf0c352d6bfe5d48e606c420c9894c2826284a19ebe2d61595c9",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`track/*` 以外のブランチ（`main` 等）では、`track_resolution.rs` の `updated_at` fallback で最新 track が解決される場合でも telemetry は記録しない（許容）。理由: telemetry の目的は track ワークフロー進行の時系列観測であり、main ブランチ上の作業は track フェーズに帰属しない操作」"
+      }
+    },
+    {
+      "claim_hash": "5a47eadd898a9f7173a84de773b368def0f21dc7d191115ed2925de87183cbf8",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ボトルネック発見 / false positive 検出 / テンプレートバグ洗い出しを目的とした telemetry を導入する。コンプライアンス監査ではない（イベントの稀な欠落は許容。SoT 成果物は telemetry と独立に無傷で残る）。」"
+      }
+    },
+    {
+      "claim_hash": "cefb7614a664a98869a6acd3840f3a433c216d35a5a673677a398dd2d090a92b",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ボトルネック発見 / false positive 検出 / テンプレートバグ洗い出しを目的とした telemetry を導入する。コンプライアンス監査ではない（イベントの稀な欠落は許容。SoT 成果物は telemetry と独立に無傷で残る）。"
+      }
+    },
+    {
+      "claim_hash": "1739e8a9efe22c5472eb606007438c81ddcf02277b028c41f69cf28a6e94addd",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "OpenTelemetry crate は導入しない。イベントに timestamp / duration / track_id 等の相関フィールドを持たせ、将来 OTel Collector（filelog receiver 等）へ接続する余地は残す。"
+      }
+    },
+    {
+      "claim_hash": "91c1d1cba1da761d56532345366d5bc9741b96e2a9e475604a2887e76019a01a",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "archive 時は gitignored の `logs/` も track dir と一緒にファイルシステム上で移動する"
+      }
+    },
+    {
+      "claim_hash": "4123122211fe7ef63e21eba770d6a03dd657b2494eca811812659962f510b137",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は apps/cli-composition の composition root のみ。domain 層は計装しない."
+      }
+    },
+    {
+      "claim_hash": "9644f9dab83660b8dddd55802e8417b745a3872551e015c4275cae0e83e9a7bc",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「並行 worker（Agent Teams）からの同時 append に備え、書き込みは O_APPEND フラグを立てた単発 write syscall で行う。1 イベント行の上限を 4096 バイトとする … 超過しうる可変長フィールドは要約して収める。ユーザーランドの lock 機構は使わない（fire-and-forget の書き込みにレイテンシを足さない）。」"
+      }
+    },
+    {
+      "claim_hash": "4975c7b0d368241c1f059924a54d00c332b0ee108d07054ab85bcffd085206ff",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spawn された実バイナリには `cfg(test)` が効かないため env で隔離する"
+      }
+    },
+    {
+      "claim_hash": "a2ae5411f63ad47bdb53ae0f74197e2cc100ef898bb893856e944eeb74d0f53a",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "（集計ロジックは Rust native。cargo make に置かない）"
+      }
+    },
+    {
+      "claim_hash": "c131e43756ae77035b2dfc6a6040a5ee98cc7aaa1a749f36adcd891aec5959cb",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する（fail-open — lock なしの並行 append で稀に生じうる破損行を読み手側で吸収する）。"
+      }
+    },
+    {
+      "claim_hash": "a476070845ac1b903f0a3a8b397f24167fc1430d870ea414452c79f3bdfb2e3b",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行（JSONL の 1 行）に `schema_version` フィールドを持たせ、スキーマ変更時の互換性判定を行単位で可能にする。file header イベント方式は並行 append の初回書き込み競合があるため採らない。"
+      }
+    },
+    {
+      "claim_hash": "5746aef83d638d833d0bed0a2ba879d753dbfccb675ff4dd350c2a97a40fc514",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は apps/cli-composition の composition root のみ。domain 層は計装しない。"
+      }
+    },
+    {
+      "claim_hash": "e36448283a30426b7ecb84bcd15870221eb39e11ac01b992dc2590b77382774d",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録する: track 操作 subcommand（command・exit code・所要時間・track_id）/ gate 評価（gate 名・verdict・理由要約）/ review・dry round（provider・model・round 種別・所要時間・findings 件数）/ 外部 subprocess（所要時間・retry 回数・verdict parse 失敗）/ hook dispatch の block 時および advisory（注入型）hook の発火時 / 非ゼロ exit（error chain）。\ntelemetry は gitignored の track dir 配下のローカル診断ログ（D3）であり"
+      }
+    },
+    {
+      "claim_hash": "ccc66f345eb641853038fbb59c3a34bdc4914fd95c99ed472c265c70289640d5",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録する: track 操作 subcommand（command・exit code・所要時間・track_id）/ gate 評価（gate 名・verdict・理由要約）/ review・dry round（provider・model・round 種別・所要時間・findings 件数） ... 記録しない: ... プロンプト本文等の機密になりうる引数."
+      }
+    },
+    {
+      "claim_hash": "128139907bb80feb4c328b03b8d6dc280acead065026e1a8b58a8a6853b6cabe",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録する: ... / hook dispatch の block 時および advisory（注入型）hook の発火時 ... /  \n記録しない: ... / hook の素通り（block も advisory 注入もない allow）/ ..."
+      }
+    },
+    {
+      "claim_hash": "74dc9826887caed7068fdcb62334fc22c6727b13fbfce5c83c3bbb379d412446",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SOTP_TELEMETRY=0` で全記録を無効化（kill switch）、`SOTP_TELEMETRY_DIR` で書き出し先を差し替える。"
+      }
+    },
+    {
+      "claim_hash": "9c34ad711cfa5dbd8a0081da45d96bcc6c9dca220cd9d13bb51566cf0b51ddec",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初期化は lazy とし、イベントが 1 件も発生しなければ file open を行わない（hook の allow 経路にファイル IO を足さない）。"
+      }
+    },
+    {
+      "claim_hash": "e6a3e6f2de1d90d049bc09d4c2f46611d2d34fd5649ca20c87db127001ee8368",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Makefile の test 系タスクと integration test helper の両方でこれらの env を設定する"
+      }
+    },
+    {
+      "claim_hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track-id 指定でフェーズ別所要時間・エラー一覧・hook block 一覧を集計する subcommand を初期スコープに含める"
+      }
+    },
+    {
+      "claim_hash": "59305ffe5c90ed46d6364f83b837a406ded7f4edfa7d27388d2bd9bbfc446adc",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行（JSONL の 1 行）に `schema_version` フィールドを持たせ、スキーマ変更時の互換性判定を行単位で可能にする。file header イベント方式は並行 append の初回書き込み競合があるため採らない。"
+      }
+    },
+    {
+      "claim_hash": "48f18630ef7f34828a21a6d4a4078f3903876e69b1916583339f6714e006f060",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は track dir 配下の `logs/` に置く（gitignore: `track/items/**/logs/`)."
+      }
+    },
+    {
+      "claim_hash": "aef4689a8826b731ecfea46f34660655ef625a62c8ac4f05a252f8e3e6649eda",
+      "evidence_hash": "06a68b85f8a476fd29a41537d55a9e3a3ed5f18b491be70053a44271b4425b7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/*` 以外のブランチ（`main` 等）では、... telemetry は記録しない（許容）。"
+      }
+    }
+  ]
+}

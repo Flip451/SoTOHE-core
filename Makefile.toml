@@ -167,18 +167,21 @@ args = ["clippy", "--locked", "--all-targets", "--all-features", "--", "-D", "wa
 [tasks.test-local]
 private = true
 description = "[internal] Run tests with nextest"
+env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["nextest", "run", "--locked", "--all-targets", "--all-features", "--no-tests=warn"]
 
 [tasks.test-doc-local]
 private = true
 description = "[internal] Run documentation tests"
+env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["test", "--locked", "--doc", "--all-features"]
 
 [tasks.test-nocapture-local]
 private = true
 description = "[internal] Run tests with stdout/stderr shown"
+env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["test", "--locked", "--all-features", "--", "--nocapture"]
 
@@ -209,6 +212,7 @@ args = ["clippy", "--locked", "--tests", "--all-features", "--", "-D", "warnings
 [tasks.llvm-cov-local]
 private = true
 description = "[internal] Generate HTML coverage report"
+env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["llvm-cov", "nextest", "--html", "--all-features", "--locked"]
 

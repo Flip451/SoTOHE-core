@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "`.gitignore` に `track/items/**/logs/` エントリを追加し、telemetry.jsonl が誤ってコミットされない状態にする（CN-03 / AC-10）。変更対象: リポジトリルートの `.gitignore`。追加する行: `track/items/**/logs/`。既存の gitignore エントリとの重複・矛盾がないことを確認する。unit test 相当の確認: `.gitignore` に当該パターンが存在すること（`bin/sotp verify` の verify-arch-docs gate または手動確認）。CN-03 のもう一方の要件（archive ツールが `logs/` をファイルシステム移動すること）は T011 で対応する。前提: なし（独立タスク）。",
+      "status": "done",
+      "commit_hash": "d37b5b8d169c6137141b8ab0ed6543970d09cb80"
+    },
+    {
+      "id": "T002",
+      "description": "`libs/infrastructure/src/telemetry/mod.rs` に `TelemetryEvent` enum（各 variant が struct payload を持つ JSONL wire-format DTO）と `TelemetryWriteError` error type を実装する（IN-03 / IN-08 / CN-09 / AC-09）。実装内容: (1) `infrastructure-types.json` に宣言された `TelemetryEvent` enum の全 7 variant（`TrackSubcommand` / `GateEval` / `ReviewRound` / `ExternalSubprocess` / `HookBlock` / `AdvisoryHookFired` / `NonZeroExit`）を Rust struct-payload enum として実装する。各 variant の payload struct は catalogue 宣言のフィールドをそのまま持ち、`schema_version: u32` フィールドを必須とする（per-line schema_version、CN-09 / AC-09）。`ReviewRound` variant の `round_type` フィールドは `String` 型とし（catalogue 宣言に従う）、serde シリアライズ時は `\"fast\"` / `\"final\"` の小文字文字列を格納する。JSONL boundary では agent_profiles::RoundType enum への依存を持ち込まず、DTO を自己完結させる。(2) `TelemetryWriteError` enum（`Serialize { message: String }` / `Io { path: String, message: String }`）を実装する。`thiserror::Error` derive で `Display` + `Error` + `Debug` を実装する。(3) `TelemetryEvent` に `Debug` / `Clone` / `serde::Serialize` / `serde::Deserialize<'de>` を derive する。(4) モジュールを `libs/infrastructure/src/lib.rs` の pub mod telemetry として公開する。unit tests: `TelemetryEvent::TrackSubcommand` を `serde_json::to_string` でシリアライズしたとき `schema_version` フィールドが含まれること / `TelemetryEvent::GateEval` のラウンドトリップ（serialize → deserialize → 元の値に等しい）/ `ReviewRound` の `round_type` フィールドが `\"fast\"` / `\"final\"` の String として serde でラウンドトリップすること / `TelemetryWriteError::Io` が `Display` を実装していること。前提: なし（独立タスク）。",
+      "status": "done",
+      "commit_hash": "618bd04e1d0ee5d661fb2b8964e98c62088a3ac5"
+    },
+    {
+      "id": "T003",
+      "description": "`TelemetryConfig` + `TelemetryWriter` を `libs/infrastructure/src/telemetry/` に実装する（IN-02 / IN-04 / IN-05 / CN-02 / CN-04 / CN-05 / AC-05 / AC-06 / AC-11）。実装内容: (1) `TelemetryConfig`: `from_env()` constructor（`SOTP_TELEMETRY=0` で `enabled=false`、`SOTP_TELEMETRY_DIR` が設定されていれば `output_dir_override=Some(path)` を格納）、`is_enabled()` accessor、`Debug` + `Clone` derive。フィールドはプライベートとし、catalogue 宣言に従う。(2) `TelemetryWriter`: `new(config: TelemetryConfig, track_id: String, items_dir: std::path::PathBuf) -> Self` constructor、`write(&self, event: TelemetryEvent) -> Result<(), TelemetryWriteError>` メソッド。`write` の実装: 初期化は lazy（初回 `write` 呼び出し時のみファイルを open し、それ以前にファイル open は行わない — AC-06）。`TelemetryConfig::is_enabled()` が false の場合は即時 `Ok(())` を返す（AC-05 kill-switch）。track_id は branch-bound で解決されているため、`track/*` ブランチ外で `TelemetryWriter::new` が構築されない設計を composition root で保証する（AC-11 の実装は T004 に委譲）。ファイルパスは `SOTP_TELEMETRY_DIR` override があればそのディレクトリ配下の `telemetry.jsonl`、なければ `items_dir/track_id/logs/telemetry.jsonl` とする（CN-03 / AC-05）。ファイルを open する前に `std::fs::create_dir_all(path.parent())` でログ出力先ディレクトリを作成する（`track/items/<id>/logs/` は初回書き込みまで存在しないため、`create(true)` だけでは親ディレクトリがない場合に IO エラーになる）。O_APPEND open は `OpenOptions::new().append(true).create(true).open(path)` で実装する（CN-05）。1 イベント行は `serde_json::to_string(&event)?` で JSON 化し、末尾に改行 `\n` を付与した上で `std::io::Write::write` の単発呼び出し（`write_all` ではなく `write`）で 1 syscall に収める。`write_all` はバッファが消費されるまで繰り返す convenience API であり O_APPEND 単発 write による行境界原子性を保証しないため使用しない。`write` の戻り値 `Ok(n)` の `n` がバッファ長と一致しない場合（short write）は `TelemetryWriteError::Io` として返す（short write は行境界を壊すため）。行全体が 4096 バイトを超える場合は可変長フィールド（`error_chain` / `reason_summary` 等）を 256 バイトに切り詰めた上で再試行する（CN-05）。write エラー（IO error / serialize error）は `TelemetryWriteError` として返すが、caller（composition root）は fire-and-forget で suppress する（CN-01）。`Debug` derive（フィールドはプライベート）。(3) モジュール内の `OnceCell<std::fs::File>` または同等のlazy init 機構を使い、スレッド安全性は Mutex ではなく `OnceCell` + 不変参照で満たす（同期 CLI のため不要だが型安全性のため）。unit tests: `TelemetryConfig::from_env` が `SOTP_TELEMETRY=0` でdisabled を返すこと / `SOTP_TELEMETRY_DIR` が設定されているとき `output_dir_override` に値が入ること / `TelemetryWriter::write` が disabled config の場合にファイルを open しないこと（AC-06）/ `TelemetryWriter::write` が enabled の場合に tmpdir に `telemetry.jsonl` が作成され、イベント行が追記されること / 書き込み後のファイルが valid JSON lines であること / 4096 バイト超のフィールドが切り詰められること / `TelemetryWriteError::Io` が返ること（書き込み不能なパスを渡した場合）。前提: T002（`TelemetryEvent` / `TelemetryWriteError` が実装済みであること）。",
+      "status": "done",
+      "commit_hash": "d123b8f2f3aca8a25e8b38e3e8de9071a2d2baf7"
+    },
+    {
+      "id": "T004",
+      "description": "`apps/cli-composition` の composition root で tracing subscriber を初期化し、`TelemetryWriter` を構築・配線する。branch-bound track 帰属解決を追加し、`track/*` ブランチ以外では `TelemetryWriter` を無効化する（IN-01 / IN-04 / CN-04 / AC-01 / AC-11）。また track 操作 subcommand の完了イベント（`TelemetryEvent::TrackSubcommand`）と非ゼロ exit イベント（`TelemetryEvent::NonZeroExit`）を composition root の dispatch 層に計装する（IN-03 / AC-02）。`TelemetryEvent::TrackSubcommand` は exit_code と duration_ms を含む completed-command フィールドのみを持つため、dispatch 実行後に 1 回だけ emit する（開始時点では exit_code・duration_ms を確定できないため開始時 emit は行わない）。実装内容: (1) `apps/cli-composition/src/lib.rs` または同等の composition entry point に `tracing_subscriber::fmt` の初期化コードを追加する。subscriber は `EnvFilter::from_env(\"RUST_LOG\")` を使い、デフォルトは `info` とする（AC-01）。(2) 現在の git ブランチ名を `git symbolic-ref --short HEAD` 等の既存 `git_cli` 機構で取得し、`track/` プレフィックスを持つ場合のみ track_id を抽出して `TelemetryWriter::new` を構築する。`track/*` 以外のブランチでは `TelemetryConfig::is_enabled()` を false に設定するか、`TelemetryWriter` を構築しないことで AC-11 を満たす。branch 解決に失敗した場合（git がない等）は telemetry を無効化して継続する（fire-and-forget）。(3) **track 操作 subcommand**（spec IN-03 に列挙された track 操作系）の dispatch 完了後に `TelemetryEvent::TrackSubcommand` を 1 回 emit する: command 名・exit code・所要時間（dispatch 前に `Instant::now()` を取得し dispatch 後に計測）・track_id を含む（AC-02）。**純表示系コマンド**（OS-04 / AC-06 でスコープ外と定義）では emit しない — これらはイベントが発生しないため `logs/` の file open も行われない（AC-06 の lazy init を保証）。dispatch 前の「開始」時点では emit しない（exit_code・duration_ms が未確定のため）。非ゼロ exit の場合は同一イベントを `TelemetryEvent::NonZeroExit` としても emit する（IN-03）。(4) domain / usecase 層には subscriber 初期化コードも `TelemetryWriter` も持ち込まない（CN-04 / IN-01）。(5) compose root 以外の場所（libs/infrastructure 等）で subscriber を init しないことを確認する（AC-01）。unit tests: `track/my-feature-2026-01-01` ブランチ名から `my-feature-2026-01-01` の track_id が抽出されること / `main` ブランチでは track_id が解決されないこと（AC-11）/ subscriber 初期化が 2 回呼ばれても panic しないこと（once-guard）。前提: T003（`TelemetryWriter` 実装済み）。",
+      "status": "done",
+      "commit_hash": "d1d4d89f0e2327d664c0c3e72de638abbda164c7"
+    },
+    {
+      "id": "T005",
+      "description": "gate 評価イベント（`TelemetryEvent::GateEval`）および hook dispatch の block イベント（`TelemetryEvent::HookBlock`）・advisory hook 発火イベント（`TelemetryEvent::AdvisoryHookFired`）を各計装ポイントに追加する（IN-03 / AC-03 / AC-04）。実装内容: (1) `bin/sotp verify *` の各 gate 評価コード（`libs/infrastructure/src/verify/` 配下）に `TelemetryEvent::GateEval` の emit ポイントを追加する。フィールドに含める内容: `gate_name`（verify subcommand 名）・`verdict`（\"ok\" / \"error\"）・`reason_summary`（gate 出力の人が読める切り詰め要約、4096 バイト行上限 — D3/CN-05）・`duration_ms`（gate 評価の所要時間 ms — ボトルネック特定のため GO-01 に対応）・`track_id`（branch-bound で解決した track 識別子）（AC-03）。(2) `apps/cli-composition/src/hook.rs` または `libs/infrastructure/src/` の hook dispatch 処理に `TelemetryEvent::HookBlock` と `TelemetryEvent::AdvisoryHookFired` の emit ポイントを追加する。block 時は `hook_name` フィールドに hook 識別子を含める。advisory（注入型）hook が発火したときも同様に emit する（AC-04）。hook の素通り（allow 経路）には emit を追加しない（OS-03）。(3) `TelemetryWriter` への参照は composition root から注入し、usecase 層や domain 層に持ち込まない（CN-04）。`TelemetryWriter` を `Arc` または参照で渡すか、global singleton 的な thread_local を使うかは composition root の設計に従う（fire-and-forget なので Arc が適切）。unit tests: gate 評価後に `TelemetryWriter` の mock または tmpdir ファイルに `GateEval` イベント行が追記されること / hook block 時に `HookBlock` イベントが emit されること / hook allow 経路では emit が発生しないこと（OS-03）。前提: T003（TelemetryWriter）、T004（composition root 配線）。",
+      "status": "done",
+      "commit_hash": "f30df22997fcd50470e109f91faaa02af0722985"
+    },
+    {
+      "id": "T006",
+      "description": "review・dry round イベント（`TelemetryEvent::ReviewRound`）および外部 subprocess イベント（`TelemetryEvent::ExternalSubprocess`）を各計装ポイントに追加する（IN-03 / AC-03）。実装内容: (1) `libs/infrastructure/src/review_v2/` 配下または review round dispatch 層に `TelemetryEvent::ReviewRound` の emit ポイントを追加する。フィールド: `provider`・`model`・`round_type`（`\"fast\"` / `\"final\"` の String — catalogue 宣言に従う）・`duration_ms`・`findings_count`・`track_id`（AC-03）。dry round（dry-check）にも同様に emit する（IN-03: review・dry round は同一 variant を共有）。(2) `libs/infrastructure/src/` の外部 subprocess 呼び出し層（codex / gemini CLI 呼び出し等）に `TelemetryEvent::ExternalSubprocess` の emit ポイントを追加する。フィールド: `command`（実行バイナリ名、引数なし）・`duration_ms`・`retry_count`・`verdict_parse_failed`（bool）（IN-03 / AC-03）。(3) findings 本文・briefing 本文・プロンプト本文は emit しない。SoT への参照（review.json のパス等）のみを含める（OS-04）。unit tests: `ReviewRound` イベントに `findings_count` が含まれること / `ExternalSubprocess` イベントの `verdict_parse_failed` が false（正常）/ true（失敗）の両方で emit されること / findings 本文が JSONL に含まれていないこと。前提: T003（TelemetryWriter）、T004（composition root 配線）。",
+      "status": "done",
+      "commit_hash": "365753755efa0c6dcfa2e1cd9ef934fc41f19a6f"
+    },
+    {
+      "id": "T007",
+      "description": "テスト実行時の telemetry 隔離を実装する。Makefile.toml の test 系タスクに `SOTP_TELEMETRY=0` 環境変数を追加し、integration test helper でも `SOTP_TELEMETRY_DIR` による tmpdir 隔離を設定することで、spawn された実バイナリ含め track dir の `logs/telemetry.jsonl` が汚染されないようにする（IN-06 / CN-06 / AC-07）。実装内容: (1) `Makefile.toml` の `test`（または `test-local`）タスクに `SOTP_TELEMETRY = \"0\"` 環境変数を追加する。`test-nocapture` 等の関連タスクにも同様に追加する（AC-07）。(2) integration test で `sotp` バイナリを spawn する箇所（`libs/infrastructure/src/` 配下の integration test helper または `tests/` ディレクトリ）に、spawn 前に `SOTP_TELEMETRY=0` または `SOTP_TELEMETRY_DIR=<tempdir>` を環境変数として設定するコードを追加する。spawn された実バイナリには `#[cfg(test)]` が効かないため env var による隔離が必要（CN-06）。(3) `llvm-cov` タスク等のカバレッジタスクにも同様の telemetry 隔離を追加する。unit tests 相当の確認: Makefile の test タスクに `SOTP_TELEMETRY=0` が設定されていることを verify するか、integration test 後に track dir の `logs/` が生成されていないことをアサーションで確認する。前提: T003（TelemetryWriter の kill-switch 実装済み）。",
+      "status": "done",
+      "commit_hash": "365753755efa0c6dcfa2e1cd9ef934fc41f19a6f"
+    },
+    {
+      "id": "T008",
+      "description": "`TelemetryReport` secondary adapter と出力 DTO 群（`TelemetryReportOutput` / `PhaseDurationSummary` / `TelemetryErrorEntry` / `TelemetryHookBlockEntry` / `TelemetryReportError`）を `libs/infrastructure/src/telemetry/` に実装する（IN-07 / CN-07 / CN-08 / AC-08）。実装内容: (1) `TelemetryReport::new(items_dir: std::path::PathBuf) -> Self` constructor と `aggregate(&self, track_id: &str) -> Result<TelemetryReportOutput, TelemetryReportError>` メソッドを実装する。(2) `aggregate` の実装: `items_dir/track_id/logs/telemetry.jsonl` を行ごとに読み込む。各行を `serde_json::from_str::<TelemetryEvent>` で typed deserialize を試みる。serde の internally-tagged enum 表現（`#[serde(tag = \"event_type\")]`）では各 variant の payload フィールドはトップレベルに展開され、`schema_version` もトップレベルキーとして存在する（例: `{\"event_type\": \"TrackSubcommand\", \"schema_version\": 1, \"command\": \"...\", ...}`）。未知の `event_type` 値を持つ行（将来 schema 追加分）は `TelemetryEvent` の typed deserialize 時に serde が `Err` を返すため自動的に skip 対象になる。deserialize に失敗した行（broken JSON / 未知 variant / フィールド不一致）は skip して `skipped_lines` カウンタを増やす（fail-open、CN-08 / AC-08）。deserialize 成功後は必ず enum match で payload 内の `schema_version` フィールドを取り出し、既知バージョン（現時点では `1`）以外の行は skip して `skipped_lines` を増やす（必須 — CN-08 / AC-08: 既知 variant 名でも将来バージョンの payload を持つ行を誤集計しないため）。`TrackSubcommand` events から command フィールドをフェーズ名として `PhaseDurationSummary` を集計（`total_ms` 加算 / `event_count` 加算）する。`NonZeroExit` events から `TelemetryErrorEntry` を収集する。`HookBlock` events から `TelemetryHookBlockEntry` を収集する。`track_id` ディレクトリが存在しない場合は `TelemetryReportError::TrackNotFound` を返す。`logs/telemetry.jsonl` が存在しない場合は空の `TelemetryReportOutput`（0 件・`skipped_lines=0`）を返す（ファイルが空の正常ケース）。(3) 出力 DTO 群（`TelemetryReportOutput` / `PhaseDurationSummary` / `TelemetryErrorEntry` / `TelemetryHookBlockEntry`）は catalogue 宣言のフィールドをそのまま実装し、`Debug` + `Clone` を derive する。(4) `TelemetryReportError` は `thiserror::Error` derive で `Io { path: String, message: String }` / `TrackNotFound { track_id: String }` を実装する。行のパース失敗は `TelemetryReportError` にしない（fail-open で skip、CN-08）。unit tests: 正常な JSONL ファイルを tmpdir に用意し、`aggregate` が `PhaseDurationSummary`・`TelemetryErrorEntry`・`TelemetryHookBlockEntry` を正しく集計すること / 破損行が skip されて `skipped_lines` がカウントされること / 未知 `schema_version`（将来の forward-compat 確認）の行が skip されること / `telemetry.jsonl` が存在しない場合に空 output が返ること / 存在しない track_id で `TrackNotFound` が返ること。前提: T002（`TelemetryEvent` のデシリアライズ型が実装済み）。",
+      "status": "done",
+      "commit_hash": "db0b8570b78376ad1075489d43bb245820409334"
+    },
+    {
+      "id": "T009",
+      "description": "`bin/sotp telemetry report <track-id>` CLI subcommand を `apps/cli/` + `apps/cli-composition/` に実装する（IN-07 / CN-07 / AC-08）。実装内容: (1) `apps/cli/src/main.rs` の `CliCommand` enum に `Telemetry { cmd: TelemetryCommand }` variant を追加し、`apps/cli/src/commands/telemetry.rs`（新規）に `TelemetryCommand` enum（`Report { track_id: String }`）を定義する。(2) `apps/cli-composition/src/` に telemetry subcommand の DI 配線コードを追加する（`TelemetryReport::new(items_dir)` を構築し、`aggregate(track_id)` を呼び出し、`TelemetryReportOutput` を human-readable 形式で stdout に出力する）。出力形式: フェーズ別所要時間テーブル・エラー一覧・hook block 一覧・skip 件数を含むテキストレポート（AC-08）。(3) `TelemetryReportError::TrackNotFound` は exit code 1 にマッピングし、エラーメッセージを stderr に出力する。IO エラーも同様に exit code 1。(4) `skipped_lines > 0` の場合は「N 行をスキップしました（パース失敗または未知 schema_version）」の旨を出力に含める（AC-08）。(5) `TelemetryReport` の集計ロジックは T008 の Rust native 実装を呼ぶだけで、`cargo make` や shell スクリプトには置かない（CN-07）。unit tests: `sotp telemetry report <id>` が clap でパースされること / `TelemetryReportOutput` が正常に stdout に出力されること / `TrackNotFound` が exit code 1 になること / `skipped_lines > 0` のときスキップ件数が出力に含まれること。前提: T008（`TelemetryReport` / `TelemetryReportOutput` 実装済み）。",
+      "status": "done",
+      "commit_hash": "416b0812fc87dc97590f1cf3fdd168b63c506f7c"
+    },
+    {
+      "id": "T010",
+      "description": "E2E 検証: `cargo make ci` をすべての gate（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass することを確認し、全 acceptance criteria を満たすことを検証する（全 AC）。具体的に確認する AC: AC-01（`apps/cli-composition` に subscriber 初期化コードがあり、domain / usecase 層に計装コードがないこと）/ AC-02（track 操作 subcommand 後に `telemetry.jsonl` にイベント行が追記されること）/ AC-03（gate 評価・review round・外部 subprocess イベントが正しいフィールドで記録されること）/ AC-04（hook block および advisory hook 発火のみが記録され、素通りは記録されないこと）/ AC-05（`SOTP_TELEMETRY=0` でファイル書き込みがなく、`SOTP_TELEMETRY_DIR` で指定先に書き出されること）/ AC-06（純表示系コマンドで `logs/` ディレクトリへの file open がないこと）/ AC-07（Makefile test タスクに `SOTP_TELEMETRY=0` があり、テスト中に track dir の `logs/` が汚染されないこと）/ AC-08（`bin/sotp telemetry report <id>` がフェーズ別所要時間・エラー一覧・hook block 一覧・skip 件数を出力し、exit code 0 で完了すること）/ AC-09（`telemetry.jsonl` の各行に `schema_version` フィールドがあること）/ AC-10（`.gitignore` に `track/items/**/logs/` が追加されていること）/ AC-11（`track/*` 以外のブランチで telemetry が記録されないこと）。failing gate や clippy warning が発生した場合は同タスク内で修正する。前提: T001–T009 完了（T011 は archive retention の別タスクであり、AC-01〜AC-11 の E2E 検証の前提には含めない）。",
+      "status": "done",
+      "commit_hash": "3fca100adab3871b2b644aa893380a918c21ebee"
+    },
+    {
+      "id": "T011",
+      "description": "`bin/sotp track archive` サブコマンドに `track/items/<id>/logs/` ディレクトリを移動対象に含める変更を追加する（CN-03 / GO-03）。実装内容: `libs/infrastructure/src/` または `apps/cli-composition/src/` の archive 処理で track dir をファイルシステム移動する際、gitignored であっても `logs/` サブディレクトリをともに移動するようにする（現在 gitignored ディレクトリを除外している場合は当該除外ロジックを修正する）。これにより archived track と telemetry.jsonl の突き合わせが可能になる（GO-03）。unit tests: archive 実行後に `logs/telemetry.jsonl` が移動先に存在すること / 移動元に残っていないこと。前提: T001（gitignore エントリ追加済み）。",
+      "status": "done",
+      "commit_hash": "f7d7f11c49a804e13188d4c12d062481eac16309"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Repository Configuration — .gitignore Entry (T001)",
+        "description": [
+          "`.gitignore` に `track/items/**/logs/` を追加し、telemetry.jsonl が誤ってリポジトリにコミットされない状態を作る（CN-03 / AC-10）。",
+          "これは独立した最初のタスクで、他のすべてのタスクから独立して commit できる。"
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Infrastructure Layer — Telemetry DTO and Writer (T002, T003)",
+        "description": [
+          "T002: `TelemetryEvent` enum（7 variant の JSONL wire-format DTO、per-line `schema_version`）と `TelemetryWriteError` を `libs/infrastructure/src/telemetry/` に実装する（IN-03 / IN-08 / CN-09 / AC-09）。",
+          "T003: `TelemetryConfig`（env var 解決、kill-switch、dir override）と `TelemetryWriter`（O_APPEND 単発 write、lazy init、4096 バイト上限、fire-and-forget）を実装する（IN-02 / IN-05 / CN-05 / AC-05 / AC-06）。",
+          "これら 2 タスクは hexagonal layer の infrastructure 内に閉じており、composition root への配線前に独立して実装・テスト可能。",
+          "tracing + tracing-subscriber の Cargo.toml への追加もこの slice に含める（CN-02）。"
+        ],
+        "task_ids": [
+          "T002",
+          "T003"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Composition Root Wiring and Core Instrumentation (T004)",
+        "description": [
+          "T004: `apps/cli-composition` の composition root で tracing subscriber を初期化し（AC-01）、branch-bound track 帰属解決で `track/*` 以外では telemetry を無効化する（IN-04 / AC-11）。",
+          "track 操作 subcommand の完了イベント（`TelemetryEvent::TrackSubcommand`）と非ゼロ exit イベント（`TelemetryEvent::NonZeroExit`）を dispatch 層に計装する（IN-03 / AC-02）。dispatch 完了後に 1 回だけ emit（開始時 emit なし）。",
+          "subscriber 初期化は composition root のみ（IN-01 / CN-04）。domain / usecase 層への計装は行わない（OS-02）。"
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Gate, Hook, Review, and Subprocess Instrumentation (T005, T006)",
+        "description": [
+          "T005: gate 評価イベント（`TelemetryEvent::GateEval`）を `libs/infrastructure/src/verify/` 配下の各 gate に追加し、hook block（`TelemetryEvent::HookBlock`）および advisory hook 発火（`TelemetryEvent::AdvisoryHookFired`）を hook dispatch 層に追加する（IN-03 / AC-03 / AC-04）。GateEval には duration_ms フィールドを含める（GO-01: ボトルネック発見のため gate 所要時間を記録する）。hook の素通り（allow）は記録しない（OS-03）。",
+          "T006: review・dry round イベント（`TelemetryEvent::ReviewRound`）を review round dispatch 層に追加し、外部 subprocess イベント（`TelemetryEvent::ExternalSubprocess`）を CLI 呼び出し層に追加する（IN-03 / AC-03）。findings・briefing 本文は記録しない（OS-04）。",
+          "これら 2 タスクは composition root 配線（T004）後に各計装ポイントへ `TelemetryWriter` を注入するため、T004 の後に実施する。"
+        ],
+        "task_ids": [
+          "T005",
+          "T006"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "Test Isolation (T007)",
+        "description": [
+          "T007: Makefile.toml の test 系タスクと integration test helper に `SOTP_TELEMETRY=0` / `SOTP_TELEMETRY_DIR` による telemetry 隔離を追加する（IN-06 / CN-06 / AC-07）。",
+          "spawn された実バイナリには `#[cfg(test)]` が効かないため env var による隔離が必要（CN-06）。",
+          "このタスクは T003 の kill-switch 実装に依存する。"
+        ],
+        "task_ids": [
+          "T007"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "Telemetry Report — Aggregation and CLI Surface (T008, T009)",
+        "description": [
+          "T008: `TelemetryReport` secondary adapter と出力 DTO 群を `libs/infrastructure/src/telemetry/` に実装する。fail-open 行 skip（CN-08）、フェーズ別所要時間集計・エラー一覧・hook block 一覧（IN-07 / AC-08）。",
+          "T009: `bin/sotp telemetry report <track-id>` CLI subcommand を `apps/cli/` と `apps/cli-composition/` に実装する（IN-07 / CN-07 / AC-08）。集計ロジックは Rust native — cargo make に置かない（CN-07）。",
+          "T008 は T002 の `TelemetryEvent` deserialization に依存し、T009 は T008 に依存する。"
+        ],
+        "task_ids": [
+          "T008",
+          "T009"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "Archive Retention — `logs/` Move Support (T011)",
+        "description": [
+          "T011: `bin/sotp track archive` の track dir 移動処理に `logs/` ディレクトリを含める（CN-03 / GO-03）。",
+          "telemetry の retention を track のライフサイクル（active → archive）に自動追随させるため、archive 時に gitignored の `logs/` もともに移動する。",
+          "このタスクは T001（gitignore エントリ）の後に実施する。"
+        ],
+        "task_ids": [
+          "T011"
+        ]
+      },
+      {
+        "id": "S8",
+        "title": "E2E Verification (T010)",
+        "description": [
+          "T010: T001–T009 完了後に `cargo make ci` を実行し、全 gate（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass することを確認する。T011 は archive retention の別タスクであり、AC-01〜AC-11 の E2E 検証の前提には含めない。",
+          "AC-01 〜 AC-11 の全項目を実機確認または自動テストで検証する。",
+          "failing gate・clippy warning はこのタスク内で修正する。"
+        ],
+        "task_ids": [
+          "T010"
+        ]
+      }
+    ]
+  }
+}

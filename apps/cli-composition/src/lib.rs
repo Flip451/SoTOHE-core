@@ -22,10 +22,19 @@ mod pr;
 mod ref_verify;
 pub mod review_v2;
 mod semantic_dup;
+mod telemetry;
 mod track;
 mod verify;
 
 mod dry_fix_runner;
+
+/// Telemetry wiring for the composition root.
+///
+/// Provides subscriber initialisation, branch-bound `TelemetryWriter`
+/// construction, and fire-and-forget event emit helpers.  This module is the
+/// only place in the codebase where `tracing_subscriber` is initialised
+/// (IN-01 / CN-04 / AC-01).
+pub mod telemetry_wiring;
 
 #[cfg(test)]
 pub(crate) mod test_support {
@@ -51,6 +60,7 @@ pub use review_v2::{
 pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
 };
+pub use telemetry::TelemetryReportInput;
 
 // ---------------------------------------------------------------------------
 // Public API types

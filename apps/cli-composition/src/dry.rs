@@ -14,17 +14,19 @@
 //! (`FsDryCheckCommitHashStore`, `GitDryCheckDiffGetter`). The `review_v2`
 //! adapters (`FsCommitHashStore`, `GitDiffGetter`) are never imported.
 
-#[cfg(test)]
 use std::path::Path;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::{Arc, Mutex};
+use std::time::Instant;
 
 use domain::dry_check::{DryCheckFinding, DryCheckReader as _, DryCheckVerdict};
-use domain::semantic_dup::SimilarityThreshold;
+use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
 use infrastructure::dry_check::{CodexDryChecker, FsDryCheckStore};
 use infrastructure::semantic_dup::embedding::FastEmbedAdapter;
 use usecase::dry_check::{
-    DryCheckApprovalInteractor, DryCheckApprovalService as _, DryCheckInteractor,
+    DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckApprovalInteractor,
+    DryCheckApprovalService as _, DryCheckCycleError, DryCheckInteractor,
     DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _,
 };
 
@@ -45,8 +47,6 @@ use shared::{git_diff_path_key, normalize_fragment_paths};
 
 #[cfg(test)]
 use domain::dry_check::{DryCheckApprovalVerdict, VerdictFilter, fragments_overlapping_hunks};
-#[cfg(test)]
-use domain::semantic_dup::CodeFragment;
 #[cfg(test)]
 use infrastructure::semantic_dup::{
     extractor::extract_code_fragments, index::LanceDbSemanticIndexAdapter,
@@ -174,6 +174,14 @@ fn create_ephemeral_index_adapter(
     Ok((temp_index_dir, index_adapter))
 }
 
+fn resolve_dry_write_telemetry_writer(
+    items_dir: &Path,
+    dry_track_id: &str,
+) -> Option<(infrastructure::telemetry::TelemetryWriter, String)> {
+    crate::telemetry_wiring::resolve_telemetry_writer(items_dir)
+        .filter(|(_, telemetry_track_id)| telemetry_track_id.as_str() == dry_track_id)
+}
+
 // ── CliApp impl — dry write ───────────────────────────────────────────────────
 
 impl CliApp {
@@ -197,6 +205,8 @@ impl CliApp {
         let canonical_root =
             root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
         let track_id = parse_dry_track_id(&input.track_id)?;
+        let telemetry_writer =
+            resolve_dry_write_telemetry_writer(&input.items_dir, track_id.as_ref());
 
         // Resolve the effective model: explicit --model overrides; otherwise read
         // the `dry-checker` capability model from agent-profiles.json (same pattern
@@ -272,7 +282,11 @@ impl CliApp {
             .read_records()
             .map_err(|e| format!("dry-check read before write failed: {e}"))?
             .len();
-        let agent = Arc::new(CodexDryChecker::new(effective_model, input.capability_name.clone()));
+        let (agent, agent_recorder) = RecordingDryAgent::new(CodexDryChecker::new(
+            effective_model.clone(),
+            input.capability_name.clone(),
+        ));
+        let agent = Arc::new(agent);
         let embedding_port = Arc::new(
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
@@ -302,9 +316,44 @@ impl CliApp {
         );
 
         // Run the dry-check write cycle with empty corpus (index pre-built above).
-        let findings: Vec<DryCheckFinding> = interactor
-            .run_dry_check(vec![], diff_fragments, threshold, base)
-            .map_err(|e| format!("dry-check write cycle failed: {e}"))?;
+        let dry_start = std::time::Instant::now();
+        let dry_result = interactor.run_dry_check(vec![], diff_fragments, threshold, base);
+
+        // Emit ReviewRound + ExternalSubprocess telemetry for the dry round
+        // (T006 / AC-03 / IN-03). round_type = "dry" (per spec IN-03 shared variant).
+        // Placement rationale: composition layer has effective_model, findings count,
+        // and timing; no usecase/domain change required (CN-04).
+        // Emit for Ok (completed) and for subprocess-involved errors (Agent, Entry,
+        // Writer — errors that occur after DryCheckAgentPort::judge() was invoked).
+        // Pre-subprocess errors (Embedding, Index, Reader, Diff) do not emit, as no
+        // subprocess ran for those.
+        if let Some((ref w, ref tid)) = telemetry_writer {
+            let round_telemetry = dry_round_telemetry_for_result(&dry_result, &agent_recorder);
+            if let Some(telemetry) = round_telemetry {
+                crate::telemetry_wiring::emit_review_round(
+                    w,
+                    tid,
+                    "codex",
+                    &effective_model,
+                    "dry",
+                    telemetry.findings_count,
+                    dry_start,
+                );
+                if let Some(subprocess_started_at) = telemetry.subprocess_started_at {
+                    crate::telemetry_wiring::emit_external_subprocess(
+                        w,
+                        tid,
+                        "codex",
+                        0,
+                        telemetry.verdict_parse_failed,
+                        subprocess_started_at,
+                    );
+                }
+            }
+        }
+
+        let findings: Vec<DryCheckFinding> =
+            dry_result.map_err(|e| format!("dry-check write cycle failed: {e}"))?;
 
         let records_after = store_for_summary
             .read_records()
@@ -467,6 +516,162 @@ impl CliApp {
     }
 }
 
+#[derive(Clone)]
+struct DryAgentRunRecorder {
+    completed: Arc<AtomicBool>,
+    findings_count: Arc<AtomicU64>,
+    started_at: Arc<Mutex<Option<Instant>>>,
+}
+
+impl DryAgentRunRecorder {
+    fn new() -> Self {
+        Self {
+            completed: Arc::new(AtomicBool::new(false)),
+            findings_count: Arc::new(AtomicU64::new(0)),
+            started_at: Arc::new(Mutex::new(None)),
+        }
+    }
+
+    fn record_started(&self) {
+        if let Ok(mut started_at) = self.started_at.lock() {
+            if started_at.is_none() {
+                *started_at = Some(Instant::now());
+            }
+        }
+    }
+
+    fn record_completed(&self) {
+        self.completed.store(true, Ordering::Relaxed);
+    }
+
+    fn record_violation(&self) {
+        let mut current = self.findings_count.load(Ordering::Relaxed);
+        while current < u64::from(u32::MAX) {
+            match self.findings_count.compare_exchange_weak(
+                current,
+                current + 1,
+                Ordering::Relaxed,
+                Ordering::Relaxed,
+            ) {
+                Ok(_) => return,
+                Err(next) => current = next,
+            }
+        }
+    }
+
+    fn has_completed(&self) -> bool {
+        self.completed.load(Ordering::Relaxed)
+    }
+
+    fn findings_count(&self) -> u32 {
+        self.findings_count.load(Ordering::Relaxed).try_into().unwrap_or(u32::MAX)
+    }
+
+    fn started_at(&self) -> Option<Instant> {
+        self.started_at.lock().ok().and_then(|started_at| *started_at)
+    }
+}
+
+struct RecordingDryAgent<A> {
+    inner: A,
+    recorder: DryAgentRunRecorder,
+}
+
+impl<A> RecordingDryAgent<A> {
+    fn new(inner: A) -> (Self, DryAgentRunRecorder) {
+        let recorder = DryAgentRunRecorder::new();
+        (Self { inner, recorder: recorder.clone() }, recorder)
+    }
+}
+
+impl<A: DryCheckAgentPort> DryCheckAgentPort for RecordingDryAgent<A> {
+    fn judge(
+        &self,
+        changed_fragment: &CodeFragment,
+        candidate_fragment: &CodeFragment,
+    ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
+        self.recorder.record_started();
+        let result = self.inner.judge(changed_fragment, candidate_fragment);
+        if let Ok(judgment) = &result {
+            if matches!(judgment, DryCheckAgentJudgment::Violation { .. }) {
+                self.recorder.record_violation();
+            }
+            self.recorder.record_completed();
+        }
+        result
+    }
+}
+
+struct DryRoundTelemetry {
+    findings_count: u32,
+    verdict_parse_failed: bool,
+    subprocess_started_at: Option<std::time::Instant>,
+}
+
+fn dry_round_telemetry_for_result(
+    dry_result: &Result<Vec<DryCheckFinding>, DryCheckCycleError>,
+    agent_recorder: &DryAgentRunRecorder,
+) -> Option<DryRoundTelemetry> {
+    match dry_result {
+        Ok(findings) => Some(DryRoundTelemetry {
+            findings_count: findings.len().try_into().unwrap_or(u32::MAX),
+            verdict_parse_failed: false,
+            subprocess_started_at: agent_recorder.started_at(),
+        }),
+        // Map only subprocess-involved agent failures to telemetry.
+        // Unexpected(_) is overloaded by the adapter: some messages happen
+        // before spawn, while the prefixes recognized by
+        // dry_agent_error_is_subprocess_failure happen after the child exists.
+        // IllegalOutput is the only parse-failure variant.
+        Err(DryCheckCycleError::Agent(inner)) => {
+            if dry_agent_error_is_subprocess_failure(inner) {
+                let verdict_parse_failed = matches!(inner, DryCheckAgentError::IllegalOutput);
+                Some(DryRoundTelemetry {
+                    findings_count: agent_recorder.findings_count(),
+                    verdict_parse_failed,
+                    subprocess_started_at: agent_recorder.started_at(),
+                })
+            } else {
+                None
+            }
+        }
+        // Entry and Writer errors occur after the agent ran — not parse failures.
+        Err(DryCheckCycleError::Entry(_)) | Err(DryCheckCycleError::Writer(_)) => {
+            Some(DryRoundTelemetry {
+                findings_count: agent_recorder.findings_count(),
+                verdict_parse_failed: false,
+                subprocess_started_at: agent_recorder.started_at(),
+            })
+        }
+        // The interactor can also raise Index after a successful judge() call
+        // while converting the changed path for persistence.
+        Err(DryCheckCycleError::Index(_)) if agent_recorder.has_completed() => {
+            Some(DryRoundTelemetry {
+                findings_count: agent_recorder.findings_count(),
+                verdict_parse_failed: false,
+                subprocess_started_at: agent_recorder.started_at(),
+            })
+        }
+        Err(_) => None,
+    }
+}
+
+fn dry_agent_error_is_subprocess_failure(error: &DryCheckAgentError) -> bool {
+    match error {
+        DryCheckAgentError::UserAbort
+        | DryCheckAgentError::AgentAbort
+        | DryCheckAgentError::Timeout
+        | DryCheckAgentError::IllegalOutput => true,
+        DryCheckAgentError::Unexpected(message) => dry_agent_unexpected_after_spawn(message),
+    }
+}
+
+fn dry_agent_unexpected_after_spawn(message: &str) -> bool {
+    message.starts_with("failed to poll dry-check agent child:")
+        || message.starts_with("failed to reap dry-check agent child:")
+        || message.starts_with("failed to read output-last-message ")
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -480,6 +685,7 @@ mod tests {
         dry_fix_build_smoke_env, dry_fix_smoke_test_codex_version, dry_fix_spawn_and_collect,
         resolve_codex_bin, run_dry_fix_codex,
     };
+    use crate::review_v2::process_guards::{CwdGuard, EnvGuard, run_git};
 
     fn repo_root_for_tests() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -502,44 +708,62 @@ mod tests {
         "a".repeat(40)
     }
 
-    struct EnvGuard {
-        key: &'static str,
-        value: Option<std::ffi::OsString>,
+    /// Initialize a minimal bare git repo (no commits required for discover()).
+    fn run_git_init(root: &Path) {
+        let status = std::process::Command::new("git")
+            .args(["init", "-b", "main"])
+            .current_dir(root)
+            .status()
+            .unwrap();
+        assert!(status.success(), "git init failed");
     }
 
-    impl EnvGuard {
-        fn set(key: &'static str, value: impl Into<std::ffi::OsString>) -> Self {
-            let previous = std::env::var_os(key);
-            // Safety: tests that mutate process environment hold process_env_lock
-            // for the full guard lifetime, so env mutation is serialized.
-            unsafe {
-                std::env::set_var(key, value.into());
-            }
-            Self { key, value: previous }
-        }
-
-        fn remove(key: &'static str) -> Self {
-            let previous = std::env::var_os(key);
-            // Safety: tests that mutate process environment hold process_env_lock
-            // for the full guard lifetime, so env mutation is serialized.
-            unsafe {
-                std::env::remove_var(key);
-            }
-            Self { key, value: previous }
-        }
+    fn setup_dry_telemetry_repo(root: &Path) -> PathBuf {
+        run_git(root, &["init", "-b", "main"]);
+        run_git(root, &["config", "user.email", "test@example.com"]);
+        run_git(root, &["config", "user.name", "Test"]);
+        run_git(root, &["config", "commit.gpgsign", "false"]);
+        let items_dir = root.join("track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        run_git(root, &["add", "."]);
+        run_git(root, &["commit", "--no-gpg-sign", "-m", "init"]);
+        items_dir
     }
 
-    impl Drop for EnvGuard {
-        fn drop(&mut self) {
-            // Safety: see EnvGuard::set; the guard is dropped before releasing
-            // the process-wide env lock.
-            unsafe {
-                match &self.value {
-                    Some(value) => std::env::set_var(self.key, value),
-                    None => std::env::remove_var(self.key),
-                }
-            }
-        }
+    #[test]
+    fn test_resolve_dry_write_telemetry_writer_requires_track_branch() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let repo = tempfile::tempdir().unwrap();
+        let items_dir = setup_dry_telemetry_repo(repo.path());
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", "1");
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+
+        let writer =
+            resolve_dry_write_telemetry_writer(&items_dir, "dry-telemetry-main-2026-06-11");
+
+        assert!(writer.is_none(), "dry-write telemetry must not emit from non-track branches");
+    }
+
+    #[test]
+    fn test_resolve_dry_write_telemetry_writer_requires_matching_track_branch() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let repo = tempfile::tempdir().unwrap();
+        let items_dir = setup_dry_telemetry_repo(repo.path());
+        let branch_track_id = "dry-telemetry-branch-2026-06-11";
+        run_git(repo.path(), &["checkout", "-b", &format!("track/{branch_track_id}")]);
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", "1");
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+
+        assert!(
+            resolve_dry_write_telemetry_writer(&items_dir, "dry-telemetry-other-2026-06-11",)
+                .is_none(),
+            "dry-write telemetry must not emit for a different explicit track id"
+        );
+
+        let (_writer, resolved_track_id) =
+            resolve_dry_write_telemetry_writer(&items_dir, branch_track_id).unwrap();
+        assert_eq!(resolved_track_id, branch_track_id);
     }
 
     #[cfg(unix)]
@@ -807,6 +1031,147 @@ mod tests {
         assert_eq!(key, "src/lib.rs");
     }
 
+    #[test]
+    fn test_dry_agent_unexpected_after_spawn_classifies_child_poll_failure() {
+        let error =
+            DryCheckAgentError::Unexpected("failed to poll dry-check agent child: io".to_owned());
+
+        assert!(dry_agent_error_is_subprocess_failure(&error));
+    }
+
+    #[test]
+    fn test_dry_agent_unexpected_before_spawn_is_not_subprocess_failure() {
+        let error =
+            DryCheckAgentError::Unexpected("failed to write output-schema: disk full".to_owned());
+
+        assert!(!dry_agent_error_is_subprocess_failure(&error));
+    }
+
+    #[test]
+    fn test_dry_agent_unexpected_fragment_path_error_is_not_subprocess_failure() {
+        let error = DryCheckAgentError::Unexpected(
+            "invalid fragment path: path must be relative".to_owned(),
+        );
+
+        assert!(!dry_agent_error_is_subprocess_failure(&error));
+    }
+
+    #[test]
+    fn test_dry_round_telemetry_for_result_index_after_agent_success_emits_failure() {
+        let recorder = DryAgentRunRecorder::new();
+        recorder.record_started();
+        recorder.record_violation();
+        recorder.record_violation();
+        recorder.record_completed();
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Err(
+            DryCheckCycleError::Index(usecase::semantic_dup::SemanticIndexError::SearchFailed {
+                source: "changed_path error: invalid path".to_owned(),
+            }),
+        );
+
+        let telemetry = dry_round_telemetry_for_result(&result, &recorder).unwrap();
+        assert_eq!(telemetry.findings_count, 2);
+        assert!(!telemetry.verdict_parse_failed);
+        assert!(telemetry.subprocess_started_at.is_some());
+    }
+
+    #[test]
+    fn test_dry_round_telemetry_for_result_index_before_agent_returns_none() {
+        let recorder = DryAgentRunRecorder::new();
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Err(
+            DryCheckCycleError::Index(usecase::semantic_dup::SemanticIndexError::SearchFailed {
+                source: "candidate index failed".to_owned(),
+            }),
+        );
+
+        assert!(dry_round_telemetry_for_result(&result, &recorder).is_none());
+    }
+
+    #[test]
+    fn test_dry_round_telemetry_for_result_writer_error_uses_agent_findings_count() {
+        let recorder = DryAgentRunRecorder::new();
+        recorder.record_started();
+        recorder.record_violation();
+        recorder.record_violation();
+        recorder.record_violation();
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> =
+            Err(DryCheckCycleError::Writer(domain::dry_check::DryCheckWriterError::Codec {
+                detail: "serialize failed".to_owned(),
+            }));
+
+        let telemetry = dry_round_telemetry_for_result(&result, &recorder).unwrap();
+        assert_eq!(telemetry.findings_count, 3);
+        assert!(!telemetry.verdict_parse_failed);
+        assert!(telemetry.subprocess_started_at.is_some());
+    }
+
+    #[test]
+    fn test_dry_round_telemetry_for_result_success_without_agent_start_skips_subprocess() {
+        let recorder = DryAgentRunRecorder::new();
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Ok(vec![]);
+
+        let telemetry = dry_round_telemetry_for_result(&result, &recorder).unwrap();
+
+        assert_eq!(telemetry.findings_count, 0);
+        assert!(!telemetry.verdict_parse_failed);
+        assert!(telemetry.subprocess_started_at.is_none());
+    }
+
+    #[test]
+    fn test_dry_agent_run_recorder_tracks_first_start_time() {
+        let recorder = DryAgentRunRecorder::new();
+
+        assert!(recorder.started_at().is_none());
+        recorder.record_started();
+        let first_start = recorder.started_at();
+        recorder.record_started();
+
+        assert!(first_start.is_some());
+        assert_eq!(recorder.started_at(), first_start);
+    }
+
+    struct ViolationAgent;
+
+    impl DryCheckAgentPort for ViolationAgent {
+        fn judge(
+            &self,
+            _changed_fragment: &CodeFragment,
+            _candidate_fragment: &CodeFragment,
+        ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
+            Ok(DryCheckAgentJudgment::Violation {
+                rationale: domain::Rationale::new("same control flow").unwrap(),
+                finding: dry_check_finding_for_tests(),
+            })
+        }
+    }
+
+    fn dry_check_finding_for_tests() -> DryCheckFinding {
+        let changed_ref = domain::FragmentRef::new(
+            domain::review_v2::FilePath::new("src/a.rs").unwrap(),
+            domain::FragmentContentHash::new("a".repeat(64)).unwrap(),
+        );
+        let candidate_ref = domain::FragmentRef::new(
+            domain::review_v2::FilePath::new("src/b.rs").unwrap(),
+            domain::FragmentContentHash::new("b".repeat(64)).unwrap(),
+        );
+        DryCheckFinding::new(changed_ref, candidate_ref, "extract shared helper").unwrap()
+    }
+
+    #[test]
+    fn test_recording_dry_agent_counts_violation_judgment_before_persistence() {
+        let (agent, recorder) = RecordingDryAgent::new(ViolationAgent);
+        let changed =
+            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
+        let candidate =
+            CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
+
+        let result = agent.judge(&changed, &candidate);
+
+        assert!(matches!(result, Ok(DryCheckAgentJudgment::Violation { .. })));
+        assert_eq!(recorder.findings_count(), 1);
+        assert!(recorder.has_completed());
+    }
+
     /// Fragments whose path cannot be stripped (not under repo_root) are kept
     /// with the same path except for git-style separator normalization —
     /// conservative fallback, no silent drop.
@@ -942,30 +1307,61 @@ exit 0
 
     // ── CliApp::dry_run_fix_local: wrapper logic (agent-profile loading + provider dispatch) ──
 
+    /// Helper: write a fixture agent-profiles.json with `dry-fix-lead.provider = "claude"`.
+    ///
+    /// This ensures the two dispatch-path tests below remain isolated from the live
+    /// `.harness/config/agent-profiles.json` — the 'claude' provider is unsupported by
+    /// `dry_run_fix_local`, so it reliably produces the sentinel error at provider-dispatch.
+    fn write_dry_fix_lead_claude_profiles(root: &std::path::Path) {
+        let config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        let content = r#"{
+  "schema_version": 1,
+  "providers": {
+    "claude": { "label": "Claude" }
+  },
+  "capabilities": {
+    "dry-fix-lead": {
+      "provider": "claude",
+      "model": "claude-profile-model"
+    }
+  }
+}
+"#;
+        std::fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
+    }
+
     /// Exercises the full `dry_run_fix_local` wrapper with `model: None`:
     /// git discover → agent-profiles load → track_id validation → profile resolution
     /// → model fallback from profiles → provider dispatch.
     ///
-    /// The `dry-fix-lead` capability in agent-profiles.json defines `provider = "claude"`
-    /// and a non-empty model.  The test verifies that:
+    /// Uses a fixture `agent-profiles.json` that sets `dry-fix-lead.provider = "claude"`.
+    /// The 'claude' provider is unsupported by `dry_run_fix_local` (only 'codex' is), so
+    /// the test deterministically reaches the provider-dispatch error without spawning any
+    /// subprocess.  This ensures the test is isolated from the live configuration.
+    ///
+    /// Verifies that:
     ///   - Profiles are loaded successfully (no "failed to load agent-profiles" error).
     ///   - The capability is resolved (no "capability not defined" error).
-    ///   - The profile model fills the `None` input, so "no model specified" is NOT triggered.
-    ///   - Execution reaches the provider-dispatch arm with the error
-    ///     "[ERROR] unsupported dry-fix-lead provider 'claude' (supported: 'codex')",
-    ///     proving the wrapper traversed every stage up to dispatch.
-    ///
-    /// A regression that broke profile loading or model-fallback would produce a different
-    /// error message from an earlier stage, causing the assertions below to fail.
+    ///   - The profile model fills the `None` input ("no model specified" NOT triggered).
+    ///   - Execution reaches the provider-dispatch sentinel error for 'claude'.
     #[test]
     fn test_dry_run_fix_local_none_model_falls_back_to_profile_model_and_reaches_dispatch() {
-        // Hold process_env_lock: dry_run_fix_local calls SystemGitRepo::discover() which
-        // reads PATH, and other tests in this module mutate PATH (fake git/claude injection).
-        // The lock serializes all env-mutating tests to prevent nondeterministic failure.
+        // Hold process_env_lock: changes CWD, which races with other env-mutating tests.
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
         let dir = tempfile::tempdir().unwrap();
+
+        // Write a minimal git repo so SystemGitRepo::discover() succeeds.
+        run_git_init(dir.path());
+        // Write fixture profiles that use 'claude' (unsupported → deterministic error).
+        write_dry_fix_lead_claude_profiles(dir.path());
+
         let briefing_file = dir.path().join("briefing.md");
         std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+
+        // Set CWD to the fixture repo so discover() reads the fixture profiles.
+        let _cwd = CwdGuard::save_current();
+        std::env::set_current_dir(dir.path()).unwrap();
 
         let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
             track_id: "dry-track".to_owned(),
@@ -991,7 +1387,7 @@ exit 0
             !message.contains("capability not defined"),
             "dry-fix-lead capability must be defined in agent-profiles.json; got: {message}"
         );
-        // Provider dispatch must be reached with the exact error for 'claude'.
+        // Provider dispatch must be reached with the sentinel error for 'claude'.
         assert!(
             message.contains("unsupported dry-fix-lead provider 'claude'"),
             "None model must reach provider dispatch with 'claude' provider error; got: {message}"
@@ -1000,23 +1396,28 @@ exit 0
 
     /// Exercises `dry_run_fix_local` with an explicit `model: Some(x)`.
     ///
-    /// The explicit model short-circuits `or_else(|| resolved.model.clone())` so the
-    /// profile model is NOT consulted for model selection.  Profiles are still loaded to
-    /// resolve the provider.  The test verifies that:
-    ///   - "no model specified" is NOT triggered (explicit model is non-None, bypasses fallback).
-    ///   - The provider-dispatch error is reached, proving the wrapper ran end-to-end.
+    /// Uses a fixture `agent-profiles.json` (same 'claude' provider as the `model: None` test)
+    /// so the test is isolated from the live configuration.  The explicit model
+    /// short-circuits `or_else(|| resolved.model.clone())` so the profile model is NOT
+    /// consulted for model selection.  Profiles are still loaded to resolve the provider.
     ///
-    /// Difference from the `model: None` variant: this path never reads `resolved.model`;
-    /// a bug that ignored `input.model` and fell through to `resolved.model` would not be
-    /// caught here, but a regression that broke the OR-logic so that explicit model
-    /// triggered "no model specified" WOULD be caught.
+    /// Verifies that:
+    ///   - "no model specified" is NOT triggered (explicit model bypasses profile-model fallback).
+    ///   - The provider-dispatch sentinel error is reached, proving the wrapper ran end-to-end.
     #[test]
     fn test_dry_run_fix_local_explicit_model_bypasses_profile_model_and_reaches_dispatch() {
-        // Hold process_env_lock: same reason as the None-model variant above.
+        // Hold process_env_lock: changes CWD.
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
         let dir = tempfile::tempdir().unwrap();
+
+        run_git_init(dir.path());
+        write_dry_fix_lead_claude_profiles(dir.path());
+
         let briefing_file = dir.path().join("briefing.md");
         std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+
+        let _cwd = CwdGuard::save_current();
+        std::env::set_current_dir(dir.path()).unwrap();
 
         let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
             track_id: "dry-track".to_owned(),
@@ -1035,7 +1436,7 @@ exit 0
             !message.contains("invalid --track-id"),
             "valid track_id must not be rejected; got: {message}"
         );
-        // Provider dispatch must be reached with the exact 'claude' error.
+        // Provider dispatch must be reached with the sentinel 'claude' error.
         assert!(
             message.contains("unsupported dry-fix-lead provider 'claude'"),
             "explicit model must reach provider dispatch with 'claude' provider error; got: {message}"

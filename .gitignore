@@ -86,6 +86,10 @@ track/items/**/*-graph-d*/
 track/items/**/.commit_hash
 track/items/**/.commit_hash.tmp
 
+# --- Track workflow telemetry logs (runtime diagnostics, not version-controlled) ---
+track/items/**/logs/
+track/archive/**/logs/
+
 # --- Temp / local scratch ---
 tmp/
 .track-template-dev
