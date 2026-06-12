@@ -505,6 +505,96 @@
           "findings": [],
           "hash": "rvw1:sha256:c74550b0605437051814f16541c49c47cf68a7a975bd2c5c615a16c71ea805d0",
           "at": "2026-06-12T00:20:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b72e19f7cb9fb3f29db7e164625afc05127674288f93ca514959ae83222dad6",
+          "at": "2026-06-12T00:37:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b72e19f7cb9fb3f29db7e164625afc05127674288f93ca514959ae83222dad6",
+          "at": "2026-06-12T00:39:32Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:39:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:42:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
+          "at": "2026-06-11T19:04:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
+          "at": "2026-06-11T19:06:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Add coverage for the `Err(e)` path in `verify`. The current tests exercise the pass case plus two config-state failures, but they never force `Command::new(\"git\").output()` to fail. A missing `git` binary or PATH failure would therefore bypass unit coverage on this new public API.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/hooks_path.rs",
+              "line": 17,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:4e8172d33b7e473ccb7eba904b38d555bd9747b250e0489b7b4af846554dabe4",
+          "at": "2026-06-11T23:40:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
+          "at": "2026-06-11T23:43:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The verifier trims all leading/trailing whitespace from the configured hooks path before comparing it to `.githooks`. A value that Git can treat as a different path, such as a quoted `\".githooks \"` or `\" .githooks\"`, would be accepted here, so the new check can falsely pass even though hooks are not actually configured to the repository-managed directory. Strip only the command's line ending before the exact comparison.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/hooks_path.rs",
+              "line": 37,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
+          "at": "2026-06-11T23:45:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61c7e5703844b381e34e08b919e3a30a5bcbc4588109403b2ddc854799a2ec0",
+          "at": "2026-06-11T23:48:48Z"
         }
       ]
     },
@@ -1446,52 +1536,6 @@
         }
       ]
     },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T06:27:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T06:29:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
-          "at": "2026-06-11T16:22:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
-          "at": "2026-06-11T16:24:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
-          "at": "2026-06-11T23:38:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
-          "at": "2026-06-11T23:40:28Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -1536,6 +1580,24 @@
           "findings": [],
           "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
           "at": "2026-06-11T17:41:39Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4775d4b0b73c07fc8c4eb9584e5e6adad0a36bc1535f5b0cef2540f327c7b80f",
+          "at": "2026-06-12T00:36:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4775d4b0b73c07fc8c4eb9584e5e6adad0a36bc1535f5b0cef2540f327c7b80f",
+          "at": "2026-06-12T00:38:10Z"
         }
       ]
     },
@@ -1689,82 +1751,6 @@
         }
       ]
     },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
-          "at": "2026-06-11T17:39:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
-          "at": "2026-06-11T17:42:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
-          "at": "2026-06-11T19:04:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
-          "at": "2026-06-11T19:06:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Add coverage for the `Err(e)` path in `verify`. The current tests exercise the pass case plus two config-state failures, but they never force `Command::new(\"git\").output()` to fail. A missing `git` binary or PATH failure would therefore bypass unit coverage on this new public API.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/hooks_path.rs",
-              "line": 17,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:4e8172d33b7e473ccb7eba904b38d555bd9747b250e0489b7b4af846554dabe4",
-          "at": "2026-06-11T23:40:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
-          "at": "2026-06-11T23:43:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The verifier trims all leading/trailing whitespace from the configured hooks path before comparing it to `.githooks`. A value that Git can treat as a different path, such as a quoted `\".githooks \"` or `\" .githooks\"`, would be accepted here, so the new check can falsely pass even though hooks are not actually configured to the repository-managed directory. Strip only the command's line ending before the exact comparison.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/hooks_path.rs",
-              "line": 37,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
-          "at": "2026-06-11T23:45:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a61c7e5703844b381e34e08b919e3a30a5bcbc4588109403b2ddc854799a2ec0",
-          "at": "2026-06-11T23:48:48Z"
-        }
-      ]
-    },
     "cli_composition": {
       "rounds": [
         {
@@ -1859,6 +1845,52 @@
           "findings": [],
           "hash": "rvw1:sha256:4a948cbc8dbb77fb8d2707f5e35846c9a836f18c174ac9be9353026a91365639",
           "at": "2026-06-12T00:23:11Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:27:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:29:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:22:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:24:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
+          "at": "2026-06-11T23:38:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
+          "at": "2026-06-11T23:40:28Z"
         }
       ]
     }

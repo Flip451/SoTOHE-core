@@ -28,12 +28,13 @@
     {
       "id": "T005",
       "description": "apps/cli-composition/src/hook.rs の block verdict 生成を stdout から stderr へ変更する (IN-07 / AC-08)。変更箇所: block 分岐で生成する CommandOutcome { stdout: if reason.is_empty() { None } else { Some(reason) }, stderr: None, exit_code: 2 } を CommandOutcome { stdout: None, stderr: if reason.is_empty() { None } else { Some(reason) }, exit_code: 2 } に変更する（D6 の stdout → stderr 移行）。変更対象は block 分岐のみであり、allow や他の非 block stdout パスは変更しない（D6 は block reason の出力先変更のみを規定する）。apps/cli/src/commands/hook.rs の execute 関数が CommandOutcome.stderr を eprintln! で出力していることを確認し、block verdict に対して block 理由が確実に stderr に届く経路が機能していることを確認する。必要であれば hook.rs 側の block 経路の出力コードも修正するが、allow や他の分岐の出力コードは変更しない。ユニットテスト: block verdict を返す場合の CommandOutcome が stdout: None / stderr: Some(reason) / exit_code: 2 であること / allow の場合は CommandOutcome::success を返すこと（allow 分岐は変更しないことを確認）。前提: なし（cli-composition 層の独立変更）。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "5c2c92ceb93dc7e1e5304f1815ab50c7445a077c"
     },
     {
       "id": "T007",
       "description": ".githooks/ ディレクトリに reference-transaction フックと pre-push フックを配置する (IN-01 / AC-01)。変更内容: .githooks/reference-transaction（実行可能属性付き shell ファイル）を新規作成する。内容: #!/bin/sh / exec \"$(git rev-parse --show-toplevel)/bin/sotp\" hook dispatch git-ref-update \"$@\" の 2 行シム。.githooks/pre-push（実行可能属性付き shell ファイル）を新規作成する。内容: #!/bin/sh / exec \"$(git rev-parse --show-toplevel)/bin/sotp\" hook dispatch git-pre-push \"$@\" の 2 行シム。実行可能属性の保証: gitattributes はファイルのテキスト / バイナリ属性等を制御するが git hook ファイルの実行可能 bit を設定する機能を持たない。そのため、両ファイルは git index に実行可能属性で登録する必要がある。具体的には (1) ファイル作成後 git update-index --chmod=+x .githooks/reference-transaction .githooks/pre-push を実行してリポジトリに実行可能 bit でコミットする方法、または (2) bootstrap ステップ（T006）で chmod +x .githooks/reference-transaction .githooks/pre-push を実行する方法のいずれかで保証する。両方を組み合わせて用いてもよい（リポジトリに実行可能属性でコミット + 新規チェックアウト後の bootstrap で chmod +x）。core.hooksPath を有効化した後にフックが実行されるためにはファイルが実行可能である必要がある。AC-01 の確認: reference-transaction フックが --no-verify で迂回できないことが git のドキュメントで確認でき、フック本体が bin/sotp hook dispatch git-ref-update へ exec するシムとして実装されていること。前提: T002（git-ref-update / git-pre-push ハンドラが実装済みであること。フック本体は 2 行だが、dispatch 先が存在しないと runtime で HookDispatchError::UnknownHookName になる）。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",
