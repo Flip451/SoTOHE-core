@@ -5,7 +5,7 @@
 
 Goal coverage note: task-coverage.json schema_version 1 carries in_scope / out_of_scope / constraints / acceptance_criteria maps only. GO-01 is covered by T001/T002/T003/T007, GO-02 by T002/T003, GO-03 by T001, GO-04 by T005, GO-05 by T004/T006/T007; these goal mappings are recorded here because adding GO keys to task-coverage.json fails the plan-artifact-refs verifier.
 
-## Tasks (7/9 resolved)
+## Tasks (8/9 resolved)
 
 ### S1 — Domain HookName Extension + Policy Layer — Retire Blanket Blocks + Add SOTP_GUARDED_GIT Scan + Redirect-Target Test-File Check (T001)
 
@@ -74,12 +74,12 @@ Goal coverage note: task-coverage.json schema_version 1 carries in_scope / out_o
 > Layer 2（output redirect 一括 / tee / sed -i）撤廃と file-lock hooks 撤去による動機消滅を記述する。
 > Layer 1（permissions.deny: touch / cp / mv 等）は維持する。
 
-- [~] **T008**: knowledge/conventions/bash-write-guard.md（CON-07）を D4 に合わせて改訂する (IN-11 / AC-12)。改訂内容: Layer 2 節（Output/writable redirects ブロック・tee ブロック・sed -i ブロック）を削除または「撤廃済み」として記録する。Overview 節と Layer 1 節は維持する（permissions.deny の touch / cp / mv 等は引き続き有効）。Layer 2 撤廃の動機として「file-lock hooks（file-lock-acquire / file-lock-release）の撤去により保護対象が消滅したこと（D4 supersede）」を記述する。Accepted Residual Risks 節の file-write ベクターのうち Layer 2 撤廃に伴い不要になった行（redirect / tee / sed -i 関連の記述）を削除または更新する。Design Decision 節を D4 の内容を反映した記述に書き換える（コマンド文字列スキャン方式から git hooks プロセスレベル enforcement へ移行したことを反映）。AC-12 の確認: 改訂後のドキュメントに Layer-2 ブロック撤廃と file-lock hooks 撤去という動機の消滅が記述されていること。前提: T001（撤廃対象のコードが実際に削除されていることをドキュメントと整合させる）。
+- [x] **T008**: knowledge/conventions/bash-write-guard.md（CON-07）を D4 に合わせて改訂する (IN-11 / AC-12)。改訂内容: Layer 2 節（Output/writable redirects ブロック・tee ブロック・sed -i ブロック）を削除または「撤廃済み」として記録する。Overview 節と Layer 1 節は維持する（permissions.deny の touch / cp / mv 等は引き続き有効）。Layer 2 撤廃の動機として「file-lock hooks（file-lock-acquire / file-lock-release）の撤去により保護対象が消滅したこと（D4 supersede）」を記述する。Accepted Residual Risks 節の file-write ベクターのうち Layer 2 撤廃に伴い不要になった行（redirect / tee / sed -i 関連の記述）を削除または更新する。Design Decision 節を D4 の内容を反映した記述に書き換える（コマンド文字列スキャン方式から git hooks プロセスレベル enforcement へ移行したことを反映）。AC-12 の確認: 改訂後のドキュメントに Layer-2 ブロック撤廃と file-lock hooks 撤去という動機の消滅が記述されていること。前提: T001（撤廃対象のコードが実際に削除されていることをドキュメントと整合させる）。 (`a0c8d6a4944445fac96f9f54d4716949d140cb20`)
 
 ### S9 — CI Green + Cross-Cutting Acceptance Criteria Verification (T009)
 
-> T001-T008 完了後に cargo make ci を実行し、fmt-check / clippy / nextest / deny / check-layers / verify-arch-docs / verify-orchestra / verify-hooks-path（T004 で追加）を含む全 gate が pass することを確認する (AC-13)。
+> T001-T008 完了後に cargo make ci を実行し、fmt-check / clippy / nextest / deny / check-layers / verify-arch-docs / verify-orchestra / verify-hooks-path（T004 で実装、T006 で ci-local 統合）を含む全 gate が pass することを確認する (AC-13)。
 > clippy warnings が発生した場合は同タスク内で修正する。
 > 全 acceptance criteria（AC-01 through AC-13）の横断確認を行い、残存する問題を修正する。
 
-- [ ] **T009**: CI グリーン確認 + 全 acceptance criteria の横断検証 (AC-13)。cargo make ci を実行し、fmt-check / clippy / nextest / deny / check-layers / verify-arch-docs / verify-orchestra / verify-hooks-path を含むすべての gate が pass することを確認する（verify-hooks-path は T004 で ci-local 依存チェーンに追加される新規 gate）。T001-T008 完了後に実施する。確認する AC: AC-01（.githooks/reference-transaction と .githooks/pre-push の存在と内容）/ AC-02（SOTP_GUARDED_GIT 注入により cargo make track-commit-message が reference-transaction を通過することの E2E 確認）/ AC-03（policy.rs の SOTP_GUARDED_GIT スキャン動作）/ AC-04（ブランケットブロック撤廃後の正当な操作 allow）/ AC-05（精密チェックが引き続き機能すること）/ AC-06（redirect 先テストファイルパターン照合が機能すること）/ AC-07（permissions.deny と FORBIDDEN_ALLOW に新規エントリが追加されていないこと）/ AC-08（block verdict の reason が stderr に出力されること）/ AC-09（bootstrap の core.hooksPath 設定ステップ）/ AC-10（bin/sotp verify hooks-path が core.hooksPath 未設定時に CI を fail させること、verify-hooks-path gate が cargo make ci に含まれることを確認）/ AC-11（block-direct-git-ops の runtime fail-closed）/ AC-12（bash-write-guard.md の改訂内容）/ AC-13（cargo make ci の全 gate pass）。clippy warnings が発生した場合は同タスク内で修正する。前提: T001-T008 完了。
+- [~] **T009**: CI グリーン確認 + 全 acceptance criteria の横断検証 (AC-13)。cargo make ci を実行し、fmt-check / clippy / nextest / deny / check-layers / verify-arch-docs / verify-orchestra / verify-hooks-path を含むすべての gate が pass することを確認する（verify-hooks-path は T004 で実装され、T006 で ci-local 依存チェーンに追加された gate）。T001-T008 完了後に実施する。確認する AC: AC-01（.githooks/reference-transaction と .githooks/pre-push の存在と内容）/ AC-02（SOTP_GUARDED_GIT 注入により cargo make track-commit-message が reference-transaction を通過することの E2E 確認）/ AC-03（policy.rs の SOTP_GUARDED_GIT スキャン動作）/ AC-04（ブランケットブロック撤廃後の正当な操作 allow）/ AC-05（精密チェックが引き続き機能すること）/ AC-06（redirect 先テストファイルパターン照合が機能すること）/ AC-07（permissions.deny と FORBIDDEN_ALLOW に新規エントリが追加されていないこと）/ AC-08（block verdict の reason が stderr に出力されること）/ AC-09（bootstrap の core.hooksPath 設定ステップ）/ AC-10（bin/sotp verify hooks-path が core.hooksPath 未設定時に CI を fail させること、verify-hooks-path gate が cargo make ci に含まれることを確認）/ AC-11（block-direct-git-ops の runtime fail-closed）/ AC-12（bash-write-guard.md の改訂内容）/ AC-13（cargo make ci の全 gate pass）。clippy warnings が発生した場合は同タスク内で修正する。前提: T001-T008 完了。
