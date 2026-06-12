@@ -1,0 +1,20 @@
+<!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
+# SoT 本体への参照 hash 埋め込みを廃止し、新鮮度判定を verify-cache の実行時突合に一元化する
+
+## Tasks (2/2 resolved)
+
+### S1 — Core compile-atomic change: SpecRef hash removal across all layers
+
+> Remove the hash field from the SpecRef domain type, the SpecRefDto infrastructure codec, and all consumers in a single compilable unit.
+> This section covers: libs/domain/src/plan_ref/spec_ref.rs (SpecRef struct + new() signature), libs/domain/src/tddd/catalogue_spec_signal.rs (HashMismatch variant removal), libs/infrastructure/src/tddd/spec_ground_codec.rs (SpecRefDto DTO + encode/decode helpers), libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs (SCHEMA_VERSION bump to 4, hash-free encode/decode fixture updates, and old schema_version 3/hash-bearing catalogue rejection tests), libs/infrastructure/src/verify/catalogue_spec_refs.rs (HashMismatch branch + format_finding arm removal), libs/infrastructure/src/verify/plan_artifact_refs/mod.rs (SpecHashMismatch variant + hash verification block removal), libs/infrastructure/src/ref_verify/pair_source_chain2.rs (Chain② claim_hash remains catalogue-entry canonical JSON without spec_refs[].hash), apps/cli/src/commands/verify_catalogue_spec_refs.rs (hash-mismatch test removal + fixture update), ref-verify cache-staleness tests for spec edits without hash transcription, and migration of this track's catalogue files under track/items/spec-ref-embedded-hash-removal-2026-06-11/{domain,usecase,infrastructure}-types.json to schema_version 4 while other tracks remain on lazy migration.
+> Because SpecRef::new() drops the hash parameter, every call site across the workspace must be updated atomically — a partial update leaves the crate graph in an uncompilable state.
+
+- [x] **T001**: Atomic compile unit: remove hash field from SpecRef domain type; remove SpecRefFindingKind::HashMismatch variant; remove hash from SpecRefDto codec + spec_ground_codec encode/decode helpers; bump CatalogueDocumentCodec SCHEMA_VERSION from 3 to 4 and define hash-containing old schema inputs as invalid so schema_version 3/hash-bearing catalogues return a codec error rather than being silently accepted; remove SpecHashMismatch variant from PlanArtifactRefsError and hash-verification block from plan_artifact_refs verifier; remove HashMismatch branch and format_finding arm from catalogue_spec_refs verifier; verify pair_source_chain2 still computes Chain② claim_hash from the hash-free catalogue-entry canonical JSON and ref-verify cache staleness still fires after spec edits without spec_refs[].hash transcription; migrate this track's catalogue files under track/items/spec-ref-embedded-hash-removal-2026-06-11/{domain,usecase,infrastructure}-types.json to schema_version 4, removing any spec_refs[].hash fields while other tracks remain on lazy migration; update all affected tests including spec_ground_codec, catalogue_document_codec old-schema rejection, catalogue_spec_refs, plan_artifact_refs, pair_source_chain2, and ref_verify cache-staleness fixtures (`406fff5da5a2735e723ede802d29bba6064cb256`)
+
+### S2 — Documentation: remove hash-transcription guidance from agent definition
+
+> Update type-designer guidance so it no longer describes spec_refs[].hash as something type-designer or users should copy from sotp track spec-element-hash.
+> This section covers: .claude/agents/type-designer.md (remove spec_refs[].hash transcription step from the internal pipeline description and any catalogue pattern examples that show the hash field). The sotp track spec-element-hash command is retained as a debugging utility and already has no transcription framing.
+> These changes have no compile-time effect and are independent of T001.
+
+- [x] **T002**: Remove hash-transcription documentation from .claude/agents/type-designer.md: remove the spec_refs[].hash transcription procedure; update spec_refs examples to show only { file, anchor } 2-field structure; retain sotp track spec-element-hash as a debugging utility with no transcription framing (`8002e0f7cd3943a5d11f0d9b24158fc5c66c58e7`)

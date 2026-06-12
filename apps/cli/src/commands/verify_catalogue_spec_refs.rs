@@ -1,5 +1,5 @@
 //! `sotp verify catalogue-spec-refs` — binary gate for SoT Chain ② integrity
-//! (dangling anchor / hash mismatch / stale signals).
+//! (dangling anchor / stale signals).
 //!
 //! Thin CLI wrapper: validates the track id, delegates all I/O to
 //! `infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs`,
@@ -110,7 +110,7 @@ mod tests {
     fn write_catalogue_with_dangling(track_dir: &Path) {
         // v3-native format required by CatalogueDocumentCodec::decode.
         let cat = serde_json::json!({
-            "schema_version": 3,
+            "schema_version": 4,
             "crate_name": "test_layer",
             "layer": "test_layer",
             "types": {
@@ -121,8 +121,7 @@ mod tests {
                     "spec_refs": [
                         {
                             "file": "track/items/x/spec.json",
-                            "anchor": "IN-99",
-                            "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                            "anchor": "IN-99"
                         }
                     ]
                 }
@@ -149,7 +148,7 @@ mod tests {
         write_spec_json(&track_dir);
         // Catalogue has no entries → no findings.
         let cat = serde_json::json!({
-            "schema_version": 3,
+            "schema_version": 4,
             "crate_name": "test_layer",
             "layer": "test_layer",
             "types": {},
@@ -308,7 +307,7 @@ mod tests {
 
         // Empty catalogue (no spec_refs) → no dangling findings regardless of signals.
         let cat = serde_json::json!({
-            "schema_version": 3,
+            "schema_version": 4,
             "crate_name": "test_layer",
             "layer": "test_layer",
             "types": {},
@@ -344,61 +343,6 @@ mod tests {
         );
     }
 
-    // Catalogue with a valid spec element but wrong declared hash must produce a
-    // HashMismatch finding (exit FAILURE).
-    #[test]
-    fn verify_exits_failure_when_hash_mismatch() {
-        let dir = tempfile::tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        let track_id = "test-track";
-        let items_dir = ws.join("track/items");
-        let track_dir = items_dir.join(track_id);
-        fs::create_dir_all(&track_dir).unwrap();
-        write_architecture_rules(&ws);
-        write_spec_json(&track_dir);
-
-        // Catalogue references valid anchor IN-01 but with a deliberately wrong hash.
-        let cat = serde_json::json!({
-            "schema_version": 3,
-            "crate_name": "test_layer",
-            "layer": "test_layer",
-            "types": {
-                "GoodType": {
-                    "action": "add",
-                    "role": "ValueObject",
-                    "kind": { "kind": "struct", "shape": { "kind": "unit" } },
-                    "spec_refs": [
-                        {
-                            "file": "track/items/test-track/spec.json",
-                            "anchor": "IN-01",
-                            "hash": "0000000000000000000000000000000000000000000000000000000000000000"
-                        }
-                    ]
-                }
-            },
-            "traits": {},
-            "functions": {}
-        });
-        fs::write(
-            track_dir.join("test_layer-types.json"),
-            serde_json::to_string_pretty(&cat).unwrap(),
-        )
-        .unwrap();
-
-        let result = execute_verify_catalogue_spec_refs(
-            items_dir,
-            track_id.to_owned(),
-            ws,
-            true, // skip stale to isolate hash-mismatch detection
-        );
-        assert!(result.is_ok());
-        assert_eq!(
-            result.unwrap(),
-            ExitCode::FAILURE,
-            "wrong declared hash must produce a hash-mismatch finding"
-        );
-    }
-
     // When skip_stale=false and the signals file exists with a mismatched
     // declaration_hash, a StaleSignals finding must be produced (exit FAILURE).
     #[test]
@@ -412,9 +356,9 @@ mod tests {
         write_architecture_rules(&ws);
         write_spec_json(&track_dir);
 
-        // Empty catalogue — no spec_refs → no dangling or hash-mismatch findings.
+        // Empty catalogue — no spec_refs → no dangling anchor findings.
         let cat = serde_json::json!({
-            "schema_version": 3,
+            "schema_version": 4,
             "crate_name": "test_layer",
             "layer": "test_layer",
             "types": {},

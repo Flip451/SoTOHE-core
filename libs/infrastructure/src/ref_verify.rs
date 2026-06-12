@@ -1385,7 +1385,7 @@ This section must not make D2 a valid ADR ref.
         docs: &str,
     ) -> serde_json::Value {
         serde_json::json!({
-            "schema_version": 3,
+            "schema_version": 4,
             "crate_name": "domain",
             "layer": "domain",
             "types": {
@@ -1398,8 +1398,7 @@ This section must not make D2 a valid ADR ref.
                     "docs": docs,
                     "spec_refs": [{
                         "file": spec_file,
-                        "anchor": "IN-01",
-                        "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+                        "anchor": "IN-01"
                     }],
                     "informal_grounds": []
                 }

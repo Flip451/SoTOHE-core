@@ -1,0 +1,385 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bf963afcb033852c552faea95f3a03775550a9518f3d04e4edf80f87e37148d",
+          "at": "2026-06-11T14:03:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `CatalogueSpecSignal` docs still say per-ref hash validation is reported separately as a `SpecRefFinding`, but this change removes `SpecRef.hash` and the `HashMismatch` finding. This leaves the domain API documentation describing behavior that no longer exists and violates the T001 requirement to remove stale `spec_refs` hash references from this layer.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 96,
+              "category": "stale_doc"
+            }
+          ],
+          "hash": "rvw1:sha256:4bf963afcb033852c552faea95f3a03775550a9518f3d04e4edf80f87e37148d",
+          "at": "2026-06-11T14:05:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b84ba033a46f0f9d1345eacbd84db35e35470476604be8b382f78d5ffddb5a5",
+          "at": "2026-06-11T14:08:03Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T10:47:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T10:54:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd10d108026a8823acb93d6e23512bbcca7a2949f4fb13fbd3ed76db2d2804b",
+          "at": "2026-06-11T14:05:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd10d108026a8823acb93d6e23512bbcca7a2949f4fb13fbd3ed76db2d2804b",
+          "at": "2026-06-11T14:07:28Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T10:36:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T10:38:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T10:57:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T10:58:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10d48d7419c36f111f012d49a81e38bf6b9d8c416b6510aca0d47fde05514061",
+          "at": "2026-06-11T15:02:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10d48d7419c36f111f012d49a81e38bf6b9d8c416b6510aca0d47fde05514061",
+          "at": "2026-06-11T15:04:56Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
+          "at": "2026-06-11T14:04:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Yellow remediation still tells users to promote `informal_grounds[]` to `spec_refs[]` with an `anchor + canonical SHA-256 hash`. After this change `SpecRef` is `{ file, anchor }` and hash-bearing refs are invalid, so a Chain 2 failure now gives users stale instructions that conflict with the new schema. Update the message to reference the hashless spec_ref shape/regeneration path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate/chain2_gate.rs",
+              "line": 266,
+              "category": "stale_hash_reference"
+            },
+            {
+              "message": "The verifier docs still describe emitted findings as `anchor/hash` violations and the inline check as `DanglingAnchor / HashMismatch`. `HashMismatch` was removed in this track, so these comments leave stale hash-verification behavior documented inside the usecase layer. Update them to describe dangling-anchor checks plus stale signal detection only.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 9,
+              "category": "stale_hash_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:51122eb9c7d237a81dba02c7f68a5083da67ae2b0d2b39abc178ff730d39d169",
+          "at": "2026-06-11T14:06:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09b1af144cb3d21761c0f328de2980f01ccce92e64bf593f05b8720a93aa046b",
+          "at": "2026-06-11T14:11:59Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
+          "at": "2026-06-11T14:04:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea778c0e88c70ef99f43521108c8a79e12c739e7de7bcd73b1acf1b54ab1db09",
+          "at": "2026-06-11T14:07:18Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e3b2d5996cd8d359970b16742b0ad1b8d1fa247fbd72a85904cb82a125eac77",
+          "at": "2026-06-11T14:06:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e3b2d5996cd8d359970b16742b0ad1b8d1fa247fbd72a85904cb82a125eac77",
+          "at": "2026-06-11T14:11:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `encode()` still delegates to `domain_to_dto`, which serializes the `CatalogueDocument`'s existing `schema_version` instead of pinning the codec's `SCHEMA_VERSION`. After this change the decoder rejects v3 catalogues, so any caller that constructs a document with the still-possible old value can write a catalogue this same codec will fail to read. Pin or validate the encoded schema version to 4 here.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+              "line": 263,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0bef931fa17299a3a7aec474795ae6ba85c661691bc45e7e9ef4d4c2f7034581",
+          "at": "2026-06-11T14:28:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b00d59fb1bc696ef906c28d6047232981d3eae2c86841bd2eba48acc5990ea3",
+          "at": "2026-06-11T14:37:12Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89115ba3ee3fed591637da3f96dd3bb03e070c74970f6ff66744535cf2e7ad14",
+          "at": "2026-06-11T10:38:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89115ba3ee3fed591637da3f96dd3bb03e070c74970f6ff66744535cf2e7ad14",
+          "at": "2026-06-11T10:40:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53958c260d8e243789f4b9d3025305e756f643c700db473e4851bb1712c48e4a",
+          "at": "2026-06-11T11:41:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 claims to satisfy the `<layer>-types.json` schema migration, but narrows the catalogue migration to `domain-types.json` and `infrastructure-types.json` only. That conflicts with `spec.json` IN-02/CN-04, which require a schema-version update and an explicit migration policy for the layer catalogues as a breaking change; the scoped `usecase-types.json` remains a layer catalogue and is left out of the planned migration. Implementing this as written can land the v4 codec while a scoped catalogue is still planned to stay at schema v3.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:53958c260d8e243789f4b9d3025305e756f643c700db473e4851bb1712c48e4a",
+          "at": "2026-06-11T11:46:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked as covering IN-05/AC-07/AC-11, but its implementation scope only removes SpecRef hash fields from the type/codec/verifier paths and updates those verifier fixtures; it never includes the Chain② pair source or a ref-verify/cache-staleness verification. As written, an implementer can complete T001 while leaving the plan's promised behavior unverified: pair_source_chain2 must continue producing claim_hash from the hash-free catalogue-entry JSON, and a spec edit must stale the verify-cache without any spec_refs[].hash transcription. Add that code/test coverage to T001 or stop mapping those criteria to it.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "The spec requires the schema-breaking migration policy to be explicit for existing catalogues, either by migrating existing in-flight tracks or by declaring the break as new-catalogue-only, but T001 only says to migrate this track's own catalogue files to schema_version 4. That leaves the in-scope schema-version change without the required migration stance, so the task coverage for IN-02 is overstated.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f97595e00ccc4aa2f1d427bbde565412c513265f3326f813feb800bf7212f32e",
+          "at": "2026-06-11T11:52:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 says SpecRef anchors must exist in `spec.json`'s `decisions[].id`, but SpecRef points at spec elements such as GO/IN/CN/AC IDs; `decisions[].id` is the ADR-frontmatter shape. This contradicts AC-03/AC-05/AC-06's requirement to validate anchors against actual spec elements and can send the implementation toward checking the wrong namespace for dangling anchors.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
+              "line": 204,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:12658ef5bd22ca68356d6b4dfb9ae843035dc3f31ba6d5412a1d60c1ea0af98e",
+          "at": "2026-06-11T11:57:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 requires the catalogue codec plan to explicitly define how hash-containing old schema inputs are handled, choosing either error or ignore, but T001 is the only mapped task and only says to remove hash from the DTO/codec, bump SCHEMA_VERSION, migrate existing catalogues, and update tests. An implementation can complete T001 exactly as written while leaving the required old-schema behavior undefined, so the IN-08 coverage claim is semantically incomplete.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0b5df7f01f7cc7f3acbab030df21a416075fa63b6763474cc5665f3034d9af84",
+          "at": "2026-06-11T12:01:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e6faa3b9d28947c9662353c25180d71ec6322f3d60e96e06772177d2b74b68d",
+          "at": "2026-06-11T12:05:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` and `impl-plan.json` describe S1/T001 as a \"repo-wide migration of every existing track catalogue file\" under `track/items/**/{domain,usecase,infrastructure}-types.json`, but the briefing explicitly says other tracks' v3 catalogues are intentionally left unmigrated for lazy migration. That makes the rollout boundary inconsistent and overstates the scope of this plan.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/spec-ref-embedded-hash-removal-2026-06-11/plan.md",
+              "line": 9,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9a25ddf4ff08e674741698d0c7cd8d00acf56460e782c96f1749e3486b2a4a9b",
+          "at": "2026-06-11T14:03:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53c66ef9ffbe5a090af83838bc2e1ed61bfd639d0819b2913d206fe640b99834",
+          "at": "2026-06-11T14:06:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53c66ef9ffbe5a090af83838bc2e1ed61bfd639d0819b2913d206fe640b99834",
+          "at": "2026-06-11T14:09:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d9a4451dcea58cc9dac9c8521524ac521c6845f84174173cc26813d0c7a81d7",
+          "at": "2026-06-11T15:01:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 still assigns work to update `sotp track spec-element-hash` help/doc comments to remove a transcription purpose, but the briefing states that CLI help already has no transcription framing and should simply remain as a debugging utility. This makes the remaining in-progress task semantically inaccurate and can send the implementer to change the wrong surface; narrow T002/S2 to the type-designer documentation/examples only, or explicitly state that the CLI command is retained without transcription framing.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 12,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:5d9a4451dcea58cc9dac9c8521524ac521c6845f84174173cc26813d0c7a81d7",
+          "at": "2026-06-11T15:03:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:479d3f7961229360834796feb0e8b54636a21671f874a9a0fc74074b4761405a",
+          "at": "2026-06-11T15:05:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a47d95117a046815605073d6dda28bfc880fad6de5a04f64081447fd7a99df4d",
+          "at": "2026-06-11T15:09:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a47d95117a046815605073d6dda28bfc880fad6de5a04f64081447fd7a99df4d",
+          "at": "2026-06-11T15:10:58Z"
+        }
+      ]
+    }
+  }
+}

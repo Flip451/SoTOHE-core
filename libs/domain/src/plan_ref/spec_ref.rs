@@ -168,21 +168,19 @@ fn nibble_to_lowercase_hex(n: u8) -> char {
 ///   `track/items/<id>/spec.json` in the current repo).
 /// * `anchor` — [`SpecElementId`] identifying the target element (an
 ///   `IN-xx`, `AC-xx`, `CO-xx`, or `OS-xx` entry).
-/// * `hash` — canonical JSON-subtree SHA-256 of the target element, used
-///   for staleness detection.
 ///
 /// Used in type catalogue entries' `spec_refs[]` to realise SoT Chain ②
-/// (spec ← type catalogue).
+/// (spec ← type catalogue). Hash-based staleness detection is superseded by
+/// verify-cache runtime recomputation (spec-ref-embedded-hash-removal IN-01).
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SpecRef {
     pub file: PathBuf,
     pub anchor: SpecElementId,
-    pub hash: ContentHash,
 }
 
 impl SpecRef {
-    pub fn new(file: impl Into<PathBuf>, anchor: SpecElementId, hash: ContentHash) -> Self {
-        Self { file: file.into(), anchor, hash }
+    pub fn new(file: impl Into<PathBuf>, anchor: SpecElementId) -> Self {
+        Self { file: file.into(), anchor }
     }
 }
 
@@ -288,10 +286,8 @@ mod tests {
     #[test]
     fn spec_ref_constructs() {
         let anchor = SpecElementId::try_new("IN-01").unwrap();
-        let hash = ContentHash::from_bytes([0u8; 32]);
-        let r = SpecRef::new("track/items/x/spec.json", anchor.clone(), hash.clone());
+        let r = SpecRef::new("track/items/x/spec.json", anchor.clone());
         assert_eq!(r.file, PathBuf::from("track/items/x/spec.json"));
         assert_eq!(r.anchor, anchor);
-        assert_eq!(r.hash, hash);
     }
 }

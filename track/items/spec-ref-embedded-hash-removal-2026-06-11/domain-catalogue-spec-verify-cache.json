@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "bdffb03cbf59b41da5fa8e7622659bc8295ff318fd94927e5a45001bfa8b1e86",
+      "evidence_hash": "c60a2e4c0ae527c6b5701b1638fd6bec4a946d5538e1d49106518b6ffb64b0f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hash フィールドを削除し、{ file, anchor } の 2 フィールド構造にする。これにより AdrRef { file, anchor } と同型になり、SoT Chain 全体で参照表現が統一される"
+      }
+    },
+    {
+      "claim_hash": "bdffb03cbf59b41da5fa8e7622659bc8295ff318fd94927e5a45001bfa8b1e86",
+      "evidence_hash": "b74524a2d09f8a93fe182be7dccb624107be8ae52d93df1bbf018339dd3f1631",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SpecRef 型が { file: PathBuf, anchor: SpecElementId } の 2 フィールドのみを持ち、hash: ContentHash フィールドを持たない。SpecRef::new() のシグネチャが file と anchor のみを引数に取る"
+      }
+    },
+    {
+      "claim_hash": "48f306529d030400a70a94c2ac407133b8fffa893355ed3f26e9bbf6bd3fe759",
+      "evidence_hash": "6ee5e8acb16dd31fba2ba3072818519d278ee58b7edbb542553d01e802e91a71",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify catalogue-spec-refs の hash mismatch 検査を撤去する。apps/cli/src/commands/verify_catalogue_spec_refs.rs 及びその委譲先の infrastructure 実装から SpecRef.hash 照合ロジックを削除する。anchor 実在確認は引き続き実施する"
+      }
+    },
+    {
+      "claim_hash": "48f306529d030400a70a94c2ac407133b8fffa893355ed3f26e9bbf6bd3fe759",
+      "evidence_hash": "95fc19480ec73d21d982cba9a9dc89572540c33dfc61f72f20ee22674206b6b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dangling anchor（spec.json に存在しない anchor を参照している SpecRef）を引き続き検出する。hash フィールド撤去後も anchor 実在確認の失敗は exit code 1 を返す"
+      }
+    },
+    {
+      "claim_hash": "b1fb7aa6b7a31ebc105b28935c7211ed0f67504cee1b4f3273b0cadc4ebe23db",
+      "evidence_hash": "c60a2e4c0ae527c6b5701b1638fd6bec4a946d5538e1d49106518b6ffb64b0f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain 層の SpecRef 型（libs/domain/src/plan_ref/spec_ref.rs）から hash フィールドを削除し、{ file, anchor } の 2 フィールド構造にする。これにより AdrRef { file, anchor } と同型になり、SoT Chain 全体で参照表現が統一される"
+      }
+    },
+    {
+      "claim_hash": "b1fb7aa6b7a31ebc105b28935c7211ed0f67504cee1b4f3273b0cadc4ebe23db",
+      "evidence_hash": "b74524a2d09f8a93fe182be7dccb624107be8ae52d93df1bbf018339dd3f1631",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SpecRef 型が { file: PathBuf, anchor: SpecElementId } の 2 フィールドのみを持ち、hash: ContentHash フィールドを持たない。SpecRef::new() のシグネチャが file と anchor のみを引数に取る"
+      }
+    },
+    {
+      "claim_hash": "3409c8f75c86d80367cee86bc12710dce6ca658fab312ba4c464d9cedffc703c",
+      "evidence_hash": "6ee5e8acb16dd31fba2ba3072818519d278ee58b7edbb542553d01e802e91a71",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify catalogue-spec-refs の hash mismatch 検査を撤去する。apps/cli/src/commands/verify_catalogue_spec_refs.rs 及びその委譲先の infrastructure 実装から SpecRef.hash 照合ロジックを削除する。anchor 実在確認は引き続き実施する"
+      }
+    },
+    {
+      "claim_hash": "3409c8f75c86d80367cee86bc12710dce6ca658fab312ba4c464d9cedffc703c",
+      "evidence_hash": "95fc19480ec73d21d982cba9a9dc89572540c33dfc61f72f20ee22674206b6b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify catalogue-spec-refs が dangling anchor（spec.json に存在しない anchor を参照している SpecRef）を引き続き検出する。hash フィールド撤去後も anchor 実在確認の失敗は exit code 1 を返す"
+      }
+    }
+  ]
+}

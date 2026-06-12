@@ -903,7 +903,7 @@ When a trait is `modify`-ed (e.g. T031 finalize), the declaration must enumerate
     "supertrait_bounds": ["Send", "Sync"],
     "module_path": "track::blob",
     "docs": null,
-    "spec_refs":         [{ "file": "track/items/<id>/spec.json", "anchor": "IN-…", "hash": "…" }],
+    "spec_refs":         [{ "file": "track/items/<id>/spec.json", "anchor": "IN-…" }],
     "informal_grounds":  []
   }
 }

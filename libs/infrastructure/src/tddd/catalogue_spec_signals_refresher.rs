@@ -278,9 +278,9 @@ mod tests {
     ///
     /// Simulates the refresher's signal computation inline.
     #[test]
-    fn test_v3_branch_computes_blue_yellow_red_from_grounding_fields() {
+    fn test_v4_catalogue_computes_blue_yellow_red_from_grounding_fields() {
         let json = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
@@ -289,7 +289,7 @@ mod tests {
       "role": "ValueObject",
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [
-        { "file": "track/items/x/spec.json", "anchor": "IN-01", "hash": "0000000000000000000000000000000000000000000000000000000000000000" }
+        { "file": "track/items/x/spec.json", "anchor": "IN-01" }
       ],
       "informal_grounds": []
     },
@@ -316,7 +316,7 @@ mod tests {
 
         let v3_doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
 
-        // Replicate the refresher's v3 signal computation inline.
+        // Replicate the refresher's signal computation inline.
         let raw_json: serde_json::Value = serde_json::from_str(json).unwrap();
         let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
         for (type_name, entry) in &v3_doc.types {

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "e4972dd6b295728e5da3ab97d067562e79398a5cdd80186ae3200ea92174f07e",
+      "evidence_hash": "d37582b34de0ab87d057cb7b1d6fdb93aba6ab946ba3d2bfbb3b585b5e7af16c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify plan-artifact-refs の SpecRef hash mismatch 検査（libs/infrastructure/src/verify/plan_artifact_refs/mod.rs の hash verification ブロック）を撤去する。anchor 実在確認（dangling anchor 検出）は引き続き実施する"
+      }
+    },
+    {
+      "claim_hash": "e4972dd6b295728e5da3ab97d067562e79398a5cdd80186ae3200ea92174f07e",
+      "evidence_hash": "88176228f7d7b7ea538a6cae4fab3dfb001b419bac4a40e0c8dc68dabc0a6db6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify plan-artifact-refs が catalogue entry の SpecRef に対して hash mismatch 検査を行わない。anchor が spec.json に存在し、かつ hash フィールドがない SpecRef で verify plan-artifact-refs が exit code 0 を返す"
+      }
+    },
+    {
+      "claim_hash": "e4972dd6b295728e5da3ab97d067562e79398a5cdd80186ae3200ea92174f07e",
+      "evidence_hash": "2c63b218beeb2ce72377ab209e7a433527edda6cd5b07671a44aad570caf7890",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify plan-artifact-refs が dangling anchor（spec.json に存在しない anchor を参照している SpecRef）を引き続き検出する。hash フィールド撤去後も anchor 実在確認の失敗は finding としてレポートされる"
+      }
+    },
+    {
+      "claim_hash": "dfc7c5a3a65099a4ae601ed6a69076ba8aceeba716dfb6aa7160f8a208f6c627",
+      "evidence_hash": "d37582b34de0ab87d057cb7b1d6fdb93aba6ab946ba3d2bfbb3b585b5e7af16c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify plan-artifact-refs の SpecRef hash mismatch 検査（libs/infrastructure/src/verify/plan_artifact_refs/mod.rs の hash verification ブロック）を撤去する。anchor 実在確認（dangling anchor 検出）は引き続き実施する"
+      }
+    },
+    {
+      "claim_hash": "dfc7c5a3a65099a4ae601ed6a69076ba8aceeba716dfb6aa7160f8a208f6c627",
+      "evidence_hash": "88176228f7d7b7ea538a6cae4fab3dfb001b419bac4a40e0c8dc68dabc0a6db6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify plan-artifact-refs が catalogue entry の SpecRef に対して hash mismatch 検査を行わない。anchor が spec.json に存在し、かつ hash フィールドがない SpecRef で verify plan-artifact-refs が exit code 0 を返す"
+      }
+    },
+    {
+      "claim_hash": "dfc7c5a3a65099a4ae601ed6a69076ba8aceeba716dfb6aa7160f8a208f6c627",
+      "evidence_hash": "2c63b218beeb2ce72377ab209e7a433527edda6cd5b07671a44aad570caf7890",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dangling anchor（spec.json に存在しない anchor を参照している SpecRef）を引き続き検出する"
+      }
+    }
+  ]
+}

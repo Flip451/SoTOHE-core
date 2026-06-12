@@ -5,7 +5,7 @@
 //! the layer, and a [`SpecRefFindingKind`] discriminant with per-variant payload.
 //!
 //! Entry-locator fields (`catalogue_entry`, `ref_index`, `spec_file`) are embedded
-//! inside the per-entry variants (`DanglingAnchor`, `HashMismatch`) of
+//! inside the per-entry variant (`DanglingAnchor`) of
 //! [`SpecRefFindingKind`] so that the impossible state of a `StaleSignals`
 //! (layer-level) finding carrying per-entry metadata is structurally excluded.
 //!
@@ -27,13 +27,16 @@ use crate::tddd::layer_id::LayerId;
 /// (see the parent ADR §D1.4 for the standard workflow).
 pub const CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION: u32 = 1;
 
-/// Discriminant for the three catalogue-spec integrity violations recognised
-/// by ADR 2026-04-23-0344 §D1.5.
+/// Discriminant for catalogue-spec integrity violations.
 ///
-/// Entry-locator fields are embedded in the per-entry variants so that
-/// `StaleSignals` (a layer-level finding) structurally cannot carry
-/// per-entry metadata, and `DanglingAnchor` / `HashMismatch` cannot
-/// be constructed without a valid entry locator.
+/// After spec-ref-embedded-hash-removal (IN-04): the `HashMismatch` variant
+/// is removed. Hash mismatch detection is superseded by verify-cache runtime
+/// recomputation (D2). Only `DanglingAnchor` (anchor absent from spec.json)
+/// and `StaleSignals` (catalogue declaration hash changed) remain.
+///
+/// Entry-locator fields are embedded in the per-entry variant (`DanglingAnchor`)
+/// so that `StaleSignals` (a layer-level finding) structurally cannot carry
+/// per-entry metadata.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SpecRefFindingKind {
     /// A `SpecRef.anchor` refers to an element that is absent from the
@@ -51,26 +54,6 @@ pub enum SpecRefFindingKind {
         anchor: SpecElementId,
     },
 
-    /// A `SpecRef.hash` differs from the canonical SHA-256 digest of the
-    /// spec element subtree. Carries the anchor plus the declared and
-    /// actually-observed hashes for diff-style output, along with the
-    /// entry locator.
-    HashMismatch {
-        /// Name of the catalogue entry that owns this spec-ref.
-        catalogue_entry: String,
-        /// Zero-based index of the failing `SpecRef` within the entry's
-        /// `spec_refs` list.
-        ref_index: usize,
-        /// Path to the `spec.json` file that was checked.
-        spec_file: PathBuf,
-        /// The anchor whose hash was checked.
-        anchor: SpecElementId,
-        /// The hash value stored in the `SpecRef` declaration.
-        declared: ContentHash,
-        /// The hash value computed from the current spec element.
-        actual: ContentHash,
-    },
-
     /// The `catalogue_declaration_hash` stored in a
     /// `<layer>-catalogue-spec-signals.json` document no longer matches the
     /// SHA-256 of the current `<layer>-types.json` file. Reported at layer
@@ -84,7 +67,7 @@ pub enum SpecRefFindingKind {
 ///
 /// The CLI layer aggregates a `Vec<SpecRefFinding>` and formats human-readable
 /// stderr output. Entry-locator data (`catalogue_entry`, `ref_index`,
-/// `spec_file`) is embedded inside the per-entry variants of
+/// `spec_file`) is embedded inside the per-entry variant of
 /// [`SpecRefFindingKind`] rather than as top-level `Option` fields, so the
 /// type structurally prevents the impossible combination of a `StaleSignals`
 /// finding (layer-level) carrying per-entry metadata.
@@ -110,7 +93,8 @@ impl SpecRefFinding {
 /// [`ConfidenceSignal`] computed by the informal-priority rule (ADR
 /// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.1). A catalogue
 /// entry with multiple `spec_refs[]` collapses to a single signal — the
-/// per-ref hash validation is reported separately as a [`SpecRefFinding`].
+/// per-ref dangling-anchor validation is reported separately as a
+/// [`SpecRefFinding`].
 ///
 /// The `entry_hash` field holds the per-entry SHA-256 hash of the catalogue
 /// entry's canonical JSON subtree, injected at the infrastructure
@@ -222,10 +206,10 @@ impl CatalogueSpecSignalsDocument {
 /// non-empty the base §D1.1 rule takes precedence (explicit grounding is
 /// honoured as-is).
 ///
-/// Per-`SpecRef` integrity (dangling `anchor`, hash drift, stale signals) is
-/// outside this signal's scope and is reported via [`SpecRefFinding`] by the
-/// binary gate (`check_catalogue_spec_ref_integrity`, authored in T004). This
-/// function is pure and I/O-free.
+/// Per-`SpecRef` integrity (dangling `anchor`, stale signals) is outside this
+/// signal's scope and is reported via [`SpecRefFinding`] by the binary gate
+/// (`check_catalogue_spec_ref_integrity`, authored in T004). This function is
+/// pure and I/O-free.
 #[must_use]
 pub fn evaluate_catalogue_entry_signal(
     action: ItemAction,
@@ -290,28 +274,6 @@ mod tests {
             }
             other => panic!("expected DanglingAnchor, got {other:?}"),
         }
-    }
-
-    #[test]
-    fn hash_mismatch_variant_carries_declared_and_actual_with_locator() {
-        let kind = SpecRefFindingKind::HashMismatch {
-            catalogue_entry: "Bar".to_string(),
-            ref_index: 2,
-            spec_file: PathBuf::from("track/items/y/spec.json"),
-            anchor: anchor("IN-01"),
-            declared: hash(0xaa),
-            actual: hash(0xbb),
-        };
-        let finding = SpecRefFinding::new(layer(), kind.clone());
-
-        match &finding.kind {
-            SpecRefFindingKind::HashMismatch { anchor: got, declared, actual, .. } => {
-                assert_eq!(got, &anchor("IN-01"));
-                assert_ne!(declared, actual);
-            }
-            other => panic!("expected HashMismatch, got {other:?}"),
-        }
-        assert_eq!(finding.kind, kind);
     }
 
     #[test]
@@ -464,7 +426,7 @@ mod tests {
     }
 
     fn spec_ref(anchor_id: &str) -> SpecRef {
-        SpecRef::new("track/items/x/spec.json", anchor(anchor_id), hash(0x00))
+        SpecRef::new("track/items/x/spec.json", anchor(anchor_id))
     }
 
     // ---------------------------------------------------------------------------

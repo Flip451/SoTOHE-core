@@ -48,7 +48,7 @@ const RULES_JSON: &str = r#"{
 /// `methods` list is empty — satisfies the demo `FieldEmpty` rule
 /// (no violation expected).
 const CATALOGUE_EMPTY_METHODS: &str = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
@@ -70,7 +70,7 @@ const CATALOGUE_EMPTY_METHODS: &str = r#"{
 /// `methods` list is non-empty — fires the demo `FieldEmpty` rule
 /// (violation expected).
 const CATALOGUE_WITH_METHODS: &str = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "domain",
   "layer": "domain",
   "types": {

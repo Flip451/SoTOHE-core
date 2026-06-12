@@ -755,12 +755,11 @@ mod tests {
 
     #[test]
     fn test_type_entry_with_non_empty_spec_refs_stores_grounding() {
-        use crate::plan_ref::{ContentHash, SpecElementId, SpecRef};
+        use crate::plan_ref::{SpecElementId, SpecRef};
         use std::path::PathBuf;
 
         let anchor = SpecElementId::try_new("IN-01").unwrap();
-        let hash = ContentHash::from_bytes([0u8; 32]);
-        let spec_ref = SpecRef::new(PathBuf::from("track/items/x/spec.json"), anchor, hash);
+        let spec_ref = SpecRef::new(PathBuf::from("track/items/x/spec.json"), anchor);
 
         let entry = TypeEntry {
             action: ItemAction::Add,
@@ -807,14 +806,12 @@ mod tests {
     #[test]
     fn test_function_entry_with_spec_refs_and_informal_grounds_stores_both() {
         use crate::plan_ref::{
-            ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
-            SpecElementId, SpecRef,
+            InformalGroundKind, InformalGroundRef, InformalGroundSummary, SpecElementId, SpecRef,
         };
         use std::path::PathBuf;
 
         let anchor = SpecElementId::try_new("AC-02").unwrap();
-        let hash = ContentHash::from_bytes([0xabu8; 32]);
-        let spec_ref = SpecRef::new(PathBuf::from("track/items/x/spec.json"), anchor, hash);
+        let spec_ref = SpecRef::new(PathBuf::from("track/items/x/spec.json"), anchor);
 
         let summary = InformalGroundSummary::try_new("user directive from session").unwrap();
         let ground = InformalGroundRef::new(InformalGroundKind::UserDirective, summary);

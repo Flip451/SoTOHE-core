@@ -443,7 +443,7 @@ mod tests {
 
     /// Minimal valid v3 domain catalogue with a single type `MyType`.
     const V3_CATALOGUE_ONE_TYPE: &str = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
@@ -460,7 +460,7 @@ mod tests {
 
     /// Minimal valid v3 domain catalogue with no types.
     const V3_CATALOGUE_EMPTY: &str = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
