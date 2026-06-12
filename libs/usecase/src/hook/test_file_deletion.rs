@@ -55,6 +55,27 @@ const LAUNCHER_OPTIONS_WITH_ARG: &[(&str, &str)] = &[
 const REENTRY_SHELLS: &[&str] = &["bash", "sh", "zsh", "dash", "ksh", "ash"];
 const MAX_REENTRY_DEPTH: u8 = 3;
 
+struct EnvSplitPayload<'a> {
+    command: &'a str,
+    remaining: &'a [String],
+}
+
+#[derive(Debug, Clone, Copy)]
+enum EnvSplitPayloadError {
+    MissingPayload,
+}
+
+enum EnvSplitArg<'a> {
+    Inline(&'a str),
+    NextToken,
+}
+
+enum EnvTokenStep<'a> {
+    Payload { command: &'a str, remaining_start: usize },
+    ReenterAt(usize),
+    Advance(usize),
+}
+
 /// Hook handler for `block-test-file-deletion`.
 ///
 /// Blocks Bash commands that delete or overwrite test files through parsed
@@ -110,6 +131,10 @@ fn check_commands_for_test_deletion(
     depth: u8,
 ) -> Option<HookVerdict> {
     for cmd in commands {
+        if let Some(verdict) = check_env_split_string(parser, cmd, depth) {
+            return Some(verdict);
+        }
+
         if let Some(arg) = test_file_rm_arg(cmd) {
             return Some(HookVerdict::block(format!("blocked: cannot delete test file '{arg}'")));
         }
@@ -145,6 +170,67 @@ fn check_commands_for_test_deletion(
     }
 
     None
+}
+
+fn check_env_split_string(
+    parser: &dyn ShellParser,
+    cmd: &SimpleCommand,
+    depth: u8,
+) -> Option<HookVerdict> {
+    let payload = env_split_string_payload_after_launchers(&cmd.argv)?;
+
+    if depth > MAX_REENTRY_DEPTH {
+        return Some(HookVerdict::block(
+            "blocked: env split-string depth limit reached".to_string(),
+        ));
+    }
+
+    let payload = match payload {
+        Ok(payload) => payload,
+        Err(err) => {
+            return Some(HookVerdict::block(format!(
+                "blocked: unable to parse env split-string command ({})",
+                env_split_error_message(err)
+            )));
+        }
+    };
+
+    let mut child_commands = match parser.split_shell(payload.command) {
+        Ok(commands) => commands,
+        Err(err) => {
+            return Some(HookVerdict::block(format!(
+                "blocked: unable to parse env split-string command ({err})"
+            )));
+        }
+    };
+
+    apply_env_split_context(&mut child_commands, payload.remaining);
+
+    check_commands_for_test_deletion(parser, &child_commands, depth + 1)
+}
+
+fn apply_env_split_context(commands: &mut Vec<SimpleCommand>, remaining: &[String]) {
+    match commands.as_mut_slice() {
+        [] if !remaining.is_empty() => {
+            commands.push(SimpleCommand {
+                argv: std::iter::once("env".to_string()).chain(remaining.iter().cloned()).collect(),
+                redirect_texts: Vec::new(),
+                output_redirect_texts: Vec::new(),
+                has_output_redirect: false,
+            });
+        }
+        [child_command] => {
+            child_command.argv.insert(0, "env".to_string());
+            child_command.argv.extend(remaining.iter().cloned());
+        }
+        _ => {}
+    }
+}
+
+fn env_split_error_message(err: EnvSplitPayloadError) -> &'static str {
+    match err {
+        EnvSplitPayloadError::MissingPayload => "missing split-string payload",
+    }
 }
 
 fn test_file_output_redirect_target(cmd: &SimpleCommand) -> Option<&str> {
@@ -282,6 +368,159 @@ fn command_name(token: &str) -> &str {
 
 fn is_assignment(token: &str) -> bool {
     token.contains('=') && !token.starts_with('=')
+}
+
+fn env_split_string_payload_after_launchers(
+    argv: &[String],
+) -> Option<Result<EnvSplitPayload<'_>, EnvSplitPayloadError>> {
+    env_split_string_payload_in_argv(argv, skip_assignments(argv, 0))
+}
+
+fn env_split_string_payload_in_argv(
+    argv: &[String],
+    start: usize,
+) -> Option<Result<EnvSplitPayload<'_>, EnvSplitPayloadError>> {
+    let mut index = start;
+
+    loop {
+        let token = argv.get(index)?;
+        if is_assignment(token) {
+            index = skip_assignments(argv, index);
+            continue;
+        }
+
+        if !is_shell_launcher(token) {
+            return None;
+        }
+
+        if command_name(token) == "env" {
+            return env_split_string_payload_at_env(argv, index);
+        }
+
+        index = skip_launcher_args_at(argv, index);
+    }
+}
+
+fn env_split_string_payload_at_env(
+    argv: &[String],
+    env_index: usize,
+) -> Option<Result<EnvSplitPayload<'_>, EnvSplitPayloadError>> {
+    let mut index = env_index + 1;
+
+    while let Some(step) = env_token_step(argv, index) {
+        let step = match step {
+            Ok(step) => step,
+            Err(err) => return Some(Err(err)),
+        };
+
+        match step {
+            EnvTokenStep::Payload { command, remaining_start } => {
+                return Some(Ok(EnvSplitPayload {
+                    command,
+                    remaining: tail_from(argv, remaining_start),
+                }));
+            }
+            EnvTokenStep::ReenterAt(next) => return env_split_string_payload_in_argv(argv, next),
+            EnvTokenStep::Advance(width) => index += width,
+        }
+    }
+
+    None
+}
+
+fn env_token_step<'a>(
+    argv: &'a [String],
+    index: usize,
+) -> Option<Result<EnvTokenStep<'a>, EnvSplitPayloadError>> {
+    let token = argv.get(index)?;
+
+    if let Some(arg) = env_split_arg(token) {
+        return Some(env_payload_step(argv, index, arg));
+    }
+
+    if is_assignment(token) {
+        return Some(Ok(EnvTokenStep::ReenterAt(skip_assignments(argv, index))));
+    }
+
+    if is_launcher_option(token) {
+        let width = if launcher_option_consumes_next("env", token) { 2 } else { 1 };
+        return Some(Ok(EnvTokenStep::Advance(width)));
+    }
+
+    Some(Ok(EnvTokenStep::ReenterAt(index)))
+}
+
+fn env_payload_step<'a>(
+    argv: &'a [String],
+    index: usize,
+    arg: EnvSplitArg<'a>,
+) -> Result<EnvTokenStep<'a>, EnvSplitPayloadError> {
+    match arg {
+        EnvSplitArg::Inline(command) => {
+            Ok(EnvTokenStep::Payload { command, remaining_start: index + 1 })
+        }
+        EnvSplitArg::NextToken => {
+            let Some(command) = argv.get(index + 1) else {
+                return Err(EnvSplitPayloadError::MissingPayload);
+            };
+            Ok(EnvTokenStep::Payload { command, remaining_start: index + 2 })
+        }
+    }
+}
+
+fn env_split_arg(token: &str) -> Option<EnvSplitArg<'_>> {
+    if let Some(payload) = token.strip_prefix("--split-string=") {
+        return Some(EnvSplitArg::Inline(payload));
+    }
+    if token == "-S" || token == "--split-string" {
+        return Some(EnvSplitArg::NextToken);
+    }
+    if let Some(payload) = token.strip_prefix("-S").filter(|payload| !payload.is_empty()) {
+        return Some(EnvSplitArg::Inline(payload));
+    }
+
+    let options = token.strip_prefix('-')?;
+    if options.starts_with('-') {
+        return None;
+    }
+
+    for (idx, opt) in options.char_indices() {
+        match opt {
+            'S' => {
+                let payload = &options[idx + opt.len_utf8()..];
+                return Some(if payload.is_empty() {
+                    EnvSplitArg::NextToken
+                } else {
+                    EnvSplitArg::Inline(payload)
+                });
+            }
+            'C' | 'a' | 'u' => return None,
+            _ => {}
+        }
+    }
+
+    None
+}
+
+fn skip_assignments(argv: &[String], start: usize) -> usize {
+    let mut index = start;
+    while argv.get(index).is_some_and(|token| is_assignment(token)) {
+        index += 1;
+    }
+    index
+}
+
+fn skip_launcher_args_at(argv: &[String], launcher_index: usize) -> usize {
+    let Some(launcher_token) = argv.get(launcher_index) else {
+        return argv.len();
+    };
+    let mut tokens = tail_from(argv, launcher_index + 1).iter().map(String::as_str).peekable();
+    skip_launcher_args(command_name(launcher_token), &mut tokens);
+    argv.len() - tokens.count()
+}
+
+fn tail_from<T>(items: &[T], start: usize) -> &[T] {
+    items.get(start..).map_or(&[], |tail| tail)
 }
 
 pub(crate) fn is_test_file(path: &str) -> bool {
@@ -469,6 +708,166 @@ mod tests {
             vec![simple_command(&["env", "-i", "rm", "tests/foo.rs"])],
         );
         let verdict = handle(parser, bash_input("env -i rm tests/foo.rs"));
+        assert!(verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_bash_env_split_string_rm_test_file_blocks() {
+        let cases = [
+            (
+                "env -S 'rm tests/foo_test.rs'",
+                &["env", "-S", "rm tests/foo_test.rs"][..],
+                "rm tests/foo_test.rs",
+                &["rm", "tests/foo_test.rs"][..],
+            ),
+            (
+                "env --split-string='rm tests/foo_test.rs'",
+                &["env", "--split-string=rm tests/foo_test.rs"][..],
+                "rm tests/foo_test.rs",
+                &["rm", "tests/foo_test.rs"][..],
+            ),
+            (
+                "env -Srm tests/foo_test.rs",
+                &["env", "-Srm", "tests/foo_test.rs"][..],
+                "rm",
+                &["rm"][..],
+            ),
+            (
+                "env -iSrm tests/foo_test.rs",
+                &["env", "-iSrm", "tests/foo_test.rs"][..],
+                "rm",
+                &["rm"][..],
+            ),
+        ];
+
+        for (command, argv, payload, payload_argv) in cases {
+            let parser = parser_with_responses(vec![
+                ParserResponse { input: command, result: Ok(vec![simple_command(argv)]) },
+                ParserResponse { input: payload, result: Ok(vec![simple_command(payload_argv)]) },
+            ]);
+            let verdict = handle(parser, bash_input(command));
+
+            assert!(verdict.is_blocked(), "command: {command}");
+        }
+    }
+
+    #[test]
+    fn test_bash_env_split_string_shell_reentry_test_file_blocks() {
+        let parser = parser_with_responses(vec![
+            ParserResponse {
+                input: "env -S 'sh -c \"rm tests/foo_test.rs\"'",
+                result: Ok(vec![simple_command(&["env", "-S", "sh -c \"rm tests/foo_test.rs\""])]),
+            },
+            ParserResponse {
+                input: "sh -c \"rm tests/foo_test.rs\"",
+                result: Ok(vec![simple_command(&["sh", "-c", "rm tests/foo_test.rs"])]),
+            },
+            ParserResponse {
+                input: "rm tests/foo_test.rs",
+                result: Ok(vec![simple_command(&["rm", "tests/foo_test.rs"])]),
+            },
+        ]);
+        let verdict = handle(parser, bash_input("env -S 'sh -c \"rm tests/foo_test.rs\"'"));
+        assert!(verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_bash_env_split_string_benign_command_allows() {
+        let parser = parser_with_responses(vec![
+            ParserResponse {
+                input: "env -S 'printf ok'",
+                result: Ok(vec![simple_command(&["env", "-S", "printf ok"])]),
+            },
+            ParserResponse {
+                input: "printf ok",
+                result: Ok(vec![simple_command(&["printf", "ok"])]),
+            },
+        ]);
+        let verdict = handle(parser, bash_input("env -S 'printf ok'"));
+        assert!(!verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_bash_env_split_string_option_payload_remaining_rm_blocks() {
+        let cases = [
+            (
+                "env -S -u PATH rm tests/foo_test.rs",
+                &["env", "-S", "-u", "PATH", "rm", "tests/foo_test.rs"][..],
+                "-u",
+                &["-u"][..],
+            ),
+            (
+                "env -S -- rm tests/foo_test.rs",
+                &["env", "-S", "--", "rm", "tests/foo_test.rs"][..],
+                "--",
+                &["--"][..],
+            ),
+            (
+                "env -S '' rm tests/foo_test.rs",
+                &["env", "-S", "", "rm", "tests/foo_test.rs"][..],
+                "",
+                &[][..],
+            ),
+        ];
+
+        for (command, argv, payload, payload_argv) in cases {
+            let payload_commands = if payload_argv.is_empty() {
+                Vec::new()
+            } else {
+                vec![simple_command(payload_argv)]
+            };
+            let parser = parser_with_responses(vec![
+                ParserResponse { input: command, result: Ok(vec![simple_command(argv)]) },
+                ParserResponse { input: payload, result: Ok(payload_commands) },
+            ]);
+            let verdict = handle(parser, bash_input(command));
+
+            assert!(verdict.is_blocked(), "command: {command}");
+        }
+    }
+
+    #[test]
+    fn test_bash_env_assignment_before_split_string_allows() {
+        let parser = parser_with_responses(vec![
+            ParserResponse {
+                input: "env FOO=bar -S 'rm tests/foo_test.rs'",
+                result: Ok(vec![simple_command(&["env", "FOO=bar", "-S", "rm tests/foo_test.rs"])]),
+            },
+            ParserResponse {
+                input: "rm tests/foo_test.rs",
+                result: Ok(vec![simple_command(&["rm", "tests/foo_test.rs"])]),
+            },
+        ]);
+        let verdict = handle(parser, bash_input("env FOO=bar -S 'rm tests/foo_test.rs'"));
+        assert!(!verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_bash_nested_env_after_assignment_split_string_blocks() {
+        let parser = parser_with_responses(vec![
+            ParserResponse {
+                input: "env FOO=bar env -S 'rm tests/foo_test.rs'",
+                result: Ok(vec![simple_command(&[
+                    "env",
+                    "FOO=bar",
+                    "env",
+                    "-S",
+                    "rm tests/foo_test.rs",
+                ])]),
+            },
+            ParserResponse {
+                input: "rm tests/foo_test.rs",
+                result: Ok(vec![simple_command(&["rm", "tests/foo_test.rs"])]),
+            },
+        ]);
+        let verdict = handle(parser, bash_input("env FOO=bar env -S 'rm tests/foo_test.rs'"));
+        assert!(verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_bash_env_split_string_missing_payload_blocks() {
+        let parser = parser_for("env -S", vec![simple_command(&["env", "-S"])]);
+        let verdict = handle(parser, bash_input("env -S"));
         assert!(verdict.is_blocked());
     }
 

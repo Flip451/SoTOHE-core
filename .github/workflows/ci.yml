@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Configure git hooks path
+        run: git config --local core.hooksPath .githooks
+
       - name: Export host UID/GID for compose
         id: hostids
         run: |

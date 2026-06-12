@@ -6085,6 +6085,282 @@
       "base_commit": "951066404e1a0123a37489214906617c0979b979",
       "rationale": "The fragments are small, complementary helper functions rather than duplicated logic. `set_env_var` implements replacement semantics by unsetting then pushing a value, while `mark_env_var_empty` delegates to `set_env_var` with an empty string. The candidate reuses the changed helper instead of repeating its implementation.",
       "recorded_at": "2026-06-12T11:11:31Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "432517e3fc5da6c1b93058bd5cc77483f0a01ef120475e1842b2ae1e569b1247",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "bed833c7d615f24c4fc42b581ae7792f2f04e433772902797a50269455491f6e",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8958607316017151,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The changed fragment is a small convenience wrapper that supplies the default start index via skip_assignments(argv, 0) and delegates to the more general _from helper. The candidate fragment contains the actual traversal logic. This is not duplicated logic; it separates the public/default entry point from the parameterized implementation.",
+      "recorded_at": "2026-06-12T13:40:25Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "432517e3fc5da6c1b93058bd5cc77483f0a01ef120475e1842b2ae1e569b1247",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "469bf89404246af71a8726588609fc40b9824fbef4a17b6c36e5d19ca6e3ded9",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8924086689949036,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments share a small parser idiom around assignment tokens and delegation, but they encode different states in the argv scan. `env_split_string_payload_after_launchers_from` walks through shell launchers until it finds `env`, while `env_split_string_payload_at_env` parses `env` split-string options and only then delegates back to launcher scanning. The repeated `is_assignment` handling is minimal and tied to the state transition between the two functions, so extracting it would likely obscure the parser rather than remove meaningful duplicated knowledge.",
+      "recorded_at": "2026-06-12T13:40:48Z"
+    },
+    {
+      "low_path": "libs/domain/src/guard/policy.rs",
+      "low_hash": "0780791025a71259fa52cb19dd0546c2218c453dd5d2a38e573f142a290f2979",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "432517e3fc5da6c1b93058bd5cc77483f0a01ef120475e1842b2ae1e569b1247",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the common argv launcher traversal into a shared helper that accepts small strategy callbacks for assignment handling, launcher detection/name extraction, env handling, and skip behavior, or move the canonical parser into a shared module/crate and adapt both call sites to map its result into their local payload/result types."
+        }
+      },
+      "similarity_score": 0.8541120290756226,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "Both fragments implement the same launcher-scanning algorithm over argv: start at an index, recognize command/shell launchers, special-case `env` by delegating to an env parser, skip non-env launcher arguments, and return `None` when no env payload is found. The changed version adds assignment handling and uses different result types, but the shared traversal policy is duplicated rather than centralized, so future fixes to launcher/env handling could diverge across crates.",
+      "recorded_at": "2026-06-12T13:41:05Z"
+    },
+    {
+      "low_path": "libs/domain/src/guard/policy.rs",
+      "low_hash": "5666f894ddc7ad0b3c060842446ef67d4f464a1f9f1a8d55824aefdb28470890",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "469bf89404246af71a8726588609fc40b9824fbef4a17b6c36e5d19ca6e3ded9",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the shared argv scan into a common helper that returns a small enum describing the located split-string payload and remaining argv, plus callbacks or flags for assignment/env-option handling. Then have `env_split_string_payload_at_env` map that result to `EnvSplitPayload`, and `env_split_string_argv_at_env` layer the child-var mutation and `split_env_string_argv` behavior on top."
+        }
+      },
+      "similarity_score": 0.8614318370819092,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "Both fragments encode the same `env -S`/`--split-string` scan over argv after an `env` token, including the same long option, separated payload, attached `-S...`, grouped short-option, assignment skipping, launcher-option skipping, and fallback-to-child-command behavior. The return types and variable-environment handling differ, but the option grammar and traversal rules are duplicated knowledge, so changes to env split-string parsing would need to be made in both places.",
+      "recorded_at": "2026-06-12T13:41:32Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "349814b91e00dd596f355daf25984e7b806b1e7218b2f01d9622e184c754fede",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "8624d8e09fef1db0b2d9737e6a0b2fd90ebda80374722094fdb690fad9ff6d83",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the shared decision logic into one helper, for example a `skip_launcher_tokens(launcher, tokens)` function that returns the number of consumed tokens for a slice/iterator, then implement `skip_launcher_args_at` by adding that count to `launcher_index + 1` and implement `skip_launcher_args` by consuming the same count from the iterator."
+        }
+      },
+      "similarity_score": 0.8719032406806946,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "Both fragments implement the same launcher-argument skipping state machine: pending value consumption, assignment skipping, launcher positional skipping, option handling via `launcher_option_consumes_next`, and stop-on-first non-launcher token. The only substantive difference is traversal mechanics: one advances an index over `argv` and returns the final index, while the other advances a `Peekable` iterator in place. This duplicates behavior that must stay synchronized if launcher parsing rules change.",
+      "recorded_at": "2026-06-12T13:41:47Z"
+    },
+    {
+      "low_path": "libs/domain/src/guard/policy.rs",
+      "low_hash": "dc7c3c90649b93aa9ff274837f60a17fbcafd97477fe181ea5c4abc536ad5653",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "c07cd65c87b8673778b3e06cdc5f0d20099dac05c35a06a7a4db0af02793650b",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the parser to a shared helper, for example a public or crate-visible function in the domain guard/policy module (or a shared test-support module if this is test-only), and have libs/usecase/src/hook/test_file_deletion.rs call that helper instead of duplicating the scan."
+        }
+      },
+      "similarity_score": 0.8938586711883545,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "Both fragments implement the same env short-option parsing rule: reject long options, scan clustered short options, return an optional payload for -S, and reject -C/-a/-u. The changed fragment reimplements logic that already exists in libs/domain/src/guard/policy.rs via env_short_option_marker, so future changes to option semantics would need to be made in two places.",
+      "recorded_at": "2026-06-12T13:42:09Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "bfc99b2afb0e2b3b62c56b592506a10cff1c607ad093b9d019f22a9a563dc593",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "dbda2bbfd0daadcf0421f66165852fefab98237033f564af2e765c77efb2e9f2",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9380534291267396,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments share ordinary table-driven test scaffolding, but the duplicated structure is small and the test data exercises different env -S parsing cases. The existing candidate also has distinct handling for an empty payload argv, which is not needed in the changed fragment. Extracting a helper would save only a few lines while making the individual edge-case tests less direct.",
+      "recorded_at": "2026-06-12T13:42:32Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "84a460621506b4f82d925cec99c7d1bd0bc5eca97d86a438f85de3d46e067050",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "dbda2bbfd0daadcf0421f66165852fefab98237033f564af2e765c77efb2e9f2",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9221747517585754,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "Both fragments exercise `env -S` parsing and blocking deletion of test files, but they cover different behavior: the changed test parameterizes direct split-string payload forms (`-S`, `--split-string=`, compact `-Srm`, `-iSrm`), while the existing test verifies recursive shell re-entry through `sh -c` before reaching `rm`. The repeated `parser_with_responses`/`handle`/`assert!(is_blocked())` shape is normal test harness boilerplate, not duplicated domain logic that should be unified.",
+      "recorded_at": "2026-06-12T13:42:46Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "19b0802f7a121a285c4b81f2a202f570b0592f4ba65f40106c59af8c6fca3f89",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "dbda2bbfd0daadcf0421f66165852fefab98237033f564af2e765c77efb2e9f2",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.881553590297699,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "Both tests share setup shape and the same dangerous payload, but they validate different behavior. The changed fragment table-checks direct `env -S` / `--split-string` forms and combined short-option parsing, while the existing test specifically covers a nested `env` command after an assignment (`env FOO=bar env -S ...`). That nested traversal case is distinct enough that the repeated parser/handle/assert scaffolding is ordinary test repetition rather than duplicated domain logic.",
+      "recorded_at": "2026-06-12T13:43:02Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "1b5ff7ea88f2926b550cf83f9c764b049fd356ae47739e66efd7ca8b23a00a4b",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "dbda2bbfd0daadcf0421f66165852fefab98237033f564af2e765c77efb2e9f2",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8547319173812866,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments exercise related but distinct cases: the changed test verifies several env -S/--split-string forms are blocked, while the existing test verifies an assignment before -S is allowed. The repeated parser_with_responses/handle/assert structure is normal test scaffolding and the behavioral assertions differ, so this is not meaningful knowledge duplication.",
+      "recorded_at": "2026-06-12T13:43:17Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "19b0802f7a121a285c4b81f2a202f570b0592f4ba65f40106c59af8c6fca3f89",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "84a460621506b4f82d925cec99c7d1bd0bc5eca97d86a438f85de3d46e067050",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.899354100227356,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments share common test scaffolding and the same deletion target, but they exercise different command-shape behavior: one covers env -S followed by shell re-entry through sh -c, while the other covers assignment handling with a nested env before env -S. The parser response sequences and behavioral intent are distinct enough that this is acceptable test-case repetition, not duplicated production logic or a clear DRY violation.",
+      "recorded_at": "2026-06-12T13:43:33Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "1b5ff7ea88f2926b550cf83f9c764b049fd356ae47739e66efd7ca8b23a00a4b",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "84a460621506b4f82d925cec99c7d1bd0bc5eca97d86a438f85de3d46e067050",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.870452880859375,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments share normal unit-test setup structure, but they exercise materially different behavior: the changed test verifies recursive shell reentry through `env -S 'sh -c ...'` blocks deletion, while the existing test verifies an environment assignment before `-S` is allowed. The parser response sequences, expected verdicts, and behavioral intent differ, so this is not duplicated knowledge that should be factored out.",
+      "recorded_at": "2026-06-12T13:43:45Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "84a460621506b4f82d925cec99c7d1bd0bc5eca97d86a438f85de3d46e067050",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "bfc99b2afb0e2b3b62c56b592506a10cff1c607ad093b9d019f22a9a563dc593",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8627306818962097,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments share test scaffolding (`parser_with_responses`, `handle`, and `assert!(verdict.is_blocked())`), but they exercise different behaviors. The existing test covers `env -S` payload/option handling where the remaining argv itself contains `rm`; the changed test covers shell re-entry through `env -S 'sh -c ...'`, requiring an additional parse of `sh -c` and then `rm`. The overlap is ordinary test setup boilerplate, not duplicated domain logic or a repeated case that should be consolidated.",
+      "recorded_at": "2026-06-12T13:44:01Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "8574cd1478d0fc39a4298084d03c354e9e57b5f6839a6e2b745efd37aaadb70f",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "9b7439a3c2736e7283917f5d50282ccbc2b5a1202a2acfc0ef9de00f6a18db92",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8840172290802002,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments are similar test shapes for the same feature, but they cover different behavioral cases: a valid `env -S` payload that should be allowed versus a missing payload that should be blocked. The repeated setup/assertion pattern is ordinary unit-test structure and does not duplicate the same test knowledge or implementation logic enough to require abstraction.",
+      "recorded_at": "2026-06-12T13:44:13Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "1b5ff7ea88f2926b550cf83f9c764b049fd356ae47739e66efd7ca8b23a00a4b",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "8574cd1478d0fc39a4298084d03c354e9e57b5f6839a6e2b745efd37aaadb70f",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.866736114025116,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments share test setup structure, but they exercise distinct env -S parsing scenarios with different inputs and expected parser calls: a simple benign split command versus an env assignment preceding the split string. The repeated boilerplate is typical for focused tests and does not by itself create a meaningful maintenance burden or duplicated business logic.",
+      "recorded_at": "2026-06-12T13:44:27Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "19b0802f7a121a285c4b81f2a202f570b0592f4ba65f40106c59af8c6fca3f89",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "bfc99b2afb0e2b3b62c56b592506a10cff1c607ad093b9d019f22a9a563dc593",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8562565445899963,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments share test setup mechanics (`parser_with_responses`, `handle`, and `assert!(verdict.is_blocked())`), but they cover different behavioral cases: the changed fragment parameterizes `env -S` option/payload edge cases where the remaining payload blocks `rm`, while the existing test checks nested `env` after an assignment with a split string command. The overlap is ordinary test harness boilerplate, not duplicated domain logic or the same scenario expressed twice.",
+      "recorded_at": "2026-06-12T13:44:50Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "19b0802f7a121a285c4b81f2a202f570b0592f4ba65f40106c59af8c6fca3f89",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "1b5ff7ea88f2926b550cf83f9c764b049fd356ae47739e66efd7ca8b23a00a4b",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9318408966064452,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments are structurally similar test cases, but they encode distinct behavioral scenarios: one verifies `env FOO=bar -S ...` is allowed, while the other verifies nested `env FOO=bar env -S ...` is blocked. The repeated parser setup is small, local, and keeps each test self-contained, so it does not create a meaningful maintenance burden or duplicated business logic.",
+      "recorded_at": "2026-06-12T13:45:04Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "25ec19e8c06649fac5e9c732f70658870ed302bdca678f9b6d6acc49a22e5771",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "c913fd81c92c27f5e46322dbf7680f3ec61b74bcebeec14ad8e319aeef4aa15b",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.858855664730072,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The changed fragment is a small wrapper that delegates to env_split_string_payload_in_argv with a computed start index. It does not duplicate the candidate fragment's scanning logic; it reuses it directly and only encodes a distinct call-site policy of skipping leading assignments.",
+      "recorded_at": "2026-06-12T13:52:53Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "25ec19e8c06649fac5e9c732f70658870ed302bdca678f9b6d6acc49a22e5771",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "de6dd481a3de17f0a41161119deba4793a5ad954f5328eaa8decb542ac7504bb",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8667383193969727,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The fragments are related but encode different responsibilities. `env_split_string_payload_in_argv` scans an argv prefix, skipping assignments and shell-launcher arguments until it finds an `env` command, then delegates. `env_split_string_payload_at_env` parses tokens after an already-identified `env`, handling payload discovery, re-entry, and option advancement through `env_token_step`. The similar loop-and-dispatch shape is incidental control flow, not duplicated domain logic that should be unified.",
+      "recorded_at": "2026-06-12T13:53:07Z"
+    },
+    {
+      "low_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "low_hash": "4cc53cb50406ef5de473c95fb447f674a94de19127dc9ec6e95a4857ab8e8bd3",
+      "high_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "high_hash": "5845f6be2ec2df848a1846f109144274520fb524d82db955441ff12d3ffeba9f",
+      "changed_path": "libs/usecase/src/hook/test_file_deletion.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8622047305107117,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e79e79dd9019906edeebf325267140ca308259e3",
+      "rationale": "The changed fragment and candidate fragment do not duplicate the same knowledge or behavior. `env_token_step` performs token classification and dispatch, while `env_payload_step` handles only the payload extraction for `EnvSplitArg`. The changed code already reuses the candidate helper instead of reimplementing its logic.",
+      "recorded_at": "2026-06-12T13:53:19Z"
     }
   ]
 }
