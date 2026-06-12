@@ -5420,11 +5420,286 @@
       "high_hash": "8a7b316a383834e911aa81809c9377983356b67facb4bf87e637d092082723f6",
       "changed_path": "libs/infrastructure/src/verify/hooks_path.rs",
       "verdict": "not-a-violation",
-      "similarity_score": 0.9781481027603149,
+      "similarity_score": 0.9781481027603148,
       "threshold": 0.8500000238418579,
       "base_commit": "15c4dcc122a264679f0f1e4329ba6f1eb42a89dc",
       "rationale": "The fragments are intentionally parallel tests for two distinct boundary cases: leading whitespace and trailing whitespace in the hooks path. Although the arrange/act/assert structure is repeated, the duplicated code is small test boilerplate and the separate test names preserve clear failure localization for each input condition. This does not duplicate production logic or create a meaningful maintenance risk.",
       "recorded_at": "2026-06-11T23:56:04Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "5a3335c9d1d7a6ffadb09d03535908d63a9c2f70ab9d4d079ab33d3e49040cc9",
+      "high_path": "apps/cli-composition/src/review_v2/mod.rs",
+      "high_hash": "5a3335c9d1d7a6ffadb09d03535908d63a9c2f70ab9d4d079ab33d3e49040cc9",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 1.0,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The matched text is only the syntactic start of an impl block. Even with surrounding context, both occurrences are local test-only EnvGuard helpers, so this fragment does not represent duplicated production logic or a shared abstraction that must be extracted for correctness or maintainability.",
+      "recorded_at": "2026-06-12T00:05:59Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "5a3335c9d1d7a6ffadb09d03535908d63a9c2f70ab9d4d079ab33d3e49040cc9",
+      "high_path": "apps/cli-composition/src/hook.rs",
+      "high_hash": "5a3335c9d1d7a6ffadb09d03535908d63a9c2f70ab9d4d079ab33d3e49040cc9",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 1.0,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The shared text is only the Rust impl block header for the same type name. An `impl EnvGuard {` declaration is structural boilerplate, not duplicated behavior or knowledge. Without duplicated method bodies, constants, validation rules, or logic inside the blocks, this does not constitute a DRY violation.",
+      "recorded_at": "2026-06-12T00:06:09Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "5a3335c9d1d7a6ffadb09d03535908d63a9c2f70ab9d4d079ab33d3e49040cc9",
+      "high_path": "apps/cli/src/commands/plan/tests.rs",
+      "high_hash": "3146bffac43960cc3c1c17114f07ca32d03dc1dc64a64e33e49ad7e59dc5babc",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9000136256217957,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The fragments only show two impl blocks for differently named guard types in different crates/modules. An impl declaration by itself is a structural necessity, not duplicated logic or knowledge. There is not enough repeated behavior in these snippets to establish a DRY violation.",
+      "recorded_at": "2026-06-12T00:06:19Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "5a3335c9d1d7a6ffadb09d03535908d63a9c2f70ab9d4d079ab33d3e49040cc9",
+      "high_path": "apps/cli/src/commands/review/tests.rs",
+      "high_hash": "3146bffac43960cc3c1c17114f07ca32d03dc1dc64a64e33e49ad7e59dc5babc",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared test-support EnvVarGuard/EnvGuard helper alongside the existing process_env_lock support, with set/remove methods and one Drop implementation containing the safety justification, then reuse it from both test modules."
+        }
+      },
+      "similarity_score": 0.9000136256217957,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "Both fragments are test-only RAII environment variable guards with the same core behavior: capture the previous value, temporarily set or remove an environment variable, and restore the original value in Drop while relying on serialized process environment access. The names and small signature differences do not represent distinct knowledge, and maintaining separate helpers risks drift in unsafe environment-mutation handling.",
+      "recorded_at": "2026-06-12T00:07:34Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "230d68449624fcbc60a1201c0e4327d2d010aa61d19b89137c38990b78e78f4b",
+      "high_path": "apps/cli-composition/src/hook.rs",
+      "high_hash": "230d68449624fcbc60a1201c0e4327d2d010aa61d19b89137c38990b78e78f4b",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the shared environment guard into one reusable helper, such as a common `EnvVarGuard` test/support module, and have both `hook.rs` and `dry.rs` call that implementation instead of maintaining duplicate `set` methods."
+        }
+      },
+      "similarity_score": 1.0,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The two fragments are identical implementations of the same environment-variable guard behavior, including previous-value capture, the unsafe `set_var` call, and the safety invariant. This duplicates a process-environment mutation helper and would require future safety or behavior changes to be kept in sync manually.",
+      "recorded_at": "2026-06-12T00:07:51Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "230d68449624fcbc60a1201c0e4327d2d010aa61d19b89137c38990b78e78f4b",
+      "high_path": "apps/cli-composition/src/review_v2/mod.rs",
+      "high_hash": "248bb11ee5331a8ec6c7c05a0e0c25aeeb643aef7a2522fb1b5ee380522ee993",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared test helper for environment-variable guards in apps/cli-composition, for example an EnvVarGuard::set(key, value: impl Into<OsString>) in a common test support module, and have both hook.rs and review_v2/mod.rs tests use that helper so the unsafe env mutation and safety invariant live in one place."
+        }
+      },
+      "similarity_score": 0.9493656754493712,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "Both fragments implement the same EnvVarGuard::set behavior: read the previous environment value, rely on the same process_env_lock safety invariant, call unsafe std::env::set_var, and store the previous value for restoration. The only material differences are the value parameter shape and wording of the safety comment, so the duplication carries the same environment-mutation policy in two places and can diverge over time.",
+      "recorded_at": "2026-06-12T00:08:16Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "230d68449624fcbc60a1201c0e4327d2d010aa61d19b89137c38990b78e78f4b",
+      "high_path": "apps/cli/src/commands/plan/tests.rs",
+      "high_hash": "f64d137731cbb6bf64710d40d14a0fe74f43b450ea06fd5bff785593c0093526",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9407785534858704,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The fragments implement the same small test-only environment guard pattern, but they live in different crates/modules with slightly different local APIs and struct fields (`value` vs `original`, `impl Into<OsString>` vs `&OsStr`). The duplicated logic is only a few lines and sharing it would likely introduce cross-crate test-helper coupling for little benefit. This is not enough repeated domain knowledge to require a DRY refactor.",
+      "recorded_at": "2026-06-12T00:08:29Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "230d68449624fcbc60a1201c0e4327d2d010aa61d19b89137c38990b78e78f4b",
+      "high_path": "apps/cli/src/commands/review/tests.rs",
+      "high_hash": "a9059ddb3a6c1b68d2a5df77ae9f11339e741bcdb1e1ed867d2bf05098dd62af",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9349441528320312,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The fragments are similar small test helper methods, but they live in different crates/modules and encode local guard state and locking conventions (`previous`/`process_env_lock` versus `original`/`env_lock()`). The duplicated logic is minimal boilerplate around Rust's unsafe environment mutation API, not a substantial repeated domain rule that clearly requires a shared abstraction.",
+      "recorded_at": "2026-06-12T00:08:47Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "dcd5fcb0e84f6262e88c620247eab7e6598b3e05aefb747271469c88f7e1a694",
+      "high_path": "apps/cli-composition/src/hook.rs",
+      "high_hash": "dcd5fcb0e84f6262e88c620247eab7e6598b3e05aefb747271469c88f7e1a694",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the environment-variable guard helper into a shared test/support module or reusable type, then have both `hook.rs` and `dry.rs` call the shared `remove` implementation instead of maintaining duplicate copies."
+        }
+      },
+      "similarity_score": 1.0,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The two fragments are identical implementations of the same `remove` helper: both capture the previous environment value, remove the variable under the same safety invariant, and return the same guard state. This duplicates non-trivial process-environment mutation logic and its safety contract across files, so future changes to the guard behavior or safety requirements would need to be made in multiple places.",
+      "recorded_at": "2026-06-12T00:09:00Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "dcd5fcb0e84f6262e88c620247eab7e6598b3e05aefb747271469c88f7e1a694",
+      "high_path": "apps/cli-composition/src/review_v2/mod.rs",
+      "high_hash": "028da848ff75611ba5fe198794054de3e7ecb4c837e4b8b050f53ea7bf4779ce",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Move the shared test environment guard logic into a common test-support module, for example a reusable EnvGuard with set/remove helpers, and have both hook.rs and review_v2/mod.rs tests use that shared helper."
+        }
+      },
+      "similarity_score": 0.9812584519386292,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "Both fragments implement the same EnvGuard::remove behavior: read the previous process environment value, unsafely remove the variable under the same locking invariant, and store the prior value for restoration. This duplicates both behavior and the safety contract, which can drift across modules.",
+      "recorded_at": "2026-06-12T00:09:16Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "bbe879bc6c751d5dbe1521fedd7aa9643f90d77baca498a3b7d5bf400dd3ac2e",
+      "high_path": "apps/cli-composition/src/review_v2/mod.rs",
+      "high_hash": "bbe879bc6c751d5dbe1521fedd7aa9643f90d77baca498a3b7d5bf400dd3ac2e",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Move EnvGuard into a shared cfg(test) helper, likely crate::test_support, with set/remove constructors accepting impl Into<OsString>, then update hook.rs and review_v2/mod.rs tests to use that shared helper."
+        }
+      },
+      "similarity_score": 1.0,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "Both fragments are the same RAII environment-restoration helper pattern in test code: each module defines an EnvGuard and an identical Drop implementation that restores or removes an environment variable on drop. This duplicates shared process-environment test setup/cleanup behavior that is already coordinated through crate::test_support::process_env_lock().",
+      "recorded_at": "2026-06-12T00:10:09Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "bbe879bc6c751d5dbe1521fedd7aa9643f90d77baca498a3b7d5bf400dd3ac2e",
+      "high_path": "apps/cli-composition/src/hook.rs",
+      "high_hash": "bbe879bc6c751d5dbe1521fedd7aa9643f90d77baca498a3b7d5bf400dd3ac2e",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 1.0,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The only duplicated fragment is the Rust syntax line `impl Drop for EnvGuard {`. A repeated trait-impl header by itself does not duplicate domain logic, behavior, or knowledge; any DRY concern would depend on the bodies and whether the same environment-restoration behavior is independently implemented. Based on the provided fragments alone, this is structural boilerplate rather than a DRY violation.",
+      "recorded_at": "2026-06-12T00:10:22Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "bbe879bc6c751d5dbe1521fedd7aa9643f90d77baca498a3b7d5bf400dd3ac2e",
+      "high_path": "apps/cli/src/commands/plan/tests.rs",
+      "high_hash": "d0ff2fbb6e68109b50369060ba23845127d401d54d0973073db1cc8234b27706",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9213645458221436,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The overlap is only the common Rust pattern of implementing Drop for a small test environment-variable guard. These helpers live in different test contexts, have different names and APIs, and the shown changed fragment is just the Drop impl header, not duplicated domain logic or a substantial repeated algorithm.",
+      "recorded_at": "2026-06-12T00:10:45Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "bbe879bc6c751d5dbe1521fedd7aa9643f90d77baca498a3b7d5bf400dd3ac2e",
+      "high_path": "apps/cli/src/commands/review/tests.rs",
+      "high_hash": "d0ff2fbb6e68109b50369060ba23845127d401d54d0973073db1cc8234b27706",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9213645458221436,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "These fragments only show two `Drop` impl headers for similarly named environment variable guard types in separate test/CLI-support contexts. A `Drop` implementation for an RAII guard is an expected, small pattern: the behavior is tied to each type's ownership of restoring environment state, and the fragment by itself does not show duplicated business logic or a repeated larger abstraction that would need consolidation. Similar type names and identical `impl Drop for ...` structure are not enough to establish a DRY violation.",
+      "recorded_at": "2026-06-12T00:11:00Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "55ac1f902f6569aafcc5ce4da4c9cbd9a9bb438ca5333b5761d37c0f9d9058d3",
+      "high_path": "apps/cli/src/commands/plan/tests.rs",
+      "high_hash": "eac2da346b3dd0656b05d08634d69b8a4db3e149394cf90166e6e7cf2b29a06c",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.9119815230369568,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The fragments duplicate the same small test-helper pattern: a Drop implementation restores or removes a process environment variable based on its saved prior value under an env lock. The duplication is real, but it is localized test infrastructure in separate crates/modules, with slightly different helper field names and safety comments. Sharing it would only be worthwhile if this EnvGuard pattern is repeated more broadly across the workspace.",
+      "recorded_at": "2026-06-12T00:11:18Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "55ac1f902f6569aafcc5ce4da4c9cbd9a9bb438ca5333b5761d37c0f9d9058d3",
+      "high_path": "apps/cli/src/commands/review/tests.rs",
+      "high_hash": "3bea43600214523b56c05f4f58fd497ed32253c29f40ca780bd71e1fbb12091f",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9098910689353944,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "Both fragments restore an environment variable in a Drop implementation, but the overlap is a small, idiomatic RAII cleanup pattern in test/support code. The implementations differ slightly in local field names, module paths, and unsafe scoping/comment placement, and extracting a shared abstraction across these files would likely add more coupling than value.",
+      "recorded_at": "2026-06-12T00:11:34Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "3ec2c50dda3a67330ee0c3546531ca62bafaa335065e648aa668e5898cd4fd45",
+      "high_path": "apps/cli-composition/src/hook.rs",
+      "high_hash": "55ac1f902f6569aafcc5ce4da4c9cbd9a9bb438ca5333b5761d37c0f9d9058d3",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the shared environment-variable guard, including its `Drop` implementation and locking invariant, into a common `#[cfg(test)]` test-support module for `apps/cli-composition`, then import and reuse it from both `hook.rs` and `dry.rs`."
+        }
+      },
+      "similarity_score": 0.9051721692085266,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The changed fragment duplicates the same non-trivial `Drop` implementation and safety comment already present in `dry.rs`. Because this code restores process-wide environment state using `unsafe`, keeping separate copies risks divergent safety assumptions or behavior if one helper changes later.",
+      "recorded_at": "2026-06-12T00:11:51Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "55ac1f902f6569aafcc5ce4da4c9cbd9a9bb438ca5333b5761d37c0f9d9058d3",
+      "high_path": "apps/cli-composition/src/review_v2/mod.rs",
+      "high_hash": "bc59a7aeaedc5a54630298156705762b4945f4d33a3d90c3a3a9ee90dc3194c7",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.8985641598701477,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The fragments duplicate the same small RAII cleanup logic for a test-only environment variable guard. Because this is localized test boilerplate and the review_v2 variant has slightly different locking context in its safety comment, the similarity is acceptable rather than a production DRY violation.",
+      "recorded_at": "2026-06-12T00:13:01Z"
+    },
+    {
+      "low_path": "apps/cli/tests/hook_dispatch.rs",
+      "low_hash": "1f9e971925b7d16c860e3772f6b1b3e165343b54128bcbc78c5a283114ced6fc",
+      "high_path": "apps/cli/tests/hook_dispatch.rs",
+      "high_hash": "d53b0071ca11918ee75a35dd2facfd4c90334316e37ae281fbe8be765526816d",
+      "changed_path": "apps/cli/tests/hook_dispatch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8645580410957336,
+      "threshold": 0.8500000238418579,
+      "base_commit": "eb125da548eb0403ac958cb9b665c4695d50a6f8",
+      "rationale": "The fragments share the same hook invocation arguments, but they exercise opposite behavior: token-present allows with exit code 0, while token-absent blocks with exit code 2 plus stderr/stdout assertions. The repeated setup is small and keeps each test explicit; extracting it would not remove meaningful duplicated logic.",
+      "recorded_at": "2026-06-12T00:16:17Z"
     }
   ]
 }

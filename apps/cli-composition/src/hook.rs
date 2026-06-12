@@ -194,8 +194,8 @@ impl CliApp {
                 if is_block {
                     let reason = verdict.reason.unwrap_or_default();
                     Ok(CommandOutcome {
-                        stdout: if reason.is_empty() { None } else { Some(reason) },
-                        stderr: None,
+                        stdout: None,
+                        stderr: if reason.is_empty() { None } else { Some(reason) },
                         exit_code: 2,
                     })
                 } else {

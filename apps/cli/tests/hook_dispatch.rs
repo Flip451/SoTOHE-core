@@ -125,4 +125,7 @@ fn test_hook_dispatch_git_pre_push_with_remote_args_without_token_blocks() {
         run_hook(&["hook", "dispatch", "git-pre-push", "origin", "https://example.com"], None);
 
     assert_exit_code(&output, 2);
+    assert!(output.stdout.is_empty(), "stdout must be empty for blocking hook verdict");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("Direct git ref updates"), "stderr must include block reason");
 }

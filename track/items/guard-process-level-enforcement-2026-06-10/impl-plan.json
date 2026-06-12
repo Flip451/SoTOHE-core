@@ -22,12 +22,13 @@
     {
       "id": "T004",
       "description": "infrastructure/verify 層に hooks_path::verify 関数を追加し bin/sotp verify hooks-path サブコマンドとして公開する (IN-09)。ci-local への verify gate 組み込みは T006 で行う（T004 単独では ci-local へ組み込まない）。変更内容: libs/infrastructure/src/verify/ に hooks_path.rs モジュールを新規追加し、infrastructure::verify::hooks_path::verify(root: &std::path::Path) -> VerifyOutcome を実装する。verify 関数は git config --local core.hooksPath の値を読み取り、.githooks に等しければ pass / 未設定または異なる値であれば non-zero VerifyOutcome を返す。git config の読み取りは std::process::Command::new(\"git\").args([\"config\", \"--local\", \"core.hooksPath\"]) を直接使用する（verify は read-only であり SOTP_GUARDED_GIT が注入される SystemGitRepo を経由する必要はなく、許容残余として扱う）。libs/infrastructure/src/verify/mod.rs に pub mod hooks_path を追加する。apps/cli/src/commands/verify.rs の VerifyCommand enum に HooksPath(VerifyArgs) variant を追加し、bin/sotp verify hooks-path として呼び出せるようにする（IN-09）。apps/cli-composition/src/verify.rs（または相当ファイル）に hooks_path verify 呼び出しを追加する。Makefile.toml に verify-hooks-path-local タスク（cargo run --quiet -p cli -- verify hooks-path）と compose ラッパータスクを追加するが、この時点では ci-local の依存チェーンに組み込まない（ci-local への組み込みは T006 で bootstrap ステップと同時に実施して per-task CI を維持する）。ユニットテスト: core.hooksPath が .githooks の場合に pass VerifyOutcome を返すこと / 未設定の場合に non-zero（error）VerifyOutcome を返すこと / .githooks 以外の値の場合に non-zero VerifyOutcome を返すこと。前提: T001（policy.rs 変更により verify 専用 git read は independent パスで可）。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "eb125da548eb0403ac958cb9b665c4695d50a6f8"
     },
     {
       "id": "T005",
       "description": "apps/cli-composition/src/hook.rs の block verdict 生成を stdout から stderr へ変更する (IN-07 / AC-08)。変更箇所: block 分岐で生成する CommandOutcome { stdout: if reason.is_empty() { None } else { Some(reason) }, stderr: None, exit_code: 2 } を CommandOutcome { stdout: None, stderr: if reason.is_empty() { None } else { Some(reason) }, exit_code: 2 } に変更する（D6 の stdout → stderr 移行）。変更対象は block 分岐のみであり、allow や他の非 block stdout パスは変更しない（D6 は block reason の出力先変更のみを規定する）。apps/cli/src/commands/hook.rs の execute 関数が CommandOutcome.stderr を eprintln! で出力していることを確認し、block verdict に対して block 理由が確実に stderr に届く経路が機能していることを確認する。必要であれば hook.rs 側の block 経路の出力コードも修正するが、allow や他の分岐の出力コードは変更しない。ユニットテスト: block verdict を返す場合の CommandOutcome が stdout: None / stderr: Some(reason) / exit_code: 2 であること / allow の場合は CommandOutcome::success を返すこと（allow 分岐は変更しないことを確認）。前提: なし（cli-composition 層の独立変更）。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T007",

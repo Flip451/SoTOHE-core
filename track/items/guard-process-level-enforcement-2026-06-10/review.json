@@ -491,264 +491,20 @@
           "findings": [],
           "hash": "rvw1:sha256:0037fd423e899bd91e2f37ea6a264867488ca981c1893d0cbd58816b4c0a53a7",
           "at": "2026-06-11T23:40:27Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
-          "at": "2026-06-11T17:39:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
-          "at": "2026-06-11T17:42:41Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
-          "at": "2026-06-11T19:04:24Z"
+          "hash": "rvw1:sha256:c74550b0605437051814f16541c49c47cf68a7a975bd2c5c615a16c71ea805d0",
+          "at": "2026-06-12T00:18:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
-          "at": "2026-06-11T19:06:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Add coverage for the `Err(e)` path in `verify`. The current tests exercise the pass case plus two config-state failures, but they never force `Command::new(\"git\").output()` to fail. A missing `git` binary or PATH failure would therefore bypass unit coverage on this new public API.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/hooks_path.rs",
-              "line": 17,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:4e8172d33b7e473ccb7eba904b38d555bd9747b250e0489b7b4af846554dabe4",
-          "at": "2026-06-11T23:40:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
-          "at": "2026-06-11T23:43:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The verifier trims all leading/trailing whitespace from the configured hooks path before comparing it to `.githooks`. A value that Git can treat as a different path, such as a quoted `\".githooks \"` or `\" .githooks\"`, would be accepted here, so the new check can falsely pass even though hooks are not actually configured to the repository-managed directory. Strip only the command's line ending before the exact comparison.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/hooks_path.rs",
-              "line": 37,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
-          "at": "2026-06-11T23:45:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a61c7e5703844b381e34e08b919e3a30a5bcbc4588109403b2ddc854799a2ec0",
-          "at": "2026-06-11T23:48:48Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
-          "at": "2026-06-11T18:07:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Dispatch` still accepts only the hook enum, but the new git hook shims are intended to invoke `bin/sotp hook dispatch git-ref-update \"$@\"` / `git-pre-push \"$@\"`. Real `reference-transaction` and `pre-push` hooks supply positional arguments, so clap will reject those extra args before `CliApp::hook_dispatch` runs. That makes normal guarded git operations fail even when `SOTP_GUARDED_GIT` is set; the dispatch command needs to accept and ignore or forward trailing git-hook args while preserving the existing Claude-envelope behavior for the other hooks.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/hook.rs",
-              "line": 49,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
-          "at": "2026-06-11T18:09:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The dispatch CLI now changes security-critical public parsing behavior by accepting trailing positional args for git hooks and rejecting them for Claude-envelope hooks, but this scope adds no CLI-level tests for either path. The briefing specifically depends on git hooks being reachable without a Claude JSON envelope while existing Claude hooks still fail closed; without a regression test around this clap boundary, a future parse or dispatch change could break the git shims or weaken the existing hook behavior without being caught. Add happy-path tests for `git-ref-update`/`git-pre-push` with positional args and an error-case test that extra args on non-git hooks return exit 2.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/hook.rs",
-              "line": 60,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:26156ae2ce16bdee659229429c994c1cb8e056ee022c2f9f80a2ae2b3bc75c93",
-          "at": "2026-06-11T18:15:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `git-pre-push` CLI dispatch path only has an allow-case integration test with `SOTP_GUARDED_GIT` set. Because this hook is security-critical and must block direct pushes when the guarded token is absent, add the missing error-case test for `sotp hook dispatch git-pre-push ...` without the token returning exit 2.",
-              "severity": "P1",
-              "file": "apps/cli/tests/hook_dispatch.rs",
-              "line": 73,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:22d1581fb17d3afbec62841771c8c44409bad2c6aba31f5937122fe8a3c7d6ef",
-          "at": "2026-06-11T18:21:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
-          "at": "2026-06-11T18:24:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
-          "at": "2026-06-11T18:27:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new CLI integration coverage only exercises the git process hooks. It does not cover the briefing's required invariant that existing Claude-envelope hooks still fail closed on bad stdin after adding the no-envelope git path. Please add CLI-level tests for `block-direct-git-ops` and `block-test-file-deletion` with empty or malformed stdin asserting exit code 2, so a future regression cannot accidentally route those hooks through the git no-envelope path while this suite still passes.",
-              "severity": "P1",
-              "file": "apps/cli/tests/hook_dispatch.rs",
-              "line": 26,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e9679ad779709e995f47bd5ea54f7311fa920537e137df559551296948eb8e50",
-          "at": "2026-06-11T18:38:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:58197fc5e01d7287c0b24d65ac728368925016e8148c5db435a0adf744f9c655",
-          "at": "2026-06-11T18:41:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c94f26a8830d84d89e632ca92c7f268012dcf6be52ba1ea238b19eed72302ed",
-          "at": "2026-06-11T18:49:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: This adds a new public `verify hooks-path` subcommand and dispatch arm, but there is no matching parser/dispatch coverage in the verify test suite. The existing `verify_tests.rs` file exercises the other `VerifyCommand` variants; without success/failure tests for `HooksPath`, a clap rename or dispatch regression here could ship unnoticed. See [apps/cli/src/commands/verify.rs:45](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L45) and [apps/cli/src/commands/verify.rs:157](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L157).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs",
-              "line": 45,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
-          "at": "2026-06-11T23:39:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "New public `verify hooks-path` CLI surface is added without CLI-layer parser/dispatch coverage. The existing composition tests cover `CliApp::verify_hooks_path`, but nothing in this scope proves clap parses `verify hooks-path` into `VerifyCommand::HooksPath` or guards the dispatch arm against future miswiring, which is a P1 test gap for a new public subcommand.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/verify.rs",
-              "line": 46,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
-          "at": "2026-06-11T23:42:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bbf15221fcbd20f9fb5b4bd440986ac8bc5e41a2649c4861b88d3fd437743ee6",
-          "at": "2026-06-11T23:45:29Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T06:27:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T06:29:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
-          "at": "2026-06-11T16:22:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
-          "at": "2026-06-11T16:24:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
-          "at": "2026-06-11T23:38:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
-          "at": "2026-06-11T23:40:28Z"
+          "hash": "rvw1:sha256:c74550b0605437051814f16541c49c47cf68a7a975bd2c5c615a16c71ea805d0",
+          "at": "2026-06-12T00:20:23Z"
         }
       ]
     },
@@ -1690,6 +1446,325 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:27:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:29:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:22:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:24:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
+          "at": "2026-06-11T23:38:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
+          "at": "2026-06-11T23:40:28Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`argv_contains_guarded_token` only blocks tokens that are exactly `SOTP_GUARDED_GIT`. A quote-split assignment like `SOTP_GUARDED_GI\"T\"=1` is tokenized to `SOTP_GUARDED_GIT=1`, then falls through `skip_var_assignments` and is allowed, so the D3 quote-splitting bypass is still open. The added tests only cover the bare token and an unrelated partial-token allow case; add a regression for the quoted-assignment form and broaden the predicate so that the guarded token cannot be reintroduced as an assignment token.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 543,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:950e2f404da1efa751e3dc0aa1022c11e749ed320d1d5b39ee7ff9479e8497c1",
+          "at": "2026-06-11T01:53:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
+          "at": "2026-06-11T01:58:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
+          "at": "2026-06-11T02:00:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
+          "at": "2026-06-11T17:38:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
+          "at": "2026-06-11T17:41:39Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
+          "at": "2026-06-11T18:07:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Dispatch` still accepts only the hook enum, but the new git hook shims are intended to invoke `bin/sotp hook dispatch git-ref-update \"$@\"` / `git-pre-push \"$@\"`. Real `reference-transaction` and `pre-push` hooks supply positional arguments, so clap will reject those extra args before `CliApp::hook_dispatch` runs. That makes normal guarded git operations fail even when `SOTP_GUARDED_GIT` is set; the dispatch command needs to accept and ignore or forward trailing git-hook args while preserving the existing Claude-envelope behavior for the other hooks.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 49,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
+          "at": "2026-06-11T18:09:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The dispatch CLI now changes security-critical public parsing behavior by accepting trailing positional args for git hooks and rejecting them for Claude-envelope hooks, but this scope adds no CLI-level tests for either path. The briefing specifically depends on git hooks being reachable without a Claude JSON envelope while existing Claude hooks still fail closed; without a regression test around this clap boundary, a future parse or dispatch change could break the git shims or weaken the existing hook behavior without being caught. Add happy-path tests for `git-ref-update`/`git-pre-push` with positional args and an error-case test that extra args on non-git hooks return exit 2.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 60,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:26156ae2ce16bdee659229429c994c1cb8e056ee022c2f9f80a2ae2b3bc75c93",
+          "at": "2026-06-11T18:15:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `git-pre-push` CLI dispatch path only has an allow-case integration test with `SOTP_GUARDED_GIT` set. Because this hook is security-critical and must block direct pushes when the guarded token is absent, add the missing error-case test for `sotp hook dispatch git-pre-push ...` without the token returning exit 2.",
+              "severity": "P1",
+              "file": "apps/cli/tests/hook_dispatch.rs",
+              "line": 73,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:22d1581fb17d3afbec62841771c8c44409bad2c6aba31f5937122fe8a3c7d6ef",
+          "at": "2026-06-11T18:21:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
+          "at": "2026-06-11T18:24:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
+          "at": "2026-06-11T18:27:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI integration coverage only exercises the git process hooks. It does not cover the briefing's required invariant that existing Claude-envelope hooks still fail closed on bad stdin after adding the no-envelope git path. Please add CLI-level tests for `block-direct-git-ops` and `block-test-file-deletion` with empty or malformed stdin asserting exit code 2, so a future regression cannot accidentally route those hooks through the git no-envelope path while this suite still passes.",
+              "severity": "P1",
+              "file": "apps/cli/tests/hook_dispatch.rs",
+              "line": 26,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e9679ad779709e995f47bd5ea54f7311fa920537e137df559551296948eb8e50",
+          "at": "2026-06-11T18:38:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58197fc5e01d7287c0b24d65ac728368925016e8148c5db435a0adf744f9c655",
+          "at": "2026-06-11T18:41:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c94f26a8830d84d89e632ca92c7f268012dcf6be52ba1ea238b19eed72302ed",
+          "at": "2026-06-11T18:49:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: This adds a new public `verify hooks-path` subcommand and dispatch arm, but there is no matching parser/dispatch coverage in the verify test suite. The existing `verify_tests.rs` file exercises the other `VerifyCommand` variants; without success/failure tests for `HooksPath`, a clap rename or dispatch regression here could ship unnoticed. See [apps/cli/src/commands/verify.rs:45](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L45) and [apps/cli/src/commands/verify.rs:157](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L157).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs",
+              "line": 45,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
+          "at": "2026-06-11T23:39:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "New public `verify hooks-path` CLI surface is added without CLI-layer parser/dispatch coverage. The existing composition tests cover `CliApp::verify_hooks_path`, but nothing in this scope proves clap parses `verify hooks-path` into `VerifyCommand::HooksPath` or guards the dispatch arm against future miswiring, which is a P1 test gap for a new public subcommand.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 46,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
+          "at": "2026-06-11T23:42:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbf15221fcbd20f9fb5b4bd440986ac8bc5e41a2649c4861b88d3fd437743ee6",
+          "at": "2026-06-11T23:45:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0d3cd25c856c185d3910153a29caa98f0a309fc4b0d7f9b214aabde5afec543",
+          "at": "2026-06-12T00:19:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0d3cd25c856c185d3910153a29caa98f0a309fc4b0d7f9b214aabde5afec543",
+          "at": "2026-06-12T00:21:23Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:39:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:42:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
+          "at": "2026-06-11T19:04:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
+          "at": "2026-06-11T19:06:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Add coverage for the `Err(e)` path in `verify`. The current tests exercise the pass case plus two config-state failures, but they never force `Command::new(\"git\").output()` to fail. A missing `git` binary or PATH failure would therefore bypass unit coverage on this new public API.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/hooks_path.rs",
+              "line": 17,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:4e8172d33b7e473ccb7eba904b38d555bd9747b250e0489b7b4af846554dabe4",
+          "at": "2026-06-11T23:40:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
+          "at": "2026-06-11T23:43:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The verifier trims all leading/trailing whitespace from the configured hooks path before comparing it to `.githooks`. A value that Git can treat as a different path, such as a quoted `\".githooks \"` or `\" .githooks\"`, would be accepted here, so the new check can falsely pass even though hooks are not actually configured to the repository-managed directory. Strip only the command's line ending before the exact comparison.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/hooks_path.rs",
+              "line": 37,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
+          "at": "2026-06-11T23:45:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61c7e5703844b381e34e08b919e3a30a5bcbc4588109403b2ddc854799a2ec0",
+          "at": "2026-06-11T23:48:48Z"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -1770,53 +1845,20 @@
           "findings": [],
           "hash": "rvw1:sha256:4cbe03c8f75962081e2c007f26deea160e63e7209fb30595ec2790b90825c0f8",
           "at": "2026-06-11T23:45:41Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`argv_contains_guarded_token` only blocks tokens that are exactly `SOTP_GUARDED_GIT`. A quote-split assignment like `SOTP_GUARDED_GI\"T\"=1` is tokenized to `SOTP_GUARDED_GIT=1`, then falls through `skip_var_assignments` and is allowed, so the D3 quote-splitting bypass is still open. The added tests only cover the bare token and an unrelated partial-token allow case; add a regression for the quoted-assignment form and broaden the predicate so that the guarded token cannot be reintroduced as an assignment token.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 543,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:950e2f404da1efa751e3dc0aa1022c11e749ed320d1d5b39ee7ff9479e8497c1",
-          "at": "2026-06-11T01:53:53Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
-          "at": "2026-06-11T01:58:38Z"
+          "hash": "rvw1:sha256:4a948cbc8dbb77fb8d2707f5e35846c9a836f18c174ac9be9353026a91365639",
+          "at": "2026-06-12T00:20:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
-          "at": "2026-06-11T02:00:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
-          "at": "2026-06-11T17:38:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
-          "at": "2026-06-11T17:41:39Z"
+          "hash": "rvw1:sha256:4a948cbc8dbb77fb8d2707f5e35846c9a836f18c174ac9be9353026a91365639",
+          "at": "2026-06-12T00:23:11Z"
         }
       ]
     }
