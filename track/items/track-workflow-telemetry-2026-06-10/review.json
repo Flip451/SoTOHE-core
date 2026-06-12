@@ -30,306 +30,20 @@
           "findings": [],
           "hash": "rvw1:sha256:089ce2a84fbbf95f031e4773fbf584fa6ff94cca61ec1e1f38f428e0181fdeeb",
           "at": "2026-06-11T13:17:06Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0af5e58601d0189697c8f1d54823d96cb2e179e4f645910b3d4600360d27a05e",
-          "at": "2026-06-10T13:45:46Z"
+          "hash": "rvw1:sha256:f4e1bd1de8c44f178ff37633f1616c42cfca1939b553504c972f6c62796ad761",
+          "at": "2026-06-12T00:18:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0af5e58601d0189697c8f1d54823d96cb2e179e4f645910b3d4600360d27a05e",
-          "at": "2026-06-10T13:47:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
-          "at": "2026-06-10T14:48:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
-          "at": "2026-06-10T14:51:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:298a274d3590653946a5ccbbbf50a9548a10e99699dc0d3d1b4d79d45a8e7d74",
-          "at": "2026-06-10T16:02:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:298a274d3590653946a5ccbbbf50a9548a10e99699dc0d3d1b4d79d45a8e7d74",
-          "at": "2026-06-10T16:05:40Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
-          "at": "2026-06-10T16:04:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
-          "at": "2026-06-10T16:08:24Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
-          "at": "2026-06-10T14:13:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new DTO tests only cover successful serialization/round-trips. The briefing explicitly asks for error-case coverage, and the later report path relies on `serde_json::from_str::<TelemetryEvent>` rejecting malformed rows, unknown `event_type` values, or rows missing required fields such as `schema_version`. Add at least one negative deserialization test so the tagged JSONL contract is guarded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/mod.rs",
-              "line": 184,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
-          "at": "2026-06-10T14:17:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec5de587869142997f00ac11b04f9a447dd87cf5bebe94e959a7bcc94e38c527",
-          "at": "2026-06-10T14:21:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryWriter::new` trusts the raw `track_id` string and joins it directly into `items_dir`, so a value containing path separators or `..` can escape `track/items` and write telemetry outside the intended workspace. This constructor should take a validated track-id type or reject non-slug input before building the path.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/writer.rs",
-              "line": 97,
-              "category": "Security"
-            },
-            {
-              "message": "The 4096-byte guard only checks the pre-truncation serialization result, then returns `line2` without verifying that the truncated JSON still fits. A long `track_id`/`command`, or JSON escaping that expands the encoded output, can still produce an oversized row while `write()` returns `Ok(())`. Recheck the second serialization length and fail if it still exceeds the cap.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/writer.rs",
-              "line": 185,
-              "category": "Correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e5e69793169aa8faee8a20dd15a718611fbccfa5d37179dbae781c9e9188e71c",
-          "at": "2026-06-10T14:53:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`safe_path_component` does not actually reduce `track_id` to a single path component: it keeps every normal component and rejoins them with `/`. A `track_id` like `foo/bar` will therefore write to `items_dir/foo/bar/logs/telemetry.jsonl` instead of the intended single-track directory, which can make later report/archive code miss the file.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
-              "line": 238,
-              "category": "correctness"
-            },
-            {
-              "message": "The oversized-line fallback truncates raw bytes and appends `\\n`. If the event contains multibyte UTF-8 or JSON escape sequences, this can emit invalid UTF-8/JSONL, so downstream readers that use text parsing will fail on the whole file instead of just skipping the oversized row.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
-              "line": 212,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4dc59c26e108c84dca04c4921fee6b693d3e50fd09bca7d0f4ef6e510e44f125",
-          "at": "2026-06-10T15:02:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryWriter::new` silently rewrites invalid `track_id` strings by taking the last normal path segment (or `unknown`). If a path-like or otherwise invalid ID reaches this constructor, distinct logical tracks can be merged into the same `telemetry.jsonl` instead of failing fast, which is a data-corruption risk.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
-              "line": 93,
-              "category": "correctness"
-            },
-            {
-              "message": "`SOTP_TELEMETRY_DIR` is read with `std::env::var`, so a valid non-UTF8 filesystem path is treated as absent. On Unix this silently falls back to the default track directory and makes the override knob unreliable for a real path value.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/config.rs",
-              "line": 40,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
-          "at": "2026-06-10T15:17:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
-          "at": "2026-06-10T15:19:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
-          "at": "2026-06-10T15:24:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
-          "at": "2026-06-11T02:39:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
-          "at": "2026-06-11T02:41:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "New public `RoundType::from_str` has no unit tests covering either the valid `fast`/`final` parses or the unknown-value error path, so a regression in the canonical round-type parser could ship unnoticed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 53,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:02bb83f3b4d845d37a85ee79a528d1bbbcc9afd198d14782952c5c19210146bf",
-          "at": "2026-06-11T03:35:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
-          "at": "2026-06-11T03:38:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
-          "at": "2026-06-11T03:42:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Empty/whitespace-only lines are dropped before parsing, so they are neither counted nor reported in `skipped_lines`. That violates the fail-open contract for invalid JSON lines: a blank line is malformed JSON and should be skipped and counted rather than silently ignored. The accompanying test also codifies the undercounting behavior.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/report.rs",
-              "line": 206,
-              "category": "spec mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:2549660a63fd9fb7417071d4aad698a4a9453dd1144c0844050125b9a484a0c5",
-          "at": "2026-06-11T13:56:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`aggregate` accepts a raw `&str` and joins it directly onto `items_dir` without validating it as a `TrackId`. A caller can pass `../...` segments and make the reader walk outside `track/items/<id>`, which violates the domain validation rule and creates a path-traversal read risk. Validate with `domain::TrackId::try_new` (or take `TrackId`) before building the path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
-              "line": 166,
-              "category": "security"
-            },
-            {
-              "message": "The `exists()` pre-checks collapse filesystem errors into absence: `Path::exists()` returns `false` for inaccessible paths, so a permission/metadata failure on the track directory is misreported as `TrackNotFound`, and the same problem on `telemetry.jsonl` returns an empty report instead of `Io`. That silently swallows real I/O failures. Distinguish `NotFound` from other errors via `metadata`/`open` error handling instead of using `exists()` as the gate.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
-              "line": 170,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:5fb8a1a6e06200e388aea5df9c41aa7da75dc1a5bbb32b6d5a12cfe6dc35554e",
-          "at": "2026-06-11T14:01:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
-          "at": "2026-06-11T14:09:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`reader.lines()` decodes each line as UTF-8 before the JSON parser sees it, and any decode failure is returned as `TelemetryReportError::Io`. That breaks the required fail-open reader behavior for invalid JSON lines: a single corrupted/non-UTF-8 JSONL line will fail the whole report instead of incrementing `skipped_lines` and continuing. Read raw lines with `read_until(b'\\n')`/`serde_json::from_slice` or otherwise treat UTF-8/JSON parse failures as skipped lines.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/telemetry/report.rs",
-              "line": 222,
-              "category": "fail_open"
-            }
-          ],
-          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
-          "at": "2026-06-11T14:13:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9dcc71e2d83c3d61a49a5c7fa5b9fdf608c59a1f2f870806936991b3077ec95f",
-          "at": "2026-06-11T14:18:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
-          "at": "2026-06-11T14:39:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
-          "at": "2026-06-11T14:43:24Z"
+          "hash": "rvw1:sha256:f4e1bd1de8c44f178ff37633f1616c42cfca1939b553504c972f6c62796ad761",
+          "at": "2026-06-12T00:20:11Z"
         }
       ]
     },
@@ -868,6 +582,50 @@
           "findings": [],
           "hash": "rvw1:sha256:05f5494aca82b63e661be79d252fa459e845d49786d6bca030fe2a4198a9a18c",
           "at": "2026-06-11T17:43:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1678363509fdd8e26120abc0bbd3a6c64ad734d63c2dfed59ae3ec586362b724",
+          "at": "2026-06-11T23:49:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/adr/README.md` still has unresolved merge stages in the index (`git status` reports `UU` and `git ls-files -u` lists stages 1/2/3). The worktree text contains both ADR rows in the intended order, but the conflict is not actually resolved for the merge, so the merge-preparation artifacts cannot be committed until this file is staged as resolved.",
+              "severity": "P1",
+              "file": "knowledge/adr/README.md",
+              "line": 129,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1678363509fdd8e26120abc0bbd3a6c64ad734d63c2dfed59ae3ec586362b724",
+          "at": "2026-06-11T23:51:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The README conflict resolution has not actually been recorded in the index: `git ls-files -u -- knowledge/adr/README.md` still shows stages 1/2/3 and `git diff --cached` reports `Unmerged path knowledge/adr/README.md`. Even though the working tree contains both ADR rows, the merge commit cannot be completed until this path is staged as resolved.",
+              "severity": "P1",
+              "file": "knowledge/adr/README.md",
+              "line": 130,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1678363509fdd8e26120abc0bbd3a6c64ad734d63c2dfed59ae3ec586362b724",
+          "at": "2026-06-11T23:55:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1678363509fdd8e26120abc0bbd3a6c64ad734d63c2dfed59ae3ec586362b724",
+          "at": "2026-06-11T23:59:13Z"
         }
       ]
     },
@@ -1540,6 +1298,20 @@
           "findings": [],
           "hash": "rvw1:sha256:566063b44e89bf104eb3d18ee0455c58fba48d2e943e3e6cf2cfe2e348f0e2b2",
           "at": "2026-06-11T16:30:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fc06e78bb71454a8a5186096ddfaec1bbe68c1708f7c2e031af4c4d71e16a4e",
+          "at": "2026-06-12T00:01:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fc06e78bb71454a8a5186096ddfaec1bbe68c1708f7c2e031af4c4d71e16a4e",
+          "at": "2026-06-12T00:03:11Z"
         }
       ]
     },
@@ -2374,6 +2146,334 @@
           "findings": [],
           "hash": "rvw1:sha256:fa32356f0a3e61841ef79d61727dfdac83e09a9b8c6b188d4e33a43a41e4254a",
           "at": "2026-06-11T17:34:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d29e624f0fd981bc41f02743974aeef4ecbcc7a78386db4dfaf18166107031d0",
+          "at": "2026-06-12T00:05:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d29e624f0fd981bc41f02743974aeef4ecbcc7a78386db4dfaf18166107031d0",
+          "at": "2026-06-12T00:08:15Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
+          "at": "2026-06-10T16:04:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:947a35d818334e3ff0d9d0ca80c4576ca03324e5bd425db9102d0886ec0c9869",
+          "at": "2026-06-10T16:08:24Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0af5e58601d0189697c8f1d54823d96cb2e179e4f645910b3d4600360d27a05e",
+          "at": "2026-06-10T13:45:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0af5e58601d0189697c8f1d54823d96cb2e179e4f645910b3d4600360d27a05e",
+          "at": "2026-06-10T13:47:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
+          "at": "2026-06-10T14:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
+          "at": "2026-06-10T14:51:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:298a274d3590653946a5ccbbbf50a9548a10e99699dc0d3d1b4d79d45a8e7d74",
+          "at": "2026-06-10T16:02:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:298a274d3590653946a5ccbbbf50a9548a10e99699dc0d3d1b4d79d45a8e7d74",
+          "at": "2026-06-10T16:05:40Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
+          "at": "2026-06-10T14:13:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new DTO tests only cover successful serialization/round-trips. The briefing explicitly asks for error-case coverage, and the later report path relies on `serde_json::from_str::<TelemetryEvent>` rejecting malformed rows, unknown `event_type` values, or rows missing required fields such as `schema_version`. Add at least one negative deserialization test so the tagged JSONL contract is guarded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/mod.rs",
+              "line": 184,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
+          "at": "2026-06-10T14:17:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec5de587869142997f00ac11b04f9a447dd87cf5bebe94e959a7bcc94e38c527",
+          "at": "2026-06-10T14:21:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter::new` trusts the raw `track_id` string and joins it directly into `items_dir`, so a value containing path separators or `..` can escape `track/items` and write telemetry outside the intended workspace. This constructor should take a validated track-id type or reject non-slug input before building the path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 97,
+              "category": "Security"
+            },
+            {
+              "message": "The 4096-byte guard only checks the pre-truncation serialization result, then returns `line2` without verifying that the truncated JSON still fits. A long `track_id`/`command`, or JSON escaping that expands the encoded output, can still produce an oversized row while `write()` returns `Ok(())`. Recheck the second serialization length and fail if it still exceeds the cap.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 185,
+              "category": "Correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e5e69793169aa8faee8a20dd15a718611fbccfa5d37179dbae781c9e9188e71c",
+          "at": "2026-06-10T14:53:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`safe_path_component` does not actually reduce `track_id` to a single path component: it keeps every normal component and rejoins them with `/`. A `track_id` like `foo/bar` will therefore write to `items_dir/foo/bar/logs/telemetry.jsonl` instead of the intended single-track directory, which can make later report/archive code miss the file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 238,
+              "category": "correctness"
+            },
+            {
+              "message": "The oversized-line fallback truncates raw bytes and appends `\\n`. If the event contains multibyte UTF-8 or JSON escape sequences, this can emit invalid UTF-8/JSONL, so downstream readers that use text parsing will fail on the whole file instead of just skipping the oversized row.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 212,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4dc59c26e108c84dca04c4921fee6b693d3e50fd09bca7d0f4ef6e510e44f125",
+          "at": "2026-06-10T15:02:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter::new` silently rewrites invalid `track_id` strings by taking the last normal path segment (or `unknown`). If a path-like or otherwise invalid ID reaches this constructor, distinct logical tracks can be merged into the same `telemetry.jsonl` instead of failing fast, which is a data-corruption risk.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 93,
+              "category": "correctness"
+            },
+            {
+              "message": "`SOTP_TELEMETRY_DIR` is read with `std::env::var`, so a valid non-UTF8 filesystem path is treated as absent. On Unix this silently falls back to the default track directory and makes the override knob unreliable for a real path value.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/config.rs",
+              "line": 40,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:17:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:19:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:24:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
+          "at": "2026-06-11T02:39:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5106b9eec91f3e69801d05cd42fe0a6abd9d7c900ddc2f4a9a067d941ab63722",
+          "at": "2026-06-11T02:41:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "New public `RoundType::from_str` has no unit tests covering either the valid `fast`/`final` parses or the unknown-value error path, so a regression in the canonical round-type parser could ship unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 53,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:02bb83f3b4d845d37a85ee79a528d1bbbcc9afd198d14782952c5c19210146bf",
+          "at": "2026-06-11T03:35:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
+          "at": "2026-06-11T03:38:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9defc5f62c234a5478a78a8e2b4c8f5038ef060fe01716c2e564d198260cdad2",
+          "at": "2026-06-11T03:42:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Empty/whitespace-only lines are dropped before parsing, so they are neither counted nor reported in `skipped_lines`. That violates the fail-open contract for invalid JSON lines: a blank line is malformed JSON and should be skipped and counted rather than silently ignored. The accompanying test also codifies the undercounting behavior.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 206,
+              "category": "spec mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2549660a63fd9fb7417071d4aad698a4a9453dd1144c0844050125b9a484a0c5",
+          "at": "2026-06-11T13:56:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`aggregate` accepts a raw `&str` and joins it directly onto `items_dir` without validating it as a `TrackId`. A caller can pass `../...` segments and make the reader walk outside `track/items/<id>`, which violates the domain validation rule and creates a path-traversal read risk. Validate with `domain::TrackId::try_new` (or take `TrackId`) before building the path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
+              "line": 166,
+              "category": "security"
+            },
+            {
+              "message": "The `exists()` pre-checks collapse filesystem errors into absence: `Path::exists()` returns `false` for inaccessible paths, so a permission/metadata failure on the track directory is misreported as `TrackNotFound`, and the same problem on `telemetry.jsonl` returns an empty report instead of `Io`. That silently swallows real I/O failures. Distinguish `NotFound` from other errors via `metadata`/`open` error handling instead of using `exists()` as the gate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/report.rs",
+              "line": 170,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5fb8a1a6e06200e388aea5df9c41aa7da75dc1a5bbb32b6d5a12cfe6dc35554e",
+          "at": "2026-06-11T14:01:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
+          "at": "2026-06-11T14:09:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reader.lines()` decodes each line as UTF-8 before the JSON parser sees it, and any decode failure is returned as `TelemetryReportError::Io`. That breaks the required fail-open reader behavior for invalid JSON lines: a single corrupted/non-UTF-8 JSONL line will fail the whole report instead of incrementing `skipped_lines` and continuing. Read raw lines with `read_until(b'\\n')`/`serde_json::from_slice` or otherwise treat UTF-8/JSON parse failures as skipped lines.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 222,
+              "category": "fail_open"
+            }
+          ],
+          "hash": "rvw1:sha256:d81bdb3183cf6b551c065fec9a758fcbfa50d39c00c19b4ec38c10f49ef6cb60",
+          "at": "2026-06-11T14:13:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dcc71e2d83c3d61a49a5c7fa5b9fdf608c59a1f2f870806936991b3077ec95f",
+          "at": "2026-06-11T14:18:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
+          "at": "2026-06-11T14:39:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:656a58274db9bc61ef38a6accab70f8abf49b69d07529384fcb1a4e3bfd31c6b",
+          "at": "2026-06-11T14:43:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61afd416f86824b4a79b564cf28a737ee3dbbab5ecd53886b9b235570ec11f67",
+          "at": "2026-06-12T00:13:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61afd416f86824b4a79b564cf28a737ee3dbbab5ecd53886b9b235570ec11f67",
+          "at": "2026-06-12T00:15:35Z"
         }
       ]
     }

@@ -7,11 +7,6 @@ use crate::{CliApp, CommandOutcome};
 pub struct RefVerifyRunInput {
     pub track_id: String,
     pub items_dir: PathBuf,
-    /// Firing-surface context name from the CLI (`spec-design` / `type-design`
-    /// / `commit-gate` / `standalone`).
-    pub context: String,
-    /// Target layer id, required when `context == "type-design"`.
-    pub layer: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -90,34 +85,6 @@ fn current_git_branch(project_root: &Path) -> Result<String, String> {
         .ok_or_else(|| "cannot read current branch: HEAD is detached".to_owned())
 }
 
-/// Convert the CLI firing-surface arguments into the typed invocation context.
-///
-/// This is the only translation cli-composition performs — the Chain1 / Chain2
-/// / All decision itself belongs to `RefVerifyScopeResolver` (IN-12).
-fn invocation_context_from_cli(
-    context: &str,
-    layer: Option<&str>,
-) -> Result<infrastructure::ref_verify::RefVerifyInvocationContext, String> {
-    use infrastructure::ref_verify::RefVerifyInvocationContext;
-    match context {
-        "spec-design" => Ok(RefVerifyInvocationContext::SpecDesign),
-        "type-design" => {
-            let layer = layer.ok_or_else(|| {
-                "--layer is required when --context type-design is given".to_owned()
-            })?;
-            let layer = domain::tddd::LayerId::try_new(layer.to_owned())
-                .map_err(|e| format!("invalid --layer: {e}"))?;
-            Ok(RefVerifyInvocationContext::TypeDesign { layer })
-        }
-        "commit-gate" => Ok(RefVerifyInvocationContext::CommitGate),
-        "standalone" => Ok(RefVerifyInvocationContext::Standalone),
-        other => Err(format!(
-            "invalid --context '{other}': expected one of spec-design, type-design, \
-             commit-gate, standalone"
-        )),
-    }
-}
-
 impl CliApp {
     pub fn ref_verify_run(&self, input: RefVerifyRunInput) -> Result<CommandOutcome, String> {
         use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles};
@@ -127,23 +94,17 @@ impl CliApp {
         };
         use usecase::ref_verify::{RefVerifyApplicationService as _, VerifySemanticRefsInteractor};
 
-        // Validate context/layer first so missing --layer or invalid --context
-        // errors are surfaced before any git-repo access (which would produce a
-        // confusing git error from a temp directory instead of the real diagnostic).
-        let invocation_context =
-            invocation_context_from_cli(&input.context, input.layer.as_deref())?;
-
         let RefVerifyCommandContext { canonical_root, track_id } =
             resolve_ref_verify_context(&input.items_dir, &input.track_id)?;
 
         let current_branch = current_git_branch(&canonical_root)?;
 
-        // Typed context-sensitive scope resolution (IN-12): cli-composition
-        // only translates CLI arguments into the invocation context; the
-        // Chain1 / Chain2 / All decision lives in RefVerifyScopeResolver.
+        // Existence-based scope resolution (IN-01): the Chain1 / Chain2 / All
+        // pair-set derivation follows from which track artifacts exist on
+        // disk; cli-composition performs no firing-surface translation.
         let resolver = RefVerifyScopeResolver::new(canonical_root.clone());
         let scope = resolver
-            .resolve(track_id.as_ref(), &invocation_context)
+            .resolve(track_id.as_ref())
             .map_err(|e| format!("ref-verify scope resolution failed: {e}"))?;
 
         let config = load_ref_verify_config(&canonical_root)?;
@@ -212,14 +173,11 @@ impl CliApp {
         let RefVerifyCommandContext { canonical_root, track_id } =
             resolve_ref_verify_context(&input.items_dir, &input.track_id)?;
 
-        // check-approved is the commit gate's read-only verification surface,
-        // so it always resolves under the CommitGate context (All scope).
+        // check-approved is the commit gate's read-only verification surface;
+        // the scope derives from artifact existence like every other run.
         let resolver = RefVerifyScopeResolver::new(canonical_root.clone());
         let scope = resolver
-            .resolve(
-                track_id.as_ref(),
-                &infrastructure::ref_verify::RefVerifyInvocationContext::CommitGate,
-            )
+            .resolve(track_id.as_ref())
             .map_err(|e| format!("ref-verify scope resolution failed: {e}"))?;
 
         let current_branch = current_git_branch(&canonical_root)?;
@@ -543,12 +501,7 @@ mod tests {
 
         with_fake_track_branch_and_path(project_root, track_id, &fake_claude_dir, || {
             CliApp::new()
-                .ref_verify_run(RefVerifyRunInput {
-                    track_id: track_id.to_owned(),
-                    items_dir,
-                    context: "spec-design".to_owned(),
-                    layer: None,
-                })
+                .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
                 .unwrap()
         })
     }
@@ -791,7 +744,7 @@ exit 64
         assert_eq!(outcome.exit_code, 0, "expected approved outcome: {outcome:?}");
     }
 
-    /// Discriminates `CommitGate` → `All` scope resolution in `ref_verify_check_approved`.
+    /// Discriminates the All-scope pair set in `ref_verify_check_approved`.
     ///
     /// Setup: Chain-1 fixture + Chain-2 TDDD layer (`test-domain`).  Only the
     /// Chain-1 Pass cache is written; the Chain-2 cache (`test-domain-catalogue-
@@ -800,7 +753,7 @@ exit 64
     /// Expected: `ref_verify_check_approved` exits 1 with a "no Pass cache entry"
     /// message for the Chain-2 pair.
     ///
-    /// If `CommitGate` wrongly resolved to `Chain1` (not `All`), only Chain-1 pairs
+    /// If the existence-based resolution wrongly derived a Chain1-only pair set, only Chain-1 pairs
     /// would be loaded, the Chain-2 pair would never appear, and the function would
     /// exit 0 — causing this test to fail and revealing the regression.
     #[cfg(unix)]
@@ -946,189 +899,19 @@ exit 64
         assert!(err.contains("track is not active"), "expected active-track error, got: {err}");
     }
 
-    // ── invocation_context_from_cli: type-design branch ─────────────────────
+    // ── ref_verify_run: fail-closed artifact-state cases ────────────────────
 
-    #[test]
-    fn test_invocation_context_from_cli_type_design_with_layer_returns_type_design_context() {
-        use infrastructure::ref_verify::RefVerifyInvocationContext;
-
-        let result = super::invocation_context_from_cli("type-design", Some("domain"));
-        match result.unwrap() {
-            RefVerifyInvocationContext::TypeDesign { layer } => {
-                assert_eq!(layer.as_ref(), "domain", "layer must be forwarded verbatim");
-            }
-            other => panic!("expected TypeDesign context, got: {other:?}"),
-        }
-    }
-
-    #[test]
-    fn test_invocation_context_from_cli_type_design_without_layer_returns_error() {
-        let result = super::invocation_context_from_cli("type-design", None);
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("--layer is required"),
-            "missing --layer must produce explicit error, got: {msg}"
-        );
-    }
-
-    #[test]
-    fn test_invocation_context_from_cli_type_design_invalid_layer_returns_error() {
-        let result = super::invocation_context_from_cli("type-design", Some("invalid layer id!"));
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("invalid --layer"),
-            "invalid layer id must produce explicit error, got: {msg}"
-        );
-    }
-
-    #[test]
-    fn test_invocation_context_from_cli_spec_design_returns_spec_design_context() {
-        use infrastructure::ref_verify::RefVerifyInvocationContext;
-
-        let result = super::invocation_context_from_cli("spec-design", None).unwrap();
-        assert!(
-            matches!(result, RefVerifyInvocationContext::SpecDesign),
-            "spec-design must map to SpecDesign context, got: {result:?}"
-        );
-    }
-
-    #[test]
-    fn test_invocation_context_from_cli_commit_gate_returns_commit_gate_context() {
-        use infrastructure::ref_verify::RefVerifyInvocationContext;
-
-        let result = super::invocation_context_from_cli("commit-gate", None).unwrap();
-        assert!(
-            matches!(result, RefVerifyInvocationContext::CommitGate),
-            "commit-gate must map to CommitGate context, got: {result:?}"
-        );
-    }
-
-    #[test]
-    fn test_invocation_context_from_cli_standalone_returns_standalone_context() {
-        use infrastructure::ref_verify::RefVerifyInvocationContext;
-
-        let result = super::invocation_context_from_cli("standalone", None).unwrap();
-        assert!(
-            matches!(result, RefVerifyInvocationContext::Standalone),
-            "standalone must map to Standalone context, got: {result:?}"
-        );
-    }
-
-    #[test]
-    fn test_invocation_context_from_cli_unknown_context_returns_error() {
-        let result = super::invocation_context_from_cli("unknown-context", None);
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("invalid --context"),
-            "unknown context must produce explicit error, got: {msg}"
-        );
-    }
-
-    // ── ref_verify_run: type-design layer forwarding ────────────────────────
-
-    /// Verifies that `ref_verify_run` surfaces the "--layer is required" error
-    /// through the public API when `context == "type-design"` and `layer` is
-    /// `None`.  This is an end-to-end wiring test: it exercises the path from
-    /// `RefVerifyRunInput` through `invocation_context_from_cli` and confirms
-    /// the error is not swallowed before reaching the caller.
-    #[test]
-    fn test_ref_verify_run_type_design_without_layer_surfaces_layer_required_error() {
-        let (_tmp, items_dir) = temp_project_with_items_dir();
-        let result = CliApp::new().ref_verify_run(RefVerifyRunInput {
-            track_id: "my-track".to_owned(),
-            items_dir,
-            context: "type-design".to_owned(),
-            layer: None,
-        });
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("--layer is required"),
-            "missing --layer must surface through ref_verify_run, got: {msg}"
-        );
-    }
-
-    /// Verifies that `ref_verify_run` surfaces the "invalid --layer" error
-    /// through the public API when `context == "type-design"` and `layer` is
-    /// set to a syntactically invalid value.
-    #[test]
-    fn test_ref_verify_run_type_design_invalid_layer_surfaces_invalid_layer_error() {
-        let (_tmp, items_dir) = temp_project_with_items_dir();
-        let result = CliApp::new().ref_verify_run(RefVerifyRunInput {
-            track_id: "my-track".to_owned(),
-            items_dir,
-            context: "type-design".to_owned(),
-            layer: Some("invalid layer id!".to_owned()),
-        });
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("invalid --layer"),
-            "invalid layer id must surface through ref_verify_run, got: {msg}"
-        );
-    }
-
-    /// Verifies that `ref_verify_run` forwards a syntactically valid layer to
-    /// `RefVerifyScopeResolver`.  When the layer id is valid but the project
-    /// tree has no matching catalogue, the scope resolver rejects it — proving
-    /// that the layer reached the resolver rather than being silently dropped.
-    ///
-    /// The git branch is faked so the test does not depend on the actual working
-    /// tree state: `invocation_context_from_cli` validation completes first
-    /// (verifying no context-translation error fires), then `current_git_branch`
-    /// is called, then scope resolution runs and is expected to fail.
+    /// Catalogue present + spec.json absent is a SoT Chain ordering violation
+    /// (IN-06 / AC-09): the scope resolver must fail closed and the error must
+    /// surface through the public `ref_verify_run` API.
     #[cfg(unix)]
     #[test]
-    fn test_ref_verify_run_type_design_valid_layer_is_forwarded_to_scope_resolver() {
+    fn test_ref_verify_run_catalogue_without_spec_fails_closed() {
         let (_tmp, items_dir) = temp_project_with_items_dir();
         let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
-        let track_id = "my-track";
-        // Write architecture-rules.json so scope resolver can attempt binding lookup.
-        std::fs::write(
-            project_root.join("architecture-rules.json"),
-            r#"{"layers":[{"crate":"placeholder-no-domain"}]}"#,
-        )
-        .unwrap();
-        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+        let track_id = "test-ref-verify-catalogue-without-spec";
 
-        let result = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_run(RefVerifyRunInput {
-                track_id: track_id.to_owned(),
-                items_dir,
-                context: "type-design".to_owned(),
-                layer: Some("domain".to_owned()),
-            })
-        });
-        // The error must come from scope resolution (layer forwarded), not from
-        // the context-translation step (which would say "--layer is required" or
-        // "invalid --layer").
-        let msg = result.unwrap_err();
-        assert!(
-            !msg.contains("--layer is required") && !msg.contains("invalid --layer"),
-            "valid layer must pass context translation; scope resolution must fire, got: {msg}"
-        );
-        assert!(
-            msg.contains("scope resolution") || msg.contains("layer") || msg.contains("TDDD"),
-            "error must originate from scope resolution, got: {msg}"
-        );
-    }
-
-    /// End-to-end success test for `ref_verify_run` with `type-design` context:
-    /// verifies that a valid `--layer` flows through `invocation_context_from_cli`
-    /// into `RefVerifyScopeResolver` and then through the full `ref_verify_run`
-    /// execution to a successful outcome.
-    ///
-    /// Uses an empty catalogue (no spec_refs → no pairs), so the interactor
-    /// succeeds without invoking any verifier agent — no fake claude is needed.
-    /// The TDDD architecture-rules.json defines a "domain" layer binding so that
-    /// scope resolution succeeds; the empty `domain-types.json` passes the
-    /// catalogue-exists check.
-    #[cfg(unix)]
-    #[test]
-    fn test_ref_verify_run_type_design_with_empty_catalogue_succeeds() {
-        let (_tmp, items_dir) = temp_project_with_items_dir();
-        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
-        let track_id = "test-ref-verify-type-design-success";
-
-        // Write TDDD architecture-rules.json with a "domain" layer binding.
+        // TDDD layer with its catalogue present, but no spec.json.
         std::fs::write(
             project_root.join("architecture-rules.json"),
             r#"{
@@ -1141,8 +924,6 @@ exit 64
 }"#,
         )
         .unwrap();
-
-        // Write a minimal empty catalogue for the "domain" layer.
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(
@@ -1158,49 +939,99 @@ exit 64
         )
         .unwrap();
 
-        // Provide agent-profiles.json with the ref-verifier-chain2 capability.
-        write_ref_verifier_profiles(&project_root);
-
-        // Use a fake git branch so current_git_branch() returns the expected value.
-        let outcome = with_fake_track_branch(&project_root, track_id, || {
+        let result = with_fake_track_branch(&project_root, track_id, || {
             CliApp::new()
-                .ref_verify_run(RefVerifyRunInput {
-                    track_id: track_id.to_owned(),
-                    items_dir,
-                    context: "type-design".to_owned(),
-                    layer: Some("domain".to_owned()),
-                })
-                .unwrap()
+                .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
         });
-
-        assert_eq!(
-            outcome.exit_code, 0,
-            "type-design run with empty catalogue must succeed: {outcome:?}"
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("scope resolution failed"),
+            "catalogue-without-spec must fail closed in scope resolution, got: {msg}"
         );
+    }
+
+    // ── ref_verify_run ───────────────────────────────────────────────────────
+
+    /// Phase 0 end-to-end (AC-01 / AC-02): no spec.json and no catalogue exist.
+    /// The run derives zero pairs for both chains and exits 0 without invoking
+    /// any verifier agent — this is the state the commit gate hits right after
+    /// `/track:init`.
+    ///
+    /// A fake `claude` binary is placed on `PATH` so that if zero-pair detection
+    /// regresses and the test accidentally reaches the verifier, the failure is
+    /// deterministic rather than dependent on a host-installed binary.
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_run_phase0_no_artifacts_exits_zero() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-phase0";
+        write_architecture_rules_no_tddd(&project_root);
+        // ref_verify_run loads agent-profiles.json unconditionally even though
+        // a zero-pair run never invokes a verifier agent.
+        write_ref_verifier_profiles(&project_root);
+        let fake_claude_dir = write_fake_claude_into_path_dir(&project_root);
+        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+
+        let outcome =
+            with_fake_track_branch_and_path(&project_root, track_id, &fake_claude_dir, || {
+                CliApp::new()
+                    .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
+                    .unwrap()
+            });
+
+        assert_eq!(outcome.exit_code, 0, "Phase 0 run must exit zero: {outcome:?}");
         assert!(
             outcome.stdout.as_deref().is_some_and(|s| s.contains("passed")),
             "success message must contain 'passed': {outcome:?}"
         );
     }
 
-    // ── ref_verify_run ───────────────────────────────────────────────────────
-
-    /// End-to-end test for `ref_verify_run` with `standalone` context.
-    ///
-    /// `standalone` maps to `RefVerifyScope::All` via `RefVerifyScopeResolver`.
-    /// Uses `write_chain1_fixture` + `add_chain2_tddd_layer_to_fixture` to create
-    /// real Chain-1 (spec→ADR) and Chain-2 (catalogue→spec) pairs so that the test
-    /// discriminates `All` from `Chain1` scope resolution.
-    ///
-    /// Scope discrimination: after a successful run the test asserts that
-    /// `test-domain-catalogue-spec-verify-cache.json` was written to the track
-    /// directory.  That file is produced only when `enumerate_chain2_all_layers`
-    /// runs (i.e. scope == All).  If `standalone` wrongly resolved to `Chain1`, the
-    /// Chain-2 catalogue would never be loaded and no catalogue-spec cache file
-    /// would be written, causing the assertion to fail.
+    /// Phase 0 check-approved (AC-02): with zero production pairs the gate
+    /// passes without any verify-cache artifact.
     #[cfg(unix)]
     #[test]
-    fn test_ref_verify_run_standalone_all_scope_with_real_pair_exits_zero() {
+    fn test_ref_verify_check_approved_phase0_no_artifacts_exits_zero() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-check-approved-phase0";
+        write_architecture_rules_no_tddd(&project_root);
+        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            CliApp::new()
+                .ref_verify_check_approved(RefVerifyCheckApprovedInput {
+                    track_id: track_id.to_owned(),
+                    items_dir,
+                })
+                .unwrap()
+        });
+
+        assert_eq!(outcome.exit_code, 0, "Phase 0 check-approved must pass: {outcome:?}");
+        assert!(
+            outcome
+                .stdout
+                .as_deref()
+                .is_some_and(|s| s.contains("No production reference pairs found")),
+            "success message must identify the zero-pairs path: {outcome:?}"
+        );
+    }
+
+    /// End-to-end test for an All-scope `ref_verify_run` with both chains
+    /// present.
+    ///
+    /// Both spec.json and the TDDD catalogue exist, so the existence-based
+    /// resolver derives `RefVerifyScope::All`. Uses `write_chain1_fixture` +
+    /// `add_chain2_tddd_layer_to_fixture` to create real Chain-1 (spec→ADR)
+    /// and Chain-2 (catalogue→spec) pairs so that the test discriminates `All`
+    /// from a single-chain pair set.
+    ///
+    /// Scope discrimination: after a successful run the test asserts that both
+    /// per-chain verify-cache files were written; a missing file would mean one
+    /// chain's pairs were never loaded.
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_run_all_scope_with_real_pair_exits_zero() {
         let (_tmp, items_dir) = temp_project_with_items_dir();
         let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
         let track_id = "test-ref-verify-standalone-all-real";
@@ -1217,15 +1048,13 @@ exit 64
                     .ref_verify_run(RefVerifyRunInput {
                         track_id: track_id.to_owned(),
                         items_dir: items_dir.clone(),
-                        context: "standalone".to_owned(),
-                        layer: None,
                     })
                     .unwrap()
             });
 
         assert_eq!(
             outcome.exit_code, 0,
-            "standalone All-scope run with real pair and fake claude must exit zero: {outcome:?}"
+            "All-scope run with real pair and fake claude must exit zero: {outcome:?}"
         );
         assert!(
             outcome.stdout.as_deref().is_some_and(|s| s.contains("passed")),
@@ -1233,37 +1062,32 @@ exit 64
         );
 
         // Scope discrimination: the Chain-1 cache file is written only when the
-        // All-scope (or Chain1-scope) path ran `enumerate_chain1_pairs`.  If
-        // `standalone` wrongly resolved to Chain2 instead of All, the Chain-1
-        // ADR pairs would never be loaded and this file would not be written.
+        // All-scope path ran `enumerate_chain1_pairs`.  If the existence-based
+        // resolution wrongly derived a Chain2-only pair set, the Chain-1 ADR
+        // pairs would never be loaded and this file would not be written.
         let chain1_cache = items_dir.join(track_id).join("spec-adr-verify-cache.json");
         assert!(
             chain1_cache.exists(),
-            "Chain-1 cache file must exist after standalone (All-scope) run — \
-             absent file means standalone resolved to Chain2 instead of All: {chain1_cache:?}"
+            "Chain-1 cache file must exist after the All-scope run — \
+             absent file means the run skipped Chain-1 pairs: {chain1_cache:?}"
         );
 
         // Scope discrimination: the Chain-2 cache file is written only when the
-        // All-scope path ran `enumerate_chain2_all_layers`.  If `standalone`
-        // wrongly resolved to Chain1, this file would not exist.
+        // All-scope path ran `enumerate_chain2_all_layers`.
         let chain2_cache =
             items_dir.join(track_id).join("test_domain-catalogue-spec-verify-cache.json");
         assert!(
             chain2_cache.exists(),
-            "Chain-2 cache file must exist after standalone (All-scope) run — \
-             absent file means standalone resolved to Chain1 instead of All: {chain2_cache:?}"
+            "Chain-2 cache file must exist after the All-scope run — \
+             absent file means the run skipped Chain-2 pairs: {chain2_cache:?}"
         );
     }
 
     #[test]
     fn test_ref_verify_run_invalid_track_id_returns_error() {
         let (_tmp, items_dir) = temp_project_with_items_dir();
-        let result = CliApp::new().ref_verify_run(RefVerifyRunInput {
-            track_id: "../outside".to_owned(),
-            items_dir,
-            context: "standalone".to_owned(),
-            layer: None,
-        });
+        let result = CliApp::new()
+            .ref_verify_run(RefVerifyRunInput { track_id: "../outside".to_owned(), items_dir });
         let msg = result.unwrap_err();
         assert!(
             msg.contains("invalid --track-id") || msg.contains("invalid track"),
@@ -1277,8 +1101,6 @@ exit 64
         let result = CliApp::new().ref_verify_run(RefVerifyRunInput {
             track_id: "my-track".to_owned(),
             items_dir: dir.path().to_path_buf(),
-            context: "standalone".to_owned(),
-            layer: None,
         });
         let msg = result.unwrap_err();
         assert!(

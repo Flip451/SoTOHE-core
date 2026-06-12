@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c65b473dc2df8f714c6e0eeb3765e44f03014cd7dc61b27b9bdbca17b75d41d0",
+  "signals": [
+    {
+      "type_name": "RefVerifyScope",
+      "signal": "blue",
+      "entry_hash": "d51fd80d2509a25d8c34e7a890ea642f03f7b06bacad93dd59f10bec9f33d475"
+    },
+    {
+      "type_name": "RefVerifierPort",
+      "signal": "blue",
+      "entry_hash": "4913ff6e6f2c24c3318eae7521af61d265efcde666a072d3b9d9f0b85c07dd5b"
+    },
+    {
+      "type_name": "RefVerifyApplicationService",
+      "signal": "blue",
+      "entry_hash": "1e60118989961f3151734f94e162c21db6295ae9d4462db55aefc93f00cd2feb"
+    },
+    {
+      "type_name": "RefVerifyCachePort",
+      "signal": "blue",
+      "entry_hash": "7d736bc2f3a85c593dab7ca9bdfbc7123980be5c7f1ab06238e7666dc13ecf14"
+    },
+    {
+      "type_name": "RefVerifyPairSourcePort",
+      "signal": "blue",
+      "entry_hash": "ae26ac9f57adc4d119fc46af13c21a0e3d04b887cc0fba44acdbf01a388cc52c"
+    }
+  ]
+}

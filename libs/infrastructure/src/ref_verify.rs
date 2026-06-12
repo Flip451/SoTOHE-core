@@ -1,5 +1,6 @@
 mod guarded_io;
 mod pair_source;
+mod pair_source_chain2;
 mod pair_source_json;
 pub mod process_runner;
 pub mod scope_resolver;
@@ -19,9 +20,7 @@ pub use process_runner::{
     build_claude_ref_verifier_args, build_codex_ref_verifier_args, build_gemini_ref_verifier_args,
     make_ref_verifier_process_runner,
 };
-pub use scope_resolver::{
-    RefVerifyInvocationContext, RefVerifyScopeResolver, RefVerifyScopeResolverError,
-};
+pub use scope_resolver::{RefVerifyScopeResolver, RefVerifyScopeResolverError};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use usecase::ref_verify::{
@@ -64,14 +63,17 @@ impl RefVerifyPairSourcePort for RefVerifyPairSourceAdapter {
         }
         match &cmd.scope {
             usecase::ref_verify::RefVerifyScope::Chain2 { layer } => {
-                pairs.extend(pair_source::enumerate_chain2_pairs_for_layer(
+                pairs.extend(pair_source_chain2::enumerate_chain2_pairs_for_layer(
                     &dir,
                     &self.project_root,
                     layer.clone(),
                 )?);
             }
             usecase::ref_verify::RefVerifyScope::All => {
-                pairs.extend(pair_source::enumerate_chain2_all_layers(&dir, &self.project_root)?);
+                pairs.extend(pair_source_chain2::enumerate_chain2_all_layers(
+                    &dir,
+                    &self.project_root,
+                )?);
             }
             usecase::ref_verify::RefVerifyScope::Chain1 => {}
         }
@@ -119,7 +121,7 @@ impl RefVerifyPairSourcePort for RefVerifyPairSourceAdapter {
                         // always exercises the Chain2 verifier when Chain-2 pairs are present.
                         // Propagate errors: a rules file that exists but fails to load/parse
                         // must not silently fall back to SpecAdr and leave Chain-2 uncalibrated.
-                        match pair_source::first_tddd_layer_scope(&self.project_root)? {
+                        match pair_source_chain2::first_tddd_layer_scope(&self.project_root)? {
                             Some(scope) => scope,
                             None => RefVerifyCacheScope::SpecAdr,
                         }
@@ -1555,6 +1557,66 @@ The guarded path must stay inside the trusted repository root.
     }
 
     #[test]
+    fn load_pairs_all_scope_with_absent_spec_returns_zero_chain1_pairs_phase0_path() {
+        // Phase 0 path (AC-01 / AC-02): spec.json does not exist yet, so Chain-1
+        // contributes zero pairs instead of erroring. With no catalogue either,
+        // the whole pair set is empty and no known-bad probe is injected.
+        let tmp = tempfile::tempdir().unwrap();
+        let track_id = "test-load-pairs-phase0-no-spec";
+        let items_dir = track_dir(tmp.path(), track_id);
+        std::fs::create_dir_all(&items_dir).unwrap();
+        write_architecture_rules(&tmp, ARCHITECTURE_RULES_NO_TDDD);
+
+        let (adapter, cmd) = ref_verify_adapter_and_cmd(&tmp, track_id, RefVerifyScope::All);
+        let pairs = adapter.load_pairs(&cmd, &RefVerifyConfig::default()).unwrap();
+
+        assert!(pairs.is_empty(), "Phase 0 must produce zero pairs, got: {pairs:?}");
+    }
+
+    #[test]
+    fn load_pairs_with_regular_file_at_track_dir_path_fails_closed() {
+        // The track directory guard must reject a regular file at the track path.
+        // Before the is_dir() fix, a regular file at the track path would pass the
+        // symlink check (Ok(true)), fail to find spec.json (not a directory), and
+        // silently return zero pairs. Now it must fail with a VerifierPort error.
+        let tmp = tempfile::tempdir().unwrap();
+        let track_id = "test-load-pairs-track-dir-is-file";
+        let items_dir = tmp.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        // Write a regular file at the path that should be a directory.
+        std::fs::write(items_dir.join(track_id), "not a directory").unwrap();
+        write_architecture_rules(&tmp, ARCHITECTURE_RULES_NO_TDDD);
+
+        let (adapter, cmd) = ref_verify_adapter_and_cmd(&tmp, track_id, RefVerifyScope::All);
+        let err = adapter.load_pairs(&cmd, &RefVerifyConfig::default()).unwrap_err();
+
+        assert!(
+            matches!(err, RefVerifyError::VerifierPort { ref message } if message.contains("not a directory")),
+            "regular file at track path must fail closed via VerifierPort, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn load_pairs_all_scope_with_malformed_spec_fails_closed() {
+        // Present-but-broken spec.json (IN-07 / AC-10): the absence skip applies
+        // only to a missing file; a malformed file still fails closed.
+        let tmp = tempfile::tempdir().unwrap();
+        let track_id = "test-load-pairs-malformed-spec";
+        let items_dir = track_dir(tmp.path(), track_id);
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::write(items_dir.join("spec.json"), "{not valid json").unwrap();
+        write_architecture_rules(&tmp, ARCHITECTURE_RULES_NO_TDDD);
+
+        let (adapter, cmd) = ref_verify_adapter_and_cmd(&tmp, track_id, RefVerifyScope::All);
+        let err = adapter.load_pairs(&cmd, &RefVerifyConfig::default()).unwrap_err();
+
+        assert!(
+            matches!(err, RefVerifyError::VerifierPort { ref message } if message.contains("spec.json")),
+            "malformed spec.json must fail closed via VerifierPort, got: {err:?}"
+        );
+    }
+
+    #[test]
     fn load_pairs_chain2_with_missing_architecture_rules_fails_closed() {
         let tmp = tempfile::tempdir().unwrap();
         let track_id = "test-load-pairs-chain2-no-rules";
@@ -1717,7 +1779,8 @@ The guarded path must stay inside the trusted repository root.
         let track_dir = items_parent.join(track_id);
         std::os::unix::fs::symlink(outside.path(), &track_dir).unwrap();
 
-        let err = pair_source::enumerate_chain2_all_layers(&track_dir, tmp.path()).unwrap_err();
+        let err =
+            pair_source_chain2::enumerate_chain2_all_layers(&track_dir, tmp.path()).unwrap_err();
         let usecase::ref_verify::RefVerifyError::VerifierPort { message } = err else {
             panic!("expected VerifierPort for symlinked track directory");
         };

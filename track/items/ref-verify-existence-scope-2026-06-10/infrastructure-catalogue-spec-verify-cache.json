@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "6301b0a0a582fbddfa722eac0b5b5bdf2fc1a30ce6cf3abdf6d3e6cc0568bfbb",
+      "evidence_hash": "b978ae7e86f71c5245b968899bef35d6f344a16d5d08ad2fdef51e522f97f89b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "RefVerifyInvocationContext 型および CommitGate / Standalone の各 variant を含む翻訳ロジックを削除する"
+      }
+    },
+    {
+      "claim_hash": "6301b0a0a582fbddfa722eac0b5b5bdf2fc1a30ce6cf3abdf6d3e6cc0568bfbb",
+      "evidence_hash": "df22e648ddbbe3df08591c0325306b332f8abd694b9496719bbe21b6383dbbdc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "RefVerifyInvocationContext 型が削除されており、CommitGate / Standalone の variant も存在しない。このコードを参照するすべての依存箇所が削除または更新されている"
+      }
+    },
+    {
+      "claim_hash": "f50615111c34eb7effd185f8da65f88ffab50ec21c661c9f0fbadb51e81fc1ba",
+      "evidence_hash": "545b93d4d03f94d0d61d6e073f54be96392d164224058bcec753a4ebf9c64c7b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "RefVerifyScopeResolver がスコープ（検証ペア集合）を、呼び出し元が申告するコンテキストからではなく track ディレクトリの SoT artifact 存在有無から導出する。spec.json 不在 → Chain① zero pairs（Chain② が zero pairs の場合と合わせてゲート通過）、catalogue 全不在 → Chain② zero pairs（既存挙動の追認）、両方存在 → 両 Chain"
+      }
+    },
+    {
+      "claim_hash": "f50615111c34eb7effd185f8da65f88ffab50ec21c661c9f0fbadb51e81fc1ba",
+      "evidence_hash": "4865af05ce8cc190c2474af8efe03f3a780fb4c3e51df92b65025f13678fd3e5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "部分 catalogue（ある層だけ catalogue が存在し他の層は不在）の場合は fail とする。整合的な不在（全 catalogue 不在）のみ skip とし、部分的な存在は SoT Chain の不整合として fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "f50615111c34eb7effd185f8da65f88ffab50ec21c661c9f0fbadb51e81fc1ba",
+      "evidence_hash": "85a1953410d32bd8a18cdfb1edd0ccd5f82046c094030c0de4c58cbd7572526c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue が存在しているにもかかわらず spec.json が不在の場合は fail とする。SoT Chain の上下関係（spec → catalogue）違反として fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "f50615111c34eb7effd185f8da65f88ffab50ec21c661c9f0fbadb51e81fc1ba",
+      "evidence_hash": "18d99de588f12618a43da07b17a51b10f0549d08ea0b9d0dc483f4bb17a5bc29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "存在するが parse 不能（壊れた）artifact（spec.json / catalogue ファイル）は fail とする。artifact の存在確認後に読み込み・パース失敗が発生した場合は fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "ab8c16ac967cd1feb89c5e7e7881d8534f357f50fe80f7c6f2c900567c0c2663",
+      "evidence_hash": "4865af05ce8cc190c2474af8efe03f3a780fb4c3e51df92b65025f13678fd3e5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "部分 catalogue（ある層だけ catalogue が存在し他の層は不在）の場合は fail とする。整合的な不在（全 catalogue 不在）のみ skip とし、部分的な存在は SoT Chain の不整合として fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "ab8c16ac967cd1feb89c5e7e7881d8534f357f50fe80f7c6f2c900567c0c2663",
+      "evidence_hash": "545b93d4d03f94d0d61d6e073f54be96392d164224058bcec753a4ebf9c64c7b",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim says RefVerifyScopeResolverError::Io covers artifact absence, including spec.json absence and catalogue absence, as resolve failure modes; the evidence requires those absence cases to derive zero-pair scopes instead: spec.json absence -> Chain① zero pairs, catalogue all absent -> Chain② zero pairs."
+      }
+    },
+    {
+      "claim_hash": "a496d7353f9d6e70605403ada5bff0eef10d4f640a715fd037de5597824f8d3b",
+      "evidence_hash": "4865af05ce8cc190c2474af8efe03f3a780fb4c3e51df92b65025f13678fd3e5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "部分 catalogue（ある層だけ catalogue が存在し他の層は不在）の場合は fail とする。整合的な不在（全 catalogue 不在）のみ skip とし、部分的な存在は SoT Chain の不整合として fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "a496d7353f9d6e70605403ada5bff0eef10d4f640a715fd037de5597824f8d3b",
+      "evidence_hash": "85a1953410d32bd8a18cdfb1edd0ccd5f82046c094030c0de4c58cbd7572526c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue が存在しているにもかかわらず spec.json が不在の場合は fail とする。SoT Chain の上下関係（spec → catalogue）違反として fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "a496d7353f9d6e70605403ada5bff0eef10d4f640a715fd037de5597824f8d3b",
+      "evidence_hash": "18d99de588f12618a43da07b17a51b10f0549d08ea0b9d0dc483f4bb17a5bc29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "存在するが parse 不能（壊れた）artifact（spec.json / catalogue ファイル）は fail とする。artifact の存在確認後に読み込み・パース失敗が発生した場合は fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "3e187808dbf99d426ea67a07357b05b83993d393a7c7e648a8819ac9fd725721",
+      "evidence_hash": "b978ae7e86f71c5245b968899bef35d6f344a16d5d08ad2fdef51e522f97f89b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin/sotp ref-verify run の CLI 引数から --context と --layer を削除する。RefVerifyInvocationContext 型および CommitGate / Standalone の各 variant を含む翻訳ロジックを削除する"
+      }
+    },
+    {
+      "claim_hash": "3e187808dbf99d426ea67a07357b05b83993d393a7c7e648a8819ac9fd725721",
+      "evidence_hash": "df22e648ddbbe3df08591c0325306b332f8abd694b9496719bbe21b6383dbbdc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "RefVerifyInvocationContext 型が削除されており、CommitGate / Standalone の variant も存在しない。"
+      }
+    },
+    {
+      "claim_hash": "0d24275be74d564b3416531383ce3c969a2dd224e5c9b71acb07babde3a37b0c",
+      "evidence_hash": "545b93d4d03f94d0d61d6e073f54be96392d164224058bcec753a4ebf9c64c7b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "RefVerifyScopeResolver がスコープ（検証ペア集合）を、呼び出し元が申告するコンテキストからではなく track ディレクトリの SoT artifact 存在有無から導出する。spec.json 不在 → Chain① zero pairs（Chain② が zero pairs の場合と合わせてゲート通過）、catalogue 全不在 → Chain② zero pairs（既存挙動の追認）、両方存在 → 両 Chain"
+      }
+    },
+    {
+      "claim_hash": "0d24275be74d564b3416531383ce3c969a2dd224e5c9b71acb07babde3a37b0c",
+      "evidence_hash": "4865af05ce8cc190c2474af8efe03f3a780fb4c3e51df92b65025f13678fd3e5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "部分 catalogue（ある層だけ catalogue が存在し他の層は不在）の場合は fail とする。整合的な不在（全 catalogue 不在）のみ skip とし、部分的な存在は SoT Chain の不整合として fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "0d24275be74d564b3416531383ce3c969a2dd224e5c9b71acb07babde3a37b0c",
+      "evidence_hash": "85a1953410d32bd8a18cdfb1edd0ccd5f82046c094030c0de4c58cbd7572526c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue が存在しているにもかかわらず spec.json が不在の場合は fail とする。SoT Chain の上下関係（spec → catalogue）違反として fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "71475eb23e9e65acd99b8498089d38d1cd3e90aeca3b70d4049dd9312b7107e9",
+      "evidence_hash": "4865af05ce8cc190c2474af8efe03f3a780fb4c3e51df92b65025f13678fd3e5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "部分 catalogue（ある層だけ catalogue が存在し他の層は不在）の場合は fail とする。整合的な不在（全 catalogue 不在）のみ skip とし、部分的な存在は SoT Chain の不整合として fail-closed に扱う"
+      }
+    },
+    {
+      "claim_hash": "71475eb23e9e65acd99b8498089d38d1cd3e90aeca3b70d4049dd9312b7107e9",
+      "evidence_hash": "85a1953410d32bd8a18cdfb1edd0ccd5f82046c094030c0de4c58cbd7572526c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue が存在しているにもかかわらず spec.json が不在の場合は fail とする。SoT Chain の上下関係（spec → catalogue）違反として fail-closed に扱う"
+      }
+    }
+  ]
+}

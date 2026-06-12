@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "ref-verify-existence-scope-2026-06-10",
+  "title": "ref-verify のスコープ解決を artifact 存在ベースに一本化する — --context / --layer の削除と Phase 0 コミットゲート誤爆の解消",
+  "branch": "track/ref-verify-existence-scope-2026-06-10",
+  "created_at": "2026-06-10T13:46:34Z",
+  "updated_at": "2026-06-10T13:46:34Z"
+}

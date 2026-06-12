@@ -1,0 +1,535 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Using `try_exists()` as the presence check here misclassifies dangling symlinks as \"absent\". A broken `spec.json` or catalogue can therefore take the skip path / `Ok(RefVerifyScope::All)` instead of the intended fail-closed error, so the IN-07 contract can be bypassed. The same pattern appears in `pair_source::enumerate_chain1_pairs` at `pair_source.rs:65-70`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 95,
+              "category": "logic"
+            },
+            {
+              "message": "`resolve()` still reads and parses `architecture-rules.json` via `load_bindings()` before it can return `All`. That violates the new existence-only contract in the briefing and makes the Phase 0 success path depend on unrelated rules-file corruption or I/O, which the resolver is supposed to avoid.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 100,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:ed60fb512594b52e54510b125fabc62b2c177faf6b4d80fb20ba558420fc1f96",
+          "at": "2026-06-10T17:25:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `RefVerifyScopeResolver::load_bindings()` now does a plain `read_to_string()` after only a leaf-level presence check, instead of using the guarded `load_tddd_layers()` path. That drops the descriptor-pinned/symlink-rejecting open that previously protected `architecture-rules.json`, so a symlinked rules path or symlinked parent can now be followed and parsed from outside the repo root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 183,
+              "category": "security"
+            },
+            {
+              "message": "P1: the new `spec.json`-absent fast path treats any `NotFound` from `symlink_metadata()` as a benign phase-0 state and returns `Ok(Vec::new())` before any guarded directory/file validation. If `track/items/<id>` itself is missing or otherwise invalid, `load_pairs()` now silently succeeds with zero pairs, which can let `run` / `check-approved` pass on a nonexistent track instead of failing closed as the previous `read_guarded_text()` path did.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 69,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:79a91fb125519b47c8b446d215f825afd26693bc012a95237a3159a30835bc53",
+          "at": "2026-06-10T17:39:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`path_is_present` only lstat's the leaf path. A symlinked `track/items` or `track_id` parent can therefore make `resolve()` classify files outside `project_root`, and the new `pair_source` skip path depends on the same check. This breaks the fail-closed boundary for scope resolution.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 40,
+              "category": "security"
+            },
+            {
+              "message": "The new `track_dir.symlink_metadata()` / `spec_path.symlink_metadata()` checks still follow symlinked parent components. A symlinked track tree outside the repo can hit the `[SKIP]` branch and return `Ok(vec![])` instead of failing closed, bypassing the guarded-read path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 63,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:686e1158a442968da40a68f13854c40d267a6f5ce126c797378f0f435c467651",
+          "at": "2026-06-10T17:49:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve()` is no longer existence-only: after checking `spec.json`, it calls `load_bindings()` and parses `architecture-rules.json` before deciding the scope. That means a malformed rules file now fails the resolver itself, even though the briefing says broken-but-present artifacts should be handled downstream and the resolver should rely on path existence only. In the phase0/spec-only happy path this turns an otherwise `Ok(All)` run into an `Io` error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 136,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2d06aa3e36965297a688f06bc1d0453177d2b7aa44df6f21e319e34c60b6b2ee",
+          "at": "2026-06-10T17:57:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Treating a missing `spec.json` as `Ok(Vec::new())` is only safe for the pure Phase-0 case. In `All` scope, this bypasses the old fail-closed path and lets `enumerate_chain2_all_layers` continue, so a track with catalogues but no spec can now produce Chain-2 pairs instead of erroring. That silently skips Chain-1 verification whenever `load_pairs` is called directly or the resolver is bypassed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 100,
+              "category": "correctness"
+            },
+            {
+              "message": "The resolver is no longer existence-only: it parses `architecture-rules.json`, and `load_bindings` converts `LoadTdddLayersError::Parse(_)` into an empty binding set. That makes a malformed rules file indistinguishable from 'no TDDD layers declared' and can return `Ok(All)` instead of failing closed at scope-resolution time, which is an architecture regression against the brief.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 193,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:98ee9ac163aed590dff73ebc3caf001eeb8dad7c356ed6b7bc7020d10931e6bb",
+          "at": "2026-06-10T18:03:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve()` now returns `Ok(RefVerifyScope::All)` immediately when `architecture-rules.json` is missing, and the only Phase-0 catalogue check when the file exists is the `*-types.json` directory scan. That means a spec-less track can still pass even if catalogue files are already present but the rules file is absent, or if the declared `tddd.catalogue_file` uses a valid custom name that does not match the suffix heuristic. Both cases violate the fail-closed IN-06/IN-05 contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 130,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:24e4da5231e6d78cd321a63a79c6ab98424130064ee243cf288f7d19752556e4",
+          "at": "2026-06-10T18:16:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve()` returns `Ok(All)` as soon as `architecture-rules.json` is missing, even if `track/items/<track_id>` already contains a `*-types.json` catalogue. That is a fail-open for the IN-06 case: a catalogue-present/spec-absent track will be treated as Phase 0 and allowed to proceed into `All` scope instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 130,
+              "category": "correctness"
+            },
+            {
+              "message": "`resolve()` still parses `architecture-rules.json` via `load_bindings()` to decide scope. That makes scope resolution depend on rules-file contents, so a malformed rules file can reject otherwise valid phase-0/spec-only tracks. The brief says the resolver should do existence checks only and leave broken-file handling to pair_source/codec.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 147,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:24e4da5231e6d78cd321a63a79c6ab98424130064ee243cf288f7d19752556e4",
+          "at": "2026-06-10T18:18:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve()` only treats files ending in `-types.json` as catalogues when deciding whether to fail closed for IN-06. `architecture-rules.json` permits arbitrary safe `catalogue_file` names, so a track that uses a valid nonstandard catalogue filename will be misclassified as having no catalogues and can resolve to `All` even when `spec.json` is absent. That bypasses the intended ordering check and can let a catalogue-present track proceed as if it were Phase 0.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/scope_resolver.rs",
+              "line": 213,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6d02222f45d1d19f9f28e5f683eec6a3a9fc21f28a2449570a754cb889a847f4",
+          "at": "2026-06-10T18:25:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_symlinks_below(track_dir, project_root)` only proves the path exists and is not a symlink; it does not require `track_dir` to be a directory. If `track/items/<track_id>` is an existing regular file, this branch succeeds, `spec.json` is then treated as absent, and the function returns `Ok(Vec::new())` instead of erroring. That lets an invalid track root masquerade as the Phase 0 zero-pair case. Use a directory guard here (`open_guarded_directory` / `is_dir()` check) before taking the skip path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 64,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9c9df6b844042f1d1bf3f385e26d6f434c25f60bcec12df138e1fe377f0ce367",
+          "at": "2026-06-10T23:29:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9d17997e49cf5f9a2057c482f4c2ab891b40c6c27ae7573b12f7dad1da475b7",
+          "at": "2026-06-10T23:37:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9d17997e49cf5f9a2057c482f4c2ab891b40c6c27ae7573b12f7dad1da475b7",
+          "at": "2026-06-10T23:40:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Chain-2 defensive presence pass still probes catalogues with `Path::try_exists` and later `exists`, which follow symlinks and report dangling symlinks as absent. If an All-scope path reaches this helper with dangling catalogue symlinks, it can take the all-absent branch and return zero Chain-2 pairs instead of fail-closing, violating the symlink-hardening contract described in the briefing. Use the same symlink-aware presence check as the resolver for catalogue probes and missing-list construction.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source_chain2.rs",
+              "line": 291,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7130d51ad17228f3ebd69433cef4827c5e4ed078f94bdaef9d45247cc135471a",
+          "at": "2026-06-11T00:04:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61afd416f86824b4a79b564cf28a737ee3dbbab5ecd53886b9b235570ec11f67",
+          "at": "2026-06-11T00:10:46Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_ref_verify_run_phase0_no_artifacts_exits_zero` is not hermetic: it does not put a fake `claude` binary on `PATH`, so if the zero-pair assumption regresses the test can escape to a host-installed verifier instead of failing deterministically. Keep the external verifier mocked even for the phase-0 case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/ref_verify.rs",
+              "line": 955,
+              "category": "testing"
+            },
+            {
+              "message": "`test_ref_verify_check_approved_phase0_no_artifacts_exits_zero` only checks `exit_code == 0`; it does not assert the user-visible success message that identifies the intended `No production reference pairs found` path. That leaves a coverage gap where a different success path could regress without this test failing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/ref_verify.rs",
+              "line": 984,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7d9627ae6ff100e6bc9c0ac80aee5d339a2fdfa57c4ceb03a65c6cb5c638ad46",
+          "at": "2026-06-10T17:23:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45e4a8a36bc572efc28ebe733bae49c5bc061a9f602ae11fd655d3484f6c2707",
+          "at": "2026-06-10T17:33:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d29e624f0fd981bc41f02743974aeef4ecbcc7a78386db4dfaf18166107031d0",
+          "at": "2026-06-10T17:45:27Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00fbe9d578c47ec56d7ec6987cc9124689ae406bb1beedaccc4b463afbbc22ae",
+          "at": "2026-06-11T00:25:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00fbe9d578c47ec56d7ec6987cc9124689ae406bb1beedaccc4b463afbbc22ae",
+          "at": "2026-06-11T00:27:50Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db1e07ad48e43cd49db9eba95e0dfcc5e92cd173dd7c36ab807d7f032ddf6981",
+          "at": "2026-06-10T13:54:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db1e07ad48e43cd49db9eba95e0dfcc5e92cd173dd7c36ab807d7f032ddf6981",
+          "at": "2026-06-10T13:59:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` maps `AC-02` only to `T001`, but the external-surface change that actually removes the hardcoded `--context commit-gate` invocation lives in `T004` (`impl-plan.json` lines 23-25). As written, the coverage matrix says the Phase 0 commit-gate acceptance is satisfied without the task that updates the commit-gate call site, so the coverage for the main gate path is incomplete.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/task-coverage.json",
+              "line": 28,
+              "category": "contradiction"
+            },
+            {
+              "message": "The new ADR file starts at the title and context without the required `## Status` section defined by the ADR template in `knowledge/adr/README.md` (`## ADR テンプレート`, lines 21-29). That leaves the ADR's lifecycle state implicit instead of recorded in the document itself, which is inconsistent with the repository's ADR contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+              "line": 15,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:9cdfb5f894d4b6d949b2f8a9b9efb86b8ebaf771ad753fcc9e62907384eaa6a7",
+          "at": "2026-06-10T15:05:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 says only the fully absent case is skippable and that every other combination must fail, but AC-06 and T001 explicitly require the spec-present / all-catalogues-absent case to exit 0 as Chain2 zero pairs. This makes the constraint inconsistent with the acceptance criteria and the implementation plan.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+              "line": 205,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:205abaa4ed37d3d52c7afd1dd8c6148d748d57789aef2ec9d835aa1a4ac81662",
+          "at": "2026-06-10T15:13:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D9` is now marked `superseded` in frontmatter, but the prose still says only the calling-context scope resolution part is replaced and that the dedicated command surface / diff cache remain valid. That leaves the same decision simultaneously retired and still active, which is an internal contradiction; either keep `D9` active with a partial-supersession note or split the surviving parts into a separate decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1a52188ce43c15561096cfc2fcfe059d922aaee620bb928b61a910db52105e01",
+          "at": "2026-06-10T15:27:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 omits `track-active-gate`, but IN-04 and AC-12 require both `track-commit-message` and `track-active-gate` to be updated. As written, the plan only covers one required Makefile surface, so AC-12 is not fully achievable.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T001's success path always returns `RefVerifyScope::All`; it never produces `Chain1` or `Chain2`. That means the planned resolver does not actually resolve scope from artifact existence and cannot encode the chain-specific skip rules required by IN-01 / CN-03 / AC-01 / AC-06 / AC-07.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 6,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:5aba1d56fb2f0a104afc44b29aaaa142059edc82dd68103201f4bd04fc1c8e20",
+          "at": "2026-06-10T15:33:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4b39c146337b4ff3b31994e2f250f527ef584a3aab03581c95da87c05b3928b",
+          "at": "2026-06-10T15:42:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 says the Makefile's `track-commit-message / track-active-gate` ref-verify calls are updated, but T004 explicitly says `track-active-gate` has no ref-verify invocation and needs no script change. That makes the acceptance criterion ambiguous about whether `track-active-gate` is actually in scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+              "line": 356,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3a0f490e3b04b6ad1eb6a1c11d3087bf649c211ea3e6674d900405db907ea5be",
+          "at": "2026-06-10T15:55:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001’s resolver logic returns `Ok(RefVerifyScope::All)` for every non-error case, so the `RefVerifyScope` variants `Chain1`/`Chain2` are never selected. That conflicts with the usecase contract that `RefVerifyScopeResolver` derives the active scope from artifact existence and returns that resolved scope to cli-composition.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:84bd19005ba2b60ffc75d63856b80cc2446645d0899612be0552dab8229c6728",
+          "at": "2026-06-10T16:08:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 changes `RefVerifyScopeResolver::resolve` to the new `resolve(&str)` signature before any caller is updated. The dependent callsites are only rewritten in T002, so a commit after T001 leaves `apps/cli-composition` uncompilable. As written, the task split cannot be executed as a small-commit sequence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 6,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T002 removes `context` / `layer` from `RefVerifyRunInput`, but `apps/cli/src/commands/ref_verify.rs` is only updated in T003. That creates another required intermediate state that does not compile, so the T002→T003 ordering is not physically executable as a standalone task boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:84bd19005ba2b60ffc75d63856b80cc2446645d0899612be0552dab8229c6728",
+          "at": "2026-06-10T16:16:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 says malformed `spec.json` is an `Io` error in `RefVerifyScopeResolver::resolve`, but the later pair_source step says the same malformed `spec.json` should still surface as `RefVerifyError::VerifierPort`. The plan never reconciles which layer owns JSON parsing or which error is user-visible, so the failure mode is internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "The boundary note claims that once `resolver` returns `Ok(All)`, catalogue files must be completely absent. That is false in the same task description, which also returns `Ok(All)` for the spec-present/all-catalogue-present and spec-present/all-catalogue-absent cases. This would mislead the Chain① skip-path implementation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/plan.md",
+              "line": 15,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:e9514e9b81809b09ac4530710643efc55d29343a5daf3d3b71e417e81ae24927",
+          "at": "2026-06-10T16:28:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifyScopeResolver` is documented as failing on parse failures here, but the implementation plan keeps parse-不能 artifacts in `pair_source`/codec and surfaces them as `RefVerifyError::VerifierPort` instead. That splits IN-07 across two layers and makes the planned error contract inconsistent.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/infrastructure-types.json",
+              "line": 105,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a9f2facaa5defabbb604bc7d90e01a28b18071e88cda4c8b2b1e24d7d879ba6e",
+          "at": "2026-06-10T16:35:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:995cef351263012eace32c146ad5d7d103654018a867eb37589531eeda27aacf",
+          "at": "2026-06-10T16:40:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:995cef351263012eace32c146ad5d7d103654018a867eb37589531eeda27aacf",
+          "at": "2026-06-10T16:44:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b0f6da1f9452dc454128dfd55cd62c81aaaab694c76653c515c4cf09307c281",
+          "at": "2026-06-10T17:22:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b0f6da1f9452dc454128dfd55cd62c81aaaab694c76653c515c4cf09307c281",
+          "at": "2026-06-10T17:44:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e5312abcfdc9dce813ef41393f1f2025dfa899669031d4f428f2742243313a0",
+          "at": "2026-06-11T00:23:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e5312abcfdc9dce813ef41393f1f2025dfa899669031d4f428f2742243313a0",
+          "at": "2026-06-11T00:27:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a748869199b5d2f3674a0f6ec003e08c1134bd9e72dcc0813fabfedeaece2f9",
+          "at": "2026-06-11T00:33:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a748869199b5d2f3674a0f6ec003e08c1134bd9e72dcc0813fabfedeaece2f9",
+          "at": "2026-06-11T00:35:21Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fc06e78bb71454a8a5186096ddfaec1bbe68c1708f7c2e031af4c4d71e16a4e",
+          "at": "2026-06-10T17:22:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fc06e78bb71454a8a5186096ddfaec1bbe68c1708f7c2e031af4c4d71e16a4e",
+          "at": "2026-06-10T17:44:43Z"
+        }
+      ]
+    }
+  }
+}
