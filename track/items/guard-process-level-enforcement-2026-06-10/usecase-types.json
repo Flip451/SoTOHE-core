@@ -90,12 +90,17 @@
       },
       "methods": [],
       "module_path": "hook_dispatch",
-      "docs": "Concrete struct implementing HookDispatchService. Modified in this track (CN-08/D1/T002/T006): resolve_handler gains git-ref-update and git-pre-push arms that instantiate GitRefUpdateHandler and GitPrePushHandler. Constructor gains two new injected flags: guarded_git_token_present (bool, from CLI composition std::env::var check, used by GitRefUpdateHandler/GitPrePushHandler) and hooks_path_configured (bool, from CLI composition git-config read, used by GuardHookHandler runtime fail-closed). Private implementation fields carry these flags.",
+      "docs": "Concrete struct implementing HookDispatchService. Modified in this track (CN-08/D1/T002/T006/T010): resolve_handler gains git-ref-update and git-pre-push arms that instantiate GitRefUpdateHandler and GitPrePushHandler, plus hooks-path-setup that instantiates HooksPathSetupHandler. Constructor gains two injected flags: guarded_git_token_present (bool, from CLI composition std::env::var check, used by GitRefUpdateHandler/GitPrePushHandler) and hooks_path_configured (bool, from CLI composition git-config read, used only by HooksPathSetupHandler runtime setup preflight). Private implementation fields carry these flags.",
       "spec_refs": [
         {
           "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
           "anchor": "CN-08",
           "hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026"
+        },
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "CN-06",
+          "hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc"
         }
       ],
       "informal_grounds": []
@@ -157,7 +162,7 @@
       "informal_grounds": []
     },
     "GuardHookHandler": {
-      "action": "modify",
+      "action": "reference",
       "role": "Interactor",
       "kind": {
         "kind": "struct",
@@ -171,17 +176,40 @@
       },
       "methods": [],
       "module_path": "hook",
-      "docs": "Guard hook handler for block-direct-git-ops. Modified in this track in two ways: (1) T001/IN-03 stage (a): handle scans the raw HookInput.command string for SOTP_GUARDED_GIT (exact match) before calling check_commands, and returns block early if the token is found — SimpleCommand does not carry the raw string, so this scan must happen at the usecase layer; (2) T006/CN-06: gains a hooks_path_configured: bool private field injected by HookDispatchInteractor, used to implement runtime fail-closed behavior — when hooks_path_configured is false and a git command is detected, handle returns block before checking normal policy. Private fields: hooks_path_configured: bool.",
+      "docs": "Guard hook handler for block-direct-git-ops. Referenced in this catalogue because T001/IN-03 stage (a) changes handler behavior: handle scans the raw HookInput.command string for SOTP_GUARDED_GIT (exact match) before calling check_commands, and returns block early if the token is found — SimpleCommand does not carry the raw string, so this scan must happen at the usecase layer. hooksPath setup policy is intentionally handled by HooksPathSetupHandler, not by this direct-git policy handler.",
       "spec_refs": [
         {
           "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
           "anchor": "IN-03",
           "hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "HooksPathSetupHandler": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "hook",
+      "docs": "Hook handler for the hooks-path-setup preflight. When the injected hooks_path_configured flag is true, allows Bash execution. When false, allows only the exact setup commands cargo make bootstrap or git config --local core.hooksPath .githooks, and blocks all other Bash with remediation text. Uses the injected ShellParser port for command parsing and keeps setup policy separate from GuardHookHandler direct-git policy. Private fields: parser: Arc<dyn ShellParser>, hooks_path_configured: bool.",
+      "spec_refs": [
+        {
+          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
+          "anchor": "IN-10",
+          "hash": "5f085555da4981ea40ce42441deb7fffb5a927bf7065e62a7bd4db775c680f0a"
         },
         {
           "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
           "anchor": "CN-06",
-          "hash": "49581e4cc6d56f7e4b8ff2c66aacc1f6a55185986261b9fe20b6332d4977ee4c"
+          "hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc"
         }
       ],
       "informal_grounds": []
@@ -410,6 +438,11 @@
       "action": "reference",
       "trait_ref": "HookHandler",
       "for_type": "GuardHookHandler"
+    },
+    {
+      "action": "add",
+      "trait_ref": "HookHandler",
+      "for_type": "HooksPathSetupHandler"
     },
     {
       "action": "reference",

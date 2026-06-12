@@ -48,7 +48,6 @@ subgraph domain["domain"]
   end
   F57_domain_domain_domain__guard__policy__block_on_parse_error[[block_on_parse_error]]
   F51_domain_domain_domain__guard__policy__check_commands[[check_commands]]
-  F60_domain_domain_domain__guard__policy__contains_git_invocation[[contains_git_invocation]]
   end
   subgraph domain_domain_module_hook["domain::hook"]
     direction TB
@@ -96,6 +95,10 @@ subgraph usecase["usecase"]
   subgraph T32_usecase_usecase_GuardHookHandler["hook::GuardHookHandler"]
     direction TB
     T32_usecase_usecase_GuardHookHandler__self[GuardHookHandler]
+  end
+  subgraph T37_usecase_usecase_HooksPathSetupHandler["hook::HooksPathSetupHandler"]
+    direction TB
+    T37_usecase_usecase_HooksPathSetupHandler__self[HooksPathSetupHandler]
   end
   subgraph T44_usecase_usecase_TestFileDeletionGuardHandler["hook::TestFileDeletionGuardHandler"]
     direction TB
@@ -185,7 +188,6 @@ F57_domain_domain_domain__guard__policy__block_on_parse_error --o T24_domain_dom
 F57_domain_domain_domain__guard__policy__block_on_parse_error --> T26_domain_domain_GuardVerdict__self
 F51_domain_domain_domain__guard__policy__check_commands --o T27_domain_domain_SimpleCommand__self
 F51_domain_domain_domain__guard__policy__check_commands --> T26_domain_domain_GuardVerdict__self
-F60_domain_domain_domain__guard__policy__contains_git_invocation --o T27_domain_domain_SimpleCommand__self
 T23_domain_domain_HookError_Guard --o T24_domain_domain_ParseError__self
 T23_domain_domain_HookError_Unsupported --o T22_domain_domain_HookName__self
 R27_usecase_usecase_HookHandler_handle --o T25_domain_domain_HookContext__self
@@ -208,6 +210,7 @@ T38_usecase_usecase_HookDispatchInteractor__self -.impl.-> R35_usecase_usecase_H
 T35_usecase_usecase_GitRefUpdateHandler__self -.impl.-> R27_usecase_usecase_HookHandler__self
 T33_usecase_usecase_GitPrePushHandler__self -.impl.-> R27_usecase_usecase_HookHandler__self
 T32_usecase_usecase_GuardHookHandler__self -.impl.-> R27_usecase_usecase_HookHandler__self
+T37_usecase_usecase_HooksPathSetupHandler__self -.impl.-> R27_usecase_usecase_HookHandler__self
 T44_usecase_usecase_TestFileDeletionGuardHandler__self -.impl.-> R27_usecase_usecase_HookHandler__self
 T43_infrastructure_infrastructure_SystemGitRepo_discover --> T38_infrastructure_infrastructure_GitError__self
 T43_infrastructure_infrastructure_SystemGitRepo_discover --> T43_infrastructure_infrastructure_SystemGitRepo__self
@@ -227,8 +230,6 @@ class F57_domain_domain_domain__guard__policy__block_on_parse_error free_functio
 class F57_domain_domain_domain__guard__policy__block_on_parse_error function_node
 class F51_domain_domain_domain__guard__policy__check_commands free_function
 class F51_domain_domain_domain__guard__policy__check_commands function_node
-class F60_domain_domain_domain__guard__policy__contains_git_invocation free_function
-class F60_domain_domain_domain__guard__policy__contains_git_invocation function_node
 class T25_domain_domain_HookContext__self value_object
 class T23_domain_domain_HookError_Input variant_node
 class T23_domain_domain_HookError_Guard variant_node
@@ -244,6 +245,7 @@ class T25_domain_domain_HookVerdict__self value_object
 class T33_usecase_usecase_GitPrePushHandler__self interactor
 class T35_usecase_usecase_GitRefUpdateHandler__self interactor
 class T32_usecase_usecase_GuardHookHandler__self interactor
+class T37_usecase_usecase_HooksPathSetupHandler__self interactor
 class T44_usecase_usecase_TestFileDeletionGuardHandler__self interactor
 class R27_usecase_usecase_HookHandler_handle method_node
 class R27_usecase_usecase_HookHandler__self secondary_port

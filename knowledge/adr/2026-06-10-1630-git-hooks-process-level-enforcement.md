@@ -133,7 +133,7 @@ git hook の判定は環境変数 1 つのみ:
 
 1. **setup**: `cargo make bootstrap` / `/track:setup` が `git config core.hooksPath .githooks` を設定する。
 2. **CI verify**: `bin/sotp verify` 系サブコマンドが設定値を検査し、未設定 / 不一致なら `cargo make ci` を fail させる。
-3. **runtime fail-closed**: `block-direct-git-ops` フックが実行時に `core.hooksPath` 未設定を検知したら git コマンドを block する (fail-closed hooks の系譜 CN-04 と整合)。
+3. **runtime fail-closed**: Claude Code / Codex の agent 実行面が任意 Bash 実行前に `core.hooksPath` を検査し、未設定 / 不一致なら setup 用の最小コマンドだけを許可して他の Bash を block する。`block-direct-git-ops` は直接 git 操作 policy に集中させ、この setup preflight とは分離する (具体化: `knowledge/adr/2026-06-12-1518-hooks-path-setup-fail-closed.md`)。
 
 ## Rejected Alternatives
 

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-12T14:00:37Z",
-  "declaration_hash": "d43ae67bcc07c2f6b6e6f4e170c24208e368b887995df15ab1ba3351163d463b",
+  "generated_at": "2026-06-12T16:20:02Z",
+  "declaration_hash": "d5c5dd31765d404d57831344691d3e269e8f1697f730e74307c9116474b80d85",
   "signals": [
     {
       "type_name": "GitPrePushHandler",
@@ -22,12 +22,6 @@
       ]
     },
     {
-      "type_name": "GuardHookHandler",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
       "type_name": "HookDispatchInteractor",
       "kind_tag": "interactor",
       "signal": "blue",
@@ -35,6 +29,21 @@
       "found_items": [
         "HookDispatchService"
       ]
+    },
+    {
+      "type_name": "HooksPathSetupHandler",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "HookHandler"
+      ]
+    },
+    {
+      "type_name": "GuardHookHandler",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "HookDispatchCommand",

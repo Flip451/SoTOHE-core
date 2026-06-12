@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d43ae67bcc07c2f6b6e6f4e170c24208e368b887995df15ab1ba3351163d463b",
+  "catalogue_declaration_hash": "d5c5dd31765d404d57831344691d3e269e8f1697f730e74307c9116474b80d85",
   "signals": [
     {
       "type_name": "GitPrePushHandler",
@@ -15,7 +15,7 @@
     {
       "type_name": "GuardHookHandler",
       "signal": "blue",
-      "entry_hash": "58e9ef241ec18335a05520d6c4baeb4b9b1ae5673103449fba885c0aa382eb67"
+      "entry_hash": "9ecdab27e54f34dc5d8596468662b63df2dd92b153d67b40a500f14db1123f75"
     },
     {
       "type_name": "HookDispatchCommand",
@@ -30,7 +30,7 @@
     {
       "type_name": "HookDispatchInteractor",
       "signal": "blue",
-      "entry_hash": "3abad7012c9e4b4990a6554af2dfd848ecb41aef0093548ec7545984cecf3251"
+      "entry_hash": "7b95ae5792aafa2c50dcee9dc79df16767d18c764812479a615f5f93c89dcc4e"
     },
     {
       "type_name": "HookVerdictDecision",
@@ -41,6 +41,11 @@
       "type_name": "HookVerdictOutput",
       "signal": "blue",
       "entry_hash": "ddcb3d7dc79deccb010e570b353946e25c0d90dee4c823457472631f30fe2738"
+    },
+    {
+      "type_name": "HooksPathSetupHandler",
+      "signal": "blue",
+      "entry_hash": "7682f83d7b71589ee49f80cdbab7dcf6752d6cfbc6d0c86c74de884c003effcc"
     },
     {
       "type_name": "TestFileDeletionGuardHandler",

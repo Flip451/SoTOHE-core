@@ -248,31 +248,6 @@
       ],
       "informal_grounds": []
     },
-    "domain::guard::policy::contains_git_invocation": {
-      "action": "add",
-      "role": "FreeFunction",
-      "params": [
-        { "name": "commands", "ty": "&[SimpleCommand]" }
-      ],
-      "returns": "bool",
-      "is_async": false,
-      "generics": [],
-      "where_predicates": [],
-      "docs": "Detects whether any parsed SimpleCommand invokes git after the same VAR=val and launcher stripping used by the guard policy. Added for T006/CN-06 runtime fail-closed behavior: GuardHookHandler uses it before normal policy checks so an unconfigured core.hooksPath blocks git invocations while allowing non-git commands.",
-      "spec_refs": [
-        {
-          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
-          "anchor": "CN-06",
-          "hash": "49581e4cc6d56f7e4b8ff2c66aacc1f6a55185986261b9fe20b6332d4977ee4c"
-        },
-        {
-          "file": "track/items/guard-process-level-enforcement-2026-06-10/spec.json",
-          "anchor": "AC-11",
-          "hash": "f26ecf1fc46bc90785b972175a3946bc966a5164c296ba5bb73db17a0a453cba"
-        }
-      ],
-      "informal_grounds": []
-    },
     "domain::guard::policy::block_on_parse_error": {
       "action": "reference",
       "role": "FreeFunction",

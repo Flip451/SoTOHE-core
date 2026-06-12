@@ -2,10 +2,12 @@
 
 pub mod git;
 pub mod guard;
+pub mod hooks_path_setup;
 pub mod test_file_deletion;
 
 pub use git::{GitPrePushHandler, GitRefUpdateHandler};
 pub use guard::GuardHookHandler;
+pub use hooks_path_setup::HooksPathSetupHandler;
 pub use test_file_deletion::TestFileDeletionGuardHandler;
 
 use domain::hook::{HookContext, HookError, HookInput, HookName, HookVerdict};

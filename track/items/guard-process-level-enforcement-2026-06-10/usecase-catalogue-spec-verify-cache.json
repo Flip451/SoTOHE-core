@@ -137,6 +137,78 @@
         "kind": "pass",
         "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
       }
+    },
+    {
+      "claim_hash": "9e4064c7f78de0282a9b6b4274a2ebab4d768b17b7e3e18c6ac0b64dfd81a23f",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "9e4064c7f78de0282a9b6b4274a2ebab4d768b17b7e3e18c6ac0b64dfd81a23f",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "setup preflight は hooksPath 設定済みなら allow、未設定なら setup コマンドだけ allow、それ以外の Bash は block する。block-direct-git-ops は直接 git 操作 policy に集中させる"
+      }
+    },
+    {
+      "claim_hash": "7682f83d7b71589ee49f80cdbab7dcf6752d6cfbc6d0c86c74de884c003effcc",
+      "evidence_hash": "5f085555da4981ea40ce42441deb7fffb5a927bf7065e62a7bd4db775c680f0a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "任意 Bash 実行前に core.hooksPath が .githooks を指すことを確認し、未設定または不一致の場合は setup 用の最小コマンド（cargo make bootstrap / git config --local core.hooksPath .githooks）だけを許可して他の Bash を block する runtime setup preflight"
+      }
+    },
+    {
+      "claim_hash": "7682f83d7b71589ee49f80cdbab7dcf6752d6cfbc6d0c86c74de884c003effcc",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath 未設定時の runtime fail-closed は block-direct-git-ops とは別責務の setup preflight として実装する。setup preflight は hooksPath 設定済みなら allow、未設定なら setup コマンドだけ allow、それ以外の Bash は block する。block-direct-git-ops は直接 git 操作 policy に集中させる"
+      }
+    },
+    {
+      "claim_hash": "909349f9d8e0dfff1a8dfa3a6adaf7d01c928728d756314b7d030f51d01a70dc",
+      "evidence_hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GuardHookHandler（usecase 層）が check_commands 呼び出し前に raw コマンド文字列をスキャンし"
+      }
+    },
+    {
+      "claim_hash": "909349f9d8e0dfff1a8dfa3a6adaf7d01c928728d756314b7d030f51d01a70dc",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: CN-06 states that runtime fail-closed when core.hooksPath is unset must be implemented as a separate setup preflight responsibility, and that block-direct-git-ops should focus on direct git operation policy. The claim instead places hooks_path_configured fail-closed behavior inside GuardHookHandler for block-direct-git-ops, blocking before normal policy when a git command is detected."
+      }
+    },
+    {
+      "claim_hash": "9ecdab27e54f34dc5d8596468662b63df2dd92b153d67b40a500f14db1123f75",
+      "evidence_hash": "e6c157bc05c0efeef24844617f0ad6a1388d459ffd451f35f1fdf15d25c96f7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GuardHookHandler（usecase 層）が check_commands 呼び出し前に raw コマンド文字列をスキャンし"
+      }
+    },
+    {
+      "claim_hash": "7b95ae5792aafa2c50dcee9dc79df16767d18c764812479a615f5f93c89dcc4e",
+      "evidence_hash": "400b3cc088678c0f56fbf133db818677921afb96916956767182c0aba7e9d026",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook dispatch の Rust usecase 層は既存のアーキテクチャ（HookDispatchInteractor / HookVerdictOutput）に git-ref-update / git-pre-push の新ディスパッチエントリを追加する形で拡張する。既存のフック dispatch パスを壊さない"
+      }
+    },
+    {
+      "claim_hash": "7b95ae5792aafa2c50dcee9dc79df16767d18c764812479a615f5f93c89dcc4e",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath 未設定時の runtime fail-closed は block-direct-git-ops とは別責務の setup preflight として実装する。setup preflight は hooksPath 設定済みなら allow、未設定なら setup コマンドだけ allow、それ以外の Bash は block する。block-direct-git-ops は直接 git 操作 policy に集中させる"
+      }
     }
   ]
 }

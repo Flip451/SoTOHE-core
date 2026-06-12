@@ -31,8 +31,9 @@
 |------|------|--------|---------|--------|----------|
 | GitPrePushHandler | interactor | — | — | 🔵 | 🔵 |
 | GitRefUpdateHandler | interactor | — | — | 🔵 | 🔵 |
-| GuardHookHandler | interactor | modify | — | 🔵 | 🔵 |
+| GuardHookHandler | interactor | reference | — | 🔵 | 🔵 |
 | HookDispatchInteractor | interactor | modify | — | 🔵 | 🔵 |
+| HooksPathSetupHandler | interactor | — | — | 🔵 | 🔵 |
 | TestFileDeletionGuardHandler | interactor | reference | — | 🔵 | 🔵 |
 
 ## DTOs

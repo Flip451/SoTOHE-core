@@ -18,7 +18,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch block-direct-git-ops || exit 2; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch block-direct-git-ops || exit 2; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch block-direct-git-ops || exit 2; else cargo run --quiet -p cli -- hook dispatch block-direct-git-ops || exit 2; fi",
+            "command": "if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch hooks-path-setup || exit 2; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch hooks-path-setup || exit 2; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch hooks-path-setup || exit 2; else echo '[Git Policy] sotp CLI is not available. Install sotp or set SOTP_CLI_BINARY, then configure hooks with `git config --local core.hooksPath .githooks`.' >&2; exit 2; fi",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch block-direct-git-ops || exit 2; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch block-direct-git-ops || exit 2; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch block-direct-git-ops || exit 2; else echo '[Git Policy] sotp CLI is not available. Install sotp or set SOTP_CLI_BINARY before running Bash commands.' >&2; exit 2; fi",
             "timeout": 10
           }
         ]
@@ -28,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch block-test-file-deletion || exit 2; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch block-test-file-deletion || exit 2; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch block-test-file-deletion || exit 2; else cargo run --quiet -p cli -- hook dispatch block-test-file-deletion || exit 2; fi",
+            "command": "if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch block-test-file-deletion || exit 2; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch block-test-file-deletion || exit 2; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch block-test-file-deletion || exit 2; else echo '[Git Policy] sotp CLI is not available. Install sotp or set SOTP_CLI_BINARY before running Bash or Write guard checks.' >&2; exit 2; fi",
             "timeout": 10
           }
         ]

@@ -45,11 +45,15 @@
     },
     {
       "id": "GO-05",
-      "text": "core.hooksPath の配備を bootstrap / CI verify / runtime fail-closed の三重で担保し、git hooks 層の不在による保護空白を排除する",
+      "text": "core.hooksPath の配備を bootstrap / CI verify / agent runtime setup preflight の三重で担保し、git hooks 層の不在による保護空白を排除する",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
           "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-06-12-1518-hooks-path-setup-fail-closed.md",
+          "anchor": "D1"
         }
       ]
     }
@@ -148,11 +152,19 @@
       },
       {
         "id": "IN-10",
-        "text": "block-direct-git-ops フックが実行時に core.hooksPath の未設定を検知した場合に git コマンドを block する runtime fail-closed 動作（D7 の第3層）",
+        "text": "Claude Code / Codex の agent 実行面は、任意 Bash 実行前に core.hooksPath が .githooks を指すことを確認し、未設定または不一致の場合は setup 用の最小コマンド（cargo make bootstrap / git config --local core.hooksPath .githooks）だけを許可して他の Bash を block する runtime setup preflight を持つ（D7 の第3層）",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
             "anchor": "D7"
+          },
+          {
+            "file": "knowledge/adr/2026-06-12-1518-hooks-path-setup-fail-closed.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-12-1518-hooks-path-setup-fail-closed.md",
+            "anchor": "D2"
           }
         ]
       },
@@ -301,11 +313,19 @@
     },
     {
       "id": "CN-06",
-      "text": "block-direct-git-ops フックは core.hooksPath が未設定の場合に runtime fail-closed（git コマンドを block）で動作する。git hooks 層が不在の状態でも CC フックが最低限の防御を維持する",
+      "text": "core.hooksPath 未設定時の runtime fail-closed は block-direct-git-ops とは別責務の setup preflight として実装する。setup preflight は hooksPath 設定済みなら allow、未設定なら setup コマンドだけ allow、それ以外の Bash は block する。block-direct-git-ops は直接 git 操作 policy に集中させる",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
           "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-06-12-1518-hooks-path-setup-fail-closed.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-12-1518-hooks-path-setup-fail-closed.md",
+          "anchor": "D2"
         }
       ]
     },
@@ -439,11 +459,19 @@
     },
     {
       "id": "AC-11",
-      "text": "block-direct-git-ops フックが core.hooksPath 未設定を検知した場合に git コマンドを block する（runtime fail-closed）。core.hooksPath が設定済みの場合はこの追加 block は発火しない",
+      "text": "hooks-path-setup preflight は core.hooksPath 未設定時に任意 Bash を block し、cargo make bootstrap と git config --local core.hooksPath .githooks だけを許可する。core.hooksPath が .githooks に設定済みの場合は通常の Bash を allow し、後続の block-direct-git-ops が直接 git 操作 policy を判定する",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-10-1630-git-hooks-process-level-enforcement.md",
           "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-06-12-1518-hooks-path-setup-fail-closed.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-12-1518-hooks-path-setup-fail-closed.md",
+          "anchor": "D2"
         }
       ]
     },

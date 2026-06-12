@@ -161,6 +161,22 @@
         "kind": "pass",
         "citation": "core.hooksPath 未設定を検知した場合に git コマンドを block する（runtime fail-closed）。core.hooksPath が設定済みの場合はこの追加 block は発火しない"
       }
+    },
+    {
+      "claim_hash": "970616680a0643963d08b96bc5320708d8103fb3cd7fa74e64b70a04c8870b6e",
+      "evidence_hash": "0a43f490da2c43fe5aeb02bb150c04f9032b1528e7fe16b746d8bed62856bebc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "block-direct-git-ops は直接 git 操作 policy に集中させる"
+      }
+    },
+    {
+      "claim_hash": "970616680a0643963d08b96bc5320708d8103fb3cd7fa74e64b70a04c8870b6e",
+      "evidence_hash": "38e624181c4451a3877a53f9be1f7e490120d154a6aaeb2075c3183516270f57",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath が .githooks に設定済みの場合は通常の Bash を allow し、後続の block-direct-git-ops が直接 git 操作 policy を判定する"
+      }
     }
   ]
 }

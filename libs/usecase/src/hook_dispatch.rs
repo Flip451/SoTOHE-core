@@ -12,7 +12,7 @@ use domain::guard::{ParseError, SimpleCommand};
 use domain::hook::{HookContext, HookInput, HookVerdict};
 
 use crate::hook::{
-    GitPrePushHandler, GitRefUpdateHandler, GuardHookHandler, HookHandler,
+    GitPrePushHandler, GitRefUpdateHandler, GuardHookHandler, HookHandler, HooksPathSetupHandler,
     TestFileDeletionGuardHandler,
 };
 
@@ -249,7 +249,10 @@ impl HookDispatchInteractor {
         let guarded_git_token_present = self.guarded_git_token_present;
         let hooks_path_configured = self.hooks_path_configured;
         match hook_name {
-            "block-direct-git-ops" => Some(Box::new(GuardHookHandler::new(
+            "block-direct-git-ops" => {
+                Some(Box::new(GuardHookHandler::new(Arc::clone(&domain_parser))))
+            }
+            "hooks-path-setup" => Some(Box::new(HooksPathSetupHandler::new(
                 Arc::clone(&domain_parser),
                 hooks_path_configured,
             ))),
@@ -428,14 +431,13 @@ mod tests {
     }
 
     #[test]
-    fn test_dispatch_block_direct_git_ops_blocks_git_when_hooks_path_not_configured() {
+    fn test_dispatch_block_direct_git_ops_allows_read_only_git_when_hooks_path_not_configured() {
         let interactor = make_interactor_with_hooks_path_configured(false);
         let cmd = bash_command("git status");
         let result = interactor.dispatch("block-direct-git-ops".to_owned(), cmd);
         assert!(result.is_ok());
         let output = result.unwrap();
-        assert_eq!(output.decision, HookVerdictDecision::Block);
-        assert!(output.reason.as_deref().is_some_and(|reason| reason.contains("core.hooksPath")));
+        assert_eq!(output.decision, HookVerdictDecision::Allow);
     }
 
     #[test]
@@ -449,6 +451,42 @@ mod tests {
         };
         let result = interactor.dispatch("block-direct-git-ops".to_owned(), cmd);
         assert!(matches!(result, Err(HookDispatchError::HandlerFailed(_))));
+    }
+
+    // --- hooks-path-setup ---
+
+    #[test]
+    fn test_dispatch_hooks_path_setup_allows_bootstrap_when_not_configured() {
+        let interactor = make_interactor_with_hooks_path_configured(false);
+        let result = interactor
+            .dispatch("hooks-path-setup".to_owned(), bash_command("cargo make bootstrap"));
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().decision, HookVerdictDecision::Allow);
+    }
+
+    #[test]
+    fn test_dispatch_hooks_path_setup_blocks_other_bash_when_not_configured() {
+        let interactor = make_interactor_with_hooks_path_configured(false);
+        let result = interactor
+            .dispatch("hooks-path-setup".to_owned(), bash_command("python3 -c 'print(1)'"));
+
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert_eq!(output.decision, HookVerdictDecision::Block);
+        assert!(output.reason.as_deref().is_some_and(|reason| {
+            reason.contains("core.hooksPath") && reason.contains("cargo make bootstrap")
+        }));
+    }
+
+    #[test]
+    fn test_dispatch_hooks_path_setup_allows_other_bash_when_configured() {
+        let interactor = make_interactor_with_hooks_path_configured(true);
+        let result = interactor
+            .dispatch("hooks-path-setup".to_owned(), bash_command("python3 -c 'print(1)'"));
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().decision, HookVerdictDecision::Allow);
     }
 
     // --- block-test-file-deletion ---

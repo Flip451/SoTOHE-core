@@ -35,5 +35,4 @@
 |------|------|--------|---------|--------|----------|
 | domain::guard::policy::block_on_parse_error | free_function | reference | fn(err: &ParseError) -> GuardVerdict | 🔵 | 🔵 |
 | domain::guard::policy::check_commands | free_function | modify | fn(commands: &[SimpleCommand]) -> GuardVerdict | 🔵 | 🔵 |
-| domain::guard::policy::contains_git_invocation | free_function | — | fn(commands: &[SimpleCommand]) -> bool | 🔵 | 🔵 |
 

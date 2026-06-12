@@ -115,6 +115,12 @@ that Claude Code must copy verbatim into plan.md or DESIGN.md}
 
 ## Git Operations Policy
 
+Before running workspace-write work or any command that could spawn git, confirm local hook setup
+with `git config --local core.hooksPath`. If the value is not exactly `.githooks`, do not proceed
+with arbitrary Bash or git-capable subprocesses. Run exactly
+`git config --local core.hooksPath .githooks` if that is the assigned setup task; in source
+checkouts, `cargo make bootstrap` is also acceptable.
+
 **Do not run `git add` or `git commit` directly.**
 These are blocked by project guardrails. Use `cargo make add <files>` and `cargo make commit` instead.
 

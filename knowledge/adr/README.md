@@ -169,6 +169,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [CLI→domain 直接参照禁止と usecase 経由への一本化](2026-04-30-0848-cli-via-usecase-only.md) | — | 2026-04-30 |
 | [composition root を専用 crate (apps/cli-composition) に切り出す](2026-05-27-0110-composition-root-dedicated-crate.md) | Proposed | 2026-05-27 |
 | [git 書き込みガードの enforcement を git hooks 層へ移行する](2026-06-10-1630-git-hooks-process-level-enforcement.md) | Proposed | 2026-06-10 |
+| [hooksPath 未設定時の runtime fail-closed を agent 実行面の setup preflight に分離する](2026-06-12-1518-hooks-path-setup-fail-closed.md) | Proposed | 2026-06-12 |
 
 ### オーケストレーション・エージェント管理
 

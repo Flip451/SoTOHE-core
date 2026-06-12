@@ -15,11 +15,6 @@ use super::HookHandler;
 /// Word-boundary exact-match token for the guarded-git bypass scan (D3).
 const SOTP_GUARDED_TOKEN: &str = "SOTP_GUARDED_GIT";
 
-/// Runtime fail-closed message when git hooks are not configured.
-const HOOKS_PATH_NOT_CONFIGURED_MESSAGE: &str = "[Git Policy] core.hooksPath is not configured. \
-     Run `cargo make bootstrap` to set up git hooks, \
-     or run `git config --local core.hooksPath .githooks`.";
-
 /// Hook handler for `block-direct-git-ops`.
 ///
 /// Stage (a): scans the raw Bash command string for `SOTP_GUARDED_GIT` at a word
@@ -29,12 +24,11 @@ const HOOKS_PATH_NOT_CONFIGURED_MESSAGE: &str = "[Git Policy] core.hooksPath is 
 /// and launcher-stripped checks.
 pub struct GuardHookHandler {
     pub parser: Arc<dyn ShellParser>,
-    hooks_path_configured: bool,
 }
 
 impl GuardHookHandler {
-    pub(crate) fn new(parser: Arc<dyn ShellParser>, hooks_path_configured: bool) -> Self {
-        Self { parser, hooks_path_configured }
+    pub(crate) fn new(parser: Arc<dyn ShellParser>) -> Self {
+        Self { parser }
     }
 }
 
@@ -59,10 +53,6 @@ impl HookHandler for GuardHookHandler {
                 return Ok(HookVerdict::block(verdict.reason));
             }
         };
-
-        if !self.hooks_path_configured && policy::contains_git_invocation(&commands) {
-            return Ok(HookVerdict::block(HOOKS_PATH_NOT_CONFIGURED_MESSAGE));
-        }
 
         let guard_verdict = policy::check_commands(&commands);
 
@@ -120,14 +110,7 @@ mod tests {
     }
 
     fn test_handler(commands: Vec<SimpleCommand>) -> GuardHookHandler {
-        test_handler_with_hooks_path_configured(commands, true)
-    }
-
-    fn test_handler_with_hooks_path_configured(
-        commands: Vec<SimpleCommand>,
-        hooks_path_configured: bool,
-    ) -> GuardHookHandler {
-        GuardHookHandler::new(test_parser(commands), hooks_path_configured)
+        GuardHookHandler::new(test_parser(commands))
     }
 
     use domain::hook::HookContext;
@@ -142,7 +125,7 @@ mod tests {
     }
 
     #[test]
-    fn test_guard_handler_allows_git_status_when_hooks_path_configured() {
+    fn test_guard_handler_allows_git_status() {
         let handler = test_handler(vec![simple_command(&["git", "status"])]);
         let ctx = HookContext { project_dir: None };
         let verdict = handler.handle(&ctx, &make_input("git status")).unwrap();
@@ -187,42 +170,5 @@ mod tests {
         let ctx = HookContext { project_dir: None };
         let verdict = handler.handle(&ctx, &make_input("echo SOTP_GUARDED_GITX")).unwrap();
         assert!(!verdict.is_blocked(), "extended identifier SOTP_GUARDED_GITX must not be blocked");
-    }
-
-    #[test]
-    fn test_guard_handler_blocks_when_hooks_path_not_configured_and_git_detected() {
-        let handler = test_handler_with_hooks_path_configured(
-            vec![simple_command(&["git", "status"])],
-            false,
-        );
-        let ctx = HookContext { project_dir: None };
-        let verdict = handler.handle(&ctx, &make_input("git status")).unwrap();
-        assert!(verdict.is_blocked());
-        assert!(
-            verdict.reason.as_deref().is_some_and(|reason| reason.contains("core.hooksPath")),
-            "hooksPath remediation should be returned"
-        );
-    }
-
-    #[test]
-    fn test_guard_handler_allows_non_git_when_hooks_path_not_configured() {
-        let handler = test_handler_with_hooks_path_configured(
-            vec![simple_command(&["cargo", "test"])],
-            false,
-        );
-        let ctx = HookContext { project_dir: None };
-        let verdict = handler.handle(&ctx, &make_input("cargo test")).unwrap();
-        assert!(!verdict.is_blocked());
-    }
-
-    #[test]
-    fn test_guard_handler_blocks_launcher_git_when_hooks_path_not_configured() {
-        let handler = test_handler_with_hooks_path_configured(
-            vec![simple_command(&["timeout", "30", "git", "status"])],
-            false,
-        );
-        let ctx = HookContext { project_dir: None };
-        let verdict = handler.handle(&ctx, &make_input("timeout 30 git status")).unwrap();
-        assert!(verdict.is_blocked());
     }
 }

@@ -148,14 +148,6 @@ pub fn block_on_parse_error(err: &ParseError) -> GuardVerdict {
     }
 }
 
-/// Returns `true` when any parsed command invokes `git` after skipping
-/// VAR=val assignments and command launchers.
-pub fn contains_git_invocation(commands: &[SimpleCommand]) -> bool {
-    commands
-        .iter()
-        .any(|cmd| argv_contains_git_invocation(&cmd.argv, env_split_expansion_budget(&cmd.argv)))
-}
-
 /// Checks pre-parsed simple commands against the guard policy.
 ///
 /// Returns a `GuardVerdict` indicating whether the commands are allowed or blocked.
@@ -227,26 +219,6 @@ fn check_argv(argv: &[String], env_split_budget: usize) -> GuardVerdict {
     }
 
     GuardVerdict::allow()
-}
-
-fn argv_contains_git_invocation(argv: &[String], env_split_budget: usize) -> bool {
-    if argv.is_empty() {
-        return false;
-    }
-
-    if let Some(split_argv) = env_split_string_argv_after_launchers(argv) {
-        let Ok(split_argv) = split_argv else {
-            return true;
-        };
-        if env_split_budget == 0 {
-            return true;
-        }
-        return argv_contains_git_invocation(&split_argv, env_split_budget - 1);
-    }
-
-    let effective_start = skip_var_assignments(argv, 0);
-    let effective_start = skip_command_launchers(argv, effective_start);
-    argv.get(effective_start).is_some_and(|token| basename(token).to_lowercase() == "git")
 }
 
 /// Checks a git command for protected subcommands.
@@ -791,66 +763,6 @@ mod tests {
     }
 
     #[rstest]
-    #[case::env_git_status(vec!["env", "git", "status"])]
-    #[case::env_i_git_status(vec!["env", "-i", "git", "status"])]
-    #[case::env_assignment_git_status(vec!["env", "FOO=bar", "git", "status"])]
-    #[case::env_split_string_git_status(vec!["env", "-S", "git status"])]
-    #[case::env_split_string_env_option_then_remaining_git_status(vec![
-        "env", "-S", "-i", "git", "status",
-    ])]
-    #[case::env_split_string_escaped_underscore_git_status(vec!["env", "-S", r"git\_status"])]
-    #[case::env_split_string_escape_c_git_status(vec!["env", "-S", r"git\c status"])]
-    #[case::env_clustered_split_string_git_status(vec!["env", "-vSgit", "status"])]
-    #[case::env_clustered_ignore_env_split_string_git_status(vec!["env", "-ivSgit", "status"])]
-    #[case::env_clustered_unset_then_git_status(vec!["env", "-iu", "FOO", "git", "status"])]
-    #[case::env_clustered_unset_then_split_string_git_status(vec![
-        "env", "-iu", "FOO", "-Sgit", "status",
-    ])]
-    #[case::env_split_string_expanded_var_git_status(vec![
-        "GIT=git", "env", "-S", "${GIT} status",
-    ])]
-    #[case::env_assignment_before_split_string_git_status(vec![
-        "env", "GIT=git", "-S", "git status",
-    ])]
-    #[case::env_split_string_unknown_runtime_var_before_git_status(vec![
-        "env", "-S", "${MISSING} git status",
-    ])]
-    #[case::env_split_string_comment_then_remaining_git_status(vec![
-        "env", "-S", "# noop", "git", "status",
-    ])]
-    #[case::env_assignment_nested_env_split_expanded_var_git_status(vec![
-        "env", "GIT=git", "env", "-S", "${GIT} status",
-    ])]
-    #[case::env_i_assignment_nested_env_split_expanded_var_git_status(vec![
-        "env", "-i", "GIT=git", "env", "-S", "${GIT} status",
-    ])]
-    #[case::env_split_string_assignment_git_status(vec!["env", "-S", "FOO=bar git status"])]
-    #[case::env_split_string_eq_git_status(vec!["env", "--split-string=git status"])]
-    #[case::sudo_env_split_string_git_status(vec!["sudo", "env", "-S", "git status"])]
-    #[case::nested_env_split_string_git_status(vec![
-        "env",
-        "-S",
-        "env -S 'env -S \"env -S git status\"'",
-    ])]
-    #[case::env_split_string_nested_env_expanded_var_git_status(vec![
-        "GIT=git",
-        "env",
-        "-S",
-        "env -S '${GIT} status'",
-    ])]
-    #[case::sudo_env_git_status(vec!["sudo", "env", "git", "status"])]
-    fn test_contains_git_invocation_env_wrapped_git_returns_true(#[case] argv: Vec<&str>) {
-        let cmd = SimpleCommand {
-            argv: argv.into_iter().map(str::to_string).collect(),
-            redirect_texts: vec![],
-            output_redirect_texts: vec![],
-            has_output_redirect: false,
-        };
-
-        assert!(contains_git_invocation(&[cmd]));
-    }
-
-    #[rstest]
     #[case::env_split_string_git_add(vec!["env", "-S", "git add ."])]
     #[case::env_split_string_env_option_then_remaining_git_add(vec![
         "env", "-S", "-i", "git", "add", ".",
@@ -906,38 +818,6 @@ mod tests {
     }
 
     #[test]
-    fn test_contains_git_invocation_env_wrapped_non_git_returns_false() {
-        let cmd = SimpleCommand {
-            argv: vec!["env".to_string(), "cargo".to_string(), "test".to_string()],
-            redirect_texts: vec![],
-            output_redirect_texts: vec![],
-            has_output_redirect: false,
-        };
-
-        assert!(!contains_git_invocation(&[cmd]));
-    }
-
-    #[test]
-    fn test_contains_git_invocation_env_unset_before_nested_split_string_returns_false() {
-        let cmd = SimpleCommand {
-            argv: vec![
-                "GIT=git".to_string(),
-                "env".to_string(),
-                "-u".to_string(),
-                "GIT".to_string(),
-                "env".to_string(),
-                "-S".to_string(),
-                "${GIT} status".to_string(),
-            ],
-            redirect_texts: vec![],
-            output_redirect_texts: vec![],
-            has_output_redirect: false,
-        };
-
-        assert!(!contains_git_invocation(&[cmd]));
-    }
-
-    #[test]
     fn test_check_commands_env_unset_before_nested_split_string_git_add_is_allowed() {
         let cmd = SimpleCommand {
             argv: vec![
@@ -973,24 +853,6 @@ mod tests {
 
         let v = check_commands(&[cmd]);
         assert!(!v.is_blocked(), "env split-string non-git command must stay allowed");
-    }
-
-    #[test]
-    fn test_contains_git_invocation_env_split_string_quoted_known_empty_var_before_git_returns_false()
-     {
-        let cmd = SimpleCommand {
-            argv: vec![
-                "MISSING=".to_string(),
-                "env".to_string(),
-                "-S".to_string(),
-                r#""${MISSING}" git status"#.to_string(),
-            ],
-            redirect_texts: vec![],
-            output_redirect_texts: vec![],
-            has_output_redirect: false,
-        };
-
-        assert!(!contains_git_invocation(&[cmd]));
     }
 
     #[test]
