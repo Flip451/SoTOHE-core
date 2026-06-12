@@ -1,0 +1,196 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "RefVerifyInvocationContext": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "SpecDesign", "payload": { "kind": "unit" } },
+          {
+            "name": "TypeDesign",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "domain::tddd::LayerId" }
+              ]
+            }
+          },
+          { "name": "CommitGate", "payload": { "kind": "unit" } },
+          { "name": "Standalone", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::scope_resolver",
+      "docs": "Deleted in this track (IN-02 / AC-04 / D2). Caller-declared invocation context replaced by artifact-existence-based scope resolution. All usages in cli-composition and scope_resolver removed.",
+      "spec_refs": [
+        {
+          "file": "track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+          "anchor": "IN-02",
+          "hash": "b978ae7e86f71c5245b968899bef35d6f344a16d5d08ad2fdef51e522f97f89b"
+        },
+        {
+          "file": "track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+          "anchor": "AC-04",
+          "hash": "df22e648ddbbe3df08591c0325306b332f8abd694b9496719bbe21b6383dbbdc"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyScopeResolverError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "PartialCatalogues",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "missing", "ty": "Vec<String>" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::scope_resolver",
+      "docs": "Failure modes of RefVerifyScopeResolver::resolve after IN-01 artifact-existence-based refactor. InvalidLayerId variant removed (was only needed for TypeDesign { layer } context which is deleted by IN-02). Io covers genuine filesystem I/O errors when inspecting artifact paths (e.g. permission denied) and the fail-closed case where catalogues exist but spec.json is absent (IN-06, SoT Chain integrity violation). Consistent absence — spec.json absent (Chain1 zero pairs) or all catalogues absent (Chain2 zero pairs) — is NOT an error and does NOT return Err; those are zero-pair skip paths resolved without error. PartialCatalogues covers partial catalogue sets where some but not all layer catalogues exist (IN-05). Note: present-but-unparseable artifacts (IN-07) are NOT detected by the resolver — the resolver performs existence checks only; parse failures are detected downstream by pair_source/codec and surface as RefVerifyError::VerifierPort.",
+      "spec_refs": [
+        {
+          "file": "track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+          "anchor": "IN-05",
+          "hash": "4865af05ce8cc190c2474af8efe03f3a780fb4c3e51df92b65025f13678fd3e5"
+        },
+        {
+          "file": "track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+          "anchor": "IN-06",
+          "hash": "85a1953410d32bd8a18cdfb1edd0ccd5f82046c094030c0de4c58cbd7572526c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyScopeResolver": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify::scope_resolver",
+      "docs": "Infrastructure adapter that resolves RefVerifyScope purely from artifact existence on disk (IN-01 / D1). After this track: resolve() takes only track_id and derives scope by checking whether spec.json and TDDD catalogue files exist; the context param is removed. resolve() performs existence checks only — it does NOT read or parse artifact contents. spec.json absent → Chain1 zero pairs (Phase 0 pass-through); all catalogues absent → Chain2 zero pairs; both present → All; partial catalogues → fail (IN-05); catalogue present + spec absent → fail (IN-06). Parse failures (IN-07) are NOT detected here; they are detected downstream by pair_source/codec as RefVerifyError::VerifierPort.",
+      "spec_refs": [
+        {
+          "file": "track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+          "anchor": "IN-01",
+          "hash": "545b93d4d03f94d0d61d6e073f54be96392d164224058bcec753a4ebf9c64c7b"
+        },
+        {
+          "file": "track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+          "anchor": "IN-05",
+          "hash": "4865af05ce8cc190c2474af8efe03f3a780fb4c3e51df92b65025f13678fd3e5"
+        },
+        {
+          "file": "track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+          "anchor": "IN-06",
+          "hash": "85a1953410d32bd8a18cdfb1edd0ccd5f82046c094030c0de4c58cbd7572526c"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "RefVerifyScopeResolver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "Result<usecase::ref_verify::RefVerifyScope, RefVerifyScopeResolverError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyScopeResolverError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RefVerifyScopeResolverError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "RefVerifyScopeResolverError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyScopeResolver"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyInvocationContext"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RefVerifyInvocationContext"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RefVerifyInvocationContext"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RefVerifyInvocationContext"
+    }
+  ]
+}

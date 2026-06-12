@@ -22,18 +22,42 @@ mod pr;
 mod ref_verify;
 pub mod review_v2;
 mod semantic_dup;
+mod telemetry;
 mod track;
 mod verify;
 
 mod dry_fix_runner;
 
+/// Telemetry wiring for the composition root.
+///
+/// Provides subscriber initialisation, branch-bound `TelemetryWriter`
+/// construction, and fire-and-forget event emit helpers.  This module is the
+/// only place in the codebase where `tracing_subscriber` is initialised
+/// (IN-01 / CN-04 / AC-01).
+pub mod telemetry_wiring;
+
 #[cfg(test)]
 pub(crate) mod test_support {
+    use std::path::PathBuf;
     use std::sync::{Mutex, OnceLock};
 
     pub(crate) fn process_env_lock() -> &'static Mutex<()> {
         static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
         LOCK.get_or_init(|| Mutex::new(()))
+    }
+
+    pub(crate) fn repo_root_for_tests() -> PathBuf {
+        let mut root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        root.pop();
+        root.pop();
+        root
+    }
+
+    #[cfg(unix)]
+    pub(crate) fn make_executable(script: &std::path::Path) {
+        use std::os::unix::fs::PermissionsExt;
+        let result = std::fs::set_permissions(script, std::fs::Permissions::from_mode(0o755));
+        assert!(result.is_ok(), "failed to make {} executable: {result:?}", script.display());
     }
 }
 
@@ -51,6 +75,7 @@ pub use review_v2::{
 pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
 };
+pub use telemetry::TelemetryReportInput;
 
 // ---------------------------------------------------------------------------
 // Public API types

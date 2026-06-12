@@ -11,7 +11,12 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn sotp_bin() -> Command {
-    Command::new(env!("CARGO_BIN_EXE_sotp"))
+    let mut cmd = Command::new(env!("CARGO_BIN_EXE_sotp"));
+    // Disable telemetry in spawned binary so integration tests never write to
+    // the real track/items/ tree (CN-06 / AC-07).  The #[cfg(test)] guard only
+    // applies to in-process code; spawned binaries are full production processes.
+    cmd.env("SOTP_TELEMETRY", "0");
+    cmd
 }
 
 /// Creates a minimal git repository rooted at `root` with a track branch

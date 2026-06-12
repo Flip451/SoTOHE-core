@@ -1,6 +1,7 @@
 //! Shared v2 review composition types, builders, and diff-base resolution.
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::time::Instant;
 
 use domain::review_v2::{CommitHashReader, FilePath, ReviewScopeConfig};
 use domain::{CommitHash, TrackId};
@@ -81,12 +82,43 @@ pub(crate) struct ReviewV2CompositionWithClaude {
 /// importing `domain::review_v2::Verdict`, `FastVerdict`, or `ReviewOutcome`
 /// directly (CN-01 / AC-03).
 pub enum CodexReviewOutcome {
-    /// The scope had no diff files — review was skipped.
+    /// The scope had no diff files — review was skipped (no subprocess ran).
     Skipped { scope_label: String },
     /// A final review completed: verdict JSON to emit and the exit code (0 or 2).
-    FinalCompleted { verdict_json: String, exit_code: u8 },
+    FinalCompleted {
+        verdict_json: String,
+        exit_code: u8,
+        findings_count: u32,
+        subprocess_started_at: Instant,
+    },
     /// A fast review completed: verdict JSON to emit and the exit code (0 or 2).
-    FastCompleted { verdict_json: String, exit_code: u8 },
+    FastCompleted {
+        verdict_json: String,
+        exit_code: u8,
+        findings_count: u32,
+        subprocess_started_at: Instant,
+    },
+    /// The reviewer subprocess was launched but failed.
+    ///
+    /// `verdict_parse_failed` is `true` only when the subprocess ran successfully but
+    /// its stdout could not be parsed as a valid verdict (e.g. `ReviewerError::IllegalVerdict`
+    /// / `DryCheckAgentError::IllegalOutput`). For all other failures (timeout, abort,
+    /// file-changed race, record-write error) it is `false`.
+    ///
+    /// `findings_count` carries the actual count from the subprocess when the verdict was
+    /// successfully parsed before failure (e.g. persistence failure after a good verdict).
+    /// It is `0` for failures where no verdict was obtained.
+    ///
+    /// Distinct from `Err(String)` returned by `run_codex_review_str` /
+    /// `run_claude_review_str`, which represents pre-subprocess failures (diff/hash
+    /// computation, scope lookup, composition build) that never launched the subprocess.
+    SubprocessFailed {
+        error: String,
+        round_type: String,
+        verdict_parse_failed: bool,
+        findings_count: u32,
+        subprocess_started_at: Instant,
+    },
 }
 
 /// Shared setup logic for both `build_review_v2` and `build_review_v2_with_reviewer`.
@@ -99,7 +131,7 @@ pub(super) fn build_v2_shared(
     track_id: &TrackId,
     items_dir: &Path,
 ) -> Result<(ReviewScopeConfig, FsReviewStore, FsCommitHashStore, CommitHash), String> {
-    let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+    let git = discover_repo_from_items_dir(items_dir)?;
     let root = git.root().to_path_buf();
 
     let canonical_root = root
@@ -153,9 +185,69 @@ pub(super) fn build_v2_shared(
     let review_store = FsReviewStore::new(review_json_path, canonical_root.clone());
     let commit_hash_store = FsCommitHashStore::new(commit_hash_path, canonical_root.clone());
 
-    let base = resolve_diff_base(&commit_hash_store, &git)?;
+    let base = with_repo_cwd(&canonical_root, || resolve_diff_base(&commit_hash_store, &git))?;
 
     Ok((scope_config, review_store, commit_hash_store, base))
+}
+
+fn discover_repo_from_items_dir(items_dir: &Path) -> Result<SystemGitRepo, String> {
+    if let Ok(repo) = SystemGitRepo::discover_from(items_dir) {
+        return Ok(repo);
+    }
+    if let Ok(project_root) = crate::track::resolve_project_root(items_dir) {
+        if let Ok(repo) = SystemGitRepo::discover_from(&project_root) {
+            return Ok(repo);
+        }
+    }
+    SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))
+}
+
+pub(super) fn repo_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, String> {
+    Ok(discover_repo_from_items_dir(items_dir)?.root().to_path_buf())
+}
+
+struct RepoCwdGuard {
+    original: PathBuf,
+    restored: bool,
+}
+
+impl RepoCwdGuard {
+    fn change_to(repo_root: &Path) -> Result<Self, String> {
+        let original = std::env::current_dir()
+            .map_err(|e| format!("failed to read current directory: {e}"))?;
+        std::env::set_current_dir(repo_root)
+            .map_err(|e| format!("failed to enter repo root {}: {e}", repo_root.display()))?;
+        Ok(Self { original, restored: false })
+    }
+
+    fn restore(&mut self) -> Result<(), String> {
+        if self.restored {
+            return Ok(());
+        }
+        std::env::set_current_dir(&self.original).map_err(|e| {
+            format!("failed to restore current directory {}: {e}", self.original.display())
+        })?;
+        self.restored = true;
+        Ok(())
+    }
+}
+
+impl Drop for RepoCwdGuard {
+    fn drop(&mut self) {
+        let _ = self.restore();
+    }
+}
+
+pub(super) fn with_repo_cwd<T>(
+    repo_root: &Path,
+    f: impl FnOnce() -> Result<T, String>,
+) -> Result<T, String> {
+    let mut guard = RepoCwdGuard::change_to(repo_root)?;
+    let result = f();
+    if let Err(e) = guard.restore() {
+        eprintln!("[warn] {e}");
+    }
+    result
 }
 
 /// Resolves the diff base commit hash.
@@ -184,6 +276,7 @@ pub(super) fn resolve_diff_base(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
+#[allow(dead_code)]
 pub(crate) fn build_review_v2_with_reviewer(
     track_id: &TrackId,
     items_dir: &Path,
@@ -331,4 +424,118 @@ pub(crate) fn build_scope_query_interactor_no_diff_str(
     let placeholder_base = CommitHash::try_new("0".repeat(40))
         .map_err(|e| format!("internal: placeholder commit hash construction failed: {e}"))?;
     Ok(ScopeQueryInteractor::new(scope_config, NullDiffGetter, placeholder_base))
+}
+
+// ---------------------------------------------------------------------------
+// Profile-loading helpers shared across review commands
+// ---------------------------------------------------------------------------
+
+/// Discovers the git repository root, loads `agent-profiles.json`, and
+/// returns the parsed `AgentProfiles`.
+///
+/// When `items_dir` is `Some`, git discovery is anchored to the project root
+/// derived from `items_dir` (stripping the trailing `track/items` segments) so
+/// that launchers or wrappers that `cd` to an arbitrary working directory do not
+/// break profile loading when the target repository is discoverable from
+/// `items_dir`. When `items_dir` is `None`, falls back to CWD-based discovery
+/// (legacy behaviour for callers that do not have an `items_dir`).
+///
+/// # Errors
+/// Returns `Err` when the repository cannot be discovered or the profiles
+/// file is missing / malformed.
+pub(crate) fn load_agent_profiles_from_repo(
+    items_dir: Option<&Path>,
+) -> Result<infrastructure::agent_profiles::AgentProfiles, String> {
+    let repo = if let Some(dir) = items_dir {
+        let project_root = crate::track::resolve_project_root(dir)?;
+        SystemGitRepo::discover_from(&project_root)
+            .map_err(|e| format!("[ERROR] failed to discover git repository root: {e}"))?
+    } else {
+        SystemGitRepo::discover()
+            .map_err(|e| format!("[ERROR] failed to discover git repository root: {e}"))?
+    };
+    let profiles_path = repo.root().join(infrastructure::agent_profiles::AGENT_PROFILES_PATH);
+    infrastructure::agent_profiles::AgentProfiles::load(&profiles_path)
+        .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))
+}
+
+pub(crate) struct ResolvedAgentExecution {
+    pub(crate) provider: String,
+    pub(crate) model: String,
+}
+
+/// Resolves an agent capability execution from `agent-profiles.json`, applying
+/// the caller's optional model override.
+///
+/// # Errors
+/// Returns `Err` when profiles cannot be loaded, the capability is missing, or
+/// neither the caller nor profile supplies a model.
+pub(crate) fn resolve_agent_execution(
+    items_dir: Option<&Path>,
+    capability: &str,
+    round_type: infrastructure::agent_profiles::RoundType,
+    model_override: Option<&str>,
+) -> Result<ResolvedAgentExecution, String> {
+    let profiles = load_agent_profiles_from_repo(items_dir)?;
+    let resolved = profiles.resolve_execution(capability, round_type).ok_or_else(|| {
+        format!("[ERROR] {capability} capability not defined in agent-profiles.json")
+    })?;
+    let model =
+        model_override.map(str::to_owned).or_else(|| resolved.model.clone()).ok_or_else(|| {
+            format!(
+                "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
+                 {capability} capability"
+            )
+        })?;
+    Ok(ResolvedAgentExecution { provider: resolved.provider.clone(), model })
+}
+
+/// Parses a `round_type` string (`"fast"` or `"final"`) into the infra
+/// `RoundType` enum.
+///
+/// Delegates to `RoundType`'s `FromStr` implementation so the accepted values
+/// and error format are defined in a single place.
+///
+/// # Errors
+/// Returns `Err` with a human-readable message for any unrecognised value.
+pub(crate) fn parse_round_type(
+    s: &str,
+) -> Result<infrastructure::agent_profiles::RoundType, String> {
+    s.parse()
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod tests {
+    use std::path::PathBuf;
+
+    use super::with_repo_cwd;
+
+    struct CwdRestore(PathBuf);
+
+    impl Drop for CwdRestore {
+        fn drop(&mut self) {
+            let _ = std::env::set_current_dir(&self.0);
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_with_repo_cwd_restore_failure_preserves_primary_result() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let saved_cwd = std::env::current_dir().unwrap();
+        let _cwd_restore = CwdRestore(saved_cwd);
+        let original = tempfile::tempdir().unwrap();
+        let repo = tempfile::tempdir().unwrap();
+        let original_path = original.path().to_path_buf();
+
+        std::env::set_current_dir(&original_path).unwrap();
+
+        let result = with_repo_cwd(repo.path(), || {
+            std::fs::remove_dir_all(&original_path).unwrap();
+            Ok::<u32, String>(42)
+        });
+
+        assert_eq!(result, Ok(42));
+    }
 }

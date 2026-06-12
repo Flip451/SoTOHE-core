@@ -178,18 +178,21 @@ args = ["clippy", "--locked", "--all-targets", "--all-features", "--", "-D", "wa
 [tasks.test-local]
 private = true
 description = "[internal] Run tests with nextest"
+env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["nextest", "run", "--locked", "--all-targets", "--all-features", "--no-tests=warn"]
 
 [tasks.test-doc-local]
 private = true
 description = "[internal] Run documentation tests"
+env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["test", "--locked", "--doc", "--all-features"]
 
 [tasks.test-nocapture-local]
 private = true
 description = "[internal] Run tests with stdout/stderr shown"
+env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["test", "--locked", "--all-features", "--", "--nocapture"]
 
@@ -220,6 +223,7 @@ args = ["clippy", "--locked", "--tests", "--all-features", "--", "-D", "warnings
 [tasks.llvm-cov-local]
 private = true
 description = "[internal] Generate HTML coverage report"
+env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["llvm-cov", "nextest", "--html", "--all-features", "--locked"]
 
@@ -610,14 +614,14 @@ command = "bin/sotp"
 args = ["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"]
 
 [tasks.track-commit-message]
-description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the strict commit gate: stage working tree, full cargo make ci, code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` under the commit-gate context — the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved + semantic review + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
+description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved + semantic review + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
 dependencies = ["track-active-gate"]
 script_runner = "@shell"
 script = ['''
 bin/sotp git add-all && \
 cargo make ci && \
 bin/sotp review check-approved && \
-bin/sotp ref-verify run --context commit-gate && \
+bin/sotp ref-verify run && \
 bin/sotp git add-all && \
 bin/sotp ref-verify check-approved && \
 bin/sotp dry check-approved && \

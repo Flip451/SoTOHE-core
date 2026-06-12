@@ -17,6 +17,7 @@ pub mod pr;
 pub mod ref_verify;
 pub mod review;
 pub mod semantic_dup;
+pub mod telemetry;
 pub mod track;
 pub mod verify;
 #[cfg(test)]

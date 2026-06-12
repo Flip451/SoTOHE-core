@@ -50,6 +50,24 @@ pub enum RoundType {
     Fast,
 }
 
+impl std::str::FromStr for RoundType {
+    type Err = String;
+
+    /// Parses `"fast"` → `Fast` and `"final"` → `Final`.
+    ///
+    /// # Errors
+    /// Returns an error message for any unrecognised value.
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "fast" => Ok(RoundType::Fast),
+            "final" => Ok(RoundType::Final),
+            other => {
+                Err(format!("[ERROR] unknown round type '{other}' (expected 'fast' or 'final')"))
+            }
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // ResolvedExecution
 // ---------------------------------------------------------------------------
@@ -660,6 +678,33 @@ mod tests {
         assert!(
             err.to_string().contains("timeout_seconds"),
             "expected unknown-field rejection, got: {err}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // RoundType::from_str tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_round_type_from_str_fast_succeeds() {
+        let result: Result<RoundType, _> = "fast".parse();
+        assert_eq!(result.unwrap(), RoundType::Fast);
+    }
+
+    #[test]
+    fn test_round_type_from_str_final_succeeds() {
+        let result: Result<RoundType, _> = "final".parse();
+        assert_eq!(result.unwrap(), RoundType::Final);
+    }
+
+    #[test]
+    fn test_round_type_from_str_unknown_returns_error() {
+        let result: Result<RoundType, _> = "unknown".parse();
+        assert!(result.is_err());
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("unknown round type"),
+            "expected error message to mention 'unknown round type', got: {msg}"
         );
     }
 }

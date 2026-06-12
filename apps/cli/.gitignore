@@ -1,0 +1,14 @@
+# Local ignore rules for stray telemetry artifacts.
+#
+# The `TrackCommand::SetCommitHash` `items_dir()` accessor previously returned
+# the CWD-relative "track/items" fallback, which could cause telemetry writes
+# to land under apps/cli/track/ when the process ran from a subdirectory.
+# That bug was fixed by making SetCommitHash discover the git repo root via
+# `git rev-parse --show-toplevel` and return an absolute items_dir path.
+#
+# The root-level `.gitignore` rule `track/items/**/logs/` only matches paths
+# anchored at the repo root. It does NOT cover `apps/cli/track/items/.../logs/`
+# paths. This local rule covers any residual stray artifacts under this crate.
+# The leading `/` anchors the pattern to `apps/cli/` so that the `src/commands/track/`
+# source tree is not accidentally ignored.
+/track/items/**/logs/
