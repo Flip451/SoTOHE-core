@@ -10234,6 +10234,62 @@
       "base_commit": "5a71c8060c66ae92849c7844c3f45a23cc925077",
       "rationale": "Both tests share routine fixture setup for a temporary git repo and subdirectory execution, but they exercise different behavior: one verifies archiving an existing track without logs succeeds, while the other verifies a missing track returns an error and does not create an archive. The repeated setup is small, clear, and test-local; extracting it would not remove a meaningful duplicated rule or abstraction.",
       "recorded_at": "2026-06-12T19:20:15Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "e4ef9e6c5ec8845285d30621017a2a61094830dd234d6f594ab44bc9622faa86",
+      "high_path": "libs/infrastructure/src/verify/hooks_path.rs",
+      "high_hash": "ff063160664dfa01d59780a08d8da6903b262038fea8784155a5cb76cd9f95b5",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Move `strip_git_config_line_ending` into a shared utility module or crate accessible to both `apps/cli-composition` and `libs/infrastructure`, then replace both local copies with calls to that single implementation."
+        }
+      },
+      "similarity_score": 0.8899795413017273,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1e893cdc48d841833ce35567b30d69caaef7201d",
+      "rationale": "The fragments are identical production helpers with the same name and behavior, both normalizing git config output line endings. This is repeated domain-specific logic rather than incidental similarity, so future fixes or behavior changes would need to be made in both places.",
+      "recorded_at": "2026-06-12T19:58:22Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "4903f6f7dabb53499eed2b911f0913a95bb1a6fe7d19796e1217711e87fc0103",
+      "high_path": "apps/cli-composition/src/hook.rs",
+      "high_hash": "96b72a79d73da35abbad68fd82c953d6321f626323f6d5c883f76c568428a21b",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.875215470790863,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1e893cdc48d841833ce35567b30d69caaef7201d",
+      "rationale": "These are neighboring tests for the same parser/helper, but they cover distinct boundary behaviors: exact accepted values with newline variants versus rejection of a trailing-space value. The repeated call to `hooks_path_configured_from_stdout` is minimal and expected in focused unit tests, and extracting it would likely reduce clarity rather than remove meaningful duplication.",
+      "recorded_at": "2026-06-12T19:58:35Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "4903f6f7dabb53499eed2b911f0913a95bb1a6fe7d19796e1217711e87fc0103",
+      "high_path": "apps/cli-composition/src/hook.rs",
+      "high_hash": "6271f763923e2df84fb0723cee079caf8e93278df2f969856b09fc228e174f51",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8601290583610535,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1e893cdc48d841833ce35567b30d69caaef7201d",
+      "rationale": "The fragments exercise different behaviors of the same helper: exact `.githooks` output with optional newline variants should return true, while a leading-space variant should return false. The overlap is limited to calling the same function in related tests, not duplicated logic that would benefit from abstraction.",
+      "recorded_at": "2026-06-12T19:58:44Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/hook.rs",
+      "low_hash": "6271f763923e2df84fb0723cee079caf8e93278df2f969856b09fc228e174f51",
+      "high_path": "apps/cli-composition/src/hook.rs",
+      "high_hash": "96b72a79d73da35abbad68fd82c953d6321f626323f6d5c883f76c568428a21b",
+      "changed_path": "apps/cli-composition/src/hook.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.966032862663269,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1e893cdc48d841833ce35567b30d69caaef7201d",
+      "rationale": "The fragments are two small, parallel unit tests for distinct edge cases: leading whitespace versus trailing whitespace in hook path output. The repeated assertion shape is incidental test structure and keeping separate test names preserves clear coverage intent.",
+      "recorded_at": "2026-06-12T19:58:57Z"
     }
   ]
 }

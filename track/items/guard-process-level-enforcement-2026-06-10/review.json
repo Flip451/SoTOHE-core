@@ -1,6 +1,52 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4775d4b0b73c07fc8c4eb9584e5e6adad0a36bc1535f5b0cef2540f327c7b80f",
+          "at": "2026-06-12T00:36:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4775d4b0b73c07fc8c4eb9584e5e6adad0a36bc1535f5b0cef2540f327c7b80f",
+          "at": "2026-06-12T00:38:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:148d7ae42cf4f06a5761fdb18c6bf04d8717ce8b0bd80b4564db56a6fae96876",
+          "at": "2026-06-12T13:18:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:148d7ae42cf4f06a5761fdb18c6bf04d8717ce8b0bd80b4564db56a6fae96876",
+          "at": "2026-06-12T13:24:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bf7d80cab2f4c6350cd3b6ed5a488d9454d620b885482046cd03af97c905b26",
+          "at": "2026-06-12T15:10:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38213834b82642569d97bac79bf050e1c79c642c113cf434e93d4ec00a301a30",
+          "at": "2026-06-12T17:16:41Z"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -137,6 +183,674 @@
           "findings": [],
           "hash": "rvw1:sha256:eb32fb664e3177af1229a7b305ceadd8a1d497822faceb23924d312e295b08f3",
           "at": "2026-06-12T19:36:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c2633f10d08a4303999f305734aa3255d9e4aa14f40ccd1899d381be67c0d9b",
+          "at": "2026-06-12T19:54:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c2633f10d08a4303999f305734aa3255d9e4aa14f40ccd1899d381be67c0d9b",
+          "at": "2026-06-12T19:56:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb8d94a1437dba5ba2052f0c58c2b0f478b6e730cc991b1b4be3478520e0b7ff",
+          "at": "2026-06-12T20:05:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb8d94a1437dba5ba2052f0c58c2b0f478b6e730cc991b1b4be3478520e0b7ff",
+          "at": "2026-06-12T20:08:18Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
+          "at": "2026-06-11T18:07:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Dispatch` still accepts only the hook enum, but the new git hook shims are intended to invoke `bin/sotp hook dispatch git-ref-update \"$@\"` / `git-pre-push \"$@\"`. Real `reference-transaction` and `pre-push` hooks supply positional arguments, so clap will reject those extra args before `CliApp::hook_dispatch` runs. That makes normal guarded git operations fail even when `SOTP_GUARDED_GIT` is set; the dispatch command needs to accept and ignore or forward trailing git-hook args while preserving the existing Claude-envelope behavior for the other hooks.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 49,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
+          "at": "2026-06-11T18:09:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The dispatch CLI now changes security-critical public parsing behavior by accepting trailing positional args for git hooks and rejecting them for Claude-envelope hooks, but this scope adds no CLI-level tests for either path. The briefing specifically depends on git hooks being reachable without a Claude JSON envelope while existing Claude hooks still fail closed; without a regression test around this clap boundary, a future parse or dispatch change could break the git shims or weaken the existing hook behavior without being caught. Add happy-path tests for `git-ref-update`/`git-pre-push` with positional args and an error-case test that extra args on non-git hooks return exit 2.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 60,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:26156ae2ce16bdee659229429c994c1cb8e056ee022c2f9f80a2ae2b3bc75c93",
+          "at": "2026-06-11T18:15:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `git-pre-push` CLI dispatch path only has an allow-case integration test with `SOTP_GUARDED_GIT` set. Because this hook is security-critical and must block direct pushes when the guarded token is absent, add the missing error-case test for `sotp hook dispatch git-pre-push ...` without the token returning exit 2.",
+              "severity": "P1",
+              "file": "apps/cli/tests/hook_dispatch.rs",
+              "line": 73,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:22d1581fb17d3afbec62841771c8c44409bad2c6aba31f5937122fe8a3c7d6ef",
+          "at": "2026-06-11T18:21:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
+          "at": "2026-06-11T18:24:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
+          "at": "2026-06-11T18:27:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI integration coverage only exercises the git process hooks. It does not cover the briefing's required invariant that existing Claude-envelope hooks still fail closed on bad stdin after adding the no-envelope git path. Please add CLI-level tests for `block-direct-git-ops` and `block-test-file-deletion` with empty or malformed stdin asserting exit code 2, so a future regression cannot accidentally route those hooks through the git no-envelope path while this suite still passes.",
+              "severity": "P1",
+              "file": "apps/cli/tests/hook_dispatch.rs",
+              "line": 26,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e9679ad779709e995f47bd5ea54f7311fa920537e137df559551296948eb8e50",
+          "at": "2026-06-11T18:38:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58197fc5e01d7287c0b24d65ac728368925016e8148c5db435a0adf744f9c655",
+          "at": "2026-06-11T18:41:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c94f26a8830d84d89e632ca92c7f268012dcf6be52ba1ea238b19eed72302ed",
+          "at": "2026-06-11T18:49:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: This adds a new public `verify hooks-path` subcommand and dispatch arm, but there is no matching parser/dispatch coverage in the verify test suite. The existing `verify_tests.rs` file exercises the other `VerifyCommand` variants; without success/failure tests for `HooksPath`, a clap rename or dispatch regression here could ship unnoticed. See [apps/cli/src/commands/verify.rs:45](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L45) and [apps/cli/src/commands/verify.rs:157](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L157).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs",
+              "line": 45,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
+          "at": "2026-06-11T23:39:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "New public `verify hooks-path` CLI surface is added without CLI-layer parser/dispatch coverage. The existing composition tests cover `CliApp::verify_hooks_path`, but nothing in this scope proves clap parses `verify hooks-path` into `VerifyCommand::HooksPath` or guards the dispatch arm against future miswiring, which is a P1 test gap for a new public subcommand.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 46,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
+          "at": "2026-06-11T23:42:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbf15221fcbd20f9fb5b4bd440986ac8bc5e41a2649c4861b88d3fd437743ee6",
+          "at": "2026-06-11T23:45:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0d3cd25c856c185d3910153a29caa98f0a309fc4b0d7f9b214aabde5afec543",
+          "at": "2026-06-12T00:19:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0d3cd25c856c185d3910153a29caa98f0a309fc4b0d7f9b214aabde5afec543",
+          "at": "2026-06-12T00:21:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54358dd4257ab4795edd3e76a2f78d551ef17e6421297e5f0761a634d0b91852",
+          "at": "2026-06-12T15:10:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d29a6e9c80c71474a0bcd41e87e283f321f44760ae1c9a23a2acc6160943fad0",
+          "at": "2026-06-12T17:12:35Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`argv_contains_guarded_token` only blocks tokens that are exactly `SOTP_GUARDED_GIT`. A quote-split assignment like `SOTP_GUARDED_GI\"T\"=1` is tokenized to `SOTP_GUARDED_GIT=1`, then falls through `skip_var_assignments` and is allowed, so the D3 quote-splitting bypass is still open. The added tests only cover the bare token and an unrelated partial-token allow case; add a regression for the quoted-assignment form and broaden the predicate so that the guarded token cannot be reintroduced as an assignment token.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 543,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:950e2f404da1efa751e3dc0aa1022c11e749ed320d1d5b39ee7ff9479e8497c1",
+          "at": "2026-06-11T01:53:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
+          "at": "2026-06-11T01:58:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
+          "at": "2026-06-11T02:00:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
+          "at": "2026-06-11T17:38:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
+          "at": "2026-06-11T17:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `contains_git_invocation` misses `env`-prefixed invocations because `env` is not in `COMMAND_LAUNCHERS`. That leaves a fail-closed bypass in `GuardHookHandler`: `env git ...` and `sudo env git ...` are parsed as `env`, not `git`, so the new hooks-path gate will not trip even though the command still executes git. `env` is already treated as a wrapper elsewhere in the repo, so this needs to be handled here and regression-tested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "line": 14,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: The new public API `contains_git_invocation` was added without any unit tests in this module. That leaves the launcher-stripping behavior and the new git-detection path unverified, which conflicts with the repo policy that public APIs need happy-path and error/bypass coverage. Add regression tests for direct git, launcher-wrapped git, and at least one non-git case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "line": 143,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6f11052f82ad3e52b175e383a103800e3bef2816d685d51c0e93abe76d35cbe1",
+          "at": "2026-06-12T01:00:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contains_git_invocation()` only strips tokens in `COMMAND_LAUNCHERS`, and `env` is not included there. As a result, `env git status`, `env -i git status`, and `sudo env git status` are parsed as `env` here and return `false`, which bypasses the new fail-closed hooks-path gate even though git still executes.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "line": 143,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:6f11052f82ad3e52b175e383a103800e3bef2816d685d51c0e93abe76d35cbe1",
+          "at": "2026-06-12T01:09:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -i` is still treated as an arg-consuming launcher option here because the final `LAUNCHER_OPTIONS_WITH_ARG` check returns `true` after the `env` special-case. That makes `skip_command_launchers()` skip the real `git` token in `env -i git add`, so the direct-git block is bypassed.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "line": 443,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:771a4974ef9bcb485b587590da53e58159b629a86dd3f8dc299aabe2ebfb8e40",
+          "at": "2026-06-12T01:14:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `env` as a launcher does not cover the `-S/--split-string` form, so a quoted command like `env -S 'git add .'` or `env --split-string='git add .'` is left as a single non-git token and `contains_git_invocation()` returns false. That creates a policy bypass for the hooks-path fail-closed check.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 53,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:359e2ba359d94ef5e965667cc958acec5a438c78cc3b0655efeb151e77893361",
+          "at": "2026-06-12T01:18:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MAX_ENV_SPLIT_DEPTH` caps `env -S` expansion at 3 levels, so a command nested one level deeper stops being inspected for an inner `git` invocation. Once the limit is hit, the code falls back to the plain launcher scan and can silently allow a crafted nested `env -S ... git add` chain.",
+              "severity": "P1",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 136,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:6383e874ffde4a327793c61dc7ce22628620e518945a1043fae9f3ec94f5855c",
+          "at": "2026-06-12T01:28:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24c0fe7f6e8ab1a5c38daf84b9a3d01686740b85e3b8279283606457e9f7a24f",
+          "at": "2026-06-12T01:36:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_env_string` treats every backslash escape as a literal next character, but GNU `env -S` gives `\\_` special meaning as an argument separator. A command like `env -S 'git\\_add .'` is parsed here as executable `git_add` and is allowed, while real `env` executes `git add .`; this bypasses the retained direct-git policy for `git add` and also makes `contains_git_invocation` miss the runtime fail-closed case. The `env -S` splitter needs to model `\\_` as a split boundary, with a regression for `git\\_add`/`git\\_status`.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 495,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:24c0fe7f6e8ab1a5c38daf84b9a3d01686740b85e3b8279283606457e9f7a24f",
+          "at": "2026-06-12T02:25:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GNU `env` accepts clustered short options where `S` carries the split string, for example `env -vSgit add .` is parsed as `env -v -S git add .` and executes `git add .`. This parser only recognizes `-S` when it is the whole token or the first characters of the token, so `-vSgit`/`-ivSgit` are treated as ordinary env options and the effective command becomes `add`, allowing the guarded direct git operation to bypass the policy. Handle clustered env short options containing `S` before skipping them.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 461,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:298274472c05c0076d5a4dc21e3d087cd1776dbf5115366443b8f709f1b54b71",
+          "at": "2026-06-12T02:31:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new env launcher handling misses clustered short options that consume the next argument. For example, GNU `env -iu FOO git add .` is parsed as `env -i -u FOO git add .` and runs `git add`, but this code does not treat `-iu` as consuming `FOO`, so policy inspection stops at `FOO` and allows the command. This reopens a direct-git-operation bypass for both `check_commands` and `contains_git_invocation`.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 630,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:969e2dbb8c1cad54fb081dff1a733366528308dd2e57065f0269dd07c9ee97ec",
+          "at": "2026-06-12T02:36:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_env_string` does not model GNU `env -S` variable expansion, so a command like `GIT=git env -S '${GIT} add .'` is split by policy as `${GIT} add .` and allowed, while real `env` expands `${GIT}` and executes `git add .`. This bypasses the retained direct git-write block and also makes `contains_git_invocation` return false for the runtime git process.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 535,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:c2b9a2ba9ba4a67d5302f2e8a0975df94ee6326515a51d8118301e1e5c0c53ee",
+          "at": "2026-06-12T02:39:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env_split_string_argv_at_env` gives up as soon as it sees an `env` assignment, but `skip_command_launcher_at` later skips that assignment and continues treating a following nested `env` as a launcher. This lets `env FOO=git env -S '${FOO} add .'` through as allowed even though it executes `git add`: the first `env` returns `None`, then launcher skipping consumes `FOO=git` and skips the nested `env -S` string instead of expanding/checking it. The split-string handling needs to carry env-assigned variables forward or otherwise inspect the nested env rather than returning `None` here.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 466,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:4191a489c993ef7eec891a96fa19fcc10463effc521a511ce910fab610d904e5",
+          "at": "2026-06-12T02:45:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_env_string` treats every backslash escape as a literal next character, but GNU `env -S` gives `\\c` special meaning: it terminates parsing and ignores the rest of the split string while keeping the token built so far. A command like `env -S 'git push\\c ignored'` is parsed here as `git pushc ignored`, so `check_git_command` sees subcommand `pushc` and allows it; real `env` executes `git push`. That reopens a direct git write bypass for protected subcommands such as push/commit. Model `\\c` and add a regression test.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 664,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a3956dd8d8c9dbac42e10b283d366de62211dc47f45be8d2d45451239dfd39c8",
+          "at": "2026-06-12T02:56:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_env_string` marks a token as present after every `${...}` expansion even when the variable is unset and appends no text. For `env -S '${MISSING} git add .'` with `MISSING` unset, this code produces an argv like `[\"\", \"git\", \"add\", \".\"]`; `check_argv` then treats the empty string as the effective command and allows it. GNU `env -S` drops the unquoted empty expansion and actually runs `git add .`, so this bypasses the direct git-write block and also makes `contains_git_invocation` return false. The splitter should not create an unquoted empty token for an unset expansion at a token boundary.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 689,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ffe2ee7b3ba52c3f4b638d409dfae8545047f992cc747ff78816c33ffb3e378d",
+          "at": "2026-06-12T03:01:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GNU `env -S` treats an unescaped `#` in the split string as a comment, and if that leaves the split string with no argv entries, the remaining command-line args become the command. This parser keeps `#` as argv[0`, so `env -S '# noop' git add .` is allowed by the policy even though `/usr/bin/env` executes `git add .`, bypassing the direct-git block.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 646,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:3d3900a5f1bb4710d581c9df727e0b376c02aca1fd86636950baac050e54bcae",
+          "at": "2026-06-12T03:08:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -S` split tokens are rechecked as the child command argv, but GNU `env` continues parsing those split tokens as `env` options before executing the command. For example, `env -S '-i' git add .` yields split argv `['-i', 'git', 'add', '.']`; this code then treats `-i` as the effective command and allows it, while real `env` consumes `-i` and executes `git add .`. The same bypass affects `contains_git_invocation`, so guarded direct git operations can evade the policy whenever the split string starts with env options.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 197,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:9c80982d8456b7d6111657beee72fc4da2eb4bade239c88735cce2457ce38043",
+          "at": "2026-06-12T03:13:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -S` is only expanded if it appears before any `NAME=value` assignments for that `env`. When `env_split_string_argv_at_env` sees an assignment, it records the variable and immediately returns to `env_split_string_argv_after_launchers_from` at the next token; that helper only looks for another launcher, so `env GIT=git -S \"git add .\"` falls through to the normal launcher skip path and treats `-S` as the effective command. GNU `env` accepts assignments before `-S`, so this bypasses the direct `git add` block and `contains_git_invocation` fail-closed detection.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 476,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:5ed5bfed8945f93e665581680831458fd1c9c4f583ff17d1461560dcdc537d60",
+          "at": "2026-06-12T03:18:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`policy.rs` now has 1,038 production lines before the `#[cfg(test)]` block, up from 605, which exceeds the AGENTS.md hard maximum of 700 non-test lines per module. The new `env -S` parsing helpers should be split into a smaller module so this domain policy module stays within the required size boundary.",
+              "severity": "P1",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 426,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:01f5ee1e9820f848abfc98a3f6fe5f5abe1e27a994bf99ce6e4817817c3d3741",
+          "at": "2026-06-12T03:33:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -S` expansion silently treats variables that were not assigned in the same argv as empty. In a real shell, an earlier command can export that variable before the guarded command runs, e.g. `export G=git; env -S '${G} add .'`. The parser will hand this policy the second command with only `env -S ${G} add .`; `expand_env_var` drops `${G}`, so `check_commands` and `contains_git_invocation` see `add .` and allow it, while GNU `env` executes `git add .`. This bypasses the retained direct-git block and the hooks-path fail-closed check.",
+              "severity": "P0",
+              "file": "libs/domain/src/guard/policy.rs",
+              "line": 450,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:78e44f87307c97b6ac2674119e14ea74b98b58150d8d339af3b2b4b782e2cae3",
+          "at": "2026-06-12T03:43:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55996d6b21fe60e40f4a7f1c54e1a30ef19845d1491528fb950cd2b06bd910e9",
+          "at": "2026-06-12T04:07:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3df37bf44d1f620b06a55a339277bad177b1e2acfe60969e204ebc82f84c48",
+          "at": "2026-06-12T11:18:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3df37bf44d1f620b06a55a339277bad177b1e2acfe60969e204ebc82f84c48",
+          "at": "2026-06-12T11:22:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f483922ae1ee54b3fe015469370f7de105103f85af0156b5b88696d637e951e3",
+          "at": "2026-06-12T16:06:29Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:27:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
+          "at": "2026-06-11T06:29:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:22:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
+          "at": "2026-06-11T16:24:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
+          "at": "2026-06-11T23:38:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
+          "at": "2026-06-11T23:40:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify-hooks-path-local` is wired into both `ci-local` and `ci-container`, turning a new repository-local config check into a core CI gate. The briefing says this hooks-path verification is not supposed to land in `ci-local` yet, so clean checkouts that have not been bootstrapped will start failing before the later rollout step.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 354,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
+          "at": "2026-06-12T01:09:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4056d58f2c240bd68c04e40e75c0e02381567e8648cc19711e07f5826c3420cd",
+          "at": "2026-06-12T01:12:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4056d58f2c240bd68c04e40e75c0e02381567e8648cc19711e07f5826c3420cd",
+          "at": "2026-06-12T02:24:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45d1aec4aba0ba009180d834a8a309ef44d7fd7262ffef79e254203ea166d1da",
+          "at": "2026-06-12T11:46:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45d1aec4aba0ba009180d834a8a309ef44d7fd7262ffef79e254203ea166d1da",
+          "at": "2026-06-12T11:48:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `verify-hooks-path-local` here makes `cargo make ci-container` require `core.hooksPath` to already be set, but the GitHub Actions workflow still invokes `cargo make ci-container` directly on a fresh checkout and does not run the bootstrap step that sets it. Because the container mounts `.git` read-only, the new verifier will see the default unset config and fail every CI run.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 362,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
+          "at": "2026-06-12T13:06:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
+          "at": "2026-06-12T13:19:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
+          "at": "2026-06-12T13:25:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2040cb2e2ab4fc9790ebb7a4a7d58f08f5a554bdf7160e349462929fc727e6ad",
+          "at": "2026-06-12T15:10:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9466a53ab9792aebe62f12792036b06f7726a05b4c1be72f9701a4bdbabb077",
+          "at": "2026-06-12T17:17:10Z"
         }
       ]
     },
@@ -772,653 +1486,6 @@
           "findings": [],
           "hash": "rvw1:sha256:cc6b8278137914935421dffb2dbfa9b24797bfcd11aa63196ef23ef78cee9875",
           "at": "2026-06-12T17:17:20Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
-          "at": "2026-06-11T17:39:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
-          "at": "2026-06-11T17:42:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
-          "at": "2026-06-11T19:04:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
-          "at": "2026-06-11T19:06:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Add coverage for the `Err(e)` path in `verify`. The current tests exercise the pass case plus two config-state failures, but they never force `Command::new(\"git\").output()` to fail. A missing `git` binary or PATH failure would therefore bypass unit coverage on this new public API.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/hooks_path.rs",
-              "line": 17,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:4e8172d33b7e473ccb7eba904b38d555bd9747b250e0489b7b4af846554dabe4",
-          "at": "2026-06-11T23:40:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
-          "at": "2026-06-11T23:43:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The verifier trims all leading/trailing whitespace from the configured hooks path before comparing it to `.githooks`. A value that Git can treat as a different path, such as a quoted `\".githooks \"` or `\" .githooks\"`, would be accepted here, so the new check can falsely pass even though hooks are not actually configured to the repository-managed directory. Strip only the command's line ending before the exact comparison.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/hooks_path.rs",
-              "line": 37,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
-          "at": "2026-06-11T23:45:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a61c7e5703844b381e34e08b919e3a30a5bcbc4588109403b2ddc854799a2ec0",
-          "at": "2026-06-11T23:48:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated direct-git expectation no longer requires the old `cargo run --quiet -p cli --` fallback, but it still does not forbid it. `verify_hook_paths` only checks that one command contains all listed positive fragments, so a drifted command that includes `SOTP_CLI_BINARY:-`, `$CLAUDE_PROJECT_DIR/bin/sotp`, `command -v sotp`, `hook dispatch block-direct-git-ops`, the missing-CLI message, `|| exit 2`, and then still falls back to `cargo run --quiet -p cli -- hook dispatch block-direct-git-ops` would pass verification. That misses the briefing requirement that the direct-git hook fail closed when `sotp` is unavailable and not allow the cargo fallback.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra/constants.rs",
-              "line": 71,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:db7fd6be57e830f82e271412d26cd7b4115fa7110879c12a57cb5e9520a08baf",
-          "at": "2026-06-12T15:11:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`EXPECTED_HOOK_COMMANDS` still does not include an entry for `hook dispatch block-test-file-deletion`, even though this file documents that Rust hooks are validated through this list and `verify_hook_paths` only checks these constants. As a result, `.claude/settings.json` can remove or drift the Write/Edit deletion guard entirely and `verify-orchestra` will not report it. Add the expected fragments for the `block-test-file-deletion` hook, including the installed-CLI resolution and fail-closed remediation shape.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra/constants.rs",
-              "line": 57,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:91e901de346f147f5936ca0290ccddc2a35a9cb1fa00d0c94957112faa2f5923",
-          "at": "2026-06-12T15:16:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The direct-git hook expectation now only lists positive fragments. `verify_hook_paths` treats `EXPECTED_HOOK_COMMANDS` as a contains-all check, so a command that includes the new installed-CLI path but also still contains `cargo run --quiet -p cli --` would pass verification. That misses the briefing requirement to not allow the cargo fallback, leaving the verifier unable to catch this policy drift. Add an explicit forbidden-fragment check for the direct-git hook fallback or an equivalent negative expectation.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra/constants.rs",
-              "line": 71,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:93128f980328f843634a61157b22abdf0a8b12ac26009d2be3601a060a67f125",
-          "at": "2026-06-12T15:19:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66e28f4a3105f2b138cd7f22e1accb294d4065003832de786a543ccc06869735",
-          "at": "2026-06-12T16:07:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryWriter` sanitizes the track id but then creates and opens the default `items_dir/<track>/logs/telemetry.jsonl` path with plain `create_dir_all`/`OpenOptions`, which follows symlinked path components. If `track/items/<track-id>` is a symlink, any instrumented command on that track branch will append telemetry outside the repository. This should reject symlinks below the trusted items/root path before creating/opening the log path, consistent with the existing infrastructure symlink guards.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/telemetry/writer.rs",
-              "line": 153,
-              "category": "security"
-            },
-            {
-              "message": "`TelemetryReport::aggregate` validates the track id but uses `std::fs::metadata` and `File::open` on `<items_dir>/<track-id>/logs/telemetry.jsonl`, both of which follow symlinks. A symlinked track directory can make `sotp telemetry report <track-id>` read and print JSONL data from outside `track/items`. Use the existing symlink guard/descriptor-pinned open pattern anchored at `items_dir` before accepting the track directory and log file.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/telemetry/report.rs",
-              "line": 173,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:49206afbbc320dc97b34fb5f5a38010fc4cd3fdc3c050baa4b89d269538fb46e",
-          "at": "2026-06-12T17:19:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31e0566dd4fc3e8afd8653c8a33dd67c5236b7c6e54240e0ce6e4593bf071c10",
-          "at": "2026-06-12T17:28:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:76a605f8bece6808971bce05dcbaf6820e909b0742c017a015efcefa0886c4de",
-          "at": "2026-06-12T19:26:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:76a605f8bece6808971bce05dcbaf6820e909b0742c017a015efcefa0886c4de",
-          "at": "2026-06-12T19:31:51Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T06:27:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04d54a4656a9c3869c24671b3de99dfe3418439c1c7927f3d6b7ae17deebd1bb",
-          "at": "2026-06-11T06:29:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
-          "at": "2026-06-11T16:22:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:230305a62e5c8507d89448d2e04cf56984d85e4519b70a582f03c9a746afcdef",
-          "at": "2026-06-11T16:24:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
-          "at": "2026-06-11T23:38:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1789c41aae46cc863348cc2d6564b41186a692d002a7927dfb0879ee73d06aab",
-          "at": "2026-06-11T23:40:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify-hooks-path-local` is wired into both `ci-local` and `ci-container`, turning a new repository-local config check into a core CI gate. The briefing says this hooks-path verification is not supposed to land in `ci-local` yet, so clean checkouts that have not been bootstrapped will start failing before the later rollout step.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 354,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
-          "at": "2026-06-12T01:09:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4056d58f2c240bd68c04e40e75c0e02381567e8648cc19711e07f5826c3420cd",
-          "at": "2026-06-12T01:12:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4056d58f2c240bd68c04e40e75c0e02381567e8648cc19711e07f5826c3420cd",
-          "at": "2026-06-12T02:24:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:45d1aec4aba0ba009180d834a8a309ef44d7fd7262ffef79e254203ea166d1da",
-          "at": "2026-06-12T11:46:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:45d1aec4aba0ba009180d834a8a309ef44d7fd7262ffef79e254203ea166d1da",
-          "at": "2026-06-12T11:48:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `verify-hooks-path-local` here makes `cargo make ci-container` require `core.hooksPath` to already be set, but the GitHub Actions workflow still invokes `cargo make ci-container` directly on a fresh checkout and does not run the bootstrap step that sets it. Because the container mounts `.git` read-only, the new verifier will see the default unset config and fail every CI run.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 362,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
-          "at": "2026-06-12T13:06:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
-          "at": "2026-06-12T13:19:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce3108ba3bef60362fa3d5bda7de73d28dfb4584255463579bd863398c0c45c8",
-          "at": "2026-06-12T13:25:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2040cb2e2ab4fc9790ebb7a4a7d58f08f5a554bdf7160e349462929fc727e6ad",
-          "at": "2026-06-12T15:10:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9466a53ab9792aebe62f12792036b06f7726a05b4c1be72f9701a4bdbabb077",
-          "at": "2026-06-12T17:17:10Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`argv_contains_guarded_token` only blocks tokens that are exactly `SOTP_GUARDED_GIT`. A quote-split assignment like `SOTP_GUARDED_GI\"T\"=1` is tokenized to `SOTP_GUARDED_GIT=1`, then falls through `skip_var_assignments` and is allowed, so the D3 quote-splitting bypass is still open. The added tests only cover the bare token and an unrelated partial-token allow case; add a regression for the quoted-assignment form and broaden the predicate so that the guarded token cannot be reintroduced as an assignment token.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 543,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:950e2f404da1efa751e3dc0aa1022c11e749ed320d1d5b39ee7ff9479e8497c1",
-          "at": "2026-06-11T01:53:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
-          "at": "2026-06-11T01:58:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d0eabcd10a67207d269ed0f40c80bd1669637bb0dc2084d4515aed882487a979",
-          "at": "2026-06-11T02:00:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
-          "at": "2026-06-11T17:38:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a5ea443d1e1668f4cf0c4c79c59af7b8a3e7b881d5d90feda9ed36a28d5d39f",
-          "at": "2026-06-11T17:41:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `contains_git_invocation` misses `env`-prefixed invocations because `env` is not in `COMMAND_LAUNCHERS`. That leaves a fail-closed bypass in `GuardHookHandler`: `env git ...` and `sudo env git ...` are parsed as `env`, not `git`, so the new hooks-path gate will not trip even though the command still executes git. `env` is already treated as a wrapper elsewhere in the repo, so this needs to be handled here and regression-tested.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
-              "line": 14,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: The new public API `contains_git_invocation` was added without any unit tests in this module. That leaves the launcher-stripping behavior and the new git-detection path unverified, which conflicts with the repo policy that public APIs need happy-path and error/bypass coverage. Add regression tests for direct git, launcher-wrapped git, and at least one non-git case.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
-              "line": 143,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:6f11052f82ad3e52b175e383a103800e3bef2816d685d51c0e93abe76d35cbe1",
-          "at": "2026-06-12T01:00:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`contains_git_invocation()` only strips tokens in `COMMAND_LAUNCHERS`, and `env` is not included there. As a result, `env git status`, `env -i git status`, and `sudo env git status` are parsed as `env` here and return `false`, which bypasses the new fail-closed hooks-path gate even though git still executes.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
-              "line": 143,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:6f11052f82ad3e52b175e383a103800e3bef2816d685d51c0e93abe76d35cbe1",
-          "at": "2026-06-12T01:09:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`env -i` is still treated as an arg-consuming launcher option here because the final `LAUNCHER_OPTIONS_WITH_ARG` check returns `true` after the `env` special-case. That makes `skip_command_launchers()` skip the real `git` token in `env -i git add`, so the direct-git block is bypassed.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
-              "line": 443,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:771a4974ef9bcb485b587590da53e58159b629a86dd3f8dc299aabe2ebfb8e40",
-          "at": "2026-06-12T01:14:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `env` as a launcher does not cover the `-S/--split-string` form, so a quoted command like `env -S 'git add .'` or `env --split-string='git add .'` is left as a single non-git token and `contains_git_invocation()` returns false. That creates a policy bypass for the hooks-path fail-closed check.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 53,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:359e2ba359d94ef5e965667cc958acec5a438c78cc3b0655efeb151e77893361",
-          "at": "2026-06-12T01:18:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`MAX_ENV_SPLIT_DEPTH` caps `env -S` expansion at 3 levels, so a command nested one level deeper stops being inspected for an inner `git` invocation. Once the limit is hit, the code falls back to the plain launcher scan and can silently allow a crafted nested `env -S ... git add` chain.",
-              "severity": "P1",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 136,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:6383e874ffde4a327793c61dc7ce22628620e518945a1043fae9f3ec94f5855c",
-          "at": "2026-06-12T01:28:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:24c0fe7f6e8ab1a5c38daf84b9a3d01686740b85e3b8279283606457e9f7a24f",
-          "at": "2026-06-12T01:36:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`split_env_string` treats every backslash escape as a literal next character, but GNU `env -S` gives `\\_` special meaning as an argument separator. A command like `env -S 'git\\_add .'` is parsed here as executable `git_add` and is allowed, while real `env` executes `git add .`; this bypasses the retained direct-git policy for `git add` and also makes `contains_git_invocation` miss the runtime fail-closed case. The `env -S` splitter needs to model `\\_` as a split boundary, with a regression for `git\\_add`/`git\\_status`.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 495,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:24c0fe7f6e8ab1a5c38daf84b9a3d01686740b85e3b8279283606457e9f7a24f",
-          "at": "2026-06-12T02:25:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GNU `env` accepts clustered short options where `S` carries the split string, for example `env -vSgit add .` is parsed as `env -v -S git add .` and executes `git add .`. This parser only recognizes `-S` when it is the whole token or the first characters of the token, so `-vSgit`/`-ivSgit` are treated as ordinary env options and the effective command becomes `add`, allowing the guarded direct git operation to bypass the policy. Handle clustered env short options containing `S` before skipping them.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 461,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:298274472c05c0076d5a4dc21e3d087cd1776dbf5115366443b8f709f1b54b71",
-          "at": "2026-06-12T02:31:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new env launcher handling misses clustered short options that consume the next argument. For example, GNU `env -iu FOO git add .` is parsed as `env -i -u FOO git add .` and runs `git add`, but this code does not treat `-iu` as consuming `FOO`, so policy inspection stops at `FOO` and allows the command. This reopens a direct-git-operation bypass for both `check_commands` and `contains_git_invocation`.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 630,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:969e2dbb8c1cad54fb081dff1a733366528308dd2e57065f0269dd07c9ee97ec",
-          "at": "2026-06-12T02:36:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`split_env_string` does not model GNU `env -S` variable expansion, so a command like `GIT=git env -S '${GIT} add .'` is split by policy as `${GIT} add .` and allowed, while real `env` expands `${GIT}` and executes `git add .`. This bypasses the retained direct git-write block and also makes `contains_git_invocation` return false for the runtime git process.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 535,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:c2b9a2ba9ba4a67d5302f2e8a0975df94ee6326515a51d8118301e1e5c0c53ee",
-          "at": "2026-06-12T02:39:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`env_split_string_argv_at_env` gives up as soon as it sees an `env` assignment, but `skip_command_launcher_at` later skips that assignment and continues treating a following nested `env` as a launcher. This lets `env FOO=git env -S '${FOO} add .'` through as allowed even though it executes `git add`: the first `env` returns `None`, then launcher skipping consumes `FOO=git` and skips the nested `env -S` string instead of expanding/checking it. The split-string handling needs to carry env-assigned variables forward or otherwise inspect the nested env rather than returning `None` here.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 466,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:4191a489c993ef7eec891a96fa19fcc10463effc521a511ce910fab610d904e5",
-          "at": "2026-06-12T02:45:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`split_env_string` treats every backslash escape as a literal next character, but GNU `env -S` gives `\\c` special meaning: it terminates parsing and ignores the rest of the split string while keeping the token built so far. A command like `env -S 'git push\\c ignored'` is parsed here as `git pushc ignored`, so `check_git_command` sees subcommand `pushc` and allows it; real `env` executes `git push`. That reopens a direct git write bypass for protected subcommands such as push/commit. Model `\\c` and add a regression test.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 664,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:a3956dd8d8c9dbac42e10b283d366de62211dc47f45be8d2d45451239dfd39c8",
-          "at": "2026-06-12T02:56:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`split_env_string` marks a token as present after every `${...}` expansion even when the variable is unset and appends no text. For `env -S '${MISSING} git add .'` with `MISSING` unset, this code produces an argv like `[\"\", \"git\", \"add\", \".\"]`; `check_argv` then treats the empty string as the effective command and allows it. GNU `env -S` drops the unquoted empty expansion and actually runs `git add .`, so this bypasses the direct git-write block and also makes `contains_git_invocation` return false. The splitter should not create an unquoted empty token for an unset expansion at a token boundary.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 689,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:ffe2ee7b3ba52c3f4b638d409dfae8545047f992cc747ff78816c33ffb3e378d",
-          "at": "2026-06-12T03:01:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GNU `env -S` treats an unescaped `#` in the split string as a comment, and if that leaves the split string with no argv entries, the remaining command-line args become the command. This parser keeps `#` as argv[0`, so `env -S '# noop' git add .` is allowed by the policy even though `/usr/bin/env` executes `git add .`, bypassing the direct-git block.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 646,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:3d3900a5f1bb4710d581c9df727e0b376c02aca1fd86636950baac050e54bcae",
-          "at": "2026-06-12T03:08:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`env -S` split tokens are rechecked as the child command argv, but GNU `env` continues parsing those split tokens as `env` options before executing the command. For example, `env -S '-i' git add .` yields split argv `['-i', 'git', 'add', '.']`; this code then treats `-i` as the effective command and allows it, while real `env` consumes `-i` and executes `git add .`. The same bypass affects `contains_git_invocation`, so guarded direct git operations can evade the policy whenever the split string starts with env options.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 197,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:9c80982d8456b7d6111657beee72fc4da2eb4bade239c88735cce2457ce38043",
-          "at": "2026-06-12T03:13:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`env -S` is only expanded if it appears before any `NAME=value` assignments for that `env`. When `env_split_string_argv_at_env` sees an assignment, it records the variable and immediately returns to `env_split_string_argv_after_launchers_from` at the next token; that helper only looks for another launcher, so `env GIT=git -S \"git add .\"` falls through to the normal launcher skip path and treats `-S` as the effective command. GNU `env` accepts assignments before `-S`, so this bypasses the direct `git add` block and `contains_git_invocation` fail-closed detection.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 476,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:5ed5bfed8945f93e665581680831458fd1c9c4f583ff17d1461560dcdc537d60",
-          "at": "2026-06-12T03:18:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`policy.rs` now has 1,038 production lines before the `#[cfg(test)]` block, up from 605, which exceeds the AGENTS.md hard maximum of 700 non-test lines per module. The new `env -S` parsing helpers should be split into a smaller module so this domain policy module stays within the required size boundary.",
-              "severity": "P1",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 426,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:01f5ee1e9820f848abfc98a3f6fe5f5abe1e27a994bf99ce6e4817817c3d3741",
-          "at": "2026-06-12T03:33:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`env -S` expansion silently treats variables that were not assigned in the same argv as empty. In a real shell, an earlier command can export that variable before the guarded command runs, e.g. `export G=git; env -S '${G} add .'`. The parser will hand this policy the second command with only `env -S ${G} add .`; `expand_env_var` drops `${G}`, so `check_commands` and `contains_git_invocation` see `add .` and allow it, while GNU `env` executes `git add .`. This bypasses the retained direct-git block and the hooks-path fail-closed check.",
-              "severity": "P0",
-              "file": "libs/domain/src/guard/policy.rs",
-              "line": 450,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:78e44f87307c97b6ac2674119e14ea74b98b58150d8d339af3b2b4b782e2cae3",
-          "at": "2026-06-12T03:43:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55996d6b21fe60e40f4a7f1c54e1a30ef19845d1491528fb950cd2b06bd910e9",
-          "at": "2026-06-12T04:07:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f3df37bf44d1f620b06a55a339277bad177b1e2acfe60969e204ebc82f84c48",
-          "at": "2026-06-12T11:18:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f3df37bf44d1f620b06a55a339277bad177b1e2acfe60969e204ebc82f84c48",
-          "at": "2026-06-12T11:22:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f483922ae1ee54b3fe015469370f7de105103f85af0156b5b88696d637e951e3",
-          "at": "2026-06-12T16:06:29Z"
         }
       ]
     },
@@ -2520,213 +2587,174 @@
         }
       ]
     },
-    "other": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4775d4b0b73c07fc8c4eb9584e5e6adad0a36bc1535f5b0cef2540f327c7b80f",
-          "at": "2026-06-12T00:36:40Z"
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:39:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4775d4b0b73c07fc8c4eb9584e5e6adad0a36bc1535f5b0cef2540f327c7b80f",
-          "at": "2026-06-12T00:38:10Z"
+          "hash": "rvw1:sha256:86e32742e0ce480aba0d5b208f13f6f4fb013561785fb0fd4c84ebc179888232",
+          "at": "2026-06-11T17:42:41Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:148d7ae42cf4f06a5761fdb18c6bf04d8717ce8b0bd80b4564db56a6fae96876",
-          "at": "2026-06-12T13:18:48Z"
+          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
+          "at": "2026-06-11T19:04:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:148d7ae42cf4f06a5761fdb18c6bf04d8717ce8b0bd80b4564db56a6fae96876",
-          "at": "2026-06-12T13:24:51Z"
+          "hash": "rvw1:sha256:14d0f21d2f82978c4e887e64176b52d7e4c4c8a6b851060319cfd5f6b0adb14c",
+          "at": "2026-06-11T19:06:43Z"
         },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1bf7d80cab2f4c6350cd3b6ed5a488d9454d620b885482046cd03af97c905b26",
-          "at": "2026-06-12T15:10:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38213834b82642569d97bac79bf050e1c79c642c113cf434e93d4ec00a301a30",
-          "at": "2026-06-12T17:16:41Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
-          "at": "2026-06-11T18:07:00Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`Dispatch` still accepts only the hook enum, but the new git hook shims are intended to invoke `bin/sotp hook dispatch git-ref-update \"$@\"` / `git-pre-push \"$@\"`. Real `reference-transaction` and `pre-push` hooks supply positional arguments, so clap will reject those extra args before `CliApp::hook_dispatch` runs. That makes normal guarded git operations fail even when `SOTP_GUARDED_GIT` is set; the dispatch command needs to accept and ignore or forward trailing git-hook args while preserving the existing Claude-envelope behavior for the other hooks.",
+              "message": "Add coverage for the `Err(e)` path in `verify`. The current tests exercise the pass case plus two config-state failures, but they never force `Command::new(\"git\").output()` to fail. A missing `git` binary or PATH failure would therefore bypass unit coverage on this new public API.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/hook.rs",
-              "line": 49,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:116a092941e8f85c1afbe3ded094fdbdb1074186fa5603f13a96dd37edee099d",
-          "at": "2026-06-11T18:09:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The dispatch CLI now changes security-critical public parsing behavior by accepting trailing positional args for git hooks and rejecting them for Claude-envelope hooks, but this scope adds no CLI-level tests for either path. The briefing specifically depends on git hooks being reachable without a Claude JSON envelope while existing Claude hooks still fail closed; without a regression test around this clap boundary, a future parse or dispatch change could break the git shims or weaken the existing hook behavior without being caught. Add happy-path tests for `git-ref-update`/`git-pre-push` with positional args and an error-case test that extra args on non-git hooks return exit 2.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/hook.rs",
-              "line": 60,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:26156ae2ce16bdee659229429c994c1cb8e056ee022c2f9f80a2ae2b3bc75c93",
-          "at": "2026-06-11T18:15:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `git-pre-push` CLI dispatch path only has an allow-case integration test with `SOTP_GUARDED_GIT` set. Because this hook is security-critical and must block direct pushes when the guarded token is absent, add the missing error-case test for `sotp hook dispatch git-pre-push ...` without the token returning exit 2.",
-              "severity": "P1",
-              "file": "apps/cli/tests/hook_dispatch.rs",
-              "line": 73,
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/hooks_path.rs",
+              "line": 17,
               "category": "tests"
             }
           ],
-          "hash": "rvw1:sha256:22d1581fb17d3afbec62841771c8c44409bad2c6aba31f5937122fe8a3c7d6ef",
-          "at": "2026-06-11T18:21:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
-          "at": "2026-06-11T18:24:06Z"
+          "hash": "rvw1:sha256:4e8172d33b7e473ccb7eba904b38d555bd9747b250e0489b7b4af846554dabe4",
+          "at": "2026-06-11T23:40:22Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f37761fda4469c6cd117f6fe02aa2073555e8ce223029e86fa35b10a2332c310",
-          "at": "2026-06-11T18:27:48Z"
+          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
+          "at": "2026-06-11T23:43:25Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new CLI integration coverage only exercises the git process hooks. It does not cover the briefing's required invariant that existing Claude-envelope hooks still fail closed on bad stdin after adding the no-envelope git path. Please add CLI-level tests for `block-direct-git-ops` and `block-test-file-deletion` with empty or malformed stdin asserting exit code 2, so a future regression cannot accidentally route those hooks through the git no-envelope path while this suite still passes.",
+              "message": "The verifier trims all leading/trailing whitespace from the configured hooks path before comparing it to `.githooks`. A value that Git can treat as a different path, such as a quoted `\".githooks \"` or `\" .githooks\"`, would be accepted here, so the new check can falsely pass even though hooks are not actually configured to the repository-managed directory. Strip only the command's line ending before the exact comparison.",
               "severity": "P1",
-              "file": "apps/cli/tests/hook_dispatch.rs",
-              "line": 26,
-              "category": "test_coverage"
+              "file": "libs/infrastructure/src/verify/hooks_path.rs",
+              "line": 37,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:e9679ad779709e995f47bd5ea54f7311fa920537e137df559551296948eb8e50",
-          "at": "2026-06-11T18:38:47Z"
+          "hash": "rvw1:sha256:fe363deb7f878a81155cd6ca1df36280091c3709afcd70e40616396dad5a41b7",
+          "at": "2026-06-11T23:45:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:58197fc5e01d7287c0b24d65ac728368925016e8148c5db435a0adf744f9c655",
-          "at": "2026-06-11T18:41:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c94f26a8830d84d89e632ca92c7f268012dcf6be52ba1ea238b19eed72302ed",
-          "at": "2026-06-11T18:49:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: This adds a new public `verify hooks-path` subcommand and dispatch arm, but there is no matching parser/dispatch coverage in the verify test suite. The existing `verify_tests.rs` file exercises the other `VerifyCommand` variants; without success/failure tests for `HooksPath`, a clap rename or dispatch regression here could ship unnoticed. See [apps/cli/src/commands/verify.rs:45](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L45) and [apps/cli/src/commands/verify.rs:157](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L157).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs",
-              "line": 45,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
-          "at": "2026-06-11T23:39:34Z"
+          "hash": "rvw1:sha256:a61c7e5703844b381e34e08b919e3a30a5bcbc4588109403b2ddc854799a2ec0",
+          "at": "2026-06-11T23:48:48Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "New public `verify hooks-path` CLI surface is added without CLI-layer parser/dispatch coverage. The existing composition tests cover `CliApp::verify_hooks_path`, but nothing in this scope proves clap parses `verify hooks-path` into `VerifyCommand::HooksPath` or guards the dispatch arm against future miswiring, which is a P1 test gap for a new public subcommand.",
+              "message": "The updated direct-git expectation no longer requires the old `cargo run --quiet -p cli --` fallback, but it still does not forbid it. `verify_hook_paths` only checks that one command contains all listed positive fragments, so a drifted command that includes `SOTP_CLI_BINARY:-`, `$CLAUDE_PROJECT_DIR/bin/sotp`, `command -v sotp`, `hook dispatch block-direct-git-ops`, the missing-CLI message, `|| exit 2`, and then still falls back to `cargo run --quiet -p cli -- hook dispatch block-direct-git-ops` would pass verification. That misses the briefing requirement that the direct-git hook fail closed when `sotp` is unavailable and not allow the cargo fallback.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/verify.rs",
-              "line": 46,
-              "category": "test_coverage"
+              "file": "libs/infrastructure/src/verify/orchestra/constants.rs",
+              "line": 71,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:b55157b11b3877ad8d86bac9bd6d3059a9773edb73bb0f3c44bfd0ef74e5b4af",
-          "at": "2026-06-11T23:42:02Z"
+          "hash": "rvw1:sha256:db7fd6be57e830f82e271412d26cd7b4115fa7110879c12a57cb5e9520a08baf",
+          "at": "2026-06-12T15:11:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`EXPECTED_HOOK_COMMANDS` still does not include an entry for `hook dispatch block-test-file-deletion`, even though this file documents that Rust hooks are validated through this list and `verify_hook_paths` only checks these constants. As a result, `.claude/settings.json` can remove or drift the Write/Edit deletion guard entirely and `verify-orchestra` will not report it. Add the expected fragments for the `block-test-file-deletion` hook, including the installed-CLI resolution and fail-closed remediation shape.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra/constants.rs",
+              "line": 57,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:91e901de346f147f5936ca0290ccddc2a35a9cb1fa00d0c94957112faa2f5923",
+          "at": "2026-06-12T15:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The direct-git hook expectation now only lists positive fragments. `verify_hook_paths` treats `EXPECTED_HOOK_COMMANDS` as a contains-all check, so a command that includes the new installed-CLI path but also still contains `cargo run --quiet -p cli --` would pass verification. That misses the briefing requirement to not allow the cargo fallback, leaving the verifier unable to catch this policy drift. Add an explicit forbidden-fragment check for the direct-git hook fallback or an equivalent negative expectation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra/constants.rs",
+              "line": 71,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:93128f980328f843634a61157b22abdf0a8b12ac26009d2be3601a060a67f125",
+          "at": "2026-06-12T15:19:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bbf15221fcbd20f9fb5b4bd440986ac8bc5e41a2649c4861b88d3fd437743ee6",
-          "at": "2026-06-11T23:45:29Z"
+          "hash": "rvw1:sha256:66e28f4a3105f2b138cd7f22e1accb294d4065003832de786a543ccc06869735",
+          "at": "2026-06-12T16:07:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter` sanitizes the track id but then creates and opens the default `items_dir/<track>/logs/telemetry.jsonl` path with plain `create_dir_all`/`OpenOptions`, which follows symlinked path components. If `track/items/<track-id>` is a symlink, any instrumented command on that track branch will append telemetry outside the repository. This should reject symlinks below the trusted items/root path before creating/opening the log path, consistent with the existing infrastructure symlink guards.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 153,
+              "category": "security"
+            },
+            {
+              "message": "`TelemetryReport::aggregate` validates the track id but uses `std::fs::metadata` and `File::open` on `<items_dir>/<track-id>/logs/telemetry.jsonl`, both of which follow symlinks. A symlinked track directory can make `sotp telemetry report <track-id>` read and print JSONL data from outside `track/items`. Use the existing symlink guard/descriptor-pinned open pattern anchored at `items_dir` before accepting the track directory and log file.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 173,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:49206afbbc320dc97b34fb5f5a38010fc4cd3fdc3c050baa4b89d269538fb46e",
+          "at": "2026-06-12T17:19:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31e0566dd4fc3e8afd8653c8a33dd67c5236b7c6e54240e0ce6e4593bf071c10",
+          "at": "2026-06-12T17:28:50Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0d3cd25c856c185d3910153a29caa98f0a309fc4b0d7f9b214aabde5afec543",
-          "at": "2026-06-12T00:19:07Z"
+          "hash": "rvw1:sha256:76a605f8bece6808971bce05dcbaf6820e909b0742c017a015efcefa0886c4de",
+          "at": "2026-06-12T19:26:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0d3cd25c856c185d3910153a29caa98f0a309fc4b0d7f9b214aabde5afec543",
-          "at": "2026-06-12T00:21:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54358dd4257ab4795edd3e76a2f78d551ef17e6421297e5f0761a634d0b91852",
-          "at": "2026-06-12T15:10:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d29a6e9c80c71474a0bcd41e87e283f321f44760ae1c9a23a2acc6160943fad0",
-          "at": "2026-06-12T17:12:35Z"
+          "hash": "rvw1:sha256:76a605f8bece6808971bce05dcbaf6820e909b0742c017a015efcefa0886c4de",
+          "at": "2026-06-12T19:31:51Z"
         }
       ]
     }

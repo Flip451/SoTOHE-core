@@ -6,7 +6,7 @@
 //! `HookDispatchInteractor`.
 
 use std::io::Read as _;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use crate::{CliApp, CommandOutcome};
@@ -113,6 +113,10 @@ fn is_git_ref_update_final_notification(hook_name: &str, hook_args: &[String]) -
         && hook_args.first().is_some_and(|state| matches!(state.as_str(), "committed" | "aborted"))
 }
 
+fn hooks_path_configured() -> bool {
+    infrastructure::verify::hooks_path::verify(Path::new(".")).is_ok()
+}
+
 impl CliApp {
     /// Dispatch a security-critical hook via Rust logic.
     ///
@@ -144,12 +148,7 @@ impl CliApp {
 
         let is_post = is_post_tool_use(&hook_name);
         let guarded_git_token_present = std::env::var("SOTP_GUARDED_GIT").is_ok();
-        let hooks_path_configured = std::process::Command::new("git")
-            .args(["config", "--local", "core.hooksPath"])
-            .output()
-            .ok()
-            .and_then(|o| if o.status.success() { String::from_utf8(o.stdout).ok() } else { None })
-            .is_some_and(|v| v.trim() == ".githooks");
+        let hooks_path_configured = hooks_path_configured();
 
         let dispatch_cmd = if is_git_process_hook(&hook_name) {
             HookDispatchCommand {
