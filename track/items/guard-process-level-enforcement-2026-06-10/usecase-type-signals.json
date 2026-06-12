@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-12T00:39:41Z",
+  "generated_at": "2026-06-12T11:26:59Z",
   "declaration_hash": "d43ae67bcc07c2f6b6e6f4e170c24208e368b887995df15ab1ba3351163d463b",
   "signals": [
     {
@@ -24,13 +24,13 @@
     {
       "type_name": "GuardHookHandler",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "HookDispatchInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "HookDispatchService"

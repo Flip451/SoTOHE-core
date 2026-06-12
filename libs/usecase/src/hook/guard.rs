@@ -15,6 +15,11 @@ use super::HookHandler;
 /// Word-boundary exact-match token for the guarded-git bypass scan (D3).
 const SOTP_GUARDED_TOKEN: &str = "SOTP_GUARDED_GIT";
 
+/// Runtime fail-closed message when git hooks are not configured.
+const HOOKS_PATH_NOT_CONFIGURED_MESSAGE: &str = "[Git Policy] core.hooksPath is not configured. \
+     Run `cargo make bootstrap` to set up git hooks, \
+     or run `git config --local core.hooksPath .githooks`.";
+
 /// Hook handler for `block-direct-git-ops`.
 ///
 /// Stage (a): scans the raw Bash command string for `SOTP_GUARDED_GIT` at a word
@@ -24,6 +29,13 @@ const SOTP_GUARDED_TOKEN: &str = "SOTP_GUARDED_GIT";
 /// and launcher-stripped checks.
 pub struct GuardHookHandler {
     pub parser: Arc<dyn ShellParser>,
+    hooks_path_configured: bool,
+}
+
+impl GuardHookHandler {
+    pub(crate) fn new(parser: Arc<dyn ShellParser>, hooks_path_configured: bool) -> Self {
+        Self { parser, hooks_path_configured }
+    }
 }
 
 impl HookHandler for GuardHookHandler {
@@ -47,6 +59,10 @@ impl HookHandler for GuardHookHandler {
                 return Ok(HookVerdict::block(verdict.reason));
             }
         };
+
+        if !self.hooks_path_configured && policy::contains_git_invocation(&commands) {
+            return Ok(HookVerdict::block(HOOKS_PATH_NOT_CONFIGURED_MESSAGE));
+        }
 
         let guard_verdict = policy::check_commands(&commands);
 
@@ -103,6 +119,17 @@ mod tests {
         Arc::new(TestShellParser { commands })
     }
 
+    fn test_handler(commands: Vec<SimpleCommand>) -> GuardHookHandler {
+        test_handler_with_hooks_path_configured(commands, true)
+    }
+
+    fn test_handler_with_hooks_path_configured(
+        commands: Vec<SimpleCommand>,
+        hooks_path_configured: bool,
+    ) -> GuardHookHandler {
+        GuardHookHandler::new(test_parser(commands), hooks_path_configured)
+    }
+
     use domain::hook::HookContext;
 
     fn make_input(command: &str) -> HookInput {
@@ -115,9 +142,8 @@ mod tests {
     }
 
     #[test]
-    fn test_guard_handler_allows_safe_command() {
-        let handler =
-            GuardHookHandler { parser: test_parser(vec![simple_command(&["git", "status"])]) };
+    fn test_guard_handler_allows_git_status_when_hooks_path_configured() {
+        let handler = test_handler(vec![simple_command(&["git", "status"])]);
         let ctx = HookContext { project_dir: None };
         let verdict = handler.handle(&ctx, &make_input("git status")).unwrap();
         assert!(!verdict.is_blocked());
@@ -125,8 +151,7 @@ mod tests {
 
     #[test]
     fn test_guard_handler_blocks_git_add() {
-        let handler =
-            GuardHookHandler { parser: test_parser(vec![simple_command(&["git", "add", "."])]) };
+        let handler = test_handler(vec![simple_command(&["git", "add", "."])]);
         let ctx = HookContext { project_dir: None };
         let verdict = handler.handle(&ctx, &make_input("git add .")).unwrap();
         assert!(verdict.is_blocked());
@@ -134,7 +159,7 @@ mod tests {
 
     #[test]
     fn test_guard_handler_returns_error_on_missing_command() {
-        let handler = GuardHookHandler { parser: test_parser(Vec::new()) };
+        let handler = test_handler(Vec::new());
         let ctx = HookContext { project_dir: None };
         let input =
             HookInput { tool_name: "Bash".into(), command: None, file_path: None, content: None };
@@ -147,7 +172,7 @@ mod tests {
     #[case::token_as_env_prefix("SOTP_GUARDED_GIT=1 git commit -m msg")]
     #[case::token_in_middle("env SOTP_GUARDED_GIT=1 cargo test")]
     fn test_guard_handler_blocks_raw_command_with_guarded_token(#[case] raw_command: &str) {
-        let handler = GuardHookHandler { parser: test_parser(Vec::new()) };
+        let handler = test_handler(Vec::new());
         let ctx = HookContext { project_dir: None };
         let verdict = handler.handle(&ctx, &make_input(raw_command)).unwrap();
         assert!(
@@ -158,11 +183,46 @@ mod tests {
 
     #[test]
     fn test_guard_handler_allows_extended_identifier_containing_token() {
-        let handler = GuardHookHandler {
-            parser: test_parser(vec![simple_command(&["echo", "SOTP_GUARDED_GITX"])]),
-        };
+        let handler = test_handler(vec![simple_command(&["echo", "SOTP_GUARDED_GITX"])]);
         let ctx = HookContext { project_dir: None };
         let verdict = handler.handle(&ctx, &make_input("echo SOTP_GUARDED_GITX")).unwrap();
         assert!(!verdict.is_blocked(), "extended identifier SOTP_GUARDED_GITX must not be blocked");
+    }
+
+    #[test]
+    fn test_guard_handler_blocks_when_hooks_path_not_configured_and_git_detected() {
+        let handler = test_handler_with_hooks_path_configured(
+            vec![simple_command(&["git", "status"])],
+            false,
+        );
+        let ctx = HookContext { project_dir: None };
+        let verdict = handler.handle(&ctx, &make_input("git status")).unwrap();
+        assert!(verdict.is_blocked());
+        assert!(
+            verdict.reason.as_deref().is_some_and(|reason| reason.contains("core.hooksPath")),
+            "hooksPath remediation should be returned"
+        );
+    }
+
+    #[test]
+    fn test_guard_handler_allows_non_git_when_hooks_path_not_configured() {
+        let handler = test_handler_with_hooks_path_configured(
+            vec![simple_command(&["cargo", "test"])],
+            false,
+        );
+        let ctx = HookContext { project_dir: None };
+        let verdict = handler.handle(&ctx, &make_input("cargo test")).unwrap();
+        assert!(!verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_guard_handler_blocks_launcher_git_when_hooks_path_not_configured() {
+        let handler = test_handler_with_hooks_path_configured(
+            vec![simple_command(&["timeout", "30", "git", "status"])],
+            false,
+        );
+        let ctx = HookContext { project_dir: None };
+        let verdict = handler.handle(&ctx, &make_input("timeout 30 git status")).unwrap();
+        assert!(verdict.is_blocked());
     }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3c65a2a4b6419fd7ae9e18015428131235f8cd3da9256ad3e23de272a04775b0",
+  "catalogue_declaration_hash": "ef8039bb5871f9549abf11b116cd969540f9460041258c4f8a108bf83d588c65",
   "signals": [
     {
       "type_name": "GuardVerdict",
@@ -56,6 +56,11 @@
       "type_name": "domain::guard::policy::check_commands",
       "signal": "blue",
       "entry_hash": "bb902f31cdf8ec11ef0f62e3c057d4cae540aec2e6520001eaa9b650d03f3d1c"
+    },
+    {
+      "type_name": "domain::guard::policy::contains_git_invocation",
+      "signal": "blue",
+      "entry_hash": "336d0a181300485ba5501abcbfb67dbc73021c5e9e8256e35be60c40ba6bb944"
     }
   ]
 }

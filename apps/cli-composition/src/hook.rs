@@ -144,6 +144,12 @@ impl CliApp {
 
         let is_post = is_post_tool_use(&hook_name);
         let guarded_git_token_present = std::env::var("SOTP_GUARDED_GIT").is_ok();
+        let hooks_path_configured = std::process::Command::new("git")
+            .args(["config", "--local", "core.hooksPath"])
+            .output()
+            .ok()
+            .and_then(|o| if o.status.success() { String::from_utf8(o.stdout).ok() } else { None })
+            .is_some_and(|v| v.trim() == ".githooks");
 
         let dispatch_cmd = if is_git_process_hook(&hook_name) {
             HookDispatchCommand {
@@ -183,8 +189,12 @@ impl CliApp {
 
         let parser_port = Arc::new(ConchShellParser);
         let project_dir = std::env::var("CLAUDE_PROJECT_DIR").ok().map(PathBuf::from);
-        let service =
-            HookDispatchInteractor::new(parser_port, project_dir, guarded_git_token_present);
+        let service = HookDispatchInteractor::new(
+            parser_port,
+            project_dir,
+            guarded_git_token_present,
+            hooks_path_configured,
+        );
 
         let result = service.dispatch(hook_name, dispatch_cmd);
 

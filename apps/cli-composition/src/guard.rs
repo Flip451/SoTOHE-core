@@ -19,7 +19,7 @@ impl CliApp {
         };
 
         let parser_port = Arc::new(ConchShellParser);
-        let service = HookDispatchInteractor::new(parser_port, None, false);
+        let service = HookDispatchInteractor::new(parser_port, None, false, true);
 
         let dispatch_cmd = HookDispatchCommand {
             tool_name: "Bash".to_owned(),

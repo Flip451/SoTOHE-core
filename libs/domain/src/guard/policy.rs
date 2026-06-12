@@ -13,7 +13,7 @@ use super::verdict::{GuardVerdict, ParseError};
 /// Command launchers that prefix the real command.
 const COMMAND_LAUNCHERS: &[&str] = &[
     "nohup", "nice", "timeout", "stdbuf", "setsid", "chronic", "ionice", "chrt", "taskset",
-    "command", "time", "exec", "sudo", "doas",
+    "command", "time", "exec", "sudo", "doas", "env",
 ];
 
 /// Launchers that consume a mandatory positional argument before the command.
@@ -52,6 +52,14 @@ const LAUNCHER_OPTIONS_WITH_ARG: &[&str] = &[
 /// and `taskset -c LIST cmd` uniformly.
 const LAUNCHER_SPECIFIC_OPTIONS_WITH_ARG: &[(&str, &str)] = &[
     ("exec", "-a"),
+    ("env", "-a"),
+    ("env", "--argv0"),
+    ("env", "-C"),
+    ("env", "--chdir"),
+    ("env", "-S"),
+    ("env", "--split-string"),
+    ("env", "-u"),
+    ("env", "--unset"),
     ("chrt", "-p"),
     ("chrt", "--pid"),
     ("ionice", "-c"),
@@ -121,6 +129,8 @@ const SOTP_GUARDED_TOKEN_MESSAGE: &str = "[Git Policy] The guarded-git token is 
 const BIN_SOTP_OVERWRITE_MESSAGE: &str = "[Build Policy] Direct copy to `bin/sotp` is blocked. \
      Use `cargo make build-sotp` which includes runtime verification to prevent glibc mismatch.";
 
+const ENV_SPLIT_DYNAMIC_MESSAGE: &str = "[Git Policy] env split-string uses runtime environment expansion that cannot be validated safely.";
+
 /// The exact token string scanned in argv to block inline token injection (D3/IN-03).
 /// This must be an exact-match scan so that normal words containing substrings are not affected.
 const GUARDED_GIT_TOKEN: &str = "SOTP_GUARDED_GIT";
@@ -136,6 +146,14 @@ pub fn block_on_parse_error(err: &ParseError) -> GuardVerdict {
         }
         ParseError::UnmatchedQuote => GuardVerdict::block("unparseable command (unmatched quote)"),
     }
+}
+
+/// Returns `true` when any parsed command invokes `git` after skipping
+/// VAR=val assignments and command launchers.
+pub fn contains_git_invocation(commands: &[SimpleCommand]) -> bool {
+    commands
+        .iter()
+        .any(|cmd| argv_contains_git_invocation(&cmd.argv, env_split_expansion_budget(&cmd.argv)))
 }
 
 /// Checks pre-parsed simple commands against the guard policy.
@@ -162,7 +180,10 @@ pub fn check_commands(commands: &[SimpleCommand]) -> GuardVerdict {
 ///   - D3: SOTP_GUARDED_GIT exact-match scan over quote-stripped argv tokens
 ///   - D4 (maintained): direct git subcommand checks, launcher stripping, is_bin_sotp_overwrite
 fn check_simple_command(cmd: &SimpleCommand) -> GuardVerdict {
-    let argv = &cmd.argv;
+    check_argv(&cmd.argv, env_split_expansion_budget(&cmd.argv))
+}
+
+fn check_argv(argv: &[String], env_split_budget: usize) -> GuardVerdict {
     if argv.is_empty() {
         return GuardVerdict::allow();
     }
@@ -173,6 +194,16 @@ fn check_simple_command(cmd: &SimpleCommand) -> GuardVerdict {
     // calling this function, since SimpleCommand does not carry the original raw string.
     if argv_contains_guarded_token(argv) {
         return GuardVerdict::block(SOTP_GUARDED_TOKEN_MESSAGE);
+    }
+
+    if let Some(split_argv) = env_split_string_argv_after_launchers(argv) {
+        let Ok(split_argv) = split_argv else {
+            return GuardVerdict::block(ENV_SPLIT_DYNAMIC_MESSAGE);
+        };
+        if env_split_budget == 0 {
+            return GuardVerdict::block("env split-string expansion budget exceeded");
+        }
+        return check_argv(&split_argv, env_split_budget - 1);
     }
 
     // Skip VAR=val assignments and command launchers to find the effective command
@@ -196,6 +227,26 @@ fn check_simple_command(cmd: &SimpleCommand) -> GuardVerdict {
     }
 
     GuardVerdict::allow()
+}
+
+fn argv_contains_git_invocation(argv: &[String], env_split_budget: usize) -> bool {
+    if argv.is_empty() {
+        return false;
+    }
+
+    if let Some(split_argv) = env_split_string_argv_after_launchers(argv) {
+        let Ok(split_argv) = split_argv else {
+            return true;
+        };
+        if env_split_budget == 0 {
+            return true;
+        }
+        return argv_contains_git_invocation(&split_argv, env_split_budget - 1);
+    }
+
+    let effective_start = skip_var_assignments(argv, 0);
+    let effective_start = skip_command_launchers(argv, effective_start);
+    argv.get(effective_start).is_some_and(|token| basename(token).to_lowercase() == "git")
 }
 
 /// Checks a git command for protected subcommands.
@@ -373,48 +424,55 @@ fn skip_var_assignments(argv: &[String], start: usize) -> usize {
 fn skip_command_launchers(argv: &[String], start: usize) -> usize {
     let mut i = start;
 
-    while i < argv.len() && COMMAND_LAUNCHERS.contains(&basename(&argv[i]).to_lowercase().as_str())
-    {
-        let launcher = basename(&argv[i]).to_lowercase();
-        i += 1;
-
-        // Skip launcher options, tracking --key=value forms that embed a positional value
-        let opts_start = i;
-        while i < argv.len() && argv[i].starts_with('-') {
-            if LAUNCHER_OPTIONS_WITH_ARG.contains(&argv[i].as_str())
-                || LAUNCHER_SPECIFIC_OPTIONS_WITH_ARG
-                    .iter()
-                    .any(|(name, flag)| *name == launcher && *flag == argv[i].as_str())
-            {
-                i = (i + 2).min(argv.len());
-            } else {
-                i += 1;
-            }
-        }
-
-        // Skip mandatory positional args.
-        // For taskset: --cpu-list=VALUE embeds the CPU list, so reduce positional
-        // count to avoid over-skipping the actual command. Only applies to taskset
-        // because its positional (mask/list) can be embedded in --cpu-list=VALUE.
-        let positional = LAUNCHER_POSITIONAL_ARGS
-            .iter()
-            .find(|(name, _)| *name == launcher)
-            .map(|(_, count)| *count)
-            .unwrap_or(0);
-        let opts_end = i.min(argv.len());
-        let embedded = if launcher == "taskset" {
-            argv[opts_start..opts_end].iter().filter(|t| t.starts_with("--cpu-list=")).count()
-        } else {
-            0
-        };
-        i += positional.saturating_sub(embedded);
-
-        // After launcher, skip VAR=val assignments if present
-        i = skip_var_assignments(argv, i);
+    while i < argv.len() && is_command_launcher(&argv[i]) {
+        i = skip_command_launcher_at(argv, i);
     }
 
     i
 }
+
+#[rustfmt::skip]
+fn env_split_string_argv_after_launchers(argv: &[String]) -> Option<Result<Vec<String>, ()>> { let vars = leading_var_assignments(argv); env_split_string_argv_after_launchers_from(argv, skip_var_assignments(argv, 0), &vars) }
+#[rustfmt::skip]
+fn env_split_string_argv_after_launchers_from<'a>(argv: &'a [String], start: usize, vars: &[(&'a str, &'a str)]) -> Option<Result<Vec<String>, ()>> { let mut i = start; while i < argv.len() && is_command_launcher(&argv[i]) { let launcher = basename(&argv[i]).to_lowercase(); if launcher == "env" { return env_split_string_argv_at_env(argv, i, vars); } i = skip_command_launcher_at(argv, i); } None }
+#[rustfmt::skip]
+fn env_split_expansion_budget(argv: &[String]) -> usize { argv.iter().fold(1, |n, token| n.saturating_add(token.len()).saturating_add(1)) }
+#[rustfmt::skip]
+fn leading_var_assignments(argv: &[String]) -> Vec<(&str, &str)> { let mut vars = Vec::new(); for token in argv { let Some((name, value)) = split_var_assignment(token) else { break; }; vars.push((name, value)); } vars }
+#[rustfmt::skip]
+#[allow(clippy::possible_missing_else)]
+fn env_split_string_argv_at_env<'a>(argv: &'a [String], env_index: usize, vars: &[(&'a str, &'a str)]) -> Option<Result<Vec<String>, ()>> { let mut i = env_index + 1; let mut child_vars = vars.to_vec(); while i < argv.len() { let token = &argv[i]; if let Some((name, value)) = split_var_assignment(token) { set_env_var(&mut child_vars, name, value); i += 1; continue; } if let Some(s) = token.strip_prefix("--split-string=") { return Some(split_env_string_argv(s, &argv[i + 1..], vars, &child_vars)); } if token == "-S" || token == "--split-string" { return Some(split_env_string_argv(argv.get(i + 1)?, &argv[(i + 2).min(argv.len())..], vars, &child_vars)); } if let Some(s) = token.strip_prefix("-S").filter(|s| !s.is_empty()) { return Some(split_env_string_argv(s, &argv[i + 1..], vars, &child_vars)); } if let Some(s) = env_short_option_split_string(token) { return Some(if let Some(s) = s { split_env_string_argv(s, &argv[i + 1..], vars, &child_vars) } else { split_env_string_argv(argv.get(i + 1)?, &argv[(i + 2).min(argv.len())..], vars, &child_vars) }); } if let Some(consumed) = apply_env_option_to_child_vars(token, argv.get(i + 1), &mut child_vars) { i = (i + consumed).min(argv.len()); continue; } if token.starts_with('-') { i = if launcher_option_consumes_arg("env", token) { (i + 2).min(argv.len()) } else { i + 1 }; continue; } return env_split_string_argv_after_launchers_from(argv, i, &child_vars); } None }
+#[rustfmt::skip]
+#[allow(clippy::possible_missing_else)]
+fn apply_env_option_to_child_vars<'a>(token: &'a str, next: Option<&'a String>, vars: &mut Vec<(&'a str, &'a str)>) -> Option<usize> { if token == "-" || token == "-i" || token == "--ignore-environment" { vars.clear(); vars.push(("", "")); return Some(1); } if token == "-u" || token == "--unset" { if let Some(name) = next { mark_env_var_empty(vars, name); } return Some(2); } if let Some(name) = token.strip_prefix("--unset=") { mark_env_var_empty(vars, name); return Some(1); } let options = token.strip_prefix('-')?; if options.starts_with('-') { return None; } for (idx, opt) in options.char_indices() { match opt { 'i' => { vars.clear(); vars.push(("", "")); } 'u' => { let name = &options[idx + opt.len_utf8()..]; if name.is_empty() { if let Some(next) = next { mark_env_var_empty(vars, next); } return Some(2); } mark_env_var_empty(vars, name); return Some(1); } 'C' | 'a' => return Some(if options[idx + opt.len_utf8()..].is_empty() { 2 } else { 1 }), _ => {} } } Some(1) }
+#[rustfmt::skip]
+fn env_short_option_marker(token: &str) -> Option<(char, &str)> { let options = token.strip_prefix('-')?; if options.starts_with('-') { return None; } for (idx, opt) in options.char_indices() { match opt { 'S' | 'C' | 'a' | 'u' => return Some((opt, &options[idx + opt.len_utf8()..])), _ => {} } } None }
+#[rustfmt::skip]
+fn env_short_option_split_string(token: &str) -> Option<Option<&str>> { match env_short_option_marker(token)? { ('S', s) => Some((!s.is_empty()).then_some(s)), ('C' | 'a' | 'u', _) => None, _ => None } }
+#[rustfmt::skip]
+fn env_short_option_consumes_next_arg(token: &str) -> bool { matches!(env_short_option_marker(token), Some(('C' | 'a' | 'u', ""))) }
+#[rustfmt::skip]
+fn split_env_string_argv(s: &str, remaining: &[String], vars: &[(&str, &str)], child_vars: &[(&str, &str)]) -> Result<Vec<String>, ()> { let mut argv: Vec<String> = child_vars.iter().filter(|(name, _)| !name.is_empty()).map(|(name, value)| format!("{name}={value}")).collect(); argv.push("env".to_string()); argv.extend(split_env_string(s, vars)?); argv.extend(remaining.iter().cloned()); Ok(argv) }
+#[rustfmt::skip]
+#[allow(clippy::possible_missing_else)]
+fn split_env_string(input: &str, vars: &[(&str, &str)]) -> Result<Vec<String>, ()> { let mut tokens = Vec::new(); let mut current = String::new(); let mut quote = None; let mut in_token = false; let mut chars = input.chars().peekable(); while let Some(ch) = chars.next() { if quote == Some('\'') { if ch == '\'' { quote = None; } else { current.push(ch); } in_token = true; continue; } if ch == '\\' { let Some(next) = chars.next() else { current.push('\\'); in_token = true; continue; }; if next == '_' { if quote == Some('"') { current.push(' '); in_token = true; } else { push_env_split_token(&mut tokens, &mut current, &mut in_token); } continue; } if next == 'c' { break; } current.push(next); in_token = true; continue; } if ch == '$' { let len = current.len(); if expand_env_var(&mut chars, vars, &mut current)? { if quote.is_some() || current.len() > len { in_token = true; } continue; } current.push(ch); in_token = true; continue; } if let Some(q) = quote { if ch == q { quote = None; } else { current.push(ch); } in_token = true; continue; } if ch == '\'' || ch == '"' { quote = Some(ch); in_token = true; continue; } if ch == '#' && !in_token { break; } if ch.is_whitespace() { if in_token { tokens.push(std::mem::take(&mut current)); in_token = false; } continue; } current.push(ch); in_token = true; } push_env_split_token(&mut tokens, &mut current, &mut in_token); Ok(tokens) }
+#[rustfmt::skip]
+#[allow(clippy::possible_missing_else)]
+fn expand_env_var(chars: &mut std::iter::Peekable<std::str::Chars<'_>>, vars: &[(&str, &str)], out: &mut String) -> Result<bool, ()> { if chars.peek() != Some(&'{') { return Ok(false); } chars.next(); let mut name = String::new(); for ch in chars.by_ref() { if ch == '}' { if let Some((_, value)) = vars.iter().rev().find(|(var, _)| *var == name) { out.push_str(value); return Ok(true); } if vars.iter().any(|(var, _)| var.is_empty()) { return Ok(true); } return Err(()); } name.push(ch); } out.push_str("${"); out.push_str(&name); Ok(true) }
+#[rustfmt::skip]
+fn push_env_split_token(tokens: &mut Vec<String>, current: &mut String, in_token: &mut bool) { if *in_token { tokens.push(std::mem::take(current)); *in_token = false; } }
+#[rustfmt::skip]
+fn set_env_var<'a>(vars: &mut Vec<(&'a str, &'a str)>, name: &'a str, value: &'a str) { unset_env_var(vars, name); vars.push((name, value)); }
+#[rustfmt::skip]
+fn mark_env_var_empty<'a>(vars: &mut Vec<(&'a str, &'a str)>, name: &'a str) { set_env_var(vars, name, ""); }
+#[rustfmt::skip]
+fn unset_env_var(vars: &mut Vec<(&str, &str)>, name: &str) { vars.retain(|(var, _)| *var != name); }
+#[rustfmt::skip]
+fn is_command_launcher(token: &str) -> bool { COMMAND_LAUNCHERS.contains(&basename(token).to_lowercase().as_str()) }
+#[rustfmt::skip]
+fn skip_command_launcher_at(argv: &[String], launcher_index: usize) -> usize { let Some(token) = argv.get(launcher_index) else { return argv.len(); }; let launcher = basename(token).to_lowercase(); let mut i = launcher_index + 1; let opts_start = i; while i < argv.len() && argv[i].starts_with('-') { i = if launcher_option_consumes_arg(&launcher, &argv[i]) { (i + 2).min(argv.len()) } else { i + 1 }; } let positional = LAUNCHER_POSITIONAL_ARGS.iter().find(|(name, _)| *name == launcher).map(|(_, n)| *n).unwrap_or(0); let embedded = if launcher == "taskset" { argv[opts_start..i.min(argv.len())].iter().filter(|token| token.starts_with("--cpu-list=")).count() } else { 0 }; skip_var_assignments(argv, i + positional.saturating_sub(embedded)) }
+#[rustfmt::skip]
+fn launcher_option_consumes_arg(launcher: &str, option: &str) -> bool { let specific = LAUNCHER_SPECIFIC_OPTIONS_WITH_ARG.iter().any(|(name, flag)| *name == launcher && *flag == option); if launcher == "env" { specific || env_short_option_consumes_next_arg(option) } else { specific || LAUNCHER_OPTIONS_WITH_ARG.contains(&option) } }
 
 /// Checks if a command is `cp`, `mv`, or `install` targeting `bin/sotp` as
 /// the **destination**.
@@ -590,15 +648,24 @@ fn basename(token: &str) -> &str {
 
 /// Checks if a token looks like a `VAR=val` assignment.
 fn is_var_assignment(token: &str) -> bool {
+    split_var_assignment(token).is_some()
+}
+
+fn split_var_assignment(token: &str) -> Option<(&str, &str)> {
     if let Some(eq_pos) = token.find('=') {
         if eq_pos == 0 {
-            return false;
+            return None;
         }
         let var_name = &token[..eq_pos];
-        var_name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
+        if var_name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
             && var_name.starts_with(|c: char| c.is_ascii_alphabetic() || c == '_')
+        {
+            Some((var_name, &token[eq_pos + 1..]))
+        } else {
+            None
+        }
     } else {
-        false
+        None
     }
 }
 
@@ -713,9 +780,230 @@ mod tests {
     #[case::command_p_git_add("command -p git add .")]
     #[case::exec_c_git_add("exec -c git add .")]
     #[case::exec_a_name_git_add("exec -a myname git add .")]
+    #[case::env_git_add("env git add .")]
+    #[case::env_i_git_add("env -i git add .")]
+    #[case::env_clustered_unset_git_add("env -iu FOO git add .")]
+    #[case::env_var_assignment_git_add("env FOO=bar git add .")]
+    #[case::sudo_env_git_add("sudo env git add .")]
     fn test_blocked_direct_git_operations_with_launchers(#[case] cmd: &str) {
         let v = check(cmd);
         assert!(v.is_blocked(), "expected blocked: {cmd}");
+    }
+
+    #[rstest]
+    #[case::env_git_status(vec!["env", "git", "status"])]
+    #[case::env_i_git_status(vec!["env", "-i", "git", "status"])]
+    #[case::env_assignment_git_status(vec!["env", "FOO=bar", "git", "status"])]
+    #[case::env_split_string_git_status(vec!["env", "-S", "git status"])]
+    #[case::env_split_string_env_option_then_remaining_git_status(vec![
+        "env", "-S", "-i", "git", "status",
+    ])]
+    #[case::env_split_string_escaped_underscore_git_status(vec!["env", "-S", r"git\_status"])]
+    #[case::env_split_string_escape_c_git_status(vec!["env", "-S", r"git\c status"])]
+    #[case::env_clustered_split_string_git_status(vec!["env", "-vSgit", "status"])]
+    #[case::env_clustered_ignore_env_split_string_git_status(vec!["env", "-ivSgit", "status"])]
+    #[case::env_clustered_unset_then_git_status(vec!["env", "-iu", "FOO", "git", "status"])]
+    #[case::env_clustered_unset_then_split_string_git_status(vec![
+        "env", "-iu", "FOO", "-Sgit", "status",
+    ])]
+    #[case::env_split_string_expanded_var_git_status(vec![
+        "GIT=git", "env", "-S", "${GIT} status",
+    ])]
+    #[case::env_assignment_before_split_string_git_status(vec![
+        "env", "GIT=git", "-S", "git status",
+    ])]
+    #[case::env_split_string_unknown_runtime_var_before_git_status(vec![
+        "env", "-S", "${MISSING} git status",
+    ])]
+    #[case::env_split_string_comment_then_remaining_git_status(vec![
+        "env", "-S", "# noop", "git", "status",
+    ])]
+    #[case::env_assignment_nested_env_split_expanded_var_git_status(vec![
+        "env", "GIT=git", "env", "-S", "${GIT} status",
+    ])]
+    #[case::env_i_assignment_nested_env_split_expanded_var_git_status(vec![
+        "env", "-i", "GIT=git", "env", "-S", "${GIT} status",
+    ])]
+    #[case::env_split_string_assignment_git_status(vec!["env", "-S", "FOO=bar git status"])]
+    #[case::env_split_string_eq_git_status(vec!["env", "--split-string=git status"])]
+    #[case::sudo_env_split_string_git_status(vec!["sudo", "env", "-S", "git status"])]
+    #[case::nested_env_split_string_git_status(vec![
+        "env",
+        "-S",
+        "env -S 'env -S \"env -S git status\"'",
+    ])]
+    #[case::env_split_string_nested_env_expanded_var_git_status(vec![
+        "GIT=git",
+        "env",
+        "-S",
+        "env -S '${GIT} status'",
+    ])]
+    #[case::sudo_env_git_status(vec!["sudo", "env", "git", "status"])]
+    fn test_contains_git_invocation_env_wrapped_git_returns_true(#[case] argv: Vec<&str>) {
+        let cmd = SimpleCommand {
+            argv: argv.into_iter().map(str::to_string).collect(),
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+
+        assert!(contains_git_invocation(&[cmd]));
+    }
+
+    #[rstest]
+    #[case::env_split_string_git_add(vec!["env", "-S", "git add ."])]
+    #[case::env_split_string_env_option_then_remaining_git_add(vec![
+        "env", "-S", "-i", "git", "add", ".",
+    ])]
+    #[case::env_split_string_escaped_underscore_git_add(vec!["env", "-S", r"git\_add ."])]
+    #[case::env_clustered_split_string_git_add(vec!["env", "-vSgit", "add", "."])]
+    #[case::env_clustered_ignore_env_split_string_git_add(vec!["env", "-ivSgit", "add", "."])]
+    #[case::env_clustered_unset_then_split_string_git_add(vec![
+        "env", "-iu", "FOO", "-Sgit", "add", ".",
+    ])]
+    #[case::env_split_string_expanded_var_git_add(vec![
+        "GIT=git", "env", "-S", "${GIT} add .",
+    ])]
+    #[case::env_assignment_before_split_string_git_add(vec![
+        "env", "GIT=git", "-S", "git add .",
+    ])]
+    #[case::env_split_string_unknown_runtime_var_before_git_add(vec![
+        "env", "-S", "${MISSING} git add .",
+    ])]
+    #[case::env_split_string_comment_then_remaining_git_add(vec![
+        "env", "-S", "# noop", "git", "add", ".",
+    ])]
+    #[case::env_assignment_nested_env_split_expanded_var_git_add(vec![
+        "env", "GIT=git", "env", "-S", "${GIT} add .",
+    ])]
+    #[case::env_i_assignment_nested_env_split_expanded_var_git_add(vec![
+        "env", "-i", "GIT=git", "env", "-S", "${GIT} add .",
+    ])]
+    #[case::env_split_string_assignment_git_add(vec!["env", "-S", "FOO=bar git add ."])]
+    #[case::env_split_string_eq_git_add(vec!["env", "--split-string=git add ."])]
+    #[case::sudo_env_split_string_git_add(vec!["sudo", "env", "-S", "git add ."])]
+    #[case::nested_env_split_string_git_add(vec![
+        "env",
+        "-S",
+        "env -S 'env -S \"env -S git add .\"'",
+    ])]
+    #[case::env_split_string_nested_env_expanded_var_git_add(vec![
+        "GIT=git",
+        "env",
+        "-S",
+        "env -S '${GIT} add .'",
+    ])]
+    fn test_check_commands_env_split_string_git_add_is_blocked(#[case] argv: Vec<&str>) {
+        let cmd = SimpleCommand {
+            argv: argv.into_iter().map(str::to_string).collect(),
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+
+        let v = check_commands(&[cmd]);
+        assert!(v.is_blocked(), "env split-string git add must be blocked");
+    }
+
+    #[test]
+    fn test_contains_git_invocation_env_wrapped_non_git_returns_false() {
+        let cmd = SimpleCommand {
+            argv: vec!["env".to_string(), "cargo".to_string(), "test".to_string()],
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+
+        assert!(!contains_git_invocation(&[cmd]));
+    }
+
+    #[test]
+    fn test_contains_git_invocation_env_unset_before_nested_split_string_returns_false() {
+        let cmd = SimpleCommand {
+            argv: vec![
+                "GIT=git".to_string(),
+                "env".to_string(),
+                "-u".to_string(),
+                "GIT".to_string(),
+                "env".to_string(),
+                "-S".to_string(),
+                "${GIT} status".to_string(),
+            ],
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+
+        assert!(!contains_git_invocation(&[cmd]));
+    }
+
+    #[test]
+    fn test_check_commands_env_unset_before_nested_split_string_git_add_is_allowed() {
+        let cmd = SimpleCommand {
+            argv: vec![
+                "GIT=git".to_string(),
+                "env".to_string(),
+                "-u".to_string(),
+                "GIT".to_string(),
+                "env".to_string(),
+                "-S".to_string(),
+                "${GIT} add .".to_string(),
+            ],
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+
+        let v = check_commands(&[cmd]);
+        assert!(!v.is_blocked(), "unset git variable must not expand in nested env");
+    }
+
+    #[test]
+    fn test_check_commands_env_split_string_non_git_is_allowed() {
+        let cmd = SimpleCommand {
+            argv: vec![
+                "env".to_string(),
+                "-S".to_string(),
+                "env -S 'env -S \"env -S cargo test\"'".to_string(),
+            ],
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+
+        let v = check_commands(&[cmd]);
+        assert!(!v.is_blocked(), "env split-string non-git command must stay allowed");
+    }
+
+    #[test]
+    fn test_contains_git_invocation_env_split_string_quoted_known_empty_var_before_git_returns_false()
+     {
+        let cmd = SimpleCommand {
+            argv: vec![
+                "MISSING=".to_string(),
+                "env".to_string(),
+                "-S".to_string(),
+                r#""${MISSING}" git status"#.to_string(),
+            ],
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+
+        assert!(!contains_git_invocation(&[cmd]));
+    }
+
+    #[test]
+    fn test_check_commands_env_split_string_escape_c_git_push_is_blocked() {
+        let cmd = SimpleCommand {
+            argv: vec!["env".to_string(), "-S".to_string(), r"git push\c ignored".to_string()],
+            redirect_texts: vec![],
+            output_redirect_texts: vec![],
+            has_output_redirect: false,
+        };
+
+        let v = check_commands(&[cmd]);
+        assert!(v.is_blocked(), "env split-string \\c must keep git push blocked");
     }
 
     // AC-05: absolute path git is still blocked

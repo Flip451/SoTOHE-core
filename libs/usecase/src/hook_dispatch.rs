@@ -194,6 +194,8 @@ impl HookHandler for SkillComplianceHandler {
 /// (from `$CLAUDE_PROJECT_DIR`) so that environment access stays in the CLI layer.
 /// `guarded_git_token_present` is also injected by the CLI composition root
 /// from `SOTP_GUARDED_GIT` presence so usecase code never reads process env.
+/// `hooks_path_configured` is injected from the CLI composition root after it
+/// reads local git config, keeping process calls out of the usecase layer.
 ///
 /// Injects a [`HookShellParserPort`] (usecase-owned faithful parser port)
 /// for both `block-direct-git-ops` and `block-test-file-deletion`. Both
@@ -209,6 +211,8 @@ pub struct HookDispatchInteractor {
     project_dir: Option<std::path::PathBuf>,
     /// Whether the guarded git token was present when the CLI composition root started.
     guarded_git_token_present: bool,
+    /// Whether local git config points `core.hooksPath` at `.githooks`.
+    hooks_path_configured: bool,
 }
 
 impl HookDispatchInteractor {
@@ -224,13 +228,16 @@ impl HookDispatchInteractor {
     /// * `guarded_git_token_present` — should be supplied by the CLI composition
     ///   root from the process environment check for `SOTP_GUARDED_GIT`. It is
     ///   consumed only by process-level git hook handlers.
+    /// * `hooks_path_configured` — should be supplied by the CLI composition
+    ///   root from a local `core.hooksPath` git config check.
     #[must_use]
     pub fn new(
         parser_port: Arc<dyn HookShellParserPort>,
         project_dir: Option<std::path::PathBuf>,
         guarded_git_token_present: bool,
+        hooks_path_configured: bool,
     ) -> Self {
-        Self { parser_port, project_dir, guarded_git_token_present }
+        Self { parser_port, project_dir, guarded_git_token_present, hooks_path_configured }
     }
 
     /// Builds the appropriate domain handler for the given hook name.
@@ -240,10 +247,12 @@ impl HookDispatchInteractor {
         let domain_parser: Arc<dyn domain::guard::ShellParser> =
             Arc::new(HookShellParserPortAdapter { port: Arc::clone(&self.parser_port) });
         let guarded_git_token_present = self.guarded_git_token_present;
+        let hooks_path_configured = self.hooks_path_configured;
         match hook_name {
-            "block-direct-git-ops" => {
-                Some(Box::new(GuardHookHandler { parser: Arc::clone(&domain_parser) }))
-            }
+            "block-direct-git-ops" => Some(Box::new(GuardHookHandler::new(
+                Arc::clone(&domain_parser),
+                hooks_path_configured,
+            ))),
             "block-test-file-deletion" => {
                 Some(Box::new(TestFileDeletionGuardHandler { parser: domain_parser }))
             }
@@ -337,6 +346,18 @@ mod tests {
             Arc::new(StubHookShellParserPort),
             None,
             guarded_git_token_present,
+            true,
+        )
+    }
+
+    fn make_interactor_with_hooks_path_configured(
+        hooks_path_configured: bool,
+    ) -> HookDispatchInteractor {
+        HookDispatchInteractor::new(
+            Arc::new(StubHookShellParserPort),
+            None,
+            false,
+            hooks_path_configured,
         )
     }
 
@@ -404,6 +425,17 @@ mod tests {
         let result = interactor.dispatch("block-direct-git-ops".to_owned(), cmd);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().decision, HookVerdictDecision::Block);
+    }
+
+    #[test]
+    fn test_dispatch_block_direct_git_ops_blocks_git_when_hooks_path_not_configured() {
+        let interactor = make_interactor_with_hooks_path_configured(false);
+        let cmd = bash_command("git status");
+        let result = interactor.dispatch("block-direct-git-ops".to_owned(), cmd);
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert_eq!(output.decision, HookVerdictDecision::Block);
+        assert!(output.reason.as_deref().is_some_and(|reason| reason.contains("core.hooksPath")));
     }
 
     #[test]

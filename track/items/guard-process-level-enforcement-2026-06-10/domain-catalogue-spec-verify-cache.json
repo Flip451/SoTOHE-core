@@ -145,6 +145,22 @@
         "kind": "pass",
         "citation": "block-test-file-deletion にリダイレクト先ターゲットのテストファイルパターン照合を追加し、リダイレクト解禁後の「> tests/foo.rs」形式の truncation を block する"
       }
+    },
+    {
+      "claim_hash": "336d0a181300485ba5501abcbfb67dbc73021c5e9e8256e35be60c40ba6bb944",
+      "evidence_hash": "49581e4cc6d56f7e4b8ff2c66aacc1f6a55185986261b9fe20b6332d4977ee4c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath が未設定の場合に runtime fail-closed（git コマンドを block）で動作する。git hooks 層が不在の状態でも CC フックが最低限の防御を維持する"
+      }
+    },
+    {
+      "claim_hash": "336d0a181300485ba5501abcbfb67dbc73021c5e9e8256e35be60c40ba6bb944",
+      "evidence_hash": "f26ecf1fc46bc90785b972175a3946bc966a5164c296ba5bb73db17a0a453cba",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core.hooksPath 未設定を検知した場合に git コマンドを block する（runtime fail-closed）。core.hooksPath が設定済みの場合はこの追加 block は発火しない"
+      }
     }
   ]
 }
