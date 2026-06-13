@@ -523,6 +523,39 @@ mod tests {
         assert_eq!(result.unwrap().decision, HookVerdictDecision::Block);
     }
 
+    #[test]
+    fn test_dispatch_block_test_file_deletion_apply_patch_delete_test_file_is_blocked() {
+        let interactor = make_interactor();
+        let cmd = HookDispatchCommand {
+            tool_name: "apply_patch".to_owned(),
+            command: Some(
+                "*** Begin Patch\n*** Delete File: tests/foo.rs\n*** End Patch".to_owned(),
+            ),
+            file_path: None,
+            content: None,
+        };
+        let result = interactor.dispatch("block-test-file-deletion".to_owned(), cmd);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().decision, HookVerdictDecision::Block);
+    }
+
+    #[test]
+    fn test_dispatch_block_test_file_deletion_apply_patch_update_test_file_is_allowed() {
+        let interactor = make_interactor();
+        let cmd = HookDispatchCommand {
+            tool_name: "apply_patch".to_owned(),
+            command: Some(
+                "*** Begin Patch\n*** Update File: tests/foo.rs\n@@\n-old\n+new\n*** End Patch"
+                    .to_owned(),
+            ),
+            file_path: None,
+            content: None,
+        };
+        let result = interactor.dispatch("block-test-file-deletion".to_owned(), cmd);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().decision, HookVerdictDecision::Allow);
+    }
+
     // --- git-ref-update ---
 
     #[test]

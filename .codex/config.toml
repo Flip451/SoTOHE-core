@@ -20,9 +20,15 @@ job_max_runtime_seconds = 1800
 [[hooks.UserPromptSubmit]]
 matcher = ""
 
+# Advisory hook: `|| exit 0` keeps it fail-open. In a fresh trusted checkout
+# `bin/sotp` is gitignored and may be unbuilt, so sotp-hook.sh exits 2 ("CLI not
+# available"); without this guard that exit 2 would block UserPromptSubmit and
+# lock the user out during onboarding. Mirrors the Claude advisory hook's
+# `|| exit 0` / `else exit 0` fail-open. Enforcement PreToolUse hooks below stay
+# fail-closed (no `|| exit 0`) — matching .claude/settings.json.
 [[hooks.UserPromptSubmit.hooks]]
 type = "command"
-command = 'sh "$(git rev-parse --show-toplevel)/.codex/hooks/sotp-hook.sh" skill-compliance'
+command = 'sh "$(git rev-parse --show-toplevel)/.codex/hooks/sotp-hook.sh" skill-compliance || exit 0'
 timeout = 5
 statusMessage = "Checking SoTOHE skill compliance"
 
@@ -44,8 +50,14 @@ command = 'sh "$(git rev-parse --show-toplevel)/.codex/hooks/sotp-hook.sh" block
 timeout = 10
 statusMessage = "Checking git operation policy"
 
+# `apply_patch` is listed explicitly: Codex routes file edits through apply_patch,
+# which matches Write/Edit matchers but reports `tool_name: "apply_patch"` in the
+# hook input. The guard (libs/usecase/src/hook/test_file_deletion.rs) parses the
+# apply_patch payload (carried in tool_input.command) for `*** Delete File:`
+# directives targeting test files. Without the explicit matcher entry the guard
+# would not fire on apply_patch test-file deletions.
 [[hooks.PreToolUse]]
-matcher = "^(Bash|Write)$"
+matcher = "^(Bash|Write|apply_patch)$"
 
 [[hooks.PreToolUse.hooks]]
 type = "command"

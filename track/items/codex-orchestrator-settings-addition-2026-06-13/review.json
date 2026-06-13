@@ -19,130 +19,6 @@
         }
       ]
     },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ee76ccde44b034209dde790d4d39135a1f06c5444de6d52885cde90e0b595623",
-          "at": "2026-06-13T03:58:09Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The default capability table is stale: it hardcodes `orchestrator` / `spec-designer` / `type-designer` / `impl-planner` / `adr-editor` to Claude Code even though the new model routes these through `capabilities.<name>.provider`. That makes the doc internally inconsistent with the provider-driven routing model and can send operators to the wrong host.",
-              "severity": "P1",
-              "file": ".claude/rules/08-orchestration.md",
-              "line": 12,
-              "category": "correctness"
-            },
-            {
-              "message": "This workflow doc repeats the same stale default-provider table, including `researcher -> Gemini`, instead of reflecting provider resolution from `.harness/config/agent-profiles.json`. It no longer matches the routing model introduced in the surrounding paragraph and should be rewritten as provider-resolved, not fixed-provider defaults.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 39,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4cb27a0b543845775c7a38241a7ee71a7fc4b101f44203c52c1cba0bab99aa0c",
-          "at": "2026-06-13T03:57:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d41f8299a994fec516c0df10975d88a168860caa28e76e7a9a900a7d56ee9465",
-          "at": "2026-06-13T04:00:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The forbidden-command list is incomplete: it blocks `git add/commit/push/reset/checkout/switch`, but `git merge`, `git rebase`, and `git cherry-pick` are still allowed, and there is no ban on direct `codex exec review`. That leaves the repo's own guardrail bypassable by the exact operations this workflow says must be blocked.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.codex/rules/default.rules",
-              "line": 31,
-              "category": "guardrail"
-            },
-            {
-              "message": "The allowlist only whitelists `bin/sotp ref-verify run`; it does not permit the native Codex fallback commands documented in `.codex/instructions.md` (`bin/sotp plan codex-local` and `bin/sotp review local`). Codex will be blocked from its supported planner/reviewer fallback path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.codex/rules/default.rules",
-              "line": 20,
-              "category": "workflow"
-            },
-            {
-              "message": "This claims `cargo make conventions-add ...` auto-updates the index, but no such task exists in this repo; the actual entrypoint is `bin/sotp conventions add ...`. As written, the primary conventions doc points contributors at a dead command.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/conventions/README.md",
-              "line": 55,
-              "category": "documentation"
-            }
-          ],
-          "hash": "rvw1:sha256:cd216ae0b1c63f5418636ed9ceaa12291a36222a7bcf1ff4a9d49f893b5e4e2e",
-          "at": "2026-06-13T07:00:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cargo make verify-orchestra` is still listed as an allowed wrapper here, but `Makefile.toml` deleted both `verify-orchestra` and `verify-orchestra-local`. As written, the policy surface now points users at a nonexistent command, so this stale entry needs to be removed from both this document and the matching allowlist in `.codex/rules/default.rules`.",
-              "severity": "P1",
-              "file": ".codex/instructions.md",
-              "line": 63,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:5ac091a4ea248ad6d13e22c8964c77c0d5a816a1f8ede3ca6f1a5159dc523224",
-          "at": "2026-06-13T07:12:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This instruction tells Codex not to treat untracked local files as architectural authority, but this change introduces the new `.agents/skills` and `.codex/*` surfaces as working-tree files that will be untracked during review. A root-orchestrator session following this guidance could ignore the very wrappers and rules this patch is adding. Narrow the wording to scratch/runtime files, not repository files that are intentionally introduced in the working tree.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.codex/instructions.md",
-              "line": 37,
-              "category": "guardrails"
-            },
-            {
-              "message": "The operating-context list never points the Codex session at `.codex/rules/default.rules`, even though that file is the new Codex-specific command-policy surface. As written, a Codex-root session is explicitly told to read `.claude/rules/` but not the repo-local Codex rules, so the deny/allow guardrails added in this patch are left out of the explicit contract. Add the Codex rules file to the first-read list.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.codex/instructions.md",
-              "line": 12,
-              "category": "guardrails"
-            }
-          ],
-          "hash": "rvw1:sha256:05d152ef7e970bb509f8103c737484711426e4c6b782204f1b90283206ffd4b3",
-          "at": "2026-06-13T07:24:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:240a64346b6b1b2e658300cfd191fa41204c800e223d30fdff31fb7b4f7e010f",
-          "at": "2026-06-13T07:31:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:240a64346b6b1b2e658300cfd191fa41204c800e223d30fdff31fb7b4f7e010f",
-          "at": "2026-06-13T07:38:47Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -256,6 +132,216 @@
         }
       ]
     },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee76ccde44b034209dde790d4d39135a1f06c5444de6d52885cde90e0b595623",
+          "at": "2026-06-13T03:58:09Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29d6d135bab995c3d5c6f3b8a9ec1dc2a905748489e1c1878a29d2f2b82910d3",
+          "at": "2026-06-13T08:26:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `apply_patch_deleted_test_file` trims the whole patch line before checking for `*** Delete File:`, so an ordinary update hunk context line like ` *** Delete File: tests/foo.rs` is misclassified as a deletion directive. That means a legitimate `*** Update File:` patch can be blocked just because unchanged file content contains that text, despite updates being intentionally allowed. Match the directive prefix on the raw line and trim only the path after the prefix.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook/test_file_deletion.rs",
+              "line": 168,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:29d6d135bab995c3d5c6f3b8a9ec1dc2a905748489e1c1878a29d2f2b82910d3",
+          "at": "2026-06-13T08:27:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:336bae3a1d087bb3b9a20b3d0357469f6aa58c9ba04f6b0e0130f032136f08fc",
+          "at": "2026-06-13T08:33:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:336bae3a1d087bb3b9a20b3d0357469f6aa58c9ba04f6b0e0130f032136f08fc",
+          "at": "2026-06-13T08:34:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30612267ada6e187bc9c6f62e4fece6cffe0a506641621f1698e0fd603359b01",
+          "at": "2026-06-13T08:50:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30612267ada6e187bc9c6f62e4fece6cffe0a506641621f1698e0fd603359b01",
+          "at": "2026-06-13T08:51:56Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The default capability table is stale: it hardcodes `orchestrator` / `spec-designer` / `type-designer` / `impl-planner` / `adr-editor` to Claude Code even though the new model routes these through `capabilities.<name>.provider`. That makes the doc internally inconsistent with the provider-driven routing model and can send operators to the wrong host.",
+              "severity": "P1",
+              "file": ".claude/rules/08-orchestration.md",
+              "line": 12,
+              "category": "correctness"
+            },
+            {
+              "message": "This workflow doc repeats the same stale default-provider table, including `researcher -> Gemini`, instead of reflecting provider resolution from `.harness/config/agent-profiles.json`. It no longer matches the routing model introduced in the surrounding paragraph and should be rewritten as provider-resolved, not fixed-provider defaults.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 39,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4cb27a0b543845775c7a38241a7ee71a7fc4b101f44203c52c1cba0bab99aa0c",
+          "at": "2026-06-13T03:57:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d41f8299a994fec516c0df10975d88a168860caa28e76e7a9a900a7d56ee9465",
+          "at": "2026-06-13T04:00:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The forbidden-command list is incomplete: it blocks `git add/commit/push/reset/checkout/switch`, but `git merge`, `git rebase`, and `git cherry-pick` are still allowed, and there is no ban on direct `codex exec review`. That leaves the repo's own guardrail bypassable by the exact operations this workflow says must be blocked.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.codex/rules/default.rules",
+              "line": 31,
+              "category": "guardrail"
+            },
+            {
+              "message": "The allowlist only whitelists `bin/sotp ref-verify run`; it does not permit the native Codex fallback commands documented in `.codex/instructions.md` (`bin/sotp plan codex-local` and `bin/sotp review local`). Codex will be blocked from its supported planner/reviewer fallback path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.codex/rules/default.rules",
+              "line": 20,
+              "category": "workflow"
+            },
+            {
+              "message": "This claims `cargo make conventions-add ...` auto-updates the index, but no such task exists in this repo; the actual entrypoint is `bin/sotp conventions add ...`. As written, the primary conventions doc points contributors at a dead command.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/conventions/README.md",
+              "line": 55,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:cd216ae0b1c63f5418636ed9ceaa12291a36222a7bcf1ff4a9d49f893b5e4e2e",
+          "at": "2026-06-13T07:00:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make verify-orchestra` is still listed as an allowed wrapper here, but `Makefile.toml` deleted both `verify-orchestra` and `verify-orchestra-local`. As written, the policy surface now points users at a nonexistent command, so this stale entry needs to be removed from both this document and the matching allowlist in `.codex/rules/default.rules`.",
+              "severity": "P1",
+              "file": ".codex/instructions.md",
+              "line": 63,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:5ac091a4ea248ad6d13e22c8964c77c0d5a816a1f8ede3ca6f1a5159dc523224",
+          "at": "2026-06-13T07:12:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This instruction tells Codex not to treat untracked local files as architectural authority, but this change introduces the new `.agents/skills` and `.codex/*` surfaces as working-tree files that will be untracked during review. A root-orchestrator session following this guidance could ignore the very wrappers and rules this patch is adding. Narrow the wording to scratch/runtime files, not repository files that are intentionally introduced in the working tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.codex/instructions.md",
+              "line": 37,
+              "category": "guardrails"
+            },
+            {
+              "message": "The operating-context list never points the Codex session at `.codex/rules/default.rules`, even though that file is the new Codex-specific command-policy surface. As written, a Codex-root session is explicitly told to read `.claude/rules/` but not the repo-local Codex rules, so the deny/allow guardrails added in this patch are left out of the explicit contract. Add the Codex rules file to the first-read list.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.codex/instructions.md",
+              "line": 12,
+              "category": "guardrails"
+            }
+          ],
+          "hash": "rvw1:sha256:05d152ef7e970bb509f8103c737484711426e4c6b782204f1b90283206ffd4b3",
+          "at": "2026-06-13T07:24:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:240a64346b6b1b2e658300cfd191fa41204c800e223d30fdff31fb7b4f7e010f",
+          "at": "2026-06-13T07:31:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:240a64346b6b1b2e658300cfd191fa41204c800e223d30fdff31fb7b4f7e010f",
+          "at": "2026-06-13T07:38:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8714aebda65a263c206a4a668103b26c1b0fd1c706a2a15012257b3c2606c6a3",
+          "at": "2026-06-13T08:25:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8714aebda65a263c206a4a668103b26c1b0fd1c706a2a15012257b3c2606c6a3",
+          "at": "2026-06-13T08:27:40Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d616046ab03e30383a9cbfc9674911ba6653474eb9d13d1c495eb8d7668c3f6f",
+          "at": "2026-06-13T06:54:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d616046ab03e30383a9cbfc9674911ba6653474eb9d13d1c495eb8d7668c3f6f",
+          "at": "2026-06-13T06:56:59Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -335,24 +421,6 @@
           "findings": [],
           "hash": "rvw1:sha256:1cfe76e0dd98a3b139721adbe00ac55027ea42fff20f5e5ad7ece679a0b6de44",
           "at": "2026-06-13T07:01:25Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d616046ab03e30383a9cbfc9674911ba6653474eb9d13d1c495eb8d7668c3f6f",
-          "at": "2026-06-13T06:54:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d616046ab03e30383a9cbfc9674911ba6653474eb9d13d1c495eb8d7668c3f6f",
-          "at": "2026-06-13T06:56:59Z"
         }
       ]
     }

@@ -1,8 +1,12 @@
-//! TestFileDeletionGuardHandler blocks Bash and Write tool calls that delete
-//! or truncate test files.
+//! TestFileDeletionGuardHandler blocks Bash, Write, and apply_patch tool calls
+//! that delete or truncate test files.
 //!
 //! Shell syntax is interpreted only through `SimpleCommand` values produced by
-//! the injected `ShellParser`.
+//! the injected `ShellParser`. The apply_patch path inspects the patch payload
+//! (carried in `HookInput::command`) directly — Codex routes file edits through
+//! apply_patch, which matches Write/Edit matchers but reports
+//! `tool_name: "apply_patch"`, so without a dedicated arm those edits would
+//! bypass the guard.
 
 use std::sync::Arc;
 
@@ -79,8 +83,9 @@ enum EnvTokenStep<'a> {
 /// Hook handler for `block-test-file-deletion`.
 ///
 /// Blocks Bash commands that delete or overwrite test files through parsed
-/// `rm` argv or output redirect metadata, and Write tool calls that truncate
-/// test files with empty content.
+/// `rm` argv or output redirect metadata, Write tool calls that truncate
+/// test files with empty content, and apply_patch payloads that delete test
+/// files via `*** Delete File:` directives.
 pub struct TestFileDeletionGuardHandler {
     pub parser: Arc<dyn ShellParser>,
 }
@@ -89,6 +94,7 @@ impl HookHandler for TestFileDeletionGuardHandler {
     fn handle(&self, _ctx: &HookContext, input: &HookInput) -> Result<HookVerdict, HookError> {
         match input.tool_name.as_str() {
             "Write" => return Ok(check_write_input(input)),
+            "apply_patch" => return check_apply_patch_input(input),
             "Bash" => {}
             _ => return Ok(HookVerdict::allow()),
         }
@@ -123,6 +129,53 @@ fn check_write_input(input: &HookInput) -> HookVerdict {
     }
 
     HookVerdict::allow()
+}
+
+/// Inspects an apply_patch payload for test-file deletion.
+///
+/// Codex carries the patch text in `tool_input.command`, surfaced here as
+/// `HookInput::command`. A missing payload is fail-closed (`HookError::Input`)
+/// so a malformed apply_patch envelope cannot silently bypass the guard.
+///
+/// Only explicit deletion (`*** Delete File:` targeting a test file) is blocked —
+/// the namesake removal vector and the apply_patch analogue of `rm tests/foo.rs`.
+/// Truncation via update hunks is intentionally out of scope: a hunk only shows
+/// the lines it touches, so deciding whether the resulting file is empty would
+/// require applying the patch to the original file (which a pure handler must
+/// not read). Legitimate test edits (`*** Update File:`) and renames are allowed.
+///
+/// # Errors
+/// Returns [`HookError::Input`] when the apply_patch payload is missing.
+fn check_apply_patch_input(input: &HookInput) -> Result<HookVerdict, HookError> {
+    let patch = input
+        .command
+        .as_deref()
+        .ok_or_else(|| HookError::Input("missing apply_patch command".into()))?;
+
+    if let Some(path) = apply_patch_deleted_test_file(patch) {
+        return Ok(HookVerdict::block(format!(
+            "blocked: cannot delete test file '{path}' via apply_patch"
+        )));
+    }
+
+    Ok(HookVerdict::allow())
+}
+
+/// Returns the first test-file path targeted by an apply_patch
+/// `*** Delete File:` directive, if any.
+///
+/// The directive prefix is matched on the **raw** line: apply_patch file-action
+/// directives start at column 0, whereas hunk content lines are prefixed with a
+/// space (context), `+` (added), or `-` (removed). Matching the raw line avoids
+/// misclassifying a context/added/removed line that merely *contains* the
+/// directive text (e.g. ` *** Delete File: tests/foo.rs` inside an update hunk)
+/// as a real deletion — which would wrongly block a legitimate update. Only the
+/// path after the prefix is trimmed.
+fn apply_patch_deleted_test_file(patch: &str) -> Option<&str> {
+    patch.lines().find_map(|line| {
+        let path = line.strip_prefix("*** Delete File:")?.trim();
+        is_test_file(path).then_some(path)
+    })
 }
 
 fn check_commands_for_test_deletion(
@@ -663,6 +716,15 @@ mod tests {
         }
     }
 
+    fn apply_patch_input(patch: Option<&str>) -> HookInput {
+        HookInput {
+            tool_name: "apply_patch".to_string(),
+            command: patch.map(str::to_string),
+            file_path: None,
+            content: None,
+        }
+    }
+
     fn handle(parser: Arc<dyn ShellParser>, input: HookInput) -> HookVerdict {
         let handler = TestFileDeletionGuardHandler { parser };
         let ctx = HookContext { project_dir: None };
@@ -685,6 +747,75 @@ mod tests {
     fn test_write_non_test_file_empty_content_allows() {
         let verdict = handle(parser_for("", Vec::new()), write_input("src/lib.rs", Some("")));
         assert!(!verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_apply_patch_delete_test_file_blocks() {
+        let patch = "*** Begin Patch\n*** Delete File: tests/foo.rs\n*** End Patch";
+        let verdict = handle(parser_for("", Vec::new()), apply_patch_input(Some(patch)));
+        assert!(verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_apply_patch_delete_rust_test_named_file_blocks() {
+        let patch = "*** Begin Patch\n*** Delete File: src/user_test.rs\n*** End Patch";
+        let verdict = handle(parser_for("", Vec::new()), apply_patch_input(Some(patch)));
+        assert!(verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_apply_patch_delete_test_file_among_other_changes_blocks() {
+        let patch = "*** Begin Patch\n*** Update File: src/lib.rs\n@@\n-old\n+new\n*** Delete File: tests/foo.rs\n*** End Patch";
+        let verdict = handle(parser_for("", Vec::new()), apply_patch_input(Some(patch)));
+        assert!(verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_apply_patch_delete_non_test_file_allows() {
+        let patch = "*** Begin Patch\n*** Delete File: src/lib.rs\n*** End Patch";
+        let verdict = handle(parser_for("", Vec::new()), apply_patch_input(Some(patch)));
+        assert!(!verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_apply_patch_update_test_file_allows() {
+        let patch = "*** Begin Patch\n*** Update File: tests/foo.rs\n@@\n-old\n+new\n*** End Patch";
+        let verdict = handle(parser_for("", Vec::new()), apply_patch_input(Some(patch)));
+        assert!(!verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_apply_patch_add_test_file_allows() {
+        let patch = "*** Begin Patch\n*** Add File: tests/foo.rs\n+fn t() {}\n*** End Patch";
+        let verdict = handle(parser_for("", Vec::new()), apply_patch_input(Some(patch)));
+        assert!(!verdict.is_blocked());
+    }
+
+    #[test]
+    fn test_apply_patch_hunk_content_line_with_delete_directive_text_allows() {
+        // A hunk content line — context (' '), added ('+'), or removed ('-') —
+        // that merely contains the delete-directive text must NOT be treated as
+        // a deletion: apply_patch file-action directives start at column 0, hunk
+        // content lines do not. Only a real column-0 `*** Delete File:` triggers
+        // the guard, so legitimate updates touching such lines stay allowed.
+        for prefix in [" ", "+", "-"] {
+            let patch = format!(
+                "*** Begin Patch\n*** Update File: src/doc.rs\n@@\n{prefix}*** Delete File: tests/foo.rs\n*** End Patch"
+            );
+            let verdict =
+                handle(parser_for("", Vec::new()), apply_patch_input(Some(patch.as_str())));
+            assert!(!verdict.is_blocked(), "prefix: {prefix:?}");
+        }
+    }
+
+    #[test]
+    fn test_apply_patch_missing_payload_returns_error() {
+        let handler = TestFileDeletionGuardHandler { parser: parser_for("", Vec::new()) };
+        let ctx = HookContext { project_dir: None };
+        let result = handler.handle(&ctx, &apply_patch_input(None));
+        assert!(
+            matches!(result, Err(HookError::Input(message)) if message == "missing apply_patch command")
+        );
     }
 
     #[test]
