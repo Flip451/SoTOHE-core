@@ -1,0 +1,296 @@
+{
+  "schema_version": 4,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "DryCheckConfig": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "threshold",                          "ty": "f64" },
+            { "name": "fast_reasoning_effort",              "ty": "String" },
+            { "name": "final_reasoning_effort",             "ty": "String" },
+            { "name": "known_bad_injection_rate_percent",    "ty": "u8" },
+            { "name": "known_bad_detection_threshold_percent", "ty": "u8" },
+            { "name": "max_parallelism",                     "ty": "usize" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "load",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<Self, DryCheckConfigError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "threshold",
+          "receiver": "&self",
+          "params": [],
+          "returns": "f64",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fast_reasoning_effort",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "final_reasoning_effort",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "max_parallelism",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "known_bad_injection_rate_percent",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "known_bad_detection_threshold_percent",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_check::config",
+      "docs": "Filesystem DTO for `.harness/config/dry-check.json` after the final schema_version 3 migration. Existing threshold is preserved; new fields added in this track are max_parallelism (D3 schema_version 2), fast_reasoning_effort (D4 schema_version 3), final_reasoning_effort (D4 schema_version 3), known_bad_injection_rate_percent (D4 schema_version 3), and known_bad_detection_threshold_percent (D4 schema_version 3). Raw primitive fields are used here because this is the serde boundary; the loader validates fast_reasoning_effort/final_reasoning_effort and the composition layer converts numeric settings to the validated usecase::DryCheckConfig (DryCheckPercent / DryCheckParallelism newtype wrappers). CN-06/CN-04.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckConfigError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Io",                     "payload": { "kind": "unit" } },
+          { "name": "Parse",                  "payload": { "kind": "unit" } },
+          { "name": "UnsupportedSchemaVersion", "payload": { "kind": "unit" } },
+          { "name": "InvalidThreshold",       "payload": { "kind": "unit" } },
+          { "name": "InvalidParallelism",     "payload": { "kind": "unit" } },
+          { "name": "InvalidReasoningEffort", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check::config",
+      "docs": "Error variants for DryCheckConfig::load. InvalidParallelism is new in this track (D3): covers max_parallelism = 0 or other invalid parallelism settings read from dry-check.json. InvalidReasoningEffort is new in this track (D4): covers unsupported fast_reasoning_effort/final_reasoning_effort values read from dry-check.json.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CodexDryChecker": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "fast_model", "ty": "String" },
+            { "name": "fast_reasoning_effort", "ty": "String" },
+            { "name": "final_model", "ty": "String" },
+            { "name": "final_reasoning_effort", "ty": "String" },
+            { "name": "capability_name", "ty": "String" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_check::codex_dry_checker",
+      "docs": "Secondary adapter implementing the tier-aware DryCheckAgentPort. Updated for D4 two-tier execution: Fast uses the fast_model from CapabilityConfigDto plus fast_reasoning_effort from dry-check.json; Final uses the primary model plus final_reasoning_effort from dry-check.json. The adapter executes exactly one production/probe pair on the tier requested by DryCheckJudgeTier and does not accept or reject run-level calibration; DryCheckInteractor uses DryCheckConfig percentages for probe count, detection threshold, and all-pair final retry. Private fields hold model and reasoning-effort configuration for tier execution.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-06"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-08"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryCheckCoverageAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "store_path", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "store_path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_check",
+      "docs": "Filesystem adapter implementing usecase::DryCheckCoveragePort. Persists and reads the DryCheckCoverageRecord as JSON alongside the dry-check store. The store_path points to the directory holding the coverage manifest file. CN-08: missing coverage file returns Ok(None) to the port caller.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-06"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-08"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryEvent": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "TrackSubcommand",    "payload": { "kind": "unit" } },
+          { "name": "GateEval",           "payload": { "kind": "unit" } },
+          { "name": "ReviewRound",        "payload": { "kind": "unit" } },
+          { "name": "ExternalSubprocess", "payload": { "kind": "unit" } },
+          { "name": "HookBlock",          "payload": { "kind": "unit" } },
+          { "name": "AdvisoryHookFired",  "payload": { "kind": "unit" } },
+          { "name": "NonZeroExit",        "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": null,
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-07"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "modify", "trait_ref": "core::fmt::Debug",                    "for_type": "DryCheckConfig" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug",                    "for_type": "DryCheckConfigError" },
+    { "action": "modify", "trait_ref": "core::fmt::Display",                  "for_type": "DryCheckConfigError" },
+    { "action": "modify", "trait_ref": "core::error::Error",                  "for_type": "DryCheckConfigError" },
+    { "action": "modify", "trait_ref": "core::convert::From<std::io::Error>", "for_type": "DryCheckConfigError" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                             "for_type": "CodexDryChecker" },
+    { "action": "modify",    "trait_ref": "usecase::dry_check::ports::DryCheckAgentPort", "for_type": "CodexDryChecker" },
+    { "action": "add",    "trait_ref": "usecase::dry_check::ports::DryCheckCoveragePort", "for_type": "FsDryCheckCoverageAdapter" },
+    { "action": "add",    "trait_ref": "core::fmt::Debug",                    "for_type": "FsDryCheckCoverageAdapter" }
+  ]
+}

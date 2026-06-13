@@ -16,6 +16,351 @@
           "findings": [],
           "hash": "rvw1:sha256:f59559a57b71b02b31cf7e8be0f07e641b1445d4675f818692773a22d2873c27",
           "at": "2026-06-13T19:43:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is internally inconsistent about `DryCheckApprovalService::check_approved`: the task first says to change it to `check_approved(&self) -> Result<...>` and then immediately changes it again to `check_approved(&self, current_fragment_hashes: &BTreeSet<FragmentContentHash>) -> Result<...>`. That leaves the approval API underspecified and conflicts with the existing type catalogue, which still records the service as parameterless.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
+              "line": 26,
+              "category": "contradiction"
+            },
+            {
+              "message": "T014/T015 do not allocate the ports needed to satisfy the documented D2 behavior. The interactor docs say it must combine dry approval, review-state, and ref-verify result ports, but the constructor in the task injects `dry_approval`, `dry_checker`, and `coverage`, where `coverage` is a D5-specific port and the review/ref-verify inputs are missing. As written, the resolver cannot compute the required 3-gate state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
+              "line": 78,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b1be09a6e395b9ab7d0b37ff5f6bbf110baf266053cea95b315479e067148f4b",
+          "at": "2026-06-13T20:35:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` references `AN-12`, but this track only defines `AC-12` / `CN-09` anchors. As written, the regression-test requirement points at a nonexistent spec anchor and is a broken cross-reference.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
+              "line": 28,
+              "category": "broken reference"
+            },
+            {
+              "message": "`T012` / `T016` require `CodexDryChecker::new` to accept model or config inputs, but the infrastructure catalogue still models `CodexDryChecker::new` as parameterless. The planned API is inconsistent across the artefacts, so the checker cannot be wired to the new fast/final models as described.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
+              "line": 106,
+              "category": "contradiction"
+            },
+            {
+              "message": "`T008` adds a `max_parallelism()` accessor to `DryCheckConfig`, but the infrastructure catalogue only exposes `load()` and `threshold()`. The type catalogue and the task plan disagree on the public API needed by `T016`.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
+              "line": 21,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:518fc07b532ec7213747c079ebd04f050868870697d198c921fe0dc9ee18399e",
+          "at": "2026-06-13T20:47:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea14f03ec626bd960f6e2cf9fc0e7ee9b096c3dd127beae63ea5691821d5a8c6",
+          "at": "2026-06-13T20:53:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04 says an omitted `max_parallelism` must fall back to a nonzero default, but T008 instructs implementers to make a schema_version=2 config missing `max_parallelism` fail with a Parse error. Those are mutually exclusive config semantics, so the task can be implemented in a way that violates the spec-level constraint.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `DryCheckConfig` DTO catalogue drops the existing `threshold` field while marking the field list as complete (`has_stripped_fields: false`), even though T008 explicitly says the existing `threshold` is preserved and the same type still exposes a `threshold()` accessor. This leaves the infrastructure config contract internally inconsistent and would remove the similarity threshold from the planned schema.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
+              "line": 13,
+              "category": "contradiction"
+            },
+            {
+              "message": "The usecase type catalogue changes `DryCheckInteractor::new` to accept only `config`, while the implementation plan says the constructor keeps its existing embedding/index/reader dependencies and later adds coverage wiring into `DryCheckInteractor::new`. With only `config` in the planned constructor, the interactor cannot be wired with the ports required by T004/T010/T016, so the catalogue and plan are semantically inconsistent.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
+              "line": 642,
+              "category": "contradiction"
+            },
+            {
+              "message": "T012 says `DryCheckAgentPort::judge` should process all pairs together with known-bad probes as a batch, but CN-03 and T010 require preserving the `1 pair 1 agent_port.judge()` granularity and explicitly forbid packing multiple pairs into one agent call. This conflicts with the bounded fan-out design and makes the D3/D4 behavior ambiguous.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 72,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ea14f03ec626bd960f6e2cf9fc0e7ee9b096c3dd127beae63ea5691821d5a8c6",
+          "at": "2026-06-13T20:57:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07 requires the fast tier to mix known-bad probes into the batch, but CN-03 explicitly forbids putting multiple pairs into one agent call, and T012 then implements probes as separate one-pair calls. As written, the plan cannot satisfy both the acceptance criterion and the constraint; clarify whether probes are separate calibration calls or part of a batch.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+              "line": 400,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-06 requires the known-bad probe injection rate to be configurable, and T011/T016 only add/pass the field. The actual two-tier implementation task T012 never says to use `known_bad_injection_rate_percent` to decide probe frequency or selection, so the implementation can ignore a required control while still completing the plan tasks.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 72,
+              "category": "semantic_gap"
+            },
+            {
+              "message": "AC-06 says wall-clock shortening must be confirmable via telemetry for runs with multiple unverified pairs, but T017 explicitly skips the wall-clock confirmation in CI and substitutes only a unit test that ReviewRound telemetry is emitted. That does not verify the acceptance criterion's performance claim, leaving AC-06 uncovered by the final validation task.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6dc9303a94ac72004994717fe73cd53340941db9f3c76bcacb9d7290b46b53e8",
+          "at": "2026-06-13T21:03:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-04 requires adding both reasoning effort and probe settings to `.harness/config/dry-check.json`, but the D4 task only adds `known_bad_injection_rate_percent` and `known_bad_detection_threshold_percent`; the infrastructure config catalogue likewise lists no reasoning-effort field. As planned, T012 can only refer to an unspecified `reasoning_effort` setting, so the IN-04 requirement is not actually implementable from the plan artifacts.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5bd405074ec9ccb8dbc61ef6de7276751e6e10aed2484b206d39cd06d1c5f5c4",
+          "at": "2026-06-13T21:09:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-02 requires the fixpoint resolver to output the RFP target scope list, but the planned contract only models a single scope (`RunRfp { scope: String }`, `NeedsReview { scope: String }`, and CLI output `run-rfp scope=<scope>`). If more than one review scope is stale, the resolver cannot represent the required next work set, so the plan does not satisfy its own D2 contract.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/domain-types.json",
+              "line": 13,
+              "category": "contradiction"
+            },
+            {
+              "message": "`DryCheckCycleError::CoveragePort` is documented as covering coverage-record read/write failures, but the same variant is also assigned to `DryCheckParallelism::try_new` and `DryCheckPercent::try_new` validation failures. That collapses config validation errors into a coverage I/O error, making the error contract semantically wrong for callers and tests that need to distinguish invalid configuration from coverage-store failures.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
+              "line": 300,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:1c8479ad10f76ed09f7c80a135d14c9c563cd925cf04b078473237675dd7f928",
+          "at": "2026-06-13T21:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Interface-breaking changes are split from their required composition rewiring, so the planned task order is not independently CI-passable. T010 changes `DryCheckInteractor::new` and T012 changes `CodexDryChecker::new`, but the `dry_write` call-site/config wiring for both is deferred to T016 after T008-T012 are complete. That leaves intermediate commits after T010/T012 unable to compile, and T013 is scheduled on top of that broken composition path. Move each required call-site update into the task that changes the interface, or insert an earlier wiring task before requiring CI between these steps.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
+              "line": 86,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:33a6012fb1ad008ef9d2f2e3f83d355dd830af90967ed25ae6bb2572084012a3",
+          "at": "2026-06-13T21:28:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T012 puts D4 calibration inside `DryCheckAgentPort::judge`, while also defining that call as judging exactly one production pair and then claiming a fast-tier calibration failure means all production pairs go to the final tier. That does not satisfy CN-07's all-pair retry guarantee: once `judge` is called per pair, a failure detected in one call cannot invalidate or re-run fast results already returned for other pairs unless there is a run-level/shared calibration mechanism. The plan needs to move calibration/failover to the batch/run level or specify a shared fail-closed coordination point before any fast result can be accepted.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 72,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:71119f0cfda88a44286374a9637d1ea6593f8b2826328ea7fdd848b1bfda3f6a",
+          "at": "2026-06-13T21:33:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 requires proving `sotp dry write` wall-clock improves versus a serial baseline using telemetry or measured wall-clock, and the implementation plan assigns that actual fixed-delay baseline/integration verification to T017. However `task-coverage.json` maps AC-06 only to T010/T013: T010 covers the parallel fan-out mechanics with unit tests, while T013 covers fast/final telemetry tagging. This leaves the artifact coverage map semantically inconsistent with the plan and can let the AC-06 performance verification be treated as covered before the only task that actually verifies it runs.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/task-coverage.json",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:98e4e4252e2fe8205d2625d3dc1a005d15c30e4d1e9632dc84e72715050fc38b",
+          "at": "2026-06-13T21:44:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FixpointResolveCommand` documents `current_branch` as having a non-empty invariant, but the catalogue models it as a raw `String` on a plain struct with no constructor or validation method. That leaves an explicitly illegal command state representable at the usecase API boundary, contrary to the plan briefing's type-design rule to make illegal states unrepresentable. Add a validated branch/current-branch value object or define a `try_new`/validation path for the command before exposing it to `FixpointResolveService::resolve`.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
+              "line": 15,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:4738a41b88aa12261e8758857ef95888f827c20be87fed7f96e670f2ed62cb13",
+          "at": "2026-06-13T21:49:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 directs the composition work through `dry_write`'s `DryCheckApprovalInteractor` construction and also updates the `dry_check_approved` path, but that is the check-approved interactor/path owned by T003/T005. T004's stated interface change is adding a coverage port to `DryCheckInteractor::run_dry_check`, so the plan is pointing implementers at the wrong composition seam for the dry-write wiring and can leave the actual dry-write constructor path unresolved.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 24,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "The S5 section says T010's only prerequisite is T009, while the T010 task itself requires T008 because it loads infra `DryCheckConfig` and consumes the new `max_parallelism` DTO. Following the section-level dependency lets T010 start before T008 exists, so the task is not independently compile-passable in the advertised order.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 159,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2831048fd0726c5afc1959553cd4c6d21956d0f72e7e10803b18eb4c05de37e0",
+          "at": "2026-06-13T21:56:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003's new approval algorithm scans `reader.read_records()` and blocks whenever any record involving a current fragment hash has verdict `Violation`, but dry-check history is append-only and the current semantics derive the latest verdict per pair with last-write-wins. If a pair has an older `Violation` followed by a later `Accepted`/`NotAViolation`, this plan would still block `dry check-approved`, contradicting the all-resolved requirement and potentially making the pure-read gate unable to approve resolved pairs. The task should derive latest-per-pair before evaluating verdicts.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f1fe1bd31fccd3ec61b7c0c6b0c268b9ab7c7aad0da8540d6177df3a9bcab734",
+          "at": "2026-06-13T22:02:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-04 carries the D4 requirement to move dry-checker reasoning-effort configuration into `.harness/config/dry-check.json`, but the planned config/adapter surface only models `fast_reasoning_effort`: `CodexDryChecker::new` accepts `fast_reasoning_effort` plus `final_model`, with no final-tier reasoning-effort input. If implemented as planned, the final tier necessarily keeps an implicit or hard-coded effort, so the D4/tiered reasoning-effort configuration requirement is not actually implementable from these artifacts.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
+              "line": 160,
+              "category": "contradiction"
+            },
+            {
+              "message": "This in-scope telemetry requirement says the work stays within the existing telemetry schema, but then allows adding new fields or event types if needed. That conflicts with the same D4 telemetry plan in T013, which explicitly says to use existing `round_type` and add no new fields or event types, leaving implementers with two incompatible schema-change rules.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+              "line": 121,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f3f0f73f7e2a6544258f05cbdb1144c1758a3d9bafdaf6c092ea4961b62661a4",
+          "at": "2026-06-13T22:08:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 defines `.harness/config/dry-check.json` schema_version 2 as the D3 schema with only `max_parallelism` added, while T011 later adds the D4 reasoning/probe fields but explicitly keeps the schema at 2. The final infrastructure catalogue models those new fields as required, so the same schema_version now describes two incompatible config shapes depending on task order. That makes the plan's config migration semantically inconsistent; either bump the schema again for the D4 fields or make the new fields explicitly defaulted/optional under schema_version 2.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8a9052a1b19b0d8f8c78815463dd8bf19e610b19550de08fc60044e9bc3234f3",
+          "at": "2026-06-13T22:17:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 changes the public `DryCheckApprovalInteractor::new` constructor and `DryCheckApprovalService::check_approved` signature, but the composition call-site migration is explicitly deferred to T005 while the section also requires each task to be committed with `cargo make ci-rust` passing. That makes T003 physically unexecutable as an independent green task unless T003 also updates the composition call sites or preserves a compatibility path until T005.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 18,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:ba8b7aad761f0293bd2396a5ca7d004291c4eb19d0a608dd7af0a050f55fac3a",
+          "at": "2026-06-13T22:21:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckCoverageRecord` and the new approval API track only `FragmentContentHash` values, so `check-approved` cannot prove that the current diff fragment itself was processed by the latest `dry write`. If a new or renamed diff fragment has the same content hash as a previously covered fragment at another path, the staleness check described in T003 will see the hash in `fragment_hashes` and can approve without forcing `dry write`, despite CN-08/AC-11 requiring fail-closed coverage for the current diff. The coverage key needs enough fragment identity to distinguish paths, not just content hashes.",
+              "severity": "P0",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/domain-types.json",
+              "line": 120,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a6a014cf0961962aba8748019e3b40267ea838cf418da91ac9a4d64384c2a2d0",
+          "at": "2026-06-13T22:28:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8579c4c97361419a3bf7395a71157996913ebfe40a6250ddf37e3e1a09b5015c",
+          "at": "2026-06-13T22:36:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cca5edc2194f56fd2885d5b0e3b4da4f3bf7d525eb7a6080ed845d0b0cd5894",
+          "at": "2026-06-13T23:02:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cca5edc2194f56fd2885d5b0e3b4da4f3bf7d525eb7a6080ed845d0b0cd5894",
+          "at": "2026-06-13T23:06:34Z"
         }
       ]
     },

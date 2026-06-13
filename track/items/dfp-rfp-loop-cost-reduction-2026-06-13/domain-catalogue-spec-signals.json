@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "33de6229df34217d9a322a9c47550f7a6f2375f2da9747c701c71c1927e08c3f",
+  "signals": [
+    {
+      "type_name": "DryCheckCoverageRecord",
+      "signal": "blue",
+      "entry_hash": "4de28d89f1bed119acaf7d328609c739652f188885db270a321dd8e9f191c433"
+    },
+    {
+      "type_name": "FixpointStep",
+      "signal": "blue",
+      "entry_hash": "ae363f3164b0441414754494daa865167964a5f1252aa9ef231506cff2014b17"
+    },
+    {
+      "type_name": "ReviewScopeSet",
+      "signal": "blue",
+      "entry_hash": "d5d6cfb6e7f9596a41f144fa28daebe9d835ac4c49e007a0a3b2f93fa6813326"
+    },
+    {
+      "type_name": "ReviewScopeSetError",
+      "signal": "blue",
+      "entry_hash": "9248196dcb3d90a252dbdfc7a1b46228c254c2cb5c962f4764b8434b34ae1246"
+    }
+  ]
+}

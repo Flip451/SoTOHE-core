@@ -1,0 +1,371 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_dry_check["domain::dry_check"]
+    direction TB
+  subgraph T36_domain_domain_DryCheckCoverageRecord["dry_check::DryCheckCoverageRecord"]
+    direction TB
+    T36_domain_domain_DryCheckCoverageRecord__self[DryCheckCoverageRecord]
+  end
+  end
+  subgraph domain_domain_module_track_phase["domain::track_phase"]
+    direction TB
+  subgraph T26_domain_domain_FixpointStep["track_phase::FixpointStep"]
+    direction TB
+    T26_domain_domain_FixpointStep__self[FixpointStep]
+    T26_domain_domain_FixpointStep_RunDfp[RunDfp]
+    T26_domain_domain_FixpointStep_RunRfp[RunRfp]
+    T26_domain_domain_FixpointStep_RunRefVerify[RunRefVerify]
+    T26_domain_domain_FixpointStep_Commit[Commit]
+  end
+  subgraph T28_domain_domain_ReviewScopeSet["track_phase::ReviewScopeSet"]
+    direction TB
+    T28_domain_domain_ReviewScopeSet__self[ReviewScopeSet]
+    T28_domain_domain_ReviewScopeSet_try_new([try_new])
+    T28_domain_domain_ReviewScopeSet_as_set([as_set])
+  end
+  subgraph T33_domain_domain_ReviewScopeSetError["track_phase::ReviewScopeSetError"]
+    direction TB
+    T33_domain_domain_ReviewScopeSetError__self[ReviewScopeSetError]
+    T33_domain_domain_ReviewScopeSetError_Empty[Empty]
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_dry_check["usecase::dry_check"]
+    direction TB
+  subgraph T42_usecase_usecase_DryCheckApprovalInteractor["dry_check::approval_interactor::DryCheckApprovalInteractor"]
+    direction TB
+    T42_usecase_usecase_DryCheckApprovalInteractor__self[DryCheckApprovalInteractor]
+    T42_usecase_usecase_DryCheckApprovalInteractor_new([new])
+  end
+  subgraph T30_usecase_usecase_DryCheckConfig["dry_check::DryCheckConfig"]
+    direction TB
+    T30_usecase_usecase_DryCheckConfig__self[DryCheckConfig]
+  end
+  subgraph T34_usecase_usecase_DryCheckCycleError["dry_check::errors::DryCheckCycleError"]
+    direction TB
+    T34_usecase_usecase_DryCheckCycleError__self[DryCheckCycleError]
+    T34_usecase_usecase_DryCheckCycleError_Embedding[Embedding]
+    T34_usecase_usecase_DryCheckCycleError_Index[Index]
+    T34_usecase_usecase_DryCheckCycleError_Agent[Agent]
+    T34_usecase_usecase_DryCheckCycleError_Reader[Reader]
+    T34_usecase_usecase_DryCheckCycleError_Writer[Writer]
+    T34_usecase_usecase_DryCheckCycleError_Diff[Diff]
+    T34_usecase_usecase_DryCheckCycleError_Entry[Entry]
+    T34_usecase_usecase_DryCheckCycleError_CoveragePort[CoveragePort]
+    T34_usecase_usecase_DryCheckCycleError_InvalidParallelism[InvalidParallelism]
+    T34_usecase_usecase_DryCheckCycleError_InvalidPercent[InvalidPercent]
+  end
+  subgraph T34_usecase_usecase_DryCheckInteractor["dry_check::interactor::DryCheckInteractor"]
+    direction TB
+    T34_usecase_usecase_DryCheckInteractor__self[DryCheckInteractor]
+    T34_usecase_usecase_DryCheckInteractor_new([new])
+  end
+  subgraph T33_usecase_usecase_DryCheckJudgeTier["dry_check::DryCheckJudgeTier"]
+    direction TB
+    T33_usecase_usecase_DryCheckJudgeTier__self[DryCheckJudgeTier]
+    T33_usecase_usecase_DryCheckJudgeTier_Fast[Fast]
+    T33_usecase_usecase_DryCheckJudgeTier_Final[Final]
+  end
+  subgraph T35_usecase_usecase_DryCheckParallelism["dry_check::DryCheckParallelism"]
+    direction TB
+    T35_usecase_usecase_DryCheckParallelism__self[DryCheckParallelism]
+    T35_usecase_usecase_DryCheckParallelism_try_new([try_new])
+    T35_usecase_usecase_DryCheckParallelism_as_usize([as_usize])
+  end
+  subgraph T31_usecase_usecase_DryCheckPercent["dry_check::DryCheckPercent"]
+    direction TB
+    T31_usecase_usecase_DryCheckPercent__self[DryCheckPercent]
+    T31_usecase_usecase_DryCheckPercent_try_new([try_new])
+    T31_usecase_usecase_DryCheckPercent_as_u8([as_u8])
+  end
+  subgraph R33_usecase_usecase_DryCheckAgentPort["dry_check::ports::DryCheckAgentPort"]
+    direction TB
+    R33_usecase_usecase_DryCheckAgentPort__self[DryCheckAgentPort]
+    R33_usecase_usecase_DryCheckAgentPort_judge([judge])
+  end
+  subgraph R39_usecase_usecase_DryCheckApprovalService["dry_check::services::DryCheckApprovalService"]
+    direction TB
+    R39_usecase_usecase_DryCheckApprovalService__self[DryCheckApprovalService]
+    R39_usecase_usecase_DryCheckApprovalService_check_approved([check_approved])
+  end
+  subgraph R36_usecase_usecase_DryCheckCoveragePort["dry_check::ports::DryCheckCoveragePort"]
+    direction TB
+    R36_usecase_usecase_DryCheckCoveragePort__self[DryCheckCoveragePort]
+    R36_usecase_usecase_DryCheckCoveragePort_read_coverage([read_coverage])
+    R36_usecase_usecase_DryCheckCoveragePort_write_coverage([write_coverage])
+  end
+  subgraph R31_usecase_usecase_DryCheckService["dry_check::services::DryCheckService"]
+    direction TB
+    R31_usecase_usecase_DryCheckService__self[DryCheckService]
+    R31_usecase_usecase_DryCheckService_run_dry_check([run_dry_check])
+  end
+  end
+  subgraph usecase_usecase_module_fixpoint_resolve["usecase::fixpoint_resolve"]
+    direction TB
+  subgraph T37_usecase_usecase_FixpointCurrentBranch["fixpoint_resolve::FixpointCurrentBranch"]
+    direction TB
+    T37_usecase_usecase_FixpointCurrentBranch__self[FixpointCurrentBranch]
+    T37_usecase_usecase_FixpointCurrentBranch_try_new([try_new])
+    T37_usecase_usecase_FixpointCurrentBranch_as_str([as_str])
+  end
+  subgraph T38_usecase_usecase_FixpointResolveCommand["fixpoint_resolve::FixpointResolveCommand"]
+    direction TB
+    T38_usecase_usecase_FixpointResolveCommand__self[FixpointResolveCommand]
+  end
+  subgraph T36_usecase_usecase_FixpointResolveError["fixpoint_resolve::FixpointResolveError"]
+    direction TB
+    T36_usecase_usecase_FixpointResolveError__self[FixpointResolveError]
+    T36_usecase_usecase_FixpointResolveError_InvalidTrackId[InvalidTrackId]
+    T36_usecase_usecase_FixpointResolveError_InvalidCurrentBranch[InvalidCurrentBranch]
+    T36_usecase_usecase_FixpointResolveError_TrackNotActive[TrackNotActive]
+    T36_usecase_usecase_FixpointResolveError_GateQueryFailed[GateQueryFailed]
+  end
+  subgraph T41_usecase_usecase_FixpointResolveInteractor["fixpoint_resolve::FixpointResolveInteractor"]
+    direction TB
+    T41_usecase_usecase_FixpointResolveInteractor__self[FixpointResolveInteractor]
+    T41_usecase_usecase_FixpointResolveInteractor_new([new])
+  end
+  subgraph T35_usecase_usecase_RefVerifyGateStatus["fixpoint_resolve::RefVerifyGateStatus"]
+    direction TB
+    T35_usecase_usecase_RefVerifyGateStatus__self[RefVerifyGateStatus]
+    T35_usecase_usecase_RefVerifyGateStatus_Approved[Approved]
+    T35_usecase_usecase_RefVerifyGateStatus_Blocked[Blocked]
+  end
+  subgraph T32_usecase_usecase_ReviewGateStatus["fixpoint_resolve::ReviewGateStatus"]
+    direction TB
+    T32_usecase_usecase_ReviewGateStatus__self[ReviewGateStatus]
+    T32_usecase_usecase_ReviewGateStatus_Approved[Approved]
+    T32_usecase_usecase_ReviewGateStatus_NeedsReview[NeedsReview]
+  end
+  subgraph R38_usecase_usecase_FixpointResolveService["fixpoint_resolve::FixpointResolveService"]
+    direction TB
+    R38_usecase_usecase_FixpointResolveService__self[FixpointResolveService]
+    R38_usecase_usecase_FixpointResolveService_resolve([resolve])
+  end
+  subgraph R38_usecase_usecase_RefVerifyGateStatePort["fixpoint_resolve::RefVerifyGateStatePort"]
+    direction TB
+    R38_usecase_usecase_RefVerifyGateStatePort__self[RefVerifyGateStatePort]
+    R38_usecase_usecase_RefVerifyGateStatePort_ref_verify_status([ref_verify_status])
+  end
+  subgraph R35_usecase_usecase_ReviewGateStatePort["fixpoint_resolve::ReviewGateStatePort"]
+    direction TB
+    R35_usecase_usecase_ReviewGateStatePort__self[ReviewGateStatePort]
+    R35_usecase_usecase_ReviewGateStatePort_review_status([review_status])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
+    direction TB
+  subgraph T45_infrastructure_infrastructure_CodexDryChecker["dry_check::codex_dry_checker::CodexDryChecker"]
+    direction TB
+    T45_infrastructure_infrastructure_CodexDryChecker__self[CodexDryChecker]
+    T45_infrastructure_infrastructure_CodexDryChecker_new([new])
+  end
+  subgraph T44_infrastructure_infrastructure_DryCheckConfig["dry_check::config::DryCheckConfig"]
+    direction TB
+    T44_infrastructure_infrastructure_DryCheckConfig__self[DryCheckConfig]
+    T44_infrastructure_infrastructure_DryCheckConfig_load([load])
+    T44_infrastructure_infrastructure_DryCheckConfig_threshold([threshold])
+    T44_infrastructure_infrastructure_DryCheckConfig_fast_reasoning_effort([fast_reasoning_effort])
+    T44_infrastructure_infrastructure_DryCheckConfig_final_reasoning_effort([final_reasoning_effort])
+    T44_infrastructure_infrastructure_DryCheckConfig_max_parallelism([max_parallelism])
+    T44_infrastructure_infrastructure_DryCheckConfig_known_bad_injection_rate_percent([known_bad_injection_rate_percent])
+    T44_infrastructure_infrastructure_DryCheckConfig_known_bad_detection_threshold_percent([known_bad_detection_threshold_percent])
+  end
+  subgraph T49_infrastructure_infrastructure_DryCheckConfigError["dry_check::config::DryCheckConfigError"]
+    direction TB
+    T49_infrastructure_infrastructure_DryCheckConfigError__self[DryCheckConfigError]
+    T49_infrastructure_infrastructure_DryCheckConfigError_Io[Io]
+    T49_infrastructure_infrastructure_DryCheckConfigError_Parse[Parse]
+    T49_infrastructure_infrastructure_DryCheckConfigError_UnsupportedSchemaVersion[UnsupportedSchemaVersion]
+    T49_infrastructure_infrastructure_DryCheckConfigError_InvalidThreshold[InvalidThreshold]
+    T49_infrastructure_infrastructure_DryCheckConfigError_InvalidParallelism[InvalidParallelism]
+    T49_infrastructure_infrastructure_DryCheckConfigError_InvalidReasoningEffort[InvalidReasoningEffort]
+  end
+  subgraph T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter["dry_check::FsDryCheckCoverageAdapter"]
+    direction TB
+    T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter__self[FsDryCheckCoverageAdapter]
+    T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_telemetry["infrastructure::telemetry"]
+    direction TB
+  subgraph T44_infrastructure_infrastructure_TelemetryEvent["telemetry::TelemetryEvent"]
+    direction TB
+    T44_infrastructure_infrastructure_TelemetryEvent__self[TelemetryEvent]
+    T44_infrastructure_infrastructure_TelemetryEvent_TrackSubcommand[TrackSubcommand]
+    T44_infrastructure_infrastructure_TelemetryEvent_GateEval[GateEval]
+    T44_infrastructure_infrastructure_TelemetryEvent_ReviewRound[ReviewRound]
+    T44_infrastructure_infrastructure_TelemetryEvent_ExternalSubprocess[ExternalSubprocess]
+    T44_infrastructure_infrastructure_TelemetryEvent_HookBlock[HookBlock]
+    T44_infrastructure_infrastructure_TelemetryEvent_AdvisoryHookFired[AdvisoryHookFired]
+    T44_infrastructure_infrastructure_TelemetryEvent_NonZeroExit[NonZeroExit]
+  end
+  end
+end
+T26_domain_domain_FixpointStep_RunRfp --o|scopes| T28_domain_domain_ReviewScopeSet__self
+T28_domain_domain_ReviewScopeSet_try_new --> T33_domain_domain_ReviewScopeSetError__self
+T28_domain_domain_ReviewScopeSet_try_new --> T28_domain_domain_ReviewScopeSet__self
+T42_usecase_usecase_DryCheckApprovalInteractor_new --> T42_usecase_usecase_DryCheckApprovalInteractor__self
+T30_usecase_usecase_DryCheckConfig__self --o|known_bad_injection_rate_percent| T31_usecase_usecase_DryCheckPercent__self
+T30_usecase_usecase_DryCheckConfig__self --o|known_bad_detection_threshold_percent| T31_usecase_usecase_DryCheckPercent__self
+T30_usecase_usecase_DryCheckConfig__self --o|max_parallelism| T35_usecase_usecase_DryCheckParallelism__self
+T34_usecase_usecase_DryCheckInteractor_new --o T30_usecase_usecase_DryCheckConfig__self
+T34_usecase_usecase_DryCheckInteractor_new --> T34_usecase_usecase_DryCheckInteractor__self
+T35_usecase_usecase_DryCheckParallelism_try_new --> T34_usecase_usecase_DryCheckCycleError__self
+T35_usecase_usecase_DryCheckParallelism_try_new --> T35_usecase_usecase_DryCheckParallelism__self
+T31_usecase_usecase_DryCheckPercent_try_new --> T34_usecase_usecase_DryCheckCycleError__self
+T31_usecase_usecase_DryCheckPercent_try_new --> T31_usecase_usecase_DryCheckPercent__self
+R33_usecase_usecase_DryCheckAgentPort_judge --o T33_usecase_usecase_DryCheckJudgeTier__self
+R39_usecase_usecase_DryCheckApprovalService_check_approved --> T34_usecase_usecase_DryCheckCycleError__self
+R36_usecase_usecase_DryCheckCoveragePort_read_coverage --> T34_usecase_usecase_DryCheckCycleError__self
+R36_usecase_usecase_DryCheckCoveragePort_read_coverage --> T36_domain_domain_DryCheckCoverageRecord__self
+R36_usecase_usecase_DryCheckCoveragePort_write_coverage --o T36_domain_domain_DryCheckCoverageRecord__self
+R36_usecase_usecase_DryCheckCoveragePort_write_coverage --> T34_usecase_usecase_DryCheckCycleError__self
+R31_usecase_usecase_DryCheckService_run_dry_check --> T34_usecase_usecase_DryCheckCycleError__self
+T37_usecase_usecase_FixpointCurrentBranch_try_new --> T36_usecase_usecase_FixpointResolveError__self
+T37_usecase_usecase_FixpointCurrentBranch_try_new --> T37_usecase_usecase_FixpointCurrentBranch__self
+T38_usecase_usecase_FixpointResolveCommand__self --o|current_branch| T37_usecase_usecase_FixpointCurrentBranch__self
+T41_usecase_usecase_FixpointResolveInteractor_new --> T41_usecase_usecase_FixpointResolveInteractor__self
+T32_usecase_usecase_ReviewGateStatus_NeedsReview --o|scopes| T28_domain_domain_ReviewScopeSet__self
+R38_usecase_usecase_FixpointResolveService_resolve --o T38_usecase_usecase_FixpointResolveCommand__self
+R38_usecase_usecase_FixpointResolveService_resolve --> T36_usecase_usecase_FixpointResolveError__self
+R38_usecase_usecase_FixpointResolveService_resolve --> T26_domain_domain_FixpointStep__self
+R38_usecase_usecase_RefVerifyGateStatePort_ref_verify_status --> T36_usecase_usecase_FixpointResolveError__self
+R38_usecase_usecase_RefVerifyGateStatePort_ref_verify_status --> T35_usecase_usecase_RefVerifyGateStatus__self
+R35_usecase_usecase_ReviewGateStatePort_review_status --> T36_usecase_usecase_FixpointResolveError__self
+R35_usecase_usecase_ReviewGateStatePort_review_status --> T32_usecase_usecase_ReviewGateStatus__self
+T41_usecase_usecase_FixpointResolveInteractor__self -.impl.-> R38_usecase_usecase_FixpointResolveService__self
+T34_usecase_usecase_DryCheckInteractor__self -.impl.-> R31_usecase_usecase_DryCheckService__self
+T42_usecase_usecase_DryCheckApprovalInteractor__self -.impl.-> R39_usecase_usecase_DryCheckApprovalService__self
+T45_infrastructure_infrastructure_CodexDryChecker_new --> T45_infrastructure_infrastructure_CodexDryChecker__self
+T44_infrastructure_infrastructure_DryCheckConfig_load --> T49_infrastructure_infrastructure_DryCheckConfigError__self
+T44_infrastructure_infrastructure_DryCheckConfig_load --> T44_infrastructure_infrastructure_DryCheckConfig__self
+T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter_new --> T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter__self
+T45_infrastructure_infrastructure_CodexDryChecker__self -.impl.-> R33_usecase_usecase_DryCheckAgentPort__self
+T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter__self -.impl.-> R36_usecase_usecase_DryCheckCoveragePort__self
+class T36_domain_domain_DryCheckCoverageRecord__self value_object
+class T26_domain_domain_FixpointStep_RunDfp variant_node
+class T26_domain_domain_FixpointStep_RunRfp variant_node
+class T26_domain_domain_FixpointStep_RunRefVerify variant_node
+class T26_domain_domain_FixpointStep_Commit variant_node
+class T26_domain_domain_FixpointStep__self value_object
+class T28_domain_domain_ReviewScopeSet_try_new method_node
+class T28_domain_domain_ReviewScopeSet_as_set method_node
+class T28_domain_domain_ReviewScopeSet__self value_object
+class T33_domain_domain_ReviewScopeSetError_Empty variant_node
+class T33_domain_domain_ReviewScopeSetError__self error_type
+class T42_usecase_usecase_DryCheckApprovalInteractor_new method_node
+class T42_usecase_usecase_DryCheckApprovalInteractor__self interactor
+class T30_usecase_usecase_DryCheckConfig__self value_object
+class T34_usecase_usecase_DryCheckCycleError_Embedding variant_node
+class T34_usecase_usecase_DryCheckCycleError_Index variant_node
+class T34_usecase_usecase_DryCheckCycleError_Agent variant_node
+class T34_usecase_usecase_DryCheckCycleError_Reader variant_node
+class T34_usecase_usecase_DryCheckCycleError_Writer variant_node
+class T34_usecase_usecase_DryCheckCycleError_Diff variant_node
+class T34_usecase_usecase_DryCheckCycleError_Entry variant_node
+class T34_usecase_usecase_DryCheckCycleError_CoveragePort variant_node
+class T34_usecase_usecase_DryCheckCycleError_InvalidParallelism variant_node
+class T34_usecase_usecase_DryCheckCycleError_InvalidPercent variant_node
+class T34_usecase_usecase_DryCheckCycleError__self error_type
+class T34_usecase_usecase_DryCheckInteractor_new method_node
+class T34_usecase_usecase_DryCheckInteractor__self interactor
+class T33_usecase_usecase_DryCheckJudgeTier_Fast variant_node
+class T33_usecase_usecase_DryCheckJudgeTier_Final variant_node
+class T33_usecase_usecase_DryCheckJudgeTier__self value_object
+class T35_usecase_usecase_DryCheckParallelism_try_new method_node
+class T35_usecase_usecase_DryCheckParallelism_as_usize method_node
+class T35_usecase_usecase_DryCheckParallelism__self value_object
+class T31_usecase_usecase_DryCheckPercent_try_new method_node
+class T31_usecase_usecase_DryCheckPercent_as_u8 method_node
+class T31_usecase_usecase_DryCheckPercent__self value_object
+class R33_usecase_usecase_DryCheckAgentPort_judge method_node
+class R33_usecase_usecase_DryCheckAgentPort__self secondary_port
+class R39_usecase_usecase_DryCheckApprovalService_check_approved method_node
+class R39_usecase_usecase_DryCheckApprovalService__self app_service
+class R36_usecase_usecase_DryCheckCoveragePort_read_coverage method_node
+class R36_usecase_usecase_DryCheckCoveragePort_write_coverage method_node
+class R36_usecase_usecase_DryCheckCoveragePort__self secondary_port
+class R31_usecase_usecase_DryCheckService_run_dry_check method_node
+class R31_usecase_usecase_DryCheckService__self app_service
+class T37_usecase_usecase_FixpointCurrentBranch_try_new method_node
+class T37_usecase_usecase_FixpointCurrentBranch_as_str method_node
+class T37_usecase_usecase_FixpointCurrentBranch__self value_object
+class T38_usecase_usecase_FixpointResolveCommand__self command
+class T36_usecase_usecase_FixpointResolveError_InvalidTrackId variant_node
+class T36_usecase_usecase_FixpointResolveError_InvalidCurrentBranch variant_node
+class T36_usecase_usecase_FixpointResolveError_TrackNotActive variant_node
+class T36_usecase_usecase_FixpointResolveError_GateQueryFailed variant_node
+class T36_usecase_usecase_FixpointResolveError__self error_type
+class T41_usecase_usecase_FixpointResolveInteractor_new method_node
+class T41_usecase_usecase_FixpointResolveInteractor__self interactor
+class T35_usecase_usecase_RefVerifyGateStatus_Approved variant_node
+class T35_usecase_usecase_RefVerifyGateStatus_Blocked variant_node
+class T35_usecase_usecase_RefVerifyGateStatus__self value_object
+class T32_usecase_usecase_ReviewGateStatus_Approved variant_node
+class T32_usecase_usecase_ReviewGateStatus_NeedsReview variant_node
+class T32_usecase_usecase_ReviewGateStatus__self value_object
+class R38_usecase_usecase_FixpointResolveService_resolve method_node
+class R38_usecase_usecase_FixpointResolveService__self app_service
+class R38_usecase_usecase_RefVerifyGateStatePort_ref_verify_status method_node
+class R38_usecase_usecase_RefVerifyGateStatePort__self secondary_port
+class R35_usecase_usecase_ReviewGateStatePort_review_status method_node
+class R35_usecase_usecase_ReviewGateStatePort__self secondary_port
+class T45_infrastructure_infrastructure_CodexDryChecker_new method_node
+class T45_infrastructure_infrastructure_CodexDryChecker__self secondary_adapter
+class T44_infrastructure_infrastructure_DryCheckConfig_load method_node
+class T44_infrastructure_infrastructure_DryCheckConfig_threshold method_node
+class T44_infrastructure_infrastructure_DryCheckConfig_fast_reasoning_effort method_node
+class T44_infrastructure_infrastructure_DryCheckConfig_final_reasoning_effort method_node
+class T44_infrastructure_infrastructure_DryCheckConfig_max_parallelism method_node
+class T44_infrastructure_infrastructure_DryCheckConfig_known_bad_injection_rate_percent method_node
+class T44_infrastructure_infrastructure_DryCheckConfig_known_bad_detection_threshold_percent method_node
+class T44_infrastructure_infrastructure_DryCheckConfig__self dto
+class T49_infrastructure_infrastructure_DryCheckConfigError_Io variant_node
+class T49_infrastructure_infrastructure_DryCheckConfigError_Parse variant_node
+class T49_infrastructure_infrastructure_DryCheckConfigError_UnsupportedSchemaVersion variant_node
+class T49_infrastructure_infrastructure_DryCheckConfigError_InvalidThreshold variant_node
+class T49_infrastructure_infrastructure_DryCheckConfigError_InvalidParallelism variant_node
+class T49_infrastructure_infrastructure_DryCheckConfigError_InvalidReasoningEffort variant_node
+class T49_infrastructure_infrastructure_DryCheckConfigError__self error_type
+class T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter_new method_node
+class T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter__self secondary_adapter
+class T44_infrastructure_infrastructure_TelemetryEvent_TrackSubcommand variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_GateEval variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_ReviewRound variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_ExternalSubprocess variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_HookBlock variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_AdvisoryHookFired variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_NonZeroExit variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent__self value_object
+```

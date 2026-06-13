@@ -1,0 +1,169 @@
+{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "FixpointStep": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "RunDfp",       "payload": { "kind": "unit" } },
+          { "name": "RunRfp",       "payload": { "kind": "struct", "fields": [ { "name": "scopes", "ty": "ReviewScopeSet" } ] } },
+          { "name": "RunRefVerify", "payload": { "kind": "unit" } },
+          { "name": "Commit",       "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_phase",
+      "docs": "Output of the mechanized fixpoint resolver (D2). Each variant names the one phase the orchestrator must execute next to move toward convergence: RunDfp (dry gate open), RunRfp { scopes } (one or more review scopes are open), RunRefVerify (ref-verify gate open), Commit (all gates green; safe to commit). scopes is a non-empty ReviewScopeSet of opaque orchestrator-assigned review-group labels; the domain validates only non-emptiness, not review-group naming.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewScopeSet": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "scopes", "ty": "std::collections::BTreeSet<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "scopes", "ty": "std::collections::BTreeSet<String>" }
+          ],
+          "returns": "Result<Self, ReviewScopeSetError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_set",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeSet<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "track_phase",
+      "docs": "Non-empty deterministic set of review scopes that must run through RFP before the fixpoint can advance. Scope labels remain opaque Strings owned by the orchestrator/review infrastructure; this value object only rejects the empty set so FixpointStep::RunRfp cannot represent 'run RFP for no scopes'. BTreeSet keeps CLI output deterministic.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewScopeSetError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Empty", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_phase",
+      "docs": "Validation error for ReviewScopeSet construction. Empty means the review gate attempted to request RFP with no target scopes, which is not a valid FixpointStep::RunRfp payload.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckCoverageRecord": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "fragment_refs", "ty": "std::collections::BTreeSet<FragmentRef>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run. If a current diff fragment's FragmentRef is absent from this set, `check-approved` returns Blocked (stale coverage), so the same content hash at a different path is not treated as covered. BTreeSet preserves deterministic serialization order (CN-05).",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-06"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "FixpointStep" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "FixpointStep" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "FixpointStep" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "FixpointStep" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "ReviewScopeSet" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "ReviewScopeSet" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "ReviewScopeSet" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "ReviewScopeSet" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "ReviewScopeSetError" },
+    { "action": "add", "trait_ref": "core::fmt::Display",     "for_type": "ReviewScopeSetError" },
+    { "action": "add", "trait_ref": "core::error::Error",     "for_type": "ReviewScopeSetError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckCoverageRecord" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckCoverageRecord" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckCoverageRecord" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckCoverageRecord" }
+  ]
+}

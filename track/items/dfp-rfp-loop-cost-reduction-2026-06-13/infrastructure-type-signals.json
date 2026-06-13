@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-13T23:07:43Z",
+  "declaration_hash": "259e7696ceac022bd7427b5c30d795a9291192abf7ee6054d52b17578532274f",
+  "signals": [
+    {
+      "type_name": "CodexDryChecker",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "DryCheckAgentPort"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfig",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfigError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "FsDryCheckCoverageAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "DryCheckCoveragePort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TelemetryEvent",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
