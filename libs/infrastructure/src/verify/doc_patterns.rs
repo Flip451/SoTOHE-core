@@ -121,11 +121,6 @@ static REQUIRED_LINES: &[RequireLine] = &[
     },
     RequireLine {
         rel_path: "track/workflow.md",
-        pattern: "`cargo make verify-orchestra` passes",
-        label: "workflow orchestra gate",
-    },
-    RequireLine {
-        rel_path: "track/workflow.md",
         pattern: "`cargo make verify-latest-track` passes",
         label: "workflow latest-track gate",
     },
@@ -140,11 +135,6 @@ static REQUIRED_LINES: &[RequireLine] = &[
         label: "workflow mermaid dependency direction",
     },
     // Developer workflow references.
-    RequireLine {
-        rel_path: "DEVELOPER_AI_WORKFLOW.md",
-        pattern: "cargo make verify-orchestra",
-        label: "workflow orchestra guardrail",
-    },
     RequireLine {
         rel_path: "DEVELOPER_AI_WORKFLOW.md",
         pattern: "cargo make verify-track-metadata",

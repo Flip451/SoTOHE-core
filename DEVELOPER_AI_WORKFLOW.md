@@ -293,10 +293,9 @@ cargo make verify-track-metadata  # track metadata.json の必須項目を検査
 cargo make verify-track-registry # track registry.md と metadata.json の同期を検査
 cargo make verify-tech-stack  # tech-stack.md の TODO 解消を検査
 cargo make verify-latest-track  # 最新トラックの spec.md / spec.json / plan.md 完成度確認（metadata.updated_at + placeholder 検知）
-cargo make verify-orchestra  # フック・権限・エージェント設定を検査
 ```
 
-補足: `cargo make ci` には `fmt-check`, `clippy`, `test`, `test-doc`, `deny`, `check-layers`, `verify-arch-docs`, `verify-plan-progress`, `verify-track-metadata`, `verify-track-registry`, `verify-tech-stack`, `verify-orchestra`, `verify-latest-track` が含まれる。`cargo make check` はローカルでの高速なコンパイル確認用で、`cargo make ci` には含まれない。`cargo make machete` は依存整理時の補助監査として個別に回す。
+補足: `cargo make ci` には `fmt-check`, `clippy`, `test`, `test-doc`, `deny`, `check-layers`, `verify-arch-docs`, `verify-plan-progress`, `verify-track-metadata`, `verify-track-registry`, `verify-tech-stack`, `verify-latest-track` が含まれる。`cargo make check` はローカルでの高速なコンパイル確認用で、`cargo make ci` には含まれない。`cargo make machete` は依存整理時の補助監査として個別に回す。
 
 ### 4.2 `bacon` を使う場合
 

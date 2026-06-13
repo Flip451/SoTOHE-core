@@ -16,9 +16,10 @@ Core guardrails:
 
 ## Permission Guardrails
 
-`permissions.allow` in `.claude/settings.json` is split into two categories: commands that are
-explicitly **allowed** and commands that are **forbidden** (rejected by `FORBIDDEN_ALLOW` in
-`scripts/verify_orchestra_guardrails.py`).
+`permissions.allow` in `.claude/settings.json` is the template consumer's responsibility
+(`knowledge/conventions/responsibility-boundary.md`): SoTOHE ships a recommended default allowlist
+and documents which commands are safe vs dangerous to allow, but does **not** CI-enforce it. The
+lists below are guidance, not a gate — the consumer owns their permission posture.
 
 ### Allowed (present in `permissions.allow`)
 
@@ -30,10 +31,10 @@ cannot fully substitute (e.g., GNU grep flags, jq JSON filters):
 - `Bash(grep:*)`, `Bash(diff:*)`, `Bash(jq:*)`, `Bash(pwd:*)` — read-only; prefer Glob/Grep/Read for normal searches
 - `Bash(uniq:*)` — 第2引数で write 可能だが exec 機構を持たないため許容 (Write tool と同等権限)
 
-### Forbidden (in `FORBIDDEN_ALLOW`, rejected by verifier)
+### Dangerous to allow (excluded from the default allowlist)
 
-The `FORBIDDEN_ALLOW` list prevents the following shell commands from being added to
-`permissions.allow` in `.claude/settings.json`:
+The recommended default allowlist excludes the following dangerous shell commands. Adding any of
+them to `.claude/settings.json` is the consumer's choice and risk — there is no CI gate rejecting it:
 
 - `Bash(ls:*)`, `Bash(cat:*)` — use dedicated tools (`Glob`, `Read`) instead
 - `Bash(cd:*)` — use each tool's `path` parameter instead
@@ -45,10 +46,10 @@ The `FORBIDDEN_ALLOW` list prevents the following shell commands from being adde
 - `Bash(env:*)` — `env [name=value ...] [utility [argument ...]]` 形式で任意 utility を exec する wrapper。allow すると `env git commit` 等で他の guardrail を bypass できるため維持
 - `Bash(git add:*)`, `Bash(git commit:*)` etc. — use `cargo make` wrappers instead
 
-If a user requests adding a forbidden permission, explain that it is in `FORBIDDEN_ALLOW` and
-suggest the alternative tools. For project-specific extensions, add entries to
-`.claude/permission-extensions.json` under `extra_allow`, but entries matching `FORBIDDEN_ALLOW`
-will be rejected.
+If asked to add one of these, explain the risk and suggest the safer alternative tools. The
+consumer may still choose to add it (their responsibility); SoTOHE no longer rejects it via CI.
+For project-specific extensions, `.claude/permission-extensions.json` under `extra_allow` remains
+the place to record additions.
 
 ## Subagent Tool Usage
 

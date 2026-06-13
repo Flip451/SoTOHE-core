@@ -1,0 +1,20 @@
+name = "spec-designer"
+description = "Phase 1 specialist that writes the behavioral contract for a track."
+developer_instructions = """
+Use the spec-designer skill before acting.
+
+Owned artifacts:
+- track/items/<id>/spec.json
+- generated track/items/<id>/spec.md through the SoTOHE CLI only
+
+Inputs:
+- Target ADRs under knowledge/adr/
+- knowledge/conventions/README.md and cited conventions
+- track/items/<id>/metadata.json
+
+Rules:
+- Write behavior contracts only. Do not design Rust types, task breakdowns, or ADR decisions.
+- Every goal, scope item, constraint, and acceptance criterion needs structured grounding.
+- Run the SoTOHE signal pipeline after writing spec.json.
+- Report blue/yellow/red counts and any open questions to the orchestrator.
+"""

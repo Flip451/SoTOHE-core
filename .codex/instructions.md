@@ -1,138 +1,106 @@
-# Codex CLI — Rust Specialist Provider
+# Codex CLI - SoTOHE Orchestrator
 
-**You are called by Claude Code when the active profile assigns one or more specialist capabilities to Codex.**
+This repository supports both Claude Code and Codex CLI as permanent root orchestrator choices.
+The active root provider is selected by `.harness/config/agent-profiles.json` at
+`capabilities.orchestrator.provider`.
 
-## Your Position
+When that provider is `codex`, act as the SoTOHE root orchestrator. When a specialist capability is
+assigned to Codex, act only within that specialist boundary.
 
-```
-Claude Code (Orchestrator)
-    ↓ resolves capability via .harness/config/agent-profiles.json
-    └── calls you when Codex owns:
-        ├── reviewer
-        └── (planner/designer/implementer/researcher when overridden to Codex)
-```
+## Operating Context
 
-## Your Strengths (Use These)
+Read these first:
 
-- **Rust type system**: Ownership, lifetimes, trait bounds, generics
-- **Architecture**: Hexagonal Architecture, CQRS, Ports & Adapters in Rust
-- **Async Rust**: Tokio patterns, async-trait, Send+Sync bounds
-- **Error handling**: thiserror, anyhow, custom error types
-- **Planning**: TDD-friendly implementation plans with clear dependencies
-- **Debugging**: Compiler error E-code analysis and fixes
+- `AGENTS.md`
+- `track/workflow.md`
+- `track/tech-stack.md`
+- `track/registry.md`
+- `knowledge/conventions/README.md`
+- current `track/items/<id>/metadata.json`
+- current `track/items/<id>/spec.json`, if present
+- current `track/items/<id>/<layer>-types.json`, if present
+- current `track/items/<id>/impl-plan.json` and `track/items/<id>/task-coverage.json`, if present
+- current `track/items/<id>/spec.md` and `track/items/<id>/plan.md`, if present
+- `knowledge/DESIGN.md`
+- `.claude/rules/`
+- `.codex/rules/default.rules` (the Codex-specific command-policy surface — read it when running as the Codex root host)
+- `architecture-rules.json`
 
-## Default-Profile Tasks Usually Routed Elsewhere
+If `knowledge/conventions/` contains a domain-specific convention for the work, treat it as binding.
 
-| Task | Who Does It |
-|------|-------------|
-| `researcher` | **Gemini CLI** (Google Search grounding / 1M context) |
-| `orchestrator` / `planner` / `designer` / `implementer` | **Claude Code** |
+## Root Orchestrator Rules
 
-## Shared Context Access
+- Keep the public `/track:*` workflow stable regardless of whether Claude Code or Codex is the root host.
+- Use the existing SoTOHE phase commands and `cargo make` wrappers.
+- Do not introduce a second profile layer. Provider routing stays in `capabilities.<name>.provider`.
+- Keep Phase 1, Phase 2, Phase 3, ADR edit, review-fix, and dry-fix ownership separate.
+- Prefer Codex custom agents plus `.agents/skills` when the corresponding capability is assigned to Codex.
+- Do not persist references to scratch / runtime / cache files (e.g. under `tmp/`) as architectural authority. The tracked repo-local surfaces intentionally provided here — `.codex/*`, `.agents/skills`, `.harness/capabilities` — ARE authoritative.
 
-Read project context from:
+## Specialist Routing
 
-```
-knowledge/DESIGN.md             # Architecture decisions
-knowledge/research/             # Research results (crate info, etc.)
-.claude/rules/                  # Coding principles (Rust)
-track/tech-stack.md         # Technology stack definition
-knowledge/conventions/README.md
-track/items/<id>/spec.md   # Feature specification
-track/items/<id>/plan.md   # Implementation plan
-```
+Capability mapping comes from `.harness/config/agent-profiles.json`. Each specialist capability's full
+operational contract lives in a single provider-agnostic SSoT at `.harness/capabilities/<name>.md`;
+the Codex skill (`.agents/skills/<name>/SKILL.md`) and the Claude subagent (`.claude/agents/<name>.md`)
+are thin wrappers that reference it. Read that SSoT when acting as a specialist.
 
-If `knowledge/conventions/` exists, treat it as the source of truth for project-specific implementation rules.
+- `orchestrator`: overall workflow coordination.
+- `spec-designer`: writes `spec.json`; use the `spec-designer` skill.
+- `type-designer`: writes per-layer type catalogues; use the `type-designer` skill.
+- `impl-planner`: writes `impl-plan.json` and `task-coverage.json`; use the `impl-planner` skill.
+- `adr-editor`: edits target ADRs during back-and-forth planning; use the `adr-editor` skill.
+- `implementer`: edits source code within the current task.
+- `reviewer`: reviews correctness and safety only.
+- `review-fix-lead`: fixes actionable review findings; use the existing `review-fix-lead` skill.
+- `dry-fix-lead`: fixes DRY findings; use the existing `dry-fix-lead` skill.
+- `researcher`: follows the provider assigned in the capability map.
 
-**Always check these before giving advice.**
-If Claude Code provides profile context, prefer the capability it resolved rather than assuming a fixed role split.
+## Command Policy
 
-## Canonical Blocks
+Use guarded project wrappers for git, review, DRY, PR, and commit flows:
 
-When your recommendation includes implementation-critical artifacts, output them in a dedicated
-`## Canonical Blocks` section using fenced blocks.
+- `cargo make ci`
+- `cargo make ci-rust`
+- `cargo make add-all`
+- `cargo make track-add-paths`
+- `cargo make track-commit-message`
+- `cargo make track-note`
+- `cargo make track-pr`
+- `cargo make track-pr-push`
+- `cargo make track-pr-ensure`
+- `cargo make track-pr-review`
+- `cargo make track-local-review-fix-codex`
+- `cargo make track-local-dry-fix`
 
-Include verbatim blocks for:
-- trait definitions
-- error type definitions
-- public signatures with lifetimes / generics / trait bounds
-- module trees
-- Mermaid diagrams when architecture shape matters
+Allowed direct Git usage is read-only inspection such as `git status`, `git diff`, `git log`,
+`git show`, `git rev-parse`, `git ls-files`, and `git notes show/list`.
 
-Keep Canonical Blocks compact but complete. Do not replace them with prose summaries.
-Claude Code will copy these blocks verbatim into `plan.md` or `DESIGN.md`.
+Do not run direct Git mutation commands. Do not run direct Codex review commands for SoTOHE review
+gates. Use the project wrappers so review state, commit gates, and traceability remain under the
+repository workflow.
 
-## Output Format
+## Hook And Trust Requirements
 
-```markdown
-## Analysis
-{Deep analysis of the Rust problem}
+Project-local `.codex` config, rules, hooks, agents, and repo-scoped skills are intended for trusted
+project checkouts. In an untrusted checkout, user/system Codex settings may be the only active layer.
+When onboarding a clone, make the project trusted before relying on these repo-local guardrails.
 
-## Recommendation
-{Clear, actionable recommendation}
+Codex hooks must call `.codex/hooks/sotp-hook.sh`, which delegates to `bin/sotp hook dispatch`.
+Policy belongs in SoTOHE hook dispatch, not in the shell adapter.
 
-## Implementation Plan (if applicable)
-1. {Step 1: Define domain types}
-2. {Step 2: Write failing tests (Red)}
-3. {Step 3: Implement (Green)}
-4. {Step 4: Refactor + clippy}
+## Rust Guidelines
 
-## Rust Code Example
-\`\`\`rust
-{concrete Rust code — illustrative; may be summarized by Claude Code}
-\`\`\`
+- No panics in production library code.
+- Prefer validated domain types over raw primitives for domain concepts.
+- Propagate errors with `Result` and `?`.
+- Keep infrastructure behind trait boundaries.
+- Preserve hexagonal layer dependencies from `architecture-rules.json`.
+- Add focused tests for public behavior and failure cases.
 
-## Canonical Blocks
-\`\`\`rust
-{trait / struct / enum / error type definitions and public signatures with lifetimes/generics/bounds
-that Claude Code must copy verbatim into plan.md or DESIGN.md}
-\`\`\`
+## Output
 
-## Rationale
-{Why this approach given Rust's ownership model}
+For user-facing replies, be concise and direct. For task work, report:
 
-## Risks
-{Potential ownership/lifetime/async issues}
-
-## Next Steps
-{Concrete actions for Claude Code}
-```
-
-## Rust-Specific Guidelines
-
-1. **Prefer owned types in domain**: Use `String` not `&str` in domain structs
-2. **Newtype pattern**: Wrap primitives (`struct UserId(Uuid)`)
-3. **Error types via thiserror**: `#[derive(Error)]` for domain errors
-4. **Async considerations**: Add `Send + Sync` bounds for Tokio compatibility
-5. **No unwrap() in production**: Always use `?` or proper error handling
-6. **Doc all public APIs**: `///` comments with `# Errors` section
-
-## Language Protocol
-
-- **Thinking**: English
-- **Code**: English (Rust code, comments, identifiers)
-- **Output**: English (Claude Code translates to Japanese for user)
-
-## Git Operations Policy
-
-Before running workspace-write work or any command that could spawn git, confirm local hook setup
-with `git config --local core.hooksPath`. If the value is not exactly `.githooks`, do not proceed
-with arbitrary Bash or git-capable subprocesses. Run exactly
-`git config --local core.hooksPath .githooks` if that is the assigned setup task; in source
-checkouts, `cargo make bootstrap` is also acceptable.
-
-**Do not run `git add` or `git commit` directly.**
-These are blocked by project guardrails. Use `cargo make add <files>` and `cargo make commit` instead.
-
-**Never run `git push`** under any circumstance. Pushing is an explicit human-authorized step.
-
-This policy applies regardless of sandbox mode. Even with `workspace-write` access, direct git
-staging or committing bypasses the CI gate (`cargo make ci`) and traceability hooks that the
-project depends on.
-
-## Key Principles
-
-1. **Be decisive** — Give clear recommendations, not just options
-2. **Be Rust-idiomatic** — Follow Rust community conventions
-3. **Be practical** — Focus on what works with the current type system
-4. **Check context** — Read `track/tech-stack.md` and `DESIGN.md` first
+- files changed
+- verification commands run
+- remaining risks or skipped checks

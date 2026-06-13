@@ -1,0 +1,1341 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "064d9a8630fd6341bbe6cc6dabaa1fdfe3bad3b55a532f8877b8d95d232e35ca",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が要求するのは、`capabilities.orchestrator.provider` で `claude` と `codex` のどちらも正規に選べることである。"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し、`.codex/instructions.md` は SoTOHE 固有の orchestration rules と specialist routing を定義する。`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Claude provider 向けの `.claude/agents/*.md` は残しつつ、Codex provider 向けには `.codex/agents/*.toml` と `.agents/skills/<name>/SKILL.md` の組み合わせで同等の specialist surface を追加する。」「Codex 側で対応させる capability は次の通り: - `orchestrator`: root Codex session + `.codex/agents/orchestrator.toml`」"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存の `bin/sotp hook dispatch <hook-id>` に接続する…既存の SoTOHE hook policy を再利用する」"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules`、`.codex/agents/*.toml` が repository root に配置されている。"
+      }
+    },
+    {
+      "claim_hash": "a3ff5636da153a8f67eb37974b0822f4343de84cf3b2adf9a4b5f307ba89d6b3",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し、`.codex/instructions.md` は SoTOHE 固有の orchestration rules と specialist routing を定義する。"
+      }
+    },
+    {
+      "claim_hash": "6711ef5e32aac2f8b06e74c57d1a401258fa467b18ad8a5bc5cde89718e2402d",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\".codex/rules/default.rules は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。\""
+      }
+    },
+    {
+      "claim_hash": "39cdf22f4c50346a1426db21846fee8a7191c5a4b4410eef649d358c41f8da1e",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Codex custom agent TOML は、agent 名、説明、model、sandbox、所有 artifact、境界、最終 status contract」"
+      }
+    },
+    {
+      "claim_hash": "f8bef8bcadbd07e13792094787533d846b84a0d0d7e64289fb154def71bab468",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「agent 定義を薄くするだけでは specialist 能力が空になるため、skill の root 配置は agent の root 配置と同時に行う。」また「`spec-designer`: `.codex/agents/spec-designer.toml` + `.agents/skills/spec-designer`」「`review-fix-lead`: `.codex/agents/review-fix-lead.toml` + 既存 `.agents/skills/review-fix-lead`」「`dry-fix-lead`: `.codex/agents/dry-fix-lead.toml` + 既存 `.agents/skills/dry-fix-lead`」"
+      }
+    },
+    {
+      "claim_hash": "f8bef8bcadbd07e13792094787533d846b84a0d0d7e64289fb154def71bab468",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の skill が `.agents/skills` に promoted され、既存の `review-fix-lead` / `dry-fix-lead` skill と同じ検証対象になっている。"
+      }
+    },
+    {
+      "claim_hash": "bf56d4c3ad598b79addf9320f09b6f7fcf1b94a7aa67e758255db36c8b515366",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/agent-profiles.json` の現行 schema は `providers` と `capabilities` の対応表であり、別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。`"
+      }
+    },
+    {
+      "claim_hash": "a6afa79febd45e337c250686724c09f9d880aa4c6dd3a6b434d1fafac7656b81",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex 用の hook coverage は `.codex/config.toml` の inline hooks から `.codex/hooks/sotp-hook.sh` を呼び、そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する。"
+      }
+    },
+    {
+      "claim_hash": "aababf019163724735931c26190de67c8bca5e80124c483a0703ec140881e953",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。"
+      }
+    },
+    {
+      "claim_hash": "aababf019163724735931c26190de67c8bca5e80124c483a0703ec140881e953",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4. `track/workflow.md`、`.codex/instructions.md`、`.claude/rules/08-orchestration.md` 相当の運用文書が、Claude 固定ではなく Codex root orchestration を説明している。\n\n条件を満たした後も、Claude root orchestration は同じ template の恒久的な選択肢として残る。"
+      }
+    },
+    {
+      "claim_hash": "825ccf2c8a15167e6d6af8e2975d1fefa5a63453fe72ae589d0bb0cf978a6a86",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5. `verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。"
+      }
+    },
+    {
+      "claim_hash": "37d8d3f554e647a4f32ac7ccf50861fb1e76eb6a709bb10ca4f490e127f22519",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この `.codex` surface は Claude Code surface の廃止準備ではない。template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。"
+      }
+    },
+    {
+      "claim_hash": "37d8d3f554e647a4f32ac7ccf50861fb1e76eb6a709bb10ca4f490e127f22519",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が要求するのは、`capabilities.orchestrator.provider` で `claude` と `codex` のどちらも正規に選べることである。"
+      }
+    },
+    {
+      "claim_hash": "65d0fcab8e20a1d22ce4308e72ac7539cbeebcb4564c86c2be8896b9af76e1e6",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この変更は、SoTOHE core の phase command を置き換えるものではない。Codex orchestrator は、既存の `bin/sotp` と `cargo make` wrapper を呼び出して」"
+      }
+    },
+    {
+      "claim_hash": "1b93b9a16939c60e89256cd0813076f8ac2828ad0e89a545364b5e6ee20d4b53",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この decision は root orchestrator の host 選択を扱う。`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` などの specialist capability を同時に Codex provider へ切り替えることは必須条件にしない。... `.harness/config/agent-profiles.json` 側で各 specialist provider をどう割り当てるかは、別途の provider assignment として扱う。"
+      }
+    },
+    {
+      "claim_hash": "f52a72914addd5f3419f80f62fe1c3d5177c4c22974a21db65f1155b61e19cf6",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。"
+      }
+    },
+    {
+      "claim_hash": "a22dcc0e335e5a92d1e270da0442d8300270041cb7f3ca3b2eb09e4aa66187a8",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「.codex/config.toml は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義する」"
+      }
+    },
+    {
+      "claim_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。"
+      }
+    },
+    {
+      "claim_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "これにより、direct git operation の抑止、保護された test file deletion の抑止、skill compliance など、既存の SoTOHE hook policy を再利用する。"
+      }
+    },
+    {
+      "claim_hash": "7c61a8c5dc81f5ceaeabd3138ba475caa276f383cdf44e203f90e348a9484097",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex custom agent TOML は、agent 名、説明、model、sandbox、所有 artifact、境界、最終 status contract などの薄い role definition を持つ。一方、実際の specialist workflow、必読資料、command discipline、self-verification、final response format は skill 側へ移す。Codex 側で対応させる capability は次の通り: - `spec-designer`: `.codex/agents/spec-designer.toml` + `.agents/skills/spec-designer` - `impl-planner`: `.codex/agents/impl-planner.toml` + `.agents/skills/impl-planner` - `type-designer`: `.codex/agents/type-designer.toml` + `.agents/skills/type-designer` - `adr-editor`: `.codex/agents/adr-editor.toml` + `.agents/skills/adr-editor`"
+      }
+    },
+    {
+      "claim_hash": "b8b4f7023f04d6f17da44902c528e0b119279520551e3c62fc17352a10a14a14",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。"
+      }
+    },
+    {
+      "claim_hash": "5c8d1f348c6f81aae1eb9e81fc64c145ce73d9f23b82e69413bfbccdd4fb6542",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する。これにより、direct git operation の抑止、保護された test file deletion の抑止、skill compliance など、既存の SoTOHE hook policy を再利用する。"
+      }
+    },
+    {
+      "claim_hash": "9f34b2b73701ed058aead5430e0a4fb64eeaf957ed067907d6266402955805b0",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。 hook adapter の挙動が `bin/sotp hook dispatch` の期待と一致することを実行確認している。"
+      }
+    },
+    {
+      "claim_hash": "6a9600304574732ea832c4e3a5b266dddd505afbc1bba30749dd1681bfcac75d",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。」"
+      }
+    },
+    {
+      "claim_hash": "46b7d9f072b22cc4f8ea70cac2c8e5c7e706ac2cb730d29f3617feaeb5b44b0a",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。"
+      }
+    },
+    {
+      "claim_hash": "91611677cd60d1af1ebabe459c374e24d099e0dcdfb69ace3dd199f9879b5657",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。"
+      }
+    },
+    {
+      "claim_hash": "aea4e2cac715066a5d4e2e5af1fe6e0abf00a6169cd84912a558ebaa6b611688",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「agent 定義を薄くするだけでは specialist 能力が空になるため、skill の root 配置は agent の root 配置と同時に行う。」「`spec-designer`: `.codex/agents/spec-designer.toml` + `.agents/skills/spec-designer`」"
+      }
+    },
+    {
+      "claim_hash": "aea4e2cac715066a5d4e2e5af1fe6e0abf00a6169cd84912a558ebaa6b611688",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/agents/*.toml` が repository root に配置されている。`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の skill が `.agents/skills` に promoted され、既存の `review-fix-lead` / `dry-fix-lead` skill と同じ検証対象になっている。"
+      }
+    },
+    {
+      "claim_hash": "bacb8877c7674396128f6dfb8cb44dba2a12b0df3791e6d6e69a973ef36e1913",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存 `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。"
+      }
+    },
+    {
+      "claim_hash": "0e38fdf7282154a261de58fd35ca532facd2341bab9e553ac7fdf4a1de1e4e2f",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。この変更は、SoTOHE core の phase command を置き換えるものではない。Codex orchestrator は、既存の `bin/sotp` と `cargo make` wrapper を呼び出して Phase 0-3、review、DRY gate、track PR 操作を進める。"
+      }
+    },
+    {
+      "claim_hash": "0e38fdf7282154a261de58fd35ca532facd2341bab9e553ac7fdf4a1de1e4e2f",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Claude 固定ではなく Codex root orchestration を説明している】【。 Claude root orchestration は同じ template の恒久的な選択肢として残る。」"
+      }
+    },
+    {
+      "claim_hash": "4f4580bd58299c2ba58de6098f5b0f3fb9f92dcdc4e3d059f1929d6110f86942",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex 用の hook coverage は `.codex/config.toml` の inline hooks から `.codex/hooks/sotp-hook.sh` を呼び、そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する。これにより、direct git operation の抑止、保護された test file deletion の抑止、skill compliance など、既存の SoTOHE hook policy を再利用する。"
+      }
+    },
+    {
+      "claim_hash": "4e59b163d3eedfd9f29a884d64db53a1a0647f52cb12ad8ca691f83c785f75a1",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1. `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules`、`.codex/agents/*.toml` が repository root に配置されている。\n5. `verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。"
+      }
+    },
+    {
+      "claim_hash": "1bc127c1162c9ed120b1b5a6630175e162871a6a5686e0503889fca2565c8e31",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し"
+      }
+    },
+    {
+      "claim_hash": "a936cae88290820f6e95546df3c89963f72aeb0a47137720192b51edcb779515",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the evidence decides to add and use repository-local `.codex` project config/rules/hooks, but it does not mention or imply a trusted-project-only loading model or the untrusted-checkout fallback to user/system layers."
+      }
+    },
+    {
+      "claim_hash": "46b7d9f072b22cc4f8ea70cac2c8e5c7e706ac2cb730d29f3617feaeb5b44b0a",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex provider 向けには `.codex/agents/*.toml` と `.agents/skills/<name>/SKILL.md` の組み合わせで同等の specialist surface を追加する。\n\nCodex 側で対応させる capability は次の通り:\n\n- `orchestrator`: root Codex session + `.codex/agents/orchestrator.toml`\n- `spec-designer`: `.codex/agents/spec-designer.toml` + `.agents/skills/spec-designer`\n- `impl-planner`: `.codex/agents/impl-planner.toml` + `.agents/skills/impl-planner`\n- `type-designer`: `.codex/agents/type-designer.toml` + `.agents/skills/type-designer`\n- `adr-editor`: `.codex/agents/adr-editor.toml` + `.agents/skills/adr-editor`\n- `review-fix-lead`: `.codex/agents/review-fix-lead.toml` + 既存 `.agents/skills/review-fix-lead`\n- `dry-fix-lead`: `.codex/agents/dry-fix-lead.toml` + 既存 `.agents/skills/dry-fix-lead`"
+      }
+    },
+    {
+      "claim_hash": "099e9bf8bd903ab430bee66a5ff6bf787461bfc5847f51c6b50ef1b6843bc8e4",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules`、`.codex/agents/*.toml` が repository root に配置されている。\n`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の skill が `.agents/skills` に promoted され、既存の `review-fix-lead` / `dry-fix-lead` skill と同じ検証対象になっている。\nこの条件を満たす前は、未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。"
+      }
+    },
+    {
+      "claim_hash": "205f3941a660ece64d494f8d93924bb117f2b22995027c08e6bcb6bbb3f49254",
+      "evidence_hash": "942718f93356fef810843b00ff2d19cc4a31542083d9a427a6c1385099d56373",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex orchestrator を active と扱う前に、次の有効化前提条件を満たす。"
+      }
+    },
+    {
+      "claim_hash": "064d9a8630fd6341bbe6cc6dabaa1fdfe3bad3b55a532f8877b8d95d232e35ca",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が要求するのは、`capabilities.orchestrator.provider` で `claude` と `codex` のどちらも正規に選べることである。"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex を SoTOHE の user-facing root orchestrator として扱えるように、repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し、`.codex/instructions.md` は SoTOHE 固有の orchestration rules と specialist routing を定義する。Codex orchestrator は、既存の `bin/sotp` と `cargo make` wrapper を呼び出して Phase 0-3、review、DRY gate、track PR 操作を進める。"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex provider 向けには `.codex/agents/*.toml` と `.agents/skills/<name>/SKILL.md` の組み合わせで同等の specialist surface を追加する。"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex 用の hook coverage は `.codex/config.toml` の inline hooks から `.codex/hooks/sotp-hook.sh` を呼び、そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する。これにより、direct git operation の抑止、保護された test file deletion の抑止、skill compliance など、既存の SoTOHE hook policy を再利用する。"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules`、`.codex/agents/*.toml` が repository root に配置されている」「verify-orchestra が ... Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる」"
+      }
+    },
+    {
+      "claim_hash": "a3ff5636da153a8f67eb37974b0822f4343de84cf3b2adf9a4b5f307ba89d6b3",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\".codex/config.toml は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し、.codex/instructions.md は SoTOHE 固有の orchestration rules と specialist routing を定義する。\""
+      }
+    },
+    {
+      "claim_hash": "6711ef5e32aac2f8b06e74c57d1a401258fa467b18ad8a5bc5cde89718e2402d",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。"
+      }
+    },
+    {
+      "claim_hash": "39cdf22f4c50346a1426db21846fee8a7191c5a4b4410eef649d358c41f8da1e",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Codex provider 向けには `.codex/agents/*.toml` と `.agents/skills/<name>/SKILL.md` の組み合わせで同等の specialist surface を追加する。」"
+      }
+    },
+    {
+      "claim_hash": "f8bef8bcadbd07e13792094787533d846b84a0d0d7e64289fb154def71bab468",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skill の root 配置は agent の root 配置と同時に行う。`spec-designer`: `.codex/agents/spec-designer.toml` + `.agents/skills/spec-designer` ... `review-fix-lead`: `.codex/agents/review-fix-lead.toml` + 既存 `.agents/skills/review-fix-lead` ... `dry-fix-lead`: `.codex/agents/dry-fix-lead.toml` + 既存 `.agents/skills/dry-fix-lead`"
+      }
+    },
+    {
+      "claim_hash": "f8bef8bcadbd07e13792094787533d846b84a0d0d7e64289fb154def71bab468",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "2. `spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の skill が `.agents/skills` に promoted され、既存の `review-fix-lead` / `dry-fix-lead` skill と同じ検証対象になっている。"
+      }
+    },
+    {
+      "claim_hash": "bf56d4c3ad598b79addf9320f09b6f7fcf1b94a7aa67e758255db36c8b515366",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/agent-profiles.json` の現行 schema は `providers` と `capabilities` の対応表であり、別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。"
+      }
+    },
+    {
+      "claim_hash": "a6afa79febd45e337c250686724c09f9d880aa4c6dd3a6b434d1fafac7656b81",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex 用の hook coverage は `.codex/config.toml` の inline hooks から `.codex/hooks/sotp-hook.sh` を呼び、そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する。"
+      }
+    },
+    {
+      "claim_hash": "aababf019163724735931c26190de67c8bca5e80124c483a0703ec140881e953",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。"
+      }
+    },
+    {
+      "claim_hash": "aababf019163724735931c26190de67c8bca5e80124c483a0703ec140881e953",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「track/workflow.md、.codex/instructions.md、.claude/rules/08-orchestration.md 相当の運用文書が、Claude 固定ではなく Codex root orchestration を説明している】【。】【…Claude root orchestration は同じ template の恒久的な選択肢として残る。」"
+      }
+    },
+    {
+      "claim_hash": "825ccf2c8a15167e6d6af8e2975d1fefa5a63453fe72ae589d0bb0cf978a6a86",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5. `verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。"
+      }
+    },
+    {
+      "claim_hash": "37d8d3f554e647a4f32ac7ccf50861fb1e76eb6a709bb10ca4f490e127f22519",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この `.codex` surface は Claude Code surface の廃止準備ではない。template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。"
+      }
+    },
+    {
+      "claim_hash": "37d8d3f554e647a4f32ac7ccf50861fb1e76eb6a709bb10ca4f490e127f22519",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`claude` と `codex` のどちらも正規に選べる"
+      }
+    },
+    {
+      "claim_hash": "65d0fcab8e20a1d22ce4308e72ac7539cbeebcb4564c86c2be8896b9af76e1e6",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "This change is、SoTOHE core の phase command を置き換えるものではない。Codex orchestrator は、既存の `bin/sotp` と `cargo make` wrapper を呼び出して Phase 0-3、review、DRY gate、track PR 操作を進める。"
+      }
+    },
+    {
+      "claim_hash": "1b93b9a16939c60e89256cd0813076f8ac2828ad0e89a545364b5e6ee20d4b53",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` などの specialist capability を同時に Codex provider へ切り替えることは必須条件にしない。... `.harness/config/agent-profiles.json` 側で各 specialist provider をどう割り当てるかは、別途の provider assignment として扱う。」"
+      }
+    },
+    {
+      "claim_hash": "f52a72914addd5f3419f80f62fe1c3d5177c4c22974a21db65f1155b61e19cf6",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この条件を満たす前は、未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。"
+      }
+    },
+    {
+      "claim_hash": "a22dcc0e335e5a92d1e270da0442d8300270041cb7f3ca3b2eb09e4aa66187a8",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "未trusted checkout では repository-local `.codex` 設定が存在しても user/system layer の設定だけが有効になり得る"
+      }
+    },
+    {
+      "claim_hash": "1bc127c1162c9ed120b1b5a6630175e162871a6a5686e0503889fca2565c8e31",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義する。Codex の project-local config、rules、hooks は trusted project として扱われる checkout でのみ読み込まれる前提で運用する。"
+      }
+    },
+    {
+      "claim_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。」"
+      }
+    },
+    {
+      "claim_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「direct git operation の抑止」および「既存の SoTOHE hook policy を再利用する」"
+      }
+    },
+    {
+      "claim_hash": "7c61a8c5dc81f5ceaeabd3138ba475caa276f383cdf44e203f90e348a9484097",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex custom agent TOML は、agent 名、説明、model、sandbox、所有 artifact、境界、最終 status contract などの薄い role definition を持つ。一方、実際の specialist workflow、必読資料、command discipline、self-verification、final response format は skill 側へ移す。... - `spec-designer`: `.codex/agents/spec-designer.toml` + `.agents/skills/spec-designer` - `impl-planner`: `.codex/agents/impl-planner.toml` + `.agents/skills/impl-planner` - `type-designer`: `.codex/agents/type-designer.toml` + `.agents/skills/type-designer` - `adr-editor`: `.codex/agents/adr-editor.toml` + `.agents/skills/adr-editor`"
+      }
+    },
+    {
+      "claim_hash": "b8b4f7023f04d6f17da44902c528e0b119279520551e3c62fc17352a10a14a14",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。」「別の設定階層を導入しない。」"
+      }
+    },
+    {
+      "claim_hash": "5c8d1f348c6f81aae1eb9e81fc64c145ce73d9f23b82e69413bfbccdd4fb6542",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する」「policy 本体は `bin/sotp hook dispatch` 側に残す」"
+      }
+    },
+    {
+      "claim_hash": "9f34b2b73701ed058aead5430e0a4fb64eeaf957ed067907d6266402955805b0",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。6. hook adapter の挙動が `bin/sotp hook dispatch` の期待と一致することを実行確認している。"
+      }
+    },
+    {
+      "claim_hash": "6a9600304574732ea832c4e3a5b266dddd505afbc1bba30749dd1681bfcac75d",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この条件を満たす前は、未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。」"
+      }
+    },
+    {
+      "claim_hash": "a936cae88290820f6e95546df3c89963f72aeb0a47137720192b51edcb779515",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Codex の project-local config、rules、hooks は trusted project として扱われる checkout でのみ読み込まれる前提で運用する。未trusted checkout では repository-local `.codex` 設定が存在しても user/system layer の設定だけが有効になり得る」"
+      }
+    },
+    {
+      "claim_hash": "46b7d9f072b22cc4f8ea70cac2c8e5c7e706ac2cb730d29f3617feaeb5b44b0a",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し、`.codex/instructions.md` は SoTOHE 固有の orchestration rules と specialist routing を定義する。"
+      }
+    },
+    {
+      "claim_hash": "91611677cd60d1af1ebabe459c374e24d099e0dcdfb69ace3dd199f9879b5657",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。"
+      }
+    },
+    {
+      "claim_hash": "aea4e2cac715066a5d4e2e5af1fe6e0abf00a6169cd84912a558ebaa6b611688",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「agent 定義を薄くするだけでは specialist 能力が空になるため、skill の root 配置は agent の root 配置と同時に行う。」"
+      }
+    },
+    {
+      "claim_hash": "aea4e2cac715066a5d4e2e5af1fe6e0abf00a6169cd84912a558ebaa6b611688",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の skill が `.agents/skills` に promoted され、` .codex/agents/*.toml` が repository root に配置されている"
+      }
+    },
+    {
+      "claim_hash": "bacb8877c7674396128f6dfb8cb44dba2a12b0df3791e6d6e69a973ef36e1913",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存 `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。"
+      }
+    },
+    {
+      "claim_hash": "0e38fdf7282154a261de58fd35ca532facd2341bab9e553ac7fdf4a1de1e4e2f",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。"
+      }
+    },
+    {
+      "claim_hash": "0e38fdf7282154a261de58fd35ca532facd2341bab9e553ac7fdf4a1de1e4e2f",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「track/workflow.md、.codex/instructions.md、.claude/rules/08-orchestration.md 相当の運用文書が、Claude 固定ではなく Codex root orchestration を説明している。」また「Claude root orchestration は同じ template の恒久的な選択肢として残る。」"
+      }
+    },
+    {
+      "claim_hash": "4f4580bd58299c2ba58de6098f5b0f3fb9f92dcdc4e3d059f1929d6110f86942",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex 用の hook coverage は `.codex/config.toml` の inline hooks から `.codex/hooks/sotp-hook.sh` を呼び、そこから既存 `bin/sotp hook dispatch <hook-id>` に接続する。"
+      }
+    },
+    {
+      "claim_hash": "099e9bf8bd903ab430bee66a5ff6bf787461bfc5847f51c6b50ef1b6843bc8e4",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。"
+      }
+    },
+    {
+      "claim_hash": "205f3941a660ece64d494f8d93924bb117f2b22995027c08e6bcb6bbb3f49254",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify-orchestra が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる"
+      }
+    },
+    {
+      "claim_hash": "46b7d9f072b22cc4f8ea70cac2c8e5c7e706ac2cb730d29f3617feaeb5b44b0a",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex provider 向けには `.codex/agents/*.toml` と `.agents/skills/<name>/SKILL.md` の組み合わせで同等の specialist surface を追加する。"
+      }
+    },
+    {
+      "claim_hash": "4e59b163d3eedfd9f29a884d64db53a1a0647f52cb12ad8ca691f83c785f75a1",
+      "evidence_hash": "1ae43ad0576cf7b61452c015889594b2fe0134144c2d9c01cc247852e4bae168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5. `verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。"
+      }
+    },
+    {
+      "claim_hash": "064d9a8630fd6341bbe6cc6dabaa1fdfe3bad3b55a532f8877b8d95d232e35ca",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が要求するのは、`capabilities.orchestrator.provider` で `claude` と `codex` のどちらも正規に選べることである。"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `bin/sotp` と `cargo make` wrapper を呼び出して Phase 0-3、review、DRY gate、track PR 操作を進める。"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Codex provider 向けには `.codex/agents/*.toml` と `.agents/skills/<name>/SKILL.md` の組み合わせで同等の specialist surface を追加する。」"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex 用の hook coverage は `.codex/config.toml` の inline hooks から `.codex/hooks/sotp-hook.sh` を呼び、そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する。これにより、direct git operation の抑止、保護された test file deletion の抑止、skill compliance など、既存の SoTOHE hook policy を再利用する。"
+      }
+    },
+    {
+      "claim_hash": "5d56fea582164ba0210b752bae32a4765a0264047f9e782396a636bad6e5185c",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md`、`.codex/instructions.md`、`.claude/rules/08-orchestration.md` 相当の運用文書が、Claude 固定ではなく Codex root orchestration を説明している。`verify-orchestra` が ... Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる"
+      }
+    },
+    {
+      "claim_hash": "a3ff5636da153a8f67eb37974b0822f4343de84cf3b2adf9a4b5f307ba89d6b3",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し、`.codex/instructions.md` は SoTOHE 固有の orchestration rules と specialist routing を定義する。"
+      }
+    },
+    {
+      "claim_hash": "6711ef5e32aac2f8b06e74c57d1a401258fa467b18ad8a5bc5cde89718e2402d",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。"
+      }
+    },
+    {
+      "claim_hash": "ad57fe559aab419d0589f17f4ffe3cf380973aac512fc3eab02c89bae0ca42b9",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex custom agent TOML は、agent 名、説明、model、所有 artifact、境界、最終 status contract などの薄い role definition を持つ。per-agent sandbox は Codex 現行 schema が agent role file で受け付けない（`unknown field 'sandbox'`）ため agent TOML には設定せず、sandbox は `.codex/config.toml` の session-level `sandbox_mode` で与える。\n\nCodex 側で対応させる capability は次の通り:\n\n- `orchestrator`: root Codex session + `.codex/agents/orchestrator.toml`\n- `spec-designer`: `.codex/agents/spec-designer.toml` + `.agents/skills/spec-designer`\n- `impl-planner`: `.codex/agents/impl-planner.toml` + `.agents/skills/impl-planner`\n- `type-designer`: `.codex/agents/type-designer.toml` + `.agents/skills/type-designer`\n- `adr-editor`: `.codex/agents/adr-editor.toml` + `.agents/skills/adr-editor`\n- `review-fix-lead`: `.codex/agents/review-fix-lead.toml` + 既存 `.agents/skills/review-fix-lead`\n- `dry-fix-lead`: `.codex/agents/dry-fix-lead.toml` + 既存 `.agents/skills/dry-fix-lead`"
+      }
+    },
+    {
+      "claim_hash": "af952db848f1fbce992b69fdf51c2d06dbe6595a2c1c94e7e6be5498dddcf81e",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実際の specialist workflow、必読資料、command discipline、self-verification、final response format は、provider 非依存の単一 SSoT として `.harness/capabilities/<name>.md` に置く。`.claude/agents/<name>.md`（Claude subagent）と `.agents/skills/<name>/SKILL.md`（Codex skill）はどちらもこの共有 SSoT を参照する薄い wrapper とし"
+      }
+    },
+    {
+      "claim_hash": "bf56d4c3ad598b79addf9320f09b6f7fcf1b94a7aa67e758255db36c8b515366",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/agent-profiles.json` の現行 schema は `providers` と `capabilities` の対応表であり、別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。"
+      }
+    },
+    {
+      "claim_hash": "a6afa79febd45e337c250686724c09f9d880aa4c6dd3a6b434d1fafac7656b81",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex 用の hook coverage は `.codex/config.toml` の inline hooks から `.codex/hooks/sotp-hook.sh` を呼び、そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する。\\n\\nhook adapter は設定面の bridge とし、policy 本体は `bin/sotp hook dispatch` 側に残す。"
+      }
+    },
+    {
+      "claim_hash": "aababf019163724735931c26190de67c8bca5e80124c483a0703ec140881e953",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。"
+      }
+    },
+    {
+      "claim_hash": "aababf019163724735931c26190de67c8bca5e80124c483a0703ec140881e953",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4. `track/workflow.md`、`.codex/instructions.md`、`.claude/rules/08-orchestration.md` 相当の運用文書が、Claude 固定ではなく Codex root orchestration を説明している。"
+      }
+    },
+    {
+      "claim_hash": "37d8d3f554e647a4f32ac7ccf50861fb1e76eb6a709bb10ca4f490e127f22519",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この `.codex` surface は Claude Code surface の廃止準備ではない。template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。"
+      }
+    },
+    {
+      "claim_hash": "37d8d3f554e647a4f32ac7ccf50861fb1e76eb6a709bb10ca4f490e127f22519",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が要求するのは、`capabilities.orchestrator.provider` で `claude` と `codex` のどちらも正規に選べることである。"
+      }
+    },
+    {
+      "claim_hash": "65d0fcab8e20a1d22ce4308e72ac7539cbeebcb4564c86c2be8896b9af76e1e6",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "This changeは、SoTOHE core の phase command を置き換えるものではない。Codex orchestrator は、既存の `bin/sotp` と `cargo make` wrapper を呼び出して Phase 0-3、review、DRY gate、track PR 操作を進める。"
+      }
+    },
+    {
+      "claim_hash": "1b93b9a16939c60e89256cd0813076f8ac2828ad0e89a545364b5e6ee20d4b53",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同時に Codex provider へ切り替えることは必須条件にしない。"
+      }
+    },
+    {
+      "claim_hash": "f52a72914addd5f3419f80f62fe1c3d5177c4c22974a21db65f1155b61e19cf6",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。」"
+      }
+    },
+    {
+      "claim_hash": "a22dcc0e335e5a92d1e270da0442d8300270041cb7f3ca3b2eb09e4aa66187a8",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/config.toml は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し`"
+      }
+    },
+    {
+      "claim_hash": "1bc127c1162c9ed120b1b5a6630175e162871a6a5686e0503889fca2565c8e31",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex の project-local config、rules、hooks は trusted project として扱われる checkout でのみ読み込まれる前提で運用する。未trusted checkout では repository-local `.codex` 設定が存在しても user/system layer の設定だけが有効になり得る"
+      }
+    },
+    {
+      "claim_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\".codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。\""
+      }
+    },
+    {
+      "claim_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "これにより、direct git operation の抑止、保護された test file deletion の抑止、skill compliance など、既存の SoTOHE hook policy を再利用する。"
+      }
+    },
+    {
+      "claim_hash": "4c09be5d900caa5880ea48bf3bb8fadf20b72cacda30aa0f73a6f33a64550257",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実際の specialist workflow ... 単一 SSoT として `.harness/capabilities/<name>.md` に置く。`.claude/agents/<name>.md` と `.agents/skills/<name>/SKILL.md` はどちらもこの共有 SSoT を参照する薄い wrapper とし、... 同一 workflow を Claude 側と Codex 側へ二重に複製せず（DRY）"
+      }
+    },
+    {
+      "claim_hash": "b8b4f7023f04d6f17da44902c528e0b119279520551e3c62fc17352a10a14a14",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。"
+      }
+    },
+    {
+      "claim_hash": "5c8d1f348c6f81aae1eb9e81fc64c145ce73d9f23b82e69413bfbccdd4fb6542",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Codex 用の hook coverage は `.codex/config.toml` の inline hooks から `.codex/hooks/sotp-hook.sh` を呼び、そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する。これにより、direct git operation の抑止、保護された test file deletion の抑止、skill compliance など、既存の SoTOHE hook policy を再利用する。... hook adapter は設定面の bridge とし、policy 本体は `bin/sotp hook dispatch` 側に残す。」"
+      }
+    },
+    {
+      "claim_hash": "9f34b2b73701ed058aead5430e0a4fb64eeaf957ed067907d6266402955805b0",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify-orchestra が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。"
+      }
+    },
+    {
+      "claim_hash": "6a9600304574732ea832c4e3a5b266dddd505afbc1bba30749dd1681bfcac75d",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この条件を満たす前は、未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。"
+      }
+    },
+    {
+      "claim_hash": "a936cae88290820f6e95546df3c89963f72aeb0a47137720192b51edcb779515",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex の project-local config、rules、hooks は trusted project として扱われる checkout でのみ読み込まれる前提で運用する。未trusted checkout では repository-local `.codex` 設定が存在しても user/system layer の設定だけが有効になり得る"
+      }
+    },
+    {
+      "claim_hash": "91611677cd60d1af1ebabe459c374e24d099e0dcdfb69ace3dd199f9879b5657",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。"
+      }
+    },
+    {
+      "claim_hash": "5b9d21ad10377d8f7b8a51f00332f91f7dbb634c18ca8b63e01d21f9edfef23e",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.harness/capabilities/<name>.md` に置く。`.claude/agents/<name>.md` と `.agents/skills/<name>/SKILL.md` はどちらもこの共有 SSoT を参照する薄い wrapper」"
+      }
+    },
+    {
+      "claim_hash": "bacb8877c7674396128f6dfb8cb44dba2a12b0df3791e6d6e69a973ef36e1913",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/agent-profiles.json` の現行 schema は `providers` と `capabilities` の対応表であり、別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。"
+      }
+    },
+    {
+      "claim_hash": "0e38fdf7282154a261de58fd35ca532facd2341bab9e553ac7fdf4a1de1e4e2f",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。この変更は、SoTOHE core の phase command を置き換えるものではない。"
+      }
+    },
+    {
+      "claim_hash": "4f4580bd58299c2ba58de6098f5b0f3fb9f92dcdc4e3d059f1929d6110f86942",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex 用の hook coverage は `.codex/config.toml` の inline hooks から `.codex/hooks/sotp-hook.sh` を呼び、そこから既存の `bin/sotp hook dispatch <hook-id>` に接続する。これにより、direct git operation の抑止、保護された test file deletion の抑止、skill compliance など、既存の SoTOHE hook policy を再利用する。"
+      }
+    },
+    {
+      "claim_hash": "1efcb1280fc563a0e3018593749943632c23dd3dbf2da4be7df9c5dbf37a0b39",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。」および「`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の skill が `.agents/skills` に promoted され、既存の `review-fix-lead` / `dry-fix-lead` skill と同じ検証対象になっている。」"
+      }
+    },
+    {
+      "claim_hash": "af952db848f1fbce992b69fdf51c2d06dbe6595a2c1c94e7e6be5498dddcf81e",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the evidence requires Codex orchestrator activation prerequisites, promoted skills, multi-provider documentation, and verification coverage, but it does not state or imply that specialist workflows must live as a provider-independent single SSoT under `.harness/capabilities/<name>.md`, nor that Codex skills and Claude subagents must be thin DRY wrappers over that shared file."
+      }
+    },
+    {
+      "claim_hash": "e0a0a851187c77698023ed8bf86751e6bbbca80808a1509857287934fbbec65c",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。"
+      }
+    },
+    {
+      "claim_hash": "46b7d9f072b22cc4f8ea70cac2c8e5c7e706ac2cb730d29f3617feaeb5b44b0a",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex を SoTOHE の user-facing root orchestrator として扱えるように、repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し、`.codex/instructions.md` は SoTOHE 固有の orchestration rules と specialist routing を定義する。"
+      }
+    },
+    {
+      "claim_hash": "46b7d9f072b22cc4f8ea70cac2c8e5c7e706ac2cb730d29f3617feaeb5b44b0a",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex provider 向けには `.codex/agents/*.toml` と `.agents/skills/<name>/SKILL.md` の組み合わせで同等の specialist surface を追加する。\n\nCodex custom agent TOML は、agent 名、説明、model、所有 artifact、境界、最終 status contract などの薄い role definition を持つ。per-agent sandbox は Codex 現行 schema が agent role file で受け付けない（`unknown field 'sandbox'`）ため agent TOML には設定せず、sandbox は `.codex/config.toml` の session-level `sandbox_mode` で与える。"
+      }
+    },
+    {
+      "claim_hash": "5b9d21ad10377d8f7b8a51f00332f91f7dbb634c18ca8b63e01d21f9edfef23e",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "2. `spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の skill が `.agents/skills` に promoted され、既存の `review-fix-lead` / `dry-fix-lead` skill と同じ検証対象になっている。\n5. `verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。"
+      }
+    },
+    {
+      "claim_hash": "0e38fdf7282154a261de58fd35ca532facd2341bab9e553ac7fdf4a1de1e4e2f",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md`、`.codex/instructions.md`、`.claude/rules/08-orchestration.md` 相当の運用文書が、Claude 固定ではなく Codex root orchestration を説明している。\n\n条件を満たした後も、Claude root orchestration は同じ template の恒久的な選択肢として残る。"
+      }
+    },
+    {
+      "claim_hash": "099e9bf8bd903ab430bee66a5ff6bf787461bfc5847f51c6b50ef1b6843bc8e4",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この条件を満たす前は、未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。"
+      }
+    },
+    {
+      "claim_hash": "205f3941a660ece64d494f8d93924bb117f2b22995027c08e6bcb6bbb3f49254",
+      "evidence_hash": "68368dbe6f7d0842826105f20e04efc297c81844ab0df75379a1dd3fd0b51d9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5. `verify-orchestra` が Claude subagent 定義だけでなく Codex project config、project-local rules、custom agent、skill coverage、hook adapter を検証できる。\n\nこれは SoTOHE の実行時 gate ではなく、Codex を root orchestrator として選んだ場合の運用を active と呼ぶための受け入れ条件である。"
+      }
+    },
+    {
+      "claim_hash": "064d9a8630fd6341bbe6cc6dabaa1fdfe3bad3b55a532f8877b8d95d232e35ca",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が要求するのは、`capabilities.orchestrator.provider` で `claude` と `codex` のどちらも正規に選べることである。"
+      }
+    },
+    {
+      "claim_hash": "d0a2712b05015b70e198d3f72e77274f25a65fbcdffd5558cf0b76ad5e0b7ef6",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し、`.codex/instructions.md` は SoTOHE 固有の orchestration rules と specialist routing を定義する。 Codex orchestrator は、既存の `bin/sotp` と `cargo make` wrapper を呼び出して Phase 0-3、review、DRY gate、track PR 操作を進める。"
+      }
+    },
+    {
+      "claim_hash": "d0a2712b05015b70e198d3f72e77274f25a65fbcdffd5558cf0b76ad5e0b7ef6",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex provider 向けには `.codex/agents/*.toml` と `.agents/skills/<name>/SKILL.md` の組み合わせで同等の specialist surface を追加する。"
+      }
+    },
+    {
+      "claim_hash": "d0a2712b05015b70e198d3f72e77274f25a65fbcdffd5558cf0b76ad5e0b7ef6",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存の SoTOHE hook policy を再利用する。」「hook adapter は設定面の bridge とし、policy 本体は `bin/sotp hook dispatch` 側に残す。」"
+      }
+    },
+    {
+      "claim_hash": "d0a2712b05015b70e198d3f72e77274f25a65fbcdffd5558cf0b76ad5e0b7ef6",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md`、`.codex/instructions.md`、`.claude/rules/08-orchestration.md` 相当の運用文書が、Claude 固定ではなく Codex root orchestration を説明している。... `未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。`"
+      }
+    },
+    {
+      "claim_hash": "d0a2712b05015b70e198d3f72e77274f25a65fbcdffd5558cf0b76ad5e0b7ef6",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.claude` / `.codex` の provider・agent **設定**はテンプレート利用者の責任領域とする。SoTOHE は良いデフォルトと docs を**提供**するが、その設定値・ファイル存在・permission allow/deny エントリ・散文文言を CI で hard-fail させて**強制**しない。"
+      }
+    },
+    {
+      "claim_hash": "a3ff5636da153a8f67eb37974b0822f4343de84cf3b2adf9a4b5f307ba89d6b3",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し"
+      }
+    },
+    {
+      "claim_hash": "6711ef5e32aac2f8b06e74c57d1a401258fa467b18ad8a5bc5cde89718e2402d",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository root に `.codex/config.toml`, `.codex/instructions.md`, `.codex/rules/default.rules` を追加する。`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection"
+      }
+    },
+    {
+      "claim_hash": "ad57fe559aab419d0589f17f4ffe3cf380973aac512fc3eab02c89bae0ca42b9",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-agent sandbox は Codex 現行 schema が agent role file で受け付けない（`unknown field 'sandbox'`）ため agent TOML には設定せず、sandbox は `.codex/config.toml` の session-level `sandbox_mode` で与える。"
+      }
+    },
+    {
+      "claim_hash": "4acf312593b07a5255b483be5a5abd4574d6059c18f8307599d58430d240da91",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「実際の specialist workflow、必読資料、command discipline、self-verification、final response format は、provider 非依存の単一 SSoT として **`.harness/capabilities/<name>.md`** に置く。`.claude/agents/<name>.md`（Claude subagent）と `.agents/skills/<name>/SKILL.md`（Codex skill）はどちらもこの共有 SSoT を参照する薄い wrapper とし、frontmatter（model / tools / 起動方法）と provider 固有の注記だけを持つ。これにより同一 workflow を Claude 側と Codex 側へ二重に複製せず（DRY）、agent / skill 定義を薄くしても specialist 能力が空洞化しない。」"
+      }
+    },
+    {
+      "claim_hash": "bf56d4c3ad598b79addf9320f09b6f7fcf1b94a7aa67e758255db36c8b515366",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する】【。 本 ADR が要求するのは、`capabilities.orchestrator.provider` で `claude` と `codex` のどちらも正規に選べることである。」"
+      }
+    },
+    {
+      "claim_hash": "a6afa79febd45e337c250686724c09f9d880aa4c6dd3a6b434d1fafac7656b81",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook adapter は設定面の bridge とし、policy 本体は `bin/sotp hook dispatch` 側に残す。"
+      }
+    },
+    {
+      "claim_hash": "aababf019163724735931c26190de67c8bca5e80124c483a0703ec140881e953",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。"
+      }
+    },
+    {
+      "claim_hash": "aababf019163724735931c26190de67c8bca5e80124c483a0703ec140881e953",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「track/workflow.md、`.codex/instructions.md`、`.claude/rules/08-orchestration.md` 相当の運用文書が、Claude固定ではなく Codex root orchestration を説明している。」"
+      }
+    },
+    {
+      "claim_hash": "112c681cfa51311a813a6d2111a59c39bc8f9f0581667c1d1592b6e87dbf9c22",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「設定値・ファイル存在・permission allow/deny エントリ・散文文言を CI で hard-fail させて強制しない。」「この帰結として `verify-orchestra` を全廃する。」"
+      }
+    },
+    {
+      "claim_hash": "37d8d3f554e647a4f32ac7ccf50861fb1e76eb6a709bb10ca4f490e127f22519",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"This `.codex` surface is Claude Code surface の廃止準備ではない。template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し\""
+      }
+    },
+    {
+      "claim_hash": "37d8d3f554e647a4f32ac7ccf50861fb1e76eb6a709bb10ca4f490e127f22519",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が要求するのは、`capabilities.orchestrator.provider` で `claude` と `codex` のどちらも正規に選べることである。"
+      }
+    },
+    {
+      "claim_hash": "65d0fcab8e20a1d22ce4308e72ac7539cbeebcb4564c86c2be8896b9af76e1e6",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この変更は、SoTOHE core の phase command を置き換えるものではない。Codex orchestrator は、既存の `bin/sotp` と `cargo make` wrapper を呼び出して Phase 0-3、review、DRY gate、track PR 操作を進める。"
+      }
+    },
+    {
+      "claim_hash": "1b93b9a16939c60e89256cd0813076f8ac2828ad0e89a545364b5e6ee20d4b53",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` などの specialist capability を同時に Codex provider へ切り替えることは必須条件にしない」「別途の provider assignment として扱う」"
+      }
+    },
+    {
+      "claim_hash": "f52a72914addd5f3419f80f62fe1c3d5177c4c22974a21db65f1155b61e19cf6",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。"
+      }
+    },
+    {
+      "claim_hash": "a22dcc0e335e5a92d1e270da0442d8300270041cb7f3ca3b2eb09e4aa66187a8",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/config.toml` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し`,`Codex の project-local config、rules、hooks は trusted project として扱われる checkout でのみ読み込まれる前提で運用する。"
+      }
+    },
+    {
+      "claim_hash": "1bc127c1162c9ed120b1b5a6630175e162871a6a5686e0503889fca2565c8e31",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "` .codex/config.toml ` は Codex root session の既定 model、reasoning effort、sandbox、approval policy、hooks、subagent concurrency を定義し"
+      }
+    },
+    {
+      "claim_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。"
+      }
+    },
+    {
+      "claim_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「direct git operation の抑止、保護された test file deletion の抑止、skill compliance など、既存の SoTOHE hook policy を再利用する。」"
+      }
+    },
+    {
+      "claim_hash": "4c09be5d900caa5880ea48bf3bb8fadf20b72cacda30aa0f73a6f33a64550257",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「provider 非依存の単一 SSoT として `.harness/capabilities/<name>.md` に置く。`.claude/agents/<name>.md` と `.agents/skills/<name>/SKILL.md` はどちらもこの共有 SSoT を参照する薄い wrapper とし、... 同一 workflow を Claude 側と Codex 側へ二重に複製せず（DRY）」"
+      }
+    },
+    {
+      "claim_hash": "b8b4f7023f04d6f17da44902c528e0b119279520551e3c62fc17352a10a14a14",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「別の設定階層を導入しない。Codex root orchestration の provider 解決は、既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにすることで表現する。」"
+      }
+    },
+    {
+      "claim_hash": "5c8d1f348c6f81aae1eb9e81fc64c145ce73d9f23b82e69413bfbccdd4fb6542",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hook adapter は設定面の bridge とし、policy 本体は `bin/sotp hook dispatch` 側に残す。"
+      }
+    },
+    {
+      "claim_hash": "0dcc303ee14d08a8de2888c70aa6c8872f543dd19a7eae57b8f02529e7788b0b",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.claude` / `.codex` の provider・agent **設定**はテンプレート利用者の責任領域とする。SoTOHE は良いデフォルトと docs を**提供**するが、その設定値・ファイル存在・permission allow/deny エントリ・散文文言を CI で hard-fail させて**強制**しない。"
+      }
+    },
+    {
+      "claim_hash": "6a9600304574732ea832c4e3a5b266dddd505afbc1bba30749dd1681bfcac75d",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この条件を満たす前は、未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。」"
+      }
+    },
+    {
+      "claim_hash": "a936cae88290820f6e95546df3c89963f72aeb0a47137720192b51edcb779515",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Codex の project-local config、rules、hooks は trusted project として扱われる checkout でのみ読み込まれる前提で運用する。未trusted checkout では repository-local `.codex` 設定が存在しても user/system layer の設定だけが有効になり得るため、運用文書は trust 前提と未trusted 時の fallback を明示する。」"
+      }
+    },
+    {
+      "claim_hash": "46b7d9f072b22cc4f8ea70cac2c8e5c7e706ac2cb730d29f3617feaeb5b44b0a",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository root に `.codex/config.toml`、`.codex/instructions.md`、`.codex/rules/default.rules` を追加する。"
+      }
+    },
+    {
+      "claim_hash": "2aa8c658e4715c6cd63d13355fcfef5fde19100d67f2835c4ed5c55ffdb9b7ab",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` は、SoTOHE の canonical `cargo make` wrapper や read-only Git inspection など、repo として永続的に許可する command prefix を定義する。"
+      }
+    },
+    {
+      "claim_hash": "8e1cf8f005556becac441b27d88fb920e2addcf693de92efa99b9ddd786f0346",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実際の specialist workflow、必読資料、command discipline、self-verification、final response format は、provider 非依存の単一 SSoT として **`.harness/capabilities/<name>.md`** に置く。`.claude/agents/<name>.md`（Claude subagent）と `.agents/skills/<name>/SKILL.md`（Codex skill）はどちらもこの共有 SSoT を参照する薄い wrapper とし"
+      }
+    },
+    {
+      "claim_hash": "bacb8877c7674396128f6dfb8cb44dba2a12b0df3791e6d6e69a973ef36e1913",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "別の設定階層を導入しない。既存の `capabilities.orchestrator.provider` を `codex` に設定できるようにする。"
+      }
+    },
+    {
+      "claim_hash": "0e38fdf7282154a261de58fd35ca532facd2341bab9e553ac7fdf4a1de1e4e2f",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template は `.claude` と `.codex` の両方を正規の orchestration surface として保持し、選択された root provider に応じてどちらを使うかを決める。この変更は、SoTOHE core の phase command を置き換えるものではない。Codex orchestrator は、既存の `bin/sotp` と `cargo make` wrapper を呼び出して Phase 0-3、review、DRY gate、track PR 操作を進める。"
+      }
+    },
+    {
+      "claim_hash": "ab9c037849834868e7344775359ac4acc02418ab2d9c8b4b1941129b1a6164b9",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/hooks/sotp-hook.sh` を呼び、そこから既存 `bin/sotp hook dispatch <hook-id>` に接続する。"
+      }
+    },
+    {
+      "claim_hash": "8ce98387fac2d877434bca0598cdd7cc2c3b0b5d70a502ae2e03d0a69049f5b2",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "削除対象は `libs/infrastructure/src/verify/orchestra/` モジュール、CLI の `verify orchestra` subcommand、`cargo make verify-orchestra` task、CI からの呼び出し。"
+      }
+    },
+    {
+      "claim_hash": "099e9bf8bd903ab430bee66a5ff6bf787461bfc5847f51c6b50ef1b6843bc8e4",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「未昇格のローカル設計資料や部分的な設定変更を active repository configuration として扱わない。」"
+      }
+    },
+    {
+      "claim_hash": "0ba33baff6bb4ad9a1337b27663b030a24ea76e5fa7e87eb3f0724bc1a65b749",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の skill が `.agents/skills` に promoted され、既存の `review-fix-lead` / `dry-fix-lead` skill と同じ検証対象になっている。 ... hook adapter の挙動が `bin/sotp hook dispatch` の期待と一致することを実行確認している。"
+      }
+    },
+    {
+      "claim_hash": "46b7d9f072b22cc4f8ea70cac2c8e5c7e706ac2cb730d29f3617feaeb5b44b0a",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex provider 向けには `.codex/agents/*.toml` と `.agents/skills/<name>/SKILL.md` の組み合わせで同等の specialist surface を追加する。"
+      }
+    },
+    {
+      "claim_hash": "0e38fdf7282154a261de58fd35ca532facd2341bab9e553ac7fdf4a1de1e4e2f",
+      "evidence_hash": "618152724013170aab0fcbce75de712d5741a498b662dfd8c7df661237005bab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md`、`.codex/instructions.md`、`.claude/rules/08-orchestration.md` 相当の運用文書が、Claude 固定ではなく Codex root orchestration を説明している。"
+      }
+    }
+  ]
+}

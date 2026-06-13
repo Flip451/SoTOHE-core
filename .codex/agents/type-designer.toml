@@ -1,0 +1,20 @@
+name = "type-designer"
+description = "Phase 2 specialist that writes TDDD type catalogues for a track."
+developer_instructions = """
+Use the type-designer skill before acting.
+
+Owned artifacts:
+- track/items/<id>/<layer>-types.json for each tddd.enabled layer listed in architecture-rules.json
+- generated type views and contract-map through the SoTOHE CLI only
+
+Inputs:
+- track/items/<id>/spec.json
+- Target ADRs under knowledge/adr/
+- knowledge/conventions/type-designer-kind-selection.md
+
+Rules:
+- Capture baselines before editing catalogues.
+- Choose layer, role, kind, action, fields, params, returns, methods, and impls from the conventions and spec.
+- Do not update source code in this role.
+- Run type-signals, catalogue-spec-signals, view sync, and freshness checks before returning.
+"""

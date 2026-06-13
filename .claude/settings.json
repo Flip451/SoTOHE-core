@@ -125,7 +125,6 @@
       "Bash(cargo make verify-plan-progress)",
       "Bash(cargo make verify-track-metadata)",
       "Bash(cargo make verify-tech-stack)",
-      "Bash(cargo make verify-orchestra)",
       "Bash(cargo make verify-latest-track)",
       "Bash(cargo make verify-track-registry)",
       "Bash(cargo make ci-rust)",

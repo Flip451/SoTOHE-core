@@ -40,8 +40,6 @@ pub enum VerifyCommand {
     ArchDocs(VerifyArgs),
     /// Check workspace layer dependency rules via cargo metadata.
     Layers(VerifyArgs),
-    /// Check .claude/settings.json structural guardrails.
-    Orchestra(VerifyArgs),
     /// Check local Git config uses .githooks as core.hooksPath.
     HooksPath(VerifyArgs),
     /// Check spec.md requirement lines for [source: ...] attribution.
@@ -159,7 +157,6 @@ impl VerifyCommand {
             | VerifyCommand::LatestTrack(a)
             | VerifyCommand::ArchDocs(a)
             | VerifyCommand::Layers(a)
-            | VerifyCommand::Orchestra(a)
             | VerifyCommand::HooksPath(a)
             | VerifyCommand::CanonicalModules(a)
             | VerifyCommand::ModuleSize(a)
@@ -252,7 +249,6 @@ fn dispatch_to_outcome(
         VerifyCommand::LatestTrack(args) => app.verify_latest_track(args.project_root),
         VerifyCommand::ArchDocs(args) => app.verify_arch_docs(args.project_root),
         VerifyCommand::Layers(args) => app.verify_layers(args.project_root),
-        VerifyCommand::Orchestra(args) => app.verify_orchestra(args.project_root),
         VerifyCommand::HooksPath(args) => app.verify_hooks_path(args.project_root),
         VerifyCommand::SpecAttribution(args) => app.verify_spec_attribution(args.spec_path),
         VerifyCommand::SpecFrontmatter(args) => app.verify_spec_frontmatter(args.spec_path),

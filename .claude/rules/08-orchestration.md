@@ -1,17 +1,23 @@
 # Orchestration
 
-Claude Code is the orchestrator.
+The root orchestrator is selected by `.harness/config/agent-profiles.json` at
+`capabilities.orchestrator.provider`. Claude Code and Codex CLI are both permanent template
+choices. This file describes the Claude-side operating rules while preserving the same `/track:*`
+workflow for either root host.
 
 - User-facing interface: `/track:*`
 - Context management: `track/`
 - Capability routing: `.harness/config/agent-profiles.json`
-- Default capability assignment:
-  - `orchestrator` / `spec-designer` / `impl-planner` / `type-designer` / `adr-editor` / `implementer`: Claude Code
-  - `reviewer`: Codex CLI
-  - `researcher`: Gemini CLI
+- Provider authority: each capability resolves through `capabilities.<name>.provider`; the
+  committed default profile preserves the existing Claude-first workflow, but the config file is
+  the source of truth for every capability.
 - Parallel execution: Agent Teams
 
-Host orchestration stays in Claude Code. Specialist capabilities may switch as models evolve, but the public `/track:*` interface should remain stable.
+Host orchestration may run in Claude Code or Codex depending on `capabilities.orchestrator.provider`.
+Specialist capabilities may switch as models evolve, but the public `/track:*` interface should remain stable.
+Codex root orchestration uses tracked `.codex` config, rules, hooks, agents, and repo-scoped
+`.agents/skills`; those project-local surfaces require a trusted checkout before they can be treated
+as active guardrails.
 
 Terms:
 
@@ -57,13 +63,13 @@ All capability briefings (regardless of provider — Codex, Claude, or future pr
 
 Use the minimum capable capability first, then resolve it via `.harness/config/agent-profiles.json`.
 
-- Claude Code (`orchestrator` host):
+- Claude Code or Codex (`orchestrator` host):
   - normal edits
   - workflow control
   - file synchronization
   - user interaction
 - specialist capabilities:
-  - `orchestrator`: overall coordination (always Claude Code)
+  - `orchestrator`: overall coordination (Claude Code or Codex, resolved from `capabilities.orchestrator.provider`)
   - `spec-designer`: behavioral contract authoring (Phase 1 spec.json writer)
   - `type-designer`: type-level contract authoring (Phase 2 `<layer>-types.json` writer, TDDD workflow)
   - `impl-planner`: implementation plan authoring (Phase 3 impl-plan.json + task-coverage.json writer)
@@ -72,16 +78,17 @@ Use the minimum capable capability first, then resolve it via `.harness/config/a
   - `reviewer`: code review, correctness analysis, idiomatic Rust checks
   - `researcher`: crate research, codebase-wide analysis, external research
 - provider resolution (from `.harness/config/agent-profiles.json`):
-  - `orchestrator` / `spec-designer` / `type-designer` / `impl-planner` / `adr-editor` / `implementer` → Claude Code
-  - `reviewer` → Codex CLI
-  - `researcher` → Gemini CLI
+  - `orchestrator` → `capabilities.orchestrator.provider`
+  - `spec-designer` / `type-designer` / `impl-planner` / `adr-editor` / `implementer` → their own capability provider entries
+  - `reviewer` / `review-fix-lead` / `dry-checker` / `dry-fix-lead` → their own capability provider entries
+  - `researcher` → its own capability provider entry
 - Agent Teams:
   - `/track:implement`
   - `/track:review`
 
 If unsure:
 
-1. Workflow control or user interaction -> Claude Code
+1. Workflow control or user interaction -> active root orchestrator
 2. Research need -> `researcher`
 3. Behavioral spec authoring -> `spec-designer`
 4. Type catalogue authoring -> `type-designer`
