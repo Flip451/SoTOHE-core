@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6379ed79fac71d16f641973c130d581e97bfcf7e1631a2391534d4833b7bea42",
+  "signals": [
+    {
+      "type_name": "infrastructure::verify::orchestra::verify",
+      "signal": "blue",
+      "entry_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6"
+    }
+  ]
+}

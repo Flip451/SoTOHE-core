@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-13T02:20:16Z",
+  "declaration_hash": "6379ed79fac71d16f641973c130d581e97bfcf7e1631a2391534d4833b7bea42",
+  "signals": [
+    {
+      "type_name": "infrastructure::verify::orchestra::verify",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "6711ef5e32aac2f8b06e74c57d1a401258fa467b18ad8a5bc5cde89718e2402d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex project-local rules を `.codex/rules/default.rules` に追加する。SoTOHE の canonical `cargo make` wrapper、read-only Git inspection、必要な Codex orchestration command prefix は repo として永続許可し、direct git mutation や destructive command は許可しない。"
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "825ccf2c8a15167e6d6af8e2975d1fefa5a63453fe72ae589d0bb0cf978a6a86",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-orchestra` を拡張し、Claude subagent 定義だけでなく Codex project config、project-local rules、custom agents、skill coverage、hook adapter を検証できるようにする。"
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` は least-privilege にする。`cargo make ci`、`cargo make track-commit-message`、`cargo make track-pr*` など SoTOHE canonical wrapper と read-only Git inspection は allow 対象にできるが、direct `git add` / `git commit` / `git push` / `git reset`、destructive shell、broad `bash -lc` allow は許可しない。"
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "9f34b2b73701ed058aead5430e0a4fb64eeaf957ed067907d6266402955805b0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-orchestra` は fail-closed にする。Codex config/rules/agents/skills/hooks の必須 artifact が欠ける、agent と skill の対応が崩れる、rules が危険な allow を含む、hook adapter が `sotp hook dispatch` へ接続していない場合は error finding を出す。"
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "91611677cd60d1af1ebabe459c374e24d099e0dcdfb69ace3dd199f9879b5657",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` が SoTOHE canonical wrapper の command prefix を allow し、direct git mutation と broad/destructive shell command を allow していないことを `codex execpolicy check` または verifier test で確認できる。"
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "4e59b163d3eedfd9f29a884d64db53a1a0647f52cb12ad8ca691f83c785f75a1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make verify-orchestra` が Codex project config、project-local rules、custom agents、skill coverage、hook adapter を検証し、全必須 artifact が揃った状態で pass する。欠落 artifact または危険な rules entry に対する unit test が存在する。"
+      }
+    }
+  ]
+}

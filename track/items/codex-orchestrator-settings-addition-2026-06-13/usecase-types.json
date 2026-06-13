@@ -1,0 +1,10 @@
+{
+  "schema_version": 4,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

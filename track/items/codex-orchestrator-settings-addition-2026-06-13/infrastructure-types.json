@@ -1,0 +1,53 @@
+{
+  "schema_version": 4,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "infrastructure::verify::orchestra::verify": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Extends the orchestra guardrail verifier beyond the existing Claude surface. The function must validate Codex project config, project-local command rules, custom agent TOMLs, specialist skill coverage, and the hook adapter while keeping the public verifier entry point stable.",
+      "spec_refs": [
+        {
+          "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        },
+        {
+          "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
+          "anchor": "CN-06"
+        },
+        {
+          "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
+          "anchor": "AC-02"
+        },
+        {
+          "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
+          "anchor": "AC-07"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": []
+}
