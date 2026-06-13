@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6759bdeac920ebbc6a26b127052c7a390740207e1dc473e1d0e936e30dd28f4",
+          "at": "2026-06-13T19:02:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 says schema-forcing changes must be done as a single migration because data-carrying `DataRole` / `ContractRole` changes force the same codec, renderer, evaluator, and role-comparison updates at once, but the ordered plan splits schema-bearing role changes across stage 1 (`DataRole` D4-D8) and stage 2 (`ContractRole::Repository { aggregate }` and `DataRole::EventPolicy { reacts_to }`). Following this sequence either requires repeating the migration the ADR says must be atomic, or leaves stage 1/2 boundaries ambiguous. Move all payload-bearing role schema changes into the schema migration step, or revise the rationale/order so the implementation plan is executable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+              "line": 138,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e6759bdeac920ebbc6a26b127052c7a390740207e1dc473e1d0e936e30dd28f4",
+          "at": "2026-06-13T19:05:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rule mapping assigns `EventPolicy.reacts_to` to D8, but D8 explicitly says `EventPolicy.reacts_to` is a separate D16 decision, and D16 owns the `EventPolicy` field/rules. This broken decision reference can mis-key implementation or coverage tracking for the `reacts_to` DomainEvent constraint under D8 instead of D16.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+              "line": 214,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:4b7c96f9513621cb701aed1ec39921a8efb894b76e769cad092bcf67804b6685",
+          "at": "2026-06-13T19:09:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `consistency` note says Saga support is deferred because Saga handling must come first and points readers to `D12`, but `D12` is now the Presenter/Controller rejection decision. The Saga/Process Manager rationale lives in the following addendum/reassess section, so this cross-reference now sends implementers to the wrong design decision and obscures the actual dependency for the UseCase consistency deferral.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+              "line": 435,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8a36c66ff688950b7fb0193520b96e2930e8b6f0a145d51eb2a32ba616e0f15c",
+          "at": "2026-06-13T19:12:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab417cde38a9a8681157033e75778935580d825b1d686d64b980f9cff9b26510",
+          "at": "2026-06-13T19:14:50Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T18:59:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:02:35Z"
+        }
+      ]
+    }
+  }
+}

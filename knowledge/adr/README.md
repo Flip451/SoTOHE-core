@@ -106,6 +106,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD: struct の inherent method 比較を enum と同じ両側対称比較に統一する](2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md) | Proposed | 2026-05-20 |
 | [Contract Map Renderer: catalogue schema v3 対応設計](2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md) | Proposed | 2026-05-20 |
 | [Reality View Renderer: rustdoc_types::Crate 入力への対応設計 (v3 schema 移行)](2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md) | Proposed | 2026-05-22 |
+| [TDDD カタログ taxonomy の意味論拡張 — パターン固有の機械検査ルールを持たせる](2026-05-25-0000-tddd-pattern-semantics-extension.md) | Proposed | 2026-05-25 |
 | [型シグネチャ codec の generic param 名前衝突の恒久対策](2026-05-25-0423-tddd-codec-generic-name-collision-fix.md) | Proposed | 2026-05-25 |
 | [完了済みトラック保護を frozen から現在ブランチ紐付きバリデーションへ置換](2026-05-26-0518-active-track-write-guard.md) | Proposed | 2026-05-26 |
 | [typestate は struct 形状と直交配置する — 全 struct 形状を typestate 状態にする](2026-05-26-1002-typestate-struct-kind-orthogonal.md) | Proposed | 2026-05-26 |
