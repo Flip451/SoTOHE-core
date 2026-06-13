@@ -5,7 +5,7 @@
 
 Goal coverage note: task-coverage.json schema_version 1 maps in_scope / out_of_scope / constraints / acceptance_criteria only. GO-01 is covered by T003 and T005; GO-02 is covered by T001, T002, T004, T005, T006, and T007.
 
-## Tasks (6/7 resolved)
+## Tasks (7/7 resolved)
 
 ### S1 — Codex Project Surface
 
@@ -50,4 +50,4 @@ Goal coverage note: task-coverage.json schema_version 1 maps in_scope / out_of_s
 > Run review, DRY, and PR workflow gates.
 
 - [x] **T006**: verify-orchestra 全廃後の CI 健全性を確認する。`cargo make ci` が verify-orchestra を参照せずに pass することを確認し、Makefile.toml / CI 配線に verify-orchestra への残留参照がないことを検証する。`bin/sotp verify plan-artifact-refs` と `cargo make verify-arch-docs` も通す。
-- [~] **T007**: track の最終 gate を通す。`bin/sotp review check-approved`、`bin/sotp dry check-approved`、plan artifact refs、catalogue-spec refs/signals、view freshness を確認し、review/DRY/PR workflow を既存 SoTOHE gate で完了させる。ADR/spec/docs/config/agents/skills に scratch/cache path の durable reference が残っていないことも最終確認する。
+- [x] **T007**: track の最終 gate を通す。`bin/sotp review check-approved`、`bin/sotp dry check-approved`、plan artifact refs、catalogue-spec refs/signals、view freshness を確認し、review/DRY/PR workflow を既存 SoTOHE gate で完了させる。ADR/spec/docs/config/agents/skills に scratch/cache path の durable reference が残っていないことも最終確認する。

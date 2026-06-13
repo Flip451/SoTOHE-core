@@ -34,7 +34,7 @@
     {
       "id": "T007",
       "description": "track の最終 gate を通す。`bin/sotp review check-approved`、`bin/sotp dry check-approved`、plan artifact refs、catalogue-spec refs/signals、view freshness を確認し、review/DRY/PR workflow を既存 SoTOHE gate で完了させる。ADR/spec/docs/config/agents/skills に scratch/cache path の durable reference が残っていないことも最終確認する。",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "plan": {

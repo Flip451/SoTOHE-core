@@ -1,145 +1,99 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
+    "plan-artifacts": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:138db8e53233bfc389ddb805703958a7e0f8827ebb47d0b99cd4bec4c8a89bc3",
-          "at": "2026-06-13T06:54:17Z"
+          "hash": "rvw1:sha256:e88c4079a3136942f0822187ddf51ef09803f048111e40ebe039a19281cf621e",
+          "at": "2026-06-13T00:56:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:138db8e53233bfc389ddb805703958a7e0f8827ebb47d0b99cd4bec4c8a89bc3",
-          "at": "2026-06-13T06:57:01Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_codex_project_surface()` never checks `.codex/instructions.md`, even though the track spec marks it as a required tracked Codex artifact. A repo can pass this gate with the root instructions file missing, and the new happy-path test in `orchestra_tests.rs` would not catch that regression.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
-              "line": 15,
-              "category": "validation"
-            },
-            {
-              "message": "`collect_forbidden_codex_config_keys()` stops at `value.as_table()`, so TOML arrays-of-tables are never traversed. That means forbidden keys nested under hook/config entries can evade the fail-closed scan, which weakens the Codex config validation.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
-              "line": 114,
-              "category": "validation"
-            },
-            {
-              "message": "`is_dangerous_codex_allow_pattern()` only treats bare `bash`/`sh`/`zsh` tokens followed by `-c`/`-lc` as dangerous. A rule that allows `/bin/bash -lc`, `dash -c`, or another path-qualified shell still slips past this guardrail, so the broad-shell deny check is not actually fail-closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
-              "line": 276,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:441f942fe94ee3c619c4f5954031c6f12c6f8333012c49129a316f925ac9a8ac",
-          "at": "2026-06-13T03:58:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: [libs/infrastructure/src/verify/orchestra/constants.rs#L49]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/constants.rs#L49 ) and [libs/infrastructure/src/verify/orchestra/codex.rs#L302]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs#L302 ): the new dangerous-allow check only blocks a narrow hand-picked set of prefixes. A Codex rules file can still allow other mutating git commands (`git restore`, `git clean`, `git merge`, etc.) or a path-qualified direct review invocation (`/usr/bin/codex exec review`), and the verifier will accept it. That leaves the fail-closed guardrail bypassable with a trivial extra allow entry.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
-              "line": 302,
-              "category": "security"
-            },
-            {
-              "message": "P1: [libs/infrastructure/src/verify/orchestra/codex.rs#L355]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs#L355 ) and [libs/infrastructure/src/verify/orchestra/codex.rs#L404]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs#L404 ): the Codex agent/skill validation is still just substring/length heuristics. Any agent TOML that mentions `skill` anywhere passes, and any `SKILL.md` with a matching `name:` line plus >200 bytes passes, even if the agent is not actually wired to the intended workflow skill or the skill file is arbitrary placeholder prose. That means malformed or disconnected Codex surface files can still satisfy the new gate.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
-              "line": 355,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:448c77f528ca80e7b44808ff0b1416339e0fae6b5d4a24555477fe263919e998",
-          "at": "2026-06-13T04:06:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_codex_config` only uses raw `content.contains(...)` checks for the hook adapter path and required hook ids. Those strings can be satisfied by comments or unrelated values, so a `.codex/config.toml` that is no longer actually wired to `.codex/hooks/sotp-hook.sh` can still pass.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
-              "line": 60,
-              "category": "security"
-            },
-            {
-              "message": "`verify_codex_agent_definitions` treats any `developer_instructions` that mention the expected agent name plus the word `skill` as valid. That is too loose to enforce the intended 1:1 agent-to-workflow-skill mapping, so a miswired agent can still verify if it mentions the expected name anywhere.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
-              "line": 450,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:ed80ace1c07f3cd95e35ca38c4a8be8fa31d00f77a9c637773fba00a8b86573a",
-          "at": "2026-06-13T04:14:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The Codex hook-bridge checks are substring-only in both `verify_codex_config` and `verify_codex_hook_adapter`. A config command or adapter script that merely echoes `.codex/hooks/sotp-hook.sh`, the hook id, and `hook dispatch` will satisfy the verifier without ever routing through `sotp hook dispatch`, so a broken or malicious Codex surface can still pass.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
-              "line": 60,
-              "category": "security"
-            },
-            {
-              "message": "P1: `has_codex_direct_review_pattern` only rejects the exact contiguous token triplet `codex exec review`. Any rule that inserts flags before `exec` (for example `codex --sandbox workspace-write exec review`) bypasses the dangerous-review ban, so the new Codex rules check is not fail-closed for direct review commands.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
-              "line": 401,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:739a924a5540112cf25220e5b85472e835a5717a471327368d4528a60d420fcf",
-          "at": "2026-06-13T04:21:29Z"
+          "hash": "rvw1:sha256:05beb1428457d4b4c0724f5eaef2437212c1de90ac0890cbc79ea0e112c09c38",
+          "at": "2026-06-13T01:02:52Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e80f56347b7e9eca477a209bfa58b9439090c8aeaf135f9278768c36d0146573",
-          "at": "2026-06-13T06:54:03Z"
+          "hash": "rvw1:sha256:6fc162d894c3108a28a2abe8ff47385180ca81783c6640768408bfe58313ed54",
+          "at": "2026-06-13T01:45:39Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e80f56347b7e9eca477a209bfa58b9439090c8aeaf135f9278768c36d0146573",
-          "at": "2026-06-13T06:57:02Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+          "hash": "rvw1:sha256:6fc162d894c3108a28a2abe8ff47385180ca81783c6640768408bfe58313ed54",
+          "at": "2026-06-13T01:49:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8813a966b29843dc7a60e5c934a633618f15672d6b50242d777a5a2c2e8304d",
+          "at": "2026-06-13T02:02:09Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ee76ccde44b034209dde790d4d39135a1f06c5444de6d52885cde90e0b595623",
-          "at": "2026-06-13T03:58:09Z"
+          "hash": "rvw1:sha256:0b46f4096f1771699a131c9456fe073e022b10024932fa5d4752231def6d549e",
+          "at": "2026-06-13T03:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b46f4096f1771699a131c9456fe073e022b10024932fa5d4752231def6d549e",
+          "at": "2026-06-13T03:57:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ada28c679f5b4062f36e158adb7fe71dcbd2c9ddd2bab28acde1abeee3ff74b9",
+          "at": "2026-06-13T06:54:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 still says to “promote the missing specialist workflows into root `.agents/skills`”, but the same plan’s T002, the spec, and ADR D2 now define `.harness/capabilities/<name>.md` as the canonical workflow SSoT, with `.agents/skills/<name>/SKILL.md` and `.claude/agents/<name>.md` only as thin wrappers. That leaves the plan internally contradictory about where the authoritative specialist workflow should live, and can drive implementation back into the duplicated skill-body design the rework is trying to remove.",
+              "severity": "P1",
+              "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ada28c679f5b4062f36e158adb7fe71dcbd2c9ddd2bab28acde1abeee3ff74b9",
+          "at": "2026-06-13T06:58:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cfe76e0dd98a3b139721adbe00ac55027ea42fff20f5e5ad7ece679a0b6de44",
+          "at": "2026-06-13T07:01:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68367031a961766e203b0a4b6b760809a33a72afd5f41f4eb31498446e4e4046",
+          "at": "2026-06-13T09:28:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68367031a961766e203b0a4b6b760809a33a72afd5f41f4eb31498446e4e4046",
+          "at": "2026-06-13T09:30:17Z"
         }
       ]
     },
@@ -324,6 +278,119 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_codex_project_surface()` never checks `.codex/instructions.md`, even though the track spec marks it as a required tracked Codex artifact. A repo can pass this gate with the root instructions file missing, and the new happy-path test in `orchestra_tests.rs` would not catch that regression.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "line": 15,
+              "category": "validation"
+            },
+            {
+              "message": "`collect_forbidden_codex_config_keys()` stops at `value.as_table()`, so TOML arrays-of-tables are never traversed. That means forbidden keys nested under hook/config entries can evade the fail-closed scan, which weakens the Codex config validation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "line": 114,
+              "category": "validation"
+            },
+            {
+              "message": "`is_dangerous_codex_allow_pattern()` only treats bare `bash`/`sh`/`zsh` tokens followed by `-c`/`-lc` as dangerous. A rule that allows `/bin/bash -lc`, `dash -c`, or another path-qualified shell still slips past this guardrail, so the broad-shell deny check is not actually fail-closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "line": 276,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:441f942fe94ee3c619c4f5954031c6f12c6f8333012c49129a316f925ac9a8ac",
+          "at": "2026-06-13T03:58:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [libs/infrastructure/src/verify/orchestra/constants.rs#L49]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/constants.rs#L49 ) and [libs/infrastructure/src/verify/orchestra/codex.rs#L302]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs#L302 ): the new dangerous-allow check only blocks a narrow hand-picked set of prefixes. A Codex rules file can still allow other mutating git commands (`git restore`, `git clean`, `git merge`, etc.) or a path-qualified direct review invocation (`/usr/bin/codex exec review`), and the verifier will accept it. That leaves the fail-closed guardrail bypassable with a trivial extra allow entry.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
+              "line": 302,
+              "category": "security"
+            },
+            {
+              "message": "P1: [libs/infrastructure/src/verify/orchestra/codex.rs#L355]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs#L355 ) and [libs/infrastructure/src/verify/orchestra/codex.rs#L404]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs#L404 ): the Codex agent/skill validation is still just substring/length heuristics. Any agent TOML that mentions `skill` anywhere passes, and any `SKILL.md` with a matching `name:` line plus >200 bytes passes, even if the agent is not actually wired to the intended workflow skill or the skill file is arbitrary placeholder prose. That means malformed or disconnected Codex surface files can still satisfy the new gate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
+              "line": 355,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:448c77f528ca80e7b44808ff0b1416339e0fae6b5d4a24555477fe263919e998",
+          "at": "2026-06-13T04:06:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_codex_config` only uses raw `content.contains(...)` checks for the hook adapter path and required hook ids. Those strings can be satisfied by comments or unrelated values, so a `.codex/config.toml` that is no longer actually wired to `.codex/hooks/sotp-hook.sh` can still pass.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
+              "line": 60,
+              "category": "security"
+            },
+            {
+              "message": "`verify_codex_agent_definitions` treats any `developer_instructions` that mention the expected agent name plus the word `skill` as valid. That is too loose to enforce the intended 1:1 agent-to-workflow-skill mapping, so a miswired agent can still verify if it mentions the expected name anywhere.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
+              "line": 450,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ed80ace1c07f3cd95e35ca38c4a8be8fa31d00f77a9c637773fba00a8b86573a",
+          "at": "2026-06-13T04:14:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The Codex hook-bridge checks are substring-only in both `verify_codex_config` and `verify_codex_hook_adapter`. A config command or adapter script that merely echoes `.codex/hooks/sotp-hook.sh`, the hook id, and `hook dispatch` will satisfy the verifier without ever routing through `sotp hook dispatch`, so a broken or malicious Codex surface can still pass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "line": 60,
+              "category": "security"
+            },
+            {
+              "message": "P1: `has_codex_direct_review_pattern` only rejects the exact contiguous token triplet `codex exec review`. Any rule that inserts flags before `exec` (for example `codex --sandbox workspace-write exec review`) bypasses the dangerous-review ban, so the new Codex rules check is not fail-closed for direct review commands.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "line": 401,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:739a924a5540112cf25220e5b85472e835a5717a471327368d4528a60d420fcf",
+          "at": "2026-06-13T04:21:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e80f56347b7e9eca477a209bfa58b9439090c8aeaf135f9278768c36d0146573",
+          "at": "2026-06-13T06:54:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e80f56347b7e9eca477a209bfa58b9439090c8aeaf135f9278768c36d0146573",
+          "at": "2026-06-13T06:57:02Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -342,85 +409,32 @@
         }
       ]
     },
-    "plan-artifacts": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e88c4079a3136942f0822187ddf51ef09803f048111e40ebe039a19281cf621e",
-          "at": "2026-06-13T00:56:52Z"
+          "hash": "rvw1:sha256:138db8e53233bfc389ddb805703958a7e0f8827ebb47d0b99cd4bec4c8a89bc3",
+          "at": "2026-06-13T06:54:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:05beb1428457d4b4c0724f5eaef2437212c1de90ac0890cbc79ea0e112c09c38",
-          "at": "2026-06-13T01:02:52Z"
-        },
+          "hash": "rvw1:sha256:138db8e53233bfc389ddb805703958a7e0f8827ebb47d0b99cd4bec4c8a89bc3",
+          "at": "2026-06-13T06:57:01Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6fc162d894c3108a28a2abe8ff47385180ca81783c6640768408bfe58313ed54",
-          "at": "2026-06-13T01:45:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6fc162d894c3108a28a2abe8ff47385180ca81783c6640768408bfe58313ed54",
-          "at": "2026-06-13T01:49:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8813a966b29843dc7a60e5c934a633618f15672d6b50242d777a5a2c2e8304d",
-          "at": "2026-06-13T02:02:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b46f4096f1771699a131c9456fe073e022b10024932fa5d4752231def6d549e",
-          "at": "2026-06-13T03:56:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b46f4096f1771699a131c9456fe073e022b10024932fa5d4752231def6d549e",
-          "at": "2026-06-13T03:57:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ada28c679f5b4062f36e158adb7fe71dcbd2c9ddd2bab28acde1abeee3ff74b9",
-          "at": "2026-06-13T06:54:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "S2 still says to “promote the missing specialist workflows into root `.agents/skills`”, but the same plan’s T002, the spec, and ADR D2 now define `.harness/capabilities/<name>.md` as the canonical workflow SSoT, with `.agents/skills/<name>/SKILL.md` and `.claude/agents/<name>.md` only as thin wrappers. That leaves the plan internally contradictory about where the authoritative specialist workflow should live, and can drive implementation back into the duplicated skill-body design the rework is trying to remove.",
-              "severity": "P1",
-              "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/impl-plan.json",
-              "line": 60,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ada28c679f5b4062f36e158adb7fe71dcbd2c9ddd2bab28acde1abeee3ff74b9",
-          "at": "2026-06-13T06:58:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1cfe76e0dd98a3b139721adbe00ac55027ea42fff20f5e5ad7ece679a0b6de44",
-          "at": "2026-06-13T07:01:25Z"
+          "hash": "rvw1:sha256:ee76ccde44b034209dde790d4d39135a1f06c5444de6d52885cde90e0b595623",
+          "at": "2026-06-13T03:58:09Z"
         }
       ]
     }
