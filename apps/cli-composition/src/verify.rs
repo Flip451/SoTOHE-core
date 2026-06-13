@@ -265,15 +265,6 @@ impl CliApp {
         Ok(render_outcome("verify layers", &outcome))
     }
 
-    /// Check .claude/settings.json structural guardrails.
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_orchestra(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
-        let outcome = infrastructure::verify::orchestra::verify(&project_root);
-        Ok(render_outcome("verify orchestra guardrails", &outcome))
-    }
-
     /// Check local Git config uses `.githooks` as `core.hooksPath`.
     ///
     /// # Errors

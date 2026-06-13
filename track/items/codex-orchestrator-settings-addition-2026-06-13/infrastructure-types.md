@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| infrastructure::verify::orchestra::verify | free_function | modify | fn(root: &std::path::Path) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
+| infrastructure::verify::orchestra::verify | free_function | delete | fn(root: &std::path::Path) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 

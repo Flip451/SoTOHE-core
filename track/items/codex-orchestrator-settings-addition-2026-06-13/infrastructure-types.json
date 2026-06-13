@@ -6,7 +6,7 @@
   "traits": {},
   "functions": {
     "infrastructure::verify::orchestra::verify": {
-      "action": "modify",
+      "action": "delete",
       "role": "FreeFunction",
       "params": [
         {
@@ -18,27 +18,15 @@
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Extends the orchestra guardrail verifier beyond the existing Claude surface. The function must validate Codex project config, project-local command rules, custom agent TOMLs, specialist skill coverage, and the hook adapter while keeping the public verifier entry point stable.",
+      "docs": "Removed this track: the verify-orchestra guardrail verifier and its public entry point are deleted (ADR D6 — provider/agent configuration is the template consumer's responsibility, not CI-enforced).",
       "spec_refs": [
-        {
-          "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
-          "anchor": "IN-02"
-        },
         {
           "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
           "anchor": "IN-08"
         },
         {
           "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
-          "anchor": "CN-02"
-        },
-        {
-          "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
           "anchor": "CN-06"
-        },
-        {
-          "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",
-          "anchor": "AC-02"
         },
         {
           "file": "track/items/codex-orchestrator-settings-addition-2026-06-13/spec.json",

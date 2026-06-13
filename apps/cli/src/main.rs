@@ -456,7 +456,6 @@ fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static s
         VerifyCommand::LatestTrack(_) => "verify-latest-track",
         VerifyCommand::ArchDocs(_) => "verify-arch-docs",
         VerifyCommand::Layers(_) => "verify-layers",
-        VerifyCommand::Orchestra(_) => "verify-orchestra",
         VerifyCommand::HooksPath(_) => "verify-hooks-path",
         VerifyCommand::SpecAttribution(_) => "verify-spec-attribution",
         VerifyCommand::SpecFrontmatter(_) => "verify-spec-frontmatter",

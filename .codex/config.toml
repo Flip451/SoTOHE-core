@@ -1,0 +1,54 @@
+model = "gpt-5.5"
+model_reasoning_effort = "xhigh"
+model_context_window = 1000000
+model_auto_compact_token_limit = 900000
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "cached"
+personality = "pragmatic"
+
+[features]
+hooks = true
+multi_agent = true
+shell_snapshot = true
+
+[agents]
+max_threads = 6
+max_depth = 1
+job_max_runtime_seconds = 1800
+
+[[hooks.UserPromptSubmit]]
+matcher = ""
+
+[[hooks.UserPromptSubmit.hooks]]
+type = "command"
+command = 'sh "$(git rev-parse --show-toplevel)/.codex/hooks/sotp-hook.sh" skill-compliance'
+timeout = 5
+statusMessage = "Checking SoTOHE skill compliance"
+
+[[hooks.PreToolUse]]
+matcher = "^Bash$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'sh "$(git rev-parse --show-toplevel)/.codex/hooks/sotp-hook.sh" hooks-path-setup'
+timeout = 10
+statusMessage = "Checking git hook setup"
+
+[[hooks.PreToolUse]]
+matcher = "^Bash$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'sh "$(git rev-parse --show-toplevel)/.codex/hooks/sotp-hook.sh" block-direct-git-ops'
+timeout = 10
+statusMessage = "Checking git operation policy"
+
+[[hooks.PreToolUse]]
+matcher = "^(Bash|Write)$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'sh "$(git rev-parse --show-toplevel)/.codex/hooks/sotp-hook.sh" block-test-file-deletion'
+timeout = 10
+statusMessage = "Checking protected test files"

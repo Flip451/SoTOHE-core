@@ -122,13 +122,6 @@ fn test_latest_track_subcommand_returns_success_with_no_tracks() {
 }
 
 #[test]
-fn test_orchestra_subcommand_returns_failure_for_missing_settings() {
-    let tmp = TempDir::new().unwrap();
-    let exit = execute(VerifyCommand::Orchestra(make_args(tmp.path())));
-    assert_eq!(exit, ExitCode::FAILURE);
-}
-
-#[test]
 fn test_arch_docs_subcommand_returns_failure_for_missing_rules() {
     let tmp = TempDir::new().unwrap();
     let exit = execute(VerifyCommand::ArchDocs(make_args(tmp.path())));

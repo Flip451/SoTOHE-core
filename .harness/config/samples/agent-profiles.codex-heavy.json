@@ -13,28 +13,28 @@
   },
   "capabilities": {
     "orchestrator": {
-      "provider": "claude",
-      "model": "claude-opus-4-7"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "spec-designer": {
       "provider": "codex",
-      "model": "gpt-5.4"
+      "model": "gpt-5.5"
     },
     "impl-planner": {
       "provider": "codex",
-      "model": "gpt-5.4"
+      "model": "gpt-5.5"
     },
     "type-designer": {
-      "provider": "claude",
-      "model": "claude-opus-4-7"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "adr-editor": {
-      "provider": "claude",
-      "model": "claude-opus-4-7"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "implementer": {
       "provider": "codex",
-      "model": "gpt-5.4"
+      "model": "gpt-5.5"
     },
     "reviewer": {
       "provider": "codex",
@@ -44,6 +44,18 @@
     "researcher": {
       "provider": "codex",
       "model": "gpt-5.4-mini"
+    },
+    "review-fix-lead": {
+      "provider": "codex",
+      "model": "gpt-5.5"
+    },
+    "dry-checker": {
+      "provider": "codex",
+      "model": "gpt-5.5"
+    },
+    "dry-fix-lead": {
+      "provider": "codex",
+      "model": "gpt-5.5"
     }
   }
 }

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-13T02:20:16Z",
-  "declaration_hash": "6379ed79fac71d16f641973c130d581e97bfcf7e1631a2391534d4833b7bea42",
+  "generated_at": "2026-06-13T07:41:27Z",
+  "declaration_hash": "38e90d82df82dd1b070479d6d95032716691f40e770909c7d9a4308ae92b2c5d",
   "signals": [
     {
       "type_name": "infrastructure::verify::orchestra::verify",
       "kind_tag": "free_function",
       "signal": "blue",
-      "found_type": true
+      "found_type": false
     }
   ]
 }

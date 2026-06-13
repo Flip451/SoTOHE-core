@@ -52,7 +52,7 @@
 
 ## Current Files
 
-この一覧は `cargo make conventions-add ...` により自動更新される。既知の主要カテゴリは推奨読順で並び、それ以外はファイル名順で並ぶ。
+この一覧は `bin/sotp conventions add ...` / `bin/sotp conventions update-index` により自動更新される。既知の主要カテゴリは推奨読順で並び、それ以外はファイル名順で並ぶ。
 
 <!-- convention-docs:start -->
 - `adr.md`: Convention: Architecture Decision Records (ADR)
@@ -67,6 +67,7 @@
 - `no-backward-compat.md`: No Backward Compatibility Convention
 - `pre-track-adr-authoring.md`: Pre-Track ADR Authoring Convention
 - `prefer-type-safe-abstractions.md`: Prefer Type-Safe Abstractions Convention
+- `responsibility-boundary.md`: Responsibility Boundary: Framework Enforcement vs Consumer Configuration
 - `review-protocol.md`: Review Protocol Convention
 - `security.md`: Security Convention
 - `shell-parsing.md`: Shell Parsing Convention

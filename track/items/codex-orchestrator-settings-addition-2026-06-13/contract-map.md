@@ -31,11 +31,5 @@ subgraph usecase["usecase"]
 end
 subgraph infrastructure["infrastructure"]
   direction TB
-  subgraph infrastructure_infrastructure_module_verify["infrastructure::verify"]
-    direction TB
-  F71_infrastructure_infrastructure_infrastructure__verify__orchestra__verify[[verify]]
-  end
 end
-class F71_infrastructure_infrastructure_infrastructure__verify__orchestra__verify free_function
-class F71_infrastructure_infrastructure_infrastructure__verify__orchestra__verify function_node
 ```

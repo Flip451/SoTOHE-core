@@ -15,7 +15,7 @@
     },
     {
       "id": "GO-02",
-      "text": "Codex root orchestrator が SoTOHE の既存 `/track:*` workflow、phase ownership、review、DRY gate、hook policy を維持したまま運用できる project config、custom agents、skills、rules、hooks、運用文書、検証器 coverage を追加する。",
+      "text": "Codex root orchestrator が SoTOHE の既存 `/track:*` workflow、phase ownership、review、DRY gate、hook policy を維持したまま運用できる project config、custom agents、skills、rules、hooks、運用文書を追加する。また、利用者の provider/agent 設定を CI で強制せず提供物と docs に留めることを責任分界点として確立する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
@@ -32,6 +32,10 @@
         {
           "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
           "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
+          "anchor": "D6"
         }
       ]
     }
@@ -60,7 +64,7 @@
       },
       {
         "id": "IN-03",
-        "text": "Codex custom agent definitions を `.codex/agents/*.toml` に追加する。対象は `orchestrator`、`spec-designer`、`impl-planner`、`type-designer`、`adr-editor`、`review-fix-lead`、`dry-fix-lead` とし、agent TOML は role、sandbox、model、所有 artifact、境界、status contract を薄く定義する。",
+        "text": "Codex custom agent definitions を `.codex/agents/*.toml` に追加する。対象は `orchestrator`、`spec-designer`、`impl-planner`、`type-designer`、`adr-editor`、`review-fix-lead`、`dry-fix-lead` とし、agent TOML は role、model、所有 artifact、境界、status contract を薄く定義する。per-agent sandbox は Codex 現行 schema が agent role file で受け付けないため agent TOML には設定しない。sandbox は `.codex/config.toml` の session-level `sandbox_mode` で与える。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
@@ -70,15 +74,11 @@
       },
       {
         "id": "IN-04",
-        "text": "Codex specialist workflow を `.agents/skills` に配置する。`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の skill を root に追加し、既存 `review-fix-lead` / `dry-fix-lead` skill と同じ検証対象にする。agent TOML だけを置いて specialist workflow が空になる状態を禁止する。",
+        "text": "specialist workflow は provider 非依存の単一 SSoT として `.harness/capabilities/<name>.md` に置く。`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の各 capability において、Codex skill (`.agents/skills/<name>/SKILL.md`) と Claude subagent (`.claude/agents/<name>.md`) はどちらもこの共有 SSoT を参照する薄い wrapper とする（DRY）。agent TOML だけを置いて specialist workflow が空になる状態を禁止する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
             "anchor": "D2"
-          },
-          {
-            "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
-            "anchor": "D5"
           }
         ]
       },
@@ -118,11 +118,11 @@
       },
       {
         "id": "IN-08",
-        "text": "`verify-orchestra` を拡張し、Claude subagent 定義だけでなく Codex project config、project-local rules、custom agents、skill coverage、hook adapter を検証できるようにする。",
+        "text": "`verify-orchestra` を全廃し、`.claude` / `.codex` の利用者設定（permission allow/deny、config 値、ファイル存在、散文文言）を CI で強制しない。設定は提供物 + docs に留め、正しさは review に委ねる（責任分界点）。削除対象は `libs/infrastructure/src/verify/orchestra/` モジュール、CLI の `verify orchestra` subcommand、`cargo make verify-orchestra` task、CI からの呼び出しである。Codex surface の設定ファイル自体（`.codex/*`、`.agents/skills`、`.harness/capabilities`、sample profile）は提供物として残す。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
-            "anchor": "D5"
+            "anchor": "D6"
           }
         ]
       }
@@ -211,7 +211,7 @@
     },
     {
       "id": "CN-03",
-      "text": "Codex custom agent TOML は薄い role definition に限定し、詳細 workflow は `.agents/skills/<name>/SKILL.md` に置く。`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の agent が存在する場合は対応 skill も必須とする。",
+      "text": "Codex custom agent TOML と Claude subagent は薄い wrapper に限定し、詳細 workflow は provider 非依存の単一 SSoT である `.harness/capabilities/<name>.md` に置く。`spec-designer`、`impl-planner`、`type-designer`、`adr-editor` の各 capability において、共有 SSoT (`.harness/capabilities/<name>.md`) と両 wrapper (`.agents/skills/<name>/SKILL.md` および `.claude/agents/<name>.md`) の三点セットをすべて必須とする。workflow を Claude 側と Codex 側へ二重に複製しない（DRY）。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
@@ -241,11 +241,11 @@
     },
     {
       "id": "CN-06",
-      "text": "`verify-orchestra` は fail-closed にする。Codex config/rules/agents/skills/hooks の必須 artifact が欠ける、agent と skill の対応が崩れる、rules が危険な allow を含む、hook adapter が `sotp hook dispatch` へ接続していない場合は error finding を出す。",
+      "text": "利用者の provider/agent 設定（`.claude` / `.codex` の config 値・ファイル存在・permission allow/deny エントリ・散文文言）を CI で hard-fail させる verifier を SoTOHE に追加しない（責任分界点 convention）。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
-          "anchor": "D5"
+          "anchor": "D6"
         }
       ]
     },
@@ -287,7 +287,7 @@
     },
     {
       "id": "AC-02",
-      "text": "`.codex/rules/default.rules` が SoTOHE canonical wrapper の command prefix を allow し、direct git mutation と broad/destructive shell command を allow していないことを `codex execpolicy check` または verifier test で確認できる。",
+      "text": "`.codex/rules/default.rules` が SoTOHE canonical wrapper の command prefix を allow し、direct git mutation と broad/destructive shell command を allow していないことを review で確認できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
@@ -297,15 +297,11 @@
     },
     {
       "id": "AC-03",
-      "text": "`.agents/skills/{spec-designer,impl-planner,type-designer,adr-editor}/SKILL.md` が tracked repository files として存在し、`.codex/agents/*.toml` の specialist agent から対応 workflow が空洞化していないことを確認できる。",
+      "text": "`.harness/capabilities/{spec-designer,impl-planner,type-designer,adr-editor}.md` が tracked repository files として存在する。各 capability において `.claude/agents/<name>.md` と `.agents/skills/<name>/SKILL.md` の両方が存在し、かつ両 wrapper が対応する共有 SSoT (`.harness/capabilities/<name>.md`) を参照していること（workflow が空洞化しておらず、二重複製もない）を review で確認できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
           "anchor": "D2"
-        },
-        {
-          "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
-          "anchor": "D5"
         }
       ]
     },
@@ -335,7 +331,7 @@
     },
     {
       "id": "AC-06",
-      "text": "Codex hook adapter の各 configured hook が `.codex/hooks/sotp-hook.sh` から `bin/sotp hook dispatch` へ接続している。hook adapter の smoke test または `verify-orchestra` が `block-direct-git-ops`、`block-test-file-deletion`、`skill-compliance` の接続を検証する。",
+      "text": "Codex hook adapter の各 configured hook が `.codex/hooks/sotp-hook.sh` から `bin/sotp hook dispatch` へ接続している。hook adapter の smoke test で `block-direct-git-ops`、`block-test-file-deletion`、`skill-compliance` の接続を確認できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
@@ -345,11 +341,11 @@
     },
     {
       "id": "AC-07",
-      "text": "`cargo make verify-orchestra` が Codex project config、project-local rules、custom agents、skill coverage、hook adapter を検証し、全必須 artifact が揃った状態で pass する。欠落 artifact または危険な rules entry に対する unit test が存在する。",
+      "text": "`verify-orchestra` モジュール (`libs/infrastructure/src/verify/orchestra/`)、CLI の `verify orchestra` subcommand、`cargo make verify-orchestra` task、および CI からの呼び出しが削除され、`cargo make ci` が pass する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
-          "anchor": "D5"
+          "anchor": "D6"
         }
       ]
     },
@@ -365,7 +361,7 @@
     },
     {
       "id": "AC-09",
-      "text": "最終的に `cargo make ci`、`cargo make verify-orchestra`、`bin/sotp review check-approved`、`bin/sotp dry check-approved` が pass し、review/DRY/PR workflow が既存 SoTOHE gate を通過する。",
+      "text": "最終的に `cargo make ci`、`bin/sotp review check-approved`、`bin/sotp dry check-approved` が pass し、review/DRY/PR workflow が既存 SoTOHE gate を通過する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md",
@@ -385,6 +381,10 @@
     },
     {
       "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/responsibility-boundary.md",
       "anchor": "Rules"
     },
     {

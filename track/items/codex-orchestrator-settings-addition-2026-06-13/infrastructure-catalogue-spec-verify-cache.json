@@ -49,6 +49,126 @@
         "kind": "pass",
         "citation": "`cargo make verify-orchestra` が Codex project config、project-local rules、custom agents、skill coverage、hook adapter を検証し、全必須 artifact が揃った状態で pass する。欠落 artifact または危険な rules entry に対する unit test が存在する。"
       }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "e0a0a851187c77698023ed8bf86751e6bbbca80808a1509857287934fbbec65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-orchestra` を拡張し、Claude subagent 定義だけでなく Codex project config、project-local rules、custom agents、skill coverage、hook adapter を検証できるようにする。また、capability 共有 SSoT (`.harness/capabilities/<name>.md`) が存在し、かつ各 capability の Codex skill wrapper と Claude subagent wrapper の両方がその共有 SSoT を参照していることを検証する。"
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "1efcb1280fc563a0e3018593749943632c23dd3dbf2da4be7df9c5dbf37a0b39",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make verify-orchestra` が Codex project config、project-local rules、custom agents、skill coverage、hook adapter を検証し、全必須 artifact が揃った状態で pass する。"
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "2aa8c658e4715c6cd63d13355fcfef5fde19100d67f2835c4ed5c55ffdb9b7ab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` が SoTOHE canonical wrapper の command prefix を allow し、direct git mutation と broad/destructive shell command を allow していないことを review で確認できる。"
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "112c681cfa51311a813a6d2111a59c39bc8f9f0581667c1d1592b6e87dbf9c22",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim keeps and extends infrastructure::verify::orchestra::verify to validate Codex project config and related settings, while IN-08 requires abolishing verify-orchestra and not enforcing .claude/.codex user settings in CI, including deleting the libs/infrastructure/src/verify/orchestra/ module."
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "0dcc303ee14d08a8de2888c70aa6c8872f543dd19a7eae57b8f02529e7788b0b",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim says the verifier must validate Codex project config and project-local command rules, while CN-06 explicitly says not to add a SoTOHE verifier that hard-fails CI on user provider/agent settings such as `.codex` config values, file existence, and permission allow/deny entries."
+      }
+    },
+    {
+      "claim_hash": "5595c46de770fc621d526c8cb80a058b5d98eaa1e8efef3cee6165c1653f82b6",
+      "evidence_hash": "8ce98387fac2d877434bca0598cdd7cc2c3b0b5d70a502ae2e03d0a69049f5b2",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim modifies and preserves `infrastructure::verify::orchestra::verify` as a public verifier entry point, but the evidence requires the `verify-orchestra` module and all invocation surfaces to be removed (`verify-orchestra` モジュール, CLI subcommand, cargo make task, and CI calls)."
+      }
+    },
+    {
+      "claim_hash": "26629e97c50b15979b07cb67c22ad00dfc3ad98b802436268e8d8c71b1dea7d3",
+      "evidence_hash": "6711ef5e32aac2f8b06e74c57d1a401258fa467b18ad8a5bc5cde89718e2402d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex project-local rules を `.codex/rules/default.rules` に追加する。SoTOHE の canonical `cargo make` wrapper、read-only Git inspection、必要な Codex orchestration command prefix は repo として永続許可し、direct git mutation や destructive command は許可しない。"
+      }
+    },
+    {
+      "claim_hash": "26629e97c50b15979b07cb67c22ad00dfc3ad98b802436268e8d8c71b1dea7d3",
+      "evidence_hash": "decd66511496adf1e14c08f14ab54027b3d47ecd61b54a2a14206bdb69439e87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` は least-privilege にする。`cargo make ci`、`cargo make track-commit-message`、`cargo make track-pr*` など SoTOHE canonical wrapper と read-only Git inspection は allow 対象にできるが、direct `git add` / `git commit` / `git push` / `git reset`、destructive shell、broad `bash -lc` allow は許可しない。"
+      }
+    },
+    {
+      "claim_hash": "26629e97c50b15979b07cb67c22ad00dfc3ad98b802436268e8d8c71b1dea7d3",
+      "evidence_hash": "0dcc303ee14d08a8de2888c70aa6c8872f543dd19a7eae57b8f02529e7788b0b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "利用者の provider/agent 設定（`.claude` / `.codex` の config 値・ファイル存在・permission allow/deny エントリ・散文文言）を CI で hard-fail させる verifier を SoTOHE に追加しない（責任分界点 convention）。"
+      }
+    },
+    {
+      "claim_hash": "26629e97c50b15979b07cb67c22ad00dfc3ad98b802436268e8d8c71b1dea7d3",
+      "evidence_hash": "2aa8c658e4715c6cd63d13355fcfef5fde19100d67f2835c4ed5c55ffdb9b7ab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.codex/rules/default.rules` が SoTOHE canonical wrapper の command prefix を allow し、direct git mutation と broad/destructive shell command を allow していないことを review で確認できる。"
+      }
+    },
+    {
+      "claim_hash": "26629e97c50b15979b07cb67c22ad00dfc3ad98b802436268e8d8c71b1dea7d3",
+      "evidence_hash": "112c681cfa51311a813a6d2111a59c39bc8f9f0581667c1d1592b6e87dbf9c22",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim says the orchestra verifier entry point is kept stable and extended to validate Codex project config, command rules, agent TOMLs, skill coverage, and hook adapter, but IN-08 requires `verify-orchestra` to be abolished and says `.claude` / `.codex` user settings must not be enforced in CI."
+      }
+    },
+    {
+      "claim_hash": "26629e97c50b15979b07cb67c22ad00dfc3ad98b802436268e8d8c71b1dea7d3",
+      "evidence_hash": "8ce98387fac2d877434bca0598cdd7cc2c3b0b5d70a502ae2e03d0a69049f5b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-orchestra` モジュール (`libs/infrastructure/src/verify/orchestra/`)、CLI の `verify orchestra` subcommand、`cargo make verify-orchestra` task、および CI からの呼び出しが削除され"
+      }
+    },
+    {
+      "claim_hash": "b7fe945443f5f09ca9ed0c735719e2937bb6796e5259e8dd836aaaba74697b92",
+      "evidence_hash": "112c681cfa51311a813a6d2111a59c39bc8f9f0581667c1d1592b6e87dbf9c22",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-orchestra` を全廃し、`.claude` / `.codex` の利用者設定（permission allow/deny、config 値、ファイル存在、散文文言）を CI で強制しない。設定は提供物 + docs に留め、正しさは review に委ねる（責任分界点）。削除対象は `libs/infrastructure/src/verify/orchestra/` モジュール、CLI の `verify orchestra` subcommand、`cargo make verify-orchestra` task、CI からの呼び出しである。"
+      }
+    },
+    {
+      "claim_hash": "b7fe945443f5f09ca9ed0c735719e2937bb6796e5259e8dd836aaaba74697b92",
+      "evidence_hash": "0dcc303ee14d08a8de2888c70aa6c8872f543dd19a7eae57b8f02529e7788b0b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「利用者の provider/agent 設定（`.claude` / `.codex` の config 値・ファイル存在・permission allow/deny エントリ・散文文言）を CI で hard-fail させる verifier を SoTOHE に追加しない」"
+      }
+    },
+    {
+      "claim_hash": "b7fe945443f5f09ca9ed0c735719e2937bb6796e5259e8dd836aaaba74697b92",
+      "evidence_hash": "8ce98387fac2d877434bca0598cdd7cc2c3b0b5d70a502ae2e03d0a69049f5b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-orchestra` モジュール (`libs/infrastructure/src/verify/orchestra/`)、CLI の `verify orchestra` subcommand、`cargo make verify-orchestra` task、および CI からの呼び出しが削除され、`cargo make ci` が pass する。"
+      }
     }
   ]
 }
