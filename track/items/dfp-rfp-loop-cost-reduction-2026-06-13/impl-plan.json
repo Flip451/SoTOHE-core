@@ -40,12 +40,13 @@
     {
       "id": "T007",
       "description": "D5: テレメトリ計装を更新し、dry check-approved の `GateEval` (gate_name=`dry`, verdict Approved→ok / Blocked→error) を `dry_check_approved` composition 経路に追加する (IN-07 / AC-02 / CN-10)。変更ファイル: `apps/cli-composition/src/dry.rs` の `dry_check_approved` メソッド。`dry check-approved` 完了後に `crate::telemetry_wiring::emit_gate_eval(w, tid, \"dry\", verdict_is_ok)` を呼ぶ — 既存の `emit_gate_eval` API を使い、新フィールド・新イベント型は追加しない。この計装により D1 の no-fix completed を識別できる (AC-02)。unit tests: `dry_check_approved` が Approved を返したとき GateEval が発行されること / Blocked を返したとき GateEval (error verdict) が発行されること。前提: T005 (dry_check_approved 実装済み)。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "a7f100b9d6c82f1831c6f234d18daf466ba0ba17"
     },
     {
       "id": "T008",
       "description": "D3: `.harness/config/dry-check.json` に `max_parallelism` フィールドを追加し、infrastructure 層の `DryCheckConfig` (DTO と loader) を更新する (IN-03 / CN-04 / CN-05)。変更ファイル: `.harness/config/dry-check.json`、`libs/infrastructure/src/dry_check/config.rs`。`dry-check.json` の schema_version を 2 に上げ、`max_parallelism: usize` フィールドを追加する (既存の `threshold` は維持)。`DryCheckConfigDto` に serde default 付き `max_parallelism: usize` を追加し、`DryCheckConfig::load` の `SUPPORTED_SCHEMA_VERSION` を 2 に更新する。`DryCheckConfig` に `max_parallelism()` アクセサを追加する。`DryCheckConfigError::InvalidParallelism` variant を追加し、`max_parallelism == 0` のときに返す。unit tests: schema_version=2 + valid max_parallelism の config が正常ロードされること / schema_version=1 が UnsupportedSchemaVersion になること / max_parallelism=0 が InvalidParallelism を返すこと / schema_version=2 json に max_parallelism がない場合は nonzero の既定値を採用すること。前提: なし (独立タスク)。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T009",
