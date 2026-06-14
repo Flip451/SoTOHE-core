@@ -262,7 +262,7 @@ impl CliApp {
             None => infra_config.threshold(),
         };
 
-        let usecase_config = build_usecase_dry_check_config(infra_config.max_parallelism())?;
+        let usecase_config = build_usecase_dry_check_config(&infra_config)?;
 
         let workspace_root = resolve_existing_dir_under_repo(
             &input.workspace_root,
@@ -514,19 +514,20 @@ impl CliApp {
     }
 }
 
-/// Lift `infra_config.max_parallelism()` into the usecase `DryCheckConfig` (D3 / T010).
-/// Known-bad calibration percents are hardcoded placeholders until T012 sources them from
-/// `.harness/config/dry-check.json`.
+/// Lift infra `DryCheckConfig` fields (max_parallelism + known-bad percents) into the validated
+/// usecase newtypes (D3 / D4 / T011). All values come from `.harness/config/dry-check.json` v3.
 fn build_usecase_dry_check_config(
-    max_parallelism: usize,
+    infra_config: &infrastructure::dry_check::DryCheckConfig,
 ) -> Result<usecase::dry_check::DryCheckConfig, String> {
     use usecase::dry_check::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
-    let percent = |v: u8| {
-        DryCheckPercent::try_new(v).map_err(|e| format!("invalid hardcoded known-bad percent: {e}"))
-    };
-    let parallelism = DryCheckParallelism::try_new(max_parallelism)
-        .map_err(|e| format!("invalid max_parallelism: {e}"))?;
-    Ok(DryCheckConfig::new(percent(10)?, percent(90)?, parallelism))
+    let percent =
+        |v: u8| DryCheckPercent::try_new(v).map_err(|e| format!("invalid known-bad percent: {e}"));
+    Ok(DryCheckConfig::new(
+        percent(infra_config.known_bad_injection_rate_percent())?,
+        percent(infra_config.known_bad_detection_threshold_percent())?,
+        DryCheckParallelism::try_new(infra_config.max_parallelism())
+            .map_err(|e| format!("invalid max_parallelism: {e}"))?,
+    ))
 }
 
 /// `GateEval` telemetry fields for the `"dry"` gate (T007 / IN-07 / CN-10):

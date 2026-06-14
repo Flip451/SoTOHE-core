@@ -177,60 +177,299 @@
           "findings": [],
           "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
           "at": "2026-06-14T07:13:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
+          "at": "2026-06-14T13:14:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
+          "at": "2026-06-14T13:16:44Z"
         }
       ]
     },
-    "infrastructure": {
+    "cli": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:18:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/dry.rs",
+              "line": 425,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:21:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
+          "at": "2026-06-14T04:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:39:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:42:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:07:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:09:28Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:35:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_check_approved` now reads `track_dir/dry-check-coverage.json`, but this composition layer never writes that manifest on the `dry write` path. In this file the write flow still only constructs `FsDryCheckStore` and calls `run_dry_check`; `rg` shows no production `write_coverage` call. Since `FsDryCheckCoverageAdapter::read_coverage` returns `Ok(None)` for a missing file and the new approval interactor treats that as `Blocked`, a normal `sotp dry write` followed by `sotp dry check-approved` will fail closed forever unless a manifest is created out-of-band. Wire coverage persistence into the write flow or keep the approval bridge on an artifact that the write flow actually produces.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 500,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:39:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T02:44:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:02:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:06:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:17:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:22:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:46:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:48:33Z"
+        },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `write_coverage` does not apply the repo's symlink rejection used by the other filesystem adapters. `atomic_write_file` only makes the rename atomic; it still follows the resolved `store_path`/parent path. If the coverage path or one of its parent components is a symlink, this adapter can read or overwrite a manifest outside the intended track directory. That is a filesystem-boundary regression compared with `FsDryCheckStore` and `FsCommitHashStore`.",
+              "message": "Removing `db_path`, `threshold`, and `workspace_root` from `DryCheckApprovedInput` makes the existing `execute_dry_check_approved` construction in `apps/cli/src/commands/dry.rs:197-200` no longer compile. The DTO change needs the caller updated in the same change set, otherwise the workspace is broken.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
-              "line": 127,
-              "category": "security"
-            },
-            {
-              "message": "P1: the new public adapter's tests do not cover the required deserialization error cases for malformed `path` and malformed `content_hash`. The implementation maps both to `DryCheckCycleError::CoveragePort`, but there is no regression test that exercises either branch, so a future change to domain validation or error mapping could silently break the contract described in the briefing.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
-              "line": 145,
-              "category": "test-coverage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 128,
+              "category": "build"
             }
           ],
-          "hash": "rvw1:sha256:595b78b8544082866cd15550e7801e13fa859308671a6584193ae329749eb7f7",
-          "at": "2026-06-14T01:41:40Z"
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:20:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
-          "at": "2026-06-14T01:48:51Z"
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:25:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
-          "at": "2026-06-14T01:51:55Z"
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:28:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `GateEval` path in `dry_check_approved` is not covered by tests. There is no assertion for the Approved case emitting `gate_name=\"dry\"` / `verdict=\"ok\"`, and no Blocked-case assertion for `verdict=\"error\"` plus the `blocked: N unresolved pair(s)` summary. This is public API behavior, so regressions here would be silent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 514,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:c0cf905ba18f3ae793aeaf00284a0da2a6330675eca4058520c0843a50bd3297",
+          "at": "2026-06-14T05:32:54Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c89703ec457c3dc9e3eca38ea79d4feb524b3d44394161f4417d9c20771a46da",
-          "at": "2026-06-14T07:13:19Z"
+          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
+          "at": "2026-06-14T05:37:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c89703ec457c3dc9e3eca38ea79d4feb524b3d44394161f4417d9c20771a46da",
-          "at": "2026-06-14T07:15:39Z"
+          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
+          "at": "2026-06-14T05:40:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new GateEval path is only covered by the pure mapping helper tests near the bottom of the file. There is no test that `dry_check_approved()` actually reaches `emit_gate_eval(...)` after a finalized verdict, so a regression that removes or reorders the telemetry call would be silent because the emitter suppresses errors. Add an end-to-end test for both Approved and Blocked flows that asserts the telemetry write occurs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 508,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:47c8fd4439776069504a0117cdbc43b272bf11118eba369966ac17d18adf4564",
+          "at": "2026-06-14T05:54:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
+          "at": "2026-06-14T06:06:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
+          "at": "2026-06-14T06:10:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
+          "at": "2026-06-14T11:08:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
+          "at": "2026-06-14T11:13:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
+          "at": "2026-06-14T12:40:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
+          "at": "2026-06-14T12:42:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
+          "at": "2026-06-14T13:15:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
+          "at": "2026-06-14T13:17:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
+          "at": "2026-06-14T13:43:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
+          "at": "2026-06-14T13:45:31Z"
         }
       ]
     },
@@ -865,6 +1104,48 @@
           "findings": [],
           "hash": "rvw1:sha256:84447d4aa4a0c2d07aa12edfc843411d4ab3ecfcaa79bfd49d19626594182db4",
           "at": "2026-06-14T12:53:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c5a0a70eff19f405596ee584ac745be8dfeee4c30d6c03b123799ce56c9574",
+          "at": "2026-06-14T13:13:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c5a0a70eff19f405596ee584ac745be8dfeee4c30d6c03b123799ce56c9574",
+          "at": "2026-06-14T13:15:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cc6898dde8c7edfefe1e324c98711d850ffb4d4174efd274fcd269846f4ba37",
+          "at": "2026-06-14T13:36:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cc6898dde8c7edfefe1e324c98711d850ffb4d4174efd274fcd269846f4ba37",
+          "at": "2026-06-14T13:38:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b463053e23d4b8f328872a7c53ad2f555e92d191c2f19fae6f66c881db9b35e5",
+          "at": "2026-06-14T13:51:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b463053e23d4b8f328872a7c53ad2f555e92d191c2f19fae6f66c881db9b35e5",
+          "at": "2026-06-14T13:53:44Z"
         }
       ]
     },
@@ -1148,254 +1429,107 @@
         }
       ]
     },
-    "cli": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:18:59Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
+              "message": "P1: `write_coverage` does not apply the repo's symlink rejection used by the other filesystem adapters. `atomic_write_file` only makes the rename atomic; it still follows the resolved `store_path`/parent path. If the coverage path or one of its parent components is a symlink, this adapter can read or overwrite a manifest outside the intended track directory. That is a filesystem-boundary regression compared with `FsDryCheckStore` and `FsCommitHashStore`.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/dry.rs",
-              "line": 425,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:21:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
-          "at": "2026-06-14T04:23:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:39:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:42:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:07:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:09:28Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
-          "at": "2026-06-14T02:35:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
+              "line": 127,
+              "category": "security"
+            },
             {
-              "message": "`dry_check_approved` now reads `track_dir/dry-check-coverage.json`, but this composition layer never writes that manifest on the `dry write` path. In this file the write flow still only constructs `FsDryCheckStore` and calls `run_dry_check`; `rg` shows no production `write_coverage` call. Since `FsDryCheckCoverageAdapter::read_coverage` returns `Ok(None)` for a missing file and the new approval interactor treats that as `Blocked`, a normal `sotp dry write` followed by `sotp dry check-approved` will fail closed forever unless a manifest is created out-of-band. Wire coverage persistence into the write flow or keep the approval bridge on an artifact that the write flow actually produces.",
+              "message": "P1: the new public adapter's tests do not cover the required deserialization error cases for malformed `path` and malformed `content_hash`. The implementation maps both to `DryCheckCycleError::CoveragePort`, but there is no regression test that exercises either branch, so a future change to domain validation or error mapping could silently break the contract described in the briefing.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 500,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
+              "line": 145,
+              "category": "test-coverage"
             }
           ],
-          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
-          "at": "2026-06-14T02:39:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T02:44:45Z"
+          "hash": "rvw1:sha256:595b78b8544082866cd15550e7801e13fa859308671a6584193ae329749eb7f7",
+          "at": "2026-06-14T01:41:40Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
-          "at": "2026-06-14T03:02:11Z"
+          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
+          "at": "2026-06-14T01:48:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
-          "at": "2026-06-14T03:06:44Z"
+          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
+          "at": "2026-06-14T01:51:55Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T03:17:51Z"
+          "hash": "rvw1:sha256:c89703ec457c3dc9e3eca38ea79d4feb524b3d44394161f4417d9c20771a46da",
+          "at": "2026-06-14T07:13:19Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T03:22:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
-          "at": "2026-06-14T03:46:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
-          "at": "2026-06-14T03:48:33Z"
+          "hash": "rvw1:sha256:c89703ec457c3dc9e3eca38ea79d4feb524b3d44394161f4417d9c20771a46da",
+          "at": "2026-06-14T07:15:39Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Removing `db_path`, `threshold`, and `workspace_root` from `DryCheckApprovedInput` makes the existing `execute_dry_check_approved` construction in `apps/cli/src/commands/dry.rs:197-200` no longer compile. The DTO change needs the caller updated in the same change set, otherwise the workspace is broken.",
+              "message": "`DryCheckConfig::load` stores `known_bad_injection_rate_percent` and `known_bad_detection_threshold_percent` as raw `u8` values without validating the `DryCheckPercent` invariant (`1..=100`). A v3 config with `0` will therefore load successfully and produce a `DryCheckConfig` that is already invalid for the usecase layer, so the loader is not fail-closed on malformed config. Validate these fields here or wrap them in the validated domain type before returning, and add an error-path test for the zero-value case.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 128,
-              "category": "build"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/config.rs",
+              "line": 176,
+              "category": "missing error handling"
             }
           ],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:20:02Z"
+          "hash": "rvw1:sha256:fd4b00fc295569da82aa69336123fd6df2ca83813ccc9eeb84e6177aed824217",
+          "at": "2026-06-14T13:15:54Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:25:53Z"
+          "hash": "rvw1:sha256:52bfe2a31e4b6bb290fa9a8098352518bd9bdb22b652023b0441e847e347fc71",
+          "at": "2026-06-14T13:24:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52bfe2a31e4b6bb290fa9a8098352518bd9bdb22b652023b0441e847e347fc71",
+          "at": "2026-06-14T13:24:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:28:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `GateEval` path in `dry_check_approved` is not covered by tests. There is no assertion for the Approved case emitting `gate_name=\"dry\"` / `verdict=\"ok\"`, and no Blocked-case assertion for `verdict=\"error\"` plus the `blocked: N unresolved pair(s)` summary. This is public API behavior, so regressions here would be silent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 514,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:c0cf905ba18f3ae793aeaf00284a0da2a6330675eca4058520c0843a50bd3297",
-          "at": "2026-06-14T05:32:54Z"
+          "hash": "rvw1:sha256:52bfe2a31e4b6bb290fa9a8098352518bd9bdb22b652023b0441e847e347fc71",
+          "at": "2026-06-14T13:25:37Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
-          "at": "2026-06-14T05:37:40Z"
+          "hash": "rvw1:sha256:cd324b2166090e0bab98f4b08bd9d021224f2c197dd622a194771998191bf112",
+          "at": "2026-06-14T13:36:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
-          "at": "2026-06-14T05:40:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new GateEval path is only covered by the pure mapping helper tests near the bottom of the file. There is no test that `dry_check_approved()` actually reaches `emit_gate_eval(...)` after a finalized verdict, so a regression that removes or reorders the telemetry call would be silent because the emitter suppresses errors. Add an end-to-end test for both Approved and Blocked flows that asserts the telemetry write occurs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 508,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:47c8fd4439776069504a0117cdbc43b272bf11118eba369966ac17d18adf4564",
-          "at": "2026-06-14T05:54:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
-          "at": "2026-06-14T06:06:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
-          "at": "2026-06-14T06:10:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
-          "at": "2026-06-14T11:08:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
-          "at": "2026-06-14T11:13:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
-          "at": "2026-06-14T12:40:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
-          "at": "2026-06-14T12:42:43Z"
+          "hash": "rvw1:sha256:cd324b2166090e0bab98f4b08bd9d021224f2c197dd622a194771998191bf112",
+          "at": "2026-06-14T13:38:00Z"
         }
       ]
     }
