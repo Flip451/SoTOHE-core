@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T01:18:33Z",
+  "generated_at": "2026-06-14T01:56:27Z",
   "declaration_hash": "259e7696ceac022bd7427b5c30d795a9291192abf7ee6054d52b17578532274f",
   "signals": [
     {
@@ -37,8 +37,8 @@
       "type_name": "FsDryCheckCoverageAdapter",
       "kind_tag": "secondary_adapter",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "DryCheckCoveragePort",
         "core::fmt::Debug"
       ]

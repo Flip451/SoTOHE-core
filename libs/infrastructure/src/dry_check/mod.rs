@@ -17,11 +17,13 @@ mod codec;
 mod codex_dry_checker;
 mod commit_hash_store;
 pub mod config;
+mod coverage;
 mod diff_getter;
 mod store;
 
 pub use codex_dry_checker::CodexDryChecker;
 pub use commit_hash_store::{DryCheckCommitHashError, FsDryCheckCommitHashStore};
 pub use config::{DryCheckConfig, DryCheckConfigError};
+pub use coverage::FsDryCheckCoverageAdapter;
 pub use diff_getter::GitDryCheckDiffGetter;
 pub use store::FsDryCheckStore;
