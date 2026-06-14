@@ -2740,6 +2740,41 @@ mod tests {
         assert_eq!(doc, doc2);
     }
 
+    // ADR 2026-05-25-0000 D16 / T013: DataRole::DomainEvent codec round-trip
+    #[test]
+    fn test_decode_domain_event_data_role_round_trips() {
+        // DomainEvent is a unit variant (no payload fields); the JSON form is `{"DomainEvent": {}}`.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "UserRegistered": {
+      "action": "add",
+      "role": { "DomainEvent": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        assert_eq!(
+            entry.role,
+            domain::tddd::catalogue_v2::roles::DataRole::DomainEvent,
+            "decoded role must be DomainEvent"
+        );
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(
+            encoded.contains("\"DomainEvent\""),
+            "encoded JSON must use DomainEvent discriminant key: {encoded}"
+        );
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "round-trip must preserve DomainEvent role");
+    }
+
     #[test]
     fn test_decode_repository_trait_role_with_missing_aggregate_field_returns_error() {
         // D10: Repository requires the `aggregate` field. Omitting it must fail decode.

@@ -282,6 +282,7 @@ fn data_role_display_tag(role: &DataRole) -> &'static str {
         DataRole::ErrorType => "error_type",
         DataRole::SecondaryAdapter => "secondary_adapter",
         DataRole::EventPolicy { .. } => "event_policy",
+        DataRole::DomainEvent => "domain_event",
     }
 }
 

@@ -13,18 +13,8 @@ use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
 ///
 /// This function is the **authoritative definition** of the kind_tag value scheme
 /// for v3 `DataRole` entries. The kind_tag values are the historically-established
-/// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`:
-///
-/// - `TypeKindV2::Struct(StructKind { typestate: Some(_), .. })` (any shape) → `"typestate"`
-/// - `TypeKindV2::Enum { .. }` + `DataRole::ErrorType` → `"error_type"`
-/// - `TypeKindV2::Enum { .. }` otherwise → `"enum"`
-/// - Struct/TypeAlias with `Entity | AggregateRoot | Specification | ValueObject`
-///   → `"value_object"` (these four roles share the same kind_tag)
-/// - All other struct/alias roles → their canonical snake_case name:
-///   `DomainService` → `"domain_service"`, `Factory` → `"factory"`,
-///   `UseCase` → `"use_case"`, `Interactor` → `"interactor"`,
-///   `Command` → `"command"`, `Query` → `"query"`, `Dto` → `"dto"`,
-///   `ErrorType` (non-enum) → `"error_type"`, `SecondaryAdapter` → `"secondary_adapter"`
+/// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`.
+/// The match arms below are the single source of truth for the mapping.
 pub(crate) fn data_role_kind_tag(role: &DataRole, kind: &TypeKindV2) -> &'static str {
     // Typestate detection: Struct (any shape) with a typestate marker.
     if let TypeKindV2::Struct(sk) = kind {
@@ -52,6 +42,7 @@ pub(crate) fn data_role_kind_tag(role: &DataRole, kind: &TypeKindV2) -> &'static
         DataRole::ErrorType => "error_type",
         DataRole::SecondaryAdapter => "secondary_adapter",
         DataRole::EventPolicy { .. } => "event_policy",
+        DataRole::DomainEvent => "domain_event",
     }
 }
 
@@ -60,12 +51,8 @@ pub(crate) fn data_role_kind_tag(role: &DataRole, kind: &TypeKindV2) -> &'static
 ///
 /// This function is the **authoritative definition** of the kind_tag value scheme
 /// for v3 `ContractRole` entries. The kind_tag values are the historically-established
-/// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`:
-///
-/// - `SpecificationPort | SecondaryPort` → `"secondary_port"`
-///   (both v3 `ContractRole` variants map to the same kind_tag; `SpecificationPort`
-///   has no distinct kind_tag at this level)
-/// - `ApplicationService` → `"application_service"`
+/// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`.
+/// The match arms below are the single source of truth for the mapping.
 pub(crate) const fn contract_role_kind_tag(role: &ContractRole) -> &'static str {
     match role {
         ContractRole::SpecificationPort

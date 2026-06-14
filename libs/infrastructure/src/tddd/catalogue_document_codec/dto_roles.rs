@@ -44,6 +44,7 @@ pub(super) enum DataRoleDto {
     EventPolicy {
         reacts_to: Vec<String>,
     },
+    DomainEvent {},
 }
 
 #[derive(Debug, Serialize, Deserialize)]

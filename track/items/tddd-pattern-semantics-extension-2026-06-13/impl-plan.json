@@ -60,17 +60,18 @@
     {
       "id": "T011",
       "description": "Stage 1 — unit tests: add TDD-first tests covering the Stage 1 schema-migration behavioral contracts. In domain: tests for `NonEmptyVec` (non-empty construction, `as_slice`), `InvariantName` (non-empty validation via `Identifier`), `IdentityAccessor` (round-trip), `DataRole` / `ContractRole` Clone / PartialEq / Display / FromStr with payload variants. In infrastructure (codec): round-trip tests for DataRole variants with all new payload fields, empty NonEmptyVec decode rejection, Repository decode with mandatory aggregate. Linter framework and linter-rule boundary tests are intentionally deferred to Stage 3 T016. Follows TDD (tests written before / alongside implementation in T001-T006). Depends on T001-T006 for the final Stage 1 compilation gate (T010 is skipped).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "70494484"
     },
     {
       "id": "T012",
       "description": "Stage 2 — domain layer: add `DataRole::DomainEvent` unit variant to the data-carrying enum in `roles.rs`. Update `ALL_DATA_ROLES` array to include `DomainEvent`. Update `Display` / `FromStr` for the new unit variant. Update taxonomy display and any fixture / example catalogue files that enumerate available DataRole variants. Update the `signal_evaluator_v2` / `type_signals_evaluator` / `contract_map_renderer` for the new variant (pattern match exhaustiveness). Do not introduce the linter `RoleKind` in Stage 2; T007 adds it in Stage 3 and includes DomainEvent then. Depends on T011 (Stage 1 complete and CI green).",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T013",
       "description": "Stage 2 — verify Stage 2 AC acceptance. Update `ALL_CONTRACT_ROLES` array to confirm `Repository` is present (added in T002; verify count is 4). Update `ALL_DATA_ROLES` to confirm both `DomainEvent` and `EventPolicy` are present (variant count is 15). Update any tests that assert variant counts or enumerate `ALL_DATA_ROLES` / `ALL_CONTRACT_ROLES`. Add a round-trip codec test for `DataRole::DomainEvent` (unit variant JSON). Run `cargo make ci`. Depends on T012.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T014",

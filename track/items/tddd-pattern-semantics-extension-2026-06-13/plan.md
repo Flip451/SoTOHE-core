@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD カタログ taxonomy の意味論拡張 — パターン固有の機械検査ルールを持たせる
 
-## Tasks (7/17 resolved)
+## Tasks (8/17 resolved)
 
 ### S1 — Stage 1: New supporting types in domain layer
 
@@ -33,7 +33,7 @@
 > After T011, cargo make ci must pass for Stage 1 schema migration (linter rule evaluation remains Stage 3 T014-T016).
 
 - [-] **T010**: N/A: 旧 active トラック (本トラック以外の active track) の catalogue 移行は本トラックのスコープ外。signal 評価対象 (verify-plan-artifact-refs 等) は current track の catalogue のみを parse するため、他トラックの旧 schema 残置は本トラックの commit gate を阻害しない。本トラックの catalogue (domain/usecase/infrastructure) は T002-T006 で新 schema に移行済み。OS-05 の spec text は将来の reference として保持するが、本トラックでは migration を実施しない (D3 移行対象の限定を踏まえた解釈)。
-- [~] **T011**: Stage 1 — unit tests: add TDD-first tests covering the Stage 1 schema-migration behavioral contracts. In domain: tests for `NonEmptyVec` (non-empty construction, `as_slice`), `InvariantName` (non-empty validation via `Identifier`), `IdentityAccessor` (round-trip), `DataRole` / `ContractRole` Clone / PartialEq / Display / FromStr with payload variants. In infrastructure (codec): round-trip tests for DataRole variants with all new payload fields, empty NonEmptyVec decode rejection, Repository decode with mandatory aggregate. Linter framework and linter-rule boundary tests are intentionally deferred to Stage 3 T016. Follows TDD (tests written before / alongside implementation in T001-T006). Depends on T001-T006 for the final Stage 1 compilation gate (T010 is skipped).
+- [x] **T011**: Stage 1 — unit tests: add TDD-first tests covering the Stage 1 schema-migration behavioral contracts. In domain: tests for `NonEmptyVec` (non-empty construction, `as_slice`), `InvariantName` (non-empty validation via `Identifier`), `IdentityAccessor` (round-trip), `DataRole` / `ContractRole` Clone / PartialEq / Display / FromStr with payload variants. In infrastructure (codec): round-trip tests for DataRole variants with all new payload fields, empty NonEmptyVec decode rejection, Repository decode with mandatory aggregate. Linter framework and linter-rule boundary tests are intentionally deferred to Stage 3 T016. Follows TDD (tests written before / alongside implementation in T001-T006). Depends on T001-T006 for the final Stage 1 compilation gate (T010 is skipped). (`70494484`)
 
 ### S4 — Stage 2: DomainEvent unit variant and taxonomy update
 
@@ -41,8 +41,8 @@
 > T013 verifies all Stage 2 acceptance criteria: ALL_DATA_ROLES has 15 variants (DomainEvent + EventPolicy), ALL_CONTRACT_ROLES has 4 variants (Repository), codec round-trip for DomainEvent, cargo make ci passes.
 > Stage 2 is intentionally small — only a unit variant addition with no new payload schema. The linter RoleKind discriminant is introduced later in Stage 3 T007.
 
-- [ ] **T012**: Stage 2 — domain layer: add `DataRole::DomainEvent` unit variant to the data-carrying enum in `roles.rs`. Update `ALL_DATA_ROLES` array to include `DomainEvent`. Update `Display` / `FromStr` for the new unit variant. Update taxonomy display and any fixture / example catalogue files that enumerate available DataRole variants. Update the `signal_evaluator_v2` / `type_signals_evaluator` / `contract_map_renderer` for the new variant (pattern match exhaustiveness). Do not introduce the linter `RoleKind` in Stage 2; T007 adds it in Stage 3 and includes DomainEvent then. Depends on T011 (Stage 1 complete and CI green).
-- [ ] **T013**: Stage 2 — verify Stage 2 AC acceptance. Update `ALL_CONTRACT_ROLES` array to confirm `Repository` is present (added in T002; verify count is 4). Update `ALL_DATA_ROLES` to confirm both `DomainEvent` and `EventPolicy` are present (variant count is 15). Update any tests that assert variant counts or enumerate `ALL_DATA_ROLES` / `ALL_CONTRACT_ROLES`. Add a round-trip codec test for `DataRole::DomainEvent` (unit variant JSON). Run `cargo make ci`. Depends on T012.
+- [~] **T012**: Stage 2 — domain layer: add `DataRole::DomainEvent` unit variant to the data-carrying enum in `roles.rs`. Update `ALL_DATA_ROLES` array to include `DomainEvent`. Update `Display` / `FromStr` for the new unit variant. Update taxonomy display and any fixture / example catalogue files that enumerate available DataRole variants. Update the `signal_evaluator_v2` / `type_signals_evaluator` / `contract_map_renderer` for the new variant (pattern match exhaustiveness). Do not introduce the linter `RoleKind` in Stage 2; T007 adds it in Stage 3 and includes DomainEvent then. Depends on T011 (Stage 1 complete and CI green).
+- [~] **T013**: Stage 2 — verify Stage 2 AC acceptance. Update `ALL_CONTRACT_ROLES` array to confirm `Repository` is present (added in T002; verify count is 4). Update `ALL_DATA_ROLES` to confirm both `DomainEvent` and `EventPolicy` are present (variant count is 15). Update any tests that assert variant counts or enumerate `ALL_DATA_ROLES` / `ALL_CONTRACT_ROLES`. Add a round-trip codec test for `DataRole::DomainEvent` (unit variant JSON). Run `cargo make ci`. Depends on T012.
 
 ### S5 — Stage 3: Linter framework rewrite and evaluate_catalogue_lint (D17)
 

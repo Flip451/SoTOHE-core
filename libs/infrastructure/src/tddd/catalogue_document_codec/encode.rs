@@ -129,6 +129,7 @@ fn data_role_to_dto(role: &DataRole) -> DataRoleDto {
         DataRole::EventPolicy { reacts_to } => DataRoleDto::EventPolicy {
             reacts_to: reacts_to.as_slice().iter().map(|r| r.as_str().to_owned()).collect(),
         },
+        DataRole::DomainEvent => DataRoleDto::DomainEvent {},
     }
 }
 

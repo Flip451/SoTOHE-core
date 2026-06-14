@@ -68,6 +68,7 @@ pub(super) fn data_role_from_dto(
             })?;
             Ok(DataRole::EventPolicy { reacts_to })
         }
+        DataRoleDto::DomainEvent {} => Ok(DataRole::DomainEvent),
     }
 }
 

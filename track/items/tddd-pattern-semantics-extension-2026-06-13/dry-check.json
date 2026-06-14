@@ -2042,6 +2042,183 @@
       "base_commit": "c4872ddf3345cf17e45daa274fc1c51529b33c77",
       "rationale": "The fragments share a small test idiom, but they exercise different enum types and variant sets. The repeated loop/assertion is incidental test structure, while the important knowledge is the explicit list of variants for each role enum, which should remain local and readable for coverage. Extracting a helper would save only a couple of lines and would not remove duplicated domain knowledge.",
       "recorded_at": "2026-06-14T08:18:04Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+      "low_hash": "bc8645fa1f2eeef018e4326cbc658988e297e1cf83f122075a8539e635149618",
+      "high_path": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+      "high_hash": "f27d5387b2aff88317b721f319687f699a6a52db975f28f84d3ac39d45b33b96",
+      "changed_path": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9067839980125428,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "Both fragments implement the same simple helper shape, but they encode different enum variant sets and different string mappings. The shared structure is ordinary per-enum boilerplate rather than duplicated domain knowledge or behavior that would need to stay synchronized across the two fragments.",
+      "recorded_at": "2026-06-14T08:30:05Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+      "low_hash": "d09ff76397e74ca910e9f5c397e9ef405cd0fbbc894b9d81a9c9b9c2c8ab966c",
+      "high_path": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+      "high_hash": "d280ba1e2a9f2ca0dd4cb6715a82cdb608499394a5c6a98885135babdfb4a965",
+      "changed_path": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8882474899291992,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The fragments share a small test shape, but they assert distinct domain invariants: data roles have 15 variants, contract roles have 4 variants. This is intentional parallelism in tests rather than duplicated production logic, and extracting it would reduce clarity without removing meaningful knowledge duplication.",
+      "recorded_at": "2026-06-14T08:30:19Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+      "low_hash": "15668c79bcd09dabe7ff340ea0f569715e0d32f7218e314c85efd8a2f796b0eb",
+      "high_path": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+      "high_hash": "d09ff76397e74ca910e9f5c397e9ef405cd0fbbc894b9d81a9c9b9c2c8ab966c",
+      "changed_path": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8656156659126282,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The fragments share a small test structure, but they validate distinct invariants for different role collections: data roles must have 15 variants, while function roles must have 2. The duplicated assertion pattern is minimal and improves test clarity; abstracting it would add indirection without reducing meaningful maintenance risk.",
+      "recorded_at": "2026-06-14T08:30:32Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_roles.rs",
+      "low_hash": "515606003f6194b57bdcaf111ecab1f5f04f53d1b4d9b49be327363a0d11e46d",
+      "high_path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+      "high_hash": "979284b1d4d6fe3b8dce3e24b18aa6ecbad631bd31444fd47226eeaf7d8e384d",
+      "changed_path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_roles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8770744800567627,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The fragments are symmetric codec functions, but they are not duplicating the same implementation responsibility. `data_role_from_dto` validates and constructs domain types with fallible conversions and error context, while `data_role_to_dto` serializes already-valid domain values into DTOs infallibly. The repeated enum shape is the shared domain/DTO contract, and the Rust `match` exhaustiveness check already keeps the variant list aligned. Abstracting this would likely reduce clarity without eliminating meaningful duplicated logic.",
+      "recorded_at": "2026-06-14T08:30:51Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+      "low_hash": "0c5cb8db018bdbc3c484b71052e2bea544fa4bce9189550905cd32946ce64d1e",
+      "high_path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+      "high_hash": "a4991e1f15b19997e66d9aab3198ae51ba138bc3a1a94d5d40b4e8e98bc81701",
+      "changed_path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8725674748420715,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The fragments share a standard codec test shape: build minimal JSON, decode, assert the specific DataRole behavior, encode, decode again, and verify round-trip equality. That repetition is procedural test scaffolding, while the asserted behavior differs materially: UseCase validates an optional handles payload, and DomainEvent validates a unit variant plus discriminant emission. Extracting this would likely obscure the per-role fixture and expectations more than it would remove duplicated domain knowledge.",
+      "recorded_at": "2026-06-14T08:31:11Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+      "low_hash": "0c5cb8db018bdbc3c484b71052e2bea544fa4bce9189550905cd32946ce64d1e",
+      "high_path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+      "high_hash": "3708b8a8e85bebe3df948d4fb9f7ae2972030a88646afa2a6ad7a374c509c306",
+      "changed_path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.876897394657135,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The fragments share round-trip test structure and JSON catalogue boilerplate, but they verify different role encodings: a unit `DomainEvent` discriminant versus an `EventPolicy` discriminant with `reacts_to` payload preservation. The repeated setup is ordinary test scaffolding, not duplicated business logic or a repeated rule likely to drift independently.",
+      "recorded_at": "2026-06-14T08:31:29Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+      "low_hash": "0c5cb8db018bdbc3c484b71052e2bea544fa4bce9189550905cd32946ce64d1e",
+      "high_path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+      "high_hash": "c26a0bae40695680b294cb9938bdab179330377707fc391fbae3b1149a21f030",
+      "changed_path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8588284254074097,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The fragments share ordinary round-trip test structure, but they verify different role encodings and behavior: DomainEvent is a unit variant with an empty payload and an encoded discriminant assertion, while DomainService carries an optional emits payload and validates that payload. The repeated decode/encode/decode/assert pattern is small test boilerplate and keeping the JSON inline preserves case-specific readability.",
+      "recorded_at": "2026-06-14T08:31:43Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "12748ed522a6f17aa117c5fd8a05f14da9081daa2d4739823398775f93d1c0be",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "88961abe9fa37641a6e36b332a8cf6b92a6810d260758a34bb5387df5b56e5a6",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Keep the ADR/context in the docs, but remove the exhaustive bullet mapping from the doc comment or replace it with a short statement that `data_role_kind_tag` is the executable source of truth. If a human-readable exhaustive mapping is required, derive it from a single shared mapping representation or test fixture rather than maintaining a second prose copy."
+        }
+      },
+      "similarity_score": 0.8503385782241821,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The changed documentation repeats the same role/kind-to-kind_tag mapping already encoded in `data_role_kind_tag`: typestate detection, enum/error_type handling, the grouped value_object roles, and every remaining `DataRole` arm. This duplicates domain policy knowledge in prose and code, so future mapping changes would need coordinated edits and could leave the supposedly authoritative comments stale.",
+      "recorded_at": "2026-06-14T08:32:02Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "12748ed522a6f17aa117c5fd8a05f14da9081daa2d4739823398775f93d1c0be",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "c28ecfa7df3175ef1cf5e75639426c03e97970e7c5ab33495c5b3a653a0a3f5d",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Keep the mapping authoritative in contract_role_kind_tag and make the doc describe the contract at a higher level, or update it to reference the function as the single source of truth without enumerating every variant. If variant-level documentation is required, generate or test it against the match arms so Repository cannot be omitted."
+        }
+      },
+      "similarity_score": 0.8745656609535217,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The changed documentation repeats the authoritative ContractRole-to-kind_tag mapping that is already encoded in contract_role_kind_tag. It is also already drifting: the code maps Repository { .. } to \"secondary_port\", while the new doc only lists SpecificationPort and SecondaryPort. This duplicates behavioral knowledge and creates a stale-documentation risk.",
+      "recorded_at": "2026-06-14T08:32:23Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/type_catalogue_render.rs",
+      "low_hash": "353256fc4d37e971a9dc05847adb5d700c6852b0d404f0d6bed0975719a22b35",
+      "high_path": "libs/infrastructure/src/type_catalogue_render.rs",
+      "high_hash": "56225281791865f439fc7f0d03550fd8be488e0c5a58bf1329d6f8a484eed97f",
+      "changed_path": "libs/infrastructure/src/type_catalogue_render.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.898516833782196,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "Both fragments use the same simple match-to-string shape, but they encode different enum domains: DataRole variants versus ContractRole variants. The repeated structure is incidental and type-specific; there is no duplicated business rule or shared mapping knowledge that would need to stay synchronized.",
+      "recorded_at": "2026-06-14T08:32:34Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/type_catalogue_render.rs",
+      "low_hash": "56225281791865f439fc7f0d03550fd8be488e0c5a58bf1329d6f8a484eed97f",
+      "high_path": "libs/infrastructure/src/type_catalogue_render.rs",
+      "high_hash": "665736514cda402d0d3b19a0d3c1be7c0f7e25c40377d71f6db4e40b4e9567d0",
+      "changed_path": "libs/infrastructure/src/type_catalogue_render.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8833041191101074,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The fragments are related but not redundant: `type_entry_display_tag` handles TypeKind-specific overrides (`typestate`, enum/error handling) and delegates the shared DataRole-to-tag mapping to `data_role_display_tag`. That delegation avoids duplicating the DataRole match rather than creating duplicate knowledge.",
+      "recorded_at": "2026-06-14T08:32:49Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "b68908afcef32e55a190769fda2dfaefb4a7f277a168e23d128b91fed2aaf66d",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "cc3bec9e0dfeba49079b754457094b7198002f352bf59e503535f779be93adb4",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8530107140541077,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The changed fragment is module/function documentation and imports, while the candidate fragment is the implementation of `data_role_kind_tag` plus documentation for a different role mapping (`ContractRole`). They describe the same kind_tag scheme context, but they do not duplicate executable logic or create two competing sources of truth for the mapping; the actual mapping remains centralized in the match arms.",
+      "recorded_at": "2026-06-14T08:35:46Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "b68908afcef32e55a190769fda2dfaefb4a7f277a168e23d128b91fed2aaf66d",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "c28ecfa7df3175ef1cf5e75639426c03e97970e7c5ab33495c5b3a653a0a3f5d",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8706168532371521,
+      "threshold": 0.8500000238418579,
+      "base_commit": "704944841f5b95469d4904df01a0fccdb780a21e",
+      "rationale": "The fragments implement adjacent but distinct mappings: `data_role_kind_tag` maps `DataRole` plus `TypeKindV2`, while `contract_role_kind_tag` maps `ContractRole`, and the candidate documentation concerns `FunctionRole`. They share the same kind_tag vocabulary and similar explanatory wording, but they do not duplicate the same decision table or maintenance-sensitive logic. Keeping separate role-specific tag functions in one module is an intentional boundary, not a DRY violation.",
+      "recorded_at": "2026-06-14T08:36:09Z"
     }
   ]
 }

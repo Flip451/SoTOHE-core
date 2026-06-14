@@ -345,6 +345,7 @@ mod tests {
             DataRole::EventPolicy {
                 reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
             }, // (kept multi-line for readability — line exceeds small-heuristics threshold)
+            DataRole::DomainEvent,
         ];
         for role in roles {
             let entry = TypeEntry {

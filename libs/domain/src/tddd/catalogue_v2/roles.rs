@@ -38,10 +38,10 @@ pub use strum::IntoStaticStr;
 /// accepts `DataRole`; attaching `ContractRole` or `FunctionRole` to a `TypeEntry`
 /// is a parse-time type error (ADR 1 D2).
 ///
-/// 13 values covering domain layer through infrastructure layer roles:
+/// 15 values covering domain layer through infrastructure layer roles:
 /// `ValueObject`, `Entity`, `AggregateRoot`, `DomainService`, `Specification`,
 /// `Factory`, `UseCase`, `Interactor`, `Command`, `Query`, `Dto`,
-/// `ErrorType`, `SecondaryAdapter`.
+/// `ErrorType`, `SecondaryAdapter`, `EventPolicy`, `DomainEvent`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DataRole {
     /// A value object — immutable, equality by value (DDD).
@@ -78,6 +78,8 @@ pub enum DataRole {
     SecondaryAdapter,
     /// A declarative domain-layer policy that reacts to one or more events.
     EventPolicy { reacts_to: NonEmptyVec<TypeRef> },
+    /// A domain event — a record that something significant occurred in the domain.
+    DomainEvent,
 }
 
 impl DataRole {
@@ -139,6 +141,7 @@ impl DataRole {
             Self::ErrorType => "ErrorType",
             Self::SecondaryAdapter => "SecondaryAdapter",
             Self::EventPolicy { .. } => "EventPolicy",
+            Self::DomainEvent => "DomainEvent",
         }
     }
 
@@ -180,6 +183,7 @@ impl FromStr for DataRole {
                 let event = Self::placeholder_event_ref().map_err(parse_error)?;
                 Ok(Self::EventPolicy { reacts_to: NonEmptyVec::new(event, Vec::new()) })
             }
+            "DomainEvent" => Ok(Self::DomainEvent),
             _ => Err(strum::ParseError::VariantNotFound),
         }
     }
@@ -484,6 +488,7 @@ mod tests {
         "ErrorType",
         "SecondaryAdapter",
         "EventPolicy",
+        "DomainEvent",
     ];
 
     const ALL_CONTRACT_ROLE_NAMES: &[&str] =
@@ -499,12 +504,12 @@ mod tests {
         &[SelfReceiver::Owned, SelfReceiver::SharedRef, SelfReceiver::ExclusiveRef];
 
     // -----------------------------------------------------------------------
-    // DataRole — 14 Stage 1 values
+    // DataRole — 15 Stage 2 values
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_data_role_has_14_variants() {
-        assert_eq!(ALL_DATA_ROLE_NAMES.len(), 14);
+    fn test_data_role_has_15_variants() {
+        assert_eq!(ALL_DATA_ROLE_NAMES.len(), 15);
     }
 
     #[test]
