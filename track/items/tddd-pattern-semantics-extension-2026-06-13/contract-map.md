@@ -81,6 +81,11 @@ subgraph domain["domain"]
     T34_domain_domain_CatalogueLoaderError_IoError[IoError]
     T34_domain_domain_CatalogueLoaderError_TopologicalSortFailed[TopologicalSortFailed]
   end
+  subgraph T31_domain_domain_ConstructionError["tddd::catalogue_v2::roles::ConstructionError"]
+    direction TB
+    T31_domain_domain_ConstructionError__self[ConstructionError]
+    T31_domain_domain_ConstructionError_EmptyCollection[EmptyCollection]
+  end
   subgraph T26_domain_domain_ContractRole["tddd::catalogue_v2::roles::ContractRole"]
     direction TB
     T26_domain_domain_ContractRole__self[ContractRole]
@@ -129,7 +134,9 @@ subgraph domain["domain"]
     direction TB
     T25_domain_domain_NonEmptyVec__self[NonEmptyVec]
     T25_domain_domain_NonEmptyVec_new([new])
+    T25_domain_domain_NonEmptyVec_try_new([try_new])
     T25_domain_domain_NonEmptyVec_as_slice([as_slice])
+    T25_domain_domain_NonEmptyVec_first([first])
   end
   subgraph T22_domain_domain_RoleKind["tddd::catalogue_linter::RoleKind"]
     direction TB
@@ -261,6 +268,8 @@ T22_domain_domain_DataRole_EventPolicy --o|reacts_to| T25_domain_domain_NonEmpty
 T27_domain_domain_InvariantDecl__self --o|name| T27_domain_domain_InvariantName__self
 T27_domain_domain_InvariantDecl__self --o|predicate| T32_domain_domain_InvariantPredicate__self
 T25_domain_domain_NonEmptyVec_new --> T25_domain_domain_NonEmptyVec__self
+T25_domain_domain_NonEmptyVec_try_new --> T31_domain_domain_ConstructionError__self
+T25_domain_domain_NonEmptyVec_try_new --> T25_domain_domain_NonEmptyVec__self
 T24_domain_domain_RuleTarget__self --o|target_roles| T22_domain_domain_RoleKind__self
 R29_domain_domain_CatalogueLoader_load_all --> T34_domain_domain_CatalogueLoaderError__self
 F63_domain_domain_domain__tddd__catalogue_linter__ddd_strict_preset --> T33_domain_domain_CatalogueLinterRule__self
@@ -315,6 +324,8 @@ class T34_domain_domain_CatalogueLoaderError_SymlinkRejected variant_node
 class T34_domain_domain_CatalogueLoaderError_IoError variant_node
 class T34_domain_domain_CatalogueLoaderError_TopologicalSortFailed variant_node
 class T34_domain_domain_CatalogueLoaderError__self error_type
+class T31_domain_domain_ConstructionError_EmptyCollection variant_node
+class T31_domain_domain_ConstructionError__self error_type
 class T26_domain_domain_ContractRole_SpecificationPort variant_node
 class T26_domain_domain_ContractRole_ApplicationService variant_node
 class T26_domain_domain_ContractRole_SecondaryPort variant_node
@@ -342,7 +353,9 @@ class T27_domain_domain_InvariantName__self value_object
 class T32_domain_domain_InvariantPredicate_SelfMethod variant_node
 class T32_domain_domain_InvariantPredicate__self value_object
 class T25_domain_domain_NonEmptyVec_new method_node
+class T25_domain_domain_NonEmptyVec_try_new method_node
 class T25_domain_domain_NonEmptyVec_as_slice method_node
+class T25_domain_domain_NonEmptyVec_first method_node
 class T25_domain_domain_NonEmptyVec__self value_object
 class T22_domain_domain_RoleKind_ValueObject variant_node
 class T22_domain_domain_RoleKind_Entity variant_node

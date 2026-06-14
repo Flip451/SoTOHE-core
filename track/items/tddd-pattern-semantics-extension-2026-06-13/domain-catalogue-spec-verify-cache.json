@@ -209,6 +209,30 @@
         "kind": "pass",
         "citation": "本 ADR が定める最小コアルール群を一括有効化する `ddd-strict` プリセットを提供する。"
       }
+    },
+    {
+      "claim_hash": "91ff43156a08fda3eb89244a01de79ecb08ea9faba04b154a46aa6a7f39667d7",
+      "evidence_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）"
+      }
+    },
+    {
+      "claim_hash": "91ff43156a08fda3eb89244a01de79ecb08ea9faba04b154a46aa6a7f39667d7",
+      "evidence_hash": "84657bbacbf37a40d5d42030d6536cee6f0536556307745b704ab61db5f0e5b0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant が追加され、空の `reacts_to` 配列が codec の decode 段階でエラーになる（`NonEmptyVec` の schema invariant）。1 つ以上の TypeRef を持つ `reacts_to` は decode に成功する。"
+      }
+    },
+    {
+      "claim_hash": "8b2ff1cafd28cab6e322e6b6d1d518e4e4ea7642ef62911d7d8058d5da2c52d3",
+      "evidence_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。"
+      }
     }
   ]
 }

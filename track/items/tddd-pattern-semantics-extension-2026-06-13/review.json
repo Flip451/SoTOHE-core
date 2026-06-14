@@ -178,6 +178,110 @@
           "findings": [],
           "hash": "rvw1:sha256:35b51f89be43499ebfa9a37070eec38e133ed88fd1600dc389c56aaae64a99df",
           "at": "2026-06-14T01:55:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb82a8bbd54f694f7a790b44984c300ce2454a5ff932e9840fa8486ba1715a23",
+          "at": "2026-06-14T02:29:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb82a8bbd54f694f7a790b44984c300ce2454a5ff932e9840fa8486ba1715a23",
+          "at": "2026-06-14T02:31:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e5c40c0fb9d033e0918a48f959500cf2681386858c975193ed9b088595dec58",
+          "at": "2026-06-14T02:47:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e5c40c0fb9d033e0918a48f959500cf2681386858c975193ed9b088595dec58",
+          "at": "2026-06-14T02:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fa2ec1fd3b77539871943c49a7674a738a1e8e88b34afe6233090b6ecb7c82f",
+          "at": "2026-06-14T03:04:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NonEmptyVec` is documented here as enforcing that empty collections are an illegal state, and both constructors establish that invariant, but the newly added `first` API returns `Option<&TypeRef>`. That exposes an impossible empty case to downstream code and contradicts the type's non-empty contract; the method should return `&TypeRef` or the catalogue should stop claiming non-emptiness is guaranteed.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
+              "line": 364,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5fa2ec1fd3b77539871943c49a7674a738a1e8e88b34afe6233090b6ecb7c82f",
+          "at": "2026-06-14T03:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3292f807e578f5ca8908e0662c17fa52c858f1c18bfcf87b5025c2bf4b585bd6",
+          "at": "2026-06-14T03:11:46Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
+          "at": "2026-06-14T02:30:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
+          "at": "2026-06-14T02:32:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
+          "at": "2026-06-14T02:49:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NonEmptyVec` now only exposes `new(first, rest)`, so callers that receive a decoded array cannot ask the domain type to validate the non-empty invariant from a `Vec<T>`. The T001 briefing explicitly requires `NonEmptyVec<T>` to provide both `new(first, rest)` and `try_new(Vec<T>)`, with empty input rejected, and the removed tests covered that path. Without `try_new`, the infrastructure codec either cannot implement the documented JSON array -> `NonEmptyVec` conversion through the public domain API or must duplicate the invariant outside the value object.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 258,
+              "category": "api_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
+          "at": "2026-06-14T02:51:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
+          "at": "2026-06-14T02:56:47Z"
         }
       ]
     },

@@ -7,7 +7,7 @@
 | CatalogueLinterRuleKind | enum | modify | FieldEmpty, FieldNonEmpty, KindLayerConstraint, ReferencedRoleConstraint, TraitImplRequired, NoRoleInMethodSignature, MethodReferenceSignature, AccessorSignatureRequired, FieldElementUniqueAcrossEntries, NoExternalReferenceInMethods, NoPublicField, ForbiddenMethodReceiver | 🟡 | 🔵 |
 | ContractRole | enum | modify | SpecificationPort, ApplicationService, SecondaryPort, Repository | 🟡 | 🔵 |
 | DataRole | enum | modify | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter, DomainEvent, EventPolicy | 🟡 | 🔵 |
-| InvariantPredicate | enum | — | SelfMethod | 🟡 | 🔵 |
+| InvariantPredicate | enum | — | SelfMethod | 🔵 | 🔵 |
 | RoleKind | enum | — | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter, DomainEvent, EventPolicy, SpecificationPort, ApplicationService, SecondaryPort, Repository, FreeFunction, UseCaseFunction | 🟡 | 🔵 |
 
 ## Value Objects
@@ -29,6 +29,7 @@
 | CatalogueLinterError | error_type | modify | InvalidRuleConfig | 🔵 | 🔵 |
 | CatalogueLinterRuleError | error_type | modify | EmptyPermittedLayers, EmptyRequiredTraits, EmptyForbiddenRoles, EmptyTargetField | 🟡 | 🔵 |
 | CatalogueLoaderError | error_type | reference | CatalogueNotFound, LayerDiscoveryFailed, DecodeFailed, SymlinkRejected, IoError, TopologicalSortFailed | 🔵 | 🔵 |
+| ConstructionError | error_type | — | EmptyCollection | 🔵 | 🔵 |
 
 ## Secondary Ports
 

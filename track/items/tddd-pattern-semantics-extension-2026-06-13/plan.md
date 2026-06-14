@@ -8,7 +8,7 @@
 > T001 adds the new value-object types needed as payloads for the data-carrying DataRole / ContractRole variants: InvariantName, InvariantDecl, InvariantPredicate, IdentityAccessor, NonEmptyVec<TypeRef>.
 > These types are domain-layer, serde-free, and are prerequisites for T002. No breaking changes in this task alone.
 
-- [ ] **T001**: Stage 1 — domain layer: add new value-object types supporting the data-carrying enum migration. Add `InvariantName`, `InvariantPredicate`, `InvariantDecl`, `IdentityAccessor`, and `NonEmptyVec<TypeRef>` in `libs/domain/src/tddd/catalogue_v2/roles.rs`. These are prerequisites for the DataRole / ContractRole rewrite in T002 (T002 references them in variant payloads). No serde derives (domain is serde-free). Wire all new types into the existing pub use chains in `roles.rs` / `mod.rs`.
+- [~] **T001**: Stage 1 — domain layer: add new value-object types supporting the data-carrying enum migration. Add `InvariantName`, `InvariantPredicate`, `InvariantDecl`, `IdentityAccessor`, and `NonEmptyVec<TypeRef>` in `libs/domain/src/tddd/catalogue_v2/roles.rs`. These are prerequisites for the DataRole / ContractRole rewrite in T002 (T002 references them in variant payloads). No serde derives (domain is serde-free). Wire all new types into the existing pub use chains in `roles.rs` / `mod.rs`.
 
 ### S2 — Stage 1: DataRole / ContractRole data-carrying enum migration
 

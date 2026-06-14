@@ -280,6 +280,33 @@
       ],
       "informal_grounds": []
     },
+    "ConstructionError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyCollection",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::roles",
+      "docs": "Error type returned by `NonEmptyVec::try_new` when the input vector is empty.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-12"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "AC-07"
+        }
+      ],
+      "informal_grounds": []
+    },
     "NonEmptyVec": {
       "action": "add",
       "role": "ValueObject",
@@ -307,6 +334,19 @@
           "docs": "Creates a NonEmptyVec with at least one element. Guarantees non-emptiness at construction."
         },
         {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "values", "ty": "Vec<TypeRef>" }
+          ],
+          "returns": "Result<Self, ConstructionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a NonEmptyVec from a vector, rejecting empty input. Returns ConstructionError::EmptyCollection when `values` is empty."
+        },
+        {
           "name": "as_slice",
           "receiver": "&self",
           "params": [],
@@ -316,6 +356,17 @@
           "has_default_impl": false,
           "where_predicates": [],
           "docs": "Returns the elements as a slice."
+        },
+        {
+          "name": "first",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TypeRef",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the first element."
         }
       ],
       "module_path": "tddd::catalogue_v2::roles",
@@ -1011,6 +1062,31 @@
     },
     {
       "action": "add",
+      "trait_ref": "core::cmp::Ord",
+      "for_type": "InvariantName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialOrd",
+      "for_type": "InvariantName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::AsRef<str>",
+      "for_type": "InvariantName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "InvariantName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::str::traits::FromStr",
+      "for_type": "InvariantName"
+    },
+    {
+      "action": "add",
       "trait_ref": "core::fmt::Debug",
       "for_type": "InvariantPredicate"
     },
@@ -1068,6 +1144,36 @@
       "action": "add",
       "trait_ref": "core::cmp::Eq",
       "for_type": "NonEmptyVec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ConstructionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ConstructionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ConstructionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ConstructionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ConstructionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ConstructionError"
     },
     {
       "action": "add",

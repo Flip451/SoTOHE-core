@@ -173,6 +173,8 @@ macro_rules! identifier_newtype {
     };
 }
 
+pub(super) use identifier_newtype;
+
 // ---------------------------------------------------------------------------
 // Identifier-based newtypes (8 types)
 // ---------------------------------------------------------------------------

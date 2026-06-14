@@ -1,11 +1,13 @@
 //! Role enums and action/receiver enums for the catalogue v2 schema.
 //!
-//! Implements 5 enums from the TDDD v2 domain-types.json:
+//! Implements role enums and role payload value objects from the TDDD v2 domain-types.json:
 //! - `DataRole` (13 values) — for `TypeEntry`
 //! - `ContractRole` (3 values) — for `TraitEntry`
 //! - `FunctionRole` (2 values) — for `FunctionEntry`
 //! - `ItemAction` (4 values) — per-entry action
 //! - `SelfReceiver` (3 values) — method self-receiver form
+//! - `InvariantName`, `InvariantPredicate`, `InvariantDecl`, `IdentityAccessor`
+//! - `NonEmptyVec<T>`
 //!
 //! The architectural layer axis is represented by [`crate::tddd::LayerId`] — a
 //! data-driven validated newtype (ADR `2026-05-08-0248` D1). The former
@@ -16,6 +18,13 @@
 //! (ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`).
 //!
 //! No serde derives — the infrastructure codec layer handles JSON serialization.
+
+use std::fmt;
+use std::str::FromStr;
+
+use crate::tddd::catalogue_v2::identifiers::{
+    Identifier, IdentifierError, MethodName, identifier_newtype,
+};
 
 // Re-export strum traits to make them available to callers.
 pub use strum::EnumString;
@@ -181,6 +190,115 @@ pub enum SelfReceiver {
 }
 
 // ---------------------------------------------------------------------------
+// Invariant payload value objects
+// ---------------------------------------------------------------------------
+
+identifier_newtype!(
+    /// Validated name for a declared invariant.
+    ///
+    /// Wraps [`Identifier`] so invariant names use the same non-empty Rust identifier
+    /// validation as the other catalogue v2 identifier-backed newtypes.
+    InvariantName
+);
+
+/// The verification mechanism for an [`InvariantDecl`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum InvariantPredicate {
+    /// A predicate method on the declaring type's `self`.
+    SelfMethod(MethodName),
+}
+
+/// Declares a named invariant for a domain type.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InvariantDecl {
+    /// The invariant name. Required because unnamed invariants are unidentifiable.
+    pub name: InvariantName,
+    /// The verification mechanism. Required because predicate-free invariants are
+    /// uncheckable.
+    pub predicate: InvariantPredicate,
+}
+
+impl InvariantDecl {
+    /// Creates a new `InvariantDecl`.
+    #[must_use]
+    pub fn new(name: InvariantName, predicate: InvariantPredicate) -> Self {
+        Self { name, predicate }
+    }
+}
+
+/// References the public getter method that exposes an Entity or AggregateRoot identity.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IdentityAccessor(MethodName);
+
+impl IdentityAccessor {
+    /// Creates a new `IdentityAccessor` from an already-validated method name.
+    #[must_use]
+    pub fn new(method_name: MethodName) -> Self {
+        Self(method_name)
+    }
+
+    /// Returns the referenced getter method name.
+    #[must_use]
+    pub fn method_name(&self) -> &MethodName {
+        &self.0
+    }
+}
+
+// ---------------------------------------------------------------------------
+// NonEmptyVec — schema-level non-empty collection
+// ---------------------------------------------------------------------------
+
+/// Error type for catalogue v2 value-object construction.
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+pub enum ConstructionError {
+    /// A collection required to contain at least one element was empty.
+    #[error("collection must contain at least one element")]
+    EmptyCollection,
+}
+
+/// A vector that is guaranteed to contain at least one element.
+///
+/// Domain-layer type only; infrastructure codecs are responsible for converting
+/// JSON arrays into this value object and rejecting empty arrays.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NonEmptyVec<T>(Vec<T>);
+
+impl<T> NonEmptyVec<T> {
+    /// Creates a `NonEmptyVec` from a first element and the remaining elements.
+    #[must_use]
+    pub fn new(first: T, rest: Vec<T>) -> Self {
+        let mut values = Vec::with_capacity(rest.len() + 1);
+        values.push(first);
+        values.extend(rest);
+        Self(values)
+    }
+
+    /// Creates a `NonEmptyVec` from a vector, rejecting empty input.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ConstructionError::EmptyCollection`] when `values` is empty.
+    pub fn try_new(values: Vec<T>) -> Result<Self, ConstructionError> {
+        if values.is_empty() {
+            return Err(ConstructionError::EmptyCollection);
+        }
+        Ok(Self(values))
+    }
+
+    /// Returns the elements as a slice.
+    #[must_use]
+    pub fn as_slice(&self) -> &[T] {
+        self.0.as_slice()
+    }
+
+    /// Returns the first element.
+    #[must_use]
+    pub fn first(&self) -> Option<&T> {
+        self.0.first()
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -188,6 +306,7 @@ pub enum SelfReceiver {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::tddd::catalogue_v2::identifiers::TypeRef;
 
     // Manual variant arrays replace strum::EnumIter to avoid generating public
     // <EnumName>Iter structs that trigger the catalogue declaration check.
@@ -402,6 +521,104 @@ mod tests {
         assert_eq!("self".parse::<SelfReceiver>().unwrap(), SelfReceiver::Owned);
         assert_eq!("&self".parse::<SelfReceiver>().unwrap(), SelfReceiver::SharedRef);
         assert_eq!("&mut self".parse::<SelfReceiver>().unwrap(), SelfReceiver::ExclusiveRef);
+    }
+
+    // -----------------------------------------------------------------------
+    // Invariant payload value objects
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_invariant_name_new_with_identifier_returns_name() {
+        let name = InvariantName::new("email_is_valid").unwrap();
+
+        assert_eq!(name.as_str(), "email_is_valid");
+    }
+
+    #[test]
+    fn test_invariant_name_new_with_empty_returns_error() {
+        let result = InvariantName::new("");
+
+        assert!(matches!(result, Err(IdentifierError::Empty)));
+    }
+
+    #[test]
+    fn test_invariant_name_new_with_whitespace_returns_error() {
+        let result = InvariantName::new("email is valid");
+
+        assert!(
+            matches!(result, Err(IdentifierError::InvalidCharacters(value)) if value == "email is valid")
+        );
+    }
+
+    #[test]
+    fn test_invariant_decl_new_stores_name_and_predicate() {
+        let name = InvariantName::new("email_is_valid").unwrap();
+        let method_name = MethodName::new("is_email_valid").unwrap();
+        let predicate = InvariantPredicate::SelfMethod(method_name.clone());
+
+        let decl = InvariantDecl::new(name.clone(), predicate);
+
+        assert_eq!(decl.name, name);
+        assert_eq!(decl.predicate, InvariantPredicate::SelfMethod(method_name));
+    }
+
+    #[test]
+    fn test_identity_accessor_new_with_method_name_returns_accessor() {
+        let method_name = MethodName::new("id").unwrap();
+
+        let accessor = IdentityAccessor::new(method_name.clone());
+
+        assert_eq!(accessor.method_name().as_str(), "id");
+        assert_eq!(accessor.method_name(), &method_name);
+    }
+
+    #[test]
+    fn test_identity_accessor_composed_with_empty_method_name_returns_error() {
+        let result = MethodName::new("").map(IdentityAccessor::new);
+
+        assert!(matches!(result, Err(IdentifierError::Empty)));
+    }
+
+    #[test]
+    fn test_identity_accessor_composed_with_whitespace_method_name_returns_error() {
+        let result = MethodName::new("user id").map(IdentityAccessor::new);
+
+        assert!(
+            matches!(result, Err(IdentifierError::InvalidCharacters(value)) if value == "user id")
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // NonEmptyVec
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_non_empty_vec_new_with_first_and_rest_returns_values() {
+        let first = TypeRef::new("UserRegistered").unwrap();
+        let second = TypeRef::new("UserRenamed").unwrap();
+
+        let values = NonEmptyVec::new(first.clone(), vec![second.clone()]);
+
+        assert_eq!(values.as_slice().len(), 2);
+        assert_eq!(values.first(), Some(&first));
+        assert!(values.as_slice().contains(&second));
+    }
+
+    #[test]
+    fn test_non_empty_vec_try_new_with_values_returns_values() {
+        let event = TypeRef::new("UserRegistered").unwrap();
+
+        let values = NonEmptyVec::try_new(vec![event.clone()]).unwrap();
+
+        assert_eq!(values.as_slice(), std::slice::from_ref(&event));
+        assert_eq!(values.first(), Some(&event));
+    }
+
+    #[test]
+    fn test_non_empty_vec_try_new_with_empty_returns_error() {
+        let result = NonEmptyVec::<TypeRef>::try_new(vec![]);
+
+        assert!(matches!(result, Err(ConstructionError::EmptyCollection)));
     }
 
     // -----------------------------------------------------------------------

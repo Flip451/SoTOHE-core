@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T01:57:25Z",
-  "declaration_hash": "a779696cd556da20a83a5bd3cf30321d69ea1af3c477b1927f4036bb6959d72c",
+  "generated_at": "2026-06-14T03:12:59Z",
+  "declaration_hash": "0b8fc7477884a899aaa907e245f3892f3477813976223747c90b864611c9ba81",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
@@ -64,6 +64,20 @@
       ]
     },
     {
+      "type_name": "ConstructionError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "ContractRole",
       "kind_tag": "enum",
       "signal": "yellow",
@@ -103,8 +117,8 @@
       "type_name": "IdentityAccessor",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -115,8 +129,8 @@
       "type_name": "InvariantDecl",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -127,21 +141,26 @@
       "type_name": "InvariantName",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
+        "core::cmp::Ord",
         "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef<str>",
         "core::fmt::Debug",
-        "core::hash::Hash"
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
       "type_name": "InvariantPredicate",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -152,8 +171,8 @@
       "type_name": "NonEmptyVec",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
