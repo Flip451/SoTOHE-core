@@ -108,7 +108,7 @@ use crate::tddd::type_signals_evaluator::signal_tags::{
 /// Delegates to `signal_tags::data_role_kind_tag`, which is the single source of
 /// truth for the grandfathered kind-tag mapping shared by the type-signal evaluator
 /// and the catalogue linter.
-fn type_entry_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
+fn type_entry_kind_tag(role: &DataRole, kind: &TypeKindV2) -> &'static str {
     data_role_kind_tag(role, kind)
 }
 
@@ -337,7 +337,7 @@ impl CatalogueLinter for InMemoryCatalogueLinter {
                 // fire `enum` or `error_type` rules (not `value_object`/role rules),
                 // and Entity/AggregateRoot/Specification entries fire `value_object`
                 // rules — per the v2-compatible kind-tag scheme.
-                let kind_tag = type_entry_kind_tag(type_entry.role, &type_entry.kind);
+                let kind_tag = type_entry_kind_tag(&type_entry.role, &type_entry.kind);
                 // Derive members_len and variants_len from TypeKindV2 so that
                 // `expected_members` and `expected_variants` rules can fire on v3
                 // entries equivalently to the v2 linter.
@@ -368,7 +368,7 @@ impl CatalogueLinter for InMemoryCatalogueLinter {
             // Walk v3 trait entries.
             // Traits have no members or variants.
             for (trait_name, trait_entry) in &catalogue.traits {
-                let kind_tag = contract_role_kind_tag(trait_entry.role);
+                let kind_tag = contract_role_kind_tag(&trait_entry.role);
                 let lengths = EntryFieldLengths {
                     methods: Some(trait_entry.methods.len()),
                     members: None,
@@ -443,7 +443,7 @@ mod tests {
     fn value_object_entry_empty_methods() -> TypeEntry {
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -468,7 +468,7 @@ mod tests {
         );
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -523,7 +523,7 @@ mod tests {
     fn domain_service_entry() -> TypeEntry {
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::DomainService,
+            role: DataRole::domain_service(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -750,7 +750,7 @@ mod tests {
         let field = FieldDecl::new(FieldName::new("inner").unwrap(), TypeRef::new("u64").unwrap());
         let entry = TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![field], has_stripped_fields: false },
                 None,

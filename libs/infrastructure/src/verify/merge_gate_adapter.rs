@@ -611,7 +611,7 @@ mod tests {
   "types": {
     "TrackId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
@@ -629,7 +629,7 @@ mod tests {
   "types": {
     "TrackId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },

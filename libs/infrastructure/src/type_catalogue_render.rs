@@ -183,16 +183,19 @@ const SECTIONS: &[Section] = &[
 /// renderer groups by the *real* v3 role (`type_entry_display_tag` /
 /// `contract_role_display_tag` / `function_role_display_tag`), so a catalogue
 /// entry whose role is `Entity` / `AggregateRoot` / `Specification` /
-/// `SpecificationPort` / `UseCaseFunction` lands in its dedicated section
-/// here. Type-signal lookup within these sections translates the heading tag
-/// back to the v2-compat storage key via [`section_to_signal_kind_tag`].
-/// Empty sections (no entry with that role) are skipped at render time.
+/// `SpecificationPort` / `UseCaseFunction` / `Repository` / `EventPolicy`
+/// lands in its dedicated section here. Type-signal lookup within these
+/// sections translates the heading tag back to the v2-compat storage key via
+/// [`section_to_signal_kind_tag`]. Empty sections (no entry with that role)
+/// are skipped at render time.
 const V3_EXTRA_SECTIONS: &[Section] = &[
     Section { heading: "## Entities", kind_tag: "entity" },
     Section { heading: "## Aggregate Roots", kind_tag: "aggregate_root" },
     Section { heading: "## Specifications", kind_tag: "specification" },
     Section { heading: "## Specification Ports", kind_tag: "specification_port" },
     Section { heading: "## Use Case Functions", kind_tag: "use_case_function" },
+    Section { heading: "## Repositories", kind_tag: "repository" },
+    Section { heading: "## Event Policies", kind_tag: "event_policy" },
 ];
 
 /// Maps a section `kind_tag` (a real v3 role tag, as produced by
@@ -202,13 +205,14 @@ const V3_EXTRA_SECTIONS: &[Section] = &[
 ///
 /// The signal evaluator stores signals under the v2-collapsed `kind_tag`
 /// (e.g. an `Entity` entry's signal is keyed `"value_object"`, a
-/// `UseCaseFunction`'s `"free_function"`), so a section rendered under the
-/// dedicated v3 heading must translate back to that key when looking up its
-/// Signal column. v3-only tags collapse; everything else is the identity.
+/// `UseCaseFunction`'s `"free_function"`, a `Repository`'s `"secondary_port"`),
+/// so a section rendered under the dedicated v3 heading must translate back to
+/// that key when looking up its Signal column. v3-only tags collapse;
+/// everything else is the identity.
 fn section_to_signal_kind_tag(section_kind_tag: &'static str) -> &'static str {
     match section_kind_tag {
         "entity" | "aggregate_root" | "specification" => "value_object",
-        "specification_port" => "secondary_port",
+        "specification_port" | "repository" => "secondary_port",
         "use_case_function" => "free_function",
         other => other,
     }
@@ -252,7 +256,7 @@ fn catalogue_spec_signal_emoji(signal: ConfidenceSignal) -> String {
 /// 2. `Enum { .. }` with `ErrorType` role → `"error_type"` (enum shape + role combo)
 /// 3. `Enum { .. }` with any other role → `"enum"` (structural shape wins)
 /// 4. All other shapes → role-based mapping via [`data_role_display_tag`]
-fn type_entry_display_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
+fn type_entry_display_tag(role: &DataRole, kind: &TypeKindV2) -> &'static str {
     match kind {
         TypeKindV2::Struct(sk) if sk.typestate.is_some() => "typestate",
         TypeKindV2::Enum { .. } if matches!(role, DataRole::ErrorType) => "error_type",
@@ -262,30 +266,32 @@ fn type_entry_display_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
 }
 
 /// Display kind tag for a v3 `DataRole` — the real role, not the v2 collapse.
-fn data_role_display_tag(role: DataRole) -> &'static str {
+fn data_role_display_tag(role: &DataRole) -> &'static str {
     match role {
-        DataRole::ValueObject => "value_object",
-        DataRole::Entity => "entity",
-        DataRole::AggregateRoot => "aggregate_root",
+        DataRole::ValueObject { .. } => "value_object",
+        DataRole::Entity { .. } => "entity",
+        DataRole::AggregateRoot { .. } => "aggregate_root",
         DataRole::Specification => "specification",
-        DataRole::DomainService => "domain_service",
+        DataRole::DomainService { .. } => "domain_service",
         DataRole::Factory => "factory",
-        DataRole::UseCase => "use_case",
+        DataRole::UseCase { .. } => "use_case",
         DataRole::Interactor => "interactor",
         DataRole::Command => "command",
         DataRole::Query => "query",
         DataRole::Dto => "dto",
         DataRole::ErrorType => "error_type",
         DataRole::SecondaryAdapter => "secondary_adapter",
+        DataRole::EventPolicy { .. } => "event_policy",
     }
 }
 
 /// Display kind tag for a v3 `ContractRole` — the real role, not the v2 collapse.
-fn contract_role_display_tag(role: ContractRole) -> &'static str {
+fn contract_role_display_tag(role: &ContractRole) -> &'static str {
     match role {
         ContractRole::SpecificationPort => "specification_port",
         ContractRole::SecondaryPort => "secondary_port",
         ContractRole::ApplicationService => "application_service",
+        ContractRole::Repository { .. } => "repository",
     }
 }
 
@@ -386,7 +392,7 @@ pub fn render_type_catalogue_v3(
         // precedence over the semantic DataRole. Signal lookup within the
         // section translates this back to the v2-compat key via
         // section_to_signal_kind_tag.
-        let kind_tag = type_entry_display_tag(type_entry.role, &type_entry.kind);
+        let kind_tag = type_entry_display_tag(&type_entry.role, &type_entry.kind);
         let action = v3_action_tag(type_entry.action);
         let details = v3_type_entry_details(
             type_entry,
@@ -405,7 +411,7 @@ pub fn render_type_catalogue_v3(
     }
 
     for (trait_name, trait_entry) in &doc.traits {
-        let kind_tag = contract_role_display_tag(trait_entry.role);
+        let kind_tag = contract_role_display_tag(&trait_entry.role);
         let action = v3_action_tag(trait_entry.action);
         let details = v3_trait_entry_details(trait_entry);
         let sig_idx = has_spec_signals.then_some(spec_idx);
@@ -599,7 +605,7 @@ mod tests {
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
         let entry = TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -685,7 +691,7 @@ mod tests {
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
         let plain_entry = TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -737,7 +743,7 @@ mod tests {
             TypeName::new("AType").unwrap(),
             TypeEntry {
                 action: ItemAction::Add,
-                role: DataRole::ValueObject,
+                role: DataRole::value_object(),
                 kind: TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
@@ -783,7 +789,7 @@ mod tests {
             TypeName::new("UserAccount").unwrap(),
             TypeEntry {
                 action: ItemAction::Add,
-                role: DataRole::Entity,
+                role: DataRole::entity().unwrap(),
                 kind: TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,

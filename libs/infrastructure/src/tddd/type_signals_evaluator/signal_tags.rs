@@ -25,7 +25,7 @@ use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
 ///   `UseCase` → `"use_case"`, `Interactor` → `"interactor"`,
 ///   `Command` → `"command"`, `Query` → `"query"`, `Dto` → `"dto"`,
 ///   `ErrorType` (non-enum) → `"error_type"`, `SecondaryAdapter` → `"secondary_adapter"`
-pub(crate) fn data_role_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
+pub(crate) fn data_role_kind_tag(role: &DataRole, kind: &TypeKindV2) -> &'static str {
     // Typestate detection: Struct (any shape) with a typestate marker.
     if let TypeKindV2::Struct(sk) = kind {
         if sk.typestate.is_some() {
@@ -38,19 +38,20 @@ pub(crate) fn data_role_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static 
     }
     // Struct (no typestate) / TypeAlias: role-based mapping.
     match role {
-        DataRole::ValueObject
-        | DataRole::Entity
-        | DataRole::AggregateRoot
+        DataRole::ValueObject { .. }
+        | DataRole::Entity { .. }
+        | DataRole::AggregateRoot { .. }
         | DataRole::Specification => "value_object",
-        DataRole::DomainService => "domain_service",
+        DataRole::DomainService { .. } => "domain_service",
         DataRole::Factory => "factory",
-        DataRole::UseCase => "use_case",
+        DataRole::UseCase { .. } => "use_case",
         DataRole::Interactor => "interactor",
         DataRole::Command => "command",
         DataRole::Query => "query",
         DataRole::Dto => "dto",
         DataRole::ErrorType => "error_type",
         DataRole::SecondaryAdapter => "secondary_adapter",
+        DataRole::EventPolicy { .. } => "event_policy",
     }
 }
 
@@ -65,9 +66,11 @@ pub(crate) fn data_role_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static 
 ///   (both v3 `ContractRole` variants map to the same kind_tag; `SpecificationPort`
 ///   has no distinct kind_tag at this level)
 /// - `ApplicationService` → `"application_service"`
-pub(crate) const fn contract_role_kind_tag(role: ContractRole) -> &'static str {
+pub(crate) const fn contract_role_kind_tag(role: &ContractRole) -> &'static str {
     match role {
-        ContractRole::SpecificationPort | ContractRole::SecondaryPort => "secondary_port",
+        ContractRole::SpecificationPort
+        | ContractRole::SecondaryPort
+        | ContractRole::Repository { .. } => "secondary_port",
         ContractRole::ApplicationService => "application_service",
     }
 }

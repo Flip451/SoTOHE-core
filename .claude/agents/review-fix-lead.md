@@ -1,6 +1,6 @@
 ---
 name: review-fix-lead
-model: fable
+model: opus
 description: Own one review scope, autonomously fix findings and re-review until zero_findings or timeout. Use for parallel per-scope fix+review loops.
 ---
 
@@ -130,10 +130,10 @@ right form when you just need to confirm `required (stale hash)` /
    - P0/P1/P2: implement the fix within scope boundaries.
    - If a fix requires out-of-scope files: return `blocked_cross_scope`.
    - Run `cargo make ci-rust` to verify fixes compile.
-   - **Cross-doc hash sync (mandatory after editing `spec.json` or `impl-plan.json`)**: spec / impl-plan の anchor 文言が変わると、それを cite している catalogue (`<layer>-types.json` の `spec_refs[].hash`) が stale になる。`cargo make verify-plan-artifact-refs` を回して hash drift を検出する (これは `cargo make ci-rust` には含まれず、`cargo make ci` でのみ走る verify。spec/impl-plan を一度でも編集した round では agent loop 中に明示的に呼び出す)。
+   - **Cross-doc ref sync (mandatory after editing `spec.json` or `impl-plan.json`)**: spec / impl-plan の anchor を追加・変更・削除すると、catalogue (`<layer>-types.json`) の `spec_refs[].anchor` が dangling になる可能性がある。`cargo make verify-plan-artifact-refs` を回して anchor validity を検出する (これは `cargo make ci-rust` には含まれず、`cargo make ci` でのみ走る verify。spec/impl-plan を一度でも編集した round では agent loop 中に明示的に呼び出す)。注意: catalogue の `spec_refs[]` エントリに `hash` フィールドは存在しない (schema_version 4 で削除済み。codec は `deny_unknown_fields` で reject する)。
      - `[OK] All checks passed.` → step 4 (re-review) へ進む。
-     - `SpecRef hash mismatch ...` エラー → catalogue 側の修正は **catalogue の専属 writer = type-designer** の責務なので、自分で `<layer>-types.json` を直接編集してはいけない。代わりに Agent tool を `subagent_type: "type-designer"` で起動し、briefing に (a) mismatch エラーの全文 (`expected ... actual ...`)、(b) 自分が編集した spec / impl-plan anchor の一覧、(c) `spec_refs[].hash` refresh + 連動 derived view (`<layer>-types.md` / `contract-map.md` / `<layer>-type-signals.json`) の再生成、(d) hash sync のみで catalogue の semantic content (kind / expected_methods / etc) は変えない、を明示する。type-designer 完了後 `cargo make verify-plan-artifact-refs` を再度回して `OK` を確認、その上で step 4 に進む。
-     - その他のエラー (`unresolved SpecRef anchor` / `invalid anchor` / coverage violation / I/O or JSON parse error 等) → catalogue の `spec_refs[].anchor` 値そのものが不正か、spec.json / impl-plan.json の構造が壊れているケース。自分で編集した anchor 一覧と verifier の出力全文を添えて orchestrator に `failed` を返し、人手の判断を仰ぐ。
+     - `unresolved SpecRef anchor` / `invalid anchor` エラー → catalogue の `spec_refs[].anchor` 値が spec.json / impl-plan.json の実在しない anchor を参照している。catalogue 修正は **catalogue の専属 writer = type-designer** の責務なので、自分で `<layer>-types.json` を直接編集してはいけない。代わりに Agent tool を `subagent_type: "type-designer"` で起動し、briefing に (a) エラーの全文、(b) 自分が編集した spec / impl-plan anchor の一覧、(c) anchor 修正 + 連動 derived view (`<layer>-types.md` / `contract-map.md` / `<layer>-type-signals.json`) の再生成、(d) anchor fix のみで catalogue の semantic content (kind / expected_methods / etc) は変えない、を明示する。type-designer 完了後 `cargo make verify-plan-artifact-refs` を再度回して `OK` を確認、その上で step 4 に進む。
+     - coverage violation / I/O or JSON parse error 等 → spec.json / impl-plan.json の構造が壊れているケース。自分が編集した anchor 一覧と verifier の出力全文を添えて orchestrator に `failed` を返し、人手の判断を仰ぐ。
 4. **Re-review**: Run the reviewer again with updated briefing (include previous findings
    and fixes applied). Go to step 2.
 

@@ -5,7 +5,7 @@
   "types": {
     "LintRuleKind": {
       "action": "modify",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -131,7 +131,7 @@
     },
     "LintRuleSpec": {
       "action": "modify",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -156,7 +156,7 @@
     },
     "RunCatalogueLintCommand": {
       "action": "reference",
-      "role": "Command",
+      "role": { "Command": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -177,7 +177,7 @@
     },
     "RunCatalogueLintInteractor": {
       "action": "modify",
-      "role": "Interactor",
+      "role": { "Interactor": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -201,7 +201,7 @@
     },
     "RunCatalogueLintError": {
       "action": "modify",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -244,7 +244,7 @@
   "traits": {
     "RunCatalogueLint": {
       "action": "reference",
-      "role": "ApplicationService",
+      "role": { "ApplicationService": {} },
       "methods": [
         {
           "name": "execute",

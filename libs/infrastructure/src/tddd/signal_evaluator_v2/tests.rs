@@ -3488,7 +3488,7 @@ fn test_impl_block_generics_symmetric_compare_blue() {
         TypeName::new("Foo").unwrap(),
         TypeEntry {
             action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -3726,7 +3726,7 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
         TypeName::new("Foo").unwrap(),
         TypeEntry {
             action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -4334,7 +4334,7 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
         TypeName::new("SelfType").unwrap(),
         TypeEntry {
             action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,

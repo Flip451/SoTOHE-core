@@ -76,7 +76,7 @@ fn write_domain_catalogue_with_spec_ref(track_dir: &Path, file: &str, anchor: &s
   "types": {{
     "MyType": {{
       "action": "add",
-      "role": "ValueObject",
+      "role": {{ "ValueObject": {{}} }},
       "kind": {{ "kind": "struct", "shape": {{ "kind": "unit" }} }},
       "spec_refs": [
         {{
@@ -268,7 +268,7 @@ fn test_empty_spec_refs_on_catalogue_entry_passes() {
   "types": {
     "MyType": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
@@ -692,7 +692,7 @@ const V3_CATALOGUE_DOMAIN: &str = r#"{
   "types": {
     "MyType": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "plain" } },
       "docs": "A simple value object."
     }

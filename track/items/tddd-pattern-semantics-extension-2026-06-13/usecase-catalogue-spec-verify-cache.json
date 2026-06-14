@@ -65,6 +65,38 @@
         "kind": "pass",
         "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
       }
+    },
+    {
+      "claim_hash": "bdab56ce29c0665059d42f7b0b5f2bff007ba3e9b8121add3440918b1fd994c8",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成"
+      }
+    },
+    {
+      "claim_hash": "93e138017773e447e5a9e1b078fbebf3503498947f3dd9829d376a62888b6421",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "3603e814a85e7bec2d8815f6a1321583a3c19ce4c33ae9f211eb555df249eb35",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "28beaa0c3c350754ca837f183c22f882a55b7aa75d0e875324788d826d13fad6",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
     }
   ]
 }

@@ -5,7 +5,7 @@
   "types": {
     "DataRole": {
       "action": "modify",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -147,7 +147,7 @@
     },
     "ContractRole": {
       "action": "modify",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -187,7 +187,7 @@
     },
     "InvariantDecl": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -212,7 +212,7 @@
     },
     "InvariantName": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -234,7 +234,7 @@
     },
     "InvariantPredicate": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -260,7 +260,7 @@
     },
     "IdentityAccessor": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -282,7 +282,7 @@
     },
     "ConstructionError": {
       "action": "add",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -309,7 +309,7 @@
     },
     "NonEmptyVec": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -381,7 +381,7 @@
     },
     "RoleKind": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -421,7 +421,7 @@
     },
     "RuleTarget": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -445,7 +445,7 @@
     },
     "CatalogueLinterRuleKind": {
       "action": "modify",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -571,7 +571,7 @@
     },
     "CatalogueLinterRule": {
       "action": "modify",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -633,7 +633,7 @@
     },
     "CatalogueLinterRuleError": {
       "action": "modify",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -668,7 +668,7 @@
     },
     "CatalogueLintViolation": {
       "action": "modify",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -743,7 +743,7 @@
     },
     "CatalogueLinterError": {
       "action": "modify",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -769,7 +769,7 @@
     },
     "CatalogueLoaderError": {
       "action": "reference",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -842,7 +842,7 @@
   "traits": {
     "CatalogueLoader": {
       "action": "reference",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": [
         {
           "name": "load_all",
@@ -869,7 +869,7 @@
     },
     "CatalogueLinter": {
       "action": "delete",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": [],
       "supertrait_bounds": [],
       "module_path": "tddd::catalogue_linter",

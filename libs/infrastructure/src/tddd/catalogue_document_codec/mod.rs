@@ -37,7 +37,9 @@ use serde::{Deserialize, de};
 use thiserror::Error;
 
 mod decode;
+mod decode_roles;
 mod dto;
+mod dto_roles;
 mod encode;
 mod validate;
 
@@ -324,7 +326,7 @@ mod tests {
   "traits": {{
     "MyPort": {{
       "action": "add",
-      "role": "SpecificationPort",
+      "role": {{ "SpecificationPort": {{}} }},
       "methods": [
         {{
           "name": "do_it",
@@ -348,7 +350,7 @@ mod tests {
   "traits": {
     "MixedTrait": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         {
           "name": "required",
@@ -497,7 +499,7 @@ mod tests {
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "plain", "fields": [] } }
     }
   },
@@ -508,7 +510,7 @@ mod tests {
         assert_eq!(doc.types.len(), 1);
         let entry = doc.types.values().next().unwrap();
         assert_eq!(entry.action, ItemAction::Add);
-        assert_eq!(entry.role, DataRole::ValueObject);
+        assert_eq!(entry.role, DataRole::value_object());
         assert!(
             matches!(&entry.kind, TypeKindV2::Struct(sk) if matches!(sk.shape, StructShape::Plain { .. }))
         );
@@ -523,7 +525,7 @@ mod tests {
   "types": {
     "Marker": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
@@ -547,7 +549,7 @@ mod tests {
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } }
     }
   },
@@ -578,7 +580,7 @@ mod tests {
   "types": {
     "IdleState": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "plain", "fields": [] },
@@ -612,7 +614,7 @@ mod tests {
   "traits": {
     "UserRepository": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": []
     }
   },
@@ -639,7 +641,7 @@ mod tests {
   "traits": {
     "Foo": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "generics": [{ "name": "T", "bounds": [] }],
       "where_predicates": [{ "lhs": "T", "rhs": ["Clone"] }]
     }
@@ -667,7 +669,7 @@ mod tests {
   "traits": {
     "OldTrait": {
       "action": "add",
-      "role": "SecondaryPort"
+      "role": { "SecondaryPort": {} }
     }
   },
   "functions": {}
@@ -689,7 +691,7 @@ mod tests {
   "traits": {
     "Bar": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "generics": [{ "name": "T", "bounds": ["Clone"] }],
       "where_predicates": [{ "lhs": "T", "rhs": ["Send"] }]
     }
@@ -719,7 +721,7 @@ mod tests {
   "traits": {
     "Plain": {
       "action": "add",
-      "role": "SecondaryPort"
+      "role": { "SecondaryPort": {} }
     }
   },
   "functions": {}
@@ -747,7 +749,7 @@ mod tests {
   "traits": {
     "BadTrait": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "generics": [{ "name": "", "bounds": [] }]
     }
   },
@@ -769,7 +771,7 @@ mod tests {
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } },
       "methods": [],
       "module_path": ""
@@ -829,7 +831,7 @@ mod tests {
   "types": {
     "RenderContractMapError": {
       "action": "modify",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": { "kind": "enum", "variants": [] }
     }
   },
@@ -867,7 +869,7 @@ mod tests {
   "types": {
     "MyType": {
       "action": "add",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": { "kind": "enum", "variants": [] }
     }
   },
@@ -892,7 +894,7 @@ mod tests {
   "types": {
     "MyError": {
       "action": "add",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": { "kind": "enum", "variants": [] }
     }
   },
@@ -922,7 +924,7 @@ mod tests {
   "types": {
     "BadError": {
       "action": "add",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": { "kind": "enum", "variants": [] },
       "trait_impls": [
         { "trait_name": "From", "origin_crate": "core", "generic_args": "" }
@@ -967,7 +969,7 @@ mod tests {
   "types": {
     "Marker": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "unit_struct" }
     }
   },
@@ -992,7 +994,7 @@ mod tests {
   "types": {
     "Locked": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "unit" },
@@ -1038,7 +1040,7 @@ mod tests {
   "types": {
     "Pending": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "tuple", "fields": ["Uuid"] },
@@ -1082,48 +1084,17 @@ mod tests {
         for (case, generics_json) in [
             ("empty generic param name", r#"[{ "name": "", "bounds": ["Send"] }]"#),
             ("empty generic bound", r#"[{ "name": "T", "bounds": [""] }]"#),
+            ("hyphenated generic param name", r#"[{ "name": "T-U", "bounds": [] }]"#),
+            ("qualified generic param name", r#"[{ "name": "T::X", "bounds": [] }]"#),
+            ("angle-bracket generic param name", r#"[{ "name": "<T>", "bounds": [] }]"#),
+            ("digit-leading generic param name", r#"[{ "name": "123T", "bounds": [] }]"#),
+            ("space-containing generic param name", r#"[{ "name": "T U", "bounds": [] }]"#),
         ] {
             let json = trait_method_catalogue_with_generics(generics_json);
             let result = CatalogueDocumentCodec::decode(&json, "domain");
             assert!(
                 matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
                 "expected InvalidEntry for {case}, got: {result:?}"
-            );
-        }
-    }
-
-    #[test]
-    fn test_decode_method_with_invalid_generic_param_name_returns_invalid_entry_error() {
-        // Generic param names like "T-U" or "T::X" must be rejected at the codec boundary.
-        for bad_name in &["T-U", "T::X", "<T>", "123T", "T U", ""] {
-            let json = format!(
-                r#"{{
-  "schema_version": 4,
-  "crate_name": "domain",
-  "layer": "domain",
-  "types": {{
-    "Foo": {{
-      "action": "add",
-      "role": "ValueObject",
-      "kind": {{ "kind": "struct", "shape": {{ "kind": "plain" }} }},
-      "methods": [
-        {{
-          "name": "do_something",
-          "params": [],
-          "returns": "()",
-          "generics": [{{"name": "{bad_name}", "bounds": []}}]
-        }}
-      ]
-    }}
-  }},
-  "traits": {{}},
-  "functions": {{}}
-}}"#
-            );
-            let result = CatalogueDocumentCodec::decode(&json, "domain");
-            assert!(
-                matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
-                "expected InvalidEntry for bad generic name '{bad_name}', got: {result:?}"
             );
         }
     }
@@ -1139,7 +1110,7 @@ mod tests {
   "traits": {
     "MyPort": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "supertrait_bounds": [""],
       "methods": []
     }
@@ -1164,7 +1135,7 @@ mod tests {
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [
         { "file": "track/items/x/spec.json", "anchor": "IN-01" }
@@ -1198,7 +1169,7 @@ mod tests {
   "traits": {
     "UserRepository": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": [],
       "spec_refs": [
         { "file": "track/items/x/spec.json", "anchor": "AC-02" }
@@ -1264,7 +1235,7 @@ mod tests {
   "types": {
     "Marker": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
@@ -1297,7 +1268,7 @@ mod tests {
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [
         { "file": "track/items/x/spec.json", "anchor": "IN-01", "hash": "0000000000000000000000000000000000000000000000000000000000000000" }
@@ -1376,7 +1347,7 @@ mod tests {
   "traits": {
     "Describable": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         {
           "name": "describe",
@@ -1610,7 +1581,7 @@ mod tests {
   "traits": {
     "GenericRepo": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": [
         {
           "name": "save",
@@ -1690,7 +1661,7 @@ mod tests {
   "traits": {
     "LegacyRepo": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": [
         {
           "name": "find",
@@ -1775,7 +1746,7 @@ mod tests {
   "traits": {
     "SimplePort": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         { "name": "do_it", "receiver": "&self", "params": [], "returns": "()" }
       ]
@@ -1803,7 +1774,7 @@ mod tests {
   "traits": {
     "SimplePort": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         { "name": "do_it", "receiver": "&self", "params": [], "returns": "()" }
       ]
@@ -1831,7 +1802,7 @@ mod tests {
   "traits": {
     "BadPort": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         {
           "name": "do_it",
@@ -2209,7 +2180,7 @@ mod tests {
   "types": {
     "Foo": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "plain" } }
     }
   },
@@ -2283,7 +2254,7 @@ mod tests {
   "types": {
     "Foo": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "plain" } }
     }
   },
@@ -2356,6 +2327,190 @@ mod tests {
         assert!(
             !encoded.contains("\"impl_where_predicates\""),
             "impl_where_predicates must be omitted when empty: {encoded}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR 2026-05-25-0000 D16: DataRole::EventPolicy codec tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_event_policy_type_role_with_non_empty_reacts_to_succeeds() {
+        // D16: EventPolicy.reacts_to is a NonEmptyVec<TypeRef>. Happy-path: a valid
+        // list of event type references must decode without error.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "OrderPolicyHandler": {
+      "action": "add",
+      "role": { "EventPolicy": { "reacts_to": ["OrderPlaced", "OrderCancelled"] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            domain::tddd::catalogue_v2::roles::DataRole::EventPolicy { reacts_to } => {
+                let slice = reacts_to.as_slice();
+                assert_eq!(slice.len(), 2);
+                assert_eq!(slice[0].as_str(), "OrderPlaced");
+                assert_eq!(slice[1].as_str(), "OrderCancelled");
+            }
+            other => panic!("expected EventPolicy role, got: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_encode_decode_round_trip_preserves_event_policy_role() {
+        // D16: encode → decode round-trip must preserve EventPolicy.reacts_to exactly.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "PaymentPolicyHandler": {
+      "action": "add",
+      "role": { "EventPolicy": { "reacts_to": ["PaymentReceived"] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "round-trip must preserve EventPolicy role");
+        // Encoded JSON must use discriminated-object form, not bare string.
+        assert!(
+            encoded.contains("\"EventPolicy\""),
+            "encoded JSON must use discriminated-object form for EventPolicy: {encoded}"
+        );
+        assert!(
+            encoded.contains("\"reacts_to\""),
+            "encoded JSON must contain reacts_to field: {encoded}"
+        );
+    }
+
+    #[test]
+    fn test_decode_event_policy_with_empty_reacts_to_returns_invalid_entry_error() {
+        // D16: EventPolicy.reacts_to must be non-empty (NonEmptyVec). An empty array
+        // must be rejected at the codec boundary with InvalidEntry.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "EmptyPolicyHandler": {
+      "action": "add",
+      "role": { "EventPolicy": { "reacts_to": [] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "empty EventPolicy.reacts_to must be rejected with InvalidEntry, got: {result:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR 2026-05-25-0000 D10: ContractRole::Repository codec tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_repository_trait_role_with_aggregate_succeeds() {
+        // D10: ContractRole::Repository requires a non-empty aggregate TypeRef. Happy-path:
+        // a valid aggregate type reference must decode without error.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "OrderRepository": {
+      "action": "add",
+      "role": { "Repository": { "aggregate": "Order" } },
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits.values().next().unwrap();
+        match &entry.role {
+            domain::tddd::catalogue_v2::roles::ContractRole::Repository { aggregate } => {
+                assert_eq!(aggregate.as_str(), "Order");
+            }
+            other => panic!("expected Repository role, got: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_encode_decode_round_trip_preserves_repository_role() {
+        // D10: encode → decode round-trip must preserve Repository.aggregate exactly.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "UserRepository": {
+      "action": "add",
+      "role": { "Repository": { "aggregate": "User" } },
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "round-trip must preserve Repository role");
+        // Encoded JSON must use discriminated-object form, not bare string.
+        assert!(
+            encoded.contains("\"Repository\""),
+            "encoded JSON must use discriminated-object form for Repository: {encoded}"
+        );
+        assert!(
+            encoded.contains("\"aggregate\""),
+            "encoded JSON must contain aggregate field: {encoded}"
+        );
+    }
+
+    #[test]
+    fn test_decode_repository_with_empty_aggregate_returns_invalid_entry_error() {
+        // D10: Repository.aggregate must be a non-empty TypeRef. An empty string must
+        // be rejected at the codec boundary with InvalidEntry.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "BadRepository": {
+      "action": "add",
+      "role": { "Repository": { "aggregate": "" } },
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "empty Repository.aggregate must be rejected with InvalidEntry, got: {result:?}"
         );
     }
 }

@@ -1,96 +1,96 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "0b8fc7477884a899aaa907e245f3892f3477813976223747c90b864611c9ba81",
+  "catalogue_declaration_hash": "00eb56d1a2f48edab9dccb5c6c3755150824e8ad1ca8af6eae1bf990e01fff6b",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
       "signal": "blue",
-      "entry_hash": "86b5093ee1c32f2fa181af3003ac0b4f1df0f02b06509281d41efb3a8ef9ac35"
+      "entry_hash": "fb80550b268d0e464bcb5ecc1585f0f5fac9abe28a843fdba4e8f45e249b7d6a"
     },
     {
       "type_name": "CatalogueLinterError",
       "signal": "blue",
-      "entry_hash": "ddc744166e4b6f43e6f1ccdbeba4f5e73dc64dfb55a5a37bc8a09a5c35c47936"
+      "entry_hash": "82cdf3a3173f689ddedbe77cc67fc52981c0b3229ac5366ef9d50c72e65e8f94"
     },
     {
       "type_name": "CatalogueLinterRule",
       "signal": "blue",
-      "entry_hash": "61358483c2d39deb19d92ac0886148fc953073b36b06f074bcadb85d4422e202"
+      "entry_hash": "09e276a3f796bdf9c833bcd8c98710ff372b61c3e9c6c543810421528a03b9a8"
     },
     {
       "type_name": "CatalogueLinterRuleError",
       "signal": "blue",
-      "entry_hash": "ebc31ffbc1fd10d494dce32ec27e0909aa2947936473c617fc514e469e1a016a"
+      "entry_hash": "4a5a1db9efe9953853103ce2ece3381e43bf6f29aca2906f8fb41b895f71633f"
     },
     {
       "type_name": "CatalogueLinterRuleKind",
       "signal": "blue",
-      "entry_hash": "d1174ab763c6dbd7404bc9800d758db607fba1d8553ed231a17c2b2b5d2600fd"
+      "entry_hash": "ee79afc45b2055fb35e0b888a9be18bd867742999cd4827d0a5b311ebda03751"
     },
     {
       "type_name": "CatalogueLoaderError",
       "signal": "blue",
-      "entry_hash": "7be457899bf4fbf4a12fef8e6a953a95511399e771bc24d8e990859c504a8e30"
+      "entry_hash": "c8f4a1e99614ddf90bfae941860d543a5b0f0a8d3a0da05c3cc305a1cc1e4975"
     },
     {
       "type_name": "ConstructionError",
       "signal": "blue",
-      "entry_hash": "91ff43156a08fda3eb89244a01de79ecb08ea9faba04b154a46aa6a7f39667d7"
+      "entry_hash": "c9229e1212dbcd496912344cd8d241661d1025846acd2e0c8adcb104c1a01558"
     },
     {
       "type_name": "ContractRole",
       "signal": "blue",
-      "entry_hash": "79fa7a45fe4e7395a5c75ad69be5590420a24719cf363d8c08c9bd7e051501d7"
+      "entry_hash": "a8318db87fbfcc06563030a237e1e3dceee8b4a4a8ad173731021f6db4275bf1"
     },
     {
       "type_name": "DataRole",
       "signal": "blue",
-      "entry_hash": "b05a2747651185bb200d6205ba23709c988506324c2be0c08f3d551f01fa4779"
+      "entry_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f"
     },
     {
       "type_name": "IdentityAccessor",
       "signal": "blue",
-      "entry_hash": "48c8e0778fac458f3ac37f247dd014935f77892b0b882a4a359890fe85bd9c88"
+      "entry_hash": "f09ee63d7b059909ff73c1676de75735434f4e2a3089332d63db40eecc6acbf9"
     },
     {
       "type_name": "InvariantDecl",
       "signal": "blue",
-      "entry_hash": "8cc6d9c7c1f12322b5cf51816f1b3c5d7935c4018810a052d5eda4b414ff3f1a"
+      "entry_hash": "71148b5debced5d996f84dfc6f5fb76c05a2ac71b91bff4f6ac317e6fdaab6c9"
     },
     {
       "type_name": "InvariantName",
       "signal": "blue",
-      "entry_hash": "c7d9d54c6c05a952b13cea4936ea58b1d637fc25c53f1413b61b76cbbf919380"
+      "entry_hash": "f3caf9b984697226b49011a19bfbb1927ce151a52b93f9497fff1a5e903538c1"
     },
     {
       "type_name": "InvariantPredicate",
       "signal": "blue",
-      "entry_hash": "42a50aaaf7f9862c245f5a46287636d5adddabcff4f0a867faecdd9990e1cf29"
+      "entry_hash": "9fe5c817700e2257d2fa4072af0adf7374f39a511c3c6eb0222e983dbbbb2043"
     },
     {
       "type_name": "NonEmptyVec",
       "signal": "blue",
-      "entry_hash": "8b2ff1cafd28cab6e322e6b6d1d518e4e4ea7642ef62911d7d8058d5da2c52d3"
+      "entry_hash": "e0fb53aed2f1c2be87a7169a7b689186769f438695875611ec3736480de1911a"
     },
     {
       "type_name": "RoleKind",
       "signal": "blue",
-      "entry_hash": "99215a538c3a16867a69547abff59f4c814347ce64be072ca1d64d94f0a1de27"
+      "entry_hash": "7d3391fc090b847f35d41684684b6af1fba335ef3cc700c7c75138abf3c12e9a"
     },
     {
       "type_name": "RuleTarget",
       "signal": "blue",
-      "entry_hash": "77ca9a856e61f6374608f6fe28c89e1758b880a6a27b9f121534994aaa0bcd03"
+      "entry_hash": "4494869ca1ae4497772f7229068cb4e3816f7d0d0c10c424473d026f80e05803"
     },
     {
       "type_name": "CatalogueLinter",
       "signal": "blue",
-      "entry_hash": "2d44cd7740c5aa09a903edc68a39ee34e829105584eda8222cdbfb9344f716ec"
+      "entry_hash": "65efbe3453648946c31a361578e32c4d253ce4c8bab5fc1dda4cbffd16f096eb"
     },
     {
       "type_name": "CatalogueLoader",
       "signal": "blue",
-      "entry_hash": "13b58f3b44fe363a08480944864971589a39d8f747bc88de5875d10bc8b23e6a"
+      "entry_hash": "9f8a48842ae4cee359211447a3b4275fa6a2bfdae3e2471aa0ff09e7f5b9fc0e"
     },
     {
       "type_name": "domain::tddd::catalogue_linter::ddd_strict_preset",

@@ -1,6 +1,6 @@
 //! Newtype wrappers for catalogue v2 identifier types.
 //!
-//! All 12 newtypes are implemented here, with validation and `Display` / `FromStr`
+//! All 13 newtypes are implemented here, with validation and `Display` / `FromStr`
 //! derived or hand-implemented as appropriate.
 //!
 //! No serde derives are attached — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
@@ -173,8 +173,6 @@ macro_rules! identifier_newtype {
     };
 }
 
-pub(super) use identifier_newtype;
-
 // ---------------------------------------------------------------------------
 // Identifier-based newtypes (8 types)
 // ---------------------------------------------------------------------------
@@ -232,6 +230,14 @@ identifier_newtype!(
 identifier_newtype!(
     /// Newtype around `Identifier` for function names in `FunctionPath` (ADR 1 D5 / D11).
     FunctionName
+);
+
+identifier_newtype!(
+    /// Validated name for a declared invariant.
+    ///
+    /// Uses the same non-empty Rust identifier validation as the other catalogue v2
+    /// identifier-backed newtypes.
+    InvariantName
 );
 
 // ---------------------------------------------------------------------------

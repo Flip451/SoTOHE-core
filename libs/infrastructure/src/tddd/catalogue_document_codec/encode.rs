@@ -4,10 +4,11 @@ use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2, TypestateMa
 use domain::tddd::catalogue_v2::entries::{
     FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
+use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, InvariantPredicate};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    BoundOp, CatalogueDocument, MethodDeclaration, ParamDeclaration, TraitImplDeclV2,
-    WherePredicateDecl,
+    BoundOp, CatalogueDocument, InvariantDecl, MethodDeclaration, MethodGenericParam,
+    ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
@@ -19,6 +20,9 @@ use super::dto::{
     MethodDeclarationDto, MethodGenericParamDto, ParamDto, StructShapeDto, TraitEntryDto,
     TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
     WherePredicateDeclDto,
+};
+use super::dto_roles::{
+    ContractRoleDto, DataRoleDto, IdentityAccessorDto, InvariantDeclDto, InvariantPredicateDto,
 };
 
 // ---------------------------------------------------------------------------
@@ -69,7 +73,7 @@ pub(super) fn type_entry_to_dto(
     let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
     Ok(TypeEntryDto {
         action: entry.action.to_string(),
-        role: entry.role.to_string(),
+        role: data_role_to_dto(&entry.role),
         kind: type_kind_to_dto(&entry.kind),
         methods,
         module_path: entry.module_path.to_string(),
@@ -77,6 +81,69 @@ pub(super) fn type_entry_to_dto(
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
         informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
     })
+}
+
+fn data_role_to_dto(role: &DataRole) -> DataRoleDto {
+    match role {
+        DataRole::ValueObject { invariants } => {
+            DataRoleDto::ValueObject { invariants: invariants_to_dtos(invariants) }
+        }
+        DataRole::Entity { identity, invariants } => DataRoleDto::Entity {
+            identity: IdentityAccessorDto {
+                method_name: identity.method_name().as_str().to_owned(),
+            },
+            invariants: invariants_to_dtos(invariants),
+        },
+        DataRole::AggregateRoot {
+            identity,
+            invariants,
+            exclusive_members,
+            shared_value_objects,
+            emits,
+        } => DataRoleDto::AggregateRoot {
+            identity: IdentityAccessorDto {
+                method_name: identity.method_name().as_str().to_owned(),
+            },
+            invariants: invariants_to_dtos(invariants),
+            exclusive_members: exclusive_members.iter().map(|r| r.as_str().to_owned()).collect(),
+            shared_value_objects: shared_value_objects
+                .iter()
+                .map(|r| r.as_str().to_owned())
+                .collect(),
+            emits: emits.iter().map(|r| r.as_str().to_owned()).collect(),
+        },
+        DataRole::DomainService { emits } => DataRoleDto::DomainService {
+            emits: emits.iter().map(|r| r.as_str().to_owned()).collect(),
+        },
+        DataRole::Specification => DataRoleDto::Specification {},
+        DataRole::Factory => DataRoleDto::Factory {},
+        DataRole::UseCase { handles } => DataRoleDto::UseCase {
+            handles: handles.iter().map(|r| r.as_str().to_owned()).collect(),
+        },
+        DataRole::Interactor => DataRoleDto::Interactor {},
+        DataRole::Command => DataRoleDto::Command {},
+        DataRole::Query => DataRoleDto::Query {},
+        DataRole::Dto => DataRoleDto::Dto {},
+        DataRole::ErrorType => DataRoleDto::ErrorType {},
+        DataRole::SecondaryAdapter => DataRoleDto::SecondaryAdapter {},
+        DataRole::EventPolicy { reacts_to } => DataRoleDto::EventPolicy {
+            reacts_to: reacts_to.as_slice().iter().map(|r| r.as_str().to_owned()).collect(),
+        },
+    }
+}
+
+fn invariants_to_dtos(invariants: &[InvariantDecl]) -> Vec<InvariantDeclDto> {
+    invariants
+        .iter()
+        .map(|decl| InvariantDeclDto {
+            name: decl.name.as_str().to_owned(),
+            predicate: match &decl.predicate {
+                InvariantPredicate::SelfMethod(method) => {
+                    InvariantPredicateDto::SelfMethod(method.as_str().to_owned())
+                }
+            },
+        })
+        .collect()
 }
 
 fn type_kind_to_dto(kind: &TypeKindV2) -> TypeKindDto {
@@ -152,14 +219,7 @@ pub(super) fn method_decl_to_dto(
         returns: m.returns.as_str().to_owned(),
         is_async: m.is_async,
         has_default_impl: m.has_default_impl,
-        generics: m
-            .generics
-            .iter()
-            .map(|g| MethodGenericParamDto {
-                name: g.name.as_str().to_owned(),
-                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
-            })
-            .collect(),
+        generics: method_generic_params_to_dtos(&m.generics),
         where_predicates,
         docs: m.docs.clone(),
     })
@@ -218,6 +278,17 @@ fn param_decl_to_dto(p: &ParamDeclaration) -> ParamDto {
     ParamDto { name: p.name.as_str().to_owned(), ty: p.ty.as_str().to_owned() }
 }
 
+fn method_generic_param_to_dto(g: &MethodGenericParam) -> MethodGenericParamDto {
+    MethodGenericParamDto {
+        name: g.name.as_str().to_owned(),
+        bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+    }
+}
+
+fn method_generic_params_to_dtos(generics: &[MethodGenericParam]) -> Vec<MethodGenericParamDto> {
+    generics.iter().map(method_generic_param_to_dto).collect()
+}
+
 /// Encodes a top-level `TraitImplDeclV2` to its DTO form (ADR `2026-05-20-0048` D2).
 ///
 /// Emits `action`, `trait_ref`, and `for_type` fields. Validates `trait_ref` as a
@@ -246,14 +317,7 @@ fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocum
         action: t.action.to_string(),
         trait_ref: t.trait_ref.as_str().to_owned(),
         for_type: t.for_type.as_str().to_owned(),
-        impl_generics: t
-            .impl_generics
-            .iter()
-            .map(|g| MethodGenericParamDto {
-                name: g.name.as_str().to_owned(),
-                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
-            })
-            .collect(),
+        impl_generics: method_generic_params_to_dtos(&t.impl_generics),
         impl_where_predicates,
     })
 }
@@ -266,23 +330,27 @@ pub(super) fn trait_entry_to_dto(
         entry.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
     Ok(TraitEntryDto {
         action: entry.action.to_string(),
-        role: entry.role.to_string(),
+        role: contract_role_to_dto(&entry.role),
         methods,
         supertrait_bounds: entry.supertrait_bounds.iter().map(|b| b.as_str().to_owned()).collect(),
-        generics: entry
-            .generics
-            .iter()
-            .map(|g| MethodGenericParamDto {
-                name: g.name.as_str().to_owned(),
-                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
-            })
-            .collect(),
+        generics: method_generic_params_to_dtos(&entry.generics),
         where_predicates,
         module_path: entry.module_path.to_string(),
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
         informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
     })
+}
+
+fn contract_role_to_dto(role: &ContractRole) -> ContractRoleDto {
+    match role {
+        ContractRole::SpecificationPort => ContractRoleDto::SpecificationPort {},
+        ContractRole::ApplicationService => ContractRoleDto::ApplicationService {},
+        ContractRole::SecondaryPort => ContractRoleDto::SecondaryPort {},
+        ContractRole::Repository { aggregate } => {
+            ContractRoleDto::Repository { aggregate: aggregate.as_str().to_owned() }
+        }
+    }
 }
 
 pub(super) fn inherent_impl_to_dto(
@@ -296,14 +364,7 @@ pub(super) fn inherent_impl_to_dto(
     let methods = decl.methods.iter().map(method_decl_to_dto).collect::<Result<Vec<_>, _>>()?;
     Ok(InherentImplDeclDto {
         type_name: decl.type_name.as_str().to_owned(),
-        impl_generics: decl
-            .impl_generics
-            .iter()
-            .map(|g| MethodGenericParamDto {
-                name: g.name.as_str().to_owned(),
-                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
-            })
-            .collect(),
+        impl_generics: method_generic_params_to_dtos(&decl.impl_generics),
         impl_where_predicates,
         methods,
     })
@@ -320,14 +381,7 @@ pub(super) fn function_entry_to_dto(
         params: entry.params.iter().map(param_decl_to_dto).collect(),
         returns: entry.returns.as_str().to_owned(),
         is_async: entry.is_async,
-        generics: entry
-            .generics
-            .iter()
-            .map(|g| MethodGenericParamDto {
-                name: g.name.as_str().to_owned(),
-                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
-            })
-            .collect(),
+        generics: method_generic_params_to_dtos(&entry.generics),
         where_predicates,
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),

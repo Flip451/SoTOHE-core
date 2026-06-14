@@ -257,7 +257,7 @@ mod tests {
       "types": {
         "UserId": {
           "action": "add",
-          "role": "ValueObject",
+          "role": { "ValueObject": {} },
           "kind": {
             "kind": "struct",
             "shape": { "kind": "tuple", "fields": ["u64"] }
@@ -266,7 +266,7 @@ mod tests {
         },
         "User": {
           "action": "add",
-          "role": "Entity",
+          "role": { "Entity": { "identity": { "method_name": "identity" } } },
           "kind": { "kind": "struct", "shape": { "kind": "plain" } },
           "module_path": "domain::user"
         }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T03:12:59Z",
-  "declaration_hash": "0b8fc7477884a899aaa907e245f3892f3477813976223747c90b864611c9ba81",
+  "generated_at": "2026-06-14T07:18:02Z",
+  "declaration_hash": "00eb56d1a2f48edab9dccb5c6c3755150824e8ad1ca8af6eae1bf990e01fff6b",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
@@ -89,10 +89,6 @@
         "core::fmt::Debug",
         "core::fmt::Display",
         "core::str::traits::FromStr"
-      ],
-      "missing_items": [
-        "core::hash::Hash",
-        "core::marker::Copy"
       ]
     },
     {
@@ -107,10 +103,6 @@
         "core::fmt::Debug",
         "core::fmt::Display",
         "core::str::traits::FromStr"
-      ],
-      "missing_items": [
-        "core::hash::Hash",
-        "core::marker::Copy"
       ]
     },
     {

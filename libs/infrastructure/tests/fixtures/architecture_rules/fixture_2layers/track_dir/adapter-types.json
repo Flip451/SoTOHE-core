@@ -5,7 +5,7 @@
   "types": {
     "AdapterImpl": {
       "action": "add",
-      "role": "SecondaryAdapter",
+      "role": { "SecondaryAdapter": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "plain" }

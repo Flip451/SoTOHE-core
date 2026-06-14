@@ -233,6 +233,198 @@
         "kind": "pass",
         "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。"
       }
+    },
+    {
+      "claim_hash": "fb80550b268d0e464bcb5ecc1585f0f5fac9abe28a843fdba4e8f45e249b7d6a",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DDD パターンの機械検査ルール（D4–D11 / D16 / D18 が定める各ルール）を、呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。opt-in したルールは厳格に適用し（違反を容認する「advisory」という中間状態は設けない）。"
+      }
+    },
+    {
+      "claim_hash": "82cdf3a3173f689ddedbe77cc67fc52981c0b3229ac5366ef9d50c72e65e8f94",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。"
+      }
+    },
+    {
+      "claim_hash": "09e276a3f796bdf9c833bcd8c98710ff372b61c3e9c6c543810421528a03b9a8",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし"
+      }
+    },
+    {
+      "claim_hash": "4a5a1db9efe9953853103ce2ece3381e43bf6f29aca2906f8fb41b895f71633f",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "ee79afc45b2055fb35e0b888a9be18bd867742999cd4827d0a5b311ebda03751",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。本 ADR が定める最小コアルール群を一括有効化する `ddd-strict` プリセットを提供する。"
+      }
+    },
+    {
+      "claim_hash": "c9229e1212dbcd496912344cd8d241661d1025846acd2e0c8adcb104c1a01558",
+      "evidence_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）."
+      }
+    },
+    {
+      "claim_hash": "c9229e1212dbcd496912344cd8d241661d1025846acd2e0c8adcb104c1a01558",
+      "evidence_hash": "84657bbacbf37a40d5d42030d6536cee6f0536556307745b704ab61db5f0e5b0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "空の `reacts_to` 配列が codec の decode 段階でエラーになる（`NonEmptyVec` の schema invariant）。1 つ以上の TypeRef を持つ `reacts_to` は decode に成功する。"
+      }
+    },
+    {
+      "claim_hash": "a8318db87fbfcc06563030a237e1e3dceee8b4a4a8ad173731021f6db4275bf1",
+      "evidence_hash": "0135b52bf6b981be6d09f582d24d87282ab25bc891be958a2d14662ff6d7f58e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ContractRole` に `Repository { aggregate: TypeRef }` variant を追加する（既存の `SecondaryPort` は aggregate を持たない非 Repository の secondary port として残す）。`aggregate` フィールドは `Option` 不可（aggregate なしの Repository は不正状態と 1:1 対応するため型で強制）。独立 variant にすることで「aggregate なし Repository」「aggregate あり 非Repository」の両不正状態を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f",
+      "evidence_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "verdict": {
+        "kind": "pass",
+        "citation": "段 1: `DataRole` / `ContractRole` を data-carrying enum 化し、すべての payload 付き variant の schema を 1 回の breaking migration で確定する（`Entity`・`AggregateRoot`・`ValueObject`・`DomainService`・`UseCase` への意味論フィールド追加、`ContractRole::Repository { aggregate: TypeRef }` 追加、`DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` 追加を含む）。段 2: `DomainEvent`（unit variant）を追加し、段 1 で schema 確定した新ロール群を taxonomy・表示・fixture に反映する"
+      }
+    },
+    {
+      "claim_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f",
+      "evidence_hash": "f9578e73f678535916b0ce19274191c9da605e5c85d1a0b45957b9cce3272415",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::ValueObject` / `DataRole::Entity` / `DataRole::AggregateRoot` の各 variant に `invariants: Vec<InvariantDecl>` フィールドを結合する。"
+      }
+    },
+    {
+      "claim_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f",
+      "evidence_hash": "1602a7119c81597f2a1db17567e4e7fe15660988c8e5f344fd58358281f088b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::Entity` と `DataRole::AggregateRoot` の各 variant に `identity: IdentityAccessor` フィールドを構造的に必須として結合する（`Option` 不可）。`IdentityAccessor` は public getter メソッド名のみを参照する（public field identity は禁止）。identity のない Entity は概念として成立しない不正状態であるため `Option` を取らない。"
+      }
+    },
+    {
+      "claim_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f",
+      "evidence_hash": "7d7ae2cfc50b0809ff87f2223365c2f850cb54e8f1b851efacec4b437c9e37b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::AggregateRoot` variant に `exclusive_members: Vec<TypeRef>`（集約専属 Entity の型名リスト、空 Vec 正当・任意）と `shared_value_objects: Vec<TypeRef>`（共有可能 VO の型名リスト、空 Vec 正当・任意）の 2 フィールドを結合する。VO は複数集約で共有が自然であるため両フィールドを型レベルで区別する。"
+      }
+    },
+    {
+      "claim_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f",
+      "evidence_hash": "bb0d674e6c2708445f038609946f3c0faee12de9e7dd5356e44db5813896d2af",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::AggregateRoot` と `DataRole::DomainService` の各 variant に `emits: Vec<TypeRef>`（発行する Domain Event の型名リスト、空 Vec 正当・任意）フィールドを結合する。DomainService は `reacts_to` / `handles` は持たない（宣言型リアクションは EventPolicy が担う）。"
+      }
+    },
+    {
+      "claim_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f",
+      "evidence_hash": "04c515501e34b7e51951d1a49d35a1940eddeb59997bf7115454cb5b4814d7a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::UseCase` variant に `handles: Vec<TypeRef>`（処理を起動する Domain Event の型名リスト、空 Vec 正当・任意）フィールドを結合する。コマンド駆動の UseCase はイベントをハンドルしない場合があるため空 Vec は正当な状態。"
+      }
+    },
+    {
+      "claim_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f",
+      "evidence_hash": "6e4ed9b7d0e03eaccca74f3bba77f7e3e1f92b20dd8f4762f22b81bc6d62fb90",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `DomainEvent` unit variant（payload なし）を追加する。`DomainEvent` は「ドメイン内で起きた事実を表す不変であるべきデータ」として独自のロール意味論（時間的文脈 / `emits` 参照先 / `reacts_to` 参照先の役割）を持ち、既存の `ValueObject` / `Command` / `Dto` では代替できない。"
+      }
+    },
+    {
+      "claim_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f",
+      "evidence_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。EventPolicy は宣言型リアクター（Domain Event に反応して副作用なしの判断を返す domain 層ロール）であり、UseCase の `handles`（空 Vec 正当）との型レベルの差が構造的独自性を形成する。"
+      }
+    },
+    {
+      "claim_hash": "f09ee63d7b059909ff73c1676de75735434f4e2a3089332d63db40eecc6acbf9",
+      "evidence_hash": "1602a7119c81597f2a1db17567e4e7fe15660988c8e5f344fd58358281f088b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::Entity` と `DataRole::AggregateRoot` の各 variant に `identity: IdentityAccessor` フィールドを構造的に必須として結合する（`Option` 不可）。`IdentityAccessor` は public getter メソッド名のみを参照する（public field identity は禁止）。"
+      }
+    },
+    {
+      "claim_hash": "71148b5debced5d996f84dfc6f5fb76c05a2ac71b91bff4f6ac317e6fdaab6c9",
+      "evidence_hash": "f9578e73f678535916b0ce19274191c9da605e5c85d1a0b45957b9cce3272415",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::ValueObject` / `DataRole::Entity` / `DataRole::AggregateRoot` の各 variant に `invariants: Vec<InvariantDecl>` フィールドを結合する。`InvariantDecl` は `name: InvariantName`（必須）と `predicate: InvariantPredicate`（必須）を持つ struct であり、`InvariantPredicate` は現時点では `SelfMethod(MethodName)` のみの enum とする（将来拡張軸として維持）。"
+      }
+    },
+    {
+      "claim_hash": "f3caf9b984697226b49011a19bfbb1927ce151a52b93f9497fff1a5e903538c1",
+      "evidence_hash": "f9578e73f678535916b0ce19274191c9da605e5c85d1a0b45957b9cce3272415",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`InvariantDecl` は `name: InvariantName`（必須）と `predicate: InvariantPredicate`（必須）を持つ struct"
+      }
+    },
+    {
+      "claim_hash": "9fe5c817700e2257d2fa4072af0adf7374f39a511c3c6eb0222e983dbbbb2043",
+      "evidence_hash": "f9578e73f678535916b0ce19274191c9da605e5c85d1a0b45957b9cce3272415",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`InvariantDecl` は `name: InvariantName`（必須）と `predicate: InvariantPredicate`（必須）を持つ struct であり、`InvariantPredicate` は現時点では `SelfMethod(MethodName)` のみの enum とする（将来拡張軸として維持）。"
+      }
+    },
+    {
+      "claim_hash": "7d3391fc090b847f35d41684684b6af1fba335ef3cc700c7c75138abf3c12e9a",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "4494869ca1ae4497772f7229068cb4e3816f7d0d0c10c424473d026f80e05803",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "65efbe3453648946c31a361578e32c4d253ce4c8bab5fc1dda4cbffd16f096eb",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "e0fb53aed2f1c2be87a7169a7b689186769f438695875611ec3736480de1911a",
+      "evidence_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。"
+      }
     }
   ]
 }

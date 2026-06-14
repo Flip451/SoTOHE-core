@@ -5,10 +5,10 @@
 //!
 //! ## Modules
 //!
-//! - [`identifiers`]: 12 newtype wrappers with `Display` / `FromStr` / validation.
+//! - [`identifiers`]: 13 newtype wrappers with `Display` / `FromStr` / validation.
 //! - [`roles`]: role enums (`DataRole`, `ContractRole`, `FunctionRole`, `ItemAction`,
-//!   `SelfReceiver`) and role payload value objects (`InvariantName`,
-//!   `InvariantPredicate`, `InvariantDecl`, `IdentityAccessor`, `NonEmptyVec`).
+//!   `SelfReceiver`) and role payload value objects (`InvariantPredicate`,
+//!   `InvariantDecl`, `IdentityAccessor`, `NonEmptyVec`).
 //!   The Layer axis is represented by [`crate::tddd::LayerId`] (ADR `2026-05-08-0248` D1).
 //! - [`composite`]: `TypeKindV2`, `StructKind`, `StructShape`, `TypestateMarker`, and `TypestateTransitions`.
 //! - [`variants`]: `FieldDecl`, `VariantPayload`, `VariantDecl`.
@@ -48,8 +48,8 @@ pub use document::{CatalogueDocument, CatalogueDocumentError};
 pub use entries::{FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry};
 
 pub use identifiers::{
-    CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError, MethodName,
-    ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
+    CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError, InvariantName,
+    MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
 };
 
 pub use methods::{
@@ -58,7 +58,7 @@ pub use methods::{
 
 pub use roles::{
     ConstructionError, ContractRole, DataRole, FunctionRole, IdentityAccessor, InvariantDecl,
-    InvariantName, InvariantPredicate, ItemAction, NonEmptyVec, SelfReceiver,
+    InvariantPredicate, ItemAction, NonEmptyVec, SelfReceiver,
 };
 
 pub use traits::TraitImplDeclV2;

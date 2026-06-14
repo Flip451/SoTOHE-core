@@ -5,7 +5,7 @@
   "types": {
     "CatalogueDocumentCodec": {
       "action": "modify",
-      "role": "SecondaryAdapter",
+      "role": { "SecondaryAdapter": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -80,7 +80,7 @@
     },
     "CatalogueDocumentCodecError": {
       "action": "reference",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -118,7 +118,7 @@
     },
     "InMemoryCatalogueLinter": {
       "action": "delete",
-      "role": "SecondaryAdapter",
+      "role": { "SecondaryAdapter": {} },
       "kind": {
         "kind": "struct",
         "shape": {

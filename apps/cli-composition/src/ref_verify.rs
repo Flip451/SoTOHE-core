@@ -409,7 +409,7 @@ mod tests {
             "types": {
                 "TestGuardedPath": {
                     "action": "add",
-                    "role": "ValueObject",
+                    "role": { "ValueObject": {} },
                     "kind": { "kind": "struct", "shape": { "kind": "unit" } },
                     "methods": [],
                     "module_path": "test_domain",

@@ -4,32 +4,33 @@
     {
       "id": "T001",
       "description": "Stage 1 — domain layer: add new value-object types supporting the data-carrying enum migration. Add `InvariantName`, `InvariantPredicate`, `InvariantDecl`, `IdentityAccessor`, and `NonEmptyVec<TypeRef>` in `libs/domain/src/tddd/catalogue_v2/roles.rs`. These are prerequisites for the DataRole / ContractRole rewrite in T002 (T002 references them in variant payloads). No serde derives (domain is serde-free). Wire all new types into the existing pub use chains in `roles.rs` / `mod.rs`.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0cedc839"
     },
     {
       "id": "T002",
       "description": "Stage 1 — domain layer: rewrite `DataRole` and `ContractRole` as data-carrying enums in `libs/domain/src/tddd/catalogue_v2/roles.rs`. Remove `Copy` and `Hash` derives from both (CN-03). Add struct payloads to `ValueObject` (invariants), `Entity` (identity, invariants), `AggregateRoot` (identity, invariants, exclusive_members, shared_value_objects, emits), `DomainService` (emits), `UseCase` (handles). Add `ContractRole::Repository { aggregate: TypeRef }`. Add `DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }`. Do not add `DomainEvent` in Stage 1; it remains a Stage 2 unit variant. Update `Display` / `FromStr` implementations to handle data-carrying variants (strum derives alone no longer cover them). Update `ALL_DATA_ROLES` for the Stage 1 variant set (including EventPolicy, excluding DomainEvent) and update `ALL_CONTRACT_ROLES`. Depends on T001.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T003",
       "description": "Stage 1 — domain layer: update all callers of `DataRole` / `ContractRole` inside `libs/domain/` that break after T002 (entries.rs, document.rs, catalogue_linter.rs, catalogue_spec_signal.rs, any tests in identifiers_tests.rs, methods.rs pattern matches etc.). Change `Copy`-based usages to `Clone` or references. Update pattern matches from unit variant to struct patterns where role fields are needed. Ensure `cargo make ci` (domain-internal) compiles after this task. Depends on T002.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",
       "description": "Stage 1 — infrastructure layer: update `libs/infrastructure/src/tddd/catalogue_document_codec/` (dto.rs, decode.rs, encode.rs, mod.rs) to handle the new data-carrying `DataRole` and `ContractRole`. Add JSON serde support for all new payload fields (identity, invariants, exclusive_members, shared_value_objects, emits, handles, reacts_to, aggregate) with `#[serde(default, skip_serializing_if)]` for optional Vec fields. Add `NonEmptyVec<TypeRef>` decode logic that rejects empty JSON arrays as `InvalidEntry`. Add `IdentityAccessor`, `InvariantDecl`, `InvariantName`, `InvariantPredicate` serde DTO structs. Update `DataRole` / `ContractRole` JSON codec from string-only to discriminated-object form. Depends on T003.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",
       "description": "Stage 1 — infrastructure layer: update all other infrastructure files that use `DataRole` / `ContractRole` and break after T002-T004. Specifically: existing `in_memory_catalogue_linter.rs` role comparisons required for compilation, `signal_evaluator_v2/structural_eq.rs` (role field pattern matching), `type_signals_evaluator.rs` / `signal_tags.rs` (role-based tag logic), `contract_map_renderer_adapter/mod.rs` (role display), `type_catalogue_render/entry_details.rs` (role display). Change `role ==` unit comparisons to pattern match arms for the data-carrying variants. Do not add the new linter framework or rule evaluation semantics in this task; those remain Stage 3 work. `cargo make ci` must pass after this task. Depends on T004.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",
       "description": "Stage 1 — usecase layer: update `libs/usecase/src/catalogue_lint_workflow.rs` and any other usecase files that use `DataRole` / `ContractRole` and break after the schema migration. Keep the linter-rule boundary changes out of Stage 1: `LintRuleKind` 3→12 expansion and `LintRuleSpec.target_roles` are handled in T007 after Stage 2. Verify `cargo make check-layers` passes. Depends on T003 (domain compiles cleanly).",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T007",
@@ -49,7 +50,7 @@
     {
       "id": "T010",
       "description": "Stage 1 — migrate active-track catalogue files to the new data-carrying schema. Find all catalogue JSON files under `track/items/` for active (non-archived) tracks and update any `role: Entity` / `role: AggregateRoot` / `role: ValueObject` / `role: UseCase` / `role: DomainService` / `role: Repository` / `role: EventPolicy` entries to the new object form (e.g. `role: { \"Entity\": { \"identity\": ..., \"invariants\": [] } }`). Non-active tracks are write-protected (OS-05). Verify that `cargo make ci` (which includes verify-* gates) passes after migration. Depends on T004 (codec ready) and T005 (all infra callers updated).",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T011",

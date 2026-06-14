@@ -142,7 +142,7 @@ mod tests {
             "types": {
                 "BlueType": {
                     "action": "add",
-                    "role": "ValueObject",
+                    "role": { "ValueObject": {} },
                     "kind": { "kind": "struct", "shape": { "kind": "unit" } },
                     "spec_refs": [
                         {
@@ -153,12 +153,12 @@ mod tests {
                 },
                 "RedType": {
                     "action": "add",
-                    "role": "ValueObject",
+                    "role": { "ValueObject": {} },
                     "kind": { "kind": "struct", "shape": { "kind": "unit" } }
                 },
                 "YellowType": {
                     "action": "add",
-                    "role": "ValueObject",
+                    "role": { "ValueObject": {} },
                     "kind": { "kind": "struct", "shape": { "kind": "unit" } },
                     "informal_grounds": [
                         {"kind": "user_directive", "summary": "pending formalization"}

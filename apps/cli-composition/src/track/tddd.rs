@@ -647,13 +647,7 @@ mod tests {
         r#"{"schema_version":1,"tasks":[],"plan":{"summary":[],"sections":[]}}"#
     }
 
-    /// AC-01/AC-02: `catalogue-spec-signals` gate at Phase 0 (no catalogue file) succeeds.
-    ///
-    /// The gate (`track-active-gate`) calls `sotp track catalogue-spec-signals` after
-    /// `sotp track type-signals`. When no catalogue exists, both commands
-    /// must exit zero so the full gate chain succeeds at Phase 0/1.
-    #[test]
-    fn test_track_catalogue_spec_signals_absent_catalogue_returns_ok() {
+    fn setup_catalogue_spec_signal_track() -> (tempfile::TempDir, PathBuf, PathBuf) {
         let dir = tempfile::tempdir().unwrap();
         init_git_repo_on_track_branch(dir.path(), "test-track");
 
@@ -664,8 +658,6 @@ mod tests {
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
 
-        // Layer with catalogue_spec_signal enabled.
-        // No domain-types.json written — catalogue is absent.
         let rules_json = r#"{
           "layers": [{
             "crate": "domain",
@@ -677,6 +669,18 @@ mod tests {
           }]
         }"#;
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        (dir, items_dir, track_dir)
+    }
+
+    /// AC-01/AC-02: `catalogue-spec-signals` gate at Phase 0 (no catalogue file) succeeds.
+    ///
+    /// The gate (`track-active-gate`) calls `sotp track catalogue-spec-signals` after
+    /// `sotp track type-signals`. When no catalogue exists, both commands
+    /// must exit zero so the full gate chain succeeds at Phase 0/1.
+    #[test]
+    fn test_track_catalogue_spec_signals_absent_catalogue_returns_ok() {
+        let (dir, items_dir, _track_dir) = setup_catalogue_spec_signal_track();
 
         let app = CliApp::new();
         let result = app.track_catalogue_spec_signals(
@@ -731,15 +735,7 @@ mod tests {
     /// file is genuinely absent (no fail-open on present catalogues).
     #[test]
     fn test_track_catalogue_spec_signals_present_catalogue_is_evaluated_not_skipped() {
-        let dir = tempfile::tempdir().unwrap();
-        init_git_repo_on_track_branch(dir.path(), "test-track");
-
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
-            .unwrap();
-        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        let (dir, items_dir, track_dir) = setup_catalogue_spec_signal_track();
 
         // Write a minimal v4 catalogue with a Red-signal entry.
         let v3_catalogue = r#"{
@@ -749,7 +745,7 @@ mod tests {
   "types": {
     "RedType": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [],
       "informal_grounds": []
@@ -760,21 +756,9 @@ mod tests {
 }"#;
         std::fs::write(track_dir.join("domain-types.json"), v3_catalogue).unwrap();
 
-        let rules_json = r#"{
-          "layers": [{
-            "crate": "domain",
-            "tddd": {
-              "enabled": true,
-              "catalogue_file": "domain-types.json",
-              "catalogue_spec_signal": { "enabled": true }
-            }
-          }]
-        }"#;
-        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
-
         let app = CliApp::new();
         let result = app.track_catalogue_spec_signals(
-            items_dir.clone(),
+            items_dir,
             Some("test-track".to_owned()),
             dir.path().to_path_buf(),
             None,
@@ -804,28 +788,7 @@ mod tests {
     /// a backing catalogue (which would be an error).
     #[test]
     fn test_track_catalogue_spec_signals_absent_catalogue_removes_stale_signals_file() {
-        let dir = tempfile::tempdir().unwrap();
-        init_git_repo_on_track_branch(dir.path(), "test-track");
-
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
-            .unwrap();
-        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
-
-        // Layer with catalogue_spec_signal enabled, but catalogue file is ABSENT.
-        let rules_json = r#"{
-          "layers": [{
-            "crate": "domain",
-            "tddd": {
-              "enabled": true,
-              "catalogue_file": "domain-types.json",
-              "catalogue_spec_signal": { "enabled": true }
-            }
-          }]
-        }"#;
-        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+        let (dir, items_dir, track_dir) = setup_catalogue_spec_signal_track();
 
         // Write a stale signals file (catalogue was removed but signals remained).
         let stale_signals_path = track_dir.join("domain-catalogue-spec-signals.json");

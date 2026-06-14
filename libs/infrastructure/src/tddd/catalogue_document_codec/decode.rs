@@ -14,7 +14,6 @@ use domain::tddd::catalogue_v2::entries::{
     FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
 use domain::tddd::catalogue_v2::identifiers::{FieldName, VariantName};
-use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
     BoundOp, CatalogueDocument, CrateName, FunctionPath, FunctionRole, ItemAction,
@@ -28,6 +27,7 @@ use super::CatalogueDocumentCodecError;
 use super::validate::validate_bound_str;
 // Re-export validate_type_ref_str and validate_trait_ref_is_path so that encode.rs
 // can continue to reference them as `super::decode::validate_*`.
+use super::decode_roles::{contract_role_from_dto, data_role_from_dto};
 use super::dto::{
     BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
     MethodDeclarationDto, MethodGenericParamDto, ParamDto, StructShapeDto, TraitEntryDto,
@@ -119,8 +119,7 @@ pub(super) fn type_entry_from_dto(
     let action = ItemAction::from_str(&dto.action)
         .map_err(|e| err(format!("invalid action '{}': {e}", dto.action)))?;
 
-    let role = DataRole::from_str(&dto.role)
-        .map_err(|e| err(format!("invalid data role '{}': {e}", dto.role)))?;
+    let role = data_role_from_dto(name, dto.role)?;
 
     let kind = type_kind_from_dto(name, dto.kind)?;
 
@@ -547,8 +546,7 @@ pub(super) fn trait_entry_from_dto(
     let action = ItemAction::from_str(&dto.action)
         .map_err(|e| err(format!("invalid action '{}': {e}", dto.action)))?;
 
-    let role = ContractRole::from_str(&dto.role)
-        .map_err(|e| err(format!("invalid contract role '{}': {e}", dto.role)))?;
+    let role = contract_role_from_dto(name, dto.role)?;
 
     let methods = dto
         .methods

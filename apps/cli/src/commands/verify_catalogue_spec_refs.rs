@@ -116,7 +116,7 @@ mod tests {
             "types": {
                 "BadType": {
                     "action": "add",
-                    "role": "ValueObject",
+                    "role": { "ValueObject": {} },
                     "kind": { "kind": "struct", "shape": { "kind": "unit" } },
                     "spec_refs": [
                         {

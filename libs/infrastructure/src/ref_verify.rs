@@ -1391,7 +1391,7 @@ This section must not make D2 a valid ADR ref.
             "types": {
                 "SemanticThing": {
                     "action": "add",
-                    "role": "ValueObject",
+                    "role": { "ValueObject": {} },
                     "kind": { "kind": "struct", "shape": { "kind": "unit" } },
                     "methods": [],
                     "module_path": "",
@@ -1656,7 +1656,7 @@ The guarded path must stay inside the trusted repository root.
         assert!(real_pair.claim.contains("[types:SemanticThing] SemanticThing"));
         assert!(real_pair.claim.contains("Catalogue entry canonical JSON:"));
         assert!(real_pair.claim.contains("\"docs\":\"semantic docs that model must evaluate\""));
-        assert!(real_pair.claim.contains("\"role\":\"ValueObject\""));
+        assert!(real_pair.claim.contains("\"role\":{\"ValueObject\":{}"));
     }
 
     #[test]

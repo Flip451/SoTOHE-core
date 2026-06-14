@@ -599,7 +599,7 @@ fn write_matching_domain_catalogue_with_single_entry(
         "types": {
             entry_name: {
                 "action": "add",
-                "role": "ValueObject",
+                "role": { "ValueObject": {} },
                 "kind": { "kind": "struct", "shape": { "kind": "unit" } }
             }
         },
