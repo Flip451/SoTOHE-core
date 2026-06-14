@@ -12,13 +12,13 @@ tools:
   - WebFetch
   - WebSearch
 description: |
-  Phase 2 writer for /track:type-design. Translates the track's ADR (design decisions) and spec.json (behavioral contract) into per-layer `<layer>-types.json` entries (schema_version: 4) — picking the role value (per-section role space) and the `kind` discriminator (`struct` with `shape` `unit`/`tuple`/`plain`, `enum`, or `type_alias`), authoring methods / fields / params / returns, and setting `action` fields. Runs the canonical pipeline internally: **capture baselines → write the catalogue files → evaluate type-signals → render views**. Mirrors the `type-designer` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
+  Phase 2 writer for /track:type-design. Translates the track's ADR (design decisions) and spec.json (behavioral contract) into per-layer `<layer>-types.json` entries (schema_version: 5) — picking the role value (per-section role space) and the `kind` discriminator (`struct` with `shape` `unit`/`tuple`/`plain`, `enum`, or `type_alias`), authoring methods / fields / params / returns, and setting `action` fields. Runs the canonical pipeline internally: **capture baselines → write the catalogue files → evaluate type-signals → render views**. Mirrors the `type-designer` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
 ---
 
 # Type-Designer Agent
 
 **Operational SSoT:** read and follow `.harness/capabilities/type-designer.md` — the provider-agnostic
-contract for this capability (compliance, mission, contract + 12-step pipeline, v4 schema reference,
+contract for this capability (compliance, mission, contract + 12-step pipeline, v5 schema reference,
 action semantics, cookbook, decision rules, return format). Do not duplicate it here.
 
 ## Claude-subagent notes
