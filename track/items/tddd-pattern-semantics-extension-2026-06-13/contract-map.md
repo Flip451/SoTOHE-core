@@ -1,0 +1,412 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T36_domain_domain_CatalogueLintViolation["tddd::catalogue_linter::CatalogueLintViolation"]
+    direction TB
+    T36_domain_domain_CatalogueLintViolation__self[CatalogueLintViolation]
+    T36_domain_domain_CatalogueLintViolation_new([new])
+    T36_domain_domain_CatalogueLintViolation_rule_kind([rule_kind])
+    T36_domain_domain_CatalogueLintViolation_entry_name([entry_name])
+    T36_domain_domain_CatalogueLintViolation_message([message])
+  end
+  subgraph T34_domain_domain_CatalogueLinterError["tddd::catalogue_linter::CatalogueLinterError"]
+    direction TB
+    T34_domain_domain_CatalogueLinterError__self[CatalogueLinterError]
+    T34_domain_domain_CatalogueLinterError_InvalidRuleConfig[InvalidRuleConfig]
+  end
+  subgraph T33_domain_domain_CatalogueLinterRule["tddd::catalogue_linter::CatalogueLinterRule"]
+    direction TB
+    T33_domain_domain_CatalogueLinterRule__self[CatalogueLinterRule]
+    T33_domain_domain_CatalogueLinterRule_new([new])
+    T33_domain_domain_CatalogueLinterRule_target([target])
+    T33_domain_domain_CatalogueLinterRule_kind([kind])
+  end
+  subgraph T38_domain_domain_CatalogueLinterRuleError["tddd::catalogue_linter::CatalogueLinterRuleError"]
+    direction TB
+    T38_domain_domain_CatalogueLinterRuleError__self[CatalogueLinterRuleError]
+    T38_domain_domain_CatalogueLinterRuleError_EmptyPermittedLayers[EmptyPermittedLayers]
+    T38_domain_domain_CatalogueLinterRuleError_EmptyRequiredTraits[EmptyRequiredTraits]
+    T38_domain_domain_CatalogueLinterRuleError_EmptyForbiddenRoles[EmptyForbiddenRoles]
+    T38_domain_domain_CatalogueLinterRuleError_EmptyTargetField[EmptyTargetField]
+  end
+  subgraph T37_domain_domain_CatalogueLinterRuleKind["tddd::catalogue_linter::CatalogueLinterRuleKind"]
+    direction TB
+    T37_domain_domain_CatalogueLinterRuleKind__self[CatalogueLinterRuleKind]
+    T37_domain_domain_CatalogueLinterRuleKind_FieldEmpty[FieldEmpty]
+    T37_domain_domain_CatalogueLinterRuleKind_FieldNonEmpty[FieldNonEmpty]
+    T37_domain_domain_CatalogueLinterRuleKind_KindLayerConstraint[KindLayerConstraint]
+    T37_domain_domain_CatalogueLinterRuleKind_ReferencedRoleConstraint[ReferencedRoleConstraint]
+    T37_domain_domain_CatalogueLinterRuleKind_TraitImplRequired[TraitImplRequired]
+    T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature[NoRoleInMethodSignature]
+    T37_domain_domain_CatalogueLinterRuleKind_MethodReferenceSignature[MethodReferenceSignature]
+    T37_domain_domain_CatalogueLinterRuleKind_AccessorSignatureRequired[AccessorSignatureRequired]
+    T37_domain_domain_CatalogueLinterRuleKind_FieldElementUniqueAcrossEntries[FieldElementUniqueAcrossEntries]
+    T37_domain_domain_CatalogueLinterRuleKind_NoExternalReferenceInMethods[NoExternalReferenceInMethods]
+    T37_domain_domain_CatalogueLinterRuleKind_NoPublicField[NoPublicField]
+    T37_domain_domain_CatalogueLinterRuleKind_ForbiddenMethodReceiver[ForbiddenMethodReceiver]
+  end
+  subgraph T34_domain_domain_CatalogueLoaderError["tddd::catalogue_ports::CatalogueLoaderError"]
+    direction TB
+    T34_domain_domain_CatalogueLoaderError__self[CatalogueLoaderError]
+    T34_domain_domain_CatalogueLoaderError_CatalogueNotFound[CatalogueNotFound]
+    T34_domain_domain_CatalogueLoaderError_LayerDiscoveryFailed[LayerDiscoveryFailed]
+    T34_domain_domain_CatalogueLoaderError_DecodeFailed[DecodeFailed]
+    T34_domain_domain_CatalogueLoaderError_SymlinkRejected[SymlinkRejected]
+    T34_domain_domain_CatalogueLoaderError_IoError[IoError]
+    T34_domain_domain_CatalogueLoaderError_TopologicalSortFailed[TopologicalSortFailed]
+  end
+  subgraph T26_domain_domain_ContractRole["tddd::catalogue_v2::roles::ContractRole"]
+    direction TB
+    T26_domain_domain_ContractRole__self[ContractRole]
+    T26_domain_domain_ContractRole_SpecificationPort[SpecificationPort]
+    T26_domain_domain_ContractRole_ApplicationService[ApplicationService]
+    T26_domain_domain_ContractRole_SecondaryPort[SecondaryPort]
+    T26_domain_domain_ContractRole_Repository[Repository]
+  end
+  subgraph T22_domain_domain_DataRole["tddd::catalogue_v2::roles::DataRole"]
+    direction TB
+    T22_domain_domain_DataRole__self[DataRole]
+    T22_domain_domain_DataRole_ValueObject[ValueObject]
+    T22_domain_domain_DataRole_Entity[Entity]
+    T22_domain_domain_DataRole_AggregateRoot[AggregateRoot]
+    T22_domain_domain_DataRole_DomainService[DomainService]
+    T22_domain_domain_DataRole_Specification[Specification]
+    T22_domain_domain_DataRole_Factory[Factory]
+    T22_domain_domain_DataRole_UseCase[UseCase]
+    T22_domain_domain_DataRole_Interactor[Interactor]
+    T22_domain_domain_DataRole_Command[Command]
+    T22_domain_domain_DataRole_Query[Query]
+    T22_domain_domain_DataRole_Dto[Dto]
+    T22_domain_domain_DataRole_ErrorType[ErrorType]
+    T22_domain_domain_DataRole_SecondaryAdapter[SecondaryAdapter]
+    T22_domain_domain_DataRole_DomainEvent[DomainEvent]
+    T22_domain_domain_DataRole_EventPolicy[EventPolicy]
+  end
+  subgraph T30_domain_domain_IdentityAccessor["tddd::catalogue_v2::roles::IdentityAccessor"]
+    direction TB
+    T30_domain_domain_IdentityAccessor__self[IdentityAccessor]
+  end
+  subgraph T27_domain_domain_InvariantDecl["tddd::catalogue_v2::roles::InvariantDecl"]
+    direction TB
+    T27_domain_domain_InvariantDecl__self[InvariantDecl]
+  end
+  subgraph T27_domain_domain_InvariantName["tddd::catalogue_v2::roles::InvariantName"]
+    direction TB
+    T27_domain_domain_InvariantName__self[InvariantName]
+  end
+  subgraph T32_domain_domain_InvariantPredicate["tddd::catalogue_v2::roles::InvariantPredicate"]
+    direction TB
+    T32_domain_domain_InvariantPredicate__self[InvariantPredicate]
+    T32_domain_domain_InvariantPredicate_SelfMethod[SelfMethod]
+  end
+  subgraph T25_domain_domain_NonEmptyVec["tddd::catalogue_v2::roles::NonEmptyVec"]
+    direction TB
+    T25_domain_domain_NonEmptyVec__self[NonEmptyVec]
+    T25_domain_domain_NonEmptyVec_new([new])
+    T25_domain_domain_NonEmptyVec_as_slice([as_slice])
+  end
+  subgraph T22_domain_domain_RoleKind["tddd::catalogue_linter::RoleKind"]
+    direction TB
+    T22_domain_domain_RoleKind__self[RoleKind]
+    T22_domain_domain_RoleKind_ValueObject[ValueObject]
+    T22_domain_domain_RoleKind_Entity[Entity]
+    T22_domain_domain_RoleKind_AggregateRoot[AggregateRoot]
+    T22_domain_domain_RoleKind_DomainService[DomainService]
+    T22_domain_domain_RoleKind_Specification[Specification]
+    T22_domain_domain_RoleKind_Factory[Factory]
+    T22_domain_domain_RoleKind_UseCase[UseCase]
+    T22_domain_domain_RoleKind_Interactor[Interactor]
+    T22_domain_domain_RoleKind_Command[Command]
+    T22_domain_domain_RoleKind_Query[Query]
+    T22_domain_domain_RoleKind_Dto[Dto]
+    T22_domain_domain_RoleKind_ErrorType[ErrorType]
+    T22_domain_domain_RoleKind_SecondaryAdapter[SecondaryAdapter]
+    T22_domain_domain_RoleKind_DomainEvent[DomainEvent]
+    T22_domain_domain_RoleKind_EventPolicy[EventPolicy]
+    T22_domain_domain_RoleKind_SpecificationPort[SpecificationPort]
+    T22_domain_domain_RoleKind_ApplicationService[ApplicationService]
+    T22_domain_domain_RoleKind_SecondaryPort[SecondaryPort]
+    T22_domain_domain_RoleKind_Repository[Repository]
+    T22_domain_domain_RoleKind_FreeFunction[FreeFunction]
+    T22_domain_domain_RoleKind_UseCaseFunction[UseCaseFunction]
+  end
+  subgraph T24_domain_domain_RuleTarget["tddd::catalogue_linter::RuleTarget"]
+    direction TB
+    T24_domain_domain_RuleTarget__self[RuleTarget]
+  end
+  subgraph R29_domain_domain_CatalogueLoader["tddd::catalogue_ports::CatalogueLoader"]
+    direction TB
+    R29_domain_domain_CatalogueLoader__self[CatalogueLoader]
+    R29_domain_domain_CatalogueLoader_load_all([load_all])
+  end
+  F63_domain_domain_domain__tddd__catalogue_linter__ddd_strict_preset[[ddd_strict_preset]]
+  F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint[[evaluate_catalogue_lint]]
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_catalogue_lint_workflow["usecase::catalogue_lint_workflow"]
+    direction TB
+  subgraph T28_usecase_usecase_LintRuleKind["catalogue_lint_workflow::LintRuleKind"]
+    direction TB
+    T28_usecase_usecase_LintRuleKind__self[LintRuleKind]
+    T28_usecase_usecase_LintRuleKind_FieldEmpty[FieldEmpty]
+    T28_usecase_usecase_LintRuleKind_FieldNonEmpty[FieldNonEmpty]
+    T28_usecase_usecase_LintRuleKind_KindLayerConstraint[KindLayerConstraint]
+    T28_usecase_usecase_LintRuleKind_ReferencedRoleConstraint[ReferencedRoleConstraint]
+    T28_usecase_usecase_LintRuleKind_TraitImplRequired[TraitImplRequired]
+    T28_usecase_usecase_LintRuleKind_NoRoleInMethodSignature[NoRoleInMethodSignature]
+    T28_usecase_usecase_LintRuleKind_MethodReferenceSignature[MethodReferenceSignature]
+    T28_usecase_usecase_LintRuleKind_AccessorSignatureRequired[AccessorSignatureRequired]
+    T28_usecase_usecase_LintRuleKind_FieldElementUniqueAcrossEntries[FieldElementUniqueAcrossEntries]
+    T28_usecase_usecase_LintRuleKind_NoExternalReferenceInMethods[NoExternalReferenceInMethods]
+    T28_usecase_usecase_LintRuleKind_NoPublicField[NoPublicField]
+    T28_usecase_usecase_LintRuleKind_ForbiddenMethodReceiver[ForbiddenMethodReceiver]
+  end
+  subgraph T28_usecase_usecase_LintRuleSpec["catalogue_lint_workflow::LintRuleSpec"]
+    direction TB
+    T28_usecase_usecase_LintRuleSpec__self[LintRuleSpec]
+  end
+  subgraph T39_usecase_usecase_RunCatalogueLintCommand["catalogue_lint_workflow::RunCatalogueLintCommand"]
+    direction TB
+    T39_usecase_usecase_RunCatalogueLintCommand__self[RunCatalogueLintCommand]
+  end
+  subgraph T37_usecase_usecase_RunCatalogueLintError["catalogue_lint_workflow::RunCatalogueLintError"]
+    direction TB
+    T37_usecase_usecase_RunCatalogueLintError__self[RunCatalogueLintError]
+    T37_usecase_usecase_RunCatalogueLintError_CatalogueLoad[CatalogueLoad]
+    T37_usecase_usecase_RunCatalogueLintError_LintExecution[LintExecution]
+    T37_usecase_usecase_RunCatalogueLintError_InvalidLayer[InvalidLayer]
+    T37_usecase_usecase_RunCatalogueLintError_InvalidRuleSpec[InvalidRuleSpec]
+  end
+  subgraph T42_usecase_usecase_RunCatalogueLintInteractor["catalogue_lint_workflow::RunCatalogueLintInteractor"]
+    direction TB
+    T42_usecase_usecase_RunCatalogueLintInteractor__self[RunCatalogueLintInteractor]
+    T42_usecase_usecase_RunCatalogueLintInteractor_new([new])
+  end
+  subgraph R32_usecase_usecase_RunCatalogueLint["catalogue_lint_workflow::RunCatalogueLint"]
+    direction TB
+    R32_usecase_usecase_RunCatalogueLint__self[RunCatalogueLint]
+    R32_usecase_usecase_RunCatalogueLint_execute([execute])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
+    direction TB
+  subgraph T52_infrastructure_infrastructure_CatalogueDocumentCodec["tddd::catalogue_document_codec::CatalogueDocumentCodec"]
+    direction TB
+    T52_infrastructure_infrastructure_CatalogueDocumentCodec__self[CatalogueDocumentCodec]
+    T52_infrastructure_infrastructure_CatalogueDocumentCodec_new([new])
+    T52_infrastructure_infrastructure_CatalogueDocumentCodec_decode([decode])
+    T52_infrastructure_infrastructure_CatalogueDocumentCodec_load([load])
+    T52_infrastructure_infrastructure_CatalogueDocumentCodec_encode([encode])
+  end
+  subgraph T57_infrastructure_infrastructure_CatalogueDocumentCodecError["tddd::catalogue_document_codec::CatalogueDocumentCodecError"]
+    direction TB
+    T57_infrastructure_infrastructure_CatalogueDocumentCodecError__self[CatalogueDocumentCodecError]
+    T57_infrastructure_infrastructure_CatalogueDocumentCodecError_Json[Json]
+    T57_infrastructure_infrastructure_CatalogueDocumentCodecError_Io[Io]
+    T57_infrastructure_infrastructure_CatalogueDocumentCodecError_UnsupportedSchemaVersion[UnsupportedSchemaVersion]
+    T57_infrastructure_infrastructure_CatalogueDocumentCodecError_InvalidEntry[InvalidEntry]
+    T57_infrastructure_infrastructure_CatalogueDocumentCodecError_CrateNameMismatch[CrateNameMismatch]
+    T57_infrastructure_infrastructure_CatalogueDocumentCodecError_CrossCrateFunctionPath[CrossCrateFunctionPath]
+  end
+  end
+end
+T36_domain_domain_CatalogueLintViolation_new --o T37_domain_domain_CatalogueLinterRuleKind__self
+T36_domain_domain_CatalogueLintViolation_new --> T36_domain_domain_CatalogueLintViolation__self
+T36_domain_domain_CatalogueLintViolation_rule_kind --> T37_domain_domain_CatalogueLinterRuleKind__self
+T33_domain_domain_CatalogueLinterRule_new --o T24_domain_domain_RuleTarget__self
+T33_domain_domain_CatalogueLinterRule_new --o T37_domain_domain_CatalogueLinterRuleKind__self
+T33_domain_domain_CatalogueLinterRule_new --> T38_domain_domain_CatalogueLinterRuleError__self
+T33_domain_domain_CatalogueLinterRule_new --> T33_domain_domain_CatalogueLinterRule__self
+T33_domain_domain_CatalogueLinterRule_target --> T24_domain_domain_RuleTarget__self
+T33_domain_domain_CatalogueLinterRule_kind --> T37_domain_domain_CatalogueLinterRuleKind__self
+T37_domain_domain_CatalogueLinterRuleKind_ReferencedRoleConstraint --o|expected_role| T22_domain_domain_RoleKind__self
+T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature --o|forbidden_roles| T22_domain_domain_RoleKind__self
+T22_domain_domain_DataRole_ValueObject --o|invariants| T27_domain_domain_InvariantDecl__self
+T22_domain_domain_DataRole_Entity --o|identity| T30_domain_domain_IdentityAccessor__self
+T22_domain_domain_DataRole_Entity --o|invariants| T27_domain_domain_InvariantDecl__self
+T22_domain_domain_DataRole_AggregateRoot --o|identity| T30_domain_domain_IdentityAccessor__self
+T22_domain_domain_DataRole_AggregateRoot --o|invariants| T27_domain_domain_InvariantDecl__self
+T22_domain_domain_DataRole_EventPolicy --o|reacts_to| T25_domain_domain_NonEmptyVec__self
+T27_domain_domain_InvariantDecl__self --o|name| T27_domain_domain_InvariantName__self
+T27_domain_domain_InvariantDecl__self --o|predicate| T32_domain_domain_InvariantPredicate__self
+T25_domain_domain_NonEmptyVec_new --> T25_domain_domain_NonEmptyVec__self
+T24_domain_domain_RuleTarget__self --o|target_roles| T22_domain_domain_RoleKind__self
+R29_domain_domain_CatalogueLoader_load_all --> T34_domain_domain_CatalogueLoaderError__self
+F63_domain_domain_domain__tddd__catalogue_linter__ddd_strict_preset --> T33_domain_domain_CatalogueLinterRule__self
+F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint --o T33_domain_domain_CatalogueLinterRule__self
+F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint --> T36_domain_domain_CatalogueLintViolation__self
+F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint --> T34_domain_domain_CatalogueLinterError__self
+T28_usecase_usecase_LintRuleSpec__self --o|kind| T28_usecase_usecase_LintRuleKind__self
+T39_usecase_usecase_RunCatalogueLintCommand__self --o|rules| T28_usecase_usecase_LintRuleSpec__self
+T37_usecase_usecase_RunCatalogueLintError_CatalogueLoad --o T34_domain_domain_CatalogueLoaderError__self
+T37_usecase_usecase_RunCatalogueLintError_LintExecution --o T34_domain_domain_CatalogueLinterError__self
+T42_usecase_usecase_RunCatalogueLintInteractor_new --> T42_usecase_usecase_RunCatalogueLintInteractor__self
+R32_usecase_usecase_RunCatalogueLint_execute --o T39_usecase_usecase_RunCatalogueLintCommand__self
+R32_usecase_usecase_RunCatalogueLint_execute --> T37_usecase_usecase_RunCatalogueLintError__self
+T42_usecase_usecase_RunCatalogueLintInteractor__self -.impl.-> R32_usecase_usecase_RunCatalogueLint__self
+T52_infrastructure_infrastructure_CatalogueDocumentCodec_new --> T52_infrastructure_infrastructure_CatalogueDocumentCodec__self
+T52_infrastructure_infrastructure_CatalogueDocumentCodec_decode --> T57_infrastructure_infrastructure_CatalogueDocumentCodecError__self
+T52_infrastructure_infrastructure_CatalogueDocumentCodec_load --> T57_infrastructure_infrastructure_CatalogueDocumentCodecError__self
+T52_infrastructure_infrastructure_CatalogueDocumentCodec_encode --> T57_infrastructure_infrastructure_CatalogueDocumentCodecError__self
+class T36_domain_domain_CatalogueLintViolation_new method_node
+class T36_domain_domain_CatalogueLintViolation_rule_kind method_node
+class T36_domain_domain_CatalogueLintViolation_entry_name method_node
+class T36_domain_domain_CatalogueLintViolation_message method_node
+class T36_domain_domain_CatalogueLintViolation__self value_object
+class T34_domain_domain_CatalogueLinterError_InvalidRuleConfig variant_node
+class T34_domain_domain_CatalogueLinterError__self error_type
+class T33_domain_domain_CatalogueLinterRule_new method_node
+class T33_domain_domain_CatalogueLinterRule_target method_node
+class T33_domain_domain_CatalogueLinterRule_kind method_node
+class T33_domain_domain_CatalogueLinterRule__self value_object
+class T38_domain_domain_CatalogueLinterRuleError_EmptyPermittedLayers variant_node
+class T38_domain_domain_CatalogueLinterRuleError_EmptyRequiredTraits variant_node
+class T38_domain_domain_CatalogueLinterRuleError_EmptyForbiddenRoles variant_node
+class T38_domain_domain_CatalogueLinterRuleError_EmptyTargetField variant_node
+class T38_domain_domain_CatalogueLinterRuleError__self error_type
+class T37_domain_domain_CatalogueLinterRuleKind_FieldEmpty variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_FieldNonEmpty variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_KindLayerConstraint variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_ReferencedRoleConstraint variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_TraitImplRequired variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_MethodReferenceSignature variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_AccessorSignatureRequired variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_FieldElementUniqueAcrossEntries variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_NoExternalReferenceInMethods variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_NoPublicField variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_ForbiddenMethodReceiver variant_node
+class T37_domain_domain_CatalogueLinterRuleKind__self value_object
+class T34_domain_domain_CatalogueLoaderError_CatalogueNotFound variant_node
+class T34_domain_domain_CatalogueLoaderError_LayerDiscoveryFailed variant_node
+class T34_domain_domain_CatalogueLoaderError_DecodeFailed variant_node
+class T34_domain_domain_CatalogueLoaderError_SymlinkRejected variant_node
+class T34_domain_domain_CatalogueLoaderError_IoError variant_node
+class T34_domain_domain_CatalogueLoaderError_TopologicalSortFailed variant_node
+class T34_domain_domain_CatalogueLoaderError__self error_type
+class T26_domain_domain_ContractRole_SpecificationPort variant_node
+class T26_domain_domain_ContractRole_ApplicationService variant_node
+class T26_domain_domain_ContractRole_SecondaryPort variant_node
+class T26_domain_domain_ContractRole_Repository variant_node
+class T26_domain_domain_ContractRole__self value_object
+class T22_domain_domain_DataRole_ValueObject variant_node
+class T22_domain_domain_DataRole_Entity variant_node
+class T22_domain_domain_DataRole_AggregateRoot variant_node
+class T22_domain_domain_DataRole_DomainService variant_node
+class T22_domain_domain_DataRole_Specification variant_node
+class T22_domain_domain_DataRole_Factory variant_node
+class T22_domain_domain_DataRole_UseCase variant_node
+class T22_domain_domain_DataRole_Interactor variant_node
+class T22_domain_domain_DataRole_Command variant_node
+class T22_domain_domain_DataRole_Query variant_node
+class T22_domain_domain_DataRole_Dto variant_node
+class T22_domain_domain_DataRole_ErrorType variant_node
+class T22_domain_domain_DataRole_SecondaryAdapter variant_node
+class T22_domain_domain_DataRole_DomainEvent variant_node
+class T22_domain_domain_DataRole_EventPolicy variant_node
+class T22_domain_domain_DataRole__self value_object
+class T30_domain_domain_IdentityAccessor__self value_object
+class T27_domain_domain_InvariantDecl__self value_object
+class T27_domain_domain_InvariantName__self value_object
+class T32_domain_domain_InvariantPredicate_SelfMethod variant_node
+class T32_domain_domain_InvariantPredicate__self value_object
+class T25_domain_domain_NonEmptyVec_new method_node
+class T25_domain_domain_NonEmptyVec_as_slice method_node
+class T25_domain_domain_NonEmptyVec__self value_object
+class T22_domain_domain_RoleKind_ValueObject variant_node
+class T22_domain_domain_RoleKind_Entity variant_node
+class T22_domain_domain_RoleKind_AggregateRoot variant_node
+class T22_domain_domain_RoleKind_DomainService variant_node
+class T22_domain_domain_RoleKind_Specification variant_node
+class T22_domain_domain_RoleKind_Factory variant_node
+class T22_domain_domain_RoleKind_UseCase variant_node
+class T22_domain_domain_RoleKind_Interactor variant_node
+class T22_domain_domain_RoleKind_Command variant_node
+class T22_domain_domain_RoleKind_Query variant_node
+class T22_domain_domain_RoleKind_Dto variant_node
+class T22_domain_domain_RoleKind_ErrorType variant_node
+class T22_domain_domain_RoleKind_SecondaryAdapter variant_node
+class T22_domain_domain_RoleKind_DomainEvent variant_node
+class T22_domain_domain_RoleKind_EventPolicy variant_node
+class T22_domain_domain_RoleKind_SpecificationPort variant_node
+class T22_domain_domain_RoleKind_ApplicationService variant_node
+class T22_domain_domain_RoleKind_SecondaryPort variant_node
+class T22_domain_domain_RoleKind_Repository variant_node
+class T22_domain_domain_RoleKind_FreeFunction variant_node
+class T22_domain_domain_RoleKind_UseCaseFunction variant_node
+class T22_domain_domain_RoleKind__self value_object
+class T24_domain_domain_RuleTarget__self value_object
+class R29_domain_domain_CatalogueLoader_load_all method_node
+class R29_domain_domain_CatalogueLoader__self secondary_port
+class F63_domain_domain_domain__tddd__catalogue_linter__ddd_strict_preset free_function
+class F63_domain_domain_domain__tddd__catalogue_linter__ddd_strict_preset function_node
+class F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint free_function
+class F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint function_node
+class T28_usecase_usecase_LintRuleKind_FieldEmpty variant_node
+class T28_usecase_usecase_LintRuleKind_FieldNonEmpty variant_node
+class T28_usecase_usecase_LintRuleKind_KindLayerConstraint variant_node
+class T28_usecase_usecase_LintRuleKind_ReferencedRoleConstraint variant_node
+class T28_usecase_usecase_LintRuleKind_TraitImplRequired variant_node
+class T28_usecase_usecase_LintRuleKind_NoRoleInMethodSignature variant_node
+class T28_usecase_usecase_LintRuleKind_MethodReferenceSignature variant_node
+class T28_usecase_usecase_LintRuleKind_AccessorSignatureRequired variant_node
+class T28_usecase_usecase_LintRuleKind_FieldElementUniqueAcrossEntries variant_node
+class T28_usecase_usecase_LintRuleKind_NoExternalReferenceInMethods variant_node
+class T28_usecase_usecase_LintRuleKind_NoPublicField variant_node
+class T28_usecase_usecase_LintRuleKind_ForbiddenMethodReceiver variant_node
+class T28_usecase_usecase_LintRuleKind__self value_object
+class T28_usecase_usecase_LintRuleSpec__self value_object
+class T39_usecase_usecase_RunCatalogueLintCommand__self command
+class T37_usecase_usecase_RunCatalogueLintError_CatalogueLoad variant_node
+class T37_usecase_usecase_RunCatalogueLintError_LintExecution variant_node
+class T37_usecase_usecase_RunCatalogueLintError_InvalidLayer variant_node
+class T37_usecase_usecase_RunCatalogueLintError_InvalidRuleSpec variant_node
+class T37_usecase_usecase_RunCatalogueLintError__self error_type
+class T42_usecase_usecase_RunCatalogueLintInteractor_new method_node
+class T42_usecase_usecase_RunCatalogueLintInteractor__self interactor
+class R32_usecase_usecase_RunCatalogueLint_execute method_node
+class R32_usecase_usecase_RunCatalogueLint__self app_service
+class T52_infrastructure_infrastructure_CatalogueDocumentCodec_new method_node
+class T52_infrastructure_infrastructure_CatalogueDocumentCodec_decode method_node
+class T52_infrastructure_infrastructure_CatalogueDocumentCodec_load method_node
+class T52_infrastructure_infrastructure_CatalogueDocumentCodec_encode method_node
+class T52_infrastructure_infrastructure_CatalogueDocumentCodec__self secondary_adapter
+class T57_infrastructure_infrastructure_CatalogueDocumentCodecError_Json variant_node
+class T57_infrastructure_infrastructure_CatalogueDocumentCodecError_Io variant_node
+class T57_infrastructure_infrastructure_CatalogueDocumentCodecError_UnsupportedSchemaVersion variant_node
+class T57_infrastructure_infrastructure_CatalogueDocumentCodecError_InvalidEntry variant_node
+class T57_infrastructure_infrastructure_CatalogueDocumentCodecError_CrateNameMismatch variant_node
+class T57_infrastructure_infrastructure_CatalogueDocumentCodecError_CrossCrateFunctionPath variant_node
+class T57_infrastructure_infrastructure_CatalogueDocumentCodecError__self error_type
+```

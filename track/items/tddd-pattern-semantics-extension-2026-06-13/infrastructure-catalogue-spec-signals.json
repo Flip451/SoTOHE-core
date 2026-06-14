@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "662f7ff207b0362abb82245317019e5112a671fe933d7953453ce9c788cc6a55",
+  "signals": [
+    {
+      "type_name": "CatalogueDocumentCodec",
+      "signal": "blue",
+      "entry_hash": "37ae78bbbb91786f2fb1140aaa10e967a773cf76073ddf21fd092491ed899d1e"
+    },
+    {
+      "type_name": "CatalogueDocumentCodecError",
+      "signal": "blue",
+      "entry_hash": "717bbd2b26045cd63855c1ea0b2568cc0c5f6972c05563fe293aeb4805a4eff7"
+    },
+    {
+      "type_name": "InMemoryCatalogueLinter",
+      "signal": "blue",
+      "entry_hash": "45f1dbb945e195668ea67414bdcbe053e55b22b6a04cef6bc2a8057a9a0f568a"
+    }
+  ]
+}

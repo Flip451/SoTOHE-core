@@ -1,0 +1,378 @@
+{
+  "schema_version": 4,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "LintRuleKind": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FieldEmpty",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "FieldNonEmpty",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "KindLayerConstraint",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "permitted_layers", "ty": "Vec<String>" }
+              ]
+            }
+          },
+          {
+            "name": "ReferencedRoleConstraint",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" },
+                { "name": "expected_role", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "TraitImplRequired",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "required_traits", "ty": "Vec<String>" }
+              ]
+            }
+          },
+          {
+            "name": "NoRoleInMethodSignature",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "forbidden_roles", "ty": "Vec<String>" }
+              ]
+            }
+          },
+          {
+            "name": "MethodReferenceSignature",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" },
+                { "name": "required_receiver", "ty": "Option<String>" },
+                { "name": "params_must_be_empty", "ty": "bool" },
+                { "name": "returns_must_be_bool", "ty": "bool" }
+              ]
+            }
+          },
+          {
+            "name": "AccessorSignatureRequired",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "FieldElementUniqueAcrossEntries",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "NoExternalReferenceInMethods",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "NoPublicField",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "ForbiddenMethodReceiver",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "forbidden_receiver", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Usecase-layer mirror of domain CatalogueLinterRuleKind. Expanding from 3 unit variants to 12 variants in parallel with the domain type; NoPublicField remains unit while the other 11 variants carry rule parameters. Uses String fields for role / receiver / layer names instead of domain types (FieldName / RoleKind / SelfReceiver / LayerId) because the usecase boundary accepts external input from CLI/config before domain validation. The interactor converts LintRuleKind -> CatalogueLinterRuleKind during rule construction.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "LintRuleSpec": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "target_roles", "ty": "Vec<String>" },
+            { "name": "kind", "ty": "LintRuleKind" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Usecase-layer rule specification input (mirrors domain CatalogueLinterRule). Breaking change from baseline: `kind: LintRuleKind` field remains but now carries the inspection variant; `target_roles: Vec<String>` added to mirror the domain RuleTarget.target_roles concept at the usecase input boundary (role names as strings, converted to RoleKind by the interactor). The `kind` field previously held the entire rule; now it holds only the inspection content.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunCatalogueLintCommand": {
+      "action": "reference",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "layer_id", "ty": "String" },
+            { "name": "rules", "ty": "Vec<LintRuleSpec>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Command to run catalogue lint for a track/layer with the given rules. Struct shape is unchanged from baseline: track_id and layer_id identify the catalogue to load, while LintRuleSpec field type changes are captured in the LintRuleSpec modify entry.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RunCatalogueLintInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "catalogue_loader", "ty": "Arc<dyn domain::tddd::catalogue_ports::CatalogueLoader>" }
+          ],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Concrete implementation of RunCatalogueLint. Modify from baseline: per D17, the evaluation logic moves from InMemoryCatalogueLinter (infrastructure) to domain::evaluate_catalogue_lint (pure function). The interactor no longer injects a CatalogueLinter evaluation port; it retains the CatalogueLoader port because loading CatalogueDocument from track_id/layer_id is external I/O. The execute flow loads the requested catalogue and LayerId, converts LintRuleSpec into CatalogueLinterRule, then calls domain::evaluate_catalogue_lint directly.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-13"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunCatalogueLintError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["domain::tddd::catalogue_ports::CatalogueLoaderError"]
+            }
+          },
+          {
+            "name": "LintExecution",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["domain::tddd::catalogue_linter::CatalogueLinterError"]
+            }
+          },
+          {
+            "name": "InvalidLayer",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "InvalidRuleSpec",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Errors from the RunCatalogueLint use case. Modify from baseline: CatalogueLoad continues to wrap CatalogueLoaderError because the interactor still performs external catalogue loading; LintExecution wraps domain CatalogueLinterError from evaluate_catalogue_lint rather than an infrastructure CatalogueLinter port.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-13"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "RunCatalogueLint": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            { "name": "command", "ty": "RunCatalogueLintCommand" }
+          ],
+          "returns": "Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Executes the catalogue lint workflow with the given command."
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Application service interface for running catalogue lint. Referenced unchanged from baseline — the interface contract is stable even though the underlying interactor implementation changes per D17.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "catalogue_loader", "ty": "Arc<dyn domain::tddd::catalogue_ports::CatalogueLoader>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new RunCatalogueLintInteractor with the catalogue loader port. Per D17, there is no CatalogueLinter evaluation port injection — the interactor calls domain::evaluate_catalogue_lint directly after loading the requested catalogue."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RunCatalogueLintCommand"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RunCatalogueLintCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RunCatalogueLintInteractor"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "RunCatalogueLint",
+      "for_type": "RunCatalogueLintInteractor"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<domain::tddd::catalogue_linter::CatalogueLinterError>",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<domain::tddd::catalogue_ports::CatalogueLoaderError>",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "RunCatalogueLintError"
+    }
+  ]
+}

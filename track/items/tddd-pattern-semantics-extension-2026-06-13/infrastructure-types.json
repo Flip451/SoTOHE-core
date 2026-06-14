@@ -1,0 +1,185 @@
+{
+  "schema_version": 4,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "CatalogueDocumentCodec": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new CatalogueDocumentCodec."
+        },
+        {
+          "name": "decode",
+          "receiver": "&self",
+          "params": [
+            { "name": "json", "ty": "&str" }
+          ],
+          "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Decodes a JSON string into a CatalogueDocument."
+        },
+        {
+          "name": "load",
+          "receiver": "&self",
+          "params": [
+            { "name": "path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Loads and decodes a catalogue from the given filesystem path."
+        },
+        {
+          "name": "encode",
+          "receiver": "&self",
+          "params": [
+            { "name": "catalogue", "ty": "&domain::tddd::catalogue_v2::CatalogueDocument" }
+          ],
+          "returns": "Result<String, CatalogueDocumentCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Encodes a CatalogueDocument to a JSON string."
+        }
+      ],
+      "module_path": "tddd::catalogue_document_codec",
+      "docs": "Infrastructure codec for CatalogueDocument JSON serialization / deserialization. Modify from baseline: must handle the new data-carrying DataRole (15 variants with struct/unit payloads) and ContractRole (4 variants, Repository with aggregate field). NonEmptyVec<TypeRef> codec added for EventPolicy.reacts_to — empty JSON array is a decode error. All payload fields (identity, invariants, exclusive_members, shared_value_objects, emits, handles, reacts_to, aggregate) are managed here with appropriate serde default / skip_serializing_if annotations.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-01"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueDocumentCodecError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Io",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "InvalidEntry",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "CrateNameMismatch",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "CrossCrateFunctionPath",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_document_codec",
+      "docs": "Errors from CatalogueDocumentCodec. Referenced unchanged from baseline — variant set is stable; decode failures from new payload fields are reported via the existing InvalidEntry variant.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "InMemoryCatalogueLinter": {
+      "action": "delete",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::in_memory_catalogue_linter",
+      "docs": "Deleted with the old CatalogueLinter evaluation adapter. Per D17, applying rules to CatalogueDocument moves to the pure domain::evaluate_catalogue_lint function, and this track does not retain a separate I/O-only linter adapter. Rule filtering is caller-side before passing the rule list to evaluate_catalogue_lint.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-13"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogueDocumentCodec"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CatalogueDocumentCodec"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::default::Default",
+      "for_type": "CatalogueDocumentCodec"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogueDocumentCodecError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "CatalogueDocumentCodecError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "CatalogueDocumentCodecError"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "core::default::Default",
+      "for_type": "InMemoryCatalogueLinter"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "domain::tddd::catalogue_linter::CatalogueLinter",
+      "for_type": "InMemoryCatalogueLinter"
+    }
+  ]
+}

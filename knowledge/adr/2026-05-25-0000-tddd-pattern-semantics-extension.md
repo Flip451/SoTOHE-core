@@ -41,6 +41,9 @@ decisions:
   - id: D12
     review_finding_ref: "researcher-gap-analysis:2026-05-25"
     status: proposed
+  - id: D13
+    review_finding_ref: "researcher-gap-analysis:2026-05-25"
+    status: proposed
   - id: D14
     user_decision_ref: "chat_segment:user-decision:make-illegal-states-unrepresentable-field-optionality:2026-05-25"
     status: proposed
@@ -143,6 +146,8 @@ ADR `2026-04-13-1813-tddd-taxonomy-expansion.md` の D3「YAGNI: 検証ルール
 - `DataRole` / `ContractRole` の data-carrying enum 化は不可分な変更である。1 variant でも data を持つと `Copy` が外れ、strum・codec・signal evaluator・renderer・すべての `role ==` 比較を一斉に更新する必要がある（Negative 節参照）。よって schema 変更は 1 回の migration として先に確定させるしかない。
 - linter は確定した schema にのみ依存し、追加的で opt-in（D15）である。schema を先に固めれば、基盤フィールドが無い状態で linter を仮実装する必要がなくなる。
 - 大きい breaking migration を段 1 に閉じ込めることで各 commit を小さく保て、payload を持たない新ロールの admission と周辺整備は段 1 の完了後に進められる。
+
+**移行対象の限定**: スキーマ変更は breaking change であり、既存カタログとの後方互換性は保証しない。移行はアクティブなトラックのカタログのみを対象とする。非アクティブ（archive 済み・completed）なトラックのカタログはライトプロテクトして移行対象外とする——遡及移行は行わない。
 
 `DomainEvent` は unit variant で schema 強制の意味論を持たない——その規約（`&mut self` 禁止）はすべて linter ルールである。よって段 2 では variant を追加するだけで、意味論は段 3 で入る。一方 `Repository` は `aggregate` 必須が単一 `TypeRef` で、`EventPolicy` は `reacts_to` 非空が `NonEmptyVec<TypeRef>` で、いずれも型で守られるため、その payload schema は段 1 の不可分な migration に含める。
 
@@ -552,14 +557,15 @@ pub enum DataRole {
 
 Presenter / Controller を追加したい採用プロジェクトは、`informal_grounds` に rationale を記録した上で独自カタログエントリとして扱うことができる。
 
-### （付記）Saga / Process Manager / Read Model は今後の判断ポイントへ
+### D13: Saga / Process Manager および Read Model（CQRS）は今回追加しない — 具体的要求が来た時点で別 ADR で判断する
 
-以下のパターンは「今後の判断ポイント」セクションで扱い、今回は追加しない。
+研究レポートが提案した残りのパターンのうち、Saga / Process Manager と Read Model（CQRS）は今回の拡張対象に含めない。
 
-| パターン | 追加しない理由 | 再考条件 |
-| --- | --- | --- |
-| Saga / Process Manager | 状態機械のステップ遷移を機械検査するには、`typestate` フィールド（struct 形状と直交配置、ADR `2026-05-26-1002-typestate-struct-kind-orthogonal.md`）を拡張した Saga 固有の状態遷移スキーマが必要。設計コストが高く、採用先でのユースケースが不明確。EventPolicy が後続イベントを emit するモデル（Process Manager への拡張）もここで再評価する（D16）。 | 採用プロジェクトから「Saga を TDDD で管理したい」という具体的要求が来た場合。 |
-| Read Model（CQRS） | 「ドメインロジックを持たない読み取り専用ビュー」という定義は `Dto` との区別が曖昧。`source_events: [EventRef]` を lint するためには Domain Event の配信機構が必要。 | Saga と同様、Event Sourcing を採用するプロジェクトからの要求が先。 |
+**Saga / Process Manager**:
+追加しない。状態機械のステップ遷移を機械検査するには、`typestate` フィールド（struct 形状と直交配置、ADR `2026-05-26-1002-typestate-struct-kind-orthogonal.md`）を拡張した Saga 固有の状態遷移スキーマが必要であり、設計コストが高い。また採用先での具体的なユースケースが不明確であるため、今回は追加しない。EventPolicy が後続イベントを emit するモデル（Process Manager への拡張）も同じ条件で再評価する（D16）。採用プロジェクトから「Saga を TDDD で管理したい」という具体的要求が来た場合は、別 ADR で設計する。
+
+**Read Model（CQRS）**:
+追加しない。「ドメインロジックを持たない読み取り専用ビュー」という定義は `Dto` との区別が曖昧であり、`source_events: [EventRef]` を lint するためには Domain Event の配信機構が必要である。Event Sourcing を採用するプロジェクトからの具体的な要求が来た時点で、別 ADR で判断する。
 
 ---
 

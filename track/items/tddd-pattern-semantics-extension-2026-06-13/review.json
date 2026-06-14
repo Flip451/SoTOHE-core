@@ -61,6 +61,123 @@
           "findings": [],
           "hash": "rvw1:sha256:ab417cde38a9a8681157033e75778935580d825b1d686d64b980f9cff9b26510",
           "at": "2026-06-13T19:14:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 says the stage-1 migration rewrites `DataRole` from 13 to 15 variants, but the same task explicitly defers `DataRole::DomainEvent` to Stage 2. Stage 1 only introduces `EventPolicy` here, so the variant-count claim overstates the scope and is internally inconsistent with the rest of the task.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "T007 describes `CatalogueLinterRuleKind` as expanding to 12 \"data-carrying\" variants, but `NoPublicField` is still a unit variant in the generated catalogue model. The task should say 12 variants, not 12 data-carrying variants.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 42,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:9fef2ad1cfea824f5190fc36784074b2b726a2da9976fcfea8b1141015f908ce",
+          "at": "2026-06-14T01:00:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CN-03` and `AC-08` omit `T002`, even though `T002` is the task that actually rewrites `DataRole` / `ContractRole` into data-carrying enums and removes `Copy` / `Hash`. As written, the coverage file claims the breaking migration is covered by follow-up tasks only, which leaves the core schema change unmapped.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/task-coverage.json",
+              "line": 30,
+              "category": "factual error"
+            },
+            {
+              "message": "The D17 port redefinition is semantically hollow: `CatalogueLinter` is documented as an external-I/O-only secondary port, but its `methods` array is empty, and the infrastructure adapter only has `new`. That leaves no I/O boundary for `T009` to implement, so the claimed port/adapter split is not actually represented in the catalogue.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
+              "line": 721,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4616b53d4f36412ff98728338c9dddd879cf92c965cbc6ae1a383d6394978dc2",
+          "at": "2026-06-14T01:10:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Stage 1 T008 and Stage 3 T014 contradict each other about `evaluate_catalogue_lint`: T008 says to implement all 12 rule kinds now, while the S3/S6 descriptions treat T008 as a stub that T014 later expands. That leaves the stage boundary inconsistent and the plan ambiguous to execute.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:168a6fde6314441d119fb2c9ae38bf4d1ff5494c1666d3548aa8c8e2b682356b",
+          "at": "2026-06-14T01:19:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This section schedules the linter framework rewrite and port removal in Stage 1 (`T007`-`T009`), but ADR D3 explicitly says linter work comes after schema migration and the `DomainEvent` stage. Because these tasks are not just placeholders, the plan contradicts its required execution order and becomes ambiguous to execute.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 41,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6c7d9062eaedfee16688ca062805265490fd88558613fe9d2c69cbfc0cedc63f",
+          "at": "2026-06-14T01:25:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbf69ba3e0807a1633a2e7f8000e775c06d2153b7c1955c690f3e09d58dd9927",
+          "at": "2026-06-14T01:35:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 makes `RunCatalogueLintInteractor` call `evaluate_catalogue_lint` directly and changes `RunCatalogueLintInteractor::new` to a zero-argument constructor, while the usecase catalogue keeps the interactor as a unit struct and the command contains only `rules`. The domain function requires both `&CatalogueDocument` and `&LayerId`, so after removing the injected port there is no planned source for those required inputs. This makes the T009 usecase rewrite physically unexecutable unless the command or interactor retains/provides catalogue and layer inputs.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
+              "line": 176,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`CatalogueLinterRuleError` is documented as errors returned by `CatalogueLinterRule::new`, and T016 requires error-case tests for `CatalogueLinterRule::new`, but the type catalogue declares `CatalogueLinterRule::new` as returning `Self`. With that signature, the planned validation errors cannot be returned or tested, so the catalogue contradicts the implementation/test plan for rule validation.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
+              "line": 537,
+              "category": "contradiction"
+            },
+            {
+              "message": "The domain type catalogue's Free Functions section lists only `evaluate_catalogue_lint`, but the spec and T015 require a public `ddd_strict_preset() -> Vec<CatalogueLinterRule>` to satisfy AC-21. Because the typed catalogue omits that function, the plan has no type-level artifact/signature for the required preset even though the implementation plan depends on it.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.md",
+              "line": 38,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bbf69ba3e0807a1633a2e7f8000e775c06d2153b7c1955c690f3e09d58dd9927",
+          "at": "2026-06-14T01:43:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b51f89be43499ebfa9a37070eec38e133ed88fd1600dc389c56aaae64a99df",
+          "at": "2026-06-14T01:55:33Z"
         }
       ]
     },

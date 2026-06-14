@@ -1,0 +1,622 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "TDDD カタログ taxonomy の意味論拡張 — パターン固有の機械検査ルールを持たせる",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "TDDD カタログの `DataRole` / `ContractRole` variant（`Entity` / `AggregateRoot` / `ValueObject` 等）が、名前ラベルにとどまらない DDD パターン固有の意味論フィールドと機械検査ルールを持てるように taxonomy を拡張することで、カタログ宣言が DDD パターンとしての機械処理可能な保証を提供できるようにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "カタログ taxonomy の意味論基盤（DDD パターン意味論フィールド + 新ロール）を先に整備し、後続のカタログ駆動テスト生成（gen-tests）が有意義な検査コードを生成できる基盤を整える。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "実装を 3 段階の機構軸で進める。段 1: `DataRole` / `ContractRole` を data-carrying enum 化し、すべての payload 付き variant の schema を 1 回の breaking migration で確定する（`Entity`・`AggregateRoot`・`ValueObject`・`DomainService`・`UseCase` への意味論フィールド追加、`ContractRole::Repository { aggregate: TypeRef }` 追加、`DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` 追加を含む）。段 2: `DomainEvent`（unit variant）を追加し、段 1 で schema 確定した新ロール群を taxonomy・表示・fixture に反映する。段 3: D4–D11 / D16 / D18 の opt-in linter ルールを確定済み schema の上に実装する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "`DataRole::ValueObject` / `DataRole::Entity` / `DataRole::AggregateRoot` の各 variant に `invariants: Vec<InvariantDecl>` フィールドを結合する。`InvariantDecl` は `name: InvariantName`（必須）と `predicate: InvariantPredicate`（必須）を持つ struct であり、`InvariantPredicate` は現時点では `SelfMethod(MethodName)` のみの enum とする（将来拡張軸として維持）。空 Vec は正当な状態であるため任意（宣言省略可）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "`DataRole::Entity` と `DataRole::AggregateRoot` の各 variant に `identity: IdentityAccessor` フィールドを構造的に必須として結合する（`Option` 不可）。`IdentityAccessor` は public getter メソッド名のみを参照する（public field identity は禁止）。identity のない Entity は概念として成立しない不正状態であるため `Option` を取らない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "`DataRole::AggregateRoot` variant に `exclusive_members: Vec<TypeRef>`（集約専属 Entity の型名リスト、空 Vec 正当・任意）と `shared_value_objects: Vec<TypeRef>`（共有可能 VO の型名リスト、空 Vec 正当・任意）の 2 フィールドを結合する。VO は複数集約で共有が自然であるため両フィールドを型レベルで区別する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "`DataRole::AggregateRoot` と `DataRole::DomainService` の各 variant に `emits: Vec<TypeRef>`（発行する Domain Event の型名リスト、空 Vec 正当・任意）フィールドを結合する。DomainService は `reacts_to` / `handles` は持たない（宣言型リアクションは EventPolicy が担う）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "`DataRole::UseCase` variant に `handles: Vec<TypeRef>`（処理を起動する Domain Event の型名リスト、空 Vec 正当・任意）フィールドを結合する。コマンド駆動の UseCase はイベントをハンドルしない場合があるため空 Vec は正当な状態。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D8"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "`DataRole` に `DomainEvent` unit variant（payload なし）を追加する。`DomainEvent` は「ドメイン内で起きた事実を表す不変であるべきデータ」として独自のロール意味論（時間的文脈 / `emits` 参照先 / `reacts_to` 参照先の役割）を持ち、既存の `ValueObject` / `Command` / `Dto` では代替できない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D9"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "`ContractRole` に `Repository { aggregate: TypeRef }` variant を追加する（既存の `SecondaryPort` は aggregate を持たない非 Repository の secondary port として残す）。`aggregate` フィールドは `Option` 不可（aggregate なしの Repository は不正状態と 1:1 対応するため型で強制）。独立 variant にすることで「aggregate なし Repository」「aggregate あり 非Repository」の両不正状態を構造的に排除する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "`DataRole::AggregateRoot` の `exclusive_members` / `shared_value_objects` フィールドを基盤とした Aggregate Boundary lint ルールを opt-in linter ルールとして実装する。検査内容: `exclusive_members` → Entity ロール整合チェック / `shared_value_objects` → ValueObject ロール整合チェック / `exclusive_members` 重複所属チェック（同一型が複数 AggregateRoot の `exclusive_members` に出現しない）/ `exclusive_members` 直接参照チェック（shallow: 集約外 TypeEntry のメソッドシグネチャへの出現禁止）/ ValueObject 独立性チェック（ValueObject のメソッドシグネチャに Entity / AggregateRoot ロールの型が出現しない）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D11"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "各意味論フィールドの必須 / 任意は「空または `None` が不正な状態と 1:1 対応するか」で判定する。`identity`（Entity / AggregateRoot に必須、`Option` 不可）/ `Repository.aggregate`（必須、`Option` 不可）/ `EventPolicy.reacts_to`（`NonEmptyVec<TypeRef>` で型による非空保証）は構造的に必須。`invariants` / `exclusive_members` / `shared_value_objects` / `emits` / UseCase.`handles` は空 Vec が正当な状態のため任意。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D14"
+          }
+        ]
+      },
+      {
+        "id": "IN-11",
+        "text": "DDD パターンの機械検査ルール（D4–D11 / D16 / D18 が定める各ルール）を、呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。opt-in したルールは厳格に適用し（違反を容認する「advisory」という中間状態は設けない）。ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。本 ADR が定める最小コアルール群を一括有効化する `ddd-strict` プリセットを提供する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D15"
+          }
+        ]
+      },
+      {
+        "id": "IN-12",
+        "text": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。EventPolicy は宣言型リアクター（Domain Event に反応して副作用なしの判断を返す domain 層ロール）であり、UseCase の `handles`（空 Vec 正当）との型レベルの差が構造的独自性を形成する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D16"
+          }
+        ]
+      },
+      {
+        "id": "IN-13",
+        "text": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D17"
+          }
+        ]
+      },
+      {
+        "id": "IN-14",
+        "text": "`ValueObject` ロールに対し値等価性チェック（`PartialEq` / `Eq` の `trait_impls` 宣言必須）と public mutation surface 削減チェック（`&mut self` 禁止 / struct plain/tuple の public field 禁止）を opt-in linter ルールとして追加する。DDD ValueObject の本質（値による等価性・値として扱える）を表す最小コアルールであり、D9 の DomainEvent と同じ rule kind を流用する。schema フィールドの追加は行わない（`ValueObject` は D4 の `invariants` フィールドをすでに持つ）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D18"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "Presenter / Controller（Clean Architecture Primary Adapters）の新 variant 追加は行わない。SoTOHE の TDDD は内側の六角形（Domain / UseCase 層）を主対象とし、Primary Adapters は主対象外。Presenter / Controller に固有の機械検査ルールを定義しにくいことも理由。採用プロジェクトが必要なら `informal_grounds` に根拠を記録した上で独自カタログエントリとして扱える。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D12"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "Saga / Process Manager の variant および状態遷移スキーマ拡張は本 track の対象外。状態機械のステップ遷移を機械検査するには typestate フィールドを拡張した Saga 固有スキーマが必要で設計コストが高く、採用先でのユースケースが不明確。採用プロジェクトから具体的な要求が来た時点で別 ADR で再評価する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D13"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "Read Model（CQRS）variant は本 track の対象外。「ドメインロジックを持たない読み取り専用ビュー」という定義が `Dto` との区別が曖昧であり、`source_events` を lint するためには Domain Event の配信機構が必要。Event Sourcing を採用するプロジェクトからの要求を待つ。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D13"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "UseCase の `consistency: Atomic | Eventual` フィールドは本 track では保留。`Eventual`（Saga / バックグラウンド補償）の lint には Saga 対応が先に必要。`Atomic` の lint（単一 UseCase 内での複数 AggregateRoot 変更検出）は rustdoc 静的情報からの確認が困難。Saga 設計が固まったタイミングで再評価する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D8"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "非アクティブ（archive 済み・completed）トラックのカタログファイルへの遡及移行は行わない。アクティブなトラックのカタログのみを新スキーマへ移行し、非アクティブトラックはライトプロテクトして移行対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "gen-tests（カタログ駆動テスト生成）の実装・設計は本 track の対象外。本 track はテスト生成の基盤となる意味論フィールドと新ロールを整備するに留まり、生成コードの詳細は後続の gen-tests 専用 ADR / track で扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "直接参照チェック（Aggregate Boundary lint）の対象拡大（`TraitEntry.methods` / `FunctionEntry` / struct fields / generic 引数 / method body 等への拡大）はカスタム拡張に委ね、本 track の最小コアは `TypeEntry::methods` のシグネチャ確認にとどまる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D11"
+          }
+        ]
+      },
+      {
+        "id": "OS-08",
+        "text": "EventPolicy の method / decision 契約（handler method / input event / decision output の三つ組み宣言）は本 track のスコープ外。`reacts_to` は反応する Domain Event の型名リスト（surface 宣言）にとどまる。method-level 拡張は gen-tests の設計を具体化する段階で評価する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D16"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "意味論フィールドは `TypeEntry` 構造体に平置きするのでなく、有効ロールに対応する `DataRole` / `ContractRole` variant に結合する（per-variant enum-first）。`role: Command` + `invariants` のような「ロール的に意味をなさない組み合わせ」が構造的に表現不可能であること。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "linter ルールは「検査ルールを持つパターンのみを追加する」という admission 原則に従う。DDD 語彙を variant に追加するだけの拡張（独自の機械検査ルールを持たない variant 追加）は行わない。新ロールは schema invariant / opt-in linter ルール / テスト生成のいずれかの機械検査ルールを持つことが admission の条件。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "スキーマ変更は breaking change であり後方互換性を保証しない。現行の `DataRole` / `ContractRole` は unit variant で `Copy` + strum derive を持つが、data-carrying enum 化後は `Copy` が外れ、strum 文字列変換・codec・signal evaluator・renderer・`role ==` 比較をすべて一斉に更新する必要がある。`Copy` を前提としているコードは `Clone` または参照に切り替える。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D3"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/no-backward-compat.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "`identity` は Entity / AggregateRoot にのみ存在し、public getter メソッド名を参照する（public field identity は禁止）。カタログは public surface のみを列挙するため getter で参照する（private field はカタログに出ない）。Rust の public field は外部から直接書き換え可能（`entity.id = new_id`）であり Entity の identity 安定性に反するため禁止。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "opt-in linter ルールは厳格に適用する（違反を容認する「advisory」という中間状態は設けない）。opt-in したルールの違反は必ず `CatalogueLintViolation` として報告される。opt-out したルールは検査されない（これは設計上の意図であり、opt-out を選んだ採用者は該当パターン規約を自己管理する）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D15"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "linter ルールの評価ロジック（`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する処理）は domain/application core に置く。外部 I/O を持たない純粋ロジックを infrastructure 層に置くことは Clean Architecture の依存方向に反する。port（trait）は外部 I/O が実際に必要な操作に限定する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D17"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "`EventPolicy.reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証とする（schema invariant、opt-in/out 不可）。`NonEmptyVec<TypeRef>` は domain 層の新型（serde-free）であり、infrastructure の codec で JSON 配列 ⇄ `NonEmptyVec` を変換し、空配列は decode エラーとして弾く。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D16"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "本 ADR が定める最小コアルール（検査範囲・内容）と利用者カスタム拡張の境界を維持する。最小コアはロール名の意味が成立する最低限の surface check（schema invariant / A-side 静的チェック）に限定し、検査対象の拡大（全型スロット・全 entry 種別・method body・field / constructor params 等）はカスタム拡張として `&[CatalogueLinterRule]` に追加する設計とする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-09",
+      "text": "linter（`CatalogueLinter`）と signal 評価器（`SignalEvaluatorPort`）は入力・責務・出力形式のすべてが異なる別機構として維持する。linter の入力はカタログ宣言（A-side = `CatalogueDocument`）のみ。signal 評価器の入力は A（`ExtendedCrate`）+ B（baseline）+ C（current）の 3 点。本 ADR が定める機械検査は linter ルールであり、signal 評価器の再定義は行わない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D15"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "段 1: `DataRole::Entity` / `DataRole::AggregateRoot` / `DataRole::ValueObject` の各 variant が `invariants: Vec<InvariantDecl>` フィールドを持ち、`InvariantDecl { name: InvariantName, predicate: InvariantPredicate }` が serde でシリアライズ / デシリアライズできる。`InvariantPredicate::SelfMethod(MethodName)` が現時点で唯一の variant として実装されている。`role: Command` + `invariants` の組み合わせが parse 段階で型エラーになる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "段 1: `DataRole::Entity` / `DataRole::AggregateRoot` の variant が `identity: IdentityAccessor` フィールドを構造的に必須として持つ（`Option` 不可）。`IdentityAccessor` が public getter メソッド名を保持する（public field identity 宣言を parse 段階で reject するか、codec が getter メソッド名のみを受け入れる）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "段 1: `DataRole::AggregateRoot` variant が `exclusive_members: Vec<TypeRef>` と `shared_value_objects: Vec<TypeRef>` の両フィールドを持ち、空 Vec 省略でシリアライズ / デシリアライズできる。`AggregateRoot` 以外の variant にこれらのフィールドが存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "段 1: `DataRole::AggregateRoot` / `DataRole::DomainService` の各 variant が `emits: Vec<TypeRef>` フィールドを持ち、空 Vec 省略で serde ラウンドトリップできる。`emits` フィールドが当該 2 variant 以外には存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "段 1: `DataRole::UseCase` variant が `handles: Vec<TypeRef>` フィールドを持ち、空 Vec 省略で serde ラウンドトリップできる。`handles` が `UseCase` 以外の variant には存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D8"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "段 1: `ContractRole::Repository { aggregate: TypeRef }` variant が追加され、`aggregate` が必須フィールドとして serde で encode / decode できる。`ContractRole::SecondaryPort`（aggregate を持たない非 Repository secondary port）が引き続き存在する。`aggregate` フィールドなしの Repository 宣言が codec で decode エラーになる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "段 1: `DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant が追加され、空の `reacts_to` 配列が codec の decode 段階でエラーになる（`NonEmptyVec` の schema invariant）。1 つ以上の TypeRef を持つ `reacts_to` は decode に成功する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D16"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "段 1: `DataRole` の data-carrying enum 化に伴い、`Copy` が外れ、strum 文字列変換・codec・signal evaluator・renderer・`role ==` 比較がすべて更新されて `cargo make ci` が pass する。`DataRole` / `ContractRole` を `Copy` として使っているコードがコンパイルエラーにならないよう `Clone` または参照に切り替わっている。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "段 2: `DataRole` に `DomainEvent` unit variant が追加され、カタログ宣言で `role: DomainEvent` を指定できる。`ALL_DATA_ROLES` 配列（および taxonomy 表示 / fixture）が更新されて `DomainEvent` を含む。`DataRole` の variant 数が 13 から 15 に増える（`DomainEvent` + `EventPolicy` 追加）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D9"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "段 2: `ContractRole` の variant 数が 3 から 4 に増える（`Repository` 追加）。`ALL_CONTRACT_ROLES` 配列（および taxonomy 表示 / fixture）が更新されて `Repository` を含む。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "段 3: `CatalogueLinterRule` が `RuleTarget`（検査対象ロール選択）と `CatalogueLinterRuleKind`（検査内容パラメータ）の 2 部構成で実装されている。`DataRole` / `ContractRole` を横断するロール指定のための payload なし discriminant 型（`RoleKind` 相当）が存在し、`RoleKind::Repository` のように `ContractRole` 由来のロールも指定できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D15"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "段 3: `CatalogueLinterRuleKind` に本 ADR が定める最小コアルールに対応する variant（`ReferencedRoleConstraint` / `TraitImplRequired` / `NoRoleInMethodSignature` / `MethodReferenceSignature` / `AccessorSignatureRequired` / `FieldElementUniqueAcrossEntries` / `NoExternalReferenceInMethods` / `NoPublicField` / `ForbiddenMethodReceiver` およびすでに存在する `KindLayerConstraint` / `FieldEmpty` / `FieldNonEmpty`）が実装されている。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D15"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "段 3: `invariants` の `SelfMethod` linter チェックが実装されている。`InvariantPredicate::SelfMethod(method)` で指定したメソッド名が親エントリの public method 宣言集合に存在し、かつ `&self` receiver / 引数なし / `bool` 返却の signature を満たさない場合に `CatalogueLintViolation` が返される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "段 3: Entity / AggregateRoot の identity getter 存在 + signature チェックが実装されている。`identity` で指定した getter 名が public method 集合に存在し、かつ `&self` receiver / 引数なし / 非 `()` 返却の signature を満たさない場合に linter が違反を報告する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-15",
+      "text": "段 3: Entity / AggregateRoot / ValueObject の equality impl 宣言チェックが実装されている。`PartialEq` / `Eq` の impl が `trait_impls` に宣言されていない場合に linter が違反を報告する（Entity / AggregateRoot は D5、ValueObject は D18）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D18"
+        }
+      ]
+    },
+    {
+      "id": "AC-16",
+      "text": "段 3: Aggregate Boundary の 5 種類の lint ルールが実装されている。(1) `exclusive_members` → Entity ロール整合チェック、(2) `shared_value_objects` → ValueObject ロール整合チェック、(3) `exclusive_members` 重複所属チェック、(4) `exclusive_members` 直接参照チェック（shallow: 集約外 TypeEntry のメソッドシグネチャへの出現禁止）、(5) ValueObject 独立性チェック（ValueObject のメソッドシグネチャに Entity / AggregateRoot ロール型が出現しない）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D11"
+        }
+      ]
+    },
+    {
+      "id": "AC-17",
+      "text": "段 3: DomainEvent の 2 種類の lint ルールが実装されている。(1) `ForbiddenMethodReceiver`（`&mut self` メソッド宣言を持つ DomainEvent は違反）、(2) `NoPublicField`（`StructShape::Plain` / `Tuple` の public field を持つ DomainEvent は違反。enum variant payload は禁止しない）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D9"
+        }
+      ]
+    },
+    {
+      "id": "AC-18",
+      "text": "段 3: Repository の aggregate → AggregateRoot ロール整合チェックが実装されている。`ContractRole::Repository.aggregate` で参照する型が `AggregateRoot` ロールで宣言されていない場合に linter が違反を報告する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "AC-19",
+      "text": "段 3: EventPolicy の 4 種類の lint ルールが実装されている。(1) `reacts_to` 参照先 DomainEvent チェック（`reacts_to` に列挙された型が `DomainEvent` ロールで宣言されているか）、(2) domain 層配置チェック（EventPolicy エントリが domain 層以外で宣言された場合は違反）、(3) `&mut self` 禁止（EventPolicy のメソッドに `&mut self` があれば違反）、(4) 副作用ロール禁止（EventPolicy のメソッドシグネチャに Repository / UseCase ロールの型が出現すれば違反）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D16"
+        }
+      ]
+    },
+    {
+      "id": "AC-20",
+      "text": "段 3: ValueObject の public mutation surface 削減チェックが実装されている。(1) `&mut self` 禁止（ForbiddenMethodReceiver / D18 と D9 で同じ rule kind を流用）、(2) struct public field 禁止（NoPublicField / D18 と D9 で同じ rule kind を流用）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D18"
+        }
+      ]
+    },
+    {
+      "id": "AC-21",
+      "text": "段 3: `ddd-strict` プリセット（本 ADR の最小コアルール D4–D11 / D16 / D18 のすべてを一括有効化するルールセット）が実装されており、`&[CatalogueLinterRule]` として組み上げることができる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D15"
+        }
+      ]
+    },
+    {
+      "id": "AC-22",
+      "text": "段 3: linter ルール評価ロジックが domain/application core に存在し、infrastructure 層への依存なしにユニットテストできる。現行の `InMemoryCatalogueLinter`（infrastructure 層）が廃止または再定義されており、評価ロジックが core に移っている。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D17"
+        }
+      ]
+    },
+    {
+      "id": "AC-23",
+      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。新スキーマ・新 variant・新 lint ルールに対するユニットテストが追加されており、既存テストへのリグレッションが存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/no-backward-compat.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/typed-deserialization.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "Make Illegal States Unrepresentable"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "Enum-first パターン：バリアント依存データは enum で表現する"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 56,
+    "yellow": 0,
+    "red": 0
+  }
+}
