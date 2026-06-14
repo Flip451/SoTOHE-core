@@ -34,12 +34,13 @@
     {
       "id": "T006",
       "description": "D1: `.claude/agents/dry-fix-lead.md` のワークフローを効率化し、violation ゼロ時に `cargo make ci-rust` と 2 度目の `sotp dry write` をスキップする分岐を追加する (IN-01 / AC-01 / AC-02 / CN-01)。変更ファイル: `.claude/agents/dry-fix-lead.md`。現在の 5 ステップワークフロー (write → fix → ci-rust → re-write → check-approved) を新しい 4 分岐ループに変更する: Step 1: `sotp dry check-approved` を実行 → Approved なら `completed` (violation ゼロで back-edge 再入を素通り); Blocked なら Step 2 へ。Step 2: `sotp dry write` で未判定ペアを判定。Step 3: violation ゼロ (findings が空) → `sotp dry check-approved` → Approved なら `completed` (ci-rust / 再 dry write をスキップ)。Step 4: violation あり → 修正適用 → `cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved` → Approved なら `completed`、Blocked なら Step 4 へループ (ループ疲弊で `blocked` 出力)。ループ疲弊定義・`blocked` / `failed` 出力規則・スコープ所有権の記述を維持する。Rust コード変更なし。前提: T005 (dry check-approved が安価な純読み取りになっていること)。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "646f4b28c4687d431418ff6854fca06b11bdaa16"
     },
     {
       "id": "T007",
       "description": "D5: テレメトリ計装を更新し、dry check-approved の `GateEval` (gate_name=`dry`, verdict Approved→ok / Blocked→error) を `dry_check_approved` composition 経路に追加する (IN-07 / AC-02 / CN-10)。変更ファイル: `apps/cli-composition/src/dry.rs` の `dry_check_approved` メソッド。`dry check-approved` 完了後に `crate::telemetry_wiring::emit_gate_eval(w, tid, \"dry\", verdict_is_ok)` を呼ぶ — 既存の `emit_gate_eval` API を使い、新フィールド・新イベント型は追加しない。この計装により D1 の no-fix completed を識別できる (AC-02)。unit tests: `dry_check_approved` が Approved を返したとき GateEval が発行されること / Blocked を返したとき GateEval (error verdict) が発行されること。前提: T005 (dry_check_approved 実装済み)。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T008",

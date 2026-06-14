@@ -458,6 +458,9 @@ impl CliApp {
 
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
+        // D5 (T007 / IN-07 / AC-02 / CN-10): GateEval telemetry start.
+        let gate_start = Instant::now();
+
         let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
         let root = git.root().to_path_buf();
         let canonical_root =
@@ -479,11 +482,7 @@ impl CliApp {
             &canonical_root,
         )?;
 
-        // D5 / IN-05 / AC-10 / AC-12 / CN-09 (T005): the gate is pure-read.
-        // We need only diff fragments to derive the current FragmentRef set —
-        // no corpus, no embedding, no semantic index, no threshold. The
-        // workspace root for fragment extraction is fixed to the repository
-        // root (canonical), so no separate `workspace_root` input is needed.
+        // D5 / IN-05 (T005): pure-read gate — diff fragments only.
         let (diff_fragments, _corpus_fragments) =
             build_diff_and_corpus_fragments(&base, &canonical_root, &canonical_root)?;
 
@@ -506,7 +505,38 @@ impl CliApp {
             .check_approved(&track_id, &current_fragment_refs)
             .map_err(|e| format!("dry check-approved failed: {e}"))?;
 
+        // D5 (T007 / IN-07 / AC-02 / CN-10): emit GateEval telemetry.
+        let telemetry_writer =
+            resolve_dry_write_telemetry_writer(&input.items_dir, track_id.as_ref());
+        if let Some((ref w, ref tid)) = telemetry_writer {
+            let (verdict_str, reason_summary) = dry_check_approved_gate_eval_fields(&verdict);
+            crate::telemetry_wiring::emit_gate_eval(
+                w,
+                tid,
+                "dry",
+                verdict_str,
+                &reason_summary,
+                gate_start,
+            );
+        }
+
         Ok(dry_check_approved_outcome(verdict))
+    }
+}
+
+/// Map a `DryCheckApprovalVerdict` to the `(verdict_str, reason_summary)` pair
+/// used in `GateEval` telemetry for the `"dry"` gate (T007 / IN-07 / CN-10).
+///
+/// - `Approved`  → `("ok",    "")`
+/// - `Blocked`   → `("error", "blocked: N unresolved pair(s)")`
+fn dry_check_approved_gate_eval_fields(
+    verdict: &domain::dry_check::DryCheckApprovalVerdict,
+) -> (&'static str, String) {
+    match verdict {
+        domain::dry_check::DryCheckApprovalVerdict::Approved => ("ok", String::new()),
+        domain::dry_check::DryCheckApprovalVerdict::Blocked { unresolved_pair_count } => {
+            ("error", format!("blocked: {unresolved_pair_count} unresolved pair(s)"))
+        }
     }
 }
 
@@ -675,7 +705,7 @@ mod tests {
         dry_fix_build_smoke_env, dry_fix_smoke_test_codex_version, dry_fix_spawn_and_collect,
         resolve_codex_bin, run_dry_fix_codex,
     };
-    use crate::review_v2::process_guards::{EnvGuard, GitRunner};
+    use crate::review_v2::process_guards::{CwdGuard, EnvGuard, GitRunner};
     #[cfg(unix)]
     use crate::test_support::make_executable;
     use crate::test_support::repo_root_for_tests;
@@ -2190,6 +2220,47 @@ exit 0
         assert!(input.base_commit.is_none());
     }
 
+    // ── GateEval telemetry field mapping (T007 / IN-07 / CN-10) ─────────────
+
+    /// Approved verdict maps to gate_name="dry", verdict="ok", empty reason.
+    #[test]
+    fn test_dry_check_approved_gate_eval_fields_approved_maps_to_ok() {
+        let (verdict_str, reason_summary) = dry_check_approved_gate_eval_fields(
+            &domain::dry_check::DryCheckApprovalVerdict::Approved,
+        );
+        assert_eq!(verdict_str, "ok", "Approved must map to verdict_str=\"ok\"");
+        assert!(
+            reason_summary.is_empty(),
+            "Approved must produce an empty reason_summary; got: {reason_summary:?}"
+        );
+    }
+
+    /// Blocked verdict maps to verdict="error" with "blocked: N unresolved pair(s)" summary.
+    #[test]
+    fn test_dry_check_approved_gate_eval_fields_blocked_maps_to_error_with_count() {
+        let (verdict_str, reason_summary) = dry_check_approved_gate_eval_fields(
+            &domain::dry_check::DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 3 },
+        );
+        assert_eq!(verdict_str, "error", "Blocked must map to verdict_str=\"error\"");
+        assert_eq!(
+            reason_summary, "blocked: 3 unresolved pair(s)",
+            "Blocked reason_summary must embed the unresolved pair count"
+        );
+    }
+
+    /// Blocked with zero unresolved pairs still emits "error" (gate is blocked).
+    #[test]
+    fn test_dry_check_approved_gate_eval_fields_blocked_zero_pairs_still_error() {
+        let (verdict_str, reason_summary) = dry_check_approved_gate_eval_fields(
+            &domain::dry_check::DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 0 },
+        );
+        assert_eq!(verdict_str, "error", "Blocked(0) must still map to \"error\"");
+        assert_eq!(
+            reason_summary, "blocked: 0 unresolved pair(s)",
+            "Blocked(0) reason_summary must include the zero count"
+        );
+    }
+
     // ── Ephemeral index parent selection ─────────────────────────────────────
 
     #[test]
@@ -3076,6 +3147,199 @@ exit 0
                 .iter()
                 .map(|r| r.fragment.source_path.display().to_string())
                 .collect::<Vec<_>>()
+        );
+    }
+
+    // ── GateEval telemetry end-to-end: dry_check_approved emits event ────────
+    //
+    // These tests verify that `CliApp::dry_check_approved()` actually reaches the
+    // `emit_gate_eval(...)` call after finalizing the verdict (T007 / IN-07).
+    // The mapping helper (`dry_check_approved_gate_eval_fields`) is tested
+    // separately above; these tests exercise the composition path end-to-end so
+    // a regression that removes or reorders the telemetry call would be caught.
+    //
+    // Setup: a temporary git repo on a `track/<id>` branch with a real initial
+    // commit (so `build_diff_and_corpus_fragments` has a valid base to diff
+    // against), no Rust source files (so the diff is empty → `current_fragment_refs`
+    // is empty), and pre-created dry-check artefacts for the desired verdict.
+    //
+    // Telemetry output is redirected to a tempdir via `SOTP_TELEMETRY_DIR` so the
+    // test can read `telemetry.jsonl` without touching the real repo's track items.
+
+    /// Set up a minimal git repo on a track branch with one commit.
+    ///
+    /// Returns `(repo_tempdir, items_dir, track_id, initial_commit_hash)`.
+    /// Caller must keep `repo_tempdir` alive for the duration of the test.
+    fn setup_gate_eval_repo(track_id: &str) -> (tempfile::TempDir, PathBuf, String) {
+        use std::process::Command;
+
+        let repo = tempfile::tempdir().unwrap();
+        let root = repo.path();
+
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
+
+        let items_dir = root.join("track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
+
+        // Switch to a track branch so `resolve_dry_write_telemetry_writer` returns Some.
+        GitRunner::at(root).assert_success(&["checkout", "-b", &format!("track/{track_id}")]);
+
+        // Capture the initial commit hash (the base we will pass to dry_check_approved).
+        let output =
+            Command::new("git").current_dir(root).args(["rev-parse", "HEAD"]).output().unwrap();
+        let commit_hash = String::from_utf8(output.stdout).unwrap().trim().to_owned();
+
+        (repo, items_dir, commit_hash)
+    }
+
+    /// End-to-end: `dry_check_approved` emits a GateEval event with
+    /// `verdict="ok"` (Approved) when:
+    ///   - coverage manifest present with an empty fragment-ref set,
+    ///   - dry-check.json present with no records,
+    ///   - diff is empty (no Rust source files in the repo).
+    ///
+    /// Verifies that the telemetry call in `CliApp::dry_check_approved` is
+    /// actually reached after the verdict is finalized, not just that the
+    /// mapping helper produces the right strings.
+    #[test]
+    fn test_dry_check_approved_approved_verdict_emits_gate_eval_telemetry_event() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let track_id = "gate-eval-approved-2026-06-14";
+        let (repo, items_dir, commit_hash) = setup_gate_eval_repo(track_id);
+
+        // Pre-create the track directory with an empty coverage manifest and
+        // an empty dry-check store.  No Rust source files → empty diff →
+        // empty current_fragment_refs → Approved.
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("dry-check-coverage.json"),
+            br#"{"schema_version":1,"fragment_refs":[]}"#,
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
+            .unwrap();
+
+        // Use a SOTP_TELEMETRY_DIR tempdir so telemetry.jsonl is written there.
+        let telemetry_dir = tempfile::tempdir().unwrap();
+
+        // Change CWD to the test repo so SystemGitRepo::discover() finds it.
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo.path()).unwrap();
+
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", "1");
+        let _telemetry_dir_guard =
+            EnvGuard::set("SOTP_TELEMETRY_DIR", telemetry_dir.path().as_os_str().to_os_string());
+
+        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+            track_id: track_id.to_owned(),
+            base_commit: Some(commit_hash),
+            items_dir: items_dir.clone(),
+        });
+
+        // The call must succeed with exit_code 0 (Approved).
+        let outcome = result.unwrap();
+        assert_eq!(
+            outcome.exit_code, 0,
+            "Approved verdict must produce exit_code 0; got: {outcome:?}"
+        );
+
+        // The GateEval event must be present in telemetry.jsonl.
+        let telemetry_path = telemetry_dir.path().join("telemetry.jsonl");
+        assert!(
+            telemetry_path.exists(),
+            "telemetry.jsonl must be written when SOTP_TELEMETRY=1 on a track branch"
+        );
+        let content = std::fs::read_to_string(&telemetry_path).unwrap();
+        assert!(
+            content.contains("GateEval"),
+            "GateEval event must be emitted after Approved verdict; got: {content}"
+        );
+        assert!(
+            content.contains("\"verdict\":\"ok\""),
+            "Approved verdict must produce verdict=\"ok\" in GateEval event; got: {content}"
+        );
+        assert!(
+            content.contains("\"gate_name\":\"dry\""),
+            "gate_name must be \"dry\" in GateEval event; got: {content}"
+        );
+    }
+
+    /// End-to-end: `dry_check_approved` emits a GateEval event with
+    /// `verdict="error"` (Blocked) when the coverage manifest is absent
+    /// (fail-closed: missing coverage → Blocked { unresolved_pair_count: 1 }).
+    ///
+    /// Verifies the telemetry path is reached for the Blocked flow as well,
+    /// so both branches of `dry_check_approved_gate_eval_fields` are exercised
+    /// through the full composition path.
+    #[test]
+    fn test_dry_check_approved_blocked_verdict_emits_gate_eval_telemetry_event() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let track_id = "gate-eval-blocked-2026-06-14";
+        let (repo, items_dir, commit_hash) = setup_gate_eval_repo(track_id);
+
+        // Pre-create the track directory but intentionally omit the coverage
+        // manifest so `FsDryCheckCoverageAdapter::read_coverage` returns None,
+        // causing `DryCheckApprovalInteractor::check_approved` to return
+        // Blocked { unresolved_pair_count: 1 }.
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
+            .unwrap();
+        // dry-check-coverage.json intentionally absent.
+
+        let telemetry_dir = tempfile::tempdir().unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo.path()).unwrap();
+
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", "1");
+        let _telemetry_dir_guard =
+            EnvGuard::set("SOTP_TELEMETRY_DIR", telemetry_dir.path().as_os_str().to_os_string());
+
+        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+            track_id: track_id.to_owned(),
+            base_commit: Some(commit_hash),
+            items_dir: items_dir.clone(),
+        });
+
+        // The call must succeed (Ok) with exit_code 1 (Blocked — exits non-zero).
+        let outcome = result.unwrap();
+        assert_eq!(
+            outcome.exit_code, 1,
+            "Blocked verdict must produce exit_code 1; got: {outcome:?}"
+        );
+
+        // The GateEval event must be present in telemetry.jsonl.
+        let telemetry_path = telemetry_dir.path().join("telemetry.jsonl");
+        assert!(
+            telemetry_path.exists(),
+            "telemetry.jsonl must be written when SOTP_TELEMETRY=1 on a track branch"
+        );
+        let content = std::fs::read_to_string(&telemetry_path).unwrap();
+        assert!(
+            content.contains("GateEval"),
+            "GateEval event must be emitted after Blocked verdict; got: {content}"
+        );
+        assert!(
+            content.contains("\"verdict\":\"error\""),
+            "Blocked verdict must produce verdict=\"error\" in GateEval event; got: {content}"
+        );
+        assert!(
+            content.contains("\"gate_name\":\"dry\""),
+            "gate_name must be \"dry\" in GateEval event; got: {content}"
+        );
+        assert!(
+            content.contains("blocked:"),
+            "Blocked reason_summary must contain \"blocked:\" in GateEval event; got: {content}"
         );
     }
 }

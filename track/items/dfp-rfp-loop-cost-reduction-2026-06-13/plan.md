@@ -5,7 +5,7 @@
 
 Goal coverage note: `task-coverage.json` schema_version 1 carries `in_scope` / `out_of_scope` / `constraints` / `acceptance_criteria` maps. GO-01 is covered by T006 (dfl ループ効率化), GO-02 by T014/T015 (fixpoint 機械化), GO-03 by T010 (並列 fan-out), GO-04 by T011/T012/T013 (2 段較正), GO-05 by T001-T005 (純読み取りゲート). Goal mappings are recorded here because adding GO keys to task-coverage.json fails the plan-artifact-refs verifier.
 
-## Tasks (6/17 resolved)
+## Tasks (7/17 resolved)
 
 ### S1 — D5: Coverage Record Domain Type + Port + Infrastructure Adapter (T001–T002)
 
@@ -33,8 +33,8 @@ Goal coverage note: `task-coverage.json` schema_version 1 carries `in_scope` / `
 > T007 は `dry_check_approved` に `GateEval` テレメトリ計装を追加し、no-fix completed を識別できるようにする (IN-07 / AC-02 / CN-10)。
 > S2 (T005) 完了後に着手する (dry check-approved が安価な純読み取りになっていることが前提)。
 
-- [x] **T006**: D1: `.claude/agents/dry-fix-lead.md` のワークフローを効率化し、violation ゼロ時に `cargo make ci-rust` と 2 度目の `sotp dry write` をスキップする分岐を追加する (IN-01 / AC-01 / AC-02 / CN-01)。変更ファイル: `.claude/agents/dry-fix-lead.md`。現在の 5 ステップワークフロー (write → fix → ci-rust → re-write → check-approved) を新しい 4 分岐ループに変更する: Step 1: `sotp dry check-approved` を実行 → Approved なら `completed` (violation ゼロで back-edge 再入を素通り); Blocked なら Step 2 へ。Step 2: `sotp dry write` で未判定ペアを判定。Step 3: violation ゼロ (findings が空) → `sotp dry check-approved` → Approved なら `completed` (ci-rust / 再 dry write をスキップ)。Step 4: violation あり → 修正適用 → `cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved` → Approved なら `completed`、Blocked なら Step 4 へループ (ループ疲弊で `blocked` 出力)。ループ疲弊定義・`blocked` / `failed` 出力規則・スコープ所有権の記述を維持する。Rust コード変更なし。前提: T005 (dry check-approved が安価な純読み取りになっていること)。
-- [ ] **T007**: D5: テレメトリ計装を更新し、dry check-approved の `GateEval` (gate_name=`dry`, verdict Approved→ok / Blocked→error) を `dry_check_approved` composition 経路に追加する (IN-07 / AC-02 / CN-10)。変更ファイル: `apps/cli-composition/src/dry.rs` の `dry_check_approved` メソッド。`dry check-approved` 完了後に `crate::telemetry_wiring::emit_gate_eval(w, tid, "dry", verdict_is_ok)` を呼ぶ — 既存の `emit_gate_eval` API を使い、新フィールド・新イベント型は追加しない。この計装により D1 の no-fix completed を識別できる (AC-02)。unit tests: `dry_check_approved` が Approved を返したとき GateEval が発行されること / Blocked を返したとき GateEval (error verdict) が発行されること。前提: T005 (dry_check_approved 実装済み)。
+- [x] **T006**: D1: `.claude/agents/dry-fix-lead.md` のワークフローを効率化し、violation ゼロ時に `cargo make ci-rust` と 2 度目の `sotp dry write` をスキップする分岐を追加する (IN-01 / AC-01 / AC-02 / CN-01)。変更ファイル: `.claude/agents/dry-fix-lead.md`。現在の 5 ステップワークフロー (write → fix → ci-rust → re-write → check-approved) を新しい 4 分岐ループに変更する: Step 1: `sotp dry check-approved` を実行 → Approved なら `completed` (violation ゼロで back-edge 再入を素通り); Blocked なら Step 2 へ。Step 2: `sotp dry write` で未判定ペアを判定。Step 3: violation ゼロ (findings が空) → `sotp dry check-approved` → Approved なら `completed` (ci-rust / 再 dry write をスキップ)。Step 4: violation あり → 修正適用 → `cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved` → Approved なら `completed`、Blocked なら Step 4 へループ (ループ疲弊で `blocked` 出力)。ループ疲弊定義・`blocked` / `failed` 出力規則・スコープ所有権の記述を維持する。Rust コード変更なし。前提: T005 (dry check-approved が安価な純読み取りになっていること)。 (`646f4b28c4687d431418ff6854fca06b11bdaa16`)
+- [x] **T007**: D5: テレメトリ計装を更新し、dry check-approved の `GateEval` (gate_name=`dry`, verdict Approved→ok / Blocked→error) を `dry_check_approved` composition 経路に追加する (IN-07 / AC-02 / CN-10)。変更ファイル: `apps/cli-composition/src/dry.rs` の `dry_check_approved` メソッド。`dry check-approved` 完了後に `crate::telemetry_wiring::emit_gate_eval(w, tid, "dry", verdict_is_ok)` を呼ぶ — 既存の `emit_gate_eval` API を使い、新フィールド・新イベント型は追加しない。この計装により D1 の no-fix completed を識別できる (AC-02)。unit tests: `dry_check_approved` が Approved を返したとき GateEval が発行されること / Blocked を返したとき GateEval (error verdict) が発行されること。前提: T005 (dry_check_approved 実装済み)。
 
 ### S4 — D3: 並列 fan-out 基盤 — config DTO 更新と usecase value object 追加 (T008–T009)
 
