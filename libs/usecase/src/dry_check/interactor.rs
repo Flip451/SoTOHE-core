@@ -4,23 +4,25 @@
 //! from corpus_fragments) + diff fragment query at threshold + DryCheckAgentPort
 //! verification + DryCheckWriter verdict persistence.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
 use domain::CommitHash;
+use domain::TrackId;
 use domain::dry_check::{
-    DryCheckEntry, DryCheckEntryError, DryCheckFinding, DryCheckPairKey, DryCheckReader,
-    DryCheckVerdict, DryCheckWriter, Rationale,
+    DryCheckCoverageRecord, DryCheckEntry, DryCheckEntryError, DryCheckFinding, DryCheckPairKey,
+    DryCheckReader, DryCheckVerdict, DryCheckWriter, FragmentRef, Rationale,
 };
 use domain::review_v2::types::FilePath;
 use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
 
 use super::errors::DryCheckCycleError;
 use super::judgment::DryCheckAgentJudgment;
-use super::ports::DryCheckAgentPort;
+use super::ports::{DryCheckAgentPort, DryCheckCoveragePort};
 use super::services::DryCheckService;
 use super::shared::{
     build_corpus_index, candidate_pair_keys_for_diff, collect_above_threshold_candidates,
+    fragment_ref_of,
 };
 use crate::semantic_dup::{EmbeddingPort, SemanticIndexError, SemanticIndexPort};
 
@@ -41,6 +43,8 @@ pub struct DryCheckInteractor {
     agent_port: Arc<dyn DryCheckAgentPort>,
     dry_check_writer: Arc<dyn DryCheckWriter>,
     dry_check_reader: Arc<dyn DryCheckReader>,
+    coverage: Arc<dyn DryCheckCoveragePort>,
+    track_id: TrackId,
 }
 
 impl DryCheckInteractor {
@@ -48,6 +52,12 @@ impl DryCheckInteractor {
     ///
     /// `diff_source` is NOT injected — the CLI resolves diff fragments and
     /// passes them in as `diff_fragments` (CN-01/IN-02).
+    ///
+    /// `coverage` + `track_id` are the D5 (T004) addition: `run_dry_check`
+    /// writes a [`DryCheckCoverageRecord`] for `track_id` containing every
+    /// processed diff-fragment `FragmentRef`, so the read-only `dry
+    /// check-approved` (T003) can use it for staleness matching (IN-06 / AC-11
+    /// / CN-08).
     #[must_use]
     pub fn new(
         embedding_port: Arc<dyn EmbeddingPort>,
@@ -55,6 +65,8 @@ impl DryCheckInteractor {
         agent_port: Arc<dyn DryCheckAgentPort>,
         dry_check_writer: Arc<dyn DryCheckWriter>,
         dry_check_reader: Arc<dyn DryCheckReader>,
+        coverage: Arc<dyn DryCheckCoveragePort>,
+        track_id: TrackId,
     ) -> DryCheckInteractor {
         DryCheckInteractor {
             embedding_port,
@@ -62,6 +74,8 @@ impl DryCheckInteractor {
             agent_port,
             dry_check_writer,
             dry_check_reader,
+            coverage,
+            track_id,
         }
     }
 }
@@ -112,10 +126,22 @@ impl DryCheckService for DryCheckInteractor {
 
         // ── Steps 3–5: Per diff_fragment loop ─────────────────────────────────
         let mut findings: Vec<DryCheckFinding> = Vec::new();
+        // D5 (T004): collect every processed diff-fragment FragmentRef so we
+        // can persist a coverage record at the end of the run.
+        let mut processed_refs: BTreeSet<FragmentRef> = BTreeSet::new();
 
         for diff_fragment in &diff_fragments {
             // CN-04: diff_fragments are already hunk-filtered by the CLI.
             // The interactor does NOT perform additional hunk filtering.
+
+            // Record the diff fragment as processed for the D5 coverage manifest
+            // (IN-06: FragmentRef = path + content_hash).
+            let processed_ref = fragment_ref_of(diff_fragment).map_err(|e| {
+                DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
+                    source: format!("processed_ref error: {e}"),
+                })
+            })?;
+            processed_refs.insert(processed_ref);
 
             let above_threshold_candidates = collect_above_threshold_candidates(
                 diff_fragment,
@@ -172,6 +198,14 @@ impl DryCheckService for DryCheckInteractor {
                 }
             }
         }
+
+        // ── Step 6 (D5, T004): persist the coverage manifest ──────────────────
+        //
+        // `dry check-approved` (T003) reads this record and treats any current
+        // diff fragment whose `FragmentRef` is NOT covered as stale → Blocked
+        // (IN-06 / AC-11 / CN-08).
+        let coverage_record = DryCheckCoverageRecord::new(processed_refs);
+        self.coverage.write_coverage(&self.track_id, coverage_record)?;
 
         Ok(findings)
     }
@@ -274,6 +308,59 @@ mod tests {
         }
     }
 
+    /// Stub coverage port that records every `write_coverage` call.
+    #[derive(Default)]
+    struct StubCoverage {
+        last_record: Mutex<Option<DryCheckCoverageRecord>>,
+        write_calls: Mutex<u32>,
+        write_should_fail: bool,
+    }
+
+    impl StubCoverage {
+        fn new() -> Self {
+            Self::default()
+        }
+        fn failing() -> Self {
+            Self {
+                last_record: Mutex::new(None),
+                write_calls: Mutex::new(0),
+                write_should_fail: true,
+            }
+        }
+        fn write_call_count(&self) -> u32 {
+            *self.write_calls.lock().unwrap()
+        }
+        fn last_written(&self) -> Option<DryCheckCoverageRecord> {
+            self.last_record.lock().unwrap().clone()
+        }
+    }
+
+    impl DryCheckCoveragePort for StubCoverage {
+        fn read_coverage(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<Option<DryCheckCoverageRecord>, DryCheckCycleError> {
+            // The interactor only writes — it never reads.
+            panic!("DryCheckInteractor never calls read_coverage in tests")
+        }
+        fn write_coverage(
+            &self,
+            _track_id: &TrackId,
+            record: DryCheckCoverageRecord,
+        ) -> Result<(), DryCheckCycleError> {
+            *self.write_calls.lock().unwrap() += 1;
+            if self.write_should_fail {
+                return Err(DryCheckCycleError::CoveragePort("simulated write error".to_owned()));
+            }
+            *self.last_record.lock().unwrap() = Some(record);
+            Ok(())
+        }
+    }
+
+    fn make_track() -> TrackId {
+        TrackId::try_new("test-track-2026").unwrap()
+    }
+
     impl domain::dry_check::DryCheckReader for StubReader {
         fn read_records(&self) -> Result<Vec<DryCheckRecord>, DryCheckReaderError> {
             Ok(self.records.clone())
@@ -344,12 +431,32 @@ mod tests {
         writer: Arc<StubWriter>,
         records: Vec<DryCheckRecord>,
     ) -> DryCheckInteractor {
+        make_interactor_with_coverage(
+            embed,
+            index,
+            agent,
+            writer,
+            records,
+            Arc::new(StubCoverage::new()),
+        )
+    }
+
+    fn make_interactor_with_coverage(
+        embed: MockMockEmbeddingPort,
+        index: MockMockSemanticIndexPort,
+        agent: MockMockDryCheckAgentPort,
+        writer: Arc<StubWriter>,
+        records: Vec<DryCheckRecord>,
+        coverage: Arc<StubCoverage>,
+    ) -> DryCheckInteractor {
         DryCheckInteractor::new(
             Arc::new(embed),
             Arc::new(index),
             Arc::new(agent),
             writer,
             Arc::new(StubReader::with_records(records)),
+            coverage,
+            make_track(),
         )
     }
 
@@ -966,5 +1073,114 @@ mod tests {
 
         assert!(result.is_empty());
         assert!(writer.entries.lock().unwrap().is_empty());
+    }
+
+    // ── T004: D5 coverage write ───────────────────────────────────────────────
+
+    #[test]
+    fn test_run_dry_check_writes_coverage_record_with_all_diff_fragment_refs() {
+        // Two diff fragments → coverage manifest must contain exactly those two
+        // FragmentRefs after a successful run (no candidates above threshold).
+        let frag_a = make_fragment("src/a.rs", "fn a() {}");
+        let frag_b = make_fragment("src/b.rs", "fn b() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().times(2).returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().times(1).withf(|items| items.is_empty()).returning(|_| Ok(()));
+        // No candidates above threshold for either diff fragment.
+        index.expect_search().times(2).returning(|_, _| Ok(vec![]));
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().never();
+
+        let writer = Arc::new(StubWriter::default());
+        let coverage = Arc::new(StubCoverage::new());
+        let interactor = make_interactor_with_coverage(
+            embed,
+            index,
+            agent,
+            Arc::clone(&writer),
+            vec![],
+            Arc::clone(&coverage),
+        );
+
+        let _ = interactor
+            .run_dry_check(
+                vec![],
+                vec![frag_a.clone(), frag_b.clone()],
+                make_threshold(0.8),
+                make_commit(),
+            )
+            .unwrap();
+
+        // write_coverage called exactly once.
+        assert_eq!(coverage.write_call_count(), 1);
+
+        // The recorded coverage must list exactly the two diff-fragment FragmentRefs.
+        let recorded = coverage.last_written().expect("coverage written");
+        assert_eq!(recorded.fragment_refs().len(), 2);
+        let expected_a = fragment_ref_of(&frag_a).unwrap();
+        let expected_b = fragment_ref_of(&frag_b).unwrap();
+        assert!(recorded.covers(&expected_a));
+        assert!(recorded.covers(&expected_b));
+    }
+
+    #[test]
+    fn test_run_dry_check_with_empty_diff_writes_empty_coverage_record() {
+        // Empty diff → write_coverage still called once, with an empty record.
+        let embed = MockMockEmbeddingPort::new();
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().times(1).withf(|items| items.is_empty()).returning(|_| Ok(()));
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().never();
+
+        let writer = Arc::new(StubWriter::default());
+        let coverage = Arc::new(StubCoverage::new());
+        let interactor = make_interactor_with_coverage(
+            embed,
+            index,
+            agent,
+            Arc::clone(&writer),
+            vec![],
+            Arc::clone(&coverage),
+        );
+
+        let _ =
+            interactor.run_dry_check(vec![], vec![], make_threshold(0.8), make_commit()).unwrap();
+
+        assert_eq!(coverage.write_call_count(), 1);
+        let recorded = coverage.last_written().expect("coverage written");
+        assert!(recorded.fragment_refs().is_empty());
+    }
+
+    #[test]
+    fn test_run_dry_check_coverage_port_error_propagated() {
+        // write_coverage failure → DryCheckCycleError::CoveragePort.
+        let frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().times(1).returning(|_| Ok(vec![0.1_f32]));
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().times(1).withf(|items| items.is_empty()).returning(|_| Ok(()));
+        index.expect_search().times(1).returning(|_, _| Ok(vec![]));
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().never();
+
+        let writer = Arc::new(StubWriter::default());
+        let coverage = Arc::new(StubCoverage::failing());
+        let interactor = make_interactor_with_coverage(
+            embed,
+            index,
+            agent,
+            Arc::clone(&writer),
+            vec![],
+            Arc::clone(&coverage),
+        );
+
+        let result =
+            interactor.run_dry_check(vec![], vec![frag], make_threshold(0.8), make_commit());
+        assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
     }
 }

@@ -1,6 +1,103 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:03:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:05:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T02:36:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T02:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
+          "at": "2026-06-14T03:02:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_ref_of` is still `pub(crate)` here, and `mod.rs` does not re-export it. The briefing’s new approval contract says composition must compute current `FragmentRef`s using this promoted helper; keeping it private either breaks that public usecase API or forces composition to duplicate the path/hash construction logic, which risks the gate using different identity semantics than the write path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/shared.rs",
+              "line": 46,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
+          "at": "2026-06-14T03:05:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T03:08:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_run_dry_check_writes_coverage_record_with_all_diff_fragment_refs` is not runnable as written: it runs `run_dry_check` with two diff fragments but only configures one `expect_embed()` and one `index.expect_search()`, and it also leaves an unused `expect_embed_batch()` in place even though the corpus is empty. Mockall will fail on the second diff fragment (and again on drop for the unused corpus expectation), so the coverage assertions never run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 1087,
+              "category": "test"
+            },
+            {
+              "message": "`test_run_dry_check_with_empty_diff_writes_empty_coverage_record` and `test_run_dry_check_coverage_port_error_propagated` both set `expect_embed_batch()` even though `run_dry_check(vec![], ...)` never calls `embed_batch` for an empty corpus. Those expectations will remain unmet at drop, so both tests fail before asserting the new coverage behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 1136,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:d44cc2050957463dfc615559e37e4557aa6fc4819baf12262cbcd9ef51c3d615",
+          "at": "2026-06-14T03:47:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
+          "at": "2026-06-14T03:52:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
+          "at": "2026-06-14T03:55:19Z"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -59,6 +156,38 @@
           "findings": [],
           "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
           "at": "2026-06-14T03:22:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:46:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:48:33Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:40:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:42:29Z"
         }
       ]
     },
@@ -533,6 +662,20 @@
           "findings": [],
           "hash": "rvw1:sha256:6cd6acdfb9889b2a19ce503a538cef0b922fb5d7a0ecb693cace9f3fefe6fb01",
           "at": "2026-06-14T03:24:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0cf79c8e96cda92e7364170c5c5c4a85a2be132007dab418ba404b083386e0",
+          "at": "2026-06-14T03:45:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0cf79c8e96cda92e7364170c5c5c4a85a2be132007dab418ba404b083386e0",
+          "at": "2026-06-14T03:47:39Z"
         }
       ]
     },
@@ -573,85 +716,6 @@
           "findings": [],
           "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
           "at": "2026-06-14T01:51:55Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:40:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:42:29Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
-          "at": "2026-06-14T01:03:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
-          "at": "2026-06-14T01:05:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
-          "at": "2026-06-14T02:36:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
-          "at": "2026-06-14T02:38:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
-          "at": "2026-06-14T03:02:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragment_ref_of` is still `pub(crate)` here, and `mod.rs` does not re-export it. The briefing’s new approval contract says composition must compute current `FragmentRef`s using this promoted helper; keeping it private either breaks that public usecase API or forces composition to duplicate the path/hash construction logic, which risks the gate using different identity semantics than the write path.",
-              "severity": "P1",
-              "file": "libs/usecase/src/dry_check/shared.rs",
-              "line": 46,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
-          "at": "2026-06-14T03:05:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
-          "at": "2026-06-14T03:08:56Z"
         }
       ]
     }

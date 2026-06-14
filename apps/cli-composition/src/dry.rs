@@ -20,17 +20,14 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
-use domain::dry_check::{
-    DryCheckCoverageRecord, DryCheckFinding, DryCheckReader as _, DryCheckVerdict,
-};
+use domain::dry_check::{DryCheckFinding, DryCheckReader as _, DryCheckVerdict};
 use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
 use infrastructure::dry_check::{CodexDryChecker, FsDryCheckCoverageAdapter, FsDryCheckStore};
 use infrastructure::semantic_dup::embedding::FastEmbedAdapter;
 use usecase::dry_check::{
     DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckApprovalInteractor,
-    DryCheckApprovalService as _, DryCheckCoveragePort as _, DryCheckCycleError,
-    DryCheckInteractor, DryCheckResultsInteractor, DryCheckResultsService as _,
-    DryCheckService as _, fragment_ref_of,
+    DryCheckApprovalService as _, DryCheckCycleError, DryCheckInteractor,
+    DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _, fragment_ref_of,
 };
 
 use crate::review_v2::record_instant_once;
@@ -279,18 +276,16 @@ impl CliApp {
         let (diff_fragments, corpus_fragments) =
             build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)?;
         let diff_fragments_processed = diff_fragments.len();
-        let mut covered_fragment_refs = std::collections::BTreeSet::new();
-        for fragment in &diff_fragments {
-            let fragment_ref = fragment_ref_of(fragment)
-                .map_err(|e| format!("dry write: failed to derive coverage fragment ref: {e}"))?;
-            covered_fragment_refs.insert(fragment_ref);
-        }
-        let coverage_record = DryCheckCoverageRecord::new(covered_fragment_refs);
 
         // Construct adapters.
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
-        let coverage =
-            FsDryCheckCoverageAdapter::new(dry_check_coverage_path, canonical_root.clone());
+        // D5 (T004): the coverage manifest is written by `DryCheckInteractor`
+        // at the end of `run_dry_check`. Composition just constructs the
+        // adapter and hands it to the interactor.
+        let coverage = Arc::new(FsDryCheckCoverageAdapter::new(
+            dry_check_coverage_path,
+            canonical_root.clone(),
+        ));
         let store_for_summary = store.clone();
         let records_before = store_for_summary
             .read_records()
@@ -318,7 +313,7 @@ impl CliApp {
             embedding_port.as_ref(),
         )?;
 
-        // Construct interactor (5-param; diff_source NOT injected).
+        // Construct interactor (7-param; diff_source NOT injected).
         // Pass an empty corpus — the index is already populated above; the
         // interactor's build_corpus_index call will be a no-op via NullInsertIndexProxy.
         let interactor = DryCheckInteractor::new(
@@ -327,6 +322,8 @@ impl CliApp {
             agent,
             store.clone(), // writer
             store,         // reader
+            coverage,      // D5 (T004): coverage manifest persistence
+            track_id.clone(),
         );
 
         // Run the dry-check write cycle with empty corpus (index pre-built above).
@@ -368,9 +365,7 @@ impl CliApp {
 
         let findings: Vec<DryCheckFinding> =
             dry_result.map_err(|e| format!("dry-check write cycle failed: {e}"))?;
-        coverage
-            .write_coverage(&track_id, coverage_record)
-            .map_err(|e| format!("dry-check coverage write failed: {e}"))?;
+        // D5 (T004): coverage is now written inside `DryCheckInteractor::run_dry_check`.
 
         let records_after = store_for_summary
             .read_records()
