@@ -22,7 +22,7 @@ pub use approval_interactor::DryCheckApprovalInteractor;
 pub use errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
 pub use interactor::DryCheckInteractor;
 pub use judgment::DryCheckAgentJudgment;
-pub use ports::{DryCheckAgentPort, DryCheckDiffSource};
+pub use ports::{DryCheckAgentPort, DryCheckCoveragePort, DryCheckDiffSource};
 pub use results::DryCheckResults;
 pub use results_interactor::DryCheckResultsInteractor;
 pub use services::{DryCheckApprovalService, DryCheckResultsService, DryCheckService};

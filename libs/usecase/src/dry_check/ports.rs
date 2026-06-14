@@ -1,10 +1,11 @@
 //! Secondary port traits for the dry-check use case layer.
 
 use domain::CommitHash;
-use domain::dry_check::DiffFileHunks;
+use domain::TrackId;
+use domain::dry_check::{DiffFileHunks, DryCheckCoverageRecord};
 use domain::semantic_dup::CodeFragment;
 
-use super::errors::{DryCheckAgentError, DryCheckDiffError};
+use super::errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
 use super::judgment::DryCheckAgentJudgment;
 
 // ── DryCheckAgentPort ─────────────────────────────────────────────────────────
@@ -74,4 +75,46 @@ pub trait DryCheckDiffSource: Send + Sync {
         &self,
         base: &CommitHash,
     ) -> Result<Vec<DiffFileHunks>, DryCheckDiffError>;
+}
+
+// ── DryCheckCoveragePort ──────────────────────────────────────────────────────
+
+/// Secondary port for persisting and retrieving the [`DryCheckCoverageRecord`]
+/// that backs the read-only `dry check-approved` staleness gate (D5).
+///
+/// `dry write` records the set of `FragmentRef`s it processed via
+/// [`write_coverage`](DryCheckCoveragePort::write_coverage); `dry check-approved`
+/// reads it via [`read_coverage`](DryCheckCoveragePort::read_coverage) and
+/// compares each current diff fragment's `FragmentRef` against the recorded set.
+///
+/// CN-08: when no coverage manifest exists yet, `read_coverage` returns
+/// `Ok(None)` — the calling interactor treats `None` as Blocked (fail-closed),
+/// NOT as an error. Genuine I/O / serialization failures are surfaced as
+/// [`DryCheckCycleError::CoveragePort`].
+///
+/// Implemented by `infrastructure::FsDryCheckCoverageAdapter`.
+pub trait DryCheckCoveragePort: Send + Sync {
+    /// Read the coverage record for `track_id`, or `Ok(None)` when no manifest
+    /// has been written yet.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DryCheckCycleError::CoveragePort`] on I/O / deserialization
+    /// failure (a missing manifest is `Ok(None)`, not an error).
+    fn read_coverage(
+        &self,
+        track_id: &TrackId,
+    ) -> Result<Option<DryCheckCoverageRecord>, DryCheckCycleError>;
+
+    /// Persist the coverage `record` for `track_id`, replacing any prior record.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DryCheckCycleError::CoveragePort`] on I/O / serialization
+    /// failure.
+    fn write_coverage(
+        &self,
+        track_id: &TrackId,
+        record: DryCheckCoverageRecord,
+    ) -> Result<(), DryCheckCycleError>;
 }

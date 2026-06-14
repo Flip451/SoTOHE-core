@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:03:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:05:16Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -361,6 +379,60 @@
           "findings": [],
           "hash": "rvw1:sha256:5cca5edc2194f56fd2885d5b0e3b4da4f3bf7d525eb7a6080ed845d0b0cd5894",
           "at": "2026-06-13T23:06:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62739183a3b4b697a6af04adfabaf71ae0dda3d6b03393a75f555eee8e33a7da",
+          "at": "2026-06-14T01:03:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckCoveragePort`'s Signal changed from 🟡 to 🔵 even though this round is documented as a T001 progression marker only and `impl-plan.json` still marks T001, the task that introduces this port, as only `in_progress`. That makes the plan artifacts semantically inconsistent: one view now presents the port signal as resolved while the task state says the owning work has not completed. Keep this signal unchanged for the progression-only update, or move the task/artifacts together in a later completion transition.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:62739183a3b4b697a6af04adfabaf71ae0dda3d6b03393a75f555eee8e33a7da",
+          "at": "2026-06-14T01:07:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58d2ca6be5557e3d23069cc9a88347ce6f8ef5f2af71739c7113ba67b96c2e37",
+          "at": "2026-06-14T01:14:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58d2ca6be5557e3d23069cc9a88347ce6f8ef5f2af71739c7113ba67b96c2e37",
+          "at": "2026-06-14T01:16:29Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:03:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:05:47Z"
         }
       ]
     },

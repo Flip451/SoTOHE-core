@@ -87,4 +87,11 @@ pub enum DryCheckCycleError {
     /// invariant violation.
     #[error("dry-check cycle entry error: {0}")]
     Entry(DryCheckEntryError),
+    /// The dry-check coverage port (D5 read-only staleness gate) returned an
+    /// error — e.g. the coverage manifest could not be read or written.
+    /// CN-08: a missing manifest is reported as `Ok(None)` by the port, not as
+    /// this error; this variant is reserved for genuine I/O / serialization
+    /// failures.
+    #[error("dry-check cycle coverage port error: {0}")]
+    CoveragePort(String),
 }

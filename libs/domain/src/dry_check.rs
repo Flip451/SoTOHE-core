@@ -4,6 +4,7 @@
 //! (DRY violations) using semantic similarity search and agent-based judgment.
 //! See ADR 2026-06-02-0716-dry-checker for the design decisions.
 
+mod coverage;
 mod diff;
 mod finding;
 mod fragment;
@@ -12,6 +13,7 @@ mod record;
 mod value_objects;
 mod verdict;
 
+pub use self::coverage::*;
 pub use self::diff::*;
 pub use self::finding::*;
 pub use self::fragment::*;

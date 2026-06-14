@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-13T23:07:39Z",
+  "generated_at": "2026-06-14T01:18:29Z",
   "declaration_hash": "cefe9630f72aa85704e254e5dd506690a31af340698286535093c788c5217cdf",
   "signals": [
     {
@@ -40,8 +40,8 @@
     {
       "type_name": "DryCheckCoveragePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "DryCheckCycleError",

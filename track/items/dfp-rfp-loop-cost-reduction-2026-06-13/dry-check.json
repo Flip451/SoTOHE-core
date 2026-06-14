@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "low_path": "libs/domain/src/dry_check/coverage.rs",
+      "low_hash": "89451e7740ff1076492b9ce2dbe4c2394b9da7f31c8ed9921834306519ba984c",
+      "high_path": "libs/usecase/src/dry_check/results_interactor.rs",
+      "high_hash": "3df792de62a6f58483ea9e2cbd7094dc94e9921562fcf4258ee7b5947451b828",
+      "changed_path": "libs/domain/src/dry_check/coverage.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.93422132730484,
+      "threshold": 0.8500000238418579,
+      "base_commit": "0d5dd5f563fab140cf01e129d46c81a832a8ac1e",
+      "rationale": "The two fragments duplicate a tiny test helper for constructing a FragmentRef from a path and repeated hash character. Although the logic is nearly identical, it is only three meaningful statements, appears to live in local test scaffolding, and the small duplication avoids introducing a shared test utility across domain/usecase boundaries just for this narrow setup code. This is not enough repetition or abstraction pressure to qualify as a DRY violation.",
+      "recorded_at": "2026-06-14T00:57:35Z"
+    },
+    {
+      "low_path": "libs/domain/src/dry_check/coverage.rs",
+      "low_hash": "89451e7740ff1076492b9ce2dbe4c2394b9da7f31c8ed9921834306519ba984c",
+      "high_path": "libs/usecase/src/dry_check/mod.rs",
+      "high_hash": "3df792de62a6f58483ea9e2cbd7094dc94e9921562fcf4258ee7b5947451b828",
+      "changed_path": "libs/domain/src/dry_check/coverage.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.93422132730484,
+      "threshold": 0.8500000238418579,
+      "base_commit": "0d5dd5f563fab140cf01e129d46c81a832a8ac1e",
+      "rationale": "The fragments duplicate a tiny test-helper factory for constructing `FragmentRef` values, but the duplication is localized, simple, and appears to live in separate crate test contexts. Extracting a shared helper would add cross-crate test utility coupling for only a few lines and would not meaningfully reduce maintenance risk.",
+      "recorded_at": "2026-06-14T00:57:53Z"
+    },
+    {
+      "low_path": "libs/domain/src/dry_check/coverage.rs",
+      "low_hash": "659901bd92145079add74c2963506eaed84299cd11de3c7dc219e7c00f29ad35",
+      "high_path": "libs/domain/src/dry_check/coverage.rs",
+      "high_hash": "ee50f1b45018956bc5ee2c999b545261bd9b8c2e8a08787b91783dbc22def3ec",
+      "changed_path": "libs/domain/src/dry_check/coverage.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8903347253799438,
+      "threshold": 0.8500000238418579,
+      "base_commit": "0d5dd5f563fab140cf01e129d46c81a832a8ac1e",
+      "rationale": "The fragments are adjacent tests for distinct behavioral cases: constructing a coverage record from an empty set versus retaining and covering multiple inserted fragment refs. The overlap is limited to calling DryCheckCoverageRecord::new and checking fragment_refs, which is expected in focused unit tests and does not create a meaningful maintenance hazard.",
+      "recorded_at": "2026-06-14T00:58:03Z"
+    },
+    {
+      "low_path": "libs/domain/src/dry_check/ports.rs",
+      "low_hash": "a65b287658f9a1bd8bbfff8f83d6853e3dce5ad70c456396ee2898150e66e7af",
+      "high_path": "libs/usecase/src/dry_check/errors.rs",
+      "high_hash": "98b5bae83dc7f3989acbe298fa73a9668b96e3a29561d7916db19412b65a44bd",
+      "changed_path": "libs/usecase/src/dry_check/errors.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8602479696273804,
+      "threshold": 0.8500000238418579,
+      "base_commit": "0d5dd5f563fab140cf01e129d46c81a832a8ac1e",
+      "rationale": "The changed fragment defines usecase-layer error types and a composite cycle error that wraps domain-layer reader/writer errors from the candidate fragment. The candidate fragment owns the domain port error definitions themselves. This is layered error composition, not duplicated knowledge: the usecase type does not re-declare the reader/writer variants or their handling semantics, and it keeps dry-check-specific agent, diff, embedding, index, and coverage failures in the usecase boundary.",
+      "recorded_at": "2026-06-14T00:58:17Z"
+    }
+  ]
+}
