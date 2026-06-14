@@ -94,4 +94,13 @@ pub enum DryCheckCycleError {
     /// failures.
     #[error("dry-check cycle coverage port error: {0}")]
     CoveragePort(String),
+
+    /// D3 (T009 / CN-04): `DryCheckParallelism::try_new` rejected a zero value.
+    #[error("invalid dry-check parallelism: must be nonzero")]
+    InvalidParallelism,
+
+    /// D4 (T009 / CN-06): `DryCheckPercent::try_new` rejected a value outside
+    /// the inclusive range `1..=100`.
+    #[error("invalid dry-check percent: must be in 1..=100 (got {0})")]
+    InvalidPercent(u8),
 }

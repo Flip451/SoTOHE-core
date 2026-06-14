@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T07:37:44Z",
-  "declaration_hash": "cb3819fccf5a4cf08999165771f068a85c41e3c031cb996078fefc91e5bb126b",
+  "generated_at": "2026-06-14T08:35:19Z",
+  "declaration_hash": "f71c637d30ca9f2434a92c44b04e938560c3e098a1cbca085eacace4e05b5a8d",
   "signals": [
     {
       "type_name": "DryCheckAgentPort",
@@ -28,13 +28,15 @@
       "type_name": "DryCheckConfig",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::default::Default",
         "core::fmt::Debug"
+      ],
+      "missing_items": [
+        "core::default::Default"
       ]
     },
     {
@@ -80,24 +82,26 @@
       "type_name": "DryCheckParallelism",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "core::marker::Copy"
       ]
     },
     {
       "type_name": "DryCheckPercent",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "core::marker::Copy"
       ]
     },
     {

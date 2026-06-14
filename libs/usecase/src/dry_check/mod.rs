@@ -9,6 +9,7 @@
 //! - `DryCheckResultsInteractor`, `DryCheckApprovalInteractor` (T005) — read/gate paths
 
 mod approval_interactor;
+mod config;
 mod errors;
 mod interactor;
 mod judgment;
@@ -19,6 +20,7 @@ mod services;
 pub(crate) mod shared;
 
 pub use approval_interactor::DryCheckApprovalInteractor;
+pub use config::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
 pub use errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
 pub use interactor::DryCheckInteractor;
 pub use judgment::DryCheckAgentJudgment;

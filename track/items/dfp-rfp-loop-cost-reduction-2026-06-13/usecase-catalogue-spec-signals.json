@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cb3819fccf5a4cf08999165771f068a85c41e3c031cb996078fefc91e5bb126b",
+  "catalogue_declaration_hash": "f71c637d30ca9f2434a92c44b04e938560c3e098a1cbca085eacace4e05b5a8d",
   "signals": [
     {
       "type_name": "DryCheckApprovalInteractor",
