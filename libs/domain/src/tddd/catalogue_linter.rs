@@ -25,7 +25,6 @@
 //! `knowledge/adr/2026-04-14-1531-…` forbids serde inside `libs/domain`;
 //! codec / serde support lives in the infrastructure codec.
 
-use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, NonEmptyVec};
 use crate::tddd::layer_id::LayerId;
 
@@ -493,51 +492,25 @@ pub enum CatalogueLinterError {
 }
 
 // ---------------------------------------------------------------------------
-// evaluate_catalogue_lint — pure free-function entry point (D17 / T008)
+// Internal helper functions and evaluation logic (split into submodules)
 // ---------------------------------------------------------------------------
 
-/// Evaluate `rules` against `catalogue` for the given `layer_id`.
-///
-/// Returns the full list of violations found. An empty `Vec` means no rules
-/// fired.
-///
-/// This is the pure domain-layer entry point (D17): no I/O, no trait object,
-/// no infrastructure dependency. The per-rule evaluation logic is deferred
-/// to T014; this skeleton establishes the callable surface and the exhaustive
-/// match over all 12 `CatalogueLinterRuleKind` variants.
-///
-/// # Errors
-///
-/// Returns [`CatalogueLinterError::InvalidRuleConfig`] if the provided rule
-/// configuration is internally inconsistent and prevents execution.
-pub fn evaluate_catalogue_lint(
-    rules: &[CatalogueLinterRule],
-    catalogue: &CatalogueDocument,
-    layer_id: &LayerId,
-) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
-    let violations: Vec<CatalogueLintViolation> = Vec::new();
-    for rule in rules {
-        // TODO(T014): implement per-kind evaluation logic.
-        match rule.kind() {
-            CatalogueLinterRuleKind::FieldEmpty { .. } => {}
-            CatalogueLinterRuleKind::FieldNonEmpty { .. } => {}
-            CatalogueLinterRuleKind::KindLayerConstraint { .. } => {}
-            CatalogueLinterRuleKind::ReferencedRoleConstraint { .. } => {}
-            CatalogueLinterRuleKind::TraitImplRequired { .. } => {}
-            CatalogueLinterRuleKind::NoRoleInMethodSignature { .. } => {}
-            CatalogueLinterRuleKind::MethodReferenceSignature { .. } => {}
-            CatalogueLinterRuleKind::AccessorSignatureRequired { .. } => {}
-            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries { .. } => {}
-            CatalogueLinterRuleKind::NoExternalReferenceInMethods { .. } => {}
-            CatalogueLinterRuleKind::NoPublicField => {}
-            CatalogueLinterRuleKind::ForbiddenMethodReceiver { .. } => {}
-        }
-    }
-    // Suppress unused-variable warnings until T014 fills in logic.
-    let _ = catalogue;
-    let _ = layer_id;
-    Ok(violations)
-}
+#[path = "catalogue_linter_helpers.rs"]
+mod helpers;
+
+#[path = "catalogue_linter_eval.rs"]
+mod eval;
+
+/// Re-export so that consumers of `catalogue_linter` see `evaluate_catalogue_lint`
+/// at the expected path without knowing about the `eval` submodule.
+pub use eval::evaluate_catalogue_lint;
+
+#[path = "catalogue_linter_preset.rs"]
+mod preset;
+
+/// Re-export so that consumers of `catalogue_linter` see `ddd_strict_preset`
+/// at the expected path without knowing about the `preset` submodule.
+pub use preset::ddd_strict_preset;
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -854,5 +827,1552 @@ mod tests {
         assert!(target.matches(RoleKind::Entity));
         assert!(!target.matches(RoleKind::AggregateRoot));
         assert!(!target.matches(RoleKind::Repository));
+    }
+
+    // ===========================================================================
+    // T016: Test fixture helpers
+    // ===========================================================================
+
+    use crate::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use crate::tddd::catalogue_v2::document::CatalogueDocument;
+    use crate::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+    use crate::tddd::catalogue_v2::identifiers::{
+        CrateName, FieldName, InvariantName, MethodName, ModulePath, ParamName, TraitName,
+        TypeName, TypeRef,
+    };
+    use crate::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
+    use crate::tddd::catalogue_v2::roles::{
+        ContractRole, DataRole, IdentityAccessor, InvariantDecl, InvariantPredicate, ItemAction,
+        SelfReceiver,
+    };
+    use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
+    use crate::tddd::catalogue_v2::variants::FieldDecl;
+
+    fn make_doc(layer_name: &str) -> CatalogueDocument {
+        CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer(layer_name))
+    }
+
+    fn plain_struct_kind(fields: Vec<FieldDecl>) -> TypeKindV2 {
+        TypeKindV2::Struct(StructKind::new(
+            StructShape::Plain { fields, has_stripped_fields: false },
+            None,
+        ))
+    }
+
+    fn unit_struct_kind() -> TypeKindV2 {
+        TypeKindV2::Struct(StructKind::new(StructShape::Unit, None))
+    }
+
+    fn make_type_entry(role: DataRole) -> TypeEntry {
+        make_type_entry_with_kind(role, unit_struct_kind())
+    }
+
+    fn make_type_entry_with_kind(role: DataRole, kind: TypeKindV2) -> TypeEntry {
+        TypeEntry {
+            action: ItemAction::Add,
+            role,
+            kind,
+            methods: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        }
+    }
+
+    fn make_type_entry_with_methods(role: DataRole, methods: Vec<MethodDeclaration>) -> TypeEntry {
+        TypeEntry {
+            action: ItemAction::Add,
+            role,
+            kind: unit_struct_kind(),
+            methods,
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        }
+    }
+
+    fn make_trait_entry(role: ContractRole) -> TraitEntry {
+        TraitEntry {
+            action: ItemAction::Add,
+            role,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        }
+    }
+
+    fn method_ref_no_params(
+        name: &str,
+        returns: &str,
+        receiver: SelfReceiver,
+    ) -> MethodDeclaration {
+        MethodDeclaration::new(
+            MethodName::new(name).unwrap(),
+            Some(receiver),
+            vec![],
+            TypeRef::new(returns).unwrap(),
+            false,
+            None,
+        )
+    }
+
+    fn method_shared_ref_no_params(name: &str, returns: &str) -> MethodDeclaration {
+        method_ref_no_params(name, returns, SelfReceiver::SharedRef)
+    }
+
+    fn method_exclusive_ref_no_params(name: &str, returns: &str) -> MethodDeclaration {
+        method_ref_no_params(name, returns, SelfReceiver::ExclusiveRef)
+    }
+
+    fn method_with_params(
+        name: &str,
+        receiver: Option<SelfReceiver>,
+        params: Vec<(&str, &str)>,
+        returns: &str,
+    ) -> MethodDeclaration {
+        let params = params
+            .into_iter()
+            .map(|(pname, pty)| {
+                ParamDeclaration::new(ParamName::new(pname).unwrap(), TypeRef::new(pty).unwrap())
+            })
+            .collect();
+        MethodDeclaration::new(
+            MethodName::new(name).unwrap(),
+            receiver,
+            params,
+            TypeRef::new(returns).unwrap(),
+            false,
+            None,
+        )
+    }
+
+    fn invariant_decl(method_name: &str) -> InvariantDecl {
+        InvariantDecl::new(
+            InvariantName::new(method_name).unwrap(),
+            InvariantPredicate::SelfMethod(MethodName::new(method_name).unwrap()),
+        )
+    }
+
+    fn identity_accessor(method_name: &str) -> IdentityAccessor {
+        IdentityAccessor::new(MethodName::new(method_name).unwrap())
+    }
+
+    fn field_decl(name: &str, ty: &str) -> FieldDecl {
+        FieldDecl::new(FieldName::new(name).unwrap(), TypeRef::new(ty).unwrap())
+    }
+
+    fn run_rule(
+        doc: &CatalogueDocument,
+        target: RuleTarget,
+        kind: CatalogueLinterRuleKind,
+    ) -> Vec<CatalogueLintViolation> {
+        let rule = CatalogueLinterRule::new(target, kind).unwrap();
+        evaluate_catalogue_lint(&[rule], doc, &layer("domain")).unwrap()
+    }
+
+    // ===========================================================================
+    // T016: Rule 1 — FieldEmpty
+    // ===========================================================================
+
+    #[test]
+    fn test_field_empty_happy_path_when_field_is_empty() {
+        // DomainService with emits: [] → FieldEmpty "emits" → no violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyService").unwrap(),
+            make_type_entry(DataRole::DomainService { emits: vec![] }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::DomainService]),
+            CatalogueLinterRuleKind::FieldEmpty { target_field: "emits".to_owned() },
+        );
+        assert!(violations.is_empty(), "expected no violations when emits is empty");
+    }
+
+    #[test]
+    fn test_field_empty_violation_when_field_is_not_empty() {
+        // DomainService with emits: ["OrderPlaced"] → FieldEmpty "emits" → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyService").unwrap(),
+            make_type_entry(DataRole::DomainService {
+                emits: vec![TypeRef::new("OrderPlaced").unwrap()],
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::DomainService]),
+            CatalogueLinterRuleKind::FieldEmpty { target_field: "emits".to_owned() },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when emits is non-empty");
+        assert_eq!(violations[0].rule_kind(), "FieldEmpty");
+        assert_eq!(violations[0].entry_name(), "MyService");
+        assert!(violations[0].message().contains("emits"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 2 — FieldNonEmpty
+    // ===========================================================================
+
+    #[test]
+    fn test_field_non_empty_happy_path_when_field_is_non_empty() {
+        // UseCase with handles: ["OrderCommand"] → FieldNonEmpty "handles" → no violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyUseCase").unwrap(),
+            make_type_entry(DataRole::UseCase {
+                handles: vec![TypeRef::new("OrderCommand").unwrap()],
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::FieldNonEmpty { target_field: "handles".to_owned() },
+        );
+        assert!(violations.is_empty(), "expected no violations when handles is non-empty");
+    }
+
+    #[test]
+    fn test_field_non_empty_violation_when_field_is_empty() {
+        // UseCase with handles: [] → FieldNonEmpty "handles" → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyUseCase").unwrap(),
+            make_type_entry(DataRole::UseCase { handles: vec![] }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::FieldNonEmpty { target_field: "handles".to_owned() },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when handles is empty");
+        assert_eq!(violations[0].rule_kind(), "FieldNonEmpty");
+        assert_eq!(violations[0].entry_name(), "MyUseCase");
+        assert!(violations[0].message().contains("handles"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 3 — KindLayerConstraint
+    // ===========================================================================
+
+    #[test]
+    fn test_kind_layer_constraint_happy_path_when_layer_is_permitted() {
+        // EventPolicy in domain layer → permitted_layers: [domain] → no violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyEventPolicy").unwrap(),
+            make_type_entry(DataRole::EventPolicy {
+                reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::EventPolicy]),
+            CatalogueLinterRuleKind::KindLayerConstraint {
+                permitted_layers: NonEmptyVec::new(layer("domain"), vec![]),
+            },
+        );
+        assert!(violations.is_empty(), "expected no violations when layer is permitted");
+    }
+
+    #[test]
+    fn test_kind_layer_constraint_violation_when_layer_is_not_permitted() {
+        // Table-driven: EventPolicy in various non-domain layers → 1 violation each
+        for disallowed_layer in ["usecase", "infrastructure"] {
+            let mut doc = make_doc(disallowed_layer);
+            doc.types.insert(
+                TypeName::new("MyEventPolicy").unwrap(),
+                make_type_entry(DataRole::EventPolicy {
+                    reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
+                }),
+            );
+            let violations = run_rule(
+                &doc,
+                RuleTarget::new(vec![RoleKind::EventPolicy]),
+                CatalogueLinterRuleKind::KindLayerConstraint {
+                    permitted_layers: NonEmptyVec::new(layer("domain"), vec![]),
+                },
+            );
+            assert_eq!(
+                violations.len(),
+                1,
+                "expected 1 violation for EventPolicy in {disallowed_layer} layer"
+            );
+            assert_eq!(violations[0].rule_kind(), "KindLayerConstraint");
+            assert_eq!(violations[0].entry_name(), "MyEventPolicy");
+            assert!(
+                violations[0].message().contains(disallowed_layer),
+                "expected message to mention layer {disallowed_layer}"
+            );
+        }
+    }
+
+    // ===========================================================================
+    // T016: Rule 4 — ReferencedRoleConstraint
+    // ===========================================================================
+
+    #[test]
+    fn test_referenced_role_constraint_happy_path_when_role_matches() {
+        // AggregateRoot emits→["OrderPlaced"] where OrderPlaced is DomainEvent → no violation
+        let mut doc = make_doc("domain");
+        doc.types
+            .insert(TypeName::new("OrderPlaced").unwrap(), make_type_entry(DataRole::DomainEvent));
+        doc.types.insert(
+            TypeName::new("OrderAgg").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![],
+                shared_value_objects: vec![],
+                emits: vec![TypeRef::new("OrderPlaced").unwrap()],
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "emits".to_owned(),
+                expected_role: RoleKind::DomainEvent,
+            },
+        );
+        assert!(violations.is_empty(), "expected no violations when emits → DomainEvent");
+    }
+
+    #[test]
+    fn test_referenced_role_constraint_violation_when_wrong_role() {
+        // AggregateRoot emits→["OrderEntity"] where OrderEntity is Entity (not DomainEvent) → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("OrderAgg").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![],
+                shared_value_objects: vec![],
+                emits: vec![TypeRef::new("OrderEntity").unwrap()],
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "emits".to_owned(),
+                expected_role: RoleKind::DomainEvent,
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when emits has wrong role");
+        assert_eq!(violations[0].rule_kind(), "ReferencedRoleConstraint");
+        assert_eq!(violations[0].entry_name(), "OrderAgg");
+        assert!(violations[0].message().contains("OrderEntity"));
+        assert!(violations[0].message().contains("DomainEvent"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 5 — TraitImplRequired
+    // ===========================================================================
+
+    #[test]
+    fn test_trait_impl_required_happy_path_when_all_traits_present() {
+        // ValueObject with PartialEq + Eq in trait_impls → no violation
+        let mut doc = make_doc("domain");
+        doc.types
+            .insert(TypeName::new("MyValue").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("PartialEq").unwrap(),
+            TypeRef::new("MyValue").unwrap(),
+        ));
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("Eq").unwrap(),
+            TypeRef::new("MyValue").unwrap(),
+        ));
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::TraitImplRequired {
+                required_traits: NonEmptyVec::new("PartialEq".to_owned(), vec!["Eq".to_owned()]),
+            },
+        );
+        assert!(violations.is_empty(), "expected no violations when PartialEq + Eq are present");
+    }
+
+    #[test]
+    fn test_trait_impl_required_violation_when_trait_missing() {
+        // ValueObject with only PartialEq (missing Eq) → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types
+            .insert(TypeName::new("MyValue").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("PartialEq").unwrap(),
+            TypeRef::new("MyValue").unwrap(),
+        ));
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::TraitImplRequired {
+                required_traits: NonEmptyVec::new("PartialEq".to_owned(), vec!["Eq".to_owned()]),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation for missing Eq");
+        assert_eq!(violations[0].rule_kind(), "TraitImplRequired");
+        assert_eq!(violations[0].entry_name(), "MyValue");
+        assert!(violations[0].message().contains("Eq"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 6 — NoRoleInMethodSignature
+    // ===========================================================================
+
+    #[test]
+    fn test_no_role_in_method_signature_happy_path_when_no_forbidden_role_in_sig() {
+        // ValueObject method returns "String" (not Entity) → no violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyValue").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::value_object(),
+                vec![method_shared_ref_no_params("as_str", "String")],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(RoleKind::Entity, vec![RoleKind::AggregateRoot]),
+            },
+        );
+        assert!(
+            violations.is_empty(),
+            "expected no violations when no forbidden role in signature"
+        );
+    }
+
+    #[test]
+    fn test_no_role_in_method_signature_violation_when_forbidden_role_in_return() {
+        // ValueObject method returns "OrderEntity" which is Entity → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("MyValue").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::value_object(),
+                vec![method_shared_ref_no_params("entity_ref", "OrderEntity")],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(RoleKind::Entity, vec![RoleKind::AggregateRoot]),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation for Entity in return type");
+        assert_eq!(violations[0].rule_kind(), "NoRoleInMethodSignature");
+        assert_eq!(violations[0].entry_name(), "MyValue");
+        assert!(violations[0].message().contains("entity_ref"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 7 — MethodReferenceSignature (AC-13)
+    // ===========================================================================
+
+    #[test]
+    fn test_method_reference_signature_ac13_pass_when_invariant_method_valid() {
+        // Entity with invariant "is_valid" → method &self, no params, bool return → pass
+        let mut doc = make_doc("domain");
+        let entity = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![invariant_decl("is_valid")],
+            },
+            kind: unit_struct_kind(),
+            methods: vec![method_shared_ref_no_params("is_valid", "bool")],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::MethodReferenceSignature {
+                target_field: "invariants".to_owned(),
+            },
+        );
+        assert!(violations.is_empty(), "expected no violations for valid invariant method");
+    }
+
+    #[test]
+    fn test_method_reference_signature_ac13_violation_when_method_missing() {
+        // Entity with invariant "is_valid" → method not in public methods → 1 violation
+        let mut doc = make_doc("domain");
+        let entity = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![invariant_decl("is_valid")],
+            },
+            kind: unit_struct_kind(),
+            methods: vec![], // method missing
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::MethodReferenceSignature {
+                target_field: "invariants".to_owned(),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when invariant method is missing");
+        assert_eq!(violations[0].rule_kind(), "MethodReferenceSignature");
+        assert_eq!(violations[0].entry_name(), "Order");
+        assert!(violations[0].message().contains("is_valid"));
+    }
+
+    #[test]
+    fn test_method_reference_signature_ac13_violation_when_wrong_receiver() {
+        // Entity with invariant "is_valid" → method has &mut self → 1 violation
+        let mut doc = make_doc("domain");
+        let entity = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![invariant_decl("is_valid")],
+            },
+            kind: unit_struct_kind(),
+            methods: vec![method_exclusive_ref_no_params("is_valid", "bool")],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::MethodReferenceSignature {
+                target_field: "invariants".to_owned(),
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation when invariant method has wrong receiver"
+        );
+        assert_eq!(violations[0].rule_kind(), "MethodReferenceSignature");
+        assert!(violations[0].message().contains("is_valid"));
+    }
+
+    #[test]
+    fn test_method_reference_signature_ac13_violation_when_has_params() {
+        // Entity with invariant "is_valid" → method has a param → 1 violation
+        let mut doc = make_doc("domain");
+        let entity = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![invariant_decl("is_valid")],
+            },
+            kind: unit_struct_kind(),
+            methods: vec![method_with_params(
+                "is_valid",
+                Some(SelfReceiver::SharedRef),
+                vec![("x", "i32")],
+                "bool",
+            )],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::MethodReferenceSignature {
+                target_field: "invariants".to_owned(),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when invariant method has params");
+        assert_eq!(violations[0].rule_kind(), "MethodReferenceSignature");
+        assert!(violations[0].message().contains("is_valid"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 8 — AccessorSignatureRequired (AC-14)
+    // ===========================================================================
+
+    #[test]
+    fn test_accessor_signature_required_ac14_pass_when_valid_getter() {
+        // Entity with identity "id" → method &self, no params, non-unit return → pass
+        let mut doc = make_doc("domain");
+        let entity = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+            kind: unit_struct_kind(),
+            methods: vec![method_shared_ref_no_params("id", "OrderId")],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::AccessorSignatureRequired {
+                target_field: "identity".to_owned(),
+            },
+        );
+        assert!(violations.is_empty(), "expected no violations for valid identity getter");
+    }
+
+    #[test]
+    fn test_accessor_signature_required_ac14_violation_when_getter_missing() {
+        // Entity with identity "id" → method not present → 1 violation
+        let mut doc = make_doc("domain");
+        let entity = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+            kind: unit_struct_kind(),
+            methods: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::AccessorSignatureRequired {
+                target_field: "identity".to_owned(),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when identity getter is missing");
+        assert_eq!(violations[0].rule_kind(), "AccessorSignatureRequired");
+        assert_eq!(violations[0].entry_name(), "Order");
+        assert!(violations[0].message().contains("id"));
+    }
+
+    #[test]
+    fn test_accessor_signature_required_ac14_violation_when_unit_return() {
+        // Entity identity getter returns "()" → 1 violation
+        let mut doc = make_doc("domain");
+        let entity = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+            kind: unit_struct_kind(),
+            methods: vec![method_shared_ref_no_params("id", "()")],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::AccessorSignatureRequired {
+                target_field: "identity".to_owned(),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when getter returns ()");
+        assert_eq!(violations[0].rule_kind(), "AccessorSignatureRequired");
+        assert!(violations[0].message().contains("id"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 9 — FieldElementUniqueAcrossEntries (AC-16 boundary)
+    // ===========================================================================
+
+    #[test]
+    fn test_field_element_unique_across_entries_happy_path_when_no_overlap() {
+        // Two AggregateRoots with disjoint exclusive_members → no violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("AggA").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("EntityA").unwrap()],
+                shared_value_objects: vec![],
+                emits: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("AggB").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("EntityB").unwrap()],
+                shared_value_objects: vec![],
+                emits: vec![],
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries {
+                target_field: "exclusive_members".to_owned(),
+            },
+        );
+        assert!(
+            violations.is_empty(),
+            "expected no violations when exclusive_members are disjoint"
+        );
+    }
+
+    #[test]
+    fn test_field_element_unique_across_entries_violation_when_overlap() {
+        // Two AggregateRoots sharing "EntityA" → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("AggA").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("EntityA").unwrap()],
+                shared_value_objects: vec![],
+                emits: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("AggB").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("EntityA").unwrap()], // duplicate!
+                shared_value_objects: vec![],
+                emits: vec![],
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries {
+                target_field: "exclusive_members".to_owned(),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when exclusive_members overlap");
+        assert_eq!(violations[0].rule_kind(), "FieldElementUniqueAcrossEntries");
+        assert!(violations[0].message().contains("EntityA"));
+    }
+
+    // Note: AC-16 exclusive_members uniqueness is covered by
+    // test_field_element_unique_across_entries_violation_when_overlap above.
+
+    // ===========================================================================
+    // T016: Rule 10 — NoExternalReferenceInMethods
+    // ===========================================================================
+
+    #[test]
+    fn test_no_external_reference_in_methods_happy_path_when_no_external_ref() {
+        // AggA with exclusive_member EntityA; no other type references EntityA in methods → no violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("AggA").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("EntityA").unwrap()],
+                shared_value_objects: vec![],
+                emits: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("EntityA").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+                vec![method_shared_ref_no_params("id", "EntityAId")],
+            ),
+        );
+        // EntityA method returns "EntityAId" — not a reference to EntityA → pass
+        doc.types.insert(
+            TypeName::new("AnotherService").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::DomainService { emits: vec![] },
+                vec![method_shared_ref_no_params("do_work", "String")],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::NoExternalReferenceInMethods {
+                target_field: "exclusive_members".to_owned(),
+            },
+        );
+        assert!(
+            violations.is_empty(),
+            "expected no violations when exclusive members not referenced externally"
+        );
+    }
+
+    #[test]
+    fn test_no_external_reference_in_methods_violation_when_external_ref_exists() {
+        // AggA exclusive_member EntityA; ExternalService has method referencing EntityA → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("AggA").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("EntityA").unwrap()],
+                shared_value_objects: vec![],
+                emits: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("EntityA").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        // ExternalService references EntityA in its method signature (violation of boundary)
+        doc.types.insert(
+            TypeName::new("ExternalService").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::DomainService { emits: vec![] },
+                vec![method_shared_ref_no_params("illegal_ref", "EntityA")],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::NoExternalReferenceInMethods {
+                target_field: "exclusive_members".to_owned(),
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation when external entry references exclusive member"
+        );
+        assert_eq!(violations[0].rule_kind(), "NoExternalReferenceInMethods");
+        assert_eq!(violations[0].entry_name(), "AggA");
+        assert!(violations[0].message().contains("EntityA"));
+        assert!(violations[0].message().contains("ExternalService"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 11 — NoPublicField
+    // ===========================================================================
+
+    #[test]
+    fn test_no_public_field_happy_path_when_struct_is_unit() {
+        // DomainEvent with Unit struct → no violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry_with_kind(DataRole::DomainEvent, unit_struct_kind()),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::DomainEvent]),
+            CatalogueLinterRuleKind::NoPublicField,
+        );
+        assert!(violations.is_empty(), "expected no violations for unit struct DomainEvent");
+    }
+
+    #[test]
+    fn test_no_public_field_violation_when_struct_has_public_fields() {
+        // DomainEvent with Plain struct + field → 1 violation
+        let mut doc = make_doc("domain");
+        let kind = plain_struct_kind(vec![field_decl("order_id", "OrderId")]);
+        doc.types.insert(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry_with_kind(DataRole::DomainEvent, kind),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::DomainEvent]),
+            CatalogueLinterRuleKind::NoPublicField,
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when struct has public field");
+        assert_eq!(violations[0].rule_kind(), "NoPublicField");
+        assert_eq!(violations[0].entry_name(), "OrderPlaced");
+        assert!(violations[0].message().contains("public"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 12 — ForbiddenMethodReceiver
+    // ===========================================================================
+
+    #[test]
+    fn test_forbidden_method_receiver_happy_path_when_no_forbidden_receiver() {
+        // DomainEvent with &self method → ForbiddenMethodReceiver "&mut self" → no violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::DomainEvent,
+                vec![method_shared_ref_no_params("event_id", "EventId")],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::DomainEvent]),
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                forbidden_receiver: "&mut self".to_owned(),
+            },
+        );
+        assert!(violations.is_empty(), "expected no violations when no &mut self method");
+    }
+
+    #[test]
+    fn test_forbidden_method_receiver_violation_when_forbidden_receiver_used() {
+        // DomainEvent with &mut self method → ForbiddenMethodReceiver "&mut self" → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::DomainEvent,
+                vec![method_exclusive_ref_no_params("mutate", "()")],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::DomainEvent]),
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                forbidden_receiver: "&mut self".to_owned(),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation when &mut self method exists");
+        assert_eq!(violations[0].rule_kind(), "ForbiddenMethodReceiver");
+        assert_eq!(violations[0].entry_name(), "OrderPlaced");
+        assert!(violations[0].message().contains("mutate"));
+        assert!(violations[0].message().contains("&mut self"));
+    }
+
+    // ===========================================================================
+    // T016: AC-15 — TraitImplRequired: equality traits for Entity / AggregateRoot
+    // ===========================================================================
+
+    #[test]
+    fn test_ac15_entity_requires_partial_eq_and_eq_trait_impls() {
+        // Entity without PartialEq/Eq trait_impls → 2 violations
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        // No trait_impls added
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Entity, RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::TraitImplRequired {
+                required_traits: NonEmptyVec::new("PartialEq".to_owned(), vec!["Eq".to_owned()]),
+            },
+        )
+        .unwrap();
+        let violations = evaluate_catalogue_lint(&[rule], &doc, &layer("domain")).unwrap();
+        assert_eq!(violations.len(), 2, "expected 2 violations (missing PartialEq + missing Eq)");
+        assert!(violations.iter().any(|v| v.message().contains("PartialEq")));
+        assert!(violations.iter().any(|v| v.message().contains("Eq")));
+    }
+
+    #[test]
+    fn test_ac15_aggregate_root_requires_partial_eq_and_eq_trait_impls() {
+        // AggregateRoot with PartialEq + Eq → no violations
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderAgg").unwrap(),
+            make_type_entry(DataRole::aggregate_root().unwrap()),
+        );
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("PartialEq").unwrap(),
+            TypeRef::new("OrderAgg").unwrap(),
+        ));
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("Eq").unwrap(),
+            TypeRef::new("OrderAgg").unwrap(),
+        ));
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Entity, RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::TraitImplRequired {
+                required_traits: NonEmptyVec::new("PartialEq".to_owned(), vec!["Eq".to_owned()]),
+            },
+        )
+        .unwrap();
+        let violations = evaluate_catalogue_lint(&[rule], &doc, &layer("domain")).unwrap();
+        assert!(violations.is_empty(), "expected no violations when PartialEq + Eq are present");
+    }
+
+    // ===========================================================================
+    // T016: AC-16 — 5 Aggregate Boundary rules
+    // ===========================================================================
+
+    #[test]
+    fn test_ac16_aggregate_boundary_exclusive_members_must_be_entities() {
+        // AggregateRoot exclusive_member is a ValueObject (not Entity) → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types
+            .insert(TypeName::new("Price").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.types.insert(
+            TypeName::new("OrderAgg").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("Price").unwrap()], // wrong role
+                shared_value_objects: vec![],
+                emits: vec![],
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "exclusive_members".to_owned(),
+                expected_role: RoleKind::Entity,
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation for non-Entity exclusive_member");
+        assert_eq!(violations[0].rule_kind(), "ReferencedRoleConstraint");
+        assert!(violations[0].message().contains("Price"));
+    }
+
+    #[test]
+    fn test_ac16_aggregate_boundary_shared_value_objects_must_be_value_objects() {
+        // AggregateRoot shared_value_objects includes Entity → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderLine").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("OrderAgg").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![],
+                shared_value_objects: vec![TypeRef::new("OrderLine").unwrap()], // wrong role
+                emits: vec![],
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "shared_value_objects".to_owned(),
+                expected_role: RoleKind::ValueObject,
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation for non-ValueObject in shared_value_objects"
+        );
+        assert!(violations[0].message().contains("OrderLine"));
+    }
+
+    #[test]
+    fn test_ac16_value_object_no_entity_in_method_signature() {
+        // ValueObject method param is an Entity → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("MyValue").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::value_object(),
+                vec![method_with_params(
+                    "bad_method",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("entity", "OrderEntity")],
+                    "()",
+                )],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(RoleKind::Entity, vec![RoleKind::AggregateRoot]),
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation for Entity in ValueObject method sig"
+        );
+        assert_eq!(violations[0].rule_kind(), "NoRoleInMethodSignature");
+    }
+
+    // ===========================================================================
+    // T016: AC-17 — DomainEvent mutation rules
+    // (covered by Rule 11 + Rule 12 tests above; AC-17 NoPublicField tested below)
+    // ===========================================================================
+
+    // Note: DomainEvent NoPublicField is covered by
+    // test_no_public_field_violation_when_struct_has_public_fields above.
+
+    // ===========================================================================
+    // T016: AC-18 — Repository aggregate role check
+    // ===========================================================================
+
+    #[test]
+    fn test_ac18_repository_aggregate_field_must_be_aggregate_root_happy_path() {
+        // Repository TraitEntry with aggregate → AggregateRoot: no violation.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderAgg").unwrap(),
+            make_type_entry(DataRole::aggregate_root().unwrap()),
+        );
+        doc.traits.insert(
+            TraitName::new("OrderRepository").unwrap(),
+            make_trait_entry(ContractRole::Repository {
+                aggregate: TypeRef::new("OrderAgg").unwrap(),
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::Repository]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "aggregate".to_owned(),
+                expected_role: RoleKind::AggregateRoot,
+            },
+        );
+        assert!(violations.is_empty(), "expected 0 violations: OrderAgg is declared AggregateRoot");
+    }
+
+    #[test]
+    fn test_ac18_repository_aggregate_pointing_to_non_aggregate_root_is_violation() {
+        // Repository TraitEntry with aggregate → Entity (wrong role): 1 violation.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderItem").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        doc.traits.insert(
+            TraitName::new("OrderItemRepository").unwrap(),
+            make_trait_entry(ContractRole::Repository {
+                aggregate: TypeRef::new("OrderItem").unwrap(),
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::Repository]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "aggregate".to_owned(),
+                expected_role: RoleKind::AggregateRoot,
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation: OrderItem is Entity, not AggregateRoot"
+        );
+        assert_eq!(violations[0].rule_kind(), "ReferencedRoleConstraint");
+        assert!(
+            violations[0].message().contains("OrderItem"),
+            "message should name the referenced type"
+        );
+        assert_eq!(
+            violations[0].entry_name(),
+            "OrderItemRepository",
+            "entry_name should be the Repository trait name"
+        );
+    }
+
+    // ===========================================================================
+    // T016: AC-19 — EventPolicy 4 rules
+    // ===========================================================================
+
+    #[test]
+    fn test_ac19_event_policy_reacts_to_must_be_domain_event() {
+        // EventPolicy reacts_to references a UseCase (wrong role) → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("PlaceOrderUseCase").unwrap(),
+            make_type_entry(DataRole::use_case()),
+        );
+        doc.types.insert(
+            TypeName::new("OrderPolicy").unwrap(),
+            make_type_entry(DataRole::EventPolicy {
+                reacts_to: NonEmptyVec::new(TypeRef::new("PlaceOrderUseCase").unwrap(), vec![]),
+            }),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::EventPolicy]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "reacts_to".to_owned(),
+                expected_role: RoleKind::DomainEvent,
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation for EventPolicy reacts_to wrong role"
+        );
+        assert_eq!(violations[0].rule_kind(), "ReferencedRoleConstraint");
+        assert!(violations[0].message().contains("PlaceOrderUseCase"));
+    }
+
+    // Note: AC-19 KindLayerConstraint (infrastructure layer) is covered by
+    // test_kind_layer_constraint_violation_when_layer_is_not_permitted above.
+
+    #[test]
+    fn test_ac19_event_policy_no_mut_self_method() {
+        // EventPolicy with &mut self method → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderPolicy").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::EventPolicy {
+                    reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
+                },
+                vec![method_exclusive_ref_no_params("on_event", "()")],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::EventPolicy]),
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                forbidden_receiver: "&mut self".to_owned(),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation for &mut self on EventPolicy");
+        assert_eq!(violations[0].rule_kind(), "ForbiddenMethodReceiver");
+    }
+
+    #[test]
+    fn test_ac19_event_policy_no_repository_or_usecase_in_method_sig() {
+        // EventPolicy method param is a Repository role (TraitEntry) → 1 violation
+        let mut doc = make_doc("domain");
+        doc.traits.insert(
+            TraitName::new("OrderRepo").unwrap(),
+            make_trait_entry(ContractRole::Repository {
+                aggregate: TypeRef::new("Order").unwrap(),
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("OrderPolicy").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::EventPolicy {
+                    reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
+                },
+                vec![method_with_params(
+                    "on_event",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("repo", "OrderRepo")],
+                    "()",
+                )],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::EventPolicy]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(RoleKind::Repository, vec![RoleKind::UseCase]),
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation for Repository in EventPolicy method sig"
+        );
+        assert_eq!(violations[0].rule_kind(), "NoRoleInMethodSignature");
+    }
+
+    // ===========================================================================
+    // T016: AC-20 — ValueObject mutation checks
+    // ===========================================================================
+
+    #[test]
+    fn test_ac20_value_object_no_mut_self_method() {
+        // ValueObject with &mut self method → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("Money").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::value_object(),
+                vec![method_exclusive_ref_no_params("set_amount", "()")],
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                forbidden_receiver: "&mut self".to_owned(),
+            },
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation for &mut self on ValueObject");
+        assert_eq!(violations[0].rule_kind(), "ForbiddenMethodReceiver");
+    }
+
+    #[test]
+    fn test_ac20_value_object_no_public_field() {
+        // ValueObject with public field → 1 violation
+        let mut doc = make_doc("domain");
+        let kind = plain_struct_kind(vec![field_decl("amount", "i64")]);
+        doc.types.insert(
+            TypeName::new("Money").unwrap(),
+            make_type_entry_with_kind(DataRole::value_object(), kind),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::NoPublicField,
+        );
+        assert_eq!(violations.len(), 1, "expected 1 violation for public field on ValueObject");
+        assert_eq!(violations[0].rule_kind(), "NoPublicField");
+    }
+
+    #[test]
+    fn test_ac20_value_object_equality_trait_required() {
+        // ValueObject without PartialEq → 1 violation
+        let mut doc = make_doc("domain");
+        doc.types
+            .insert(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::TraitImplRequired {
+                required_traits: NonEmptyVec::new("PartialEq".to_owned(), vec!["Eq".to_owned()]),
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            2,
+            "expected 2 violations for missing PartialEq + Eq on ValueObject"
+        );
+    }
+
+    // ===========================================================================
+    // T016: ddd_strict_preset — non-empty + covers required rule kinds
+    // ===========================================================================
+
+    #[test]
+    fn test_ddd_strict_preset_returns_non_empty_rules() {
+        let preset = ddd_strict_preset().unwrap();
+        assert!(!preset.is_empty(), "expected ddd_strict_preset to return non-empty rule list");
+    }
+
+    #[test]
+    fn test_ddd_strict_preset_contains_each_required_rule_kind() {
+        let preset = ddd_strict_preset().unwrap();
+        let names: Vec<&str> = preset.iter().map(|r| r.kind().discriminant_name()).collect();
+
+        // Must contain at least one of each rule kind used in the preset
+        let has_method_ref_sig = names.contains(&"MethodReferenceSignature");
+        let has_accessor_sig = names.contains(&"AccessorSignatureRequired");
+        let has_trait_impl_req = names.contains(&"TraitImplRequired");
+        let has_ref_role = names.contains(&"ReferencedRoleConstraint");
+        let has_forbidden_recv = names.contains(&"ForbiddenMethodReceiver");
+        let has_no_public_field = names.contains(&"NoPublicField");
+        let has_field_unique = names.contains(&"FieldElementUniqueAcrossEntries");
+        let has_no_ext_ref = names.contains(&"NoExternalReferenceInMethods");
+        let has_no_role_sig = names.contains(&"NoRoleInMethodSignature");
+        let has_layer_constraint = names.contains(&"KindLayerConstraint");
+
+        assert!(has_method_ref_sig, "preset must include MethodReferenceSignature (D4)");
+        assert!(has_accessor_sig, "preset must include AccessorSignatureRequired (D5)");
+        assert!(has_trait_impl_req, "preset must include TraitImplRequired (D5/D18)");
+        assert!(has_ref_role, "preset must include ReferencedRoleConstraint (D6/D7/D8/D10)");
+        assert!(has_forbidden_recv, "preset must include ForbiddenMethodReceiver (D9/D16/D18)");
+        assert!(has_no_public_field, "preset must include NoPublicField (D9/D18)");
+        assert!(has_field_unique, "preset must include FieldElementUniqueAcrossEntries (D11)");
+        assert!(has_no_ext_ref, "preset must include NoExternalReferenceInMethods (D11)");
+        assert!(has_no_role_sig, "preset must include NoRoleInMethodSignature (D11/D16)");
+        assert!(has_layer_constraint, "preset must include KindLayerConstraint (D16)");
+    }
+
+    #[test]
+    fn test_ddd_strict_preset_has_expected_count_of_20_rules() {
+        let preset = ddd_strict_preset().unwrap();
+        assert_eq!(preset.len(), 20, "expected exactly 20 rules in ddd_strict_preset");
+    }
+
+    // ===========================================================================
+    // T016: ddd_strict_preset end-to-end test (synthetic catalogue fixture)
+    // ===========================================================================
+
+    #[test]
+    fn test_ddd_strict_preset_end_to_end_compliant_catalogue_produces_zero_violations() {
+        // Build a minimal compliant catalogue and run all 19 preset rules.
+        // Expected: 0 violations.
+        let mut doc = make_doc("domain");
+
+        // ValueObject: immutable, PartialEq/Eq, no public fields, no Entity in method sig
+        let money_kind = TypeKindV2::Struct(StructKind::new(
+            StructShape::Plain { fields: vec![], has_stripped_fields: false },
+            None,
+        ));
+        let mut money_entry = make_type_entry_with_kind(DataRole::value_object(), money_kind);
+        money_entry.methods = vec![method_shared_ref_no_params("amount", "i64")];
+        doc.types.insert(TypeName::new("Money").unwrap(), money_entry);
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("PartialEq").unwrap(),
+            TypeRef::new("Money").unwrap(),
+        ));
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("Eq").unwrap(),
+            TypeRef::new("Money").unwrap(),
+        ));
+
+        // Entity: identity getter &self→EntityId, PartialEq/Eq
+        let entity = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+            kind: unit_struct_kind(),
+            methods: vec![method_shared_ref_no_params("id", "EntityId")],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("OrderLine").unwrap(), entity);
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("PartialEq").unwrap(),
+            TypeRef::new("OrderLine").unwrap(),
+        ));
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("Eq").unwrap(),
+            TypeRef::new("OrderLine").unwrap(),
+        ));
+
+        // AggregateRoot: identity getter, PartialEq/Eq, exclusive_members=[OrderLine], emits=[OrderPlaced]
+        let agg = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("OrderLine").unwrap()],
+                shared_value_objects: vec![TypeRef::new("Money").unwrap()],
+                emits: vec![TypeRef::new("OrderPlaced").unwrap()],
+            },
+            kind: unit_struct_kind(),
+            methods: vec![method_shared_ref_no_params("id", "OrderId")],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("OrderAgg").unwrap(), agg);
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("PartialEq").unwrap(),
+            TypeRef::new("OrderAgg").unwrap(),
+        ));
+        doc.trait_impls.push(TraitImplDeclV2::new(
+            TypeRef::new("Eq").unwrap(),
+            TypeRef::new("OrderAgg").unwrap(),
+        ));
+
+        // DomainEvent: unit struct, no &mut self, referenced by AggregateRoot.emits
+        doc.types.insert(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry_with_kind(DataRole::DomainEvent, unit_struct_kind()),
+        );
+
+        // EventPolicy: reacts_to=[OrderPlaced], no &mut self, no Repository/UseCase in sig
+        doc.types.insert(
+            TypeName::new("OrderPolicy").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::EventPolicy {
+                    reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
+                },
+                vec![method_shared_ref_no_params("handle", "()")],
+            ),
+        );
+
+        let preset = ddd_strict_preset().unwrap();
+        let violations = evaluate_catalogue_lint(&preset, &doc, &layer("domain")).unwrap();
+
+        // Filter out known limitation: D10 (Repository rule) will pass because
+        // Repository is ContractRole in TraitEntry, not TypeEntry — produces 0 violations
+        // for the Repository target (correct behavior per design).
+        let violations_str: Vec<String> = violations
+            .iter()
+            .map(|v| format!("{}: {} - {}", v.rule_kind(), v.entry_name(), v.message()))
+            .collect();
+        assert!(
+            violations.is_empty(),
+            "expected 0 violations for compliant catalogue, got:\n{}",
+            violations_str.join("\n")
+        );
+    }
+
+    #[test]
+    fn test_ddd_strict_preset_end_to_end_non_compliant_catalogue_produces_violations() {
+        // Build a catalogue with intentional violations and verify at least N violations fire.
+        let mut doc = make_doc("domain");
+
+        // ValueObject with &mut self method → D18 ForbiddenMethodReceiver violation
+        doc.types.insert(
+            TypeName::new("BadValue").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::value_object(),
+                vec![method_exclusive_ref_no_params("mutate", "()")],
+            ),
+        );
+
+        // DomainEvent with public field → D9 NoPublicField violation
+        let kind = plain_struct_kind(vec![field_decl("data", "String")]);
+        doc.types.insert(
+            TypeName::new("BadEvent").unwrap(),
+            make_type_entry_with_kind(DataRole::DomainEvent, kind),
+        );
+
+        // Entity without identity getter → D5 AccessorSignatureRequired violation
+        doc.types.insert(
+            TypeName::new("BadEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        // BadEntity has no methods (no "id" getter) → violation
+
+        let preset = ddd_strict_preset().unwrap();
+        let violations = evaluate_catalogue_lint(&preset, &doc, &layer("domain")).unwrap();
+
+        // We expect at least 3 violations (mut receiver + public field + missing getter)
+        // Plus missing PartialEq/Eq for ValueObject/Entity → more violations
+        assert!(
+            violations.len() >= 3,
+            "expected at least 3 violations for non-compliant catalogue, got: {}",
+            violations.len()
+        );
     }
 }

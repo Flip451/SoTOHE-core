@@ -11,10 +11,9 @@ use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
 /// Maps a v3 `DataRole` + `TypeKindV2` pair to the kind_tag string written into
 /// `<layer>-type-signals.json` and consumed by `check_type_signals`.
 ///
-/// This function is the **authoritative definition** of the kind_tag value scheme
+/// This function is the **single source of truth** for the kind_tag value scheme
 /// for v3 `DataRole` entries. The kind_tag values are the historically-established
 /// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`.
-/// The match arms below are the single source of truth for the mapping.
 pub(crate) fn data_role_kind_tag(role: &DataRole, kind: &TypeKindV2) -> &'static str {
     // Typestate detection: Struct (any shape) with a typestate marker.
     if let TypeKindV2::Struct(sk) = kind {
@@ -49,10 +48,9 @@ pub(crate) fn data_role_kind_tag(role: &DataRole, kind: &TypeKindV2) -> &'static
 /// Maps a `ContractRole` (v3 catalogue trait entry role) to the kind_tag string
 /// written into `<layer>-type-signals.json` and consumed by `check_type_signals`.
 ///
-/// This function is the **authoritative definition** of the kind_tag value scheme
+/// This function is the **single source of truth** for the kind_tag value scheme
 /// for v3 `ContractRole` entries. The kind_tag values are the historically-established
 /// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`.
-/// The match arms below are the single source of truth for the mapping.
 pub(crate) const fn contract_role_kind_tag(role: &ContractRole) -> &'static str {
     match role {
         ContractRole::SpecificationPort
@@ -65,12 +63,9 @@ pub(crate) const fn contract_role_kind_tag(role: &ContractRole) -> &'static str 
 /// Maps a `FunctionRole` (v3 catalogue function entry role) to the kind_tag string
 /// written into `<layer>-type-signals.json` and consumed by `check_type_signals`.
 ///
-/// This function is the **authoritative definition** of the kind_tag value scheme
-/// for v3 `FunctionRole` entries. The kind_tag value is the historically-established
-/// value grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`:
-///
-/// - All `FunctionRole` variants (`FreeFunction`, `UseCaseFunction`) → `"free_function"`
-///   (both v3 function roles share the same kind_tag)
+/// This function is the **single source of truth** for the kind_tag value scheme
+/// for v3 `FunctionRole` entries. The kind_tag values are the historically-established
+/// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`.
 pub(crate) const fn function_role_kind_tag(_role: FunctionRole) -> &'static str {
     "free_function"
 }

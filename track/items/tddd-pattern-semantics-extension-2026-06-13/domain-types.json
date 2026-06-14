@@ -998,7 +998,7 @@
     }
   },
   "functions": {
-    "domain::tddd::catalogue_linter::evaluate_catalogue_lint": {
+    "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint": {
       "action": "add",
       "role": "FreeFunction",
       "params": [
@@ -1019,11 +1019,11 @@
       ],
       "informal_grounds": []
     },
-    "domain::tddd::catalogue_linter::ddd_strict_preset": {
+    "domain::tddd::catalogue_linter::preset::ddd_strict_preset": {
       "action": "add",
       "role": "FreeFunction",
       "params": [],
-      "returns": "Vec<CatalogueLinterRule>",
+      "returns": "Result<Vec<CatalogueLinterRule>, CatalogueLinterError>",
       "is_async": false,
       "generics": [],
       "where_predicates": [],

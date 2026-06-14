@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T11:38:50Z",
-  "declaration_hash": "ad613ce00671f3be9ca1f10eed3c3e09c2a4d33b787a7a75a865b4ab1efcb6a8",
+  "generated_at": "2026-06-14T15:43:27Z",
+  "declaration_hash": "7443faaa18e4575cc25db362186e3db64499288307e188cfe284b29eaa6bd751",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
@@ -198,13 +198,13 @@
       ]
     },
     {
-      "type_name": "domain::tddd::catalogue_linter::ddd_strict_preset",
+      "type_name": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
-      "type_name": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+      "type_name": "domain::tddd::catalogue_linter::preset::ddd_strict_preset",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

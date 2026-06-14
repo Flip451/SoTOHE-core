@@ -561,6 +561,14 @@
         "kind": "pass",
         "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
       }
+    },
+    {
+      "claim_hash": "efc70e37a5ddde0f734b0c15f45c79e9a378feaeec1c89f2539a6f48e563d921",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が定める最小コアルール群を一括有効化する `ddd-strict` プリセットを提供する。"
+      }
     }
   ]
 }

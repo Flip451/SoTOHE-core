@@ -1,0 +1,445 @@
+//! `evaluate_catalogue_lint` — pure free-function entry point (D17 / T014).
+//!
+//! This module is declared by `catalogue_linter.rs` via `#[path]` and is not
+//! a public module. The `evaluate_catalogue_lint` function is re-exported from
+//! the parent module.
+
+use super::helpers::{
+    bare_name_in_type_ref, contract_role_type_ref, entry_role_kind, field_type_refs,
+    field_vec_is_empty, has_trait_impl, identity_accessor_name, invariants_for_role,
+    struct_has_public_fields, trait_entries_for_target, type_entries_for_target,
+};
+use super::{
+    CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
+    RoleKind,
+};
+use crate::tddd::catalogue_v2::CatalogueDocument;
+use crate::tddd::catalogue_v2::composite::TypeKindV2;
+use crate::tddd::catalogue_v2::roles::{InvariantPredicate, SelfReceiver};
+use crate::tddd::layer_id::LayerId;
+
+/// Evaluate `rules` against `catalogue` for the given `layer_id`.
+///
+/// Returns the full list of violations found. An empty `Vec` means no rules
+/// fired.
+///
+/// This is the pure domain-layer entry point (D17): no I/O, no trait object,
+/// no infrastructure dependency.
+///
+/// # Errors
+///
+/// Returns [`CatalogueLinterError::InvalidRuleConfig`] if the provided rule
+/// configuration is internally inconsistent and prevents execution.
+pub fn evaluate_catalogue_lint(
+    rules: &[CatalogueLinterRule],
+    catalogue: &CatalogueDocument,
+    _layer_id: &LayerId,
+) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
+    let mut violations: Vec<CatalogueLintViolation> = Vec::new();
+
+    for rule in rules {
+        match rule.kind() {
+            CatalogueLinterRuleKind::FieldEmpty { target_field } => {
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    if !field_vec_is_empty(&entry.role, target_field.as_str()) {
+                        violations.push(CatalogueLintViolation::new(
+                            rule.kind().discriminant_name(),
+                            name.as_str(),
+                            format!("field '{target_field}' must be empty but contains elements"),
+                        ));
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::FieldNonEmpty { target_field } => {
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    if field_vec_is_empty(&entry.role, target_field.as_str()) {
+                        violations.push(CatalogueLintViolation::new(
+                            rule.kind().discriminant_name(),
+                            name.as_str(),
+                            format!("field '{target_field}' must not be empty"),
+                        ));
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::KindLayerConstraint { permitted_layers } => {
+                let doc_layer = &catalogue.layer;
+                if !permitted_layers.as_slice().contains(doc_layer) {
+                    for (name, _entry) in type_entries_for_target(catalogue, rule.target()) {
+                        violations.push(CatalogueLintViolation::new(
+                            rule.kind().discriminant_name(),
+                            name.as_str(),
+                            format!(
+                                "entry is declared in layer '{}' which is not in permitted layers",
+                                doc_layer.as_ref()
+                            ),
+                        ));
+                    }
+                    for (name, _entry) in trait_entries_for_target(catalogue, rule.target()) {
+                        violations.push(CatalogueLintViolation::new(
+                            rule.kind().discriminant_name(),
+                            name.as_str(),
+                            format!(
+                                "entry is declared in layer '{}' which is not in permitted layers",
+                                doc_layer.as_ref()
+                            ),
+                        ));
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::ReferencedRoleConstraint { target_field, expected_role } => {
+                let lookup_role = |ref_str: &str| -> Option<RoleKind> {
+                    // TypeRef may be path-qualified (e.g. "domain::OrderPlaced"), while catalogue
+                    // entry names are always bare identifiers. Extract the tail segment so that
+                    // "domain::OrderPlaced" resolves the same as "OrderPlaced".
+                    let tail = ref_str.split("::").last().unwrap_or(ref_str);
+                    let data_role = catalogue
+                        .types
+                        .iter()
+                        .find(|(tn, _)| tn.as_str() == ref_str || tn.as_str() == tail)
+                        .map(|(_, e)| entry_role_kind(e));
+                    if data_role.is_some() {
+                        return data_role;
+                    }
+                    catalogue
+                        .traits
+                        .iter()
+                        .find(|(tn, _)| tn.as_str() == ref_str || tn.as_str() == tail)
+                        .map(|(_, e)| RoleKind::from_contract_role(&e.role))
+                };
+
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    for type_ref in field_type_refs(&entry.role, target_field.as_str()) {
+                        let ref_str = type_ref.as_str();
+                        if lookup_role(ref_str) != Some(*expected_role) {
+                            violations.push(CatalogueLintViolation::new(
+                                rule.kind().discriminant_name(),
+                                name.as_str(),
+                                format!(
+                                    "type '{}' referenced in field '{}' does not declare role '{}'",
+                                    ref_str,
+                                    target_field,
+                                    expected_role.variant_name()
+                                ),
+                            ));
+                        }
+                    }
+                }
+
+                for (name, entry) in trait_entries_for_target(catalogue, rule.target()) {
+                    if let Some(type_ref) =
+                        contract_role_type_ref(&entry.role, target_field.as_str())
+                    {
+                        let ref_str = type_ref.as_str();
+                        if lookup_role(ref_str) != Some(*expected_role) {
+                            violations.push(CatalogueLintViolation::new(
+                                rule.kind().discriminant_name(),
+                                name.as_str(),
+                                format!(
+                                    "type '{}' referenced in field '{}' does not declare role '{}'",
+                                    ref_str,
+                                    target_field,
+                                    expected_role.variant_name()
+                                ),
+                            ));
+                        }
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::TraitImplRequired { required_traits } => {
+                for (name, _entry) in type_entries_for_target(catalogue, rule.target()) {
+                    for trait_name in required_traits.as_slice() {
+                        if !has_trait_impl(catalogue, name.as_str(), trait_name.as_str()) {
+                            violations.push(CatalogueLintViolation::new(
+                                rule.kind().discriminant_name(),
+                                name.as_str(),
+                                format!(
+                                    "required trait impl '{}' is missing from trait_impls",
+                                    trait_name
+                                ),
+                            ));
+                        }
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    for method in &entry.methods {
+                        let sig_types: Vec<&str> = method
+                            .params
+                            .iter()
+                            .map(|p| p.ty.as_str())
+                            .chain(std::iter::once(method.returns.as_str()))
+                            .collect();
+                        for type_ref_str in sig_types {
+                            // Check type entries: match bare name or as a component in
+                            // generic / reference type expressions (e.g. Vec<T>, &T).
+                            for (tn, e) in catalogue.types.iter() {
+                                let role = entry_role_kind(e);
+                                if forbidden_roles.as_slice().contains(&role)
+                                    && bare_name_in_type_ref(type_ref_str, tn.as_str())
+                                {
+                                    violations.push(CatalogueLintViolation::new(
+                                        rule.kind().discriminant_name(),
+                                        name.as_str(),
+                                        format!(
+                                            "method '{}' signature contains type '{}' with forbidden role '{}'",
+                                            method.name.as_str(),
+                                            type_ref_str,
+                                            role.variant_name()
+                                        ),
+                                    ));
+                                    break; // one violation per (method, sig_type) slot is enough
+                                }
+                            }
+                            // Check trait entries (ContractRole) the same way.
+                            for (tn, e) in catalogue.traits.iter() {
+                                let role = RoleKind::from_contract_role(&e.role);
+                                if forbidden_roles.as_slice().contains(&role)
+                                    && bare_name_in_type_ref(type_ref_str, tn.as_str())
+                                {
+                                    violations.push(CatalogueLintViolation::new(
+                                        rule.kind().discriminant_name(),
+                                        name.as_str(),
+                                        format!(
+                                            "method '{}' signature contains type '{}' with forbidden role '{}'",
+                                            method.name.as_str(),
+                                            type_ref_str,
+                                            role.variant_name()
+                                        ),
+                                    ));
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::MethodReferenceSignature { target_field } => {
+                if target_field.as_str() != "invariants" {
+                    return Err(CatalogueLinterError::InvalidRuleConfig(format!(
+                        "MethodReferenceSignature: unsupported target_field '{}'; only 'invariants' is supported",
+                        target_field
+                    )));
+                }
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    for inv in invariants_for_role(&entry.role) {
+                        let InvariantPredicate::SelfMethod(method_name) = &inv.predicate;
+                        let mname = method_name.as_str();
+                        match entry.methods.iter().find(|m| m.name.as_str() == mname) {
+                            None => {
+                                violations.push(CatalogueLintViolation::new(
+                                    rule.kind().discriminant_name(),
+                                    name.as_str(),
+                                    format!(
+                                        "invariant predicate method '{}' not found in public methods",
+                                        mname
+                                    ),
+                                ));
+                            }
+                            Some(m) => {
+                                if m.receiver != Some(SelfReceiver::SharedRef)
+                                    || !m.params.is_empty()
+                                    || m.returns.as_str() != "bool"
+                                {
+                                    violations.push(CatalogueLintViolation::new(
+                                        rule.kind().discriminant_name(),
+                                        name.as_str(),
+                                        format!(
+                                            "invariant method '{}' must have signature (&self) -> bool",
+                                            mname
+                                        ),
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::AccessorSignatureRequired { target_field } => {
+                if target_field.as_str() != "identity" {
+                    return Err(CatalogueLinterError::InvalidRuleConfig(format!(
+                        "AccessorSignatureRequired: unsupported target_field '{}'; only 'identity' is supported",
+                        target_field
+                    )));
+                }
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    let getter_name = match identity_accessor_name(&entry.role) {
+                        Some(g) => g,
+                        None => continue,
+                    };
+                    match entry.methods.iter().find(|m| m.name.as_str() == getter_name) {
+                        None => {
+                            violations.push(CatalogueLintViolation::new(
+                                rule.kind().discriminant_name(),
+                                name.as_str(),
+                                format!(
+                                    "identity getter '{}' not found in public methods",
+                                    getter_name
+                                ),
+                            ));
+                        }
+                        Some(m) => {
+                            if m.receiver != Some(SelfReceiver::SharedRef)
+                                || !m.params.is_empty()
+                                || m.returns.as_str() == "()"
+                            {
+                                violations.push(CatalogueLintViolation::new(
+                                    rule.kind().discriminant_name(),
+                                    name.as_str(),
+                                    format!(
+                                        "identity getter '{}' must have signature (&self) -> NonUnit",
+                                        getter_name
+                                    ),
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries { target_field } => {
+                // Key by the tail segment of the TypeRef so that bare `OrderLine` and
+                // path-qualified `domain::OrderLine` are treated as the same type and the
+                // D11 exclusive-member uniqueness check cannot be bypassed by mixing forms.
+                let mut seen: std::collections::HashMap<String, String> =
+                    std::collections::HashMap::new();
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    for type_ref in field_type_refs(&entry.role, target_field.as_str()) {
+                        let ref_str = type_ref.as_str();
+                        let canonical = ref_str.split("::").last().unwrap_or(ref_str).to_owned();
+                        if let Some(prev_entry) = seen.get(&canonical) {
+                            if prev_entry.as_str() != name.as_str() {
+                                violations.push(CatalogueLintViolation::new(
+                                    rule.kind().discriminant_name(),
+                                    name.as_str(),
+                                    format!(
+                                        "type '{}' in field '{}' already belongs to entry '{}'",
+                                        ref_str, target_field, prev_entry
+                                    ),
+                                ));
+                            }
+                        } else {
+                            seen.insert(canonical, name.as_str().to_owned());
+                        }
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::NoExternalReferenceInMethods { target_field } => {
+                let agg_exclusive: Vec<(String, Vec<String>)> =
+                    type_entries_for_target(catalogue, rule.target())
+                        .map(|(name, entry)| {
+                            let refs = field_type_refs(&entry.role, target_field.as_str())
+                                .iter()
+                                .map(|r| r.as_str().to_owned())
+                                .collect();
+                            (name.as_str().to_owned(), refs)
+                        })
+                        .collect();
+                for (agg_name, exclusive_refs) in &agg_exclusive {
+                    if exclusive_refs.is_empty() {
+                        continue;
+                    }
+                    // Build a set of bare-name tails for the boundary (aggregate + its
+                    // exclusive members + its shared_value_objects).
+                    let inside_bare: std::collections::HashSet<String> = {
+                        let mut set = std::collections::HashSet::new();
+                        // The aggregate itself.
+                        let agg_tail = agg_name.split("::").last().unwrap_or(agg_name).to_owned();
+                        set.insert(agg_tail);
+                        // Exclusive members.
+                        for r in exclusive_refs {
+                            let tail = r.split("::").last().unwrap_or(r.as_str()).to_owned();
+                            set.insert(tail);
+                        }
+                        // Shared value objects of this aggregate.
+                        if let Some((_name, entry)) =
+                            catalogue.types.iter().find(|(n, _)| n.as_str() == agg_name.as_str())
+                        {
+                            for r in field_type_refs(&entry.role, "shared_value_objects") {
+                                let tail =
+                                    r.as_str().split("::").last().unwrap_or(r.as_str()).to_owned();
+                                set.insert(tail);
+                            }
+                        }
+                        set
+                    };
+                    for (other_name, other_entry) in &catalogue.types {
+                        let other_bare =
+                            other_name.as_str().split("::").last().unwrap_or(other_name.as_str());
+                        if inside_bare.contains(other_bare) {
+                            continue;
+                        }
+                        for exclusive_type in exclusive_refs {
+                            // Use the bare tail of the exclusive member for delimiter-boundary
+                            // matching so that Vec<OrderLine>, Option<OrderLine>, &OrderLine,
+                            // and path-qualified forms are all detected.
+                            let bare = exclusive_type
+                                .split("::")
+                                .last()
+                                .unwrap_or(exclusive_type.as_str());
+                            let found_in_methods = other_entry.methods.iter().any(|m| {
+                                m.params.iter().any(|p| bare_name_in_type_ref(p.ty.as_str(), bare))
+                                    || bare_name_in_type_ref(m.returns.as_str(), bare)
+                            });
+                            if found_in_methods {
+                                violations.push(CatalogueLintViolation::new(
+                                    rule.kind().discriminant_name(),
+                                    agg_name.as_str(),
+                                    format!(
+                                        "exclusive member '{}' is referenced in methods of external entry '{}'",
+                                        exclusive_type,
+                                        other_name.as_str()
+                                    ),
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::NoPublicField => {
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    if let TypeKindV2::Struct(struct_kind) = &entry.kind {
+                        if struct_has_public_fields(struct_kind) {
+                            violations.push(CatalogueLintViolation::new(
+                                rule.kind().discriminant_name(),
+                                name.as_str(),
+                                "struct has public fields; use private fields with accessor methods instead",
+                            ));
+                        }
+                    }
+                }
+            }
+
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver { forbidden_receiver } => {
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    for method in &entry.methods {
+                        let receiver_str =
+                            method.receiver.map(|r| r.to_string()).unwrap_or_default();
+                        if receiver_str.as_str() == forbidden_receiver.as_str() {
+                            violations.push(CatalogueLintViolation::new(
+                                rule.kind().discriminant_name(),
+                                name.as_str(),
+                                format!(
+                                    "method '{}' uses forbidden receiver '{}'",
+                                    method.name.as_str(),
+                                    forbidden_receiver
+                                ),
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(violations)
+}
