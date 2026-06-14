@@ -438,13 +438,17 @@ impl CliApp {
 
         let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)?;
 
-        // Demo rule set: FieldEmpty on value_object.expected_methods and
+        // Demo rule set: FieldNonEmpty on value_object.invariants and
         // KindLayerConstraint on domain_service.
         // target_roles uses role kind names ("ValueObject", "DomainService").
+        //
+        // FieldNonEmpty on "invariants" fires for any ValueObject entry that declares
+        // no invariants in its role payload. This is an enforceable field that the
+        // evaluator supports via `field_vec_is_empty(&role, "invariants")`.
         let rules = vec![
             LintRuleSpec {
                 target_roles: vec!["ValueObject".to_owned()],
-                kind: LintRuleKind::FieldEmpty { target_field: "expected_methods".to_owned() },
+                kind: LintRuleKind::FieldNonEmpty { target_field: "invariants".to_owned() },
             },
             LintRuleSpec {
                 target_roles: vec!["DomainService".to_owned()],
@@ -731,9 +735,9 @@ mod tests {
     fn test_track_catalogue_spec_signals_present_catalogue_is_evaluated_not_skipped() {
         let (dir, items_dir, track_dir) = setup_catalogue_spec_signal_track();
 
-        // Write a minimal v4 catalogue with a Red-signal entry.
-        let v3_catalogue = r#"{
-  "schema_version": 4,
+        // Write a minimal v5 catalogue with a Red-signal entry.
+        let v5_catalogue = r#"{
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
@@ -748,7 +752,7 @@ mod tests {
   "traits": {},
   "functions": {}
 }"#;
-        std::fs::write(track_dir.join("domain-types.json"), v3_catalogue).unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), v5_catalogue).unwrap();
 
         let app = CliApp::new();
         let result = app.track_catalogue_spec_signals(

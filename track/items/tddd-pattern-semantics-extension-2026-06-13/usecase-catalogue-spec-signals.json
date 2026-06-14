@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "11763a167904dca4ca90373261fc491a585c4130c48ceb5709f51026c1c1ff0a",
+  "catalogue_declaration_hash": "73a081efeacb57a67869a6ec6bd3da4f62e6db38507c987d3396b880deefe87c",
   "signals": [
     {
       "type_name": "LintRuleKind",

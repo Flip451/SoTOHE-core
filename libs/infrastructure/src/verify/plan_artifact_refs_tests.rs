@@ -70,7 +70,7 @@ fn write_spec_with_adr_ref(track_dir: &Path, adr_file: &str, anchor: &str) {
 fn write_domain_catalogue_with_spec_ref(track_dir: &Path, file: &str, anchor: &str) {
     let catalogue = format!(
         r#"{{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {{
@@ -262,7 +262,7 @@ fn test_empty_spec_refs_on_catalogue_entry_passes() {
 
     // Catalogue entry with no spec_refs → nothing to validate.
     let catalogue = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {

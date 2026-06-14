@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "infrastructure",
   "layer": "infrastructure",
   "types": {
@@ -80,41 +80,81 @@
       "informal_grounds": []
     },
     "CatalogueDocumentCodecError": {
-      "action": "reference",
+      "action": "modify",
       "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
         "variants": [
           {
             "name": "Json",
-            "payload": { "kind": "unit" }
+            "payload": { "kind": "tuple", "fields": ["serde_json::Error"] }
           },
           {
             "name": "Io",
-            "payload": { "kind": "unit" }
+            "payload": { "kind": "tuple", "fields": ["std::io::Error"] }
+          },
+          {
+            "name": "SchemaVersionRequiresMigration",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "from", "ty": "u32" },
+                { "name": "to", "ty": "u32" },
+                { "name": "reason", "ty": "&str" }
+              ]
+            }
           },
           {
             "name": "UnsupportedSchemaVersion",
-            "payload": { "kind": "unit" }
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "actual", "ty": "u32" },
+                { "name": "expected", "ty": "u32" }
+              ]
+            }
           },
           {
             "name": "InvalidEntry",
-            "payload": { "kind": "unit" }
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "entry_name", "ty": "String" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
           },
           {
             "name": "CrateNameMismatch",
-            "payload": { "kind": "unit" }
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "expected", "ty": "String" },
+                { "name": "actual", "ty": "String" }
+              ]
+            }
           },
           {
             "name": "CrossCrateFunctionPath",
-            "payload": { "kind": "unit" }
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "key", "ty": "String" },
+                { "name": "expected_crate", "ty": "String" }
+              ]
+            }
           }
         ]
       },
       "methods": [],
       "module_path": "tddd::catalogue_document_codec",
-      "docs": "Errors from CatalogueDocumentCodec. Referenced unchanged from baseline — variant set is stable; decode failures from new payload fields are reported via the existing InvalidEntry variant.",
-      "spec_refs": [],
+      "docs": "Errors from CatalogueDocumentCodec. Modified: SchemaVersionRequiresMigration variant added (v4 catalogue schema requires migration to v5; fail-closed gate added per D3 Stage 1 breaking change). Variant set now has 7 members.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-01"
+        }
+      ],
       "informal_grounds": []
     },
     "InMemoryCatalogueLinter": {
@@ -170,6 +210,11 @@
     {
       "action": "reference",
       "trait_ref": "core::error::Error",
+      "for_type": "CatalogueDocumentCodecError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<serde_json::Error>",
       "for_type": "CatalogueDocumentCodecError"
     },
     {

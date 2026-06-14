@@ -24,7 +24,7 @@ pub mod review_v2;
 mod semantic_dup;
 mod telemetry;
 mod track;
-mod verify;
+pub mod verify;
 
 mod dry_fix_runner;
 

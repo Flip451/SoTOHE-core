@@ -133,10 +133,10 @@ mod tests {
     }
 
     fn write_catalogue(track_dir: &Path) {
-        // v4-native format required by CatalogueDocumentCodec::decode.
+        // v5-native format required by CatalogueDocumentCodec::decode.
         // BTreeMap ordering: BlueType < RedType < YellowType (alphabetical).
         let catalogue = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": 5,
             "crate_name": "test_layer",
             "layer": "test_layer",
             "types": {

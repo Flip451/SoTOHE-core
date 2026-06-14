@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T15:57:56Z",
-  "declaration_hash": "eac6cd8b5137ca42685159594493b994938653e056ade21e58014c0746aa5438",
+  "generated_at": "2026-06-14T18:32:47Z",
+  "declaration_hash": "3ddcf931b0f47601e3a204cac2fb3c7af681bc59b58d07fe98b48fd9309bbb75",
   "signals": [
     {
       "type_name": "CatalogueDocumentCodec",
@@ -13,16 +13,16 @@
       ]
     },
     {
-      "type_name": "InMemoryCatalogueLinter",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
       "type_name": "CatalogueDocumentCodecError",
       "kind_tag": "error_type",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "InMemoryCatalogueLinter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": false
     }
   ]
 }

@@ -605,7 +605,7 @@ mod tests {
     /// v3-native catalogue fixture required by `CatalogueDocumentCodec::decode`.
     /// Used by `read_type_catalogue` tests and `read_catalogue_for_spec_ref_check` tests.
     const DOMAIN_TYPES_V3_MINIMAL: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
@@ -623,7 +623,7 @@ mod tests {
     /// `test_read_type_catalogue_found_with_custom_catalogue_file_override` where
     /// the file is committed as `domain_ext-types.json` (a valid Rust crate name).
     const CUSTOM_DOMAIN_TYPES_V3_MINIMAL: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain_ext",
   "layer": "domain",
   "types": {

@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueDocumentCodecError | error_type | reference | Json, Io, UnsupportedSchemaVersion, InvalidEntry, CrateNameMismatch, CrossCrateFunctionPath | 🔵 | 🔵 |
+| CatalogueDocumentCodecError | error_type | modify | Json, Io, SchemaVersionRequiresMigration, UnsupportedSchemaVersion, InvalidEntry, CrateNameMismatch, CrossCrateFunctionPath | 🔵 | 🔵 |
 
 ## Secondary Adapters
 

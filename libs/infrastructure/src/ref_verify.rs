@@ -1385,7 +1385,7 @@ This section must not make D2 a valid ADR ref.
         docs: &str,
     ) -> serde_json::Value {
         serde_json::json!({
-            "schema_version": 4,
+            "schema_version": 5,
             "crate_name": "domain",
             "layer": "domain",
             "types": {

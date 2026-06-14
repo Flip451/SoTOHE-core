@@ -1,9 +1,9 @@
 //! `sotp verify catalogue-spec-refs` — binary gate for SoT Chain ② integrity
 //! (dangling anchor / stale signals).
 //!
-//! Thin CLI wrapper: validates the track id, delegates all I/O to
-//! `infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs`,
-//! then maps the `Result<bool, String>` return to an exit code.
+//! Thin CLI wrapper: delegates to
+//! `cli_composition::verify::execute_catalogue_spec_refs` and maps the
+//! `CommandOutcome` result to a process exit code.
 //!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
 //! §D1.5 / §D3.2 / §D3.6 / IN-10.
@@ -18,6 +18,10 @@ use crate::CliError;
 /// Used by integration tests only — production dispatch is handled by
 /// `cli_composition::CliApp::verify_catalogue_spec_refs`.
 ///
+/// Delegates to `cli_composition::verify::execute_catalogue_spec_refs` and maps
+/// the `CommandOutcome` exit code to an `ExitCode`, forwarding any stdout/stderr
+/// to the appropriate streams.
+///
 /// # Errors
 ///
 /// Returns `CliError` when the track id is invalid or any fatal I/O /
@@ -30,40 +34,28 @@ pub fn execute_verify_catalogue_spec_refs(
     workspace_root: PathBuf,
     skip_stale: bool,
 ) -> Result<ExitCode, CliError> {
-    // Validate track id (path traversal guard) without importing domain types (CN-01 / AC-03).
-    crate::commands::track::validate_track_id_str(&track_id)
-        .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
+    let outcome = cli_composition::verify::execute_catalogue_spec_refs(
+        items_dir,
+        track_id,
+        workspace_root,
+        skip_stale,
+    )
+    .map_err(CliError::Message)?;
 
-    // Delegate all I/O (symlink guards, architecture-rules load, per-layer checks)
-    // to the infrastructure layer. CLI is wiring + exit-code mapping only.
-    let mut all_formatted_findings: Vec<String> = Vec::new();
-    let no_findings =
-        infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs(
-            items_dir,
-            track_id,
-            workspace_root,
-            skip_stale,
-            &mut all_formatted_findings,
-        )
-        .map_err(CliError::Message)?;
-
-    if no_findings {
-        println!("[OK] catalogue-spec-refs: no findings");
-        Ok(ExitCode::SUCCESS)
-    } else {
-        for line in &all_formatted_findings {
-            eprintln!("{line}");
-        }
-        eprintln!("[FAIL] catalogue-spec-refs: {} finding(s)", all_formatted_findings.len());
-        Ok(ExitCode::FAILURE)
+    if let Some(stdout) = &outcome.stdout {
+        println!("{stdout}");
     }
+    if let Some(stderr) = &outcome.stderr {
+        eprintln!("{stderr}");
+    }
+    if outcome.exit_code == 0 { Ok(ExitCode::SUCCESS) } else { Ok(ExitCode::FAILURE) }
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use std::fs;
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
 
     use super::*;
 
@@ -108,9 +100,9 @@ mod tests {
     }
 
     fn write_catalogue_with_dangling(track_dir: &Path) {
-        // v3-native format required by CatalogueDocumentCodec::decode.
+        // v5-native format required by CatalogueDocumentCodec::decode.
         let cat = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": 5,
             "crate_name": "test_layer",
             "layer": "test_layer",
             "types": {
@@ -148,7 +140,7 @@ mod tests {
         write_spec_json(&track_dir);
         // Catalogue has no entries → no findings.
         let cat = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": 5,
             "crate_name": "test_layer",
             "layer": "test_layer",
             "types": {},
@@ -290,24 +282,28 @@ mod tests {
         );
     }
 
-    // `--skip-stale` must prevent reading `<layer>-catalogue-spec-signals.json`
-    // even when that file exists.  A stale-signals finding from the domain layer
-    // would be the only finding if the signals file were read — so EXIT_SUCCESS
-    // with skip_stale=true proves the signals file was not consulted.
-    #[test]
-    fn verify_skip_stale_bypasses_signals_read() {
+    /// Build a temp workspace with an empty catalogue and a stale signals file.
+    ///
+    /// Returns `(dir, items_dir, track_id, ws)` where `dir` is the [`tempfile::TempDir`]
+    /// that must be kept alive for the duration of the test.  The workspace contains:
+    /// - `architecture-rules.json` (single `test_layer` with catalogue-spec-signal enabled)
+    /// - `spec.json` under the track directory
+    /// - An empty `test_layer-types.json` (no spec_refs → no dangling anchor findings)
+    /// - `test_layer-catalogue-spec-signals.json` with an all-zero
+    ///   `catalogue_declaration_hash`, guaranteed to mismatch the actual hash
+    fn setup_empty_catalogue_with_stale_signals() -> (tempfile::TempDir, PathBuf, String, PathBuf) {
         let dir = tempfile::tempdir().unwrap();
         let ws = dir.path().to_path_buf();
-        let track_id = "test-track";
+        let track_id = "test-track".to_owned();
         let items_dir = ws.join("track/items");
-        let track_dir = items_dir.join(track_id);
+        let track_dir = items_dir.join(&track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_architecture_rules(&ws);
         write_spec_json(&track_dir);
 
-        // Empty catalogue (no spec_refs) → no dangling findings regardless of signals.
+        // Empty catalogue — no spec_refs → no dangling anchor findings regardless of signals.
         let cat = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": 5,
             "crate_name": "test_layer",
             "layer": "test_layer",
             "types": {},
@@ -320,8 +316,8 @@ mod tests {
         )
         .unwrap();
 
-        // Write a signals file with a mismatched catalogue_declaration_hash so that if it were
-        // read it would produce a StaleSignals finding.
+        // Stale signals file: all-zero catalogue_declaration_hash guarantees a
+        // StaleSignals finding when the signals file is consulted.
         let stale_signals = serde_json::json!({
             "schema_version": 1,
             "catalogue_declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -333,8 +329,19 @@ mod tests {
         )
         .unwrap();
 
+        (dir, items_dir, track_id, ws)
+    }
+
+    // `--skip-stale` must prevent reading `<layer>-catalogue-spec-signals.json`
+    // even when that file exists.  A stale-signals finding from the domain layer
+    // would be the only finding if the signals file were read — so EXIT_SUCCESS
+    // with skip_stale=true proves the signals file was not consulted.
+    #[test]
+    fn verify_skip_stale_bypasses_signals_read() {
+        let (_dir, items_dir, track_id, ws) = setup_empty_catalogue_with_stale_signals();
+
         // With skip_stale=true, the signals file must NOT be read → no stale finding.
-        let result = execute_verify_catalogue_spec_refs(items_dir, track_id.to_owned(), ws, true);
+        let result = execute_verify_catalogue_spec_refs(items_dir, track_id, ws, true);
         assert!(result.is_ok(), "skip_stale must not error: {result:?}");
         assert_eq!(
             result.unwrap(),
@@ -347,45 +354,10 @@ mod tests {
     // declaration_hash, a StaleSignals finding must be produced (exit FAILURE).
     #[test]
     fn verify_exits_failure_when_stale_signals_detected() {
-        let dir = tempfile::tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        let track_id = "test-track";
-        let items_dir = ws.join("track/items");
-        let track_dir = items_dir.join(track_id);
-        fs::create_dir_all(&track_dir).unwrap();
-        write_architecture_rules(&ws);
-        write_spec_json(&track_dir);
-
-        // Empty catalogue — no spec_refs → no dangling anchor findings.
-        let cat = serde_json::json!({
-            "schema_version": 4,
-            "crate_name": "test_layer",
-            "layer": "test_layer",
-            "types": {},
-            "traits": {},
-            "functions": {}
-        });
-        fs::write(
-            track_dir.join("test_layer-types.json"),
-            serde_json::to_string_pretty(&cat).unwrap(),
-        )
-        .unwrap();
-
-        // Write a signals file with an obviously wrong catalogue_declaration_hash (all zeros).
-        // The actual catalogue hash will differ → StaleSignals finding.
-        let stale_signals = serde_json::json!({
-            "schema_version": 1,
-            "catalogue_declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-            "signals": []
-        });
-        fs::write(
-            track_dir.join("test_layer-catalogue-spec-signals.json"),
-            serde_json::to_string_pretty(&stale_signals).unwrap(),
-        )
-        .unwrap();
+        let (_dir, items_dir, track_id, ws) = setup_empty_catalogue_with_stale_signals();
 
         // With skip_stale=false the signals file IS read → stale hash → FAILURE.
-        let result = execute_verify_catalogue_spec_refs(items_dir, track_id.to_owned(), ws, false);
+        let result = execute_verify_catalogue_spec_refs(items_dir, track_id, ws, false);
         assert!(result.is_ok(), "stale signals must not error, just return FAILURE: {result:?}");
         assert_eq!(
             result.unwrap(),

@@ -5,10 +5,10 @@
 //! `evaluate_catalogue_lint` (domain pure function) wired in
 //! `apps/cli/src/commands/track/tddd/lint.rs`.
 //!
-//! Note: per-rule evaluation logic is deferred to T014. Until T014, the
-//! `evaluate_catalogue_lint` skeleton always returns an empty violation list
-//! regardless of the catalogue contents. Tests that relied on specific
-//! violations firing are updated to reflect this skeleton behavior.
+//! The demo lint rule set uses `FieldNonEmpty { target_field: "invariants" }` for
+//! `ValueObject` entries. A `ValueObject` with no `invariants` in its role payload
+//! fires a violation. Fixtures that should produce zero violations must include at
+//! least one invariant declaration.
 //!
 //! ADR `knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md`
 //! §D15 / D17.
@@ -51,19 +51,27 @@ const RULES_JSON: &str = r#"{
   ]
 }"#;
 
-/// A minimal domain-types.json (v3) with one `value_object` entry whose
-/// `methods` list is empty — satisfies the demo `FieldEmpty` rule
+/// A minimal domain-types.json (v5) with one `value_object` entry that has an
+/// invariant declared — satisfies the demo `FieldNonEmpty { "invariants" }` rule
 /// (no violation expected).
-const CATALOGUE_EMPTY_METHODS: &str = r#"{
-  "schema_version": 4,
+const CATALOGUE_WITH_INVARIANT: &str = r#"{
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "MyValueObject": {
       "action": "add",
-      "role": { "ValueObject": {} },
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            { "name": "is_valid", "predicate": { "SelfMethod": "is_valid" } }
+          ]
+        }
+      },
       "kind": {"kind": "struct", "shape": {"kind": "plain"}},
-      "methods": [],
+      "methods": [
+        {"name": "is_valid", "receiver": "&self", "params": [], "returns": "bool"}
+      ],
       "module_path": "",
       "spec_refs": [],
       "informal_grounds": []
@@ -73,21 +81,18 @@ const CATALOGUE_EMPTY_METHODS: &str = r#"{
   "functions": {}
 }"#;
 
-/// A domain-types.json (v3) with one `value_object` entry whose
-/// `methods` list is non-empty — fires the demo `FieldEmpty` rule
-/// (violation expected).
-const CATALOGUE_WITH_METHODS: &str = r#"{
-  "schema_version": 4,
+/// A domain-types.json (v5) with one `value_object` entry that has no invariants —
+/// fires the demo `FieldNonEmpty { "invariants" }` rule (violation expected).
+const CATALOGUE_NO_INVARIANTS: &str = r#"{
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
-    "MethodfulObject": {
+    "BareValueObject": {
       "action": "add",
       "role": { "ValueObject": {} },
       "kind": {"kind": "struct", "shape": {"kind": "plain"}},
-      "methods": [
-        {"name": "validate", "receiver": "&self", "params": [], "returns": "()", "is_async": false}
-      ],
+      "methods": [],
       "module_path": "",
       "spec_refs": [],
       "informal_grounds": []
@@ -153,37 +158,48 @@ fn test_track_lint_no_violations_exits_zero() {
     // Write architecture-rules.json at workspace root.
     write(&root.join("architecture-rules.json"), RULES_JSON);
 
-    // Write a domain-types.json whose value_object has empty expected_methods
-    // → no FieldEmpty violation.
-    write(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_EMPTY_METHODS);
+    // Write a domain-types.json whose value_object has an invariant declared
+    // → satisfies the FieldNonEmpty "invariants" demo rule → no violation.
+    write(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_WITH_INVARIANT);
 
     let output = run_track_lint(root);
-    assert_lint_zero_violations(&output, "catalogue with no violations");
+    assert_lint_zero_violations(&output, "catalogue with invariant satisfies FieldNonEmpty rule");
 }
 
 // ---------------------------------------------------------------------------
-// Test 2: Catalogue with non-empty methods — skeleton returns no violations
-//
-// NOTE(T014): The evaluate_catalogue_lint function is a skeleton in Stage 3.
-// Per-rule evaluation logic (including FieldEmpty) is deferred to T014.
-// Until T014, even a catalogue that would fire a rule returns no violations.
-// This test verifies the skeleton path exits 0 with a valid catalogue.
+// Test 2: ValueObject without invariants — fires FieldNonEmpty "invariants" violation
 // ---------------------------------------------------------------------------
 
 #[test]
-fn test_track_lint_skeleton_with_methods_catalogue_exits_zero() {
+fn test_track_lint_value_object_without_invariants_fires_violation() {
     let root_dir = tempfile::tempdir().unwrap();
     let root = root_dir.path();
 
     write(&root.join("architecture-rules.json"), RULES_JSON);
 
-    // Write a domain-types.json whose value_object has a non-empty methods
-    // list. In T014 this would fire FieldEmpty; in the T008 skeleton it does
-    // not, so we expect exit 0 and no violations.
-    write(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_WITH_METHODS);
+    // A value_object with no invariants fires the demo FieldNonEmpty "invariants" rule.
+    write(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_NO_INVARIANTS);
 
     let output = run_track_lint(root);
-    assert_lint_zero_violations(&output, "skeleton evaluate_catalogue_lint (no violations yet)");
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+
+    // Violation found → exit code 1.
+    assert!(
+        !output.status.success(),
+        "ValueObject without invariants must exit 1\nstdout: {stdout}\nstderr: {stderr}"
+    );
+    // Violation line must mention FieldNonEmpty and the entry name.
+    assert!(
+        stdout.contains("FieldNonEmpty") && stdout.contains("BareValueObject"),
+        "stdout must contain violation for FieldNonEmpty on BareValueObject\nstdout: {stdout}"
+    );
+    // Summary line on stderr must show 1 violation.
+    assert!(
+        stderr.contains("Found 1 violation(s)"),
+        "stderr must report 1 violation\nstderr: {stderr}"
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -198,7 +214,7 @@ fn test_track_lint_invalid_layer_exits_one_with_error_message() {
     write(&root.join("architecture-rules.json"), RULES_JSON);
 
     // Write a valid catalogue so the loader can find the track directory.
-    write(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_EMPTY_METHODS);
+    write(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_WITH_INVARIANT);
 
     let output = sotp_bin()
         .args([

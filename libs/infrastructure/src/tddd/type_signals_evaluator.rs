@@ -1,16 +1,9 @@
 //! `execute_type_signals_for_layer` — wires pre-commit type-signal recomputation
-//! to `SignalEvaluatorV2` (three-way diff evaluator).
-//!
-//! T009: the old evaluator pipeline using `TypeGraph` + `TypeBaseline` is gone.
-//! This module re-implements `execute_type_signals_for_layer` by delegating to
-//! the new `SignalEvaluatorV2` (three-way diff: catalogue A, baseline B, live C).
-//!
-//! The output written to `<layer>-type-signals.json` follows the existing
-//! schema_version 1 format so that the merge-gate reader (`type_signals_codec`)
-//! and the pre-commit classifier in `make.rs` continue to work without changes.
-//!
-//! `EvaluateSignalsError` is kept as the public error type so that the CLI
-//! composition root (`signals.rs`) does not need to be changed.
+//! to `SignalEvaluatorV2` (three-way diff evaluator: catalogue A, baseline B,
+//! live rustdoc C). Output uses the existing schema_version 1 format so the
+//! merge-gate reader (`type_signals_codec`) and the pre-commit classifier in
+//! `make.rs` continue to work unchanged. `EvaluateSignalsError` is the public
+//! error type.
 
 use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
@@ -222,17 +215,29 @@ pub fn execute_type_signals_for_layer(
 
     use crate::tddd::catalogue_document_codec::CatalogueDocumentCodecError;
     let doc = CatalogueDocumentCodec::decode(catalogue_str, &filename_stem).map_err(|e| {
-        // Provide a specific actionable message for schema_version mismatches so
-        // that tracks still using a v2 catalogue get a clear migration prompt
+        // Provide specific actionable messages for schema_version mismatches so
+        // that tracks still using an old catalogue get a clear migration prompt
         // rather than a generic decode failure.
-        if let CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual, .. } = &e {
-            return EvaluateSignalsError(format!(
-                "catalogue '{}' uses schema_version {actual} — \
-                 SignalEvaluatorV2 requires a v3 catalogue (schema_version=3). \
-                 Migrate the catalogue using the type-designer agent before running \
-                 `sotp track type-signals`.",
-                catalogue_path.display()
-            ));
+        match &e {
+            CatalogueDocumentCodecError::SchemaVersionRequiresMigration { from, to, reason } => {
+                return EvaluateSignalsError(format!(
+                    "catalogue '{}' uses schema_version {from} which requires migration to \
+                     schema_version {to}: {reason}. \
+                     Migrate the catalogue using the type-designer agent before running \
+                     `sotp track type-signals`.",
+                    catalogue_path.display()
+                ));
+            }
+            CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual, .. } => {
+                return EvaluateSignalsError(format!(
+                    "catalogue '{}' uses schema_version {actual} — \
+                     SignalEvaluatorV2 requires a v5 catalogue (schema_version=5). \
+                     Migrate the catalogue using the type-designer agent before running \
+                     `sotp track type-signals`.",
+                    catalogue_path.display()
+                ));
+            }
+            _ => {}
         }
         EvaluateSignalsError(format!(
             "failed to decode catalogue '{}': {e}",

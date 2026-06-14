@@ -280,7 +280,7 @@ mod tests {
     #[test]
     fn test_v4_catalogue_computes_blue_yellow_red_from_grounding_fields() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {

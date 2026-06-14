@@ -1410,7 +1410,7 @@ fn sync_rendered_views_propagates_error_on_spec_json_unsupported_schema_version(
 // ---------------------------------------------------------------------------
 
 const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
@@ -1914,7 +1914,7 @@ fn sync_rendered_views_single_track_skips_domain_types_md_for_done_track() {
 // already reused by `apps/cli::resolve_layers`).
 
 const USECASE_TYPES_JSON_MINIMAL: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {
@@ -1929,7 +1929,7 @@ const USECASE_TYPES_JSON_MINIMAL: &str = r#"{
 }"#;
 
 const INFRASTRUCTURE_TYPES_JSON_MINIMAL: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "infrastructure",
   "layer": "infrastructure",
   "types": {
@@ -2402,10 +2402,10 @@ const ARCH_RULES_DOMAIN_ONLY: &str = r#"{
       ]
     }"#;
 
-/// Catalogue (v4) with two type entries.
+/// Catalogue (v5) with two type entries.
 /// Mirrors the production data that produced the "0 edges" bug in the track.
 const DOMAIN_TYPES_WITH_ENUM_VARIANTS: &str = r#"{
-      "schema_version": 4,
+      "schema_version": 5,
       "crate_name": "domain",
       "layer": "domain",
       "types": {

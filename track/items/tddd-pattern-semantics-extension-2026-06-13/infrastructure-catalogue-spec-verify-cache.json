@@ -73,6 +73,14 @@
         "kind": "pass",
         "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。"
       }
+    },
+    {
+      "claim_hash": "2ca06e5f536c05a43d1e648891ee090925625e5df7bfb051a23381bf7707d0c1",
+      "evidence_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "verdict": {
+        "kind": "pass",
+        "citation": "段 1: `DataRole` / `ContractRole` を data-carrying enum 化し、すべての payload 付き variant の schema を 1 回の breaking migration で確定する"
+      }
     }
   ]
 }

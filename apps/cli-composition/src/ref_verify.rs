@@ -403,7 +403,7 @@ mod tests {
         // Write a minimal catalogue with one type entry that references GO-01 in spec.json.
         let spec_ref_path = format!("track/items/{track_id}/spec.json");
         let catalogue = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": 5,
             "crate_name": "test_domain",
             "layer": "test_domain",
             "types": {
@@ -921,7 +921,7 @@ exit 64
         std::fs::write(
             track_dir.join("domain-types.json"),
             r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
