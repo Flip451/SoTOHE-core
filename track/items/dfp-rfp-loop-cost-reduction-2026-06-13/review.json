@@ -1,103 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
-          "at": "2026-06-14T01:03:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
-          "at": "2026-06-14T01:05:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
-          "at": "2026-06-14T02:36:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
-          "at": "2026-06-14T02:38:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
-          "at": "2026-06-14T03:02:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragment_ref_of` is still `pub(crate)` here, and `mod.rs` does not re-export it. The briefing’s new approval contract says composition must compute current `FragmentRef`s using this promoted helper; keeping it private either breaks that public usecase API or forces composition to duplicate the path/hash construction logic, which risks the gate using different identity semantics than the write path.",
-              "severity": "P1",
-              "file": "libs/usecase/src/dry_check/shared.rs",
-              "line": 46,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
-          "at": "2026-06-14T03:05:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
-          "at": "2026-06-14T03:08:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_run_dry_check_writes_coverage_record_with_all_diff_fragment_refs` is not runnable as written: it runs `run_dry_check` with two diff fragments but only configures one `expect_embed()` and one `index.expect_search()`, and it also leaves an unused `expect_embed_batch()` in place even though the corpus is empty. Mockall will fail on the second diff fragment (and again on drop for the unused corpus expectation), so the coverage assertions never run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 1087,
-              "category": "test"
-            },
-            {
-              "message": "`test_run_dry_check_with_empty_diff_writes_empty_coverage_record` and `test_run_dry_check_coverage_port_error_propagated` both set `expect_embed_batch()` even though `run_dry_check(vec![], ...)` never calls `embed_batch` for an empty corpus. Those expectations will remain unmet at drop, so both tests fail before asserting the new coverage behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 1136,
-              "category": "test"
-            }
-          ],
-          "hash": "rvw1:sha256:d44cc2050957463dfc615559e37e4557aa6fc4819baf12262cbcd9ef51c3d615",
-          "at": "2026-06-14T03:47:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
-          "at": "2026-06-14T03:52:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
-          "at": "2026-06-14T03:55:19Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -116,107 +19,169 @@
         }
       ]
     },
-    "cli_composition": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
-          "at": "2026-06-14T02:35:12Z"
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:40:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:42:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
+          "at": "2026-06-14T04:18:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
+          "at": "2026-06-14T04:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
+          "at": "2026-06-14T04:32:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
+          "at": "2026-06-14T04:34:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f8ccdd4dc037c83d844720abe34f4ca8629af424183ffe6eae4c9b570aa541f",
+          "at": "2026-06-14T04:47:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
+          "at": "2026-06-14T05:02:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
+          "at": "2026-06-14T05:05:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
+          "at": "2026-06-14T05:12:35Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`dry_check_approved` now reads `track_dir/dry-check-coverage.json`, but this composition layer never writes that manifest on the `dry write` path. In this file the write flow still only constructs `FsDryCheckStore` and calls `run_dry_check`; `rg` shows no production `write_coverage` call. Since `FsDryCheckCoverageAdapter::read_coverage` returns `Ok(None)` for a missing file and the new approval interactor treats that as `Blocked`, a normal `sotp dry write` followed by `sotp dry check-approved` will fail closed forever unless a manifest is created out-of-band. Wire coverage persistence into the write flow or keep the approval bridge on an artifact that the write flow actually produces.",
+              "message": "The unchanged Rules section now contradicts the new workflow: it says to always run `cargo make ci-rust` before re-running `sotp dry check-approved` and points to “step 3 above,” but Step 3 is now the zero-violation no-fix path that explicitly must skip `ci-rust`. This makes the agent policy ambiguous and can defeat the D1 fast path the change is meant to introduce. Update this rule to refer only to fix rounds / Step 4 verification.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 500,
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 117,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
-          "at": "2026-06-14T02:39:05Z"
+          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
+          "at": "2026-06-14T05:14:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 treats a `dry write` run with zero reported `Violation` findings as either approved or an anomaly, but Step 2 explicitly says already-judged pairs are cache hits/no-ops. In that state, a previously recorded unresolved violation will not be re-emitted by `dry write`; `check-approved` will still block, and this workflow tells dfl to stop as `blocked` instead of retrieving the stored violation/proposal via `bin/sotp dry results --filter violation` and fixing it. This makes a normal re-entry/retry with cached violations fail even though autonomous fixes are still available.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 84,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:43c20f74d8e80ad92d12126ee2038140cb917c93611868dbaba4fd7cc2e312ba",
+          "at": "2026-06-14T05:17:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 can lose cached violations after a blocked follow-up gate check. `sotp dry write` returns no findings for already-verified pairs, including cached `Violation` records, so a non-zero `dry check-approved` after the follow-up write does not guarantee the “new finding set” is non-empty. Re-entering Step 4 using only that write output can spin/exhaust without applying available cached refactor proposals. The blocked branch should mirror Step 3 by reading unresolved cached violations before looping.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 103,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:ec1203a50d28ecd4e3486ffc434903b68659af286ab2d18cd607d1b166dfa405",
+          "at": "2026-06-14T05:20:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T02:44:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
-          "at": "2026-06-14T03:02:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
-          "at": "2026-06-14T03:06:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T03:17:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T03:22:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
-          "at": "2026-06-14T03:46:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
-          "at": "2026-06-14T03:48:33Z"
-        },
+          "hash": "rvw1:sha256:1ed69050537ee92aa22adf8bec811d8997e5e7c75d71b16addad21f02ecdc1b1",
+          "at": "2026-06-14T05:22:01Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Removing `db_path`, `threshold`, and `workspace_root` from `DryCheckApprovedInput` makes the existing `execute_dry_check_approved` construction in `apps/cli/src/commands/dry.rs:197-200` no longer compile. The DTO change needs the caller updated in the same change set, otherwise the workspace is broken.",
+              "message": "P1: `write_coverage` does not apply the repo's symlink rejection used by the other filesystem adapters. `atomic_write_file` only makes the rename atomic; it still follows the resolved `store_path`/parent path. If the coverage path or one of its parent components is a symlink, this adapter can read or overwrite a manifest outside the intended track directory. That is a filesystem-boundary regression compared with `FsDryCheckStore` and `FsCommitHashStore`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 128,
-              "category": "build"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
+              "line": 127,
+              "category": "security"
+            },
+            {
+              "message": "P1: the new public adapter's tests do not cover the required deserialization error cases for malformed `path` and malformed `content_hash`. The implementation maps both to `DryCheckCycleError::CoveragePort`, but there is no regression test that exercises either branch, so a future change to domain validation or error mapping could silently break the contract described in the briefing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
+              "line": 145,
+              "category": "test-coverage"
             }
           ],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:20:02Z"
+          "hash": "rvw1:sha256:595b78b8544082866cd15550e7801e13fa859308671a6584193ae329749eb7f7",
+          "at": "2026-06-14T01:41:40Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:25:53Z"
+          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
+          "at": "2026-06-14T01:48:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:28:08Z"
+          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
+          "at": "2026-06-14T01:51:55Z"
         }
       ]
     },
@@ -701,73 +666,20 @@
           "findings": [],
           "hash": "rvw1:sha256:7c7f2bd091856979f5ea26293843f52eb3500d9ad2d76d263e94fbd161128624",
           "at": "2026-06-14T04:21:16Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:40:15Z"
+          "hash": "rvw1:sha256:4ca7cd2252d804c2e15a2d2b8be87c667a48d7021111354dc2978ffcdc8610fd",
+          "at": "2026-06-14T05:11:19Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:42:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
-          "at": "2026-06-14T04:18:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
-          "at": "2026-06-14T04:20:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
-          "at": "2026-06-14T04:32:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
-          "at": "2026-06-14T04:34:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f8ccdd4dc037c83d844720abe34f4ca8629af424183ffe6eae4c9b570aa541f",
-          "at": "2026-06-14T04:47:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
-          "at": "2026-06-14T05:02:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
-          "at": "2026-06-14T05:05:07Z"
+          "hash": "rvw1:sha256:4ca7cd2252d804c2e15a2d2b8be87c667a48d7021111354dc2978ffcdc8610fd",
+          "at": "2026-06-14T05:13:28Z"
         }
       ]
     },
@@ -818,43 +730,204 @@
         }
       ]
     },
-    "infrastructure": {
+    "usecase": {
       "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `write_coverage` does not apply the repo's symlink rejection used by the other filesystem adapters. `atomic_write_file` only makes the rename atomic; it still follows the resolved `store_path`/parent path. If the coverage path or one of its parent components is a symlink, this adapter can read or overwrite a manifest outside the intended track directory. That is a filesystem-boundary regression compared with `FsDryCheckStore` and `FsCommitHashStore`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
-              "line": 127,
-              "category": "security"
-            },
-            {
-              "message": "P1: the new public adapter's tests do not cover the required deserialization error cases for malformed `path` and malformed `content_hash`. The implementation maps both to `DryCheckCycleError::CoveragePort`, but there is no regression test that exercises either branch, so a future change to domain validation or error mapping could silently break the contract described in the briefing.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
-              "line": 145,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:595b78b8544082866cd15550e7801e13fa859308671a6584193ae329749eb7f7",
-          "at": "2026-06-14T01:41:40Z"
-        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
-          "at": "2026-06-14T01:48:51Z"
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:03:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
-          "at": "2026-06-14T01:51:55Z"
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:05:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T02:36:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T02:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
+          "at": "2026-06-14T03:02:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_ref_of` is still `pub(crate)` here, and `mod.rs` does not re-export it. The briefing’s new approval contract says composition must compute current `FragmentRef`s using this promoted helper; keeping it private either breaks that public usecase API or forces composition to duplicate the path/hash construction logic, which risks the gate using different identity semantics than the write path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/shared.rs",
+              "line": 46,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
+          "at": "2026-06-14T03:05:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T03:08:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_run_dry_check_writes_coverage_record_with_all_diff_fragment_refs` is not runnable as written: it runs `run_dry_check` with two diff fragments but only configures one `expect_embed()` and one `index.expect_search()`, and it also leaves an unused `expect_embed_batch()` in place even though the corpus is empty. Mockall will fail on the second diff fragment (and again on drop for the unused corpus expectation), so the coverage assertions never run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 1087,
+              "category": "test"
+            },
+            {
+              "message": "`test_run_dry_check_with_empty_diff_writes_empty_coverage_record` and `test_run_dry_check_coverage_port_error_propagated` both set `expect_embed_batch()` even though `run_dry_check(vec![], ...)` never calls `embed_batch` for an empty corpus. Those expectations will remain unmet at drop, so both tests fail before asserting the new coverage behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 1136,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:d44cc2050957463dfc615559e37e4557aa6fc4819baf12262cbcd9ef51c3d615",
+          "at": "2026-06-14T03:47:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
+          "at": "2026-06-14T03:52:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
+          "at": "2026-06-14T03:55:19Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:35:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_check_approved` now reads `track_dir/dry-check-coverage.json`, but this composition layer never writes that manifest on the `dry write` path. In this file the write flow still only constructs `FsDryCheckStore` and calls `run_dry_check`; `rg` shows no production `write_coverage` call. Since `FsDryCheckCoverageAdapter::read_coverage` returns `Ok(None)` for a missing file and the new approval interactor treats that as `Blocked`, a normal `sotp dry write` followed by `sotp dry check-approved` will fail closed forever unless a manifest is created out-of-band. Wire coverage persistence into the write flow or keep the approval bridge on an artifact that the write flow actually produces.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 500,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:39:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T02:44:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:02:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:06:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:17:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:22:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:46:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:48:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `db_path`, `threshold`, and `workspace_root` from `DryCheckApprovedInput` makes the existing `execute_dry_check_approved` construction in `apps/cli/src/commands/dry.rs:197-200` no longer compile. The DTO change needs the caller updated in the same change set, otherwise the workspace is broken.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 128,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:20:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:25:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:28:08Z"
         }
       ]
     }
