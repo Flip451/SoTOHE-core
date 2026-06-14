@@ -1,6 +1,46 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
+          "at": "2026-06-14T05:57:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
+          "at": "2026-06-14T05:59:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 test coverage gap: the new boundary conversion path can now reject malformed public `RunCatalogueLintCommand` input via `InvalidRuleSpec`, but the added tests only cover valid `LintRuleSpec` values. Please add error-path coverage for cases such as an unknown `target_roles` entry, an empty `target_field`, and empty `permitted_layers` / `required_traits` / `forbidden_roles` so the public API’s validation contract is pinned down.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
+              "line": 175,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:21e2d02a7849cec388c231f9b3211eedaaa9247fb98c1483753d50a7bf3dceed",
+          "at": "2026-06-14T11:28:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5378faa92aaeca0dffb9d6b4327921d61e93516c708175342956a9d270130111",
+          "at": "2026-06-14T11:33:43Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -648,6 +688,38 @@
         }
       ]
     },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
+          "at": "2026-06-14T05:53:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
+          "at": "2026-06-14T05:58:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T10:56:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T11:28:40Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -1055,46 +1127,20 @@
           "findings": [],
           "hash": "rvw1:sha256:52eeda408c1b738357346aa2c0566006ef206e982e2f54538a90111b795e05e4",
           "at": "2026-06-14T15:42:34Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:57:02Z"
+          "hash": "rvw1:sha256:945cf08abed5779be7d0f87d950f89f63f45b1583a56460a7e0be38d65627fda",
+          "at": "2026-06-14T15:55:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:59:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 test coverage gap: the new boundary conversion path can now reject malformed public `RunCatalogueLintCommand` input via `InvalidRuleSpec`, but the added tests only cover valid `LintRuleSpec` values. Please add error-path coverage for cases such as an unknown `target_roles` entry, an empty `target_field`, and empty `permitted_layers` / `required_traits` / `forbidden_roles` so the public API’s validation contract is pinned down.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
-              "line": 175,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:21e2d02a7849cec388c231f9b3211eedaaa9247fb98c1483753d50a7bf3dceed",
-          "at": "2026-06-14T11:28:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5378faa92aaeca0dffb9d6b4327921d61e93516c708175342956a9d270130111",
-          "at": "2026-06-14T11:33:43Z"
+          "hash": "rvw1:sha256:945cf08abed5779be7d0f87d950f89f63f45b1583a56460a7e0be38d65627fda",
+          "at": "2026-06-14T15:57:16Z"
         }
       ]
     },
@@ -1213,38 +1259,6 @@
           "findings": [],
           "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
           "at": "2026-06-14T12:42:07Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
-          "at": "2026-06-14T05:53:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
-          "at": "2026-06-14T05:58:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
-          "at": "2026-06-14T10:56:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
-          "at": "2026-06-14T11:28:40Z"
         }
       ]
     }

@@ -81,22 +81,26 @@
     {
       "id": "T014",
       "description": "Stage 3 — domain layer: implement evaluation logic for the 12 linter rule kinds in `evaluate_catalogue_lint` (T008 stub → full implementation). Implement each rule's matching logic: `FieldEmpty` / `FieldNonEmpty` (check role-specific Vec field emptiness by field name), `KindLayerConstraint` (entry layer vs permitted_layers), `ReferencedRoleConstraint` (Vec<TypeRef> entries have expected RoleKind), `TraitImplRequired` (trait_impls contains required traits), `NoRoleInMethodSignature` (method params/return contain no forbidden-role types), `MethodReferenceSignature` (method named by target_field exists and satisfies receiver/params/return constraints), `AccessorSignatureRequired` (identity getter exists with &self/no-params/non-unit return), `FieldElementUniqueAcrossEntries` (exclusive_members not duplicated across AggregateRoot entries), `NoExternalReferenceInMethods` (exclusive_members types not in external TypeEntry method signatures), `NoPublicField` (no public fields in Plain/Tuple struct shapes), `ForbiddenMethodReceiver` (no method with forbidden receiver). Depends on T009 (linter framework/API and cleanup complete).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "30764f05"
     },
     {
       "id": "T015",
       "description": "Stage 3 — domain layer: implement `ddd_strict_preset() -> Result<Vec<CatalogueLinterRule>, CatalogueLinterError>` function that returns the full minimum-core rule set covering D4-D11 / D16 / D18. Each rule in the preset maps to one or more `CatalogueLinterRule` instances with `RuleTarget` (target_roles) and `CatalogueLinterRuleKind` as specified in the ADR D15 rule-kind correspondence table. Expose the function from `libs/domain/src/lib.rs`. Depends on T014.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "30764f05"
     },
     {
       "id": "T016",
       "description": "Stage 3 — unit tests for the linter framework and all linter rules in evaluate_catalogue_lint. Add tests for `CatalogueLinterRule::new` with each new variant including error cases (EmptyPermittedLayers, EmptyRequiredTraits, EmptyForbiddenRoles, EmptyTargetField), and usecase tests for `LintRuleSpec` / `LintRuleKind` 12-variant round-trip. Write tests for each of the 12 rule kinds: happy path (no violation), violation path (returns CatalogueLintViolation with correct rule_kind/entry_name/message). Test `ddd_strict_preset` returns a non-empty rule list and each rule kind appears. Test the invariant SelfMethod signature check (AC-13): method missing → violation, wrong receiver → violation, has params → violation, bool return on &self no-params → pass. Test identity getter check (AC-14). Test equality impl check (AC-15). Test all 5 Aggregate Boundary rules (AC-16). Test DomainEvent mutation rules (AC-17). Test Repository aggregate role check (AC-18). Test all 4 EventPolicy rules (AC-19). Test ValueObject mutation checks (AC-20). Test ddd-strict preset end-to-end with a synthetic catalogue fixture. Follows TDD — tests written before full implementation in T014. Depends on T014 and T015 for final compilation gate.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "30764f05"
     },
     {
       "id": "T017",
       "description": "Stage 3 — CI gate: run `cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix all remaining issues. Confirm AC-23 (full CI passes with no regressions). Update any remaining callers that use old `CatalogueLinterRule::try_new` API (now `CatalogueLinterRule::new`) across apps/ and cli-composition layers. Depends on T016.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "30764f05"
     }
   ],
   "plan": {
