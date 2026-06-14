@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f71c637d30ca9f2434a92c44b04e938560c3e098a1cbca085eacace4e05b5a8d",
+  "catalogue_declaration_hash": "91208c0adf5eac954e3e89ff0f248a3c2aaff4bff1583edc644be51815f5c8a6",
   "signals": [
+    {
+      "type_name": "DryCheckAgentError",
+      "signal": "blue",
+      "entry_hash": "8ee8fd96448f9454e35a2c6386b01242271bf337347d4e5e1abeef576fd1cd00"
+    },
     {
       "type_name": "DryCheckApprovalInteractor",
       "signal": "blue",

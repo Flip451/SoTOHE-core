@@ -257,6 +257,14 @@
         "kind": "pass",
         "citation": "既存テレメトリ schema の範囲内で対応し、新フィールド・新イベント型は追加しない（既存の `GateEval` / `ReviewRound` と `round_type` / `model` タグを使う）"
       }
+    },
+    {
+      "claim_hash": "60dae1b05badafa4cb4db67413e35b65a722f87d49382281a11fc71c445f2ce7",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast tier（軽量モデル）で全ペアを判定し、既知違反プローブの検出率で信頼性を較正する。"
+      }
     }
   ]
 }

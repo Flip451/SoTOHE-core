@@ -59,6 +59,15 @@ subgraph usecase["usecase"]
   direction TB
   subgraph usecase_usecase_module_dry_check["usecase::dry_check"]
     direction TB
+  subgraph T34_usecase_usecase_DryCheckAgentError["dry_check::errors::DryCheckAgentError"]
+    direction TB
+    T34_usecase_usecase_DryCheckAgentError__self[DryCheckAgentError]
+    T34_usecase_usecase_DryCheckAgentError_UserAbort[UserAbort]
+    T34_usecase_usecase_DryCheckAgentError_AgentAbort[AgentAbort]
+    T34_usecase_usecase_DryCheckAgentError_Timeout[Timeout]
+    T34_usecase_usecase_DryCheckAgentError_IllegalOutput[IllegalOutput]
+    T34_usecase_usecase_DryCheckAgentError_Unexpected[Unexpected]
+  end
   subgraph T42_usecase_usecase_DryCheckApprovalInteractor["dry_check::approval_interactor::DryCheckApprovalInteractor"]
     direction TB
     T42_usecase_usecase_DryCheckApprovalInteractor__self[DryCheckApprovalInteractor]
@@ -184,6 +193,10 @@ subgraph usecase["usecase"]
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_codex_common["infrastructure::codex_common"]
+    direction TB
+  F92_infrastructure_infrastructure_infrastructure__codex_common__build_codex_read_only_invocation[[build_codex_read_only_invocation]]
+  end
   subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
     direction TB
   subgraph T45_infrastructure_infrastructure_CodexDryChecker["dry_check::codex_dry_checker::CodexDryChecker"]
@@ -240,6 +253,7 @@ T42_usecase_usecase_DryCheckApprovalInteractor_new --> T42_usecase_usecase_DryCh
 T30_usecase_usecase_DryCheckConfig__self --o|known_bad_injection_rate_percent| T31_usecase_usecase_DryCheckPercent__self
 T30_usecase_usecase_DryCheckConfig__self --o|known_bad_detection_threshold_percent| T31_usecase_usecase_DryCheckPercent__self
 T30_usecase_usecase_DryCheckConfig__self --o|max_parallelism| T35_usecase_usecase_DryCheckParallelism__self
+T34_usecase_usecase_DryCheckCycleError_Agent --o T34_usecase_usecase_DryCheckAgentError__self
 T34_usecase_usecase_DryCheckInteractor_new --o T30_usecase_usecase_DryCheckConfig__self
 T34_usecase_usecase_DryCheckInteractor_new --> T34_usecase_usecase_DryCheckInteractor__self
 T35_usecase_usecase_DryCheckParallelism_try_new --> T34_usecase_usecase_DryCheckCycleError__self
@@ -247,6 +261,7 @@ T35_usecase_usecase_DryCheckParallelism_try_new --> T35_usecase_usecase_DryCheck
 T31_usecase_usecase_DryCheckPercent_try_new --> T34_usecase_usecase_DryCheckCycleError__self
 T31_usecase_usecase_DryCheckPercent_try_new --> T31_usecase_usecase_DryCheckPercent__self
 R33_usecase_usecase_DryCheckAgentPort_judge --o T33_usecase_usecase_DryCheckJudgeTier__self
+R33_usecase_usecase_DryCheckAgentPort_judge --> T34_usecase_usecase_DryCheckAgentError__self
 R39_usecase_usecase_DryCheckApprovalService_check_approved --> T34_usecase_usecase_DryCheckCycleError__self
 R36_usecase_usecase_DryCheckCoveragePort_read_coverage --> T34_usecase_usecase_DryCheckCycleError__self
 R36_usecase_usecase_DryCheckCoveragePort_read_coverage --> T36_domain_domain_DryCheckCoverageRecord__self
@@ -285,6 +300,12 @@ class T28_domain_domain_ReviewScopeSet_as_set method_node
 class T28_domain_domain_ReviewScopeSet__self value_object
 class T33_domain_domain_ReviewScopeSetError_Empty variant_node
 class T33_domain_domain_ReviewScopeSetError__self error_type
+class T34_usecase_usecase_DryCheckAgentError_UserAbort variant_node
+class T34_usecase_usecase_DryCheckAgentError_AgentAbort variant_node
+class T34_usecase_usecase_DryCheckAgentError_Timeout variant_node
+class T34_usecase_usecase_DryCheckAgentError_IllegalOutput variant_node
+class T34_usecase_usecase_DryCheckAgentError_Unexpected variant_node
+class T34_usecase_usecase_DryCheckAgentError__self error_type
 class T42_usecase_usecase_DryCheckApprovalInteractor_new method_node
 class T42_usecase_usecase_DryCheckApprovalInteractor__self interactor
 class T30_usecase_usecase_DryCheckConfig__self value_object
@@ -344,6 +365,8 @@ class R38_usecase_usecase_RefVerifyGateStatePort_ref_verify_status method_node
 class R38_usecase_usecase_RefVerifyGateStatePort__self secondary_port
 class R35_usecase_usecase_ReviewGateStatePort_review_status method_node
 class R35_usecase_usecase_ReviewGateStatePort__self secondary_port
+class F92_infrastructure_infrastructure_infrastructure__codex_common__build_codex_read_only_invocation free_function
+class F92_infrastructure_infrastructure_infrastructure__codex_common__build_codex_read_only_invocation function_node
 class T45_infrastructure_infrastructure_CodexDryChecker_new method_node
 class T45_infrastructure_infrastructure_CodexDryChecker__self secondary_adapter
 class T44_infrastructure_infrastructure_DryCheckConfig_load method_node

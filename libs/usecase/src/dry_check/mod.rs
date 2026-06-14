@@ -9,10 +9,12 @@
 //! - `DryCheckResultsInteractor`, `DryCheckApprovalInteractor` (T005) — read/gate paths
 
 mod approval_interactor;
+mod calibration;
 mod config;
 mod errors;
 mod interactor;
 mod judgment;
+mod known_bad;
 mod ports;
 mod results;
 mod results_interactor;
@@ -24,7 +26,7 @@ pub use config::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
 pub use errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
 pub use interactor::DryCheckInteractor;
 pub use judgment::DryCheckAgentJudgment;
-pub use ports::{DryCheckAgentPort, DryCheckCoveragePort, DryCheckDiffSource};
+pub use ports::{DryCheckAgentPort, DryCheckCoveragePort, DryCheckDiffSource, DryCheckJudgeTier};
 pub use results::DryCheckResults;
 pub use results_interactor::DryCheckResultsInteractor;
 pub use services::{DryCheckApprovalService, DryCheckResultsService, DryCheckService};

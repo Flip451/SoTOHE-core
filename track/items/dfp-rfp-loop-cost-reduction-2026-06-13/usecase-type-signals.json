@@ -1,12 +1,21 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T13:54:02Z",
-  "declaration_hash": "f71c637d30ca9f2434a92c44b04e938560c3e098a1cbca085eacace4e05b5a8d",
+  "generated_at": "2026-06-14T17:44:33Z",
+  "declaration_hash": "91208c0adf5eac954e3e89ff0f248a3c2aaff4bff1583edc644be51815f5c8a6",
   "signals": [
+    {
+      "type_name": "DryCheckAgentError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone"
+      ]
+    },
     {
       "type_name": "DryCheckAgentPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -68,9 +77,9 @@
     {
       "type_name": "DryCheckJudgeTier",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",

@@ -16,7 +16,9 @@ use domain::dry_check::{
 };
 use domain::review_v2::FilePath;
 use domain::semantic_dup::CodeFragment;
-use usecase::dry_check::{DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort};
+use usecase::dry_check::{
+    DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckJudgeTier,
+};
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -86,10 +88,20 @@ struct DryCheckAgentOutputDto {
 /// Fragment identity is always computed from the real [`CodeFragment`]
 /// arguments by this adapter — the agent JSON output carries no fragment
 /// fields (D8/D9/CN-07).
+///
+/// D4 (T012): supports 2-tier judgment — `DryCheckJudgeTier::Fast` uses
+/// `fast_model` + `fast_reasoning_effort`; `DryCheckJudgeTier::Final` uses
+/// `final_model` + `final_reasoning_effort`.
 #[derive(Debug)]
 pub struct CodexDryChecker {
-    /// Codex model name.
-    model: String,
+    /// Codex model for `DryCheckJudgeTier::Fast` calls.
+    fast_model: String,
+    /// Codex `model_reasoning_effort` for fast tier.
+    fast_reasoning_effort: String,
+    /// Codex model for `DryCheckJudgeTier::Final` calls.
+    final_model: String,
+    /// Codex `model_reasoning_effort` for final tier.
+    final_reasoning_effort: String,
     /// Capability name for the prompt (e.g. `"dry-checker"`).
     capability_name: String,
     /// Maximum time to wait for the Codex subprocess.
@@ -103,11 +115,23 @@ impl CodexDryChecker {
     /// Constructs a new [`CodexDryChecker`].
     ///
     /// # Arguments
-    /// - `model`: Codex model name.
+    /// - `fast_model`: Codex model for `DryCheckJudgeTier::Fast` calls.
+    /// - `fast_reasoning_effort`: Codex `model_reasoning_effort` for fast tier.
+    /// - `final_model`: Codex model for `DryCheckJudgeTier::Final` calls.
+    /// - `final_reasoning_effort`: Codex `model_reasoning_effort` for final tier.
     /// - `capability_name`: dry-check capability label injected into the prompt.
-    pub fn new(model: String, capability_name: String) -> CodexDryChecker {
+    pub fn new(
+        fast_model: String,
+        fast_reasoning_effort: String,
+        final_model: String,
+        final_reasoning_effort: String,
+        capability_name: String,
+    ) -> CodexDryChecker {
         CodexDryChecker {
-            model,
+            fast_model,
+            fast_reasoning_effort,
+            final_model,
+            final_reasoning_effort,
             capability_name,
             timeout: Duration::from_secs(600),
             #[cfg(test)]
@@ -160,7 +184,18 @@ impl CodexDryChecker {
     }
 
     /// Invoke the Codex subprocess and return the raw output string.
-    fn run_agent(&self, prompt: &str) -> Result<DryCheckOutcomeRaw, DryCheckAgentError> {
+    ///
+    /// `tier` selects which model + reasoning effort to use for this call.
+    fn run_agent(
+        &self,
+        prompt: &str,
+        tier: DryCheckJudgeTier,
+    ) -> Result<DryCheckOutcomeRaw, DryCheckAgentError> {
+        let (model, reasoning_effort) = match tier {
+            DryCheckJudgeTier::Fast => (&self.fast_model, &self.fast_reasoning_effort),
+            DryCheckJudgeTier::Final => (&self.final_model, &self.final_reasoning_effort),
+        };
+
         let output_last_message = prepare_runtime_path("dry-check-last-message", "txt")
             .map_err(DryCheckAgentError::Unexpected)?;
         let output_schema = prepare_runtime_path("dry-check-output-schema", "json")
@@ -185,8 +220,13 @@ impl CodexDryChecker {
         #[cfg(not(test))]
         let bin = codex_bin();
 
-        let invocation =
-            build_codex_invocation(&self.model, prompt, &output_last_message, &output_schema);
+        let invocation = crate::codex_common::build_codex_read_only_invocation(
+            model,
+            reasoning_effort,
+            prompt,
+            &output_last_message,
+            &output_schema,
+        );
 
         let (child, io_handles) =
             spawn_codex(&bin, &invocation, &session_log).map_err(DryCheckAgentError::Unexpected)?;
@@ -200,9 +240,10 @@ impl DryCheckAgentPort for CodexDryChecker {
         &self,
         changed_fragment: &CodeFragment,
         candidate_fragment: &CodeFragment,
+        tier: DryCheckJudgeTier,
     ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
         let prompt = self.build_prompt(changed_fragment, candidate_fragment);
-        let raw = self.run_agent(&prompt)?;
+        let raw = self.run_agent(&prompt, tier)?;
         convert_raw_to_judgment(raw, changed_fragment, candidate_fragment)
     }
 }
@@ -422,26 +463,6 @@ impl Drop for AutoCleanup {
 
 fn codex_bin() -> OsString {
     OsString::from("codex")
-}
-
-fn build_codex_invocation(
-    model: &str,
-    prompt: &str,
-    output_last_message: &Path,
-    output_schema: &Path,
-) -> Vec<OsString> {
-    let mut args = vec![OsString::from("exec"), OsString::from("--model"), OsString::from(model)];
-    // Use read-only sandbox (same as CodexReviewer — do NOT use --full-auto).
-    args.extend([OsString::from("--sandbox"), OsString::from("read-only")]);
-    args.extend([OsString::from("--config"), OsString::from("model_reasoning_effort=\"high\"")]);
-    args.extend([
-        OsString::from("--output-schema"),
-        output_schema.as_os_str().to_os_string(),
-        OsString::from("--output-last-message"),
-        output_last_message.as_os_str().to_os_string(),
-        OsString::from(prompt),
-    ]);
-    args
 }
 
 fn spawn_codex(
@@ -842,8 +863,14 @@ mod tests {
             perms.set_mode(0o755);
             std::fs::set_permissions(&script, perms).unwrap();
 
-            let checker = CodexDryChecker::new("test-model".to_owned(), "dry-checker".to_owned())
-                .with_bin(&script);
+            let checker = CodexDryChecker::new(
+                "fast-model".to_owned(),
+                "medium".to_owned(),
+                "final-model".to_owned(),
+                "high".to_owned(),
+                "dry-checker".to_owned(),
+            )
+            .with_bin(&script);
             (checker, dir)
         }
 
@@ -856,7 +883,7 @@ exit 1
             let changed = make_fragment("src/a.rs", "fn foo() {}");
             let candidate = make_fragment("src/b.rs", "fn bar() {}");
 
-            let result = checker.judge(&changed, &candidate);
+            let result = checker.judge(&changed, &candidate, DryCheckJudgeTier::Final);
             assert!(matches!(result, Err(DryCheckAgentError::AgentAbort)), "got: {result:?}");
         }
 
@@ -872,14 +899,20 @@ sleep 60
             perms.set_mode(0o755);
             std::fs::set_permissions(&script_path, perms).unwrap();
 
-            let checker = CodexDryChecker::new("test-model".to_owned(), "dry-checker".to_owned())
-                .with_bin(&script_path)
-                .with_timeout(Duration::from_millis(100));
+            let checker = CodexDryChecker::new(
+                "fast-model".to_owned(),
+                "medium".to_owned(),
+                "final-model".to_owned(),
+                "high".to_owned(),
+                "dry-checker".to_owned(),
+            )
+            .with_bin(&script_path)
+            .with_timeout(Duration::from_millis(100));
 
             let changed = make_fragment("src/a.rs", "fn foo() {}");
             let candidate = make_fragment("src/b.rs", "fn bar() {}");
 
-            let result = checker.judge(&changed, &candidate);
+            let result = checker.judge(&changed, &candidate, DryCheckJudgeTier::Fast);
             assert!(matches!(result, Err(DryCheckAgentError::Timeout)), "got: {result:?}");
         }
 
@@ -902,7 +935,7 @@ exit 0
             let changed = make_fragment("src/a.rs", "fn foo() {}");
             let candidate = make_fragment("src/b.rs", "fn bar() {}");
 
-            let result = checker.judge(&changed, &candidate);
+            let result = checker.judge(&changed, &candidate, DryCheckJudgeTier::Fast);
             let judgment = result.expect("should succeed");
             assert!(
                 matches!(judgment, DryCheckAgentJudgment::NotAViolation { .. }),
@@ -934,7 +967,7 @@ exit 0
             let changed = make_fragment("src/a.rs", changed_content);
             let candidate = make_fragment("src/b.rs", candidate_content);
 
-            let result = checker.judge(&changed, &candidate);
+            let result = checker.judge(&changed, &candidate, DryCheckJudgeTier::Final);
             let judgment = result.expect("should succeed");
             match judgment {
                 DryCheckAgentJudgment::Violation { finding, .. } => {
@@ -955,6 +988,50 @@ exit 0
                 }
                 other => panic!("expected Violation, got: {other:?}"),
             }
+        }
+
+        #[test]
+        fn test_fast_tier_uses_fast_model_and_reasoning_effort_in_codex_invocation() {
+            // Verify that Fast tier produces args with fast_model + fast_reasoning_effort
+            // and Final tier produces args with final_model + final_reasoning_effort.
+            let output_last_message = std::path::PathBuf::from("out.txt");
+            let output_schema = std::path::PathBuf::from("schema.json");
+
+            let fast_args = crate::codex_common::build_codex_read_only_invocation(
+                "fast-model",
+                "medium",
+                "test prompt",
+                &output_last_message,
+                &output_schema,
+            );
+            let fast_args_str: Vec<String> =
+                fast_args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
+            assert!(
+                fast_args_str.contains(&"fast-model".to_owned()),
+                "fast tier must use fast_model"
+            );
+            assert!(
+                fast_args_str.iter().any(|a| a.contains("medium")),
+                "fast tier must use medium reasoning effort"
+            );
+
+            let final_args = crate::codex_common::build_codex_read_only_invocation(
+                "final-model",
+                "high",
+                "test prompt",
+                &output_last_message,
+                &output_schema,
+            );
+            let final_args_str: Vec<String> =
+                final_args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
+            assert!(
+                final_args_str.contains(&"final-model".to_owned()),
+                "final tier must use final_model"
+            );
+            assert!(
+                final_args_str.iter().any(|a| a.contains("high")),
+                "final tier must use high reasoning effort"
+            );
         }
     }
 }

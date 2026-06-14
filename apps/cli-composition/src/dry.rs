@@ -26,7 +26,7 @@ use infrastructure::dry_check::{CodexDryChecker, FsDryCheckCoverageAdapter, FsDr
 use infrastructure::semantic_dup::embedding::FastEmbedAdapter;
 use usecase::dry_check::{
     DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckApprovalInteractor,
-    DryCheckApprovalService as _, DryCheckCycleError, DryCheckInteractor,
+    DryCheckApprovalService as _, DryCheckCycleError, DryCheckInteractor, DryCheckJudgeTier,
     DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _, fragment_ref_of,
 };
 
@@ -195,7 +195,6 @@ impl CliApp {
     /// Returns `Err` on arg validation, diff acquisition, fragment extraction,
     /// adapter construction, or interactor failures.
     pub fn dry_write(&self, input: DryWriteInput) -> Result<CommandOutcome, String> {
-        use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
         // Resolve repo root to anchor paths.
@@ -207,32 +206,8 @@ impl CliApp {
         let telemetry_writer =
             resolve_dry_write_telemetry_writer(&input.items_dir, track_id.as_ref());
 
-        // Resolve the effective model: explicit --model overrides; otherwise read
-        // the `dry-checker` capability model from agent-profiles.json (same pattern
-        // as `dry fix-local` uses for the `dry-fix-lead` capability).
-        let effective_model = match input.model.clone() {
-            Some(m) => m,
-            None => {
-                let profiles_path = root.join(AGENT_PROFILES_PATH);
-                let profiles = AgentProfiles::load(&profiles_path)
-                    .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
-                let resolved = profiles
-                    .resolve_execution(&input.capability_name, RoundType::Final)
-                    .ok_or_else(|| {
-                        format!(
-                            "[ERROR] '{}' capability not defined in agent-profiles.json",
-                            input.capability_name
-                        )
-                    })?;
-                resolved.model.ok_or_else(|| {
-                    format!(
-                        "[ERROR] no model specified: pass --model or set model in \
-                         agent-profiles.json '{}' capability",
-                        input.capability_name
-                    )
-                })?
-            }
-        };
+        let (fast_model, effective_model) =
+            resolve_dry_checker_models(&root, &input.capability_name, input.model.clone())?;
 
         // Locate per-track directory.
         let items_dir_abs =
@@ -291,7 +266,10 @@ impl CliApp {
             .map_err(|e| format!("dry-check read before write failed: {e}"))?
             .len();
         let (agent, agent_recorder) = RecordingDryAgent::new(CodexDryChecker::new(
+            fast_model,
+            infra_config.fast_reasoning_effort().to_owned(),
             effective_model.clone(),
+            infra_config.final_reasoning_effort().to_owned(),
             input.capability_name.clone(),
         ));
         let agent = Arc::new(agent);
@@ -299,16 +277,14 @@ impl CliApp {
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
 
-        // D7/IN-10: persistent index keyed by file-level content hash; only changed/new
-        // files re-embed. `NullInsertIndexProxy` makes the interactor's `build_corpus_index`
-        // call a no-op since corpus is already correct here.
+        // D7/IN-10: persistent index keyed by file-level content hash; `NullInsertIndexProxy`
+        // makes the interactor's `build_corpus_index` a no-op (corpus already correct).
         let index_port = open_persistent_index_with_corpus(
             &input.db_path,
             corpus_fragments,
             embedding_port.as_ref(),
         )?;
 
-        // 8-param: corpus is empty since the index is pre-built above.
         let interactor = DryCheckInteractor::new(
             embedding_port,
             index_port,
@@ -530,6 +506,30 @@ fn build_usecase_dry_check_config(
     ))
 }
 
+/// Resolve `(fast_model, final_model)` for the `dry-checker` capability (D4 / T012).
+/// Explicit `--model` overrides both. Otherwise read `RoundType::Final` and `Fast` from
+/// `agent-profiles.json`, falling back fast → final when no `fast_model` is configured.
+fn resolve_dry_checker_models(
+    root: &std::path::Path,
+    capability_name: &str,
+    explicit_model: Option<String>,
+) -> Result<(String, String), String> {
+    use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
+    if let Some(m) = explicit_model {
+        return Ok((m.clone(), m));
+    }
+    let profiles = AgentProfiles::load(&root.join(AGENT_PROFILES_PATH))
+        .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
+    let resolve = |rt| profiles.resolve_execution(capability_name, rt).and_then(|r| r.model);
+    let final_model = resolve(RoundType::Final).ok_or_else(|| {
+        format!(
+            "[ERROR] no model specified: pass --model or set model in \
+             agent-profiles.json '{capability_name}' capability"
+        )
+    })?;
+    Ok((resolve(RoundType::Fast).unwrap_or_else(|| final_model.clone()), final_model))
+}
+
 /// `GateEval` telemetry fields for the `"dry"` gate (T007 / IN-07 / CN-10):
 /// `Approved` → `("ok", "")`; `Blocked` → `("error", "blocked: N unresolved pair(s)")`.
 fn dry_check_approved_gate_eval_fields(
@@ -612,9 +612,10 @@ impl<A: DryCheckAgentPort> DryCheckAgentPort for RecordingDryAgent<A> {
         &self,
         changed_fragment: &CodeFragment,
         candidate_fragment: &CodeFragment,
+        tier: DryCheckJudgeTier,
     ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
         self.recorder.record_started();
-        let result = self.inner.judge(changed_fragment, candidate_fragment);
+        let result = self.inner.judge(changed_fragment, candidate_fragment, tier);
         if let Ok(judgment) = &result {
             if matches!(judgment, DryCheckAgentJudgment::Violation { .. }) {
                 self.recorder.record_violation();
@@ -1140,6 +1141,7 @@ mod tests {
             &self,
             _changed_fragment: &CodeFragment,
             _candidate_fragment: &CodeFragment,
+            _tier: DryCheckJudgeTier,
         ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
             Ok(DryCheckAgentJudgment::Violation {
                 rationale: domain::Rationale::new("same control flow").unwrap(),
@@ -1168,7 +1170,7 @@ mod tests {
         let candidate =
             CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
 
-        let result = agent.judge(&changed, &candidate);
+        let result = agent.judge(&changed, &candidate, DryCheckJudgeTier::Final);
 
         assert!(matches!(result, Ok(DryCheckAgentJudgment::Violation { .. })));
         assert_eq!(recorder.findings_count(), 1);

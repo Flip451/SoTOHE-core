@@ -280,7 +280,31 @@
     }
   },
   "traits": {},
-  "functions": {},
+  "functions": {
+    "infrastructure::codex_common::build_codex_read_only_invocation": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "model",               "ty": "&str" },
+        { "name": "reasoning_effort",    "ty": "&str" },
+        { "name": "prompt",              "ty": "&str" },
+        { "name": "output_last_message", "ty": "&std::path::Path" },
+        { "name": "output_schema",       "ty": "&std::path::Path" }
+      ],
+      "returns": "Vec<std::ffi::OsString>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Build the argument vector for a `codex exec --sandbox read-only` invocation. Centralised helper shared by CodexDryChecker (DryCheckAgentPort adapter) and the CodexReviewer adapter, so future Codex CLI flag changes only need a single edit. Added as a new public free function in this track to eliminate copy-paste argument construction across both adapters (D4 / IN-04). The function enforces read-only sandbox by construction — callers must not use --full-auto.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [],
   "trait_impls": [
     { "action": "modify", "trait_ref": "core::fmt::Debug",                    "for_type": "DryCheckConfig" },

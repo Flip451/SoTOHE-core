@@ -12,7 +12,7 @@ use crate::semantic_dup::{EmbeddingError, SemanticIndexError};
 ///
 /// Mirrors `ReviewerError`. Covers agent abort, timeout, illegal schema output,
 /// and unexpected failures.
-#[derive(Debug, Error)]
+#[derive(Debug, Clone, Error)]
 pub enum DryCheckAgentError {
     /// The user requested abort during the agent run.
     #[error("dry-check agent aborted by user")]

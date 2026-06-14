@@ -737,6 +737,30 @@
         "kind": "pass",
         "citation": "D5 の `dry check-approved` は staleness 判定を diff フラグメントの FragmentRef（path + content_hash）とカバレッジ記録の FragmentRef 照合で行い、埋め込み・類似検索を呼ばない。"
       }
+    },
+    {
+      "claim_hash": "8ee8fd96448f9454e35a2c6386b01242271bf337347d4e5e1abeef576fd1cd00",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "較正が健全なら not-a-violation / accepted を確定し、violation および不正出力のみ重量級 tier へ escalation する。"
+      }
+    },
+    {
+      "claim_hash": "8ee8fd96448f9454e35a2c6386b01242271bf337347d4e5e1abeef576fd1cd00",
+      "evidence_hash": "744b975f9a0835a34357d71992d7575e835e0e2140c695263cbed360b8652a28",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast tier は production ペアとは別の 1 ペア 1 agent 呼び出しで既知違反プローブを判定してプローブ検出率を較正し、較正が健全なら not-a-violation / accepted を確定し、violation および不正出力のみ重量級 tier へ escalation する。"
+      }
+    },
+    {
+      "claim_hash": "8ee8fd96448f9454e35a2c6386b01242271bf337347d4e5e1abeef576fd1cd00",
+      "evidence_hash": "d8f319509478fca252fba8754d262fd38f638edac8080d0d74f0a1f15d767a52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast tier のプローブ検出率が閾値未満）は fast 非違反判定を信頼せず、全ペアを重量級 tier で再判定する。重量級 tier でもプローブ検出率が閾値未満なら fail-closed で人間にエスカレーションし、gate を通過させない。"
+      }
     }
   ]
 }

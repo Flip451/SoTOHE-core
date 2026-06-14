@@ -360,6 +360,38 @@
       ],
       "informal_grounds": []
     },
+    "DryCheckAgentError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "UserAbort",     "payload": { "kind": "unit" } },
+          { "name": "AgentAbort",    "payload": { "kind": "unit" } },
+          { "name": "Timeout",       "payload": { "kind": "unit" } },
+          { "name": "IllegalOutput", "payload": { "kind": "unit" } },
+          { "name": "Unexpected",    "payload": { "kind": "tuple", "fields": [ "String" ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check::errors",
+      "docs": "Errors from DryCheckAgentPort (mirrors ReviewerError). T012 (D4 / IN-04 escalation flow) added #[derive(Clone)] so that fast-tier agent errors can be cloned when escalating to the final tier in the two-tier calibration barrier (CN-07). Clone is required because DryCheckInteractor may need to propagate the same error through the parallel fan-out join before returning the final-tier result.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-07"
+        }
+      ],
+      "informal_grounds": []
+    },
     "DryCheckCycleError": {
       "action": "modify",
       "role": "ErrorType",
@@ -883,6 +915,10 @@
     { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "DryCheckConfig" },
     { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "DryCheckConfig" },
     { "action": "add",       "trait_ref": "core::default::Default",  "for_type": "DryCheckConfig" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",        "for_type": "DryCheckAgentError" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "DryCheckAgentError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display",      "for_type": "DryCheckAgentError" },
+    { "action": "reference", "trait_ref": "core::error::Error",      "for_type": "DryCheckAgentError" },
     { "action": "modify",    "trait_ref": "core::fmt::Debug",        "for_type": "DryCheckCycleError" },
     { "action": "modify",    "trait_ref": "core::fmt::Display",      "for_type": "DryCheckCycleError" },
     { "action": "modify",    "trait_ref": "core::error::Error",      "for_type": "DryCheckCycleError" },

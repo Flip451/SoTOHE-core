@@ -1,260 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:03:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:05:16Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:40:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:42:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
-          "at": "2026-06-14T04:18:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
-          "at": "2026-06-14T04:20:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
-          "at": "2026-06-14T04:32:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
-          "at": "2026-06-14T04:34:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f8ccdd4dc037c83d844720abe34f4ca8629af424183ffe6eae4c9b570aa541f",
-          "at": "2026-06-14T04:47:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
-          "at": "2026-06-14T05:02:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
-          "at": "2026-06-14T05:05:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
-          "at": "2026-06-14T05:12:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The unchanged Rules section now contradicts the new workflow: it says to always run `cargo make ci-rust` before re-running `sotp dry check-approved` and points to “step 3 above,” but Step 3 is now the zero-violation no-fix path that explicitly must skip `ci-rust`. This makes the agent policy ambiguous and can defeat the D1 fast path the change is meant to introduce. Update this rule to refer only to fix rounds / Step 4 verification.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 117,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
-          "at": "2026-06-14T05:14:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 treats a `dry write` run with zero reported `Violation` findings as either approved or an anomaly, but Step 2 explicitly says already-judged pairs are cache hits/no-ops. In that state, a previously recorded unresolved violation will not be re-emitted by `dry write`; `check-approved` will still block, and this workflow tells dfl to stop as `blocked` instead of retrieving the stored violation/proposal via `bin/sotp dry results --filter violation` and fixing it. This makes a normal re-entry/retry with cached violations fail even though autonomous fixes are still available.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 84,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:43c20f74d8e80ad92d12126ee2038140cb917c93611868dbaba4fd7cc2e312ba",
-          "at": "2026-06-14T05:17:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 can lose cached violations after a blocked follow-up gate check. `sotp dry write` returns no findings for already-verified pairs, including cached `Violation` records, so a non-zero `dry check-approved` after the follow-up write does not guarantee the “new finding set” is non-empty. Re-entering Step 4 using only that write output can spin/exhaust without applying available cached refactor proposals. The blocked branch should mirror Step 3 by reading unresolved cached violations before looping.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 103,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:ec1203a50d28ecd4e3486ffc434903b68659af286ab2d18cd607d1b166dfa405",
-          "at": "2026-06-14T05:20:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ed69050537ee92aa22adf8bec811d8997e5e7c75d71b16addad21f02ecdc1b1",
-          "at": "2026-06-14T05:22:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
-          "at": "2026-06-14T05:31:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
-          "at": "2026-06-14T05:31:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
-          "at": "2026-06-14T05:33:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
-          "at": "2026-06-14T07:12:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
-          "at": "2026-06-14T07:13:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
-          "at": "2026-06-14T13:14:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
-          "at": "2026-06-14T13:16:44Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:18:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/dry.rs",
-              "line": 425,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:21:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
-          "at": "2026-06-14T04:23:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:39:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:42:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:07:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:09:28Z"
-        }
-      ]
-    },
     "cli_composition": {
       "rounds": [
         {
@@ -470,6 +216,52 @@
           "findings": [],
           "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
           "at": "2026-06-14T13:45:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
+          "at": "2026-06-14T15:57:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
+          "at": "2026-06-14T15:59:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
+          "at": "2026-06-14T17:25:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
+          "at": "2026-06-14T17:27:36Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:03:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:05:16Z"
         }
       ]
     },
@@ -1146,6 +938,78 @@
           "findings": [],
           "hash": "rvw1:sha256:b463053e23d4b8f328872a7c53ad2f555e92d191c2f19fae6f66c881db9b35e5",
           "at": "2026-06-14T13:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` marks T012 as done, but this catalogue still leaves `DryCheckInteractor` at 🟡 even though T012 explicitly includes changing `DryCheckInteractor` to the calibrated two-stage flow. The plan artifact and the type catalogue disagree on whether the core interactor work is complete.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 49,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
+          "at": "2026-06-14T15:57:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` marks the T012-mutated rows `DryCheckJudgeTier` and `DryCheckAgentPort` as already present (🔵), but the review briefing says the T012 commit has not been created yet and these type-signal rows should still be 🟡. That makes the generated type-signal artifact inconsistent with the stated plan state.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
+          "at": "2026-06-14T16:01:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
+          "at": "2026-06-14T16:04:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
+          "at": "2026-06-14T16:06:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30e84b4ce28f0e9fead737989dc33f276910ca899495a04acfed5ace24ca8ef1",
+          "at": "2026-06-14T16:49:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30e84b4ce28f0e9fead737989dc33f276910ca899495a04acfed5ace24ca8ef1",
+          "at": "2026-06-14T16:50:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f7eb30420313721c97a527a3e1270c552b29c24ef84b1f958ec7d01d7f7a218",
+          "at": "2026-06-14T17:41:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f7eb30420313721c97a527a3e1270c552b29c24ef84b1f958ec7d01d7f7a218",
+          "at": "2026-06-14T17:44:14Z"
         }
       ]
     },
@@ -1426,6 +1290,388 @@
           "findings": [],
           "hash": "rvw1:sha256:0e3309ccbce52e24755ada035d1d32be98fff426559e2b411181134127b718c0",
           "at": "2026-06-14T12:20:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new calibration fail-closed path returns here before the coverage manifest is written. That regresses the existing guarantee that `run_dry_check` persists coverage unconditionally after processing diff fragments, so a calibration failure leaves the current fragments uncovered and keeps `dry check-approved` blocked on later runs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 383,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3ae92fe9f45d3bd609525f834387ed64694ef15b632d60d506193d4e98a33ee3",
+          "at": "2026-06-14T15:57:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When both calibration tiers fail, this branch returns `Err(\"calibration failed\")` after persisting coverage but before writing any production verdicts. `check_approved()` treats a diff as `Approved` when the current `FragmentRef`s are covered and there are no violation records touching them, so a failed run can still leave the current diff approvable instead of fail-closed.",
+              "severity": "P0",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
+              "line": 457,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:7d4a30837d4170e6b9620a23c41ba1226fd919427ef9f7b1759add317fb37f58",
+          "at": "2026-06-14T16:08:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4453006dff24b337b847e80aa1e9db526d48c27d7f01aae2c3b6ac48248060d",
+          "at": "2026-06-14T16:15:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The escalation test does not actually verify escalation. The mock used by this test ignores `DryCheckJudgeTier` and returns `Violation` for production calls regardless of whether the interactor calls Fast, Final, or never calls Final at all, so a regression that persisted the provisional Fast violation without re-judging it would still pass. T012 explicitly requires Violation/Err production results to be re-run with `Final`; add a tier-sensitive mock, for example Fast returns `Violation` and Final returns `NotAViolation`, then assert the persisted result comes from Final and both tiers were called.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
+              "line": 2090,
+              "category": "test coverage"
+            },
+            {
+              "message": "The fast-calibration-failure test does not prove that production pairs are re-run with the Final tier after Fast calibration fails. Its production branch returns the same `NotAViolation` for every tier, so an implementation that incorrectly reused the discarded Fast provisional result would still write one production entry and pass this test. The briefing calls out that the failure path must re-run the same production set with `Final`; make this mock record or vary production results by tier and assert every production pair receives a Final judgment before writing.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
+              "line": 2136,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e4453006dff24b337b847e80aa1e9db526d48c27d7f01aae2c3b6ac48248060d",
+          "at": "2026-06-14T16:19:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70415177963bec2fa1979e5546d292e538bd09b385cdc862c3531695b731b017",
+          "at": "2026-06-14T16:25:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: if `write_coverage()` fails on a calibration-failure run, the code still returns `calibration_error` first and drops the coverage error. That masks a failed fail-closed write, so the old coverage manifest can remain in place while the caller thinks only calibration failed. The coverage failure needs to take precedence or be combined with the calibration error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 480,
+              "category": "error handling"
+            },
+            {
+              "message": "P1: `known_bad_probe_pairs()` silently filters out any probe whose `CodeFragment::new(...)` construction fails. Because the returned vector size feeds directly into the calibration denominator, a malformed probe fixture would quietly weaken the barrier instead of failing closed. This helper should surface fixture-construction failure instead of dropping probes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/known_bad.rs",
+              "line": 49,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:543721b1c1f1069dbd48bbbd5c7711ff3e999c16f967f092bf6ef50702d7b092",
+          "at": "2026-06-14T16:50:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2acdea1c8950389f81a5562d09286543b0447491a290a2abba72212641136f22",
+          "at": "2026-06-14T16:58:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`interactor.rs` now has 703 non-test lines before the `#[cfg(test)]` block at line 704, exceeding the repository's 700-line production module maximum. The new calibration helpers pushed this already-large module over the enforced size limit; move one of the helper groups, such as known-bad calibration orchestration, into a sibling module to bring the production section back under the cap.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
+              "line": 704,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2acdea1c8950389f81a5562d09286543b0447491a290a2abba72212641136f22",
+          "at": "2026-06-14T17:03:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`mod.rs` declares the new `calibration` and `known_bad` modules, but both source files are currently untracked, so they are omitted from `git diff`. Applying this patch as-is leaves these module declarations pointing at missing files and the usecase crate will fail to compile. Add `libs/usecase/src/dry_check/calibration.rs` and `libs/usecase/src/dry_check/known_bad.rs` to the tracked change set.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/mod.rs",
+              "line": 15,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:c3e97080cf9b02e6af59bf704e4d330749329a6140a55db49d23b0120a99ce33",
+          "at": "2026-06-14T17:10:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3e97080cf9b02e6af59bf704e4d330749329a6140a55db49d23b0120a99ce33",
+          "at": "2026-06-14T17:13:28Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:18:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/dry.rs",
+              "line": 425,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:21:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
+          "at": "2026-06-14T04:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:39:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:42:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:07:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:09:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
+          "at": "2026-06-14T15:54:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
+          "at": "2026-06-14T15:56:10Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:40:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:42:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
+          "at": "2026-06-14T04:18:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
+          "at": "2026-06-14T04:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
+          "at": "2026-06-14T04:32:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
+          "at": "2026-06-14T04:34:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f8ccdd4dc037c83d844720abe34f4ca8629af424183ffe6eae4c9b570aa541f",
+          "at": "2026-06-14T04:47:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
+          "at": "2026-06-14T05:02:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
+          "at": "2026-06-14T05:05:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
+          "at": "2026-06-14T05:12:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The unchanged Rules section now contradicts the new workflow: it says to always run `cargo make ci-rust` before re-running `sotp dry check-approved` and points to “step 3 above,” but Step 3 is now the zero-violation no-fix path that explicitly must skip `ci-rust`. This makes the agent policy ambiguous and can defeat the D1 fast path the change is meant to introduce. Update this rule to refer only to fix rounds / Step 4 verification.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 117,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
+          "at": "2026-06-14T05:14:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 treats a `dry write` run with zero reported `Violation` findings as either approved or an anomaly, but Step 2 explicitly says already-judged pairs are cache hits/no-ops. In that state, a previously recorded unresolved violation will not be re-emitted by `dry write`; `check-approved` will still block, and this workflow tells dfl to stop as `blocked` instead of retrieving the stored violation/proposal via `bin/sotp dry results --filter violation` and fixing it. This makes a normal re-entry/retry with cached violations fail even though autonomous fixes are still available.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 84,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:43c20f74d8e80ad92d12126ee2038140cb917c93611868dbaba4fd7cc2e312ba",
+          "at": "2026-06-14T05:17:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 can lose cached violations after a blocked follow-up gate check. `sotp dry write` returns no findings for already-verified pairs, including cached `Violation` records, so a non-zero `dry check-approved` after the follow-up write does not guarantee the “new finding set” is non-empty. Re-entering Step 4 using only that write output can spin/exhaust without applying available cached refactor proposals. The blocked branch should mirror Step 3 by reading unresolved cached violations before looping.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 103,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:ec1203a50d28ecd4e3486ffc434903b68659af286ab2d18cd607d1b166dfa405",
+          "at": "2026-06-14T05:20:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ed69050537ee92aa22adf8bec811d8997e5e7c75d71b16addad21f02ecdc1b1",
+          "at": "2026-06-14T05:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
+          "at": "2026-06-14T05:31:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
+          "at": "2026-06-14T05:31:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
+          "at": "2026-06-14T05:33:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
+          "at": "2026-06-14T07:12:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
+          "at": "2026-06-14T07:13:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
+          "at": "2026-06-14T13:14:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
+          "at": "2026-06-14T13:16:44Z"
         }
       ]
     },
@@ -1530,6 +1776,20 @@
           "findings": [],
           "hash": "rvw1:sha256:cd324b2166090e0bab98f4b08bd9d021224f2c197dd622a194771998191bf112",
           "at": "2026-06-14T13:38:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e589a1ff515a00b17646e247781b7da198aaca7c8573fbc3bea4b053bfa0575",
+          "at": "2026-06-14T15:58:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e589a1ff515a00b17646e247781b7da198aaca7c8573fbc3bea4b053bfa0575",
+          "at": "2026-06-14T16:00:59Z"
         }
       ]
     }

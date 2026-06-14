@@ -8,6 +8,20 @@ use domain::semantic_dup::CodeFragment;
 use super::errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
 use super::judgment::DryCheckAgentJudgment;
 
+// ── DryCheckJudgeTier ────────────────────────────────────────────────────────
+
+/// Tier selector for the 2-stage DRY-check calibration barrier (D4 / T012).
+///
+/// `Fast` uses the lower-cost fast model; `Final` uses the higher-accuracy
+/// final model. The interactor selects the tier per-call during the judgment phase.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DryCheckJudgeTier {
+    /// Fast tier: low-cost model for the initial screening pass.
+    Fast,
+    /// Final tier: high-accuracy model for escalated or all-final runs.
+    Final,
+}
+
 // ── DryCheckAgentPort ─────────────────────────────────────────────────────────
 
 /// Usecase port for the dry-checker agent capability.
@@ -33,8 +47,11 @@ use super::judgment::DryCheckAgentJudgment;
 /// Analogous to `Reviewer`. Placed in usecase because agent invocation is an
 /// infrastructure capability with no domain entity semantics.
 pub trait DryCheckAgentPort: Send + Sync {
-    /// Judge whether the `changed_fragment` duplicates the `candidate_fragment`
-    /// in a DRY-violating way.
+    /// Judge whether `changed_fragment` duplicates `candidate_fragment`.
+    ///
+    /// `tier` selects the model/reasoning-effort combination:
+    /// - `DryCheckJudgeTier::Fast`: fast/cheap model for initial screening.
+    /// - `DryCheckJudgeTier::Final`: accurate model for escalation or all-final runs.
     ///
     /// # Errors
     ///
@@ -44,6 +61,7 @@ pub trait DryCheckAgentPort: Send + Sync {
         &self,
         changed_fragment: &CodeFragment,
         candidate_fragment: &CodeFragment,
+        tier: DryCheckJudgeTier,
     ) -> Result<DryCheckAgentJudgment, DryCheckAgentError>;
 }
 

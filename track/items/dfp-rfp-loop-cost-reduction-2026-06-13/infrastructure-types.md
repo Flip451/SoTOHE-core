@@ -25,3 +25,9 @@
 | CodexDryChecker | secondary_adapter | modify | impl Debug, impl DryCheckAgentPort | 🟡 | 🔵 |
 | FsDryCheckCoverageAdapter | secondary_adapter | — | impl DryCheckCoveragePort, impl Debug | 🟡 | 🔵 |
 
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| infrastructure::codex_common::build_codex_read_only_invocation | free_function | — | fn(model: &str, reasoning_effort: &str, prompt: &str, output_last_message: &std::path::Path, output_schema: &std::path::Path) -> Vec<std::ffi::OsString> | 🔵 | 🔵 |
+

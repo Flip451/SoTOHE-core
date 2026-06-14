@@ -134,8 +134,13 @@ impl CodexReviewer {
         #[cfg(not(test))]
         let bin = codex_bin();
 
-        let invocation =
-            build_codex_invocation(&self.model, &prompt, &output_last_message, &output_schema);
+        let invocation = crate::codex_common::build_codex_read_only_invocation(
+            &self.model,
+            "high",
+            &prompt,
+            &output_last_message,
+            &output_schema,
+        );
 
         let (child, io_handles) =
             spawn_codex(&bin, &invocation, &session_log).map_err(ReviewerError::Unexpected)?;
@@ -312,28 +317,6 @@ fn codex_bin() -> OsString {
         return value;
     }
     OsString::from("codex")
-}
-
-fn build_codex_invocation(
-    model: &str,
-    prompt: &str,
-    output_last_message: &Path,
-    output_schema: &Path,
-) -> Vec<OsString> {
-    let mut args = vec![OsString::from("exec"), OsString::from("--model"), OsString::from(model)];
-    // Reviewers MUST use read-only sandbox. Do NOT use --full-auto here because it
-    // implies --sandbox workspace-write and Codex CLI applies it after our explicit
-    // --sandbox read-only, overriding the safety constraint.
-    args.extend([OsString::from("--sandbox"), OsString::from("read-only")]);
-    args.extend([OsString::from("--config"), OsString::from("model_reasoning_effort=\"high\"")]);
-    args.extend([
-        OsString::from("--output-schema"),
-        output_schema.as_os_str().to_os_string(),
-        OsString::from("--output-last-message"),
-        output_last_message.as_os_str().to_os_string(),
-        OsString::from(prompt),
-    ]);
-    args
 }
 
 fn spawn_codex(

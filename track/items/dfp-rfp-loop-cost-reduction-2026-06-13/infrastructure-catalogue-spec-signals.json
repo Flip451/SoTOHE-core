@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "259e7696ceac022bd7427b5c30d795a9291192abf7ee6054d52b17578532274f",
+  "catalogue_declaration_hash": "de3b68e6f1b6c2fdeeac5454d289f4378c7cdad18f096ba9d341ac5bd45faa2a",
   "signals": [
     {
       "type_name": "CodexDryChecker",
@@ -26,6 +26,11 @@
       "type_name": "TelemetryEvent",
       "signal": "blue",
       "entry_hash": "e347443c5df1d47b62e9e920d02076ec610d1e77541c72312403dda462652831"
+    },
+    {
+      "type_name": "infrastructure::codex_common::build_codex_read_only_invocation",
+      "signal": "blue",
+      "entry_hash": "60dae1b05badafa4cb4db67413e35b65a722f87d49382281a11fc71c445f2ce7"
     }
   ]
 }

@@ -17,10 +17,14 @@ use domain::dry_check::{
 use domain::review_v2::types::FilePath;
 use domain::semantic_dup::{CodeFragment, SimilarityScore, SimilarityThreshold};
 
+use super::calibration::{
+    escalate_violations_to_final, run_calibration_probes, run_parallel_judgments,
+};
 use super::config::DryCheckConfig;
 use super::errors::DryCheckCycleError;
 use super::judgment::DryCheckAgentJudgment;
-use super::ports::{DryCheckAgentPort, DryCheckCoveragePort};
+use super::known_bad::known_bad_probe_pairs;
+use super::ports::{DryCheckAgentPort, DryCheckCoveragePort, DryCheckJudgeTier};
 use super::services::DryCheckService;
 use super::shared::{
     build_corpus_index, candidate_pair_keys_for_diff, collect_above_threshold_candidates,
@@ -32,10 +36,8 @@ use crate::semantic_dup::{EmbeddingPort, SemanticIndexError, SemanticIndexPort};
 
 /// Interactor implementing [`DryCheckService`].
 ///
-/// Orchestrates: full-codebase index build (`EmbeddingPort` + `SemanticIndexPort`
-/// from `corpus_fragments`) + diff fragment query at threshold +
-/// `DryCheckAgentPort` verification + `DryCheckWriter.append_record` verdict
-/// persistence.
+/// See [`DryCheckService::run_dry_check`] for the authoritative two-phase
+/// algorithm description (inquiry → judgment, D3 / T010).
 ///
 /// The constructor return type is written as `DryCheckInteractor` (not `Self`)
 /// so the ③ evaluator exact-string match succeeds.
@@ -324,60 +326,132 @@ impl DryCheckService for DryCheckInteractor {
                 .collect();
         let fragment_pairs = fragment_pairs_result?;
 
-        // Results indexed by work_items position: Ok(judgment) or Err(agent_error).
-        let judgment_results: Vec<
-            Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>,
-        > = run_parallel_judgments(&fragment_pairs, agent, max_parallelism);
+        // ── STEP B: Fast phase — judge all production pairs with Fast tier ───────
+        let fast_judgment_results = if work_items.is_empty() {
+            Vec::new()
+        } else {
+            run_parallel_judgments(&fragment_pairs, agent, max_parallelism, DryCheckJudgeTier::Fast)
+        };
 
-        // Collect persisted entries in sorted order and accumulate errors.
+        // ── STEP C: Calibration — run known-bad probes with Fast tier ────────────
+        let all_probe_pairs = known_bad_probe_pairs().map_err(|e| {
+            DryCheckCycleError::Agent(super::errors::DryCheckAgentError::Unexpected(format!(
+                "calibration probe fixture error: {e}"
+            )))
+        })?;
+        let total_probes = all_probe_pairs.len();
+        let injection_rate = self.config.known_bad_injection_rate_percent.as_u8() as usize;
+        // Ceiling division: probe_count = ceil(total_probes * injection_rate / 100)
+        let probe_count =
+            if total_probes == 0 { 0 } else { (total_probes * injection_rate).div_ceil(100) };
+        // Always run at least 1 probe when probes exist.
+        let probe_count = probe_count.max(if total_probes > 0 { 1 } else { 0 });
+        let run_count = probe_count.min(all_probe_pairs.len());
+
+        let probes_to_run = all_probe_pairs.get(..run_count).unwrap_or(all_probe_pairs.as_slice());
+        let threshold_percent = self.config.known_bad_detection_threshold_percent.as_u8() as usize;
+
+        let fast_calibration_passed = run_calibration_probes(
+            agent,
+            probes_to_run,
+            DryCheckJudgeTier::Fast,
+            threshold_percent,
+        );
+
+        // ── STEP D/E: Choose final production judgment results ───────────────────
+        let final_judgment_results: Vec<
+            Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>,
+        > = if fast_calibration_passed {
+            // Promote fast results, escalating Violation/Err to Final tier.
+            escalate_violations_to_final(
+                &fragment_pairs,
+                fast_judgment_results,
+                agent,
+                max_parallelism,
+            )
+        } else {
+            // Discard fast results, re-run all with Final tier.
+            run_parallel_judgments(
+                &fragment_pairs,
+                agent,
+                max_parallelism,
+                DryCheckJudgeTier::Final,
+            )
+        };
+
+        // ── STEP E (continued): if fast calibration failed, check Final calibration
+        let calibration_error: Option<DryCheckCycleError> = if !fast_calibration_passed {
+            let final_calibration_passed = run_calibration_probes(
+                agent,
+                probes_to_run,
+                DryCheckJudgeTier::Final,
+                threshold_percent,
+            );
+            if !final_calibration_passed && probe_count > 0 {
+                Some(DryCheckCycleError::Agent(super::errors::DryCheckAgentError::Unexpected(
+                    "calibration failed".to_owned(),
+                )))
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        // ── STEP F: Append results and collect findings ──────────────────────────
+        // Skip pair-entry writes when calibration failed: the agent quality is
+        // untrusted, so no production verdicts are persisted.  Coverage is still
+        // written below so the current diff fragments do not remain permanently stale.
         let mut findings: Vec<DryCheckFinding> = Vec::new();
 
-        for (work_item, judgment_result) in work_items.into_iter().zip(judgment_results) {
-            let (pair_key, changed_path, _diff_idx, _candidate_fragment, similarity_score) =
-                work_item;
+        if calibration_error.is_none() {
+            for (work_item, judgment_result) in work_items.into_iter().zip(final_judgment_results) {
+                let (pair_key, changed_path, _diff_idx, _candidate_fragment, similarity_score) =
+                    work_item;
 
-            let judgment = match judgment_result {
-                Ok(j) => j,
-                Err(e) => {
-                    // CN-03: collect errors; do not abort remaining pairs.
+                let judgment = match judgment_result {
+                    Ok(j) => j,
+                    Err(e) => {
+                        // CN-03: collect errors; do not abort remaining pairs.
+                        if first_error.is_none() {
+                            first_error = Some(DryCheckCycleError::Agent(e));
+                        }
+                        continue;
+                    }
+                };
+
+                let (rationale, verdict, maybe_finding) = extract_judgment(judgment);
+
+                let entry = match DryCheckEntry::new(
+                    pair_key,
+                    changed_path,
+                    verdict,
+                    similarity_score,
+                    threshold,
+                    base_commit.clone(),
+                    rationale,
+                ) {
+                    Ok(e) => e,
+                    Err(e) => {
+                        // CN-03: collect errors; do not abort remaining pairs.
+                        if first_error.is_none() {
+                            first_error = Some(DryCheckCycleError::Entry(e));
+                        }
+                        continue;
+                    }
+                };
+
+                if let Err(e) = self.dry_check_writer.append_record(&entry) {
+                    // CN-03: collect writer errors; do not abort remaining pairs.
                     if first_error.is_none() {
-                        first_error = Some(DryCheckCycleError::Agent(e));
+                        first_error = Some(DryCheckCycleError::Writer(e));
                     }
                     continue;
                 }
-            };
 
-            let (rationale, verdict, maybe_finding) = extract_judgment(judgment);
-
-            let entry = match DryCheckEntry::new(
-                pair_key,
-                changed_path,
-                verdict,
-                similarity_score,
-                threshold,
-                base_commit.clone(),
-                rationale,
-            ) {
-                Ok(e) => e,
-                Err(e) => {
-                    // CN-03: collect errors; do not abort remaining pairs.
-                    if first_error.is_none() {
-                        first_error = Some(DryCheckCycleError::Entry(e));
-                    }
-                    continue;
+                if let Some(finding) = maybe_finding {
+                    findings.push(finding);
                 }
-            };
-
-            if let Err(e) = self.dry_check_writer.append_record(&entry) {
-                // CN-03: collect writer errors; do not abort remaining pairs.
-                if first_error.is_none() {
-                    first_error = Some(DryCheckCycleError::Writer(e));
-                }
-                continue;
-            }
-
-            if let Some(finding) = maybe_finding {
-                findings.push(finding);
             }
         }
 
@@ -388,108 +462,63 @@ impl DryCheckService for DryCheckInteractor {
         // (IN-06 / AC-11 / CN-08).
         //
         // Write coverage unconditionally — even when a partial failure occurred —
-        // so that successfully processed fragments are recorded.
+        // so that the coverage manifest is always present for `check_approved`.
+        //
+        // AC-08 / calibration failure (fail-closed): when calibration fails, write an
+        // EMPTY coverage record instead of `processed_refs`.  An empty record means
+        // ALL current diff fragments are "uncovered" → `check_approved` returns
+        // Blocked rather than Approved.  This preserves fail-closed semantics: the
+        // agent's reliability could not be confirmed, so no approval is possible.
+        // Writing *some* manifest (even empty) ensures the next `dry write` can
+        // overwrite it once calibration succeeds, and the gate does not remain
+        // blocked due to a missing manifest from a previous older run.
         //
         // CN-03: a coverage-write failure is collected into `first_error` only when
         // no prior pair-level error was recorded.  This preserves the original
         // pair-level error rather than masking it with a coverage I/O error, while
         // still surfacing the coverage error when it is the only failure.
-        let coverage_record = DryCheckCoverageRecord::new(processed_refs);
-        if let Err(e) = self.coverage.write_coverage(&self.track_id, coverage_record) {
+        let coverage_refs = if calibration_error.is_some() {
+            // Fail-closed: empty coverage → all current fragments appear stale.
+            std::collections::BTreeSet::new()
+        } else {
+            processed_refs
+        };
+        let coverage_record = DryCheckCoverageRecord::new(coverage_refs);
+        let coverage_write_error =
+            self.coverage.write_coverage(&self.track_id, coverage_record).err();
+
+        // Coverage write failure must never be silently dropped — a failed fail-closed
+        // write leaves an old manifest in place and may grant approval incorrectly.
+        // When coverage write fails alongside a calibration error, surface both by
+        // combining them into a single CoveragePort error.  When coverage write fails
+        // alongside a pair-level error, the pair-level error takes priority (CN-03).
+        if let Some(cov_err) = coverage_write_error {
+            if let Some(ref cal_err) = calibration_error {
+                // Both calibration and coverage write failed: combine into one error
+                // so neither is silently dropped.
+                return Err(DryCheckCycleError::CoveragePort(format!(
+                    "coverage write failed ({cov_err}); also: {cal_err}"
+                )));
+            }
+            // Only coverage write failed (no calibration error); treat it as the
+            // primary error, but prefer an existing pair-level error (CN-03).
             if first_error.is_none() {
-                first_error = Some(e);
+                first_error = Some(cov_err);
             }
         }
 
         // Return first collected error if any occurred (after coverage is written).
+        // Calibration error takes priority over pair-level errors because it
+        // signals that the agent itself is unreliable for the entire run.
+        if let Some(err) = calibration_error {
+            return Err(err);
+        }
         if let Some(err) = first_error {
             return Err(err);
         }
 
         Ok(findings)
     }
-}
-
-// ── Parallel judgment runner ──────────────────────────────────────────────────
-
-/// Run `agent.judge(diff_fragment, candidate_fragment)` for each pair in
-/// `fragment_pairs` using at most `max_parallelism` concurrent threads.
-///
-/// Results are returned in the **same order as `fragment_pairs`** so that callers
-/// can zip them back to the original work items by index.
-///
-/// Pairs are processed in chunks of `max_parallelism`: each chunk is handed to a
-/// `std::thread::scope` that spawns exactly one thread per pair in that chunk.  The
-/// scope joins all chunk threads before the next chunk begins, so the total number
-/// of live OS threads at any point is bounded by `max_parallelism`.  This prevents
-/// thread-count exhaustion for large diffs (unlike a semaphore-only approach that
-/// spawns N total threads over the lifetime of the function).
-///
-/// Errors from individual `judge()` calls are preserved in the result vector; they
-/// are not collapsed here.
-fn run_parallel_judgments(
-    fragment_pairs: &[(&CodeFragment, &CodeFragment)],
-    agent: &dyn DryCheckAgentPort,
-    max_parallelism: usize,
-) -> Vec<Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>> {
-    use std::sync::mpsc;
-
-    let n = fragment_pairs.len();
-    if n == 0 {
-        return Vec::new();
-    }
-
-    // Clamp chunk size: at least 1 so we always make progress.
-    let chunk_size = max_parallelism.max(1);
-
-    // Pre-allocate output slots indexed by pair position.
-    let mut results: Vec<Option<Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>>> =
-        (0..n).map(|_| None).collect();
-
-    for (chunk_start, chunk) in fragment_pairs.chunks(chunk_size).enumerate() {
-        // Channel scoped to this chunk: each thread sends (chunk-local index, result).
-        let (tx, rx) = mpsc::channel::<(
-            usize,
-            Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>,
-        )>();
-
-        // `std::thread::scope` joins all threads in this chunk before continuing
-        // to the next chunk.  At most `chunk_size` (= `max_parallelism`) OS threads
-        // are live at once because the scope covers exactly one chunk.
-        std::thread::scope(|scope| {
-            for (chunk_i, (diff_fragment, candidate_fragment)) in chunk.iter().enumerate() {
-                let tx_clone = tx.clone();
-                scope.spawn(move || {
-                    let judgment = agent.judge(diff_fragment, candidate_fragment);
-                    // Ignore send errors: rx is in scope and outlives all spawned threads.
-                    let _ = tx_clone.send((chunk_i, judgment));
-                });
-            }
-            // Drop the spawner's tx so rx sees EOF when all threads have sent.
-            drop(tx);
-        });
-
-        // Collect results from this chunk and write them into the global result
-        // buffer at the absolute pair index.
-        for (chunk_i, judgment) in rx {
-            let global_i = chunk_start * chunk_size + chunk_i;
-            if let Some(slot) = results.get_mut(global_i) {
-                *slot = Some(judgment);
-            }
-        }
-    }
-
-    // Unwrap the Option slots — every position must have been filled by a thread.
-    // The only way a slot remains None is an internal bug (chunk index calculation
-    // error), which we surface as a sentinel error rather than panicking.
-    results
-        .into_iter()
-        .map(|opt| {
-            opt.unwrap_or(Err(super::errors::DryCheckAgentError::Unexpected(
-                "internal: judgment result missing after parallel run".to_owned(),
-            )))
-        })
-        .collect()
 }
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
@@ -563,6 +592,7 @@ mod tests {
                 &self,
                 changed_fragment: &CodeFragment,
                 candidate_fragment: &CodeFragment,
+                tier: DryCheckJudgeTier,
             ) -> Result<DryCheckAgentJudgment, DryCheckAgentError>;
         }
     }
@@ -773,9 +803,10 @@ mod tests {
         let results = vec![make_similar_fragment("src/b.rs", cand_content, 0.9)];
         index.expect_search().returning(move |_, _| Ok(results.clone()));
 
-        // Agent must NOT be called — pair is already verified.
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().never();
+        // Agent must NOT be called for production pairs — pair is already verified.
+        // Calibration probes (path starts with "probes/") still fire exactly once.
+        let agent =
+            make_probe_only_agent("non-probe agent call not expected for already-verified pair");
 
         let writer = Arc::new(StubWriter::default());
         let interactor =
@@ -820,11 +851,9 @@ mod tests {
         index.expect_search().returning(move |_, _| Ok(results.clone()));
 
         // Agent IS called — new hash → new pair_key → not in verified set.
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(1).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new("different content, not a violation").unwrap(),
-            })
+        // Calibration probes (path starts with "probes/") also fire once.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("different content, not a violation").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -860,9 +889,9 @@ mod tests {
         let results = vec![make_similar_fragment("src/a.rs", content, 1.0)];
         index.expect_search().returning(move |_, _| Ok(results.clone()));
 
-        // Agent must NOT be called for self-match.
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().never();
+        // Agent must NOT be called for self-match production pairs.
+        // Calibration probes (path starts with "probes/") still fire exactly once.
+        let agent = make_probe_only_agent("non-probe agent call not expected for self-match");
 
         let writer = Arc::new(StubWriter::default());
         let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
@@ -892,11 +921,9 @@ mod tests {
         index.expect_search().returning(move |_, _| Ok(results.clone()));
 
         // Agent IS called (not a self-match).
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(1).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new("intra-file, not a DRY violation").unwrap(),
-            })
+        // Calibration probes (path starts with "probes/") also fire once.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("intra-file, not a DRY violation").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -955,12 +982,11 @@ mod tests {
             }
         });
 
-        // Agent called once for the violation candidate.
-        let mut agent = MockMockDryCheckAgentPort::new();
-        // 10 from first batch + 1 from second (x0..x9 + violation), 11 total.
+        // Agent called for each production candidate + 1 calibration probe.
+        // 10 from first batch + 1 from second (x0..x9 + violation), 11 production total.
         // Each gets judged.  We set NotAViolation for the x* ones and Violation
-        // for the last one.
-        agent.expect_judge().returning(move |changed, candidate| {
+        // for the last one.  Probe paths ("probes/") always return Violation.
+        let agent = make_probe_agent_with_non_probe(move |changed, candidate| {
             if candidate.source_path == std::path::Path::new("src/violation.rs") {
                 let changed_ref = fragment_ref_of(changed).unwrap();
                 let cand_ref = fragment_ref_of(candidate).unwrap();
@@ -1003,11 +1029,8 @@ mod tests {
             Ok(vec![make_similar_fragment("src/b.rs", "fn similar_fn() {}", 0.9)])
         });
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(1).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new("not a violation").unwrap(),
-            })
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("not a violation").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -1039,12 +1062,10 @@ mod tests {
             ])
         });
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        // Only the above-threshold fragment triggers agent call.
-        agent.expect_judge().times(1).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new("not a violation").unwrap(),
-            })
+        // Only the above-threshold fragment triggers a production agent call.
+        // Calibration probes (path starts with "probes/") also fire once.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("not a violation").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -1074,11 +1095,9 @@ mod tests {
             .times(1)
             .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(1).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::Accepted {
-                rationale: Rationale::new("acceptable cross-layer mirror").unwrap(),
-            })
+        // Calibration probes (path starts with "probes/") fire once.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::Accepted {
+            rationale: Rationale::new("acceptable cross-layer mirror").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -1111,11 +1130,9 @@ mod tests {
             Ok(vec![SimilarFragment { fragment: cand_frag_clone.clone(), score: make_score(0.85) }])
         });
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(1).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new("entry fields test rationale").unwrap(),
-            })
+        // Calibration probes (path starts with "probes/") also fire once.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("entry fields test rationale").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -1173,12 +1190,10 @@ mod tests {
             .expect_search()
             .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
 
-        let mut agent = MockMockDryCheckAgentPort::new();
         let expected_rationale = "This is the typed rationale";
-        agent.expect_judge().times(1).returning(move |_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new(expected_rationale).unwrap(),
-            })
+        // Calibration probes (path starts with "probes/") also fire once.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new(expected_rationale).unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -1197,10 +1212,17 @@ mod tests {
 
     // ── (j) Violation produces DryCheckVerdict::Violation + DryCheckFinding ───
 
-    #[test]
-    fn test_violation_produces_verdict_violation_and_finding_in_result_vec() {
-        let diff_content = "fn duplicated() {}";
-        let cand_content = "fn also_duplicated() {}";
+    /// Base scenario builder: calibration passes (probe → Violation) and the
+    /// single production pair is judged by `agent`.
+    ///
+    /// Fragments are `src/a.rs` (`diff_content`) vs `src/b.rs`
+    /// (`cand_content`) at similarity 0.9, threshold 0.8.
+    /// Returns `(findings, writer)` so callers can assert against both.
+    fn run_calibration_success_scenario(
+        diff_content: &'static str,
+        cand_content: &'static str,
+        agent: MockMockDryCheckAgentPort,
+    ) -> (Vec<DryCheckFinding>, Arc<StubWriter>) {
         let diff_frag = make_fragment("src/a.rs", diff_content);
 
         let mut embed = MockMockEmbeddingPort::new();
@@ -1213,31 +1235,45 @@ mod tests {
             Ok(vec![SimilarFragment { fragment: cand_frag.clone(), score: make_score(0.9) }])
         });
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(1).returning(move |changed, candidate| {
+        let writer = Arc::new(StubWriter::default());
+        let interactor =
+            make_interactor_with_config(embed, index, agent, Arc::clone(&writer), make_config(1));
+
+        let findings = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        (findings, writer)
+    }
+
+    /// Shared scenario builder: calibration passes (probe → Violation) and the
+    /// single production pair returns Violation with the given `refactor_proposal`.
+    fn run_calibration_success_violation_scenario(
+        refactor_proposal: &'static str,
+    ) -> (Vec<DryCheckFinding>, Arc<StubWriter>) {
+        let agent = make_probe_agent_with_non_probe(move |changed, candidate| {
             let changed_ref = fragment_ref_of(changed).unwrap();
             let cand_ref = fragment_ref_of(candidate).unwrap();
-            let finding =
-                DryCheckFinding::new(changed_ref, cand_ref, "Extract into shared trait.").unwrap();
+            let finding = DryCheckFinding::new(changed_ref, cand_ref, refactor_proposal).unwrap();
             Ok(DryCheckAgentJudgment::Violation {
                 rationale: Rationale::new("genuine duplication").unwrap(),
                 finding,
             })
         });
+        run_calibration_success_scenario("fn duplicated() {}", "fn also_duplicated() {}", agent)
+    }
 
-        let writer = Arc::new(StubWriter::default());
-        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
-
-        let findings = interactor
-            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
-            .unwrap();
+    #[test]
+    fn test_violation_produces_verdict_violation_and_finding_in_result_vec() {
+        let proposal = "Extract into shared trait.";
+        let (findings, writer) = run_calibration_success_violation_scenario(proposal);
 
         // DryCheckFinding in returned Vec
         assert_eq!(findings.len(), 1);
         let finding = &findings[0];
         assert_eq!(finding.changed_fragment_ref().path().as_str(), "src/a.rs");
         assert_eq!(finding.candidate_fragment_ref().path().as_str(), "src/b.rs");
-        assert_eq!(finding.refactor_proposal().as_str(), "Extract into shared trait.");
+        assert_eq!(finding.refactor_proposal().as_str(), proposal);
 
         // DryCheckVerdict::Violation persisted
         let entries = writer.entries.lock().unwrap();
@@ -1247,7 +1283,7 @@ mod tests {
             "persisted verdict must be Violation"
         );
         if let DryCheckVerdict::Violation { refactor_proposal } = entries[0].verdict() {
-            assert_eq!(refactor_proposal.as_str(), "Extract into shared trait.");
+            assert_eq!(refactor_proposal.as_str(), proposal);
         }
     }
 
@@ -1272,11 +1308,9 @@ mod tests {
             }])
         });
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(1).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::Accepted {
-                rationale: Rationale::new("accepted duplication").unwrap(),
-            })
+        // Calibration probes (path starts with "probes/") also fire once.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::Accepted {
+            rationale: Rationale::new("accepted duplication").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -1337,9 +1371,11 @@ mod tests {
         // Search returns empty (no candidates above threshold) so no agent calls.
         index.expect_search().returning(|_, _| Ok(vec![]));
 
-        // Agent must not be called (no above-threshold candidates).
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().never();
+        // No production agent calls (no above-threshold candidates).
+        // Calibration probes (path starts with "probes/") still fire exactly once.
+        let agent = make_probe_only_agent(
+            "non-probe agent call not expected (no above-threshold candidates)",
+        );
 
         let writer = Arc::new(StubWriter::default());
         let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
@@ -1374,8 +1410,11 @@ mod tests {
         // No candidates above threshold for either diff fragment.
         index.expect_search().times(2).returning(|_, _| Ok(vec![]));
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().never();
+        // No production agent calls (no above-threshold candidates).
+        // Calibration probes (path starts with "probes/") still fire exactly once.
+        let agent = make_probe_only_agent(
+            "non-probe agent call not expected (no above-threshold candidates)",
+        );
 
         let writer = Arc::new(StubWriter::default());
         let coverage = Arc::new(StubCoverage::new());
@@ -1415,8 +1454,9 @@ mod tests {
         let embed = MockMockEmbeddingPort::new();
         let mut index = MockMockSemanticIndexPort::new();
         index.expect_insert_batch().times(1).withf(|items| items.is_empty()).returning(|_| Ok(()));
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().never();
+        // No production agent calls (empty diff → no candidates).
+        // Calibration probes (path starts with "probes/") still fire exactly once.
+        let agent = make_probe_only_agent("non-probe agent call not expected (empty diff)");
 
         let writer = Arc::new(StubWriter::default());
         let coverage = Arc::new(StubCoverage::new());
@@ -1447,8 +1487,11 @@ mod tests {
         let mut index = MockMockSemanticIndexPort::new();
         index.expect_insert_batch().times(1).withf(|items| items.is_empty()).returning(|_| Ok(()));
         index.expect_search().times(1).returning(|_, _| Ok(vec![]));
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().never();
+        // No production agent calls (no above-threshold candidates).
+        // Calibration probes (path starts with "probes/") still fire exactly once.
+        let agent = make_probe_only_agent(
+            "non-probe agent call not expected (no above-threshold candidates)",
+        );
 
         let writer = Arc::new(StubWriter::default());
         let coverage = Arc::new(StubCoverage::failing());
@@ -1486,11 +1529,10 @@ mod tests {
             ])
         });
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(3).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new("not a violation").unwrap(),
-            })
+        // 3 production calls + 1 calibration probe call.
+        // Calibration probes (path starts with "probes/") return Violation.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("not a violation").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -1533,11 +1575,10 @@ mod tests {
             ])
         });
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(2).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new("not a violation").unwrap(),
-            })
+        // 2 production calls + 1 calibration probe call.
+        // Calibration probes (path starts with "probes/") return Violation.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("not a violation").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -1603,11 +1644,11 @@ mod tests {
         // First call fails; the other two succeed.
         // Because execution is parallel (max_parallelism=1 for determinism in
         // which one fails), we need a shared counter to vary the response.
+        // Calibration probes (changed path starts with "probes/") return Violation.
         let call_count = Arc::new(Mutex::new(0u32));
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().returning(move |_, candidate| {
-            // Fail specifically for src/b.rs (which sorts lowest and is first).
+        let agent = make_probe_agent_with_non_probe(move |_changed, candidate| {
             if candidate.source_path == std::path::Path::new("src/b.rs") {
+                // Fail specifically for src/b.rs (which sorts lowest and is first).
                 Err(DryCheckAgentError::Timeout)
             } else {
                 *call_count.lock().unwrap() += 1;
@@ -1665,9 +1706,10 @@ mod tests {
             ])
         });
 
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(2).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation { rationale: Rationale::new("ok").unwrap() })
+        // 2 production calls + 1 calibration probe call.
+        // Calibration probes (path starts with "probes/") return Violation.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("ok").unwrap(),
         });
 
         let writer = Arc::new(StubWriter::default());
@@ -1709,6 +1751,479 @@ mod tests {
         assert!(
             second_paths.0.contains("src/z.rs") || second_paths.1.contains("src/z.rs"),
             "second written pair must contain src/z.rs (higher sort key); got {second_paths:?}"
+        );
+    }
+
+    // ── T012: D4 calibration barrier tests ───────────────────────────────────
+
+    /// Build a mock agent where probe paths always return a `Violation` judgment
+    /// and non-probe paths are handled by `on_non_probe`.
+    ///
+    /// Centralises the probe detection rule (`starts_with("probes/")`) and the
+    /// authoritative probe `Violation` construction so callers only provide the
+    /// non-probe branch.
+    fn make_probe_agent_with_non_probe<F>(on_non_probe: F) -> MockMockDryCheckAgentPort
+    where
+        F: Fn(&CodeFragment, &CodeFragment) -> Result<DryCheckAgentJudgment, DryCheckAgentError>
+            + Send
+            + 'static,
+    {
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().returning(move |changed, candidate, _tier| {
+            if changed.source_path.to_string_lossy().starts_with("probes/") {
+                let changed_ref = fragment_ref_of(changed).unwrap();
+                let cand_ref = fragment_ref_of(candidate).unwrap();
+                Ok(DryCheckAgentJudgment::Violation {
+                    rationale: Rationale::new("probe: known bad").unwrap(),
+                    finding: DryCheckFinding::new(changed_ref, cand_ref, "probe violation")
+                        .unwrap(),
+                })
+            } else {
+                on_non_probe(changed, candidate)
+            }
+        });
+        agent
+    }
+
+    fn make_probe_aware_agent(
+        production_verdict: DryCheckAgentJudgment,
+    ) -> MockMockDryCheckAgentPort {
+        make_probe_agent_with_non_probe(move |_, _| Ok(production_verdict.clone()))
+    }
+
+    /// Helper: build a probe-aware agent that returns `Violation` for probe paths
+    /// and panics with `non_probe_panic_msg` for any non-probe (production) call.
+    ///
+    /// Use this in tests that assert no production agent call should occur (e.g.
+    /// the verified-pair cache test, self-match exclusion, or no-candidates paths).
+    fn make_probe_only_agent(non_probe_panic_msg: &'static str) -> MockMockDryCheckAgentPort {
+        make_probe_agent_with_non_probe(move |_, _| panic!("{non_probe_panic_msg}"))
+    }
+
+    /// Helper: build an agent where probe paths always return `NotAViolation`
+    /// (calibration fails) and production paths return `NotAViolation` as well.
+    fn make_always_not_violation_agent() -> MockMockDryCheckAgentPort {
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().returning(|_, _, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new("not a violation").unwrap(),
+            })
+        });
+        agent
+    }
+
+    /// Helper: build a DryCheckInteractor with the given config.
+    ///
+    /// Delegates to `make_interactor_with_config_and_coverage` with a default
+    /// `StubCoverage` so constructor wiring exists in exactly one place.
+    fn make_interactor_with_config(
+        embed: MockMockEmbeddingPort,
+        index: MockMockSemanticIndexPort,
+        agent: MockMockDryCheckAgentPort,
+        writer: Arc<StubWriter>,
+        config: DryCheckConfig,
+    ) -> DryCheckInteractor {
+        make_interactor_with_config_and_coverage(
+            embed,
+            index,
+            agent,
+            writer,
+            config,
+            Arc::new(StubCoverage::new()),
+        )
+    }
+
+    /// Core helper: build a `DryCheckInteractor` with the given config and an
+    /// explicit `coverage` stub so tests can inspect `write_call_count()` /
+    /// `last_written()`.
+    ///
+    /// `make_interactor_with_config` delegates to this function, supplying a
+    /// default `StubCoverage::new()` so the constructor wiring lives here only.
+    fn make_interactor_with_config_and_coverage(
+        embed: MockMockEmbeddingPort,
+        index: MockMockSemanticIndexPort,
+        agent: MockMockDryCheckAgentPort,
+        writer: Arc<StubWriter>,
+        config: DryCheckConfig,
+        coverage: Arc<StubCoverage>,
+    ) -> DryCheckInteractor {
+        // Single source of DryCheckInteractor constructor wiring for tests.
+        // make_interactor_with_config delegates here with StubCoverage::new().
+        DryCheckInteractor::new(
+            Arc::new(embed),
+            Arc::new(index),
+            Arc::new(agent),
+            writer,
+            Arc::new(StubReader::with_records(vec![])),
+            coverage,
+            make_track(),
+            config,
+        )
+    }
+
+    /// T012-1: Fast tier is used for production pairs when agent path is NOT a probe.
+    ///
+    /// With calibration passing (probe returns Violation) and a production
+    /// NotAViolation result, the writer must record exactly 1 entry (no escalation,
+    /// no double-write).
+    #[test]
+    fn test_fast_calibration_success_not_a_violation_pair_not_escalated_to_final() {
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("not a violation").unwrap(),
+        });
+        let (findings, writer) = run_calibration_success_scenario("fn a() {}", "fn b() {}", agent);
+
+        assert!(findings.is_empty(), "NotAViolation must produce no findings");
+        // Exactly 1 production pair written (probe not written CN-06).
+        assert_eq!(
+            writer.entries.lock().unwrap().len(),
+            1,
+            "exactly 1 production record written after calibration passes"
+        );
+    }
+
+    /// T012-2: Fast calibration failure causes all production pairs to be re-run
+    /// with Final tier. When Final calibration also fails, the error is returned
+    /// fail-closed — but coverage IS written first (T011 preservation) so the
+    /// current diff fragments do not remain permanently stale.
+    ///
+    /// With injection_rate=100 and 3 probes, probe_count = 3 (all probes run).
+    /// All probes return NotAViolation → detection rate = 0% < threshold 90% →
+    /// fast calibration fails. Then Final tier runs all production pairs.
+    /// Final probes also return NotAViolation → final calibration also fails →
+    /// fail-closed error returned after coverage write.
+    #[test]
+    fn test_fast_calibration_failure_final_also_fails_returns_calibration_error() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        index
+            .expect_search()
+            .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
+
+        // All judge calls return NotAViolation — probes not detected.
+        let agent = make_always_not_violation_agent();
+
+        // Use injection_rate=100 so all 3 probes are run; threshold=90.
+        let config = DryCheckConfig::new(
+            DryCheckPercent::try_new(100).unwrap(),
+            DryCheckPercent::try_new(90).unwrap(),
+            DryCheckParallelism::try_new(1).unwrap(),
+        );
+
+        let writer = Arc::new(StubWriter::default());
+        let coverage = Arc::new(StubCoverage::new());
+        let interactor = make_interactor_with_config_and_coverage(
+            embed,
+            index,
+            agent,
+            Arc::clone(&writer),
+            config,
+            Arc::clone(&coverage),
+        );
+
+        let result =
+            interactor.run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit());
+
+        assert!(
+            matches!(
+                result,
+                Err(DryCheckCycleError::Agent(DryCheckAgentError::Unexpected(ref msg)))
+                    if msg == "calibration failed"
+            ),
+            "expected calibration-failed error, got: {result:?}"
+        );
+        // Pair-level writer must NOT be called: agent quality is untrusted, so no
+        // production verdicts are persisted when calibration fails.
+        assert!(
+            writer.entries.lock().unwrap().is_empty(),
+            "pair-entry writer must not be called when calibration fails"
+        );
+        // Coverage manifest MUST be written on calibration failure — but with an
+        // EMPTY set of refs (AC-08 fail-closed).  An empty coverage record means
+        // all current diff fragments are "uncovered" → `check_approved` returns
+        // Blocked rather than Approved.  Writing the (empty) manifest ensures the
+        // gate does not remain blocked due to a missing manifest from an older run.
+        assert_eq!(
+            coverage.write_call_count(),
+            1,
+            "coverage must be written exactly once even when calibration fails"
+        );
+        assert!(
+            coverage.last_written().is_some_and(|r| r.fragment_refs().is_empty()),
+            "coverage written on calibration failure must be empty (fail-closed)"
+        );
+    }
+
+    /// T012-3: When fast calibration passes but a production pair returns Violation,
+    /// that pair is escalated to Final tier. Writer records the Final tier verdict.
+    #[test]
+    fn test_fast_calibration_success_violation_pair_escalated_to_final_tier() {
+        let (findings, writer) =
+            run_calibration_success_violation_scenario("Extract shared logic.");
+
+        // Violation finding must be returned (after Final tier escalation).
+        assert_eq!(findings.len(), 1, "one violation finding expected");
+        assert_eq!(findings[0].changed_fragment_ref().path().as_str(), "src/a.rs");
+        assert_eq!(findings[0].candidate_fragment_ref().path().as_str(), "src/b.rs");
+        // Writer must record exactly 1 production entry.
+        assert_eq!(
+            writer.entries.lock().unwrap().len(),
+            1,
+            "exactly 1 production entry written (probe not recorded CN-06)"
+        );
+    }
+
+    /// T012-3b: When a production Violation is escalated to Final tier, the writer
+    /// records the **Final-tier verdict**, not the provisional Fast-tier verdict.
+    ///
+    /// This is the tier-discriminating escalation test.  The agent returns:
+    /// - probe path → Violation (calibration passes for both tiers)
+    /// - production pair + Fast tier → Violation
+    /// - production pair + Final tier → NotAViolation
+    ///
+    /// The written verdict must be NotAViolation (from Final), proving that the
+    /// interactor actually re-judged the pair with Final instead of persisting the
+    /// provisional Fast result.
+    #[test]
+    fn test_escalation_persists_final_tier_verdict_not_provisional_fast_verdict() {
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().returning(|changed, candidate, tier| {
+            if changed.source_path.to_string_lossy().starts_with("probes/") {
+                // Probe: always Violation so calibration passes.
+                let changed_ref = fragment_ref_of(changed).unwrap();
+                let cand_ref = fragment_ref_of(candidate).unwrap();
+                return Ok(DryCheckAgentJudgment::Violation {
+                    rationale: Rationale::new("probe: known bad").unwrap(),
+                    finding: DryCheckFinding::new(changed_ref, cand_ref, "probe violation")
+                        .unwrap(),
+                });
+            }
+            // Production pair: tier-discriminating response.
+            match tier {
+                DryCheckJudgeTier::Fast => {
+                    let changed_ref = fragment_ref_of(changed).unwrap();
+                    let cand_ref = fragment_ref_of(candidate).unwrap();
+                    Ok(DryCheckAgentJudgment::Violation {
+                        rationale: Rationale::new("fast: provisional violation").unwrap(),
+                        finding: DryCheckFinding::new(changed_ref, cand_ref, "fast proposal")
+                            .unwrap(),
+                    })
+                }
+                DryCheckJudgeTier::Final => Ok(DryCheckAgentJudgment::NotAViolation {
+                    rationale: Rationale::new("final: not a violation after deeper check").unwrap(),
+                }),
+            }
+        });
+
+        let (findings, writer) =
+            run_calibration_success_scenario("fn duplicated() {}", "fn also_dup() {}", agent);
+
+        // The Final verdict (NotAViolation) must prevail — no finding returned.
+        assert!(
+            findings.is_empty(),
+            "Final-tier NotAViolation must override provisional Fast Violation; got findings: \
+             {findings:?}"
+        );
+        // The writer must record NotAViolation (Final tier), not Violation (Fast tier).
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(entries.len(), 1, "exactly 1 production entry written");
+        assert!(
+            matches!(entries[0].verdict(), DryCheckVerdict::NotAViolation),
+            "persisted verdict must be NotAViolation (Final tier), not Violation (Fast tier)"
+        );
+    }
+
+    /// T012-4: Probe verdicts are NOT written to dry_check_writer (CN-06).
+    ///
+    /// With 1 production pair (NotAViolation) and 1 probe (Violation via
+    /// make_probe_aware_agent), writer must have exactly 1 entry — not 2.
+    #[test]
+    fn test_probe_verdict_not_written_to_dry_check_writer_cn06() {
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("not a violation").unwrap(),
+        });
+        let (_findings, writer) = run_calibration_success_scenario("fn a() {}", "fn b() {}", agent);
+
+        // Only the production pair must be written — probe Violation must NOT appear.
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(
+            entries.len(),
+            1,
+            "probe Violation must not be written to dry_check_writer (CN-06), got {} entries",
+            entries.len()
+        );
+        // The written entry must be the production pair (not a probe path).
+        let changed_path = entries[0].changed_path().as_str();
+        assert!(
+            !changed_path.starts_with("probes/"),
+            "written entry must be a production pair, not a probe; got changed_path={changed_path}"
+        );
+    }
+
+    /// T012-5: Final calibration passes when fast calibration fails but Final probes
+    /// detect violations. Writer records all production Final-tier results.
+    #[test]
+    fn test_fast_calibration_failure_final_passes_production_pairs_written_with_final_results() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        index
+            .expect_search()
+            .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
+
+        // Fast probes → NotAViolation (fast calibration fails).
+        // Final probes → Violation (final calibration passes).
+        // Production Fast → NotAViolation.
+        // Production Final → NotAViolation.
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().returning(move |changed, candidate, tier| {
+            if changed.source_path.to_string_lossy().starts_with("probes/") {
+                match tier {
+                    DryCheckJudgeTier::Fast => Ok(DryCheckAgentJudgment::NotAViolation {
+                        rationale: Rationale::new("probe fast: not detected").unwrap(),
+                    }),
+                    DryCheckJudgeTier::Final => {
+                        let changed_ref = fragment_ref_of(changed).unwrap();
+                        let cand_ref = fragment_ref_of(candidate).unwrap();
+                        Ok(DryCheckAgentJudgment::Violation {
+                            rationale: Rationale::new("probe final: detected").unwrap(),
+                            finding: DryCheckFinding::new(changed_ref, cand_ref, "probe").unwrap(),
+                        })
+                    }
+                }
+            } else {
+                Ok(DryCheckAgentJudgment::NotAViolation {
+                    rationale: Rationale::new("production: not a violation").unwrap(),
+                })
+            }
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        // injection_rate=100 so all 3 probes are run; threshold=50 so that even
+        // 1 out of 3 fast detections (33%) would fail (<50%) but 3/3 final detections pass.
+        let config = DryCheckConfig::new(
+            DryCheckPercent::try_new(100).unwrap(),
+            DryCheckPercent::try_new(50).unwrap(),
+            DryCheckParallelism::try_new(1).unwrap(),
+        );
+        let interactor =
+            make_interactor_with_config(embed, index, agent, Arc::clone(&writer), config);
+
+        let findings = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(findings.is_empty(), "production NotAViolation must produce no findings");
+        // Production pair written exactly once (Final tier result).
+        assert_eq!(
+            writer.entries.lock().unwrap().len(),
+            1,
+            "exactly 1 production entry after fast-fail + final-pass"
+        );
+    }
+
+    /// T012-5b: When fast calibration fails and final calibration passes, production
+    /// pairs are re-judged with the **Final tier** and the Final-tier verdict is
+    /// persisted — NOT the discarded provisional Fast result.
+    ///
+    /// Tier-discriminating version of T012-5:
+    /// - Probe Fast → NotAViolation (fast calibration fails)
+    /// - Probe Final → Violation (final calibration passes)
+    /// - Production Fast → Violation (provisional, must be discarded)
+    /// - Production Final → NotAViolation (must be persisted)
+    ///
+    /// If the interactor incorrectly reused the discarded Fast provisional result,
+    /// the writer would record `Violation`. This test catches that regression.
+    #[test]
+    fn test_fast_calibration_failure_production_re_run_with_final_tier_verdict_persisted() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        index
+            .expect_search()
+            .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().returning(move |changed, candidate, tier| {
+            if changed.source_path.to_string_lossy().starts_with("probes/") {
+                // Probe: Fast fails calibration, Final passes calibration.
+                match tier {
+                    DryCheckJudgeTier::Fast => Ok(DryCheckAgentJudgment::NotAViolation {
+                        rationale: Rationale::new("probe fast: undetected").unwrap(),
+                    }),
+                    DryCheckJudgeTier::Final => {
+                        let changed_ref = fragment_ref_of(changed).unwrap();
+                        let cand_ref = fragment_ref_of(candidate).unwrap();
+                        Ok(DryCheckAgentJudgment::Violation {
+                            rationale: Rationale::new("probe final: detected").unwrap(),
+                            finding: DryCheckFinding::new(changed_ref, cand_ref, "probe").unwrap(),
+                        })
+                    }
+                }
+            } else {
+                // Production: Fast returns Violation (provisional, must be discarded);
+                // Final returns NotAViolation (must be the persisted verdict).
+                match tier {
+                    DryCheckJudgeTier::Fast => {
+                        let changed_ref = fragment_ref_of(changed).unwrap();
+                        let cand_ref = fragment_ref_of(candidate).unwrap();
+                        Ok(DryCheckAgentJudgment::Violation {
+                            rationale: Rationale::new("fast: provisional violation").unwrap(),
+                            finding: DryCheckFinding::new(
+                                changed_ref,
+                                cand_ref,
+                                "fast proposal (must be discarded)",
+                            )
+                            .unwrap(),
+                        })
+                    }
+                    DryCheckJudgeTier::Final => Ok(DryCheckAgentJudgment::NotAViolation {
+                        rationale: Rationale::new("final: not a violation").unwrap(),
+                    }),
+                }
+            }
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        // injection_rate=100; threshold=50 so Fast calibration (0/3 = 0%) fails
+        // but Final calibration (3/3 = 100%) passes.
+        let config = DryCheckConfig::new(
+            DryCheckPercent::try_new(100).unwrap(),
+            DryCheckPercent::try_new(50).unwrap(),
+            DryCheckParallelism::try_new(1).unwrap(),
+        );
+        let interactor =
+            make_interactor_with_config(embed, index, agent, Arc::clone(&writer), config);
+
+        let findings = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        // Final verdict is NotAViolation — no finding must be returned.
+        assert!(
+            findings.is_empty(),
+            "Final-tier NotAViolation must be the persisted result; got findings: {findings:?}"
+        );
+        // Writer must record the Final-tier verdict (NotAViolation), not the Fast provisional.
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(entries.len(), 1, "exactly 1 production entry written");
+        assert!(
+            matches!(entries[0].verdict(), DryCheckVerdict::NotAViolation),
+            "persisted verdict must be NotAViolation (from Final tier, not provisional Fast \
+             Violation)"
         );
     }
 }

@@ -165,17 +165,13 @@ pub(super) fn build_codex_invocation(
     output_last_message: &std::path::Path,
     output_schema: &std::path::Path,
 ) -> super::CodexInvocation {
-    use std::ffi::OsString;
-    let mut args = vec![OsString::from("exec"), OsString::from("--model"), OsString::from(model)];
-    args.extend([OsString::from("--sandbox"), OsString::from("read-only")]);
-    args.extend([OsString::from("--config"), OsString::from("model_reasoning_effort=\"high\"")]);
-    args.extend([
-        OsString::from("--output-schema"),
-        output_schema.as_os_str().to_os_string(),
-        OsString::from("--output-last-message"),
-        output_last_message.as_os_str().to_os_string(),
-        OsString::from(prompt),
-    ]);
+    let args = cli_composition::build_codex_read_only_invocation(
+        model,
+        "high",
+        prompt,
+        output_last_message,
+        output_schema,
+    );
     super::CodexInvocation { bin: codex_bin(), args }
 }
 
