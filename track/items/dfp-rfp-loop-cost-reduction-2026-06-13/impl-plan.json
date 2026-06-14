@@ -22,12 +22,13 @@
     {
       "id": "T004",
       "description": "D5: `dry write` 完了後に `DryCheckCoverageRecord` を書き込む配線を追加する (IN-06 / AC-11 / CN-08)。変更ファイル: `libs/usecase/src/dry_check/interactor.rs` の `DryCheckInteractor::run_dry_check` と、composition 層の `apps/cli-composition/src/dry.rs` の `dry_write`。`DryCheckInteractor` に `coverage: Arc<dyn DryCheckCoveragePort>` を追加し、`run_dry_check` の末尾で処理した diff フラグメントの FragmentRef 集合から `DryCheckCoverageRecord` を構築して `coverage.write_coverage` を呼ぶ。composition 層では `dry_write` の `DryCheckInteractor::new` 構築を新しい coverage 引数に合わせて更新し、`FsDryCheckCoverageAdapter` を接続する。T003 で橋渡し済みの `dry_check_approved` composition 経路はこの変更後も維持する。unit tests: `run_dry_check` が正常完了後に `write_coverage` を 1 回呼ぶこと / diff フラグメントが 2 件なら coverage record の `fragment_refs` が 2 要素になること / `write_coverage` が失敗したとき `DryCheckCycleError::CoveragePort` が返ること / composition の `dry_write` が `FsDryCheckCoverageAdapter` を `DryCheckInteractor::new` に渡してコンパイルすること。前提: T001, T002, T003。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5"
     },
     {
       "id": "T005",
       "description": "D5: T003 で橋渡し済みの `dry check-approved` 純読み取り call site から、旧 LanceDB / embedding / threshold 入力の残骸を除去する (IN-05 / AC-10 / AC-12 / CN-09)。変更ファイル: `apps/cli-composition/src/dry.rs` の `DryCheckApprovedInput` struct と `dry_check_approved` メソッド、および `apps/cli/src/main.rs` の引数解析部。`DryCheckApprovedInput` から `db_path: PathBuf` / `threshold: Option<f32>` / `workspace_root: PathBuf` を除去し、対応する CLI 引数・テスト fixture も削除または更新する。`dry_check_approved` は git diff から現在のフラグメント FragmentRef 集合のみを取得し (embedding 不要)、T003 で導入した `FsDryCheckCoverageAdapter` + `FsDryCheckStore` → `DryCheckApprovalInteractor::new` → `check_approved(track_id, current_fragment_refs)` 経路を維持する。`dry check-approved` が安価になったことを確認する regression test を追加する (embedding adapter / semantic index / threshold validation をインスタンス化しないこと)。D1 の DFP ループ先頭 check-approved の繰り返し実行が安全 (AC-12 / CN-09) であることもここで確認する。前提: T003, T004。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T006",

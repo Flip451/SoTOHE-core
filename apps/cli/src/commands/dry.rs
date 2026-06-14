@@ -160,6 +160,9 @@ pub fn execute_dry_results(args: DryResultsArgs) -> ExitCode {
 // ── sotp dry check-approved ───────────────────────────────────────────────────
 
 /// Arguments for `sotp dry check-approved`.
+///
+/// D5 / T005: pure-read gate — no `--db-path`, `--threshold`, or
+/// `--workspace-root` flags (those inputs are no longer consulted).
 #[derive(Debug, Args)]
 pub struct DryCheckApprovedArgs {
     /// Track ID used to locate the per-track dry-check.json and .commit_hash.
@@ -174,18 +177,6 @@ pub struct DryCheckApprovedArgs {
     /// fallback; malformed → warn + main fallback).
     #[arg(long)]
     pub base_commit: Option<String>,
-
-    /// Path to the local LanceDB semantic index database.
-    #[arg(long, default_value = ".semantic_index")]
-    pub db_path: PathBuf,
-
-    /// Cosine similarity threshold (0.0–1.0).
-    #[arg(long)]
-    pub threshold: Option<f32>,
-
-    /// Workspace root to scan for Rust sources (corpus + diff fragment extraction).
-    #[arg(long, default_value = ".")]
-    pub workspace_root: PathBuf,
 
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
@@ -206,9 +197,6 @@ pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
     outcome_to_exit(CliApp::new().dry_check_approved(DryCheckApprovedInput {
         track_id,
         base_commit: args.base_commit,
-        db_path: args.db_path,
-        threshold: args.threshold,
-        workspace_root: args.workspace_root,
         items_dir: args.items_dir,
     }))
 }
@@ -425,22 +413,30 @@ mod tests {
             DryCommand::CheckApproved(args) => {
                 assert_eq!(args.track_id.as_deref(), Some("my-track"));
                 assert!(args.base_commit.is_none(), "base_commit must be absent by default");
-                assert_eq!(args.db_path, PathBuf::from(".semantic_index"));
-                assert!(args.threshold.is_none(), "threshold must be absent by default");
+                assert_eq!(args.items_dir, PathBuf::from("track/items"));
             }
             other => panic!("expected CheckApproved, got {other:?}"),
         }
     }
 
+    /// D5 / T005: `dry check-approved` is now a pure-read gate and rejects
+    /// removed write-only inputs at parse time.
     #[test]
-    fn test_dry_check_approved_custom_threshold_parses() {
-        let cmd =
-            parse_dry(&["dry", "check-approved", "--track-id", "my-track", "--threshold", "0.9"]);
-        match cmd {
-            DryCommand::CheckApproved(args) => {
-                assert!((args.threshold.unwrap() - 0.9).abs() < 1e-5);
-            }
-            other => panic!("expected CheckApproved, got {other:?}"),
+    fn test_dry_check_approved_rejects_removed_flags() {
+        for (flag, value, message) in [
+            ("--threshold", "0.9", "--threshold must be rejected after T005 removal"),
+            ("--db-path", "/tmp/my.db", "--db-path must be rejected after T005 removal"),
+            ("--workspace-root", ".", "--workspace-root must be rejected after T005 removal"),
+        ] {
+            let result = TestCli::try_parse_from([
+                "dry",
+                "check-approved",
+                "--track-id",
+                "my-track",
+                flag,
+                value,
+            ]);
+            assert!(result.is_err(), "{message}");
         }
     }
 

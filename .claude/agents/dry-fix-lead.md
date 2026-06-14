@@ -1,6 +1,6 @@
 ---
 name: dry-fix-lead
-model: fable
+model: opus
 description: Own the DFP (DRY fix phase) loop — run sotp dry write, apply refactor proposals to eliminate DRY violations, verify with cargo make ci-rust, and iterate until sotp dry check-approved exits 0 (completed), the loop is exhausted with violations remaining (blocked), or a tooling error prevents the loop from running (failed).
 ---
 

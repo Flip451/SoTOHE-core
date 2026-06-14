@@ -1,6 +1,6 @@
 ---
 name: review-fix-lead
-model: fable
+model: opus
 description: Own one review scope, autonomously fix findings and re-review until zero_findings or timeout. Use for parallel per-scope fix+review loops.
 ---
 

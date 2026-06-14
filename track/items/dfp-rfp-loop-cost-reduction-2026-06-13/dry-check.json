@@ -1611,6 +1611,153 @@
       "base_commit": "5ac3ca8eb5eeb3387a4e8ba598f8b5b1034343f7",
       "rationale": "The fragments share some normal test setup for mocks, writer, coverage, and interactor construction, but they exercise distinct behaviors: an empty diff produces an empty coverage record, while multiple diff fragments produce coverage containing exactly those fragment refs. The repeated scaffolding is modest and already uses shared helpers; extracting more would likely reduce test clarity without removing meaningful production logic duplication.",
       "recorded_at": "2026-06-14T03:57:56Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "31df2fcee3c1bf93ace4f26475d017f2a8d4e262071cbf7ee0f543b446cec5dd",
+      "high_path": "apps/cli/src/commands/dry.rs",
+      "high_hash": "ecc53b528d810fcd8bcf5ef226a944260b942292bc5ba711cd8c282713d885b8",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9119309186935424,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "The fragments are complementary parts of the same CLI command definition rather than duplicated behavior. The changed fragment defines `DryCheckApprovedArgs` and its user-facing documentation; the candidate fragment implements `execute_dry_check_approved` by resolving `track_id` and passing the parsed arguments into the application layer. The repeated field names (`track_id`, `base_commit`, `items_dir`) are required data plumbing between the CLI args type and input type, not parallel implementations of the same logic.",
+      "recorded_at": "2026-06-14T04:10:53Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "1d7652d8c07889061f4cb99e646afc5f510bee93ac3ff7d02d08d4de7749811a",
+      "high_path": "apps/cli/src/commands/dry.rs",
+      "high_hash": "ecc53b528d810fcd8bcf5ef226a944260b942292bc5ba711cd8c282713d885b8",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.902894914150238,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "The fragments share only routine CLI command structure: wrapper functions that map parsed args into application input structs, section separators, and command documentation patterns. The actual fields and behavior are command-specific (`dry results` / `dry check-approved` versus `dry write` / verdict filter parsing), so there is no duplicated business rule or reusable logic drifting across fragments.",
+      "recorded_at": "2026-06-14T04:11:06Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "c9f80dbecfa0f047cd2224f720d3d3b7c7c81a434795f4e2ed5f942f54b36ebc",
+      "high_path": "apps/cli/src/main.rs",
+      "high_hash": "8e9c156eb9ad1d6385f7ecd13015af845a2719e1845c7a6aca922aa391cb9cfd",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.864035427570343,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "The fragments share a small assertion that `--track-id my-track` reaches `DryCommand::CheckApproved`, but they exercise different behavior: `dry.rs` tests the `parse_dry` command parser defaults including `base_commit` and `items_dir`, while `main.rs` tests top-level `Cli::try_parse_from` dispatch through `sotp dry check-approved`. The overlap is minimal and preserves distinct coverage boundaries.",
+      "recorded_at": "2026-06-14T04:11:17Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "c9f80dbecfa0f047cd2224f720d3d3b7c7c81a434795f4e2ed5f942f54b36ebc",
+      "high_path": "apps/cli/src/main.rs",
+      "high_hash": "cb4f0d60e9d05e0ffc9fd8bf82d0338bcc7c8a038967400424290fd86092bf87",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8626405596733093,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "Both fragments exercise `dry check-approved --track-id my-track`, but they validate different responsibilities: `apps/cli/src/commands/dry.rs` checks direct command parsing plus default argument behavior, while `apps/cli/src/main.rs` checks top-level CLI dispatch through `run_cli`. The small overlap in setup and assertion is incidental test scaffolding, not duplicated production logic or a repeated behavioral implementation.",
+      "recorded_at": "2026-06-14T04:11:27Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "b293f17f5d362c0f0aabfedfeecd41d01e9346dfca847437185a3139a48cbec7",
+      "high_path": "apps/cli/src/commands/dry.rs",
+      "high_hash": "c9f80dbecfa0f047cd2224f720d3d3b7c7c81a434795f4e2ed5f942f54b36ebc",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8541257977485657,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "The fragments share normal test scaffolding for parsing the same subcommand, but they assert different behavior: one verifies explicit track-id parsing plus default absence of base_commit and default items_dir, while the other verifies that an optional base_commit is accepted when provided. The repeated match/assert shape is small, localized test code and does not duplicate domain logic or create a meaningful maintenance risk.",
+      "recorded_at": "2026-06-14T04:11:42Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "735486ffc83654986210acf742658c6b917a5c023d2bb80199d638afdaf39962",
+      "high_path": "libs/usecase/src/dry_check/services.rs",
+      "high_hash": "adf46fc06fb3714dbb4719e6f412ae312ae1ee391560181e09672e6e1058ab8a",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8596669435501099,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "The fragments describe adjacent but distinct layers: `apps/cli-composition/src/dry.rs` defines CLI composition DTOs and imports, while `libs/usecase/src/dry_check/services.rs` defines use-case service traits and their contract. Some domain terms overlap (`base_commit`, corpus/diff fragments, threshold), but that overlap is expected at a boundary between CLI input mapping and application service contracts. There is no duplicated algorithm, branching policy, persistence logic, or independently maintained implementation behavior that would create a DRY maintenance risk.",
+      "recorded_at": "2026-06-14T04:11:59Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "a8dfeb0fe8f649848fd3275d4a625e025737b48b477ef6fee29502b713e5f072",
+      "high_path": "apps/cli/src/commands/dry.rs",
+      "high_hash": "eca4bc28f0935ff5875b5da7d4274f6518dd66f714247e5c599597dbab0fdaed",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Replace the per-flag tests with a table-driven test over removed flags, e.g. iterate over `[('--db-path', '/tmp/my.db'), ('--threshold', '0.9'), ...]`, build the shared `dry check-approved --track-id my-track <flag> <value>` argv, and assert parse failure for each case."
+        }
+      },
+      "similarity_score": 0.9226163029670716,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "The changed test repeats the same parse-time rejection setup already used by the existing removed-flag test: identical `TestCli::try_parse_from` invocation shape, same command arguments, same `assert!(result.is_err())`, with only the removed flag, value, and message varying. This duplicates the T005 removed-flag rejection knowledge across separate tests.",
+      "recorded_at": "2026-06-14T04:34:12Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "319a84d2acabf0730a3c2f7ad90383bfe0582a1d5f95d83949dcbeff22303329",
+      "high_path": "apps/cli/src/commands/dry.rs",
+      "high_hash": "eca4bc28f0935ff5875b5da7d4274f6518dd66f714247e5c599597dbab0fdaed",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8800854086875916,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "These are small, parallel test cases for distinct removed CLI flags. The repeated parse/assert shape is ordinary test scaffolding and does not duplicate production behavior or a rule that is likely to drift independently; each test documents a separate rejected flag and failure message.",
+      "recorded_at": "2026-06-14T04:34:26Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "319a84d2acabf0730a3c2f7ad90383bfe0582a1d5f95d83949dcbeff22303329",
+      "high_path": "apps/cli/src/commands/dry.rs",
+      "high_hash": "a8dfeb0fe8f649848fd3275d4a625e025737b48b477ef6fee29502b713e5f072",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9188876152038574,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "The fragments are intentionally parallel unit tests for two distinct removed CLI flags, `--db-path` and `--workspace-root`. Although the setup shape is nearly identical, each test asserts a separate public parse-time rejection behavior with flag-specific inputs and failure messages. The duplication is small, localized to test code, and improves the one-test-per-requirement readability rather than duplicating production logic or shared domain knowledge.",
+      "recorded_at": "2026-06-14T04:34:46Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "5e2b47a0cc1294aba3bdea6a1902f922e77c1f7a5588e66f3742e20b047b2502",
+      "high_path": "apps/cli/src/main.rs",
+      "high_hash": "cb4f0d60e9d05e0ffc9fd8bf82d0338bcc7c8a038967400424290fd86092bf87",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8560463786125183,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "The fragments share a small assertion pattern around `DryCommand::CheckApproved` and `--track-id`, but they exercise different behavior at different boundaries. The changed fragment validates `parse_dry` argument parsing, default `base_commit`, and `items_dir`; the candidate fragment validates top-level CLI dispatch through `Cli::try_parse_from` and `run_cli`. The overlap is incidental test setup/assertion, not duplicated domain logic or maintenance-significant behavior.",
+      "recorded_at": "2026-06-14T04:36:47Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/dry.rs",
+      "low_hash": "5e2b47a0cc1294aba3bdea6a1902f922e77c1f7a5588e66f3742e20b047b2502",
+      "high_path": "apps/cli/src/main.rs",
+      "high_hash": "8e9c156eb9ad1d6385f7ecd13015af845a2719e1845c7a6aca922aa391cb9cfd",
+      "changed_path": "apps/cli/src/commands/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8548205494880676,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9171de0a7bd4c9ed2c4ae57d05370e63a6960a5",
+      "rationale": "Both fragments exercise the same subcommand and `--track-id` value, but they validate different behavior boundaries. The changed fragment tests the `parse_dry` command parser directly, including default `base_commit` absence and `items_dir`. The candidate fragment tests top-level CLI dispatch from `sotp dry check-approved` into the correct `CliCommand::Dry` variant. The overlap is small and intentional for coverage across parser layers, so it is not a substantive DRY violation.",
+      "recorded_at": "2026-06-14T04:36:59Z"
     }
   ]
 }

@@ -1,9 +1,9 @@
 ---
 name: adr-editor
-model: fable
+model: opus
 effort: max
 description: |
-  Back-and-forth ADR editor for /track:plan escalation. Invoked automatically when a downstream SoT Chain signal turns 🔴 and the fix requires editing an existing ADR under knowledge/adr/. Edits the working tree only — never commits inside the loop. Mirrors the `adr-editor` capability in `.harness/config/agent-profiles.json` and enforces Fable via frontmatter.
+  Back-and-forth ADR editor for /track:plan escalation. Invoked automatically when a downstream SoT Chain signal turns 🔴 and the fix requires editing an existing ADR under knowledge/adr/. Edits the working tree only — never commits inside the loop. Mirrors the `adr-editor` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
 ---
 
 # ADR-Editor Agent

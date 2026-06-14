@@ -120,18 +120,16 @@ pub struct RunDryFixLocalInput {
 }
 
 /// Input DTO for `sotp dry check-approved`.
+///
+/// D5 / T005: `dry check-approved` is a pure-read staleness + all-resolved gate
+/// (no embedding, no similarity search, no corpus / index / threshold), so the
+/// old `db_path` / `threshold` / `workspace_root` fields are removed.
 #[derive(Debug, Clone)]
 pub struct DryCheckApprovedInput {
     /// Track ID used to locate the per-track dry-check.json and .commit_hash.
     pub track_id: String,
     /// Optional explicit base commit (overrides FsDryCheckCommitHashStore lookup).
     pub base_commit: Option<String>,
-    /// Path to the LanceDB semantic index database.
-    pub db_path: PathBuf,
-    /// Cosine similarity threshold (0.0–1.0).
-    pub threshold: Option<f32>,
-    /// Root of the workspace to scan for Rust sources (corpus extraction).
-    pub workspace_root: PathBuf,
     /// Path to the track items directory.
     pub items_dir: PathBuf,
 }
@@ -475,28 +473,19 @@ impl CliApp {
         let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
 
         // Resolve diff base (fail-closed three-branch policy, same as write).
-        // D5 / IN-05 / CN-09: the threshold / workspace_root / db_path inputs are
-        // no longer consulted by the gate itself — they remain on the input DTO
-        // for one more task (T005 removes them). We still validate workspace_root
-        // existence so misuse is caught at the boundary.
         let base = resolve_dry_diff_base(
             input.base_commit.as_deref(),
             &commit_hash_path,
             &canonical_root,
         )?;
 
-        let workspace_root = resolve_existing_dir_under_repo(
-            &input.workspace_root,
-            &root,
-            &canonical_root,
-            "workspace_root",
-        )?;
-
-        // D5: compute current FragmentRef set from diff fragments.
-        // No embedding, no semantic index, no corpus build, no threshold —
-        // the gate is now a pure-read staleness + all-resolved check.
+        // D5 / IN-05 / AC-10 / AC-12 / CN-09 (T005): the gate is pure-read.
+        // We need only diff fragments to derive the current FragmentRef set —
+        // no corpus, no embedding, no semantic index, no threshold. The
+        // workspace root for fragment extraction is fixed to the repository
+        // root (canonical), so no separate `workspace_root` input is needed.
         let (diff_fragments, _corpus_fragments) =
-            build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)?;
+            build_diff_and_corpus_fragments(&base, &canonical_root, &canonical_root)?;
 
         let mut current_fragment_refs: BTreeSet<domain::dry_check::FragmentRef> = BTreeSet::new();
         for fragment in &diff_fragments {
@@ -1935,9 +1924,6 @@ exit 0
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some("not-a-hash".to_owned()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: Some(0.85),
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
@@ -1954,9 +1940,6 @@ exit 0
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "dry-check-approved-outside-items-dir".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: Some(0.85),
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
@@ -1973,9 +1956,6 @@ exit 0
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "../outside".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: Some(0.85),
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
@@ -1997,9 +1977,6 @@ exit 0
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "dry-check-approved-missing-track-advances".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: Some(1.5),
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
@@ -2066,9 +2043,6 @@ exit 0
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: None,
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
@@ -2210,9 +2184,6 @@ exit 0
         let input = DryCheckApprovedInput {
             track_id: "my-track".to_owned(),
             base_commit: None,
-            db_path: PathBuf::from(".semantic_index"),
-            threshold: Some(0.85),
-            workspace_root: PathBuf::from("."),
             items_dir: PathBuf::from("track/items"),
         };
         assert_eq!(input.track_id, "my-track");
