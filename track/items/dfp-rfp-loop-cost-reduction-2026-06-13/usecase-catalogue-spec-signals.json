@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cefe9630f72aa85704e254e5dd506690a31af340698286535093c788c5217cdf",
+  "catalogue_declaration_hash": "cb3819fccf5a4cf08999165771f068a85c41e3c031cb996078fefc91e5bb126b",
   "signals": [
     {
       "type_name": "DryCheckApprovalInteractor",
@@ -75,7 +75,7 @@
     {
       "type_name": "DryCheckApprovalService",
       "signal": "blue",
-      "entry_hash": "c298a626acc243231366680c4bb05a957b4cdd0a3b75cfaa9abbde858a877b68"
+      "entry_hash": "6636cde125c81692b7126554639214c49d4220e711196e03e6e406ec2c11d2ce"
     },
     {
       "type_name": "DryCheckCoveragePort",
@@ -101,6 +101,11 @@
       "type_name": "ReviewGateStatePort",
       "signal": "blue",
       "entry_hash": "3657d727c3dc43dfb808674c89dbc12e2a6bdba40581b0477aa6c1d125fa04b2"
+    },
+    {
+      "type_name": "usecase::dry_check::shared::fragment_ref_of",
+      "signal": "blue",
+      "entry_hash": "05241eb8cb35dd2ff43e38e50f61706b8283da7dfb576cc98894fb4dc9acd245"
     }
   ]
 }

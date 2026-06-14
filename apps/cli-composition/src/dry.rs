@@ -20,14 +20,17 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
-use domain::dry_check::{DryCheckFinding, DryCheckReader as _, DryCheckVerdict};
+use domain::dry_check::{
+    DryCheckCoverageRecord, DryCheckFinding, DryCheckReader as _, DryCheckVerdict,
+};
 use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
-use infrastructure::dry_check::{CodexDryChecker, FsDryCheckStore};
+use infrastructure::dry_check::{CodexDryChecker, FsDryCheckCoverageAdapter, FsDryCheckStore};
 use infrastructure::semantic_dup::embedding::FastEmbedAdapter;
 use usecase::dry_check::{
     DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckApprovalInteractor,
-    DryCheckApprovalService as _, DryCheckCycleError, DryCheckInteractor,
-    DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _,
+    DryCheckApprovalService as _, DryCheckCoveragePort as _, DryCheckCycleError,
+    DryCheckInteractor, DryCheckResultsInteractor, DryCheckResultsService as _,
+    DryCheckService as _, fragment_ref_of,
 };
 
 use crate::review_v2::record_instant_once;
@@ -243,6 +246,7 @@ impl CliApp {
 
         let commit_hash_path = track_dir.join(".commit_hash");
         let dry_check_json_path = track_dir.join("dry-check.json");
+        let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
 
         // Resolve diff base (fail-closed three-branch policy).
         let base = resolve_dry_diff_base(
@@ -275,9 +279,18 @@ impl CliApp {
         let (diff_fragments, corpus_fragments) =
             build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)?;
         let diff_fragments_processed = diff_fragments.len();
+        let mut covered_fragment_refs = std::collections::BTreeSet::new();
+        for fragment in &diff_fragments {
+            let fragment_ref = fragment_ref_of(fragment)
+                .map_err(|e| format!("dry write: failed to derive coverage fragment ref: {e}"))?;
+            covered_fragment_refs.insert(fragment_ref);
+        }
+        let coverage_record = DryCheckCoverageRecord::new(covered_fragment_refs);
 
         // Construct adapters.
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
+        let coverage =
+            FsDryCheckCoverageAdapter::new(dry_check_coverage_path, canonical_root.clone());
         let store_for_summary = store.clone();
         let records_before = store_for_summary
             .read_records()
@@ -355,6 +368,9 @@ impl CliApp {
 
         let findings: Vec<DryCheckFinding> =
             dry_result.map_err(|e| format!("dry-check write cycle failed: {e}"))?;
+        coverage
+            .write_coverage(&track_id, coverage_record)
+            .map_err(|e| format!("dry-check coverage write failed: {e}"))?;
 
         let records_after = store_for_summary
             .read_records()
@@ -445,6 +461,8 @@ impl CliApp {
         &self,
         input: DryCheckApprovedInput,
     ) -> Result<CommandOutcome, String> {
+        use std::collections::BTreeSet;
+
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
         let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
@@ -459,26 +477,18 @@ impl CliApp {
 
         let commit_hash_path = track_dir.join(".commit_hash");
         let dry_check_json_path = track_dir.join("dry-check.json");
+        let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
 
         // Resolve diff base (fail-closed three-branch policy, same as write).
+        // D5 / IN-05 / CN-09: the threshold / workspace_root / db_path inputs are
+        // no longer consulted by the gate itself — they remain on the input DTO
+        // for one more task (T005 removes them). We still validate workspace_root
+        // existence so misuse is caught at the boundary.
         let base = resolve_dry_diff_base(
             input.base_commit.as_deref(),
             &commit_hash_path,
             &canonical_root,
         )?;
-
-        // Resolve threshold: explicit --threshold wins; otherwise load from dry-check config.
-        let threshold = match input.threshold {
-            Some(t) => {
-                SimilarityThreshold::new(t).map_err(|e| format!("invalid --threshold: {e}"))?
-            }
-            None => {
-                let config_path = root.join(".harness/config/dry-check.json");
-                let config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
-                    .map_err(|e| format!("failed to load dry-check config: {e}"))?;
-                config.threshold()
-            }
-        };
 
         let workspace_root = resolve_existing_dir_under_repo(
             &input.workspace_root,
@@ -487,30 +497,29 @@ impl CliApp {
             "workspace_root",
         )?;
 
-        // Build diff_fragments + corpus_fragments (shared pipeline).
-        let (diff_fragments, corpus_fragments) =
+        // D5: compute current FragmentRef set from diff fragments.
+        // No embedding, no semantic index, no corpus build, no threshold —
+        // the gate is now a pure-read staleness + all-resolved check.
+        let (diff_fragments, _corpus_fragments) =
             build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)?;
 
-        // Construct adapters.
+        let mut current_fragment_refs: BTreeSet<domain::dry_check::FragmentRef> = BTreeSet::new();
+        for fragment in &diff_fragments {
+            let fragment_ref = fragment_ref_of(fragment)
+                .map_err(|e| format!("dry check-approved: failed to derive fragment ref: {e}"))?;
+            current_fragment_refs.insert(fragment_ref);
+        }
+
+        // Construct adapters: reader + coverage port — no embedding, no index.
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
-        let embedding_port = Arc::new(
-            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
-        );
+        let coverage =
+            Arc::new(FsDryCheckCoverageAdapter::new(dry_check_coverage_path, canonical_root));
 
-        // D7/IN-10: Incremental index update (same path as dry_write).
-        let index_port = open_persistent_index_with_corpus(
-            &input.db_path,
-            corpus_fragments,
-            embedding_port.as_ref(),
-        )?;
+        // D5 read-only interactor.
+        let interactor = DryCheckApprovalInteractor::new(store, coverage);
 
-        // Construct interactor (reader + index + embedding).
-        let interactor = DryCheckApprovalInteractor::new(store, index_port, embedding_port);
-
-        // Run the gate with empty corpus — index is pre-built above; the interactor's
-        // build_corpus_index call will be a no-op via NullInsertIndexProxy.
         let verdict = interactor
-            .check_approved(vec![], &diff_fragments, threshold)
+            .check_approved(&track_id, &current_fragment_refs)
             .map_err(|e| format!("dry check-approved failed: {e}"))?;
 
         Ok(dry_check_approved_outcome(verdict))
@@ -1983,11 +1992,15 @@ exit 0
     }
 
     #[test]
-    fn test_dry_check_approved_public_api_missing_track_dir_reaches_threshold_validation() {
+    fn test_dry_check_approved_public_api_missing_track_dir_advances_to_diff_step() {
+        // D5 (T003): dry_check_approved no longer consults `--threshold` /
+        // `db_path` (T005 removes those fields). A missing track dir is
+        // tolerated up to the diff acquisition step, which then fails on
+        // the synthetic base-commit hash.
         let dir = temp_items_dir_under_repo();
 
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
-            track_id: "dry-check-approved-missing-track-invalid-threshold".to_owned(),
+            track_id: "dry-check-approved-missing-track-advances".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
             threshold: Some(1.5),
@@ -1997,8 +2010,12 @@ exit 0
 
         let message = result.unwrap_err();
         assert!(
-            message.contains("invalid --threshold"),
-            "missing track dir must not be rejected before threshold validation, got: {message}"
+            !message.contains("invalid --threshold"),
+            "threshold is no longer consulted; got: {message}"
+        );
+        assert!(
+            message.contains("merge-base") || message.contains("dry-check diff failed"),
+            "missing track dir must advance to the diff step; got: {message}"
         );
     }
 

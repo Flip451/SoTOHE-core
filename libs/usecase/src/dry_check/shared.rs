@@ -43,7 +43,7 @@ pub(crate) fn content_hash_of(content: &str) -> Result<FragmentContentHash, Stri
 ///
 /// Returns a [`String`] error description when `FilePath::new` rejects the
 /// path (e.g., absolute path or traversal) or when `content_hash_of` fails.
-pub(crate) fn fragment_ref_of(fragment: &CodeFragment) -> Result<FragmentRef, String> {
+pub fn fragment_ref_of(fragment: &CodeFragment) -> Result<FragmentRef, String> {
     let path_str = fragment.source_path.to_string_lossy().into_owned();
     let file_path = FilePath::new(path_str).map_err(|e| format!("invalid source_path: {e}"))?;
     let content_hash = content_hash_of(fragment.content())?;

@@ -126,6 +126,7 @@ subgraph usecase["usecase"]
     R31_usecase_usecase_DryCheckService__self[DryCheckService]
     R31_usecase_usecase_DryCheckService_run_dry_check([run_dry_check])
   end
+  F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of[[fragment_ref_of]]
   end
   subgraph usecase_usecase_module_fixpoint_resolve["usecase::fixpoint_resolve"]
     direction TB
@@ -318,6 +319,8 @@ class R36_usecase_usecase_DryCheckCoveragePort_write_coverage method_node
 class R36_usecase_usecase_DryCheckCoveragePort__self secondary_port
 class R31_usecase_usecase_DryCheckService_run_dry_check method_node
 class R31_usecase_usecase_DryCheckService__self app_service
+class F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of free_function
+class F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of function_node
 class T37_usecase_usecase_FixpointCurrentBranch_try_new method_node
 class T37_usecase_usecase_FixpointCurrentBranch_as_str method_node
 class T37_usecase_usecase_FixpointCurrentBranch__self value_object

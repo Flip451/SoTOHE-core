@@ -716,7 +716,7 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [],
       "module_path": "dry_check::services",
   "docs": "Application service for the cheap dry gate approval check after D5. The caller supplies the active track_id and current diff FragmentRef set; the interactor reads only DryCheckCoveragePort + DryCheckReader state to decide Approved/Blocked, with no embedding or semantic-index lookup. DryCheckReader history is interpreted as latest-per-pair with last-write-wins, so a later Accepted/NotAViolation can resolve an older Violation for the same pair.",
       "spec_refs": [
@@ -761,7 +761,27 @@
       "informal_grounds": []
     }
   },
-  "functions": {},
+  "functions": {
+    "usecase::dry_check::shared::fragment_ref_of": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "fragment", "ty": "&domain::semantic_dup::CodeFragment" }
+      ],
+      "returns": "Result<domain::dry_check::FragmentRef, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Build a FragmentRef (path + SHA-256 content_hash) from a CodeFragment. Promoted from pub(crate) to pub in T003 so the cli_composition layer can compute the current diff FragmentRef set passed to the new pure-read DryCheckApprovalInteractor (D5 / IN-05). Visibility change only — algorithm unchanged.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [
     {
       "type_name": "FixpointResolveInteractor",
@@ -815,7 +835,7 @@
             { "name": "reader",   "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" },
             { "name": "coverage", "ty": "std::sync::Arc<dyn DryCheckCoveragePort>" }
           ],
-          "returns": "Self",
+          "returns": "DryCheckApprovalInteractor",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,

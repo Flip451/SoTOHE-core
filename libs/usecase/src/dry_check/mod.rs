@@ -26,6 +26,7 @@ pub use ports::{DryCheckAgentPort, DryCheckCoveragePort, DryCheckDiffSource};
 pub use results::DryCheckResults;
 pub use results_interactor::DryCheckResultsInteractor;
 pub use services::{DryCheckApprovalService, DryCheckResultsService, DryCheckService};
+pub use shared::fragment_ref_of;
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]

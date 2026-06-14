@@ -1,8 +1,11 @@
 //! Application service trait definitions for the dry-check use case.
 
+use std::collections::BTreeSet;
+
 use domain::CommitHash;
+use domain::TrackId;
 use domain::dry_check::{
-    DryCheckApprovalVerdict, DryCheckFinding, DryCheckReaderError, VerdictFilter,
+    DryCheckApprovalVerdict, DryCheckFinding, DryCheckReaderError, FragmentRef, VerdictFilter,
 };
 use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
 
@@ -73,32 +76,41 @@ pub trait DryCheckResultsService {
 
 // ── DryCheckApprovalService ───────────────────────────────────────────────────
 
-/// Application service for the dry-check gate (D10 gate operation, AC-04).
+/// Application service for the dry-check gate (D5 / IN-05 / AC-10 / AC-12 /
+/// CN-08 / CN-09).
 ///
-/// Receives the full workspace corpus (`corpus_fragments`) plus diff fragments
-/// and threshold. Builds a fresh whole-codebase index from `corpus_fragments`,
-/// queries each diff fragment at `threshold`, then reads all history via
-/// `DryCheckReader.read_records()`, derives the latest-per-pair verdicts by
-/// computing `FragmentRef`s (SHA-256 of `content()`) for each pair and building
-/// `DryCheckPairKey` for identity matching (CN-07 identifier-based
-/// invalidation: if the `DryCheckPairKey` built from current fragments matches
-/// an existing record's `pair_key`, the pair is verified), and returns
-/// `Approved` only when all above-threshold pairs are verified as
-/// not-a-violation or accepted. Blocks otherwise.
+/// Pure read-only staleness + all-resolved gate — no embedding, no similarity
+/// search, no agent invocation. Composition computes the set of current diff
+/// fragments' `FragmentRef`s (path + content_hash) and passes them in.
 ///
-/// Does NOT record new verdicts — no `base_commit` param needed.
+/// Algorithm:
 ///
-/// Implemented by `DryCheckApprovalInteractor` (T005).
+/// 1. `coverage.read_coverage(track_id)`:
+///    - `Ok(None)` → return `Blocked` (CN-08 fail-closed: no coverage manifest).
+///    - `Ok(Some(record))` → continue.
+/// 2. Staleness: each `current_fragment_refs` entry must be present in the
+///    coverage record. Any miss → `Blocked` (matched at FragmentRef =
+///    (path + content_hash); an identical content_hash at a different path is
+///    NOT covered — IN-06 / CN-08).
+/// 3. All-resolved: read all records via `reader.read_records()`, build the
+///    latest-per-pair map keyed by `DryCheckPairKey`, then for each record
+///    whose pair touches any current `FragmentRef`, the latest verdict must be
+///    `NotAViolation` or `Accepted`. Any `Violation` → `Blocked`. Past
+///    `Violation` followed by a later `Accepted` / `NotAViolation` is
+///    resolved.
+/// 4. All steps pass → `Approved`.
+///
+/// Implemented by `DryCheckApprovalInteractor` (T003).
 pub trait DryCheckApprovalService {
-    /// Evaluate the dry-check gate for the current diff scope.
+    /// Evaluate the dry-check gate for the current diff scope (pure-read).
     ///
     /// # Errors
     ///
-    /// Returns [`DryCheckCycleError`] on embedding, index, or reader failures.
+    /// Returns [`DryCheckCycleError::Reader`] on history read failures or
+    /// [`DryCheckCycleError::CoveragePort`] on coverage-manifest failures.
     fn check_approved(
         &self,
-        corpus_fragments: Vec<CodeFragment>,
-        diff_fragments: &[CodeFragment],
-        threshold: SimilarityThreshold,
+        track_id: &TrackId,
+        current_fragment_refs: &BTreeSet<FragmentRef>,
     ) -> Result<DryCheckApprovalVerdict, DryCheckCycleError>;
 }

@@ -37,7 +37,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckApprovalService | application_service | modify | fn check_approved(&self, track_id: &domain::TrackId, current_fragment_refs: &std::collections::BTreeSet<domain::dry_check::FragmentRef>) -> Result<domain::dry_check::DryCheckApprovalVerdict, DryCheckCycleError> | 🟡 | 🔵 |
+| DryCheckApprovalService | application_service | modify | fn check_approved(&self, track_id: &domain::TrackId, current_fragment_refs: &std::collections::BTreeSet<domain::dry_check::FragmentRef>) -> Result<domain::dry_check::DryCheckApprovalVerdict, DryCheckCycleError> | 🔵 | 🔵 |
 | DryCheckService | application_service | reference | fn run_dry_check(&self) -> Result<(), DryCheckCycleError> | 🔵 | 🔵 |
 | FixpointResolveService | application_service | — | fn resolve(&self, cmd: &FixpointResolveCommand) -> Result<domain::track_phase::FixpointStep, FixpointResolveError> | 🟡 | 🔵 |
 
@@ -45,7 +45,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckApprovalInteractor | interactor | modify | — | 🟡 | 🔵 |
+| DryCheckApprovalInteractor | interactor | modify | — | 🔵 | 🔵 |
 | DryCheckInteractor | interactor | modify | — | 🟡 | 🔵 |
 | FixpointResolveInteractor | interactor | — | — | 🟡 | 🔵 |
 
@@ -54,4 +54,10 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | FixpointResolveCommand | command | — | — | 🟡 | 🔵 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| usecase::dry_check::shared::fragment_ref_of | free_function | — | fn(fragment: &domain::semantic_dup::CodeFragment) -> Result<domain::dry_check::FragmentRef, String> | 🔵 | 🔵 |
 

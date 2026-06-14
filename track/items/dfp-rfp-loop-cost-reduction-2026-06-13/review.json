@@ -1,79 +1,64 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:40:15Z"
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:35:12Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:42:29Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `write_coverage` does not apply the repo's symlink rejection used by the other filesystem adapters. `atomic_write_file` only makes the rename atomic; it still follows the resolved `store_path`/parent path. If the coverage path or one of its parent components is a symlink, this adapter can read or overwrite a manifest outside the intended track directory. That is a filesystem-boundary regression compared with `FsDryCheckStore` and `FsCommitHashStore`.",
+              "message": "`dry_check_approved` now reads `track_dir/dry-check-coverage.json`, but this composition layer never writes that manifest on the `dry write` path. In this file the write flow still only constructs `FsDryCheckStore` and calls `run_dry_check`; `rg` shows no production `write_coverage` call. Since `FsDryCheckCoverageAdapter::read_coverage` returns `Ok(None)` for a missing file and the new approval interactor treats that as `Blocked`, a normal `sotp dry write` followed by `sotp dry check-approved` will fail closed forever unless a manifest is created out-of-band. Wire coverage persistence into the write flow or keep the approval bridge on an artifact that the write flow actually produces.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
-              "line": 127,
-              "category": "security"
-            },
-            {
-              "message": "P1: the new public adapter's tests do not cover the required deserialization error cases for malformed `path` and malformed `content_hash`. The implementation maps both to `DryCheckCycleError::CoveragePort`, but there is no regression test that exercises either branch, so a future change to domain validation or error mapping could silently break the contract described in the briefing.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
-              "line": 145,
-              "category": "test-coverage"
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 500,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:595b78b8544082866cd15550e7801e13fa859308671a6584193ae329749eb7f7",
-          "at": "2026-06-14T01:41:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
-          "at": "2026-06-14T01:48:51Z"
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:39:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
-          "at": "2026-06-14T01:51:55Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T02:44:45Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
-          "at": "2026-06-14T01:03:35Z"
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:02:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
-          "at": "2026-06-14T01:05:47Z"
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:06:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:17:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:22:11Z"
         }
       ]
     },
@@ -505,6 +490,168 @@
           "findings": [],
           "hash": "rvw1:sha256:78173d098fd06cec05c1b3b5b673f7a2b92e8a9be16e54b20b4dce559e269057",
           "at": "2026-06-14T01:42:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a9bc011e2ec5b64c57d38558e7f87ef70c2f8b771d03da98aeaa59f1779f172",
+          "at": "2026-06-14T02:33:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a9bc011e2ec5b64c57d38558e7f87ef70c2f8b771d03da98aeaa59f1779f172",
+          "at": "2026-06-14T02:35:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71bfb6f370d13fe676ac86ec064d9db50072f3663c376310759b4fa1783af929",
+          "at": "2026-06-14T03:15:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is marked done in the plan artifacts, but the generated usecase catalogue still reports the core T003 API changes as incomplete: `DryCheckApprovalService` remains Signal 🟡 here and `DryCheckApprovalInteractor` remains 🟡 at line 48. That contradicts the T003 completion claim and leaves downstream tasks depending on a supposedly completed pure-read approval gate while the catalogue still says the main service/interactor changes are not complete. Regenerate or update the plan/type artifacts so T003 completion and the type signals agree.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:71bfb6f370d13fe676ac86ec064d9db50072f3663c376310759b4fa1783af929",
+          "at": "2026-06-14T03:18:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cd6acdfb9889b2a19ce503a538cef0b922fb5d7a0ecb693cace9f3fefe6fb01",
+          "at": "2026-06-14T03:24:26Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `write_coverage` does not apply the repo's symlink rejection used by the other filesystem adapters. `atomic_write_file` only makes the rename atomic; it still follows the resolved `store_path`/parent path. If the coverage path or one of its parent components is a symlink, this adapter can read or overwrite a manifest outside the intended track directory. That is a filesystem-boundary regression compared with `FsDryCheckStore` and `FsCommitHashStore`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
+              "line": 127,
+              "category": "security"
+            },
+            {
+              "message": "P1: the new public adapter's tests do not cover the required deserialization error cases for malformed `path` and malformed `content_hash`. The implementation maps both to `DryCheckCycleError::CoveragePort`, but there is no regression test that exercises either branch, so a future change to domain validation or error mapping could silently break the contract described in the briefing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/coverage.rs",
+              "line": 145,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:595b78b8544082866cd15550e7801e13fa859308671a6584193ae329749eb7f7",
+          "at": "2026-06-14T01:41:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
+          "at": "2026-06-14T01:48:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4706e7484d5e26b501fd2a0735c31b453fff895a3d23d98c8bc908fd6148a4ad",
+          "at": "2026-06-14T01:51:55Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:40:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:42:29Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:03:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:05:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T02:36:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T02:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
+          "at": "2026-06-14T03:02:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_ref_of` is still `pub(crate)` here, and `mod.rs` does not re-export it. The briefing’s new approval contract says composition must compute current `FragmentRef`s using this promoted helper; keeping it private either breaks that public usecase API or forces composition to duplicate the path/hash construction logic, which risks the gate using different identity semantics than the write path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/shared.rs",
+              "line": 46,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
+          "at": "2026-06-14T03:05:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T03:08:56Z"
         }
       ]
     }

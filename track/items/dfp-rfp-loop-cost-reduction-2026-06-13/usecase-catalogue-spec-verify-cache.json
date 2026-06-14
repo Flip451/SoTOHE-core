@@ -697,6 +697,46 @@
         "kind": "pass",
         "citation": "D2 の fixpoint 解決コマンドは各ゲートの公開インターフェース（exit code / 読み出し API）だけを合成し"
       }
+    },
+    {
+      "claim_hash": "05241eb8cb35dd2ff43e38e50f61706b8283da7dfb576cc98894fb4dc9acd245",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash"
+      }
+    },
+    {
+      "claim_hash": "6636cde125c81692b7126554639214c49d4220e711196e03e6e406ec2c11d2ce",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "埋め込み・類似検索を行わず、カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。類似検索は `dry write`（resolver）にのみ残す。"
+      }
+    },
+    {
+      "claim_hash": "6636cde125c81692b7126554639214c49d4220e711196e03e6e406ec2c11d2ce",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "6636cde125c81692b7126554639214c49d4220e711196e03e6e406ec2c11d2ce",
+      "evidence_hash": "8ddd668645d1d6e534f84b7eee7368f85239d0cccd0893c8cf8dc481b0471ec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry check-approved` を繰り返し呼んでも安価（埋め込み・検索なし）であり、D1 の dfl ループ先頭 check と D2 の fixpoint 合成が同一の `dry check-approved` を重複実行しても実害がない。"
+      }
+    },
+    {
+      "claim_hash": "6636cde125c81692b7126554639214c49d4220e711196e03e6e406ec2c11d2ce",
+      "evidence_hash": "93292a428db2266f05d5dfb1d4376bee153c6f49d6fb09eb058e988120d7b69e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D5 の `dry check-approved` は staleness 判定を diff フラグメントの FragmentRef（path + content_hash）とカバレッジ記録の FragmentRef 照合で行い、埋め込み・類似検索を呼ばない。"
+      }
     }
   ]
 }
