@@ -1,12 +1,13 @@
-//! Catalogue lint workflow (ADR 2026-04-28-0135 §S3 / IN-05 / AC-05).
+//! Catalogue lint workflow (ADR 2026-05-25-0000-tddd-pattern-semantics-extension §D15 / D17).
 //!
 //! Hexagonal composition:
 //!
 //! * [`RunCatalogueLint`] — **primary port** (application service trait).
 //!   CLI and future adapters depend on this trait, not on the concrete
 //!   interactor below.
-//! * [`RunCatalogueLintInteractor`] — orchestrates the secondary ports
-//!   (`CatalogueLoader`, `CatalogueLinter`) and returns the lint violations.
+//! * [`RunCatalogueLintInteractor`] — orchestrates the `CatalogueLoader`
+//!   secondary port and calls `domain::evaluate_catalogue_lint` directly
+//!   (D17: pure evaluation logic lives in domain, not infrastructure).
 //!   It implements [`RunCatalogueLint`].
 //!
 //! The usecase layer stays pure-orchestrator per
@@ -16,14 +17,13 @@
 
 use domain::TrackId;
 use domain::tddd::catalogue_linter::{
-    CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,
-    CatalogueLinterRuleKind,
+    CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
+    RoleKind, RuleTarget, evaluate_catalogue_lint,
 };
 use domain::tddd::catalogue_ports::{CatalogueLoader, CatalogueLoaderError};
+use domain::tddd::catalogue_v2::roles::NonEmptyVec;
+use domain::tddd::layer_id::LayerId;
 use thiserror::Error;
-
-// Note: `std::sync::Arc` is no longer needed here since the interactor uses
-// generic type parameters instead of trait objects.
 
 // ---------------------------------------------------------------------------
 // Usecase-owned lint rule types (no domain imports in CLI / callers)
@@ -32,15 +32,40 @@ use thiserror::Error;
 /// Usecase-owned mirror of `domain::tddd::catalogue_linter::CatalogueLinterRuleKind`.
 ///
 /// Callers (e.g. CLI) use this enum so they never import domain types
-/// directly (CN-01 / AC-03).
+/// directly (CN-01 / AC-03). All payload fields use `String` / `Vec<String>`
+/// as boundary representations; the interactor converts them to domain types.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LintRuleKind {
-    /// Rule asserts that the named field must be empty for entries of the target kind.
-    FieldEmpty,
-    /// Rule asserts that the named field must be non-empty for entries of the target kind.
-    FieldNonEmpty,
-    /// Rule constrains which layers entries of the target kind may appear in.
-    KindLayerConstraint,
+    /// Rule asserts that the named field must be empty for matching entries.
+    FieldEmpty { target_field: String },
+    /// Rule asserts that the named field must be non-empty for matching entries.
+    FieldNonEmpty { target_field: String },
+    /// Rule constrains which layers entries of the target role may appear in.
+    KindLayerConstraint { permitted_layers: Vec<String> },
+    /// Rule asserts that typed entries in `target_field` are declared with
+    /// `expected_role` in the catalogue.
+    ReferencedRoleConstraint { target_field: String, expected_role: String },
+    /// Rule asserts that `trait_impls` contains all of `required_traits`.
+    TraitImplRequired { required_traits: Vec<String> },
+    /// Rule asserts that no method signature contains a type with a forbidden
+    /// role.
+    NoRoleInMethodSignature { forbidden_roles: Vec<String> },
+    /// Rule asserts that the method referenced by `target_field` exists in the
+    /// entry's public method set and satisfies the expected signature.
+    MethodReferenceSignature { target_field: String },
+    /// Rule asserts that the entry has a public accessor getter matching the
+    /// identity signature.
+    AccessorSignatureRequired { target_field: String },
+    /// Rule asserts that elements in `target_field` are unique across all
+    /// entries of the target role.
+    FieldElementUniqueAcrossEntries { target_field: String },
+    /// Rule asserts that elements listed in `target_field` do not appear in
+    /// any other entry's method signatures.
+    NoExternalReferenceInMethods { target_field: String },
+    /// Rule asserts that the entry has no public struct fields. Unit variant.
+    NoPublicField,
+    /// Rule asserts that no method uses the given self-receiver kind.
+    ForbiddenMethodReceiver { forbidden_receiver: String },
 }
 
 /// Usecase-owned string-only description of a single lint rule.
@@ -50,10 +75,9 @@ pub enum LintRuleKind {
 /// internally.
 #[derive(Debug, Clone)]
 pub struct LintRuleSpec {
+    /// Roles to which this rule applies. An empty vec means "all roles".
+    pub target_roles: Vec<String>,
     pub kind: LintRuleKind,
-    pub target_kind: String,
-    pub target_field: Option<String>,
-    pub permitted_layers: Vec<String>,
 }
 
 /// Command input for [`RunCatalogueLint::execute`].
@@ -94,17 +118,14 @@ pub enum RunCatalogueLintError {
 
 /// Primary port for the catalogue lint use case.
 ///
-/// The CLI `sotp track lint` subcommand (T007) drives the workflow through
+/// The CLI `sotp track lint` subcommand drives the workflow through
 /// this trait, keeping the composition root substitutable.
 pub trait RunCatalogueLint: Send + Sync {
     /// Run catalogue lint rules for `cmd.layer_id` within `cmd.track_id`.
     ///
     /// # Errors
     ///
-    /// Returns [`RunCatalogueLintError::CatalogueLoad`] when `cmd.track_id`
-    /// is not a syntactically valid track identifier (surfaced via the loader
-    /// error path since the declared error variants share that boundary) or on
-    /// a real loader failure.
+    /// Returns [`RunCatalogueLintError::CatalogueLoad`] on loader failure.
     /// Returns [`RunCatalogueLintError::InvalidLayer`] when `cmd.layer_id`
     /// is not present in the TDDD-enabled layer set returned by the loader.
     /// Returns [`RunCatalogueLintError::LintExecution`] on linter failure.
@@ -117,50 +138,28 @@ pub trait RunCatalogueLint: Send + Sync {
 }
 
 /// Default [`RunCatalogueLint`] implementation that composes
-/// [`CatalogueLoader`] and [`CatalogueLinter`] secondary ports.
+/// [`CatalogueLoader`] and calls [`evaluate_catalogue_lint`] directly (D17).
 ///
-/// Generic over `L: CatalogueLoader` and `Li: CatalogueLinter` so callers
-/// (e.g. the CLI composition root) pass concrete types without needing to
-/// import the domain port traits directly.
-pub struct RunCatalogueLintInteractor<L, Li>
-where
-    L: CatalogueLoader,
-    Li: CatalogueLinter,
-{
-    catalogue_loader: L,
-    linter: Li,
+/// Generic over `L: CatalogueLoader` so callers (e.g. the CLI composition
+/// root) pass concrete types without importing domain port traits directly.
+pub struct RunCatalogueLintInteractor<L: CatalogueLoader> {
+    loader: L,
 }
 
-impl<L, Li> RunCatalogueLintInteractor<L, Li>
-where
-    L: CatalogueLoader,
-    Li: CatalogueLinter,
-{
-    /// Creates a new interactor wrapping the supplied secondary ports.
+impl<L: CatalogueLoader> RunCatalogueLintInteractor<L> {
+    /// Creates a new interactor wrapping the supplied catalogue loader.
     #[must_use]
-    pub fn new(catalogue_loader: L, linter: Li) -> Self {
-        Self { catalogue_loader, linter }
+    pub fn new(loader: L) -> Self {
+        Self { loader }
     }
 }
 
-impl<L, Li> RunCatalogueLint for RunCatalogueLintInteractor<L, Li>
-where
-    L: CatalogueLoader + Send + Sync,
-    Li: CatalogueLinter + Send + Sync,
-{
+impl<L: CatalogueLoader + Send + Sync> RunCatalogueLint for RunCatalogueLintInteractor<L> {
     fn execute(
         &self,
         cmd: RunCatalogueLintCommand,
     ) -> Result<Vec<CatalogueLintViolation>, RunCatalogueLintError> {
         // Step 1: parse track_id into domain type.
-        // We convert here rather than in the command so the command struct
-        // stays a plain data carrier (no domain import leak into the command
-        // layer boundary).
-        // Validate and parse track_id. An invalid string is surfaced as a
-        // CatalogueLoad error because the declared RunCatalogueLintError
-        // variants do not include a dedicated InvalidTrackId variant; the
-        // loader would reject it at the same boundary anyway, so the error
-        // kind is consistent with what callers expect for bad input.
         let track_id = TrackId::try_new(&cmd.track_id).map_err(|e| {
             CatalogueLoaderError::LayerDiscoveryFailed {
                 reason: format!("invalid track_id '{}': {e}", cmd.track_id),
@@ -170,13 +169,13 @@ where
         // Step 2: convert LintRuleSpec values to domain CatalogueLinterRule values.
         let rules: Vec<CatalogueLinterRule> = cmd
             .rules
-            .iter()
+            .into_iter()
             .map(lint_rule_spec_to_domain)
             .collect::<Result<Vec<_>, _>>()
             .map_err(RunCatalogueLintError::InvalidRuleSpec)?;
 
         // Step 3: load all TDDD-enabled layers for this track.
-        let (layer_order, catalogues) = self.catalogue_loader.load_all(&track_id)?;
+        let (layer_order, catalogues) = self.loader.load_all(&track_id)?;
 
         // Step 4: validate that the requested layer_id is TDDD-enabled.
         let target_layer = layer_order
@@ -185,10 +184,7 @@ where
             .ok_or_else(|| RunCatalogueLintError::InvalidLayer(cmd.layer_id.clone()))?;
 
         // Step 5: retrieve the catalogue for the target layer.
-        // The loader contract guarantees every layer in layer_order has a
-        // corresponding entry in catalogues, so this is safe (no IndexSlicing).
         let catalogue = catalogues.get(target_layer).ok_or_else(|| {
-            // Defensive: should not happen if the loader respects its contract.
             CatalogueLoaderError::LayerDiscoveryFailed {
                 reason: format!(
                     "loader returned layer '{}' in order but no catalogue entry",
@@ -197,8 +193,8 @@ where
             }
         })?;
 
-        // Step 6: run the linter against the catalogue.
-        let violations = self.linter.run(&rules, catalogue, &cmd.layer_id)?;
+        // Step 6: evaluate rules via the domain pure function (D17).
+        let violations = evaluate_catalogue_lint(&rules, catalogue, target_layer)?;
 
         Ok(violations)
     }
@@ -206,21 +202,96 @@ where
 
 /// Convert a [`LintRuleSpec`] to a domain [`CatalogueLinterRule`].
 ///
-/// Returns `Err(String)` when the spec is rejected by `CatalogueLinterRule::try_new`
-/// (e.g. empty target_kind or missing target_field for FieldEmpty rules).
-fn lint_rule_spec_to_domain(spec: &LintRuleSpec) -> Result<CatalogueLinterRule, String> {
-    let kind = match &spec.kind {
-        LintRuleKind::FieldEmpty => CatalogueLinterRuleKind::FieldEmpty,
-        LintRuleKind::FieldNonEmpty => CatalogueLinterRuleKind::FieldNonEmpty,
-        LintRuleKind::KindLayerConstraint => CatalogueLinterRuleKind::KindLayerConstraint,
+/// Returns `Err(String)` when the spec is rejected by the domain constructors
+/// (e.g. empty `target_field`, unknown role string, empty required_traits).
+fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, String> {
+    // Convert target_roles strings to RoleKind.
+    let target_roles =
+        spec.target_roles.iter().map(|s| parse_role_kind(s)).collect::<Result<Vec<_>, _>>()?;
+    let target = RuleTarget::new(target_roles);
+
+    // Convert LintRuleKind to CatalogueLinterRuleKind.
+    let kind = match spec.kind {
+        LintRuleKind::FieldEmpty { target_field } => {
+            CatalogueLinterRuleKind::FieldEmpty { target_field }
+        }
+        LintRuleKind::FieldNonEmpty { target_field } => {
+            CatalogueLinterRuleKind::FieldNonEmpty { target_field }
+        }
+        LintRuleKind::KindLayerConstraint { permitted_layers } => {
+            let layers: Vec<LayerId> = permitted_layers
+                .into_iter()
+                .map(|s| {
+                    LayerId::try_new(s.clone()).map_err(|e| format!("invalid layer_id '{s}': {e}"))
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            let non_empty = NonEmptyVec::try_new(layers)
+                .map_err(|_| "permitted_layers must not be empty".to_owned())?;
+            CatalogueLinterRuleKind::KindLayerConstraint { permitted_layers: non_empty }
+        }
+        LintRuleKind::ReferencedRoleConstraint { target_field, expected_role } => {
+            let role = parse_role_kind(&expected_role)?;
+            CatalogueLinterRuleKind::ReferencedRoleConstraint { target_field, expected_role: role }
+        }
+        LintRuleKind::TraitImplRequired { required_traits } => {
+            let non_empty = NonEmptyVec::try_new(required_traits)
+                .map_err(|_| "required_traits must not be empty".to_owned())?;
+            CatalogueLinterRuleKind::TraitImplRequired { required_traits: non_empty }
+        }
+        LintRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
+            let roles: Vec<RoleKind> = forbidden_roles
+                .iter()
+                .map(|s| parse_role_kind(s))
+                .collect::<Result<Vec<_>, _>>()?;
+            let non_empty = NonEmptyVec::try_new(roles)
+                .map_err(|_| "forbidden_roles must not be empty".to_owned())?;
+            CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles: non_empty }
+        }
+        LintRuleKind::MethodReferenceSignature { target_field } => {
+            CatalogueLinterRuleKind::MethodReferenceSignature { target_field }
+        }
+        LintRuleKind::AccessorSignatureRequired { target_field } => {
+            CatalogueLinterRuleKind::AccessorSignatureRequired { target_field }
+        }
+        LintRuleKind::FieldElementUniqueAcrossEntries { target_field } => {
+            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries { target_field }
+        }
+        LintRuleKind::NoExternalReferenceInMethods { target_field } => {
+            CatalogueLinterRuleKind::NoExternalReferenceInMethods { target_field }
+        }
+        LintRuleKind::NoPublicField => CatalogueLinterRuleKind::NoPublicField,
+        LintRuleKind::ForbiddenMethodReceiver { forbidden_receiver } => {
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver { forbidden_receiver }
+        }
     };
-    CatalogueLinterRule::try_new(
-        kind,
-        spec.target_kind.clone(),
-        spec.target_field.clone(),
-        spec.permitted_layers.clone(),
-    )
-    .map_err(|e| e.to_string())
+
+    CatalogueLinterRule::new(target, kind).map_err(|e| e.to_string())
+}
+
+/// Parse a role kind string into a [`RoleKind`].
+fn parse_role_kind(s: &str) -> Result<RoleKind, String> {
+    match s {
+        "ValueObject" => Ok(RoleKind::ValueObject),
+        "Entity" => Ok(RoleKind::Entity),
+        "AggregateRoot" => Ok(RoleKind::AggregateRoot),
+        "DomainService" => Ok(RoleKind::DomainService),
+        "Specification" => Ok(RoleKind::Specification),
+        "Factory" => Ok(RoleKind::Factory),
+        "UseCase" => Ok(RoleKind::UseCase),
+        "Interactor" => Ok(RoleKind::Interactor),
+        "Command" => Ok(RoleKind::Command),
+        "Query" => Ok(RoleKind::Query),
+        "Dto" => Ok(RoleKind::Dto),
+        "ErrorType" => Ok(RoleKind::ErrorType),
+        "SecondaryAdapter" => Ok(RoleKind::SecondaryAdapter),
+        "EventPolicy" => Ok(RoleKind::EventPolicy),
+        "DomainEvent" => Ok(RoleKind::DomainEvent),
+        "SpecificationPort" => Ok(RoleKind::SpecificationPort),
+        "ApplicationService" => Ok(RoleKind::ApplicationService),
+        "SecondaryPort" => Ok(RoleKind::SecondaryPort),
+        "Repository" => Ok(RoleKind::Repository),
+        other => Err(format!("unknown role kind: '{other}'")),
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -233,9 +304,7 @@ mod tests {
     use std::collections::BTreeMap;
 
     use domain::TrackId;
-    use domain::tddd::catalogue_linter::{
-        CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
-    };
+    use domain::tddd::catalogue_linter::CatalogueLintViolation;
     use domain::tddd::catalogue_ports::{CatalogueLoader, CatalogueLoaderError};
     use domain::tddd::catalogue_v2::document::CatalogueDocument;
     use domain::tddd::catalogue_v2::entries::TypeEntry;
@@ -243,12 +312,12 @@ mod tests {
     use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
     use domain::tddd::catalogue_v2::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::layer_id::LayerId;
-    use mockall::{mock, predicate};
+    use mockall::mock;
 
     use super::*;
 
     // ------------------------------------------------------------------
-    // mockall mocks for both secondary ports
+    // mockall mock for CatalogueLoader
     // ------------------------------------------------------------------
 
     mock! {
@@ -261,18 +330,6 @@ mod tests {
                 (Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>),
                 CatalogueLoaderError,
             >;
-        }
-    }
-
-    mock! {
-        pub Linter {}
-        impl CatalogueLinter for Linter {
-            fn run(
-                &self,
-                rules: &[CatalogueLinterRule],
-                catalogue: &CatalogueDocument,
-                layer_id: &str,
-            ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>;
         }
     }
 
@@ -289,9 +346,6 @@ mod tests {
     }
 
     fn single_entry_doc(crate_name: &str) -> CatalogueDocument {
-        // T025: v3-native — add one type entry so this document is structurally
-        // distinct from `empty_doc`. Tests use this distinction to verify that
-        // RunCatalogueLint passes the correct layer's catalogue to the linter.
         let mut doc = empty_doc(crate_name);
         doc.types.insert(
             TypeName::new("SentinelType").unwrap(),
@@ -303,7 +357,6 @@ mod tests {
                     None,
                 )),
                 methods: vec![],
-
                 module_path: ModulePath::root(),
                 docs: None,
                 spec_refs: vec![],
@@ -322,40 +375,25 @@ mod tests {
         catalogues.insert(domain.clone(), empty_doc("domain"));
         catalogues.insert(usecase.clone(), empty_doc("usecase"));
         catalogues.insert(infra.clone(), empty_doc("infrastructure"));
-        // Replace the target layer with a single-entry doc so tests can
-        // distinguish whether the correct catalogue was passed.
         let target_layer = layer(target);
         catalogues.insert(target_layer, single_entry_doc(target));
         (order, catalogues)
     }
 
-    fn field_non_empty_rule_spec() -> LintRuleSpec {
-        LintRuleSpec {
-            kind: LintRuleKind::FieldNonEmpty,
-            target_kind: "secondary_port".to_owned(),
-            target_field: Some("expected_methods".to_owned()),
-            permitted_layers: vec![],
-        }
+    fn no_public_field_rule_spec() -> LintRuleSpec {
+        LintRuleSpec { target_roles: vec![], kind: LintRuleKind::NoPublicField }
     }
 
-    fn violation(name: &str) -> CatalogueLintViolation {
-        CatalogueLintViolation::new(
-            CatalogueLinterRuleKind::FieldNonEmpty,
-            name,
-            "expected_methods must be non-empty for secondary_port",
-        )
-    }
-
-    fn cmd(track: &str, layer: &str) -> RunCatalogueLintCommand {
+    fn cmd(track: &str, layer_name: &str) -> RunCatalogueLintCommand {
         RunCatalogueLintCommand {
             track_id: track.to_owned(),
-            layer_id: layer.to_owned(),
-            rules: vec![field_non_empty_rule_spec()],
+            layer_id: layer_name.to_owned(),
+            rules: vec![no_public_field_rule_spec()],
         }
     }
 
     // ------------------------------------------------------------------
-    // T001: Happy path — linter returns empty violations list
+    // T001: Happy path — evaluate_catalogue_lint skeleton returns empty violations
     // ------------------------------------------------------------------
 
     #[test]
@@ -364,51 +402,19 @@ mod tests {
         let mut loader = MockLoader::new();
         loader
             .expect_load_all()
-            .with(predicate::function(|t: &TrackId| t.as_ref() == "my-track"))
+            .with(mockall::predicate::function(|t: &TrackId| t.as_ref() == "my-track"))
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
 
-        let mut linter = MockLinter::new();
-        linter.expect_run().times(1).returning(|_, _, _| Ok(vec![]));
-
-        let interactor = RunCatalogueLintInteractor::new(loader, linter);
+        let interactor = RunCatalogueLintInteractor::new(loader);
         let result = interactor.execute(cmd("my-track", "domain"));
 
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "expected Ok, got: {result:?}");
         assert_eq!(result.unwrap(), vec![]);
     }
 
     // ------------------------------------------------------------------
-    // T002: Happy path — linter returns non-empty violations list
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_execute_happy_path_violations_present() {
-        let (order, catalogues) = three_layer_result("domain");
-        let mut loader = MockLoader::new();
-        loader
-            .expect_load_all()
-            .times(1)
-            .returning(move |_| Ok((order.clone(), catalogues.clone())));
-
-        let v1 = violation("TypeA");
-        let v2 = violation("TypeB");
-        let expected = [v1.clone(), v2.clone()];
-        let mut linter = MockLinter::new();
-        linter.expect_run().times(1).returning(move |_, _, _| Ok(vec![v1.clone(), v2.clone()]));
-
-        let interactor = RunCatalogueLintInteractor::new(loader, linter);
-        let result = interactor.execute(cmd("my-track", "domain"));
-
-        assert!(result.is_ok());
-        let violations = result.unwrap();
-        assert_eq!(violations.len(), 2);
-        assert_eq!(violations[0].entry_name(), expected[0].entry_name());
-        assert_eq!(violations[1].entry_name(), expected[1].entry_name());
-    }
-
-    // ------------------------------------------------------------------
-    // T003: CatalogueLoader error propagation
+    // T002: CatalogueLoader error propagation
     // ------------------------------------------------------------------
 
     #[test]
@@ -418,14 +424,9 @@ mod tests {
             Err(CatalogueLoaderError::LayerDiscoveryFailed { reason: "boom".to_owned() })
         });
 
-        // Linter must NOT be called when loader fails.
-        let mut linter = MockLinter::new();
-        linter.expect_run().times(0);
-
-        let interactor = RunCatalogueLintInteractor::new(loader, linter);
+        let interactor = RunCatalogueLintInteractor::new(loader);
         let result = interactor.execute(cmd("my-track", "domain"));
 
-        assert!(result.is_err());
         assert!(
             matches!(result, Err(RunCatalogueLintError::CatalogueLoad(_))),
             "expected CatalogueLoad error"
@@ -433,35 +434,7 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // T004: CatalogueLinter error propagation
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_execute_linter_error_propagates() {
-        let (order, catalogues) = three_layer_result("domain");
-        let mut loader = MockLoader::new();
-        loader
-            .expect_load_all()
-            .times(1)
-            .returning(move |_| Ok((order.clone(), catalogues.clone())));
-
-        let mut linter = MockLinter::new();
-        linter.expect_run().times(1).returning(|_, _, _| {
-            Err(CatalogueLinterError::InvalidRuleConfig("contradictory rules".to_owned()))
-        });
-
-        let interactor = RunCatalogueLintInteractor::new(loader, linter);
-        let result = interactor.execute(cmd("my-track", "domain"));
-
-        assert!(result.is_err());
-        assert!(
-            matches!(result, Err(RunCatalogueLintError::LintExecution(_))),
-            "expected LintExecution error"
-        );
-    }
-
-    // ------------------------------------------------------------------
-    // T005: InvalidLayer — layer_id not in TDDD-enabled layers
+    // T003: InvalidLayer — layer_id not in TDDD-enabled layers
     // ------------------------------------------------------------------
 
     #[test]
@@ -473,19 +446,242 @@ mod tests {
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
 
-        // Linter must NOT be called for an unknown layer.
-        let mut linter = MockLinter::new();
-        linter.expect_run().times(0);
-
-        let interactor = RunCatalogueLintInteractor::new(loader, linter);
+        let interactor = RunCatalogueLintInteractor::new(loader);
         let result = interactor.execute(cmd("my-track", "presentation")); // not in set
 
-        assert!(result.is_err());
         match result {
             Err(RunCatalogueLintError::InvalidLayer(layer_id)) => {
                 assert_eq!(layer_id, "presentation");
             }
             other => panic!("expected InvalidLayer, got {other:?}"),
         }
+    }
+
+    // ------------------------------------------------------------------
+    // T004: lint_rule_spec_to_domain — all 12 LintRuleKind variants convert
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_lint_rule_spec_to_domain_converts_all_12_kinds() {
+        let specs: Vec<LintRuleSpec> = vec![
+            LintRuleSpec {
+                target_roles: vec![],
+                kind: LintRuleKind::FieldEmpty { target_field: "f".to_owned() },
+            },
+            LintRuleSpec {
+                target_roles: vec![],
+                kind: LintRuleKind::FieldNonEmpty { target_field: "f".to_owned() },
+            },
+            LintRuleSpec {
+                target_roles: vec!["EventPolicy".to_owned()],
+                kind: LintRuleKind::KindLayerConstraint {
+                    permitted_layers: vec!["domain".to_owned()],
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec!["AggregateRoot".to_owned()],
+                kind: LintRuleKind::ReferencedRoleConstraint {
+                    target_field: "emits".to_owned(),
+                    expected_role: "DomainEvent".to_owned(),
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec!["ValueObject".to_owned()],
+                kind: LintRuleKind::TraitImplRequired {
+                    required_traits: vec!["PartialEq".to_owned()],
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec!["EventPolicy".to_owned()],
+                kind: LintRuleKind::NoRoleInMethodSignature {
+                    forbidden_roles: vec!["Repository".to_owned()],
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec![],
+                kind: LintRuleKind::MethodReferenceSignature {
+                    target_field: "invariants".to_owned(),
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec![],
+                kind: LintRuleKind::AccessorSignatureRequired {
+                    target_field: "identity".to_owned(),
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec![],
+                kind: LintRuleKind::FieldElementUniqueAcrossEntries {
+                    target_field: "exclusive_members".to_owned(),
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec![],
+                kind: LintRuleKind::NoExternalReferenceInMethods {
+                    target_field: "exclusive_members".to_owned(),
+                },
+            },
+            LintRuleSpec { target_roles: vec![], kind: LintRuleKind::NoPublicField },
+            LintRuleSpec {
+                target_roles: vec![],
+                kind: LintRuleKind::ForbiddenMethodReceiver {
+                    forbidden_receiver: "&mut self".to_owned(),
+                },
+            },
+        ];
+        assert_eq!(specs.len(), 12, "must cover all 12 LintRuleKind variants");
+        for spec in specs {
+            let kind_name = format!("{:?}", spec.kind).split(' ').next().unwrap().to_owned();
+            let result = lint_rule_spec_to_domain(spec);
+            assert!(
+                result.is_ok(),
+                "conversion failed for kind starting with {kind_name}: {result:?}"
+            );
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // T005: CatalogueLintViolation re-export / interoperability
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_catalogue_lint_violation_accessible_from_usecase_boundary() {
+        // CatalogueLintViolation is used as the output type of RunCatalogueLint::execute.
+        // Verify it can be constructed at the usecase boundary.
+        let v = CatalogueLintViolation::new("NoPublicField", "MyType", "has public fields");
+        assert_eq!(v.rule_kind(), "NoPublicField");
+        assert_eq!(v.entry_name(), "MyType");
+    }
+
+    // ------------------------------------------------------------------
+    // T006: lint_rule_spec_to_domain — unknown target_roles entry is rejected
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_lint_rule_spec_to_domain_rejects_unknown_role() {
+        let spec = LintRuleSpec {
+            target_roles: vec!["NotARealRole".to_owned()],
+            kind: LintRuleKind::NoPublicField,
+        };
+        let result = lint_rule_spec_to_domain(spec);
+        assert!(result.is_err(), "expected Err for unknown role, got Ok");
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("NotARealRole"),
+            "error message should mention the bad role, got: {msg}"
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // T007: lint_rule_spec_to_domain — empty permitted_layers is rejected
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_lint_rule_spec_to_domain_rejects_empty_permitted_layers() {
+        let spec = LintRuleSpec {
+            target_roles: vec![],
+            kind: LintRuleKind::KindLayerConstraint { permitted_layers: vec![] },
+        };
+        let result = lint_rule_spec_to_domain(spec);
+        assert!(result.is_err(), "expected Err for empty permitted_layers, got Ok");
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("permitted_layers"),
+            "error message should mention permitted_layers, got: {msg}"
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // T008: lint_rule_spec_to_domain — empty required_traits is rejected
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_lint_rule_spec_to_domain_rejects_empty_required_traits() {
+        let spec = LintRuleSpec {
+            target_roles: vec![],
+            kind: LintRuleKind::TraitImplRequired { required_traits: vec![] },
+        };
+        let result = lint_rule_spec_to_domain(spec);
+        assert!(result.is_err(), "expected Err for empty required_traits, got Ok");
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("required_traits"),
+            "error message should mention required_traits, got: {msg}"
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // T009: lint_rule_spec_to_domain — empty forbidden_roles is rejected
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_lint_rule_spec_to_domain_rejects_empty_forbidden_roles() {
+        let spec = LintRuleSpec {
+            target_roles: vec![],
+            kind: LintRuleKind::NoRoleInMethodSignature { forbidden_roles: vec![] },
+        };
+        let result = lint_rule_spec_to_domain(spec);
+        assert!(result.is_err(), "expected Err for empty forbidden_roles, got Ok");
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("forbidden_roles"),
+            "error message should mention forbidden_roles, got: {msg}"
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // T010: lint_rule_spec_to_domain — empty target_field is rejected
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_lint_rule_spec_to_domain_rejects_empty_target_field() {
+        // FieldNonEmpty with empty target_field should be rejected by
+        // CatalogueLinterRule::new (EmptyTargetField).
+        let spec = LintRuleSpec {
+            target_roles: vec![],
+            kind: LintRuleKind::FieldNonEmpty { target_field: "".to_owned() },
+        };
+        let result = lint_rule_spec_to_domain(spec);
+        assert!(result.is_err(), "expected Err for empty target_field, got Ok");
+    }
+
+    // ------------------------------------------------------------------
+    // T011: execute — InvalidRuleSpec propagates when a rule spec is malformed
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_execute_invalid_rule_spec_returns_error() {
+        let (order, catalogues) = three_layer_result("domain");
+        let mut loader = MockLoader::new();
+        loader.expect_load_all().times(0); // loader should not be called; spec conversion fails first
+
+        // We need to construct the command with a malformed spec directly
+        // without going through execute (which calls load_all before rules conversion).
+        // Instead create a loader that should never be called (times(0)) by passing
+        // the bad rules before load_all.
+        // Actually, per the execute() code, rules are converted BEFORE load_all
+        // (step 2 precedes step 3). So the loader mock with times(0) is correct.
+        let _ = loader; // satisfy the borrow checker
+
+        // Rebuild with a fresh mock that enforces times(0).
+        let mut loader2 = MockLoader::new();
+        loader2.expect_load_all().times(0);
+        // Insert the target back so it compiles; we won't hit load_all anyway.
+        let _ = (order, catalogues);
+
+        let interactor = RunCatalogueLintInteractor::new(loader2);
+        let bad_cmd = RunCatalogueLintCommand {
+            track_id: "my-track".to_owned(),
+            layer_id: "domain".to_owned(),
+            rules: vec![LintRuleSpec {
+                target_roles: vec!["UnknownRoleXYZ".to_owned()],
+                kind: LintRuleKind::NoPublicField,
+            }],
+        };
+        let result = interactor.execute(bad_cmd);
+        assert!(
+            matches!(result, Err(RunCatalogueLintError::InvalidRuleSpec(_))),
+            "expected InvalidRuleSpec, got: {result:?}"
+        );
     }
 }

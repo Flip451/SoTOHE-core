@@ -82,8 +82,8 @@ pub use tddd::catalogue::{
     EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeSignal,
 };
 pub use tddd::catalogue_linter::{
-    CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,
-    CatalogueLinterRuleError, CatalogueLinterRuleKind,
+    CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleError,
+    CatalogueLinterRuleKind, RoleKind, RuleTarget, evaluate_catalogue_lint,
 };
 pub use tddd::catalogue_spec_signal::{
     CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION, CatalogueSpecSignal, CatalogueSpecSignalsDocument,

@@ -1,10 +1,17 @@
 //! Integration tests for `sotp track lint`.
 //!
 //! Process-level tests that exercise the full composition root:
-//! `FsCatalogueLoader` + `InMemoryCatalogueLinter` +
-//! `RunCatalogueLintInteractor` wired in `apps/cli/src/commands/track/tddd/lint.rs`.
+//! `FsCatalogueLoader` + `RunCatalogueLintInteractor` +
+//! `evaluate_catalogue_lint` (domain pure function) wired in
+//! `apps/cli/src/commands/track/tddd/lint.rs`.
 //!
-//! ADR `tddd-struct-kind-uniformization-and-catalogue-linter` §S3 / IN-05 / AC-05.
+//! Note: per-rule evaluation logic is deferred to T014. Until T014, the
+//! `evaluate_catalogue_lint` skeleton always returns an empty violation list
+//! regardless of the catalogue contents. Tests that relied on specific
+//! violations firing are updated to reflect this skeleton behavior.
+//!
+//! ADR `knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md`
+//! §D15 / D17.
 
 #![allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
@@ -96,6 +103,44 @@ fn write(path: &Path, content: &str) {
     std::fs::write(path, content).unwrap();
 }
 
+/// Invoke `sotp track lint` with the fixed args for the test workspace rooted at `root`.
+///
+/// Returns the raw `Output` so each test can assert its scenario-specific expectations.
+fn run_track_lint(root: &Path) -> std::process::Output {
+    sotp_bin()
+        .args([
+            "track",
+            "lint",
+            "--track-id",
+            "test-track",
+            "--layer-id",
+            "domain",
+            "--workspace-root",
+            root.to_str().unwrap(),
+        ])
+        .output()
+        .unwrap()
+}
+
+/// Assert the common zero-violation exit contract: exit 0, empty stdout, and the
+/// "Found 0 violation(s)" summary line on stderr.
+fn assert_lint_zero_violations(output: &std::process::Output, context_msg: &str) {
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        output.status.success(),
+        "{context_msg}: expected exit 0\nstdout: {stdout}\nstderr: {stderr}"
+    );
+    assert!(
+        stdout.trim().is_empty(),
+        "{context_msg}: stdout must be empty when there are no violations\nstdout: {stdout}"
+    );
+    assert!(
+        stderr.contains("Found 0 violation(s)"),
+        "{context_msg}: stderr must contain 'Found 0 violation(s)'\nstderr: {stderr}"
+    );
+}
+
 // ---------------------------------------------------------------------------
 // Test 1: Happy path — no violations, exit code 0
 // ---------------------------------------------------------------------------
@@ -112,83 +157,33 @@ fn test_track_lint_no_violations_exits_zero() {
     // → no FieldEmpty violation.
     write(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_EMPTY_METHODS);
 
-    let output = sotp_bin()
-        .args([
-            "track",
-            "lint",
-            "--track-id",
-            "test-track",
-            "--layer-id",
-            "domain",
-            "--workspace-root",
-            root.to_str().unwrap(),
-        ])
-        .output()
-        .unwrap();
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(
-        output.status.success(),
-        "expected exit 0 for catalogue with no violations\nstdout: {stdout}\nstderr: {stderr}"
-    );
-    // No violation lines on stdout.
-    assert!(
-        stdout.trim().is_empty(),
-        "stdout must be empty when there are no violations\nstdout: {stdout}"
-    );
-    // Summary line on stderr.
-    assert!(
-        stderr.contains("Found 0 violation(s)"),
-        "stderr must contain 'Found 0 violation(s)'\nstderr: {stderr}"
-    );
+    let output = run_track_lint(root);
+    assert_lint_zero_violations(&output, "catalogue with no violations");
 }
 
 // ---------------------------------------------------------------------------
-// Test 2: Violation detected — exit code 1, entry name in stdout
+// Test 2: Catalogue with non-empty methods — skeleton returns no violations
+//
+// NOTE(T014): The evaluate_catalogue_lint function is a skeleton in Stage 3.
+// Per-rule evaluation logic (including FieldEmpty) is deferred to T014.
+// Until T014, even a catalogue that would fire a rule returns no violations.
+// This test verifies the skeleton path exits 0 with a valid catalogue.
 // ---------------------------------------------------------------------------
 
 #[test]
-fn test_track_lint_with_violation_exits_one_and_prints_entry_name() {
+fn test_track_lint_skeleton_with_methods_catalogue_exits_zero() {
     let root_dir = tempfile::tempdir().unwrap();
     let root = root_dir.path();
 
     write(&root.join("architecture-rules.json"), RULES_JSON);
 
-    // Write a domain-types.json whose value_object has a non-empty
-    // expected_methods → fires the FieldEmpty demo rule.
+    // Write a domain-types.json whose value_object has a non-empty methods
+    // list. In T014 this would fire FieldEmpty; in the T008 skeleton it does
+    // not, so we expect exit 0 and no violations.
     write(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_WITH_METHODS);
 
-    let output = sotp_bin()
-        .args([
-            "track",
-            "lint",
-            "--track-id",
-            "test-track",
-            "--layer-id",
-            "domain",
-            "--workspace-root",
-            root.to_str().unwrap(),
-        ])
-        .output()
-        .unwrap();
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(
-        !output.status.success(),
-        "expected exit 1 when violations exist\nstdout: {stdout}\nstderr: {stderr}"
-    );
-    // Entry name must appear in stdout.
-    assert!(
-        stdout.contains("MethodfulObject"),
-        "stdout must contain the violating entry name\nstdout: {stdout}"
-    );
-    // Summary line must mention at least 1 violation.
-    assert!(
-        stderr.contains("Found 1 violation(s)"),
-        "stderr must contain 'Found 1 violation(s)'\nstderr: {stderr}"
-    );
+    let output = run_track_lint(root);
+    assert_lint_zero_violations(&output, "skeleton evaluate_catalogue_lint (no violations yet)");
 }
 
 // ---------------------------------------------------------------------------

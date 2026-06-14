@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "00eb56d1a2f48edab9dccb5c6c3755150824e8ad1ca8af6eae1bf990e01fff6b",
+  "catalogue_declaration_hash": "ad613ce00671f3be9ca1f10eed3c3e09c2a4d33b787a7a75a865b4ab1efcb6a8",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
       "signal": "blue",
-      "entry_hash": "fb80550b268d0e464bcb5ecc1585f0f5fac9abe28a843fdba4e8f45e249b7d6a"
+      "entry_hash": "f4aac17365f8994e6f528f3fe2a7ed5aa7dbc52bd52526b9ddcf02d809c4e286"
     },
     {
       "type_name": "CatalogueLinterError",
@@ -15,7 +15,7 @@
     {
       "type_name": "CatalogueLinterRule",
       "signal": "blue",
-      "entry_hash": "09e276a3f796bdf9c833bcd8c98710ff372b61c3e9c6c543810421528a03b9a8"
+      "entry_hash": "95d165bed7a11020113512c83eada96ef760eed4766f7051b14ab0e6284dc541"
     },
     {
       "type_name": "CatalogueLinterRuleError",
@@ -25,7 +25,7 @@
     {
       "type_name": "CatalogueLinterRuleKind",
       "signal": "blue",
-      "entry_hash": "ee79afc45b2055fb35e0b888a9be18bd867742999cd4827d0a5b311ebda03751"
+      "entry_hash": "a85d57ad188fe7acd57b8341fad6e4fd22c12c87dcc0ae96d2645830b163f69e"
     },
     {
       "type_name": "CatalogueLoaderError",
@@ -40,17 +40,17 @@
     {
       "type_name": "ContractRole",
       "signal": "blue",
-      "entry_hash": "a8318db87fbfcc06563030a237e1e3dceee8b4a4a8ad173731021f6db4275bf1"
+      "entry_hash": "ed76fbb0fee7588b62f42704778f55f41a9cbd2889e499be6e77646df388ba51"
     },
     {
       "type_name": "DataRole",
       "signal": "blue",
-      "entry_hash": "d3222ba620ca308c7dc5034043c74d19dea16051f0054b81a32b452bfe7d286f"
+      "entry_hash": "54342b02b44e6937e4365f164f19901192d8daa5c767f147558fb5aa086d86ce"
     },
     {
       "type_name": "IdentityAccessor",
       "signal": "blue",
-      "entry_hash": "f09ee63d7b059909ff73c1676de75735434f4e2a3089332d63db40eecc6acbf9"
+      "entry_hash": "4e643aa61c0ace1a3429b7ae37228a3be0e672a6e8e1330d9977a356b2af0c72"
     },
     {
       "type_name": "InvariantDecl",
@@ -60,7 +60,7 @@
     {
       "type_name": "InvariantName",
       "signal": "blue",
-      "entry_hash": "f3caf9b984697226b49011a19bfbb1927ce151a52b93f9497fff1a5e903538c1"
+      "entry_hash": "078ac923c212ec3967d9d1335f72af73846f8a7243b6fecd3996d498efb6625d"
     },
     {
       "type_name": "InvariantPredicate",
@@ -70,17 +70,17 @@
     {
       "type_name": "NonEmptyVec",
       "signal": "blue",
-      "entry_hash": "e0fb53aed2f1c2be87a7169a7b689186769f438695875611ec3736480de1911a"
+      "entry_hash": "c012c4cd4e9104ca2a6887e43c72ab0c465996616185ae72a6fff5ec44bba002"
     },
     {
       "type_name": "RoleKind",
       "signal": "blue",
-      "entry_hash": "7d3391fc090b847f35d41684684b6af1fba335ef3cc700c7c75138abf3c12e9a"
+      "entry_hash": "d7fa82abc5a1d48230ed41e076d24b3e4a8fe157038abce6818454b7f0596ff5"
     },
     {
       "type_name": "RuleTarget",
       "signal": "blue",
-      "entry_hash": "4494869ca1ae4497772f7229068cb4e3816f7d0d0c10c424473d026f80e05803"
+      "entry_hash": "399ccd9002a38e706031d3aed355d551c12fddb1a0edd7e0d2808c47e95b9521"
     },
     {
       "type_name": "CatalogueLinter",

@@ -125,7 +125,7 @@ impl DataRole {
     /// Returns the payload-free role name used for display, parsing, and method
     /// reference signatures.
     #[must_use]
-    pub const fn variant_name(&self) -> &'static str {
+    pub fn variant_name(&self) -> &'static str {
         match self {
             Self::ValueObject { .. } => "ValueObject",
             Self::Entity { .. } => "Entity",
@@ -222,7 +222,7 @@ pub enum ContractRole {
 impl ContractRole {
     /// Returns the payload-free role name used for display and parsing.
     #[must_use]
-    pub const fn variant_name(&self) -> &'static str {
+    pub fn variant_name(&self) -> &'static str {
         match self {
             Self::SpecificationPort => "SpecificationPort",
             Self::ApplicationService => "ApplicationService",

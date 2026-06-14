@@ -321,6 +321,234 @@
           "findings": [],
           "hash": "rvw1:sha256:accf2e63734336b6617f8728c701537b71292b238bc1ab122b06caa94d48e280",
           "at": "2026-06-14T08:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunCatalogueLint` is documented as “unchanged from baseline” and “stable,” but the trait now adds `Send + Sync` supertrait bounds. That is a contract change, so the docs and signature conflict.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
+              "line": 264,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ab40622af3bf0eb796a3a3fa1f5c1ff18aa714c30203a2edb0dcee56d205a80f",
+          "at": "2026-06-14T10:56:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3af046f883710c9dc53d85f84908ba635aef63f9d0c64ffdc2d474f76d26a09e",
+          "at": "2026-06-14T11:06:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3af046f883710c9dc53d85f84908ba635aef63f9d0c64ffdc2d474f76d26a09e",
+          "at": "2026-06-14T11:30:06Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
+          "at": "2026-06-14T02:30:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
+          "at": "2026-06-14T02:32:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
+          "at": "2026-06-14T02:49:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NonEmptyVec` now only exposes `new(first, rest)`, so callers that receive a decoded array cannot ask the domain type to validate the non-empty invariant from a `Vec<T>`. The T001 briefing explicitly requires `NonEmptyVec<T>` to provide both `new(first, rest)` and `try_new(Vec<T>)`, with empty input rejected, and the removed tests covered that path. Without `try_new`, the infrastructure codec either cannot implement the documented JSON array -> `NonEmptyVec` conversion through the public domain API or must duplicate the invariant outside the value object.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 258,
+              "category": "api_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
+          "at": "2026-06-14T02:51:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
+          "at": "2026-06-14T02:56:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`entries.rs` still only exercises the pre-migration role sets: `test_type_entry_all_data_roles_are_accepted` stops at `SecondaryAdapter`, and `test_trait_entry_all_contract_roles_are_accepted` stops at `SecondaryPort`. That leaves the new public variants from this change (`DataRole::EventPolicy` and `ContractRole::Repository`) without any `TypeEntry`/`TraitEntry` coverage, so regressions in the new payload-bearing role shapes could slip through CI.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 329,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:47be683e82921066dc13ad301316994ef737f7216beb878c628e37c94c42edc0",
+          "at": "2026-06-14T05:57:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa7c7bb459ff902e0532481ff3452291578072aaf53165e1d5038b1176cd64f5",
+          "at": "2026-06-14T06:06:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa7c7bb459ff902e0532481ff3452291578072aaf53165e1d5038b1176cd64f5",
+          "at": "2026-06-14T06:13:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`role.clone()` here clones `&DataRole`, not `DataRole`, so this test never exercises the enum's `Clone` implementation. It will still pass even if `DataRole` loses a correct `Clone`; clone the value itself (for example `(*role).clone()`) or iterate by value instead.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 826,
+              "category": "testing"
+            },
+            {
+              "message": "`role.clone()` here clones `&ContractRole`, not `ContractRole`, so this test does not validate the enum's `Clone` implementation. The assertion can pass regardless of the actual `Clone` impl; clone the owned value instead.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 859,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1e2a671056a7e5b9ca68382b238e3e855425c3f06d1232c631783b0a6b03ada6",
+          "at": "2026-06-14T08:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eaf4c4d345d7c0302f5a5c539135d2112357f647a43b91cc17528939fce3eef1",
+          "at": "2026-06-14T08:13:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eaf4c4d345d7c0302f5a5c539135d2112357f647a43b91cc17528939fce3eef1",
+          "at": "2026-06-14T08:15:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe5283a45170fc879792564b4dda8173ecb146b9d76ccf635c16c4841b897c16",
+          "at": "2026-06-14T08:39:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe5283a45170fc879792564b4dda8173ecb146b9d76ccf635c16c4841b897c16",
+          "at": "2026-06-14T08:43:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLinterRuleError::EmptyPermittedLayers` is still documented as a possible `CatalogueLinterRule::new` failure, but `KindLayerConstraint` now requires `NonEmptyVec<LayerId>`, so this constructor can never return that error. That makes the public contract false; either keep raw layer vectors here or remove the dead error path/docs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 317,
+              "category": "contract"
+            },
+            {
+              "message": "`CatalogueLinterRule::new` adds two new reachable failure branches (`EmptyRequiredTraits`, `EmptyForbiddenRoles`), but the test module only covers `EmptyTargetField` and happy paths. Add negative tests for those branches so the new public API surface is actually exercised.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 663,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:652e2aa4bebcaa3e3ee0428995d0cf3d72874a9cf836c44031fb5eea52a59aab",
+          "at": "2026-06-14T10:57:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLinterRuleKind` uses `NonEmptyVec` for `KindLayerConstraint.permitted_layers`, `TraitImplRequired.required_traits`, and `NoRoleInMethodSignature.forbidden_roles`, but the ADR sketch for D15 models these payloads as plain `Vec`. This changes the domain contract by making empty rule payloads unrepresentable, so the codec can no longer round-trip the documented schema and valid empty-config cases are rejected before evaluation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 217,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:527387b8b193cda66cb401efaee48df67f8c655f02f0f65b63ac43a5db73878c",
+          "at": "2026-06-14T11:07:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ForbiddenMethodReceiver` is the only `CatalogueLinterRuleKind` payload that is not validated in `CatalogueLinterRule::new`. Empty or malformed `forbidden_receiver` values are accepted, so a misconfigured rule becomes a silent no-op instead of failing fast like the other invalid rule inputs. This should be rejected or modeled with a validated receiver type.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 379,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:527387b8b193cda66cb401efaee48df67f8c655f02f0f65b63ac43a5db73878c",
+          "at": "2026-06-14T11:14:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8374b6e6204bb7598d5c76583524f859ba22baa1a09643bc0479e0eb5940f08",
+          "at": "2026-06-14T11:25:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8374b6e6204bb7598d5c76583524f859ba22baa1a09643bc0479e0eb5940f08",
+          "at": "2026-06-14T11:28:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8374b6e6204bb7598d5c76583524f859ba22baa1a09643bc0479e0eb5940f08",
+          "at": "2026-06-14T11:29:07Z"
         }
       ]
     },
@@ -339,96 +567,20 @@
           "findings": [],
           "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
           "at": "2026-06-14T05:58:36Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DataRoleDto` still leaves the unit-like roles (`Specification`, `Factory`, `Interactor`, `Command`, `Query`, `Dto`, `ErrorType`, `SecondaryAdapter`) as unit variants, so serde continues to emit and accept bare strings for those cases. That means the new codec does not actually enforce the discriminated-object wire shape for the full role enum, and the legacy string form is still implicitly supported.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
-              "line": 32,
-              "category": "serialization"
-            },
-            {
-              "message": "`ContractRole::Repository` is rendered with the display tag `repository`, but `section_to_signal_kind_tag` never collapses that tag back to the evaluator's `secondary_port` bucket, and there is no dedicated repository section. Repository traits will therefore fall into `Other` with a blank Signal column even when `check_type_signals` has produced a matching `secondary_port` signal.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 208,
-              "category": "rendering"
-            }
-          ],
-          "hash": "rvw1:sha256:5e3237b12ca76bd05e2b84ce9ece8b10e92cf2c75f40c23d30f0732087f31e87",
-          "at": "2026-06-14T05:57:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_layer` now short-circuits on `binding.targets.len() > 1` before `Self::to_infra_binding(binding)` runs, so malformed multi-target bindings never go through the domain/infra validation path. In the absent-catalogue fast path that means bad `catalogue_file` / `baseline_file` / `layer_id` input can be accepted silently, and `track_dir.join(&binding.catalogue_file)` is probed before any path validation. That is a validation bypass and path-probing issue in the new early-return branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
-              "line": 146,
-              "category": "security"
-            },
-            {
-              "message": "The new codec payload variants (`DataRoleDto::EventPolicy` and `ContractRoleDto::Repository`) have no dedicated infrastructure tests covering their happy-path round trips and required rejection cases. In particular, there is no coverage for empty `reacts_to` being rejected or `Repository.aggregate` failing validation, so regressions in the new schema-invariant decode/encode paths would ship without a safety net.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
-              "line": 44,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7cb20b6343bb5696d05b6fcfb24f60d47334daeb20f9d25735431d6402a1ccf5",
-          "at": "2026-06-14T06:07:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
-          "at": "2026-06-14T06:23:47Z"
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T10:56:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
-          "at": "2026-06-14T06:35:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
-          "at": "2026-06-14T08:11:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
-          "at": "2026-06-14T08:15:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
-          "at": "2026-06-14T08:41:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
-          "at": "2026-06-14T08:43:29Z"
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T11:28:40Z"
         }
       ]
     },
@@ -679,24 +831,6 @@
         }
       ]
     },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:57:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:59:38Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -712,132 +846,164 @@
           "findings": [],
           "hash": "rvw1:sha256:549edec9b94dfd016a378883220ffaf79fc4f5ed7d97370a2623744fbb1c3f91",
           "at": "2026-06-14T05:55:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
+          "at": "2026-06-14T10:52:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
+          "at": "2026-06-14T11:29:25Z"
         }
       ]
     },
-    "domain": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DataRoleDto` still leaves the unit-like roles (`Specification`, `Factory`, `Interactor`, `Command`, `Query`, `Dto`, `ErrorType`, `SecondaryAdapter`) as unit variants, so serde continues to emit and accept bare strings for those cases. That means the new codec does not actually enforce the discriminated-object wire shape for the full role enum, and the legacy string form is still implicitly supported.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
+              "line": 32,
+              "category": "serialization"
+            },
+            {
+              "message": "`ContractRole::Repository` is rendered with the display tag `repository`, but `section_to_signal_kind_tag` never collapses that tag back to the evaluator's `secondary_port` bucket, and there is no dedicated repository section. Repository traits will therefore fall into `Other` with a blank Signal column even when `check_type_signals` has produced a matching `secondary_port` signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 208,
+              "category": "rendering"
+            }
+          ],
+          "hash": "rvw1:sha256:5e3237b12ca76bd05e2b84ce9ece8b10e92cf2c75f40c23d30f0732087f31e87",
+          "at": "2026-06-14T05:57:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_layer` now short-circuits on `binding.targets.len() > 1` before `Self::to_infra_binding(binding)` runs, so malformed multi-target bindings never go through the domain/infra validation path. In the absent-catalogue fast path that means bad `catalogue_file` / `baseline_file` / `layer_id` input can be accepted silently, and `track_dir.join(&binding.catalogue_file)` is probed before any path validation. That is a validation bypass and path-probing issue in the new early-return branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
+              "line": 146,
+              "category": "security"
+            },
+            {
+              "message": "The new codec payload variants (`DataRoleDto::EventPolicy` and `ContractRoleDto::Repository`) have no dedicated infrastructure tests covering their happy-path round trips and required rejection cases. In particular, there is no coverage for empty `reacts_to` being rejected or `Repository.aggregate` failing validation, so regressions in the new schema-invariant decode/encode paths would ship without a safety net.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
+              "line": 44,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7cb20b6343bb5696d05b6fcfb24f60d47334daeb20f9d25735431d6402a1ccf5",
+          "at": "2026-06-14T06:07:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
+          "at": "2026-06-14T06:23:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
+          "at": "2026-06-14T06:35:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
+          "at": "2026-06-14T08:11:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
+          "at": "2026-06-14T08:15:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
+          "at": "2026-06-14T08:41:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
+          "at": "2026-06-14T08:43:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
+          "at": "2026-06-14T10:53:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
+          "at": "2026-06-14T11:28:40Z"
+        }
+      ]
+    },
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
-          "at": "2026-06-14T02:30:44Z"
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
+          "at": "2026-06-14T05:57:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
-          "at": "2026-06-14T02:32:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
-          "at": "2026-06-14T02:49:09Z"
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
+          "at": "2026-06-14T05:59:38Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`NonEmptyVec` now only exposes `new(first, rest)`, so callers that receive a decoded array cannot ask the domain type to validate the non-empty invariant from a `Vec<T>`. The T001 briefing explicitly requires `NonEmptyVec<T>` to provide both `new(first, rest)` and `try_new(Vec<T>)`, with empty input rejected, and the removed tests covered that path. Without `try_new`, the infrastructure codec either cannot implement the documented JSON array -> `NonEmptyVec` conversion through the public domain API or must duplicate the invariant outside the value object.",
+              "message": "P1 test coverage gap: the new boundary conversion path can now reject malformed public `RunCatalogueLintCommand` input via `InvalidRuleSpec`, but the added tests only cover valid `LintRuleSpec` values. Please add error-path coverage for cases such as an unknown `target_roles` entry, an empty `target_field`, and empty `permitted_layers` / `required_traits` / `forbidden_roles` so the public API’s validation contract is pinned down.",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 258,
-              "category": "api_contract"
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
+              "line": 175,
+              "category": "test coverage"
             }
           ],
-          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
-          "at": "2026-06-14T02:51:31Z"
+          "hash": "rvw1:sha256:21e2d02a7849cec388c231f9b3211eedaaa9247fb98c1483753d50a7bf3dceed",
+          "at": "2026-06-14T11:28:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
-          "at": "2026-06-14T02:56:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`entries.rs` still only exercises the pre-migration role sets: `test_type_entry_all_data_roles_are_accepted` stops at `SecondaryAdapter`, and `test_trait_entry_all_contract_roles_are_accepted` stops at `SecondaryPort`. That leaves the new public variants from this change (`DataRole::EventPolicy` and `ContractRole::Repository`) without any `TypeEntry`/`TraitEntry` coverage, so regressions in the new payload-bearing role shapes could slip through CI.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-              "line": 329,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:47be683e82921066dc13ad301316994ef737f7216beb878c628e37c94c42edc0",
-          "at": "2026-06-14T05:57:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa7c7bb459ff902e0532481ff3452291578072aaf53165e1d5038b1176cd64f5",
-          "at": "2026-06-14T06:06:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa7c7bb459ff902e0532481ff3452291578072aaf53165e1d5038b1176cd64f5",
-          "at": "2026-06-14T06:13:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`role.clone()` here clones `&DataRole`, not `DataRole`, so this test never exercises the enum's `Clone` implementation. It will still pass even if `DataRole` loses a correct `Clone`; clone the value itself (for example `(*role).clone()`) or iterate by value instead.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 826,
-              "category": "testing"
-            },
-            {
-              "message": "`role.clone()` here clones `&ContractRole`, not `ContractRole`, so this test does not validate the enum's `Clone` implementation. The assertion can pass regardless of the actual `Clone` impl; clone the owned value instead.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 859,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1e2a671056a7e5b9ca68382b238e3e855425c3f06d1232c631783b0a6b03ada6",
-          "at": "2026-06-14T08:10:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eaf4c4d345d7c0302f5a5c539135d2112357f647a43b91cc17528939fce3eef1",
-          "at": "2026-06-14T08:13:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eaf4c4d345d7c0302f5a5c539135d2112357f647a43b91cc17528939fce3eef1",
-          "at": "2026-06-14T08:15:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe5283a45170fc879792564b4dda8173ecb146b9d76ccf635c16c4841b897c16",
-          "at": "2026-06-14T08:39:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe5283a45170fc879792564b4dda8173ecb146b9d76ccf635c16c4841b897c16",
-          "at": "2026-06-14T08:43:06Z"
+          "hash": "rvw1:sha256:5378faa92aaeca0dffb9d6b4327921d61e93516c708175342956a9d270130111",
+          "at": "2026-06-14T11:33:43Z"
         }
       ]
     }

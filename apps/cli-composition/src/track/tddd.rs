@@ -431,7 +431,6 @@ impl CliApp {
         workspace_root: PathBuf,
     ) -> Result<CommandOutcome, String> {
         use infrastructure::tddd::contract_map_adapter::FsCatalogueLoader;
-        use infrastructure::tddd::in_memory_catalogue_linter::InMemoryCatalogueLinter;
         use usecase::catalogue_lint_workflow::{
             LintRuleKind, LintRuleSpec, RunCatalogueLint, RunCatalogueLintCommand,
             RunCatalogueLintInteractor,
@@ -439,26 +438,26 @@ impl CliApp {
 
         let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)?;
 
+        // Demo rule set: FieldEmpty on value_object.expected_methods and
+        // KindLayerConstraint on domain_service.
+        // target_roles uses role kind names ("ValueObject", "DomainService").
         let rules = vec![
             LintRuleSpec {
-                kind: LintRuleKind::FieldEmpty,
-                target_kind: "value_object".to_owned(),
-                target_field: Some("expected_methods".to_owned()),
-                permitted_layers: vec![],
+                target_roles: vec!["ValueObject".to_owned()],
+                kind: LintRuleKind::FieldEmpty { target_field: "expected_methods".to_owned() },
             },
             LintRuleSpec {
-                kind: LintRuleKind::KindLayerConstraint,
-                target_kind: "domain_service".to_owned(),
-                target_field: None,
-                permitted_layers: vec!["domain".to_owned(), "usecase".to_owned()],
+                target_roles: vec!["DomainService".to_owned()],
+                kind: LintRuleKind::KindLayerConstraint {
+                    permitted_layers: vec!["domain".to_owned(), "usecase".to_owned()],
+                },
             },
         ];
 
         let items_dir = workspace_root.join("track/items");
         let rules_path = workspace_root.join("architecture-rules.json");
         let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.clone());
-        let linter = InMemoryCatalogueLinter::new();
-        let interactor = RunCatalogueLintInteractor::new(loader, linter);
+        let interactor = RunCatalogueLintInteractor::new(loader);
 
         let runner: &dyn RunCatalogueLint = &interactor;
         let violations = runner
@@ -467,12 +466,7 @@ impl CliApp {
 
         let mut stdout_lines = Vec::new();
         for v in &violations {
-            stdout_lines.push(format!(
-                "{:?} on {}: {}",
-                v.rule_kind(),
-                v.entry_name(),
-                v.message()
-            ));
+            stdout_lines.push(format!("{} on {}: {}", v.rule_kind(), v.entry_name(), v.message()));
         }
         let count = violations.len();
         let stderr_msg = format!("Found {count} violation(s)");

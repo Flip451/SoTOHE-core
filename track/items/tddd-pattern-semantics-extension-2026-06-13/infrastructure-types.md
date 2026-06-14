@@ -10,6 +10,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueDocumentCodec | secondary_adapter | modify | impl Debug, impl Clone, impl Default | 🟡 | 🔵 |
-| InMemoryCatalogueLinter | secondary_adapter | delete | impl Default, impl CatalogueLinter | 🟡 | 🔵 |
+| CatalogueDocumentCodec | secondary_adapter | modify | impl Debug, impl Clone, impl Default | 🔵 | 🔵 |
+| InMemoryCatalogueLinter | secondary_adapter | delete | impl Default, impl CatalogueLinter | 🔵 | 🔵 |
 

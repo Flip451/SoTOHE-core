@@ -106,7 +106,74 @@
           }
         ]
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "value_object",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates the canonical empty-payload ValueObject role."
+        },
+        {
+          "name": "entity",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<Self, IdentifierError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a minimal Entity role with the conventional identity accessor."
+        },
+        {
+          "name": "aggregate_root",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<Self, IdentifierError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a minimal AggregateRoot role with the conventional identity accessor and empty optional vectors."
+        },
+        {
+          "name": "domain_service",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates the canonical empty-payload DomainService role."
+        },
+        {
+          "name": "use_case",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates the canonical empty-payload UseCase role."
+        },
+        {
+          "name": "variant_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&'static str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the payload-free role name used for display, parsing, and method reference signatures."
+        }
+      ],
       "module_path": "tddd::catalogue_v2::roles",
       "docs": "Role enum for TypeEntry (struct / enum / type alias). Declares the DDD / Clean Architecture role of a data type. Breaking change from baseline: data-carrying enum (Copy dropped); ValueObject / Entity / AggregateRoot / DomainService / UseCase gain per-variant semantics payload fields; DomainEvent (unit) and EventPolicy { reacts_to: NonEmptyVec<TypeRef> } added as new variants. Specification / Factory / Interactor / Command / Query / Dto / ErrorType / SecondaryAdapter remain unit variants.",
       "spec_refs": [
@@ -174,7 +241,19 @@
           }
         ]
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "variant_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&'static str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the payload-free role name used for display and parsing."
+        }
+      ],
       "module_path": "tddd::catalogue_v2::roles",
       "docs": "Role enum for TraitEntry. Breaking change from baseline: data-carrying enum (Copy dropped); Repository { aggregate: TypeRef } variant added as an independent variant (aggregate field mandatory, Option not allowed — aggregate-less Repository is an illegal state). SpecificationPort / ApplicationService / SecondaryPort remain unit variants.",
       "spec_refs": [
@@ -217,8 +296,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["Identifier"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -265,8 +344,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["MethodName"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -314,63 +393,13 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["Vec<TypeRef>"],
+          "fields": [],
           "has_stripped_fields": true
         }
       },
-      "methods": [
-        {
-          "name": "new",
-          "receiver": null,
-          "params": [
-            { "name": "first", "ty": "TypeRef" },
-            { "name": "rest", "ty": "Vec<TypeRef>" }
-          ],
-          "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Creates a NonEmptyVec with at least one element. Guarantees non-emptiness at construction."
-        },
-        {
-          "name": "try_new",
-          "receiver": null,
-          "params": [
-            { "name": "values", "ty": "Vec<TypeRef>" }
-          ],
-          "returns": "Result<Self, ConstructionError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Creates a NonEmptyVec from a vector, rejecting empty input. Returns ConstructionError::EmptyCollection when `values` is empty."
-        },
-        {
-          "name": "as_slice",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&[TypeRef]",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Returns the elements as a slice."
-        },
-        {
-          "name": "first",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&TypeRef",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Returns the first element."
-        }
-      ],
+      "methods": [],
       "module_path": "tddd::catalogue_v2::roles",
-      "docs": "A non-empty collection of TypeRef values. Used as the type of DataRole::EventPolicy.reacts_to to enforce at the type / schema level that an EventPolicy must react to at least one DomainEvent (reacts_to with zero elements is an illegal state). No serde derives — domain layer is serde-free; the infrastructure codec converts JSON array <-> NonEmptyVec and treats an empty array as a decode error.",
+      "docs": "A generic non-empty collection. Used as the element type for DataRole::EventPolicy.reacts_to (NonEmptyVec<TypeRef>), CatalogueLinterRuleKind::KindLayerConstraint.permitted_layers (NonEmptyVec<LayerId>), TraitImplRequired.required_traits (NonEmptyVec<String>), and NoRoleInMethodSignature.forbidden_roles (NonEmptyVec<RoleKind>). Enforces at the type level that the collection contains at least one element. No serde derives — domain layer is serde-free; the infrastructure codec converts JSON arrays to NonEmptyVec and treats an empty array as a decode error.",
       "spec_refs": [
         {
           "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
@@ -385,32 +414,68 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "ValueObject",      "payload": { "kind": "unit" } },
-          { "name": "Entity",           "payload": { "kind": "unit" } },
-          { "name": "AggregateRoot",    "payload": { "kind": "unit" } },
-          { "name": "DomainService",    "payload": { "kind": "unit" } },
-          { "name": "Specification",    "payload": { "kind": "unit" } },
-          { "name": "Factory",          "payload": { "kind": "unit" } },
-          { "name": "UseCase",          "payload": { "kind": "unit" } },
-          { "name": "Interactor",       "payload": { "kind": "unit" } },
-          { "name": "Command",          "payload": { "kind": "unit" } },
-          { "name": "Query",            "payload": { "kind": "unit" } },
-          { "name": "Dto",              "payload": { "kind": "unit" } },
-          { "name": "ErrorType",        "payload": { "kind": "unit" } },
-          { "name": "SecondaryAdapter", "payload": { "kind": "unit" } },
-          { "name": "DomainEvent",      "payload": { "kind": "unit" } },
-          { "name": "EventPolicy",      "payload": { "kind": "unit" } },
-          { "name": "SpecificationPort","payload": { "kind": "unit" } },
+          { "name": "ValueObject",       "payload": { "kind": "unit" } },
+          { "name": "Entity",            "payload": { "kind": "unit" } },
+          { "name": "AggregateRoot",     "payload": { "kind": "unit" } },
+          { "name": "DomainService",     "payload": { "kind": "unit" } },
+          { "name": "Specification",     "payload": { "kind": "unit" } },
+          { "name": "Factory",           "payload": { "kind": "unit" } },
+          { "name": "UseCase",           "payload": { "kind": "unit" } },
+          { "name": "Interactor",        "payload": { "kind": "unit" } },
+          { "name": "Command",           "payload": { "kind": "unit" } },
+          { "name": "Query",             "payload": { "kind": "unit" } },
+          { "name": "Dto",               "payload": { "kind": "unit" } },
+          { "name": "ErrorType",         "payload": { "kind": "unit" } },
+          { "name": "SecondaryAdapter",  "payload": { "kind": "unit" } },
+          { "name": "DomainEvent",       "payload": { "kind": "unit" } },
+          { "name": "EventPolicy",       "payload": { "kind": "unit" } },
+          { "name": "SpecificationPort", "payload": { "kind": "unit" } },
           { "name": "ApplicationService","payload": { "kind": "unit" } },
-          { "name": "SecondaryPort",    "payload": { "kind": "unit" } },
-          { "name": "Repository",       "payload": { "kind": "unit" } },
-          { "name": "FreeFunction",     "payload": { "kind": "unit" } },
-          { "name": "UseCaseFunction",  "payload": { "kind": "unit" } }
+          { "name": "SecondaryPort",     "payload": { "kind": "unit" } },
+          { "name": "Repository",        "payload": { "kind": "unit" } }
         ]
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "from_data_role",
+          "receiver": null,
+          "params": [
+            { "name": "role", "ty": "&DataRole" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the payload-free discriminant for a DataRole."
+        },
+        {
+          "name": "from_contract_role",
+          "receiver": null,
+          "params": [
+            { "name": "role", "ty": "&ContractRole" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the payload-free discriminant for a ContractRole."
+        },
+        {
+          "name": "variant_name",
+          "receiver": "self",
+          "params": [],
+          "returns": "&'static str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns a stable display name for this discriminant."
+        }
+      ],
       "module_path": "tddd::catalogue_linter",
-      "docs": "Payload-free discriminant enum spanning all DataRole / ContractRole / FunctionRole variants. Used in RuleTarget.target_roles to specify which roles a CatalogueLinterRule applies to. DataRole is data-carrying after this track's breaking change, so a payload-bearing DataRole cannot be used directly as a rule selector; RoleKind provides a lightweight discriminant that crosses DataRole / ContractRole / FunctionRole without carrying payload fields.",
+      "docs": "Payload-free discriminant enum spanning all DataRole (15 variants) and ContractRole (4 variants) variants — 19 total. Used in RuleTarget.target_roles and in CatalogueLinterRuleKind payloads (e.g. NoRoleInMethodSignature.forbidden_roles) to specify roles without carrying payload data. DataRole is data-carrying after this track's breaking change, so a payload-bearing DataRole cannot be used directly as a rule selector; RoleKind provides a lightweight discriminant. FreeFunction and UseCaseFunction are FunctionRole variants, not represented here because linter rules target types/traits, not free functions.",
       "spec_refs": [
         {
           "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
@@ -426,13 +491,60 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "target_roles", "ty": "Vec<RoleKind>" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "target_roles", "ty": "Vec<RoleKind>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new RuleTarget from the given role list. An empty target_roles means all roles."
+        },
+        {
+          "name": "all_roles",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a RuleTarget that matches all roles (empty target_roles)."
+        },
+        {
+          "name": "target_roles",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[RoleKind]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the target roles. An empty slice means all roles."
+        },
+        {
+          "name": "matches",
+          "receiver": "&self",
+          "params": [
+            { "name": "role", "ty": "RoleKind" }
+          ],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns true if the given RoleKind is in scope for this target. Always true when target_roles is empty (all_roles)."
+        }
+      ],
       "module_path": "tddd::catalogue_linter",
       "docs": "Selects which catalogue entries a CatalogueLinterRule applies to by role. An empty target_roles means the rule applies to all roles. Uses RoleKind (payload-free discriminant) so that Repository (a ContractRole variant) can be specified alongside DataRole variants in a single Vec.",
       "spec_refs": [
@@ -454,7 +566,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "target_field", "ty": "FieldName" }
+                { "name": "target_field", "ty": "String" }
               ]
             }
           },
@@ -463,7 +575,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "target_field", "ty": "FieldName" }
+                { "name": "target_field", "ty": "String" }
               ]
             }
           },
@@ -472,7 +584,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "permitted_layers", "ty": "Vec<LayerId>" }
+                { "name": "permitted_layers", "ty": "NonEmptyVec<LayerId>" }
               ]
             }
           },
@@ -481,7 +593,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "target_field", "ty": "FieldName" },
+                { "name": "target_field", "ty": "String" },
                 { "name": "expected_role", "ty": "RoleKind" }
               ]
             }
@@ -491,7 +603,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "required_traits", "ty": "Vec<TypeRef>" }
+                { "name": "required_traits", "ty": "NonEmptyVec<String>" }
               ]
             }
           },
@@ -500,7 +612,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "forbidden_roles", "ty": "Vec<RoleKind>" }
+                { "name": "forbidden_roles", "ty": "NonEmptyVec<RoleKind>" }
               ]
             }
           },
@@ -509,10 +621,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "target_field", "ty": "FieldName" },
-                { "name": "required_receiver", "ty": "Option<SelfReceiver>" },
-                { "name": "params_must_be_empty", "ty": "bool" },
-                { "name": "returns_must_be_bool", "ty": "bool" }
+                { "name": "target_field", "ty": "String" }
               ]
             }
           },
@@ -521,7 +630,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "target_field", "ty": "FieldName" }
+                { "name": "target_field", "ty": "String" }
               ]
             }
           },
@@ -530,7 +639,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "target_field", "ty": "FieldName" }
+                { "name": "target_field", "ty": "String" }
               ]
             }
           },
@@ -539,7 +648,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "target_field", "ty": "FieldName" }
+                { "name": "target_field", "ty": "String" }
               ]
             }
           },
@@ -552,15 +661,27 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "forbidden_receiver", "ty": "SelfReceiver" }
+                { "name": "forbidden_receiver", "ty": "String" }
               ]
             }
           }
         ]
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "discriminant_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&'static str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the discriminant name for display and violation reporting (e.g. 'FieldEmpty')."
+        }
+      ],
       "module_path": "tddd::catalogue_linter",
-      "docs": "Classifies the inspection content of a catalogue linter rule. Breaking change from baseline: all three existing variants (FieldEmpty / FieldNonEmpty / KindLayerConstraint) become data-carrying (payload fields move from CatalogueLinterRule flat fields into variant payloads). Nine new variants are added covering the minimum core rules defined by ADR D4-D11 / D16 / D18.",
+      "docs": "Classifies the inspection content of a catalogue linter rule. 12-variant enum per ADR D15. Breaking change from baseline: all three existing variants gain payloads; 9 new variants added. All target_field/target_field payloads use String (not FieldName) — the domain linter works with raw strings to stay serde-free. KindLayerConstraint.permitted_layers is NonEmptyVec<LayerId>; TraitImplRequired.required_traits is NonEmptyVec<String>; NoRoleInMethodSignature.forbidden_roles is NonEmptyVec<RoleKind> — NonEmptyVec enforces non-emptiness at construction. MethodReferenceSignature carries only target_field: String (ADR D15 implementation-phase decision: receiver/params/returns constraints are evaluated by the linter body, not stored in the rule kind payload). ForbiddenMethodReceiver.forbidden_receiver is String (e.g. '&mut self') not SelfReceiver enum.",
       "spec_refs": [
         {
           "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
@@ -576,10 +697,7 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "target", "ty": "RuleTarget" },
-            { "name": "kind", "ty": "CatalogueLinterRuleKind" }
-          ],
+          "fields": [],
           "has_stripped_fields": true
         }
       },
@@ -673,11 +791,7 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "rule_kind", "ty": "CatalogueLinterRuleKind" },
-            { "name": "entry_name", "ty": "String" },
-            { "name": "message", "ty": "String" }
-          ],
+          "fields": [],
           "has_stripped_fields": true
         }
       },
@@ -686,27 +800,27 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "rule_kind", "ty": "CatalogueLinterRuleKind" },
-            { "name": "entry_name", "ty": "String" },
-            { "name": "message", "ty": "String" }
+            { "name": "rule_kind", "ty": "&'static str" },
+            { "name": "entry_name", "ty": "impl Into<String>" },
+            { "name": "message", "ty": "impl Into<String>" }
           ],
           "returns": "Self",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Creates a new CatalogueLintViolation. No validation — violations are produced only by the trusted evaluator."
+          "docs": "Creates a new CatalogueLintViolation. rule_kind is the discriminant name from CatalogueLinterRuleKind::discriminant_name. No validation — violations are produced only by the trusted evaluator."
         },
         {
           "name": "rule_kind",
           "receiver": "&self",
           "params": [],
-          "returns": "&CatalogueLinterRuleKind",
+          "returns": "&'static str",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Returns the rule kind that generated this violation."
+          "docs": "Returns the discriminant name of the rule kind that generated this violation (e.g. 'FieldEmpty')."
         },
         {
           "name": "entry_name",
@@ -732,7 +846,7 @@
         }
       ],
       "module_path": "tddd::catalogue_linter",
-      "docs": "A single violation produced when a catalogue linter rule fires against an entry. Modify from baseline: field type of rule_kind changes from the old unit-variant CatalogueLinterRuleKind to the new data-carrying CatalogueLinterRuleKind. All fields are private; access via accessor methods. The struct structure (3 private fields + 4 public methods) is otherwise unchanged.",
+      "docs": "A single violation produced when a catalogue linter rule fires against an entry. All fields are private; access via accessor methods. rule_kind stores the &'static str discriminant name (from CatalogueLinterRuleKind::discriminant_name) rather than the CatalogueLinterRuleKind value itself — this avoids cloning data-carrying CatalogueLinterRuleKind in the violation. Modify from baseline: rule_kind type changes from old unit-variant enum reference to &'static str discriminant name string.",
       "spec_refs": [
         {
           "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
@@ -923,7 +1037,140 @@
       "informal_grounds": []
     }
   },
-  "inherent_impls": [],
+  "inherent_impls": [
+    {
+      "type_name": "InvariantDecl",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "name", "ty": "InvariantName" },
+            { "name": "predicate", "ty": "InvariantPredicate" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new InvariantDecl."
+        }
+      ]
+    },
+    {
+      "type_name": "IdentityAccessor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "method_name", "ty": "MethodName" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new IdentityAccessor from an already-validated method name."
+        },
+        {
+          "name": "method_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&MethodName",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the referenced getter method name."
+        }
+      ]
+    },
+    {
+      "type_name": "InvariantName",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "s", "ty": "impl Into<String>" }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new instance, validating the Rust identifier rules."
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the underlying string slice."
+        }
+      ]
+    },
+    {
+      "type_name": "NonEmptyVec",
+      "impl_generics": [{ "name": "T", "bounds": [] }],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "first", "ty": "T" },
+            { "name": "rest", "ty": "Vec<T>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a NonEmptyVec with at least one element. Guarantees non-emptiness at construction."
+        },
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "values", "ty": "Vec<T>" }
+          ],
+          "returns": "Result<Self, ConstructionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a NonEmptyVec from a vector, rejecting empty input. Returns ConstructionError::EmptyCollection when `values` is empty."
+        },
+        {
+          "name": "as_slice",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[T]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the elements as a slice."
+        },
+        {
+          "name": "first",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&T>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the first element (always Some for a NonEmptyVec constructed via new/try_new, but the implementation delegates to Vec::first which returns Option)."
+        }
+      ]
+    }
+  ],
   "trait_impls": [
     {
       "action": "modify",
@@ -1203,16 +1450,6 @@
     {
       "action": "add",
       "trait_ref": "core::marker::Copy",
-      "for_type": "RoleKind"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Display",
-      "for_type": "RoleKind"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::str::traits::FromStr",
       "for_type": "RoleKind"
     },
     {

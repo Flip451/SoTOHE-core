@@ -57,6 +57,22 @@
         "kind": "pass",
         "citation": "現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
       }
+    },
+    {
+      "claim_hash": "185c2d4632246fcf1d038610536143fbd2d512fc2658a56a70db5db98fa73215",
+      "evidence_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装を 3 段階の機構軸で進める。段 1: `DataRole` / `ContractRole` を data-carrying enum 化し、すべての payload 付き variant の schema を 1 回の breaking migration で確定する（`Entity`・`AggregateRoot`・`ValueObject`・`DomainService`・`UseCase` への意味論フィールド追加、`ContractRole::Repository { aggregate: TypeRef }` 追加、`DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` 追加を含む）."
+      }
+    },
+    {
+      "claim_hash": "185c2d4632246fcf1d038610536143fbd2d512fc2658a56a70db5db98fa73215",
+      "evidence_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。"
+      }
     }
   ]
 }

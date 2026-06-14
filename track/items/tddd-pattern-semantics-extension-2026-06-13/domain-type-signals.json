@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T08:45:20Z",
-  "declaration_hash": "00eb56d1a2f48edab9dccb5c6c3755150824e8ad1ca8af6eae1bf990e01fff6b",
+  "generated_at": "2026-06-14T11:38:50Z",
+  "declaration_hash": "ad613ce00671f3be9ca1f10eed3c3e09c2a4d33b787a7a75a865b4ab1efcb6a8",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -29,7 +29,7 @@
     {
       "type_name": "CatalogueLinterRule",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -41,7 +41,7 @@
     {
       "type_name": "CatalogueLinterRuleError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -54,7 +54,7 @@
     {
       "type_name": "CatalogueLinterRuleKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -80,7 +80,7 @@
     {
       "type_name": "ContractRole",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -94,7 +94,7 @@
     {
       "type_name": "DataRole",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -108,7 +108,7 @@
     {
       "type_name": "IdentityAccessor",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -120,7 +120,7 @@
     {
       "type_name": "InvariantDecl",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -132,7 +132,7 @@
     {
       "type_name": "InvariantName",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -162,7 +162,7 @@
     {
       "type_name": "NonEmptyVec",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -174,25 +174,23 @@
     {
       "type_name": "RoleKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug",
-        "core::fmt::Display",
         "core::hash::Hash",
-        "core::marker::Copy",
-        "core::str::traits::FromStr"
+        "core::marker::Copy"
       ]
     },
     {
       "type_name": "RuleTarget",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -208,14 +206,14 @@
     {
       "type_name": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CatalogueLinter",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "CatalogueLoader",

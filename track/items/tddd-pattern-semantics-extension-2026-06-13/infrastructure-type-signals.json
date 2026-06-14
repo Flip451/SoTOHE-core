@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T08:45:26Z",
-  "declaration_hash": "6246f339e15527e39a6c43b1eaa280fb196158306e3000e85031debde43e4537",
+  "generated_at": "2026-06-14T11:38:56Z",
+  "declaration_hash": "eac6cd8b5137ca42685159594493b994938653e056ade21e58014c0746aa5438",
   "signals": [
     {
       "type_name": "CatalogueDocumentCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::fmt::Debug"
@@ -15,12 +15,8 @@
     {
       "type_name": "InMemoryCatalogueLinter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "CatalogueLinter",
-        "core::default::Default"
-      ]
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "CatalogueDocumentCodecError",

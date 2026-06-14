@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T08:45:21Z",
-  "declaration_hash": "06e500a71aa60ee6303b49b38f314d696b80b7a0c84f9a7feb0a14faf851ca4c",
+  "generated_at": "2026-06-14T11:38:51Z",
+  "declaration_hash": "11763a167904dca4ca90373261fc491a585c4130c48ceb5709f51026c1c1ff0a",
   "signals": [
     {
       "type_name": "LintRuleKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -18,21 +18,17 @@
     {
       "type_name": "LintRuleSpec",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
-      ],
-      "missing_items": [
-        "core::cmp::Eq",
-        "core::cmp::PartialEq"
       ]
     },
     {
       "type_name": "RunCatalogueLintError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::error::Error",
@@ -43,13 +39,10 @@
     {
       "type_name": "RunCatalogueLintInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "RunCatalogueLint"
-      ],
-      "missing_items": [
-        "core::fmt::Debug"
       ]
     },
     {

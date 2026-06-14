@@ -70,6 +70,7 @@ subgraph domain["domain"]
     T37_domain_domain_CatalogueLinterRuleKind_NoExternalReferenceInMethods[NoExternalReferenceInMethods]
     T37_domain_domain_CatalogueLinterRuleKind_NoPublicField[NoPublicField]
     T37_domain_domain_CatalogueLinterRuleKind_ForbiddenMethodReceiver[ForbiddenMethodReceiver]
+    T37_domain_domain_CatalogueLinterRuleKind_discriminant_name([discriminant_name])
   end
   subgraph T34_domain_domain_CatalogueLoaderError["tddd::catalogue_ports::CatalogueLoaderError"]
     direction TB
@@ -93,6 +94,7 @@ subgraph domain["domain"]
     T26_domain_domain_ContractRole_ApplicationService[ApplicationService]
     T26_domain_domain_ContractRole_SecondaryPort[SecondaryPort]
     T26_domain_domain_ContractRole_Repository[Repository]
+    T26_domain_domain_ContractRole_variant_name([variant_name])
   end
   subgraph T22_domain_domain_DataRole["tddd::catalogue_v2::roles::DataRole"]
     direction TB
@@ -112,18 +114,29 @@ subgraph domain["domain"]
     T22_domain_domain_DataRole_SecondaryAdapter[SecondaryAdapter]
     T22_domain_domain_DataRole_DomainEvent[DomainEvent]
     T22_domain_domain_DataRole_EventPolicy[EventPolicy]
+    T22_domain_domain_DataRole_value_object([value_object])
+    T22_domain_domain_DataRole_entity([entity])
+    T22_domain_domain_DataRole_aggregate_root([aggregate_root])
+    T22_domain_domain_DataRole_domain_service([domain_service])
+    T22_domain_domain_DataRole_use_case([use_case])
+    T22_domain_domain_DataRole_variant_name([variant_name])
   end
   subgraph T30_domain_domain_IdentityAccessor["tddd::catalogue_v2::roles::IdentityAccessor"]
     direction TB
     T30_domain_domain_IdentityAccessor__self[IdentityAccessor]
+    T30_domain_domain_IdentityAccessor_new([new])
+    T30_domain_domain_IdentityAccessor_method_name([method_name])
   end
   subgraph T27_domain_domain_InvariantDecl["tddd::catalogue_v2::roles::InvariantDecl"]
     direction TB
     T27_domain_domain_InvariantDecl__self[InvariantDecl]
+    T27_domain_domain_InvariantDecl_new([new])
   end
   subgraph T27_domain_domain_InvariantName["tddd::catalogue_v2::roles::InvariantName"]
     direction TB
     T27_domain_domain_InvariantName__self[InvariantName]
+    T27_domain_domain_InvariantName_new([new])
+    T27_domain_domain_InvariantName_as_str([as_str])
   end
   subgraph T32_domain_domain_InvariantPredicate["tddd::catalogue_v2::roles::InvariantPredicate"]
     direction TB
@@ -160,12 +173,17 @@ subgraph domain["domain"]
     T22_domain_domain_RoleKind_ApplicationService[ApplicationService]
     T22_domain_domain_RoleKind_SecondaryPort[SecondaryPort]
     T22_domain_domain_RoleKind_Repository[Repository]
-    T22_domain_domain_RoleKind_FreeFunction[FreeFunction]
-    T22_domain_domain_RoleKind_UseCaseFunction[UseCaseFunction]
+    T22_domain_domain_RoleKind_from_data_role([from_data_role])
+    T22_domain_domain_RoleKind_from_contract_role([from_contract_role])
+    T22_domain_domain_RoleKind_variant_name([variant_name])
   end
   subgraph T24_domain_domain_RuleTarget["tddd::catalogue_linter::RuleTarget"]
     direction TB
     T24_domain_domain_RuleTarget__self[RuleTarget]
+    T24_domain_domain_RuleTarget_new([new])
+    T24_domain_domain_RuleTarget_all_roles([all_roles])
+    T24_domain_domain_RuleTarget_target_roles([target_roles])
+    T24_domain_domain_RuleTarget_matches([matches])
   end
   subgraph R29_domain_domain_CatalogueLoader["tddd::catalogue_ports::CatalogueLoader"]
     direction TB
@@ -248,16 +266,17 @@ subgraph infrastructure["infrastructure"]
   end
   end
 end
-T36_domain_domain_CatalogueLintViolation_new --o T37_domain_domain_CatalogueLinterRuleKind__self
 T36_domain_domain_CatalogueLintViolation_new --> T36_domain_domain_CatalogueLintViolation__self
-T36_domain_domain_CatalogueLintViolation_rule_kind --> T37_domain_domain_CatalogueLinterRuleKind__self
 T33_domain_domain_CatalogueLinterRule_new --o T24_domain_domain_RuleTarget__self
 T33_domain_domain_CatalogueLinterRule_new --o T37_domain_domain_CatalogueLinterRuleKind__self
 T33_domain_domain_CatalogueLinterRule_new --> T38_domain_domain_CatalogueLinterRuleError__self
 T33_domain_domain_CatalogueLinterRule_new --> T33_domain_domain_CatalogueLinterRule__self
 T33_domain_domain_CatalogueLinterRule_target --> T24_domain_domain_RuleTarget__self
 T33_domain_domain_CatalogueLinterRule_kind --> T37_domain_domain_CatalogueLinterRuleKind__self
+T37_domain_domain_CatalogueLinterRuleKind_KindLayerConstraint --o|permitted_layers| T25_domain_domain_NonEmptyVec__self
 T37_domain_domain_CatalogueLinterRuleKind_ReferencedRoleConstraint --o|expected_role| T22_domain_domain_RoleKind__self
+T37_domain_domain_CatalogueLinterRuleKind_TraitImplRequired --o|required_traits| T25_domain_domain_NonEmptyVec__self
+T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature --o|forbidden_roles| T25_domain_domain_NonEmptyVec__self
 T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature --o|forbidden_roles| T22_domain_domain_RoleKind__self
 T22_domain_domain_DataRole_ValueObject --o|invariants| T27_domain_domain_InvariantDecl__self
 T22_domain_domain_DataRole_Entity --o|identity| T30_domain_domain_IdentityAccessor__self
@@ -265,12 +284,30 @@ T22_domain_domain_DataRole_Entity --o|invariants| T27_domain_domain_InvariantDec
 T22_domain_domain_DataRole_AggregateRoot --o|identity| T30_domain_domain_IdentityAccessor__self
 T22_domain_domain_DataRole_AggregateRoot --o|invariants| T27_domain_domain_InvariantDecl__self
 T22_domain_domain_DataRole_EventPolicy --o|reacts_to| T25_domain_domain_NonEmptyVec__self
+T22_domain_domain_DataRole_value_object --> T22_domain_domain_DataRole__self
+T22_domain_domain_DataRole_entity --> T22_domain_domain_DataRole__self
+T22_domain_domain_DataRole_aggregate_root --> T22_domain_domain_DataRole__self
+T22_domain_domain_DataRole_domain_service --> T22_domain_domain_DataRole__self
+T22_domain_domain_DataRole_use_case --> T22_domain_domain_DataRole__self
+T30_domain_domain_IdentityAccessor_new --> T30_domain_domain_IdentityAccessor__self
+T27_domain_domain_InvariantDecl_new --o T27_domain_domain_InvariantName__self
+T27_domain_domain_InvariantDecl_new --o T32_domain_domain_InvariantPredicate__self
+T27_domain_domain_InvariantDecl_new --> T27_domain_domain_InvariantDecl__self
 T27_domain_domain_InvariantDecl__self --o|name| T27_domain_domain_InvariantName__self
 T27_domain_domain_InvariantDecl__self --o|predicate| T32_domain_domain_InvariantPredicate__self
+T27_domain_domain_InvariantName_new --> T27_domain_domain_InvariantName__self
 T25_domain_domain_NonEmptyVec_new --> T25_domain_domain_NonEmptyVec__self
 T25_domain_domain_NonEmptyVec_try_new --> T31_domain_domain_ConstructionError__self
 T25_domain_domain_NonEmptyVec_try_new --> T25_domain_domain_NonEmptyVec__self
-T24_domain_domain_RuleTarget__self --o|target_roles| T22_domain_domain_RoleKind__self
+T22_domain_domain_RoleKind_from_data_role --o T22_domain_domain_DataRole__self
+T22_domain_domain_RoleKind_from_data_role --> T22_domain_domain_RoleKind__self
+T22_domain_domain_RoleKind_from_contract_role --o T26_domain_domain_ContractRole__self
+T22_domain_domain_RoleKind_from_contract_role --> T22_domain_domain_RoleKind__self
+T24_domain_domain_RuleTarget_new --o T22_domain_domain_RoleKind__self
+T24_domain_domain_RuleTarget_new --> T24_domain_domain_RuleTarget__self
+T24_domain_domain_RuleTarget_all_roles --> T24_domain_domain_RuleTarget__self
+T24_domain_domain_RuleTarget_target_roles --> T22_domain_domain_RoleKind__self
+T24_domain_domain_RuleTarget_matches --o T22_domain_domain_RoleKind__self
 R29_domain_domain_CatalogueLoader_load_all --> T34_domain_domain_CatalogueLoaderError__self
 F63_domain_domain_domain__tddd__catalogue_linter__ddd_strict_preset --> T33_domain_domain_CatalogueLinterRule__self
 F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint --o T33_domain_domain_CatalogueLinterRule__self
@@ -316,6 +353,7 @@ class T37_domain_domain_CatalogueLinterRuleKind_FieldElementUniqueAcrossEntries 
 class T37_domain_domain_CatalogueLinterRuleKind_NoExternalReferenceInMethods variant_node
 class T37_domain_domain_CatalogueLinterRuleKind_NoPublicField variant_node
 class T37_domain_domain_CatalogueLinterRuleKind_ForbiddenMethodReceiver variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_discriminant_name method_node
 class T37_domain_domain_CatalogueLinterRuleKind__self value_object
 class T34_domain_domain_CatalogueLoaderError_CatalogueNotFound variant_node
 class T34_domain_domain_CatalogueLoaderError_LayerDiscoveryFailed variant_node
@@ -330,6 +368,7 @@ class T26_domain_domain_ContractRole_SpecificationPort variant_node
 class T26_domain_domain_ContractRole_ApplicationService variant_node
 class T26_domain_domain_ContractRole_SecondaryPort variant_node
 class T26_domain_domain_ContractRole_Repository variant_node
+class T26_domain_domain_ContractRole_variant_name method_node
 class T26_domain_domain_ContractRole__self value_object
 class T22_domain_domain_DataRole_ValueObject variant_node
 class T22_domain_domain_DataRole_Entity variant_node
@@ -346,9 +385,20 @@ class T22_domain_domain_DataRole_ErrorType variant_node
 class T22_domain_domain_DataRole_SecondaryAdapter variant_node
 class T22_domain_domain_DataRole_DomainEvent variant_node
 class T22_domain_domain_DataRole_EventPolicy variant_node
+class T22_domain_domain_DataRole_value_object method_node
+class T22_domain_domain_DataRole_entity method_node
+class T22_domain_domain_DataRole_aggregate_root method_node
+class T22_domain_domain_DataRole_domain_service method_node
+class T22_domain_domain_DataRole_use_case method_node
+class T22_domain_domain_DataRole_variant_name method_node
 class T22_domain_domain_DataRole__self value_object
+class T30_domain_domain_IdentityAccessor_new method_node
+class T30_domain_domain_IdentityAccessor_method_name method_node
 class T30_domain_domain_IdentityAccessor__self value_object
+class T27_domain_domain_InvariantDecl_new method_node
 class T27_domain_domain_InvariantDecl__self value_object
+class T27_domain_domain_InvariantName_new method_node
+class T27_domain_domain_InvariantName_as_str method_node
 class T27_domain_domain_InvariantName__self value_object
 class T32_domain_domain_InvariantPredicate_SelfMethod variant_node
 class T32_domain_domain_InvariantPredicate__self value_object
@@ -376,9 +426,14 @@ class T22_domain_domain_RoleKind_SpecificationPort variant_node
 class T22_domain_domain_RoleKind_ApplicationService variant_node
 class T22_domain_domain_RoleKind_SecondaryPort variant_node
 class T22_domain_domain_RoleKind_Repository variant_node
-class T22_domain_domain_RoleKind_FreeFunction variant_node
-class T22_domain_domain_RoleKind_UseCaseFunction variant_node
+class T22_domain_domain_RoleKind_from_data_role method_node
+class T22_domain_domain_RoleKind_from_contract_role method_node
+class T22_domain_domain_RoleKind_variant_name method_node
 class T22_domain_domain_RoleKind__self value_object
+class T24_domain_domain_RuleTarget_new method_node
+class T24_domain_domain_RuleTarget_all_roles method_node
+class T24_domain_domain_RuleTarget_target_roles method_node
+class T24_domain_domain_RuleTarget_matches method_node
 class T24_domain_domain_RuleTarget__self value_object
 class R29_domain_domain_CatalogueLoader_load_all method_node
 class R29_domain_domain_CatalogueLoader__self secondary_port

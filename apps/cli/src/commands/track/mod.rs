@@ -380,10 +380,10 @@ pub enum TrackCommand {
 
     /// Run catalogue lint rules against a layer catalogue and report violations.
     ///
-    /// Wires `FsCatalogueLoader` + `InMemoryCatalogueLinter` +
-    /// `RunCatalogueLintInteractor` at the composition root and runs a hardcoded
-    /// demo rule set (ADR `tddd-struct-kind-uniformization-and-catalogue-linter`
-    /// §S3 / IN-05 / AC-05).
+    /// Wires `FsCatalogueLoader` + `RunCatalogueLintInteractor` +
+    /// `evaluate_catalogue_lint` at the composition root and runs a hardcoded
+    /// demo rule set (ADR `knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md`
+    /// §D15 / D17).
     ///
     /// Exits with code 1 when any violations are found, 0 when none.
     Lint {

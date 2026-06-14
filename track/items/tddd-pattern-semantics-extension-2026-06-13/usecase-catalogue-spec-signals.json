@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "06e500a71aa60ee6303b49b38f314d696b80b7a0c84f9a7feb0a14faf851ca4c",
+  "catalogue_declaration_hash": "11763a167904dca4ca90373261fc491a585c4130c48ceb5709f51026c1c1ff0a",
   "signals": [
     {
       "type_name": "LintRuleKind",
       "signal": "blue",
-      "entry_hash": "bdab56ce29c0665059d42f7b0b5f2bff007ba3e9b8121add3440918b1fd994c8"
+      "entry_hash": "8b2f6f78f66c49a06e3633917c06303c3ce3632b8927d586f844dca2533e1b58"
     },
     {
       "type_name": "LintRuleSpec",
@@ -20,17 +20,17 @@
     {
       "type_name": "RunCatalogueLintError",
       "signal": "blue",
-      "entry_hash": "3603e814a85e7bec2d8815f6a1321583a3c19ce4c33ae9f211eb555df249eb35"
+      "entry_hash": "fb7219e4a6906321b30572c2835c6862fb0a4616312b5e7d23262eb9b41461fb"
     },
     {
       "type_name": "RunCatalogueLintInteractor",
       "signal": "blue",
-      "entry_hash": "28beaa0c3c350754ca837f183c22f882a55b7aa75d0e875324788d826d13fad6"
+      "entry_hash": "ab7d455fa048bbee7504c70d6a6131a9c38886fa744ceab8b570aa4274784ff0"
     },
     {
       "type_name": "RunCatalogueLint",
       "signal": "blue",
-      "entry_hash": "aa0c0c64140b2f53eb8b49171c6904d0c73b37a0cc23c57f2490d92bede301b8"
+      "entry_hash": "8b5301c971250c647ae830b8d786908bf84601c4ff28ccab2fd89323d69d9ba5"
     }
   ]
 }

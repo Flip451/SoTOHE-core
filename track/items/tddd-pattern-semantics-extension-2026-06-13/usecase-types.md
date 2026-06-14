@@ -4,19 +4,19 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| LintRuleKind | enum | modify | FieldEmpty, FieldNonEmpty, KindLayerConstraint, ReferencedRoleConstraint, TraitImplRequired, NoRoleInMethodSignature, MethodReferenceSignature, AccessorSignatureRequired, FieldElementUniqueAcrossEntries, NoExternalReferenceInMethods, NoPublicField, ForbiddenMethodReceiver | 🟡 | 🔵 |
+| LintRuleKind | enum | modify | FieldEmpty, FieldNonEmpty, KindLayerConstraint, ReferencedRoleConstraint, TraitImplRequired, NoRoleInMethodSignature, MethodReferenceSignature, AccessorSignatureRequired, FieldElementUniqueAcrossEntries, NoExternalReferenceInMethods, NoPublicField, ForbiddenMethodReceiver | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| LintRuleSpec | value_object | modify | — | 🟡 | 🔵 |
+| LintRuleSpec | value_object | modify | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RunCatalogueLintError | error_type | modify | CatalogueLoad, LintExecution, InvalidLayer, InvalidRuleSpec | 🟡 | 🔵 |
+| RunCatalogueLintError | error_type | modify | CatalogueLoad, LintExecution, InvalidLayer, InvalidRuleSpec | 🔵 | 🔵 |
 
 ## Application Services
 
@@ -28,7 +28,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RunCatalogueLintInteractor | interactor | modify | — | 🟡 | 🔵 |
+| RunCatalogueLintInteractor | interactor | modify | — | 🔵 | 🔵 |
 
 ## Commands
 

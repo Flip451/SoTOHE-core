@@ -69,10 +69,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "target_field", "ty": "String" },
-                { "name": "required_receiver", "ty": "Option<String>" },
-                { "name": "params_must_be_empty", "ty": "bool" },
-                { "name": "returns_must_be_bool", "ty": "bool" }
+                { "name": "target_field", "ty": "String" }
               ]
             }
           },
@@ -182,15 +179,13 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "catalogue_loader", "ty": "Arc<dyn domain::tddd::catalogue_ports::CatalogueLoader>" }
-          ],
+          "fields": [],
           "has_stripped_fields": true
         }
       },
       "methods": [],
       "module_path": "catalogue_lint_workflow",
-      "docs": "Concrete implementation of RunCatalogueLint. Modify from baseline: per D17, the evaluation logic moves from InMemoryCatalogueLinter (infrastructure) to domain::evaluate_catalogue_lint (pure function). The interactor no longer injects a CatalogueLinter evaluation port; it retains the CatalogueLoader port because loading CatalogueDocument from track_id/layer_id is external I/O. The execute flow loads the requested catalogue and LayerId, converts LintRuleSpec into CatalogueLinterRule, then calls domain::evaluate_catalogue_lint directly.",
+      "docs": "Concrete implementation of RunCatalogueLint. Modify from baseline: per D17, the evaluation logic moves from InMemoryCatalogueLinter (infrastructure) to domain::evaluate_catalogue_lint (pure function). The interactor no longer injects a CatalogueLinter evaluation port; it retains the CatalogueLoader port because loading CatalogueDocument from track_id/layer_id is external I/O. Generic over L: CatalogueLoader so callers pass concrete types without importing domain port traits directly (no Arc<dyn Trait> boxing at this boundary). The execute flow loads the requested catalogue and LayerId, converts LintRuleSpec into CatalogueLinterRule, then calls domain::evaluate_catalogue_lint directly.",
       "spec_refs": [
         {
           "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
@@ -221,17 +216,23 @@
           },
           {
             "name": "InvalidLayer",
-            "payload": { "kind": "unit" }
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
           },
           {
             "name": "InvalidRuleSpec",
-            "payload": { "kind": "unit" }
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
           }
         ]
       },
       "methods": [],
       "module_path": "catalogue_lint_workflow",
-      "docs": "Errors from the RunCatalogueLint use case. Modify from baseline: CatalogueLoad continues to wrap CatalogueLoaderError because the interactor still performs external catalogue loading; LintExecution wraps domain CatalogueLinterError from evaluate_catalogue_lint rather than an infrastructure CatalogueLinter port.",
+      "docs": "Errors from the RunCatalogueLint use case. Modify from baseline: CatalogueLoad continues to wrap CatalogueLoaderError because the interactor still performs external catalogue loading; LintExecution wraps domain CatalogueLinterError from evaluate_catalogue_lint rather than an infrastructure CatalogueLinter port. InvalidLayer(String) carries the unknown layer id; InvalidRuleSpec(String) carries the rejection reason from domain constructor validation.",
       "spec_refs": [
         {
           "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
@@ -260,9 +261,9 @@
           "docs": "Executes the catalogue lint workflow with the given command."
         }
       ],
-      "supertrait_bounds": [],
+      "supertrait_bounds": ["Send", "Sync"],
       "module_path": "catalogue_lint_workflow",
-      "docs": "Application service interface for running catalogue lint. Referenced unchanged from baseline — the interface contract is stable even though the underlying interactor implementation changes per D17.",
+      "docs": "Application service interface for running catalogue lint. Referenced unchanged from baseline — the interface contract is stable even though the underlying interactor implementation changes per D17. The Send + Sync supertrait bounds were already present in the baseline and are not introduced by this track.",
       "spec_refs": [],
       "informal_grounds": []
     }
@@ -271,19 +272,20 @@
   "inherent_impls": [
     {
       "type_name": "RunCatalogueLintInteractor",
+      "impl_generics": [{ "name": "L", "bounds": ["domain::tddd::catalogue_ports::CatalogueLoader"] }],
       "methods": [
         {
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "catalogue_loader", "ty": "Arc<dyn domain::tddd::catalogue_ports::CatalogueLoader>" }
+            { "name": "loader", "ty": "L" }
           ],
           "returns": "Self",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Creates a new RunCatalogueLintInteractor with the catalogue loader port. Per D17, there is no CatalogueLinter evaluation port injection — the interactor calls domain::evaluate_catalogue_lint directly after loading the requested catalogue."
+          "docs": "Creates a new RunCatalogueLintInteractor with the catalogue loader. Per D17, there is no CatalogueLinter evaluation port injection — the interactor calls domain::evaluate_catalogue_lint directly after loading the requested catalogue."
         }
       ]
     }
@@ -320,16 +322,6 @@
       "for_type": "LintRuleSpec"
     },
     {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "LintRuleSpec"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "LintRuleSpec"
-    },
-    {
       "action": "reference",
       "trait_ref": "core::fmt::Debug",
       "for_type": "RunCatalogueLintCommand"
@@ -340,14 +332,10 @@
       "for_type": "RunCatalogueLintCommand"
     },
     {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "RunCatalogueLintInteractor"
-    },
-    {
       "action": "modify",
       "trait_ref": "RunCatalogueLint",
-      "for_type": "RunCatalogueLintInteractor"
+      "for_type": "RunCatalogueLintInteractor",
+      "impl_generics": [{ "name": "L", "bounds": ["domain::tddd::catalogue_ports::CatalogueLoader", "Send", "Sync"] }]
     },
     {
       "action": "reference",
