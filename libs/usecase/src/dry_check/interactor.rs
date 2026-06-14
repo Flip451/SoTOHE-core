@@ -1,8 +1,9 @@
 //! [`DryCheckInteractor`] — implementation of [`DryCheckService`].
 //!
-//! Orchestrates: full-codebase index build (EmbeddingPort + SemanticIndexPort
-//! from corpus_fragments) + diff fragment query at threshold + DryCheckAgentPort
-//! verification + DryCheckWriter verdict persistence.
+//! Responsibility: drive the full-codebase index build + diff-fragment dry-check
+//! cycle and persist per-pair verdicts. See
+//! [`DryCheckService::run_dry_check`] for the authoritative two-phase algorithm
+//! description (inquiry → judgment, D3 / T010).
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
@@ -10,12 +11,13 @@ use std::sync::Arc;
 use domain::CommitHash;
 use domain::TrackId;
 use domain::dry_check::{
-    DryCheckCoverageRecord, DryCheckEntry, DryCheckEntryError, DryCheckFinding, DryCheckPairKey,
-    DryCheckReader, DryCheckVerdict, DryCheckWriter, FragmentRef, Rationale,
+    DryCheckCoverageRecord, DryCheckEntry, DryCheckFinding, DryCheckPairKey, DryCheckReader,
+    DryCheckVerdict, DryCheckWriter, FragmentRef, Rationale,
 };
 use domain::review_v2::types::FilePath;
-use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
+use domain::semantic_dup::{CodeFragment, SimilarityScore, SimilarityThreshold};
 
+use super::config::DryCheckConfig;
 use super::errors::DryCheckCycleError;
 use super::judgment::DryCheckAgentJudgment;
 use super::ports::{DryCheckAgentPort, DryCheckCoveragePort};
@@ -45,6 +47,7 @@ pub struct DryCheckInteractor {
     dry_check_reader: Arc<dyn DryCheckReader>,
     coverage: Arc<dyn DryCheckCoveragePort>,
     track_id: TrackId,
+    config: DryCheckConfig,
 }
 
 impl DryCheckInteractor {
@@ -58,7 +61,19 @@ impl DryCheckInteractor {
     /// processed diff-fragment `FragmentRef`, so the read-only `dry
     /// check-approved` (T003) can use it for staleness matching (IN-06 / AC-11
     /// / CN-08).
+    ///
+    /// `config` carries the D3 (T010) parallelism bound (`max_parallelism`) and
+    /// D4 calibration percentages. Composition sources `max_parallelism` from
+    /// the infrastructure `DryCheckConfig::load` and lifts it into the usecase
+    /// newtype via `DryCheckParallelism::try_new`.
+    /// # Arguments
+    ///
+    /// Construction requires 8 parameters because `DryCheckInteractor` is a
+    /// composition-layer value object that bundles all secondary ports with the
+    /// domain config.  Each parameter is a distinct, non-groupable concern
+    /// (embedding, indexing, agent, write, read, coverage, identity, config).
     #[must_use]
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         embedding_port: Arc<dyn EmbeddingPort>,
         index_port: Arc<dyn SemanticIndexPort>,
@@ -67,6 +82,7 @@ impl DryCheckInteractor {
         dry_check_reader: Arc<dyn DryCheckReader>,
         coverage: Arc<dyn DryCheckCoveragePort>,
         track_id: TrackId,
+        config: DryCheckConfig,
     ) -> DryCheckInteractor {
         DryCheckInteractor {
             embedding_port,
@@ -76,6 +92,7 @@ impl DryCheckInteractor {
             dry_check_reader,
             coverage,
             track_id,
+            config,
         }
     }
 }
@@ -83,16 +100,26 @@ impl DryCheckInteractor {
 impl DryCheckService for DryCheckInteractor {
     /// Run the dry-check write cycle.
     ///
-    /// # Algorithm
+    /// Inquiry phase (steps 1-4) builds a deduplicated set of unverified
+    /// candidate pairs from the current diff against the whole-codebase index,
+    /// filtered by the verdict history. Judgment phase (steps 5-8) fans out
+    /// the agent calls under `config.max_parallelism`, aggregates errors,
+    /// persists results in pair-key order, and returns the violation findings.
     ///
-    /// 1. Read history and build a verified-pair set (`BTreeMap<DryCheckPairKey, ()>`)
-    ///    seeded from existing records (CN-07 identifier matching).
-    /// 2. Build a fresh whole-codebase index from `corpus_fragments` (IN-02/D4).
-    /// 3. For each `diff_fragment`, run the growing-k threshold-boundary loop
-    ///    (k, 2k, 4k, …) to enumerate above-threshold candidates (IN-06).
-    /// 4. Per candidate: build pair key (skip self-match via `DryCheckPairKey::new`),
-    ///    skip verified pairs, call agent, build entry, persist.
-    /// 5. Return collected `DryCheckFinding`s from `Violation` judgments.
+    /// 1. Seed `verified_set` from `dry_check_reader` (CN-07 identifier match).
+    /// 2. Build the whole-codebase index from `corpus_fragments` (IN-02).
+    /// 3. Per `diff_fragment`: run the growing-k threshold-boundary loop
+    ///    (k, 2k, 4k, …) and enumerate above-threshold candidates.
+    /// 4. Collect unverified pairs into a `BTreeMap<DryCheckPairKey, ...>` for
+    ///    deduplication; the diff-fragment index is retained so the
+    ///    `changed_path` can be recovered when persisting each entry.
+    /// 5. Fan out the unverified pairs across `config.max_parallelism` threads
+    ///    via `std::thread::scope`. Each pair is one `agent_port.judge()`.
+    /// 6. Aggregate per-pair results; aggregate errors and return the first
+    ///    after all pairs complete (CN-03 — no premature shutdown).
+    /// 7. Persist via `dry_check_writer.append_record` in `DryCheckPairKey`
+    ///    order (CN-05 — deterministic write order).
+    /// 8. Return the collected `DryCheckFinding`s from `Violation` verdicts.
     ///
     /// # Errors
     ///
@@ -105,7 +132,9 @@ impl DryCheckService for DryCheckInteractor {
         threshold: SimilarityThreshold,
         base_commit: CommitHash,
     ) -> Result<Vec<DryCheckFinding>, DryCheckCycleError> {
-        // ── Step 1: Build the verified-pair set from history ──────────────────
+        // ── Phase 1: Inquiry phase ────────────────────────────────────────────
+
+        // Step 1: Build the verified-pair set from history.
         //
         // CN-07: identifier matching — when content changes, content_hash
         // changes, so FragmentRef changes, so DryCheckPairKey changes → no
@@ -117,85 +146,238 @@ impl DryCheckService for DryCheckInteractor {
             verified_set.insert(record.pair_key().clone(), ());
         }
 
-        // ── Step 2: Build whole-codebase index from corpus_fragments ──────────
+        // Step 2: Build whole-codebase index from corpus_fragments.
         build_corpus_index(
             corpus_fragments,
             self.embedding_port.as_ref(),
             self.index_port.as_ref(),
         )?;
 
-        // ── Steps 3–5: Per diff_fragment loop ─────────────────────────────────
-        let mut findings: Vec<DryCheckFinding> = Vec::new();
+        // Steps 3–4: Per diff_fragment loop — collect unverified pairs.
+        //
+        // CN-03: errors from individual diff fragments are collected; one
+        // fragment-level failure does not abort the remaining fragments.
+        // `first_error` is also used in Phase 2 (judgment phase) to aggregate
+        // agent / entry / writer errors with the same policy.
+        //
         // D5 (T004): collect every processed diff-fragment FragmentRef so we
         // can persist a coverage record at the end of the run.
+        let mut first_error: Option<DryCheckCycleError> = None;
         let mut processed_refs: BTreeSet<FragmentRef> = BTreeSet::new();
 
-        for diff_fragment in &diff_fragments {
+        // Map from pair_key → (diff_fragment index, candidate_fragment, similarity_score).
+        // Using BTreeMap so we iterate in DryCheckPairKey order for Phase 2.
+        // The diff-fragment index lets us recover the changed_path in Phase 2
+        // without retaining the full fragment.
+        let mut unverified_pairs: BTreeMap<
+            DryCheckPairKey,
+            (usize, CodeFragment, SimilarityScore),
+        > = BTreeMap::new();
+
+        for (diff_idx, diff_fragment) in diff_fragments.iter().enumerate() {
             // CN-04: diff_fragments are already hunk-filtered by the CLI.
             // The interactor does NOT perform additional hunk filtering.
 
             // Record the diff fragment as processed for the D5 coverage manifest
             // (IN-06: FragmentRef = path + content_hash).
-            let processed_ref = fragment_ref_of(diff_fragment).map_err(|e| {
-                DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
-                    source: format!("processed_ref error: {e}"),
-                })
-            })?;
+            let processed_ref = match fragment_ref_of(diff_fragment) {
+                Ok(r) => r,
+                Err(e) => {
+                    // CN-03: collect errors; continue with remaining fragments.
+                    if first_error.is_none() {
+                        first_error =
+                            Some(DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
+                                source: format!("processed_ref error: {e}"),
+                            }));
+                    }
+                    continue;
+                }
+            };
             processed_refs.insert(processed_ref);
 
-            let above_threshold_candidates = collect_above_threshold_candidates(
+            let above_threshold_candidates = match collect_above_threshold_candidates(
                 diff_fragment,
                 threshold,
                 self.embedding_port.as_ref(),
                 self.index_port.as_ref(),
-            )?;
+            ) {
+                Ok(c) => c,
+                Err(e) => {
+                    // CN-03: collect errors; continue with remaining fragments.
+                    if first_error.is_none() {
+                        first_error = Some(e);
+                    }
+                    continue;
+                }
+            };
             let candidate_pairs =
-                candidate_pair_keys_for_diff(diff_fragment, above_threshold_candidates)?;
+                match candidate_pair_keys_for_diff(diff_fragment, above_threshold_candidates) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        // CN-03: collect errors; continue with remaining fragments.
+                        if first_error.is_none() {
+                            first_error = Some(e);
+                        }
+                        continue;
+                    }
+                };
 
-            // ── Step 4: Per candidate ─────────────────────────────────────────
             for candidate_pair in candidate_pairs {
                 // Skip already-verified pairs (CN-07 identifier matching).
                 if verified_set.contains_key(&candidate_pair.pair_key) {
                     continue;
                 }
 
-                // Call agent for unverified candidate.
-                let judgment = self
-                    .agent_port
-                    .judge(diff_fragment, &candidate_pair.candidate_fragment)
-                    .map_err(DryCheckCycleError::Agent)?;
-
-                // ── Step 5: Per judgment ──────────────────────────────────────
-                let (rationale, verdict, maybe_finding) = extract_judgment(judgment);
-
-                let changed_path =
-                    FilePath::new(diff_fragment.source_path.to_string_lossy().into_owned())
-                        .map_err(|e| {
-                            DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
-                                source: format!("changed_path error: {e}"),
-                            })
-                        })?;
-
-                let entry = DryCheckEntry::new(
-                    candidate_pair.pair_key.clone(),
-                    changed_path,
-                    verdict,
+                // De-duplicate across the k-doubling search rounds: the same
+                // (diff_fragment, candidate_fragment) pair can appear at
+                // multiple k values.  `DryCheckPairKey` is derived from the
+                // *content hashes* of both fragments, so an identical key
+                // strictly implies identical fragment content — a second
+                // occurrence would produce the same agent judgment.  There is
+                // therefore no benefit to keeping both occurrences, and doing
+                // so would waste an agent call and risk a duplicate record
+                // (violating CN-05 uniqueness).  `or_insert` keeps the first
+                // and discards later duplicates; CN-03 is not violated because
+                // no new information would be recovered by retrying an
+                // identical (fragment-content, fragment-content) pair.
+                unverified_pairs.entry(candidate_pair.pair_key).or_insert((
+                    diff_idx,
+                    candidate_pair.candidate_fragment,
                     candidate_pair.similarity_score,
-                    threshold,
-                    base_commit.clone(),
-                    rationale,
-                )
-                .map_err(|e: DryCheckEntryError| DryCheckCycleError::Entry(e))?;
+                ));
+            }
+        }
 
-                self.dry_check_writer.append_record(&entry).map_err(DryCheckCycleError::Writer)?;
+        // ── Phase 2: Judgment phase ───────────────────────────────────────────
 
-                // Add to verified set for this run.
-                verified_set.insert(candidate_pair.pair_key, ());
+        // Prepare work items in BTreeMap order (deterministic DryCheckPairKey order).
+        // Each item: (pair_key, changed_path, diff_fragment_ref, candidate_fragment, score).
+        //
+        // `changed_path` is pre-computed here so that the parallel judgment runner
+        // never needs to index into diff_fragments.  Per-pair path errors are
+        // tolerated (CN-03): a pair whose `changed_path` cannot be constructed is
+        // skipped and its error is recorded as `first_error`; all remaining valid
+        // pairs still proceed through the judgment phase.
+        type WorkItem = (DryCheckPairKey, FilePath, usize, CodeFragment, SimilarityScore);
 
-                // Collect finding if the judgment was a Violation.
-                if let Some(finding) = maybe_finding {
-                    findings.push(finding);
+        // `first_error` was initialised at the start of the inquiry phase so that
+        // path-construction errors here are merged with agent / entry / writer
+        // errors that accumulate in the judgment loop below (CN-03).
+        let mut work_items: Vec<WorkItem> = Vec::with_capacity(unverified_pairs.len());
+
+        for (key, (diff_idx, cand_frag, score)) in unverified_pairs {
+            // diff_idx out-of-range is an internal invariant violation (the index
+            // was stored when iterating diff_fragments above).  Treat it as a
+            // hard error: record and skip this pair (CN-03).
+            let diff_fragment = match diff_fragments.get(diff_idx) {
+                Some(f) => f,
+                None => {
+                    if first_error.is_none() {
+                        first_error =
+                            Some(DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
+                                source: format!(
+                                    "internal: diff_idx {diff_idx} out of range for diff_fragments"
+                                ),
+                            }));
+                    }
+                    continue;
                 }
+            };
+            // CN-03: a malformed source_path must not abort remaining pairs.
+            let changed_path =
+                match FilePath::new(diff_fragment.source_path.to_string_lossy().into_owned()) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        if first_error.is_none() {
+                            first_error =
+                                Some(DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
+                                    source: format!("changed_path error: {e}"),
+                                }));
+                        }
+                        continue;
+                    }
+                };
+            work_items.push((key, changed_path, diff_idx, cand_frag, score));
+        }
+
+        // Fan-out with a bounded thread pool using std::thread::scope.
+        let max_parallelism = self.config.max_parallelism.as_usize();
+        let agent = self.agent_port.as_ref();
+
+        // Build (diff_fragment, candidate_fragment) pairs for the parallel runner.
+        // The runner only needs these two fragments to call agent.judge().
+        // diff_idx was validated during work_items construction, so .get() should
+        // always succeed here; the error path is a defensive fallback.
+        let fragment_pairs_result: Result<Vec<(&CodeFragment, &CodeFragment)>, DryCheckCycleError> =
+            work_items
+                .iter()
+                .map(|(_, _, diff_idx, cand_frag, _)| {
+                    let diff_frag = diff_fragments.get(*diff_idx).ok_or_else(|| {
+                        DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
+                            source: format!(
+                                "internal: diff_idx {diff_idx} out of range (defensive check)"
+                            ),
+                        })
+                    })?;
+                    Ok((diff_frag, cand_frag))
+                })
+                .collect();
+        let fragment_pairs = fragment_pairs_result?;
+
+        // Results indexed by work_items position: Ok(judgment) or Err(agent_error).
+        let judgment_results: Vec<
+            Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>,
+        > = run_parallel_judgments(&fragment_pairs, agent, max_parallelism);
+
+        // Collect persisted entries in sorted order and accumulate errors.
+        let mut findings: Vec<DryCheckFinding> = Vec::new();
+
+        for (work_item, judgment_result) in work_items.into_iter().zip(judgment_results) {
+            let (pair_key, changed_path, _diff_idx, _candidate_fragment, similarity_score) =
+                work_item;
+
+            let judgment = match judgment_result {
+                Ok(j) => j,
+                Err(e) => {
+                    // CN-03: collect errors; do not abort remaining pairs.
+                    if first_error.is_none() {
+                        first_error = Some(DryCheckCycleError::Agent(e));
+                    }
+                    continue;
+                }
+            };
+
+            let (rationale, verdict, maybe_finding) = extract_judgment(judgment);
+
+            let entry = match DryCheckEntry::new(
+                pair_key,
+                changed_path,
+                verdict,
+                similarity_score,
+                threshold,
+                base_commit.clone(),
+                rationale,
+            ) {
+                Ok(e) => e,
+                Err(e) => {
+                    // CN-03: collect errors; do not abort remaining pairs.
+                    if first_error.is_none() {
+                        first_error = Some(DryCheckCycleError::Entry(e));
+                    }
+                    continue;
+                }
+            };
+
+            if let Err(e) = self.dry_check_writer.append_record(&entry) {
+                // CN-03: collect writer errors; do not abort remaining pairs.
+                if first_error.is_none() {
+                    first_error = Some(DryCheckCycleError::Writer(e));
+                }
+                continue;
+            }
+
+            if let Some(finding) = maybe_finding {
+                findings.push(finding);
             }
         }
 
@@ -204,11 +386,110 @@ impl DryCheckService for DryCheckInteractor {
         // `dry check-approved` (T003) reads this record and treats any current
         // diff fragment whose `FragmentRef` is NOT covered as stale → Blocked
         // (IN-06 / AC-11 / CN-08).
+        //
+        // Write coverage unconditionally — even when a partial failure occurred —
+        // so that successfully processed fragments are recorded.
+        //
+        // CN-03: a coverage-write failure is collected into `first_error` only when
+        // no prior pair-level error was recorded.  This preserves the original
+        // pair-level error rather than masking it with a coverage I/O error, while
+        // still surfacing the coverage error when it is the only failure.
         let coverage_record = DryCheckCoverageRecord::new(processed_refs);
-        self.coverage.write_coverage(&self.track_id, coverage_record)?;
+        if let Err(e) = self.coverage.write_coverage(&self.track_id, coverage_record) {
+            if first_error.is_none() {
+                first_error = Some(e);
+            }
+        }
+
+        // Return first collected error if any occurred (after coverage is written).
+        if let Some(err) = first_error {
+            return Err(err);
+        }
 
         Ok(findings)
     }
+}
+
+// ── Parallel judgment runner ──────────────────────────────────────────────────
+
+/// Run `agent.judge(diff_fragment, candidate_fragment)` for each pair in
+/// `fragment_pairs` using at most `max_parallelism` concurrent threads.
+///
+/// Results are returned in the **same order as `fragment_pairs`** so that callers
+/// can zip them back to the original work items by index.
+///
+/// Pairs are processed in chunks of `max_parallelism`: each chunk is handed to a
+/// `std::thread::scope` that spawns exactly one thread per pair in that chunk.  The
+/// scope joins all chunk threads before the next chunk begins, so the total number
+/// of live OS threads at any point is bounded by `max_parallelism`.  This prevents
+/// thread-count exhaustion for large diffs (unlike a semaphore-only approach that
+/// spawns N total threads over the lifetime of the function).
+///
+/// Errors from individual `judge()` calls are preserved in the result vector; they
+/// are not collapsed here.
+fn run_parallel_judgments(
+    fragment_pairs: &[(&CodeFragment, &CodeFragment)],
+    agent: &dyn DryCheckAgentPort,
+    max_parallelism: usize,
+) -> Vec<Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>> {
+    use std::sync::mpsc;
+
+    let n = fragment_pairs.len();
+    if n == 0 {
+        return Vec::new();
+    }
+
+    // Clamp chunk size: at least 1 so we always make progress.
+    let chunk_size = max_parallelism.max(1);
+
+    // Pre-allocate output slots indexed by pair position.
+    let mut results: Vec<Option<Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>>> =
+        (0..n).map(|_| None).collect();
+
+    for (chunk_start, chunk) in fragment_pairs.chunks(chunk_size).enumerate() {
+        // Channel scoped to this chunk: each thread sends (chunk-local index, result).
+        let (tx, rx) = mpsc::channel::<(
+            usize,
+            Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>,
+        )>();
+
+        // `std::thread::scope` joins all threads in this chunk before continuing
+        // to the next chunk.  At most `chunk_size` (= `max_parallelism`) OS threads
+        // are live at once because the scope covers exactly one chunk.
+        std::thread::scope(|scope| {
+            for (chunk_i, (diff_fragment, candidate_fragment)) in chunk.iter().enumerate() {
+                let tx_clone = tx.clone();
+                scope.spawn(move || {
+                    let judgment = agent.judge(diff_fragment, candidate_fragment);
+                    // Ignore send errors: rx is in scope and outlives all spawned threads.
+                    let _ = tx_clone.send((chunk_i, judgment));
+                });
+            }
+            // Drop the spawner's tx so rx sees EOF when all threads have sent.
+            drop(tx);
+        });
+
+        // Collect results from this chunk and write them into the global result
+        // buffer at the absolute pair index.
+        for (chunk_i, judgment) in rx {
+            let global_i = chunk_start * chunk_size + chunk_i;
+            if let Some(slot) = results.get_mut(global_i) {
+                *slot = Some(judgment);
+            }
+        }
+    }
+
+    // Unwrap the Option slots — every position must have been filled by a thread.
+    // The only way a slot remains None is an internal bug (chunk index calculation
+    // error), which we surface as a sentinel error rather than panicking.
+    results
+        .into_iter()
+        .map(|opt| {
+            opt.unwrap_or(Err(super::errors::DryCheckAgentError::Unexpected(
+                "internal: judgment result missing after parallel run".to_owned(),
+            )))
+        })
+        .collect()
 }
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
@@ -250,20 +531,24 @@ mod tests {
     use std::path::PathBuf;
     use std::sync::{Arc, Mutex};
 
+    use domain::CommitHash;
     use domain::dry_check::{
-        DryCheckEntry, DryCheckFinding, DryCheckPairKey, DryCheckReaderError, DryCheckRecord,
-        DryCheckVerdict, DryCheckWriterError, FragmentRef, Rationale,
+        DryCheckEntry, DryCheckFinding, DryCheckReaderError, DryCheckRecord, DryCheckVerdict,
+        DryCheckWriterError, Rationale,
     };
-    use domain::review_v2::types::FilePath;
     use domain::semantic_dup::{
         CodeFragment, SimilarFragment, SimilarityScore, SimilarityThreshold,
     };
-    use domain::{CommitHash, Timestamp};
+
     use mockall::mock;
 
     use super::*;
+    use crate::dry_check::config::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
     use crate::dry_check::errors::DryCheckAgentError;
-    use crate::dry_check::shared::test_mocks::{MockMockEmbeddingPort, MockMockSemanticIndexPort};
+    use crate::dry_check::shared::test_mocks::{
+        MockMockEmbeddingPort, MockMockSemanticIndexPort, make_dry_check_record_for_tests,
+        make_fragment_ref_from_content,
+    };
     use crate::dry_check::shared::{content_hash_of, fragment_ref_of};
 
     // ── Mock port definitions ─────────────────────────────────────────────────
@@ -385,43 +670,39 @@ mod tests {
         CommitHash::try_new("a".repeat(40)).unwrap()
     }
 
-    fn make_rationale(s: &str) -> Rationale {
-        Rationale::new(s).unwrap()
-    }
-
     fn make_similar_fragment(path: &str, content: &str, score: f32) -> SimilarFragment {
         SimilarFragment { fragment: make_fragment(path, content), score: make_score(score) }
     }
 
+    /// Build a `NotAViolation` `DryCheckRecord` for pair-cache tests.
+    ///
+    /// Thin call-site sugar: builds the two `FragmentRef`s via the shared
+    /// [`make_fragment_ref_from_content`] helper and forwards them to
+    /// [`make_dry_check_record_for_tests`]. The `changed_path` argument is kept
+    /// for legacy call-site clarity but is ignored (the shared builder always
+    /// uses the low fragment's path).
     fn make_dry_check_record(
         low_path: &str,
         low_content: &str,
         high_path: &str,
         high_content: &str,
-        changed_path: &str,
+        _changed_path: &str,
     ) -> DryCheckRecord {
-        let low_hash = content_hash_of(low_content).unwrap();
-        let high_hash = content_hash_of(high_content).unwrap();
-        let low_ref = FragmentRef::new(FilePath::new(low_path).unwrap(), low_hash);
-        let high_ref = FragmentRef::new(FilePath::new(high_path).unwrap(), high_hash);
-        let pair_key = DryCheckPairKey::new(low_ref, high_ref).unwrap();
-        let changed = FilePath::new(changed_path).unwrap();
-        let verdict = DryCheckVerdict::NotAViolation;
-        let entry = DryCheckEntry::new(
-            pair_key,
-            changed,
-            verdict,
-            SimilarityScore::new(0.9).unwrap(),
-            SimilarityThreshold::new(0.8).unwrap(),
-            make_commit(),
-            make_rationale("prior run rationale"),
+        make_dry_check_record_for_tests(
+            make_fragment_ref_from_content(low_path, low_content),
+            make_fragment_ref_from_content(high_path, high_content),
+            DryCheckVerdict::NotAViolation,
+            "2026-06-02T00:00:00Z",
         )
-        .unwrap();
-        DryCheckRecord::from_entry_and_timestamp(
-            entry,
-            Timestamp::new("2026-06-02T00:00:00Z").unwrap(),
+    }
+
+    /// Build a test config with the given parallelism degree.
+    fn make_config(parallelism: usize) -> DryCheckConfig {
+        DryCheckConfig::new(
+            DryCheckPercent::try_new(10).unwrap(),
+            DryCheckPercent::try_new(90).unwrap(),
+            DryCheckParallelism::try_new(parallelism).unwrap(),
         )
-        .unwrap()
     }
 
     fn make_interactor(
@@ -457,6 +738,7 @@ mod tests {
             Arc::new(StubReader::with_records(records)),
             coverage,
             make_track(),
+            make_config(1),
         )
     }
 
@@ -1182,5 +1464,251 @@ mod tests {
         let result =
             interactor.run_dry_check(vec![], vec![frag], make_threshold(0.8), make_commit());
         assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
+    }
+
+    // ── T010: D3 parallel judgment phase ─────────────────────────────────────
+
+    /// Three unverified pairs → agent must be called exactly 3 times.
+    #[test]
+    fn test_three_unverified_pairs_agent_called_three_times() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        index.expect_search().returning(|_, _| {
+            Ok(vec![
+                make_similar_fragment("src/b.rs", "fn b() {}", 0.9),
+                make_similar_fragment("src/c.rs", "fn c() {}", 0.9),
+                make_similar_fragment("src/d.rs", "fn d() {}", 0.9),
+            ])
+        });
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(3).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new("not a violation").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        // Use parallelism=2 to exercise the bounded fan-out with 3 tasks.
+        let interactor = DryCheckInteractor::new(
+            Arc::new(embed),
+            Arc::new(index),
+            Arc::new(agent),
+            writer.clone() as Arc<dyn domain::dry_check::DryCheckWriter>,
+            Arc::new(StubReader::with_records(vec![])),
+            Arc::new(StubCoverage::new()),
+            make_track(),
+            make_config(2),
+        );
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty());
+        assert_eq!(writer.entries.lock().unwrap().len(), 3);
+    }
+
+    /// With max_parallelism=1, execution is effectively serial and the write
+    /// order is deterministic (BTreeMap key order = DryCheckPairKey order).
+    #[test]
+    fn test_max_parallelism_one_executes_serially_with_deterministic_order() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        // Return two above-threshold candidates with known paths.
+        index.expect_search().returning(|_, _| {
+            Ok(vec![
+                make_similar_fragment("src/z.rs", "fn z() {}", 0.9),
+                make_similar_fragment("src/b.rs", "fn b() {}", 0.9),
+            ])
+        });
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(2).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new("not a violation").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = DryCheckInteractor::new(
+            Arc::new(embed),
+            Arc::new(index),
+            Arc::new(agent),
+            writer.clone() as Arc<dyn domain::dry_check::DryCheckWriter>,
+            Arc::new(StubReader::with_records(vec![])),
+            Arc::new(StubCoverage::new()),
+            make_track(),
+            make_config(1),
+        );
+
+        interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(entries.len(), 2, "both pairs must be recorded");
+
+        // Entries must be written in DryCheckPairKey sort order (CN-05).
+        // The pair_key low/high order is determined by the key's Ord impl, not
+        // the search return order — we just check both are present.
+        let paths: Vec<String> = entries
+            .iter()
+            .map(|e| {
+                let low = e.pair_key().low().path().as_str();
+                let high = e.pair_key().high().path().as_str();
+                format!("{low}:{high}")
+            })
+            .collect();
+        // Both src/b.rs and src/z.rs pairs must appear.
+        assert!(
+            paths.iter().any(|p| p.contains("src/b.rs")),
+            "src/b.rs pair must be in written entries"
+        );
+        assert!(
+            paths.iter().any(|p| p.contains("src/z.rs")),
+            "src/z.rs pair must be in written entries"
+        );
+    }
+
+    /// When one agent call fails, the remaining pairs are still processed and
+    /// the first error is returned after all pairs complete.
+    #[test]
+    fn test_agent_error_on_one_pair_remaining_pairs_still_processed() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        index.expect_search().returning(|_, _| {
+            Ok(vec![
+                make_similar_fragment("src/b.rs", "fn b() {}", 0.9),
+                make_similar_fragment("src/c.rs", "fn c() {}", 0.9),
+                make_similar_fragment("src/d.rs", "fn d() {}", 0.9),
+            ])
+        });
+
+        // First call fails; the other two succeed.
+        // Because execution is parallel (max_parallelism=1 for determinism in
+        // which one fails), we need a shared counter to vary the response.
+        let call_count = Arc::new(Mutex::new(0u32));
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().returning(move |_, candidate| {
+            // Fail specifically for src/b.rs (which sorts lowest and is first).
+            if candidate.source_path == std::path::Path::new("src/b.rs") {
+                Err(DryCheckAgentError::Timeout)
+            } else {
+                *call_count.lock().unwrap() += 1;
+                Ok(DryCheckAgentJudgment::NotAViolation {
+                    rationale: Rationale::new("ok").unwrap(),
+                })
+            }
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = DryCheckInteractor::new(
+            Arc::new(embed),
+            Arc::new(index),
+            Arc::new(agent),
+            writer.clone() as Arc<dyn domain::dry_check::DryCheckWriter>,
+            Arc::new(StubReader::with_records(vec![])),
+            Arc::new(StubCoverage::new()),
+            make_track(),
+            make_config(1),
+        );
+
+        let result =
+            interactor.run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit());
+
+        // Error must be returned (from the failed agent call).
+        assert!(
+            matches!(result, Err(DryCheckCycleError::Agent(DryCheckAgentError::Timeout))),
+            "expected Agent(Timeout) error, got: {result:?}"
+        );
+
+        // The other two pairs must still have been processed and written.
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(entries.len(), 2, "the two successful pairs must be persisted");
+    }
+
+    /// Records are appended in DryCheckPairKey sort order regardless of search
+    /// return order (CN-05).
+    #[test]
+    fn test_records_appended_in_pair_key_sort_order() {
+        // diff=src/a.rs, candidates: src/z.rs and src/b.rs.
+        // DryCheckPairKey(src/a.rs, src/b.rs) < DryCheckPairKey(src/a.rs, src/z.rs)
+        // in BTreeMap order → src/b.rs pair must be written first.
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        // Return z first then b (reverse sort order) to confirm sort happens.
+        index.expect_search().returning(|_, _| {
+            Ok(vec![
+                make_similar_fragment("src/z.rs", "fn z() {}", 0.9),
+                make_similar_fragment("src/b.rs", "fn b() {}", 0.9),
+            ])
+        });
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(2).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation { rationale: Rationale::new("ok").unwrap() })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = DryCheckInteractor::new(
+            Arc::new(embed),
+            Arc::new(index),
+            Arc::new(agent),
+            writer.clone() as Arc<dyn domain::dry_check::DryCheckWriter>,
+            Arc::new(StubReader::with_records(vec![])),
+            Arc::new(StubCoverage::new()),
+            make_track(),
+            make_config(1), // serial for deterministic order assertion
+        );
+
+        interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(entries.len(), 2);
+
+        // The pair whose high/low sorts lower (src/b.rs < src/z.rs) must appear first.
+        let first_paths = {
+            let low = entries[0].pair_key().low().path().as_str().to_owned();
+            let high = entries[0].pair_key().high().path().as_str().to_owned();
+            (low, high)
+        };
+        let second_paths = {
+            let low = entries[1].pair_key().low().path().as_str().to_owned();
+            let high = entries[1].pair_key().high().path().as_str().to_owned();
+            (low, high)
+        };
+
+        // First entry must contain src/b.rs, second must contain src/z.rs.
+        assert!(
+            first_paths.0.contains("src/b.rs") || first_paths.1.contains("src/b.rs"),
+            "first written pair must contain src/b.rs (lower sort key); got {first_paths:?}"
+        );
+        assert!(
+            second_paths.0.contains("src/z.rs") || second_paths.1.contains("src/z.rs"),
+            "second written pair must contain src/z.rs (higher sort key); got {second_paths:?}"
+        );
     }
 }

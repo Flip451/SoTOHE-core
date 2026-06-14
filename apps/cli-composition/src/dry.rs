@@ -250,18 +250,19 @@ impl CliApp {
             &canonical_root,
         )?;
 
-        // Resolve threshold: explicit --threshold wins; otherwise load from dry-check config.
+        // Always load infra config for max_parallelism (D3 / T010); --threshold overrides its threshold.
+        let config_path = root.join(".harness/config/dry-check.json");
+        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
+            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+
         let threshold = match input.threshold {
             Some(t) => {
                 SimilarityThreshold::new(t).map_err(|e| format!("invalid --threshold: {e}"))?
             }
-            None => {
-                let config_path = root.join(".harness/config/dry-check.json");
-                let config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
-                    .map_err(|e| format!("failed to load dry-check config: {e}"))?;
-                config.threshold()
-            }
+            None => infra_config.threshold(),
         };
+
+        let usecase_config = build_usecase_dry_check_config(infra_config.max_parallelism())?;
 
         let workspace_root = resolve_existing_dir_under_repo(
             &input.workspace_root,
@@ -298,44 +299,33 @@ impl CliApp {
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
 
-        // D7/IN-10: Open (or incrementally update) the persistent index at
-        // `--db-path` using the file-level content-hash manifest.  Only changed
-        // or new files are re-embedded; unchanged files are reused.  Deleted
-        // files are removed from the index.  The returned adapter is wrapped in
-        // `NullInsertIndexProxy` so that the interactor's unconditional
-        // `build_corpus_index` call is a no-op — corpus is always correct before
-        // the interactor runs.
+        // D7/IN-10: persistent index keyed by file-level content hash; only changed/new
+        // files re-embed. `NullInsertIndexProxy` makes the interactor's `build_corpus_index`
+        // call a no-op since corpus is already correct here.
         let index_port = open_persistent_index_with_corpus(
             &input.db_path,
             corpus_fragments,
             embedding_port.as_ref(),
         )?;
 
-        // Construct interactor (7-param; diff_source NOT injected).
-        // Pass an empty corpus — the index is already populated above; the
-        // interactor's build_corpus_index call will be a no-op via NullInsertIndexProxy.
+        // 8-param: corpus is empty since the index is pre-built above.
         let interactor = DryCheckInteractor::new(
             embedding_port,
             index_port,
             agent,
-            store.clone(), // writer
-            store,         // reader
-            coverage,      // D5 (T004): coverage manifest persistence
+            store.clone(),
+            store,
+            coverage,
             track_id.clone(),
+            usecase_config,
         );
 
-        // Run the dry-check write cycle with empty corpus (index pre-built above).
         let dry_start = std::time::Instant::now();
         let dry_result = interactor.run_dry_check(vec![], diff_fragments, threshold, base);
 
-        // Emit ReviewRound + ExternalSubprocess telemetry for the dry round
-        // (T006 / AC-03 / IN-03). round_type = "dry" (per spec IN-03 shared variant).
-        // Placement rationale: composition layer has effective_model, findings count,
-        // and timing; no usecase/domain change required (CN-04).
-        // Emit for Ok (completed) and for subprocess-involved errors (Agent, Entry,
-        // Writer — errors that occur after DryCheckAgentPort::judge() was invoked).
-        // Pre-subprocess errors (Embedding, Index, Reader, Diff) do not emit, as no
-        // subprocess ran for those.
+        // T006 / AC-03 / IN-03: emit telemetry for completed runs and for subprocess-involved
+        // errors (Agent / Entry / Writer — failures after `judge()` ran). Pre-subprocess
+        // errors (Embedding / Index / Reader / Diff) don't emit.
         if let Some((ref w, ref tid)) = telemetry_writer {
             let round_telemetry = dry_round_telemetry_for_result(&dry_result, &agent_recorder);
             if let Some(telemetry) = round_telemetry {
@@ -524,11 +514,23 @@ impl CliApp {
     }
 }
 
-/// Map a `DryCheckApprovalVerdict` to the `(verdict_str, reason_summary)` pair
-/// used in `GateEval` telemetry for the `"dry"` gate (T007 / IN-07 / CN-10).
-///
-/// - `Approved`  → `("ok",    "")`
-/// - `Blocked`   → `("error", "blocked: N unresolved pair(s)")`
+/// Lift `infra_config.max_parallelism()` into the usecase `DryCheckConfig` (D3 / T010).
+/// Known-bad calibration percents are hardcoded placeholders until T012 sources them from
+/// `.harness/config/dry-check.json`.
+fn build_usecase_dry_check_config(
+    max_parallelism: usize,
+) -> Result<usecase::dry_check::DryCheckConfig, String> {
+    use usecase::dry_check::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
+    let percent = |v: u8| {
+        DryCheckPercent::try_new(v).map_err(|e| format!("invalid hardcoded known-bad percent: {e}"))
+    };
+    let parallelism = DryCheckParallelism::try_new(max_parallelism)
+        .map_err(|e| format!("invalid max_parallelism: {e}"))?;
+    Ok(DryCheckConfig::new(percent(10)?, percent(90)?, parallelism))
+}
+
+/// `GateEval` telemetry fields for the `"dry"` gate (T007 / IN-07 / CN-10):
+/// `Approved` → `("ok", "")`; `Blocked` → `("error", "blocked: N unresolved pair(s)")`.
 fn dry_check_approved_gate_eval_fields(
     verdict: &domain::dry_check::DryCheckApprovalVerdict,
 ) -> (&'static str, String) {

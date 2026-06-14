@@ -188,11 +188,24 @@ pub(crate) fn candidate_pair_keys_for_diff(
 ///
 /// All sibling interactor tests (`interactor.rs`, `approval_interactor.rs`)
 /// import from here instead of redefining the same `mockall::mock!` blocks.
+///
+/// Also provides shared test-fixture helpers (`make_fragment_ref_for_tests`,
+/// `make_dry_check_record_for_tests`) so that the same `FragmentRef` and
+/// `DryCheckRecord` construction knowledge is not duplicated across
+/// `approval_interactor`, `results_interactor`, and `mod` test modules.
 #[cfg(test)]
 pub(crate) mod test_mocks {
-    use domain::semantic_dup::{CodeFragment, SimilarFragment, TopK};
+    use domain::dry_check::{
+        DryCheckEntry, DryCheckPairKey, DryCheckRecord, DryCheckVerdict, FragmentRef, Rationale,
+    };
+    use domain::review_v2::types::FilePath;
+    use domain::semantic_dup::{
+        CodeFragment, SimilarFragment, SimilarityScore, SimilarityThreshold, TopK,
+    };
+    use domain::{CommitHash, Timestamp};
     use mockall::mock;
 
+    use crate::dry_check::shared::content_hash_of;
     use crate::semantic_dup::{EmbeddingError, SemanticIndexError};
 
     mock! {
@@ -228,6 +241,153 @@ pub(crate) mod test_mocks {
                 top_k: TopK,
             ) -> Result<Vec<SimilarFragment>, SemanticIndexError>;
         }
+    }
+
+    /// Build a [`FragmentRef`] from a path string and a single `hash_char`.
+    ///
+    /// The `hash_char` is used as the content for SHA-256 hashing, producing a
+    /// stable 64-hex-character content hash deterministic for each distinct char.
+    /// Shared across `approval_interactor`, `results_interactor`, and `mod` tests
+    /// to avoid duplicating `FragmentRef` construction knowledge.
+    ///
+    /// # Panics
+    ///
+    /// Panics on invalid path or hash (only valid in `#[cfg(test)]` context).
+    #[allow(clippy::unwrap_used)]
+    pub(crate) fn make_fragment_ref_for_tests(path: &str, hash_char: char) -> FragmentRef {
+        make_fragment_ref_from_content(path, &hash_char.to_string())
+    }
+
+    /// Build a [`FragmentRef`] from a path string and full content.
+    ///
+    /// Delegates the content-hash derivation to [`content_hash_of`]. Shared
+    /// across [`interactor`](super::super::interactor) tests that need
+    /// full-content hashes (rather than single-char hashes) so the
+    /// `FragmentRef` construction knowledge is not duplicated.
+    ///
+    /// # Panics
+    ///
+    /// Panics on invalid path or hash (only valid in `#[cfg(test)]` context).
+    #[allow(clippy::unwrap_used)]
+    pub(crate) fn make_fragment_ref_from_content(path: &str, content: &str) -> FragmentRef {
+        FragmentRef::new(FilePath::new(path).unwrap(), content_hash_of(content).unwrap())
+    }
+
+    /// Build a [`DryCheckRecord`] from two [`FragmentRef`]s, a verdict, and a
+    /// timestamp string.
+    ///
+    /// Uses fixed test defaults for score (0.9), threshold (0.8), base commit
+    /// (`"a" * 40`), and rationale (`"test"`). Shared across
+    /// `approval_interactor` and `results_interactor` tests.
+    ///
+    /// # Panics
+    ///
+    /// Panics on invalid inputs (only valid in `#[cfg(test)]` context).
+    #[allow(clippy::unwrap_used)]
+    pub(crate) fn make_dry_check_record_for_tests(
+        low: FragmentRef,
+        high: FragmentRef,
+        verdict: DryCheckVerdict,
+        timestamp: &str,
+    ) -> DryCheckRecord {
+        let changed_path = low.path().clone();
+        let entry = DryCheckEntry::new(
+            DryCheckPairKey::new(low, high).unwrap(),
+            changed_path,
+            verdict,
+            SimilarityScore::new(0.9).unwrap(),
+            SimilarityThreshold::new(0.8).unwrap(),
+            CommitHash::try_new("a".repeat(40)).unwrap(),
+            Rationale::new("test").unwrap(),
+        )
+        .unwrap();
+        DryCheckRecord::from_entry_and_timestamp(entry, Timestamp::new(timestamp).unwrap()).unwrap()
+    }
+
+    /// Assert the per-field accessibility contract of a [`DryCheckRecord`].
+    ///
+    /// Used by both [`mod`](super::super) and
+    /// [`results_interactor`](super::super::results_interactor) tests that
+    /// otherwise repeat the same path / content-hash / changed-path / verdict /
+    /// rationale / recorded-at assertions.
+    ///
+    /// This helper is designed for records produced by
+    /// [`make_dry_check_record_for_tests`], which always stores fixed defaults:
+    /// `similarity_score = 0.9`, `threshold = 0.8`, `base_commit = "a" * 40`.
+    /// Those three fields are asserted unconditionally so regressions in the
+    /// persisted numeric and commit fields are caught without additional params.
+    ///
+    /// - `expected_low_hash` and `expected_high_hash`: the exact 64-hex-char
+    ///   content hash strings for the low and high [`FragmentRef`]s.  Pass a
+    ///   known-correct hex constant (not derived at runtime via the same helper)
+    ///   so the assertion is an independent oracle for the hash derivation path.
+    /// - `expected_rationale`: the exact rationale string stored in the record.
+    ///   `make_dry_check_record_for_tests` always stores `"test"`; pass that here
+    ///   to detect a regression that persists a wrong rationale.
+    /// - `expected_verdict`: the expected [`DryCheckVerdict`] discriminant.  When
+    ///   `Violation`, `expected_proposal` **must** be `Some` — passing `None` for
+    ///   a `Violation` verdict panics immediately so test bugs are surfaced.
+    ///   Passing `NotAViolation` or `Accepted` asserts the corresponding variant
+    ///   and ignores `expected_proposal` (those variants carry no proposal).
+    /// - `expected_proposal` must be `Some` when `expected_verdict` is `Violation`;
+    ///   for `NotAViolation` / `Accepted`, pass `None`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if any assertion fails (only valid in `#[cfg(test)]` context).
+    #[allow(clippy::unwrap_used, clippy::too_many_arguments, clippy::panic)]
+    pub(crate) fn assert_record_full_fields(
+        r: &DryCheckRecord,
+        expected_low_path: &str,
+        expected_low_hash: &str,
+        expected_high_path: &str,
+        expected_high_hash: &str,
+        expected_changed_path: &str,
+        expected_rationale: &str,
+        expected_recorded_at: &str,
+        expected_verdict: &DryCheckVerdict,
+        expected_proposal: Option<&str>,
+    ) {
+        assert_eq!(r.pair_key().low().path().as_str(), expected_low_path);
+        assert_eq!(r.pair_key().low().content_hash().as_str(), expected_low_hash);
+        assert_eq!(r.pair_key().high().path().as_str(), expected_high_path);
+        assert_eq!(r.pair_key().high().content_hash().as_str(), expected_high_hash);
+        assert_eq!(r.changed_path().as_str(), expected_changed_path);
+        match (r.verdict(), expected_verdict) {
+            (DryCheckVerdict::Violation { .. }, DryCheckVerdict::Violation { .. }) => {
+                let Some(expected) = expected_proposal else {
+                    panic!("expected_proposal must be Some when expected_verdict is Violation");
+                };
+                if let DryCheckVerdict::Violation { refactor_proposal: actual } = r.verdict() {
+                    assert_eq!(actual.as_str(), expected);
+                }
+            }
+            (DryCheckVerdict::NotAViolation, DryCheckVerdict::NotAViolation) => {}
+            (DryCheckVerdict::Accepted, DryCheckVerdict::Accepted) => {}
+            (actual, expected) => {
+                panic!("verdict mismatch: expected {expected:?}, got {actual:?}");
+            }
+        }
+        assert_eq!(r.rationale().as_str(), expected_rationale);
+        assert_eq!(r.recorded_at().as_str(), expected_recorded_at);
+        // Fixed defaults from make_dry_check_record_for_tests: score=0.9, threshold=0.8,
+        // base_commit="a"*40. These are asserted unconditionally to catch regressions
+        // in persisted numeric and commit fields without requiring additional parameters.
+        assert!(
+            (r.similarity_score().value() - 0.9_f32).abs() < 1e-5,
+            "similarity_score must be 0.9 (make_dry_check_record_for_tests default), got {}",
+            r.similarity_score().value()
+        );
+        assert!(
+            (r.threshold().value() - 0.8_f32).abs() < 1e-5,
+            "threshold must be 0.8 (make_dry_check_record_for_tests default), got {}",
+            r.threshold().value()
+        );
+        assert_eq!(
+            r.base_commit().as_ref(),
+            "a".repeat(40).as_str(),
+            "base_commit must be 'a'*40 (make_dry_check_record_for_tests default)"
+        );
     }
 }
 

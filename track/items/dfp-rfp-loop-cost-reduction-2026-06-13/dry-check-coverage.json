@@ -2,80 +2,196 @@
   "schema_version": 1,
   "fragment_refs": [
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "05d775058259d60d46713ff549a8a9f25d88bb535cbd8595c7498f01dcbeb8d1"
+      "path": "apps/cli-composition/src/dry.rs",
+      "content_hash": "2eea3d5218e39aebcd586c376b8c68bd34006ea24e4db056f0c891be05506e81"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "0a3643e9ad6b8429eda8e0a27e4ed938da3211492b5be17a2a5da99a9188d376"
+      "path": "apps/cli-composition/src/dry.rs",
+      "content_hash": "4a2c5791d814e1d2383075bbf9bbb32ee133ea3f187530f6ff912abcacaf6c4b"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "22ad6ff0ad6c35b13332d0aa3cae810e456564bb3a0c1fbf68802c73f67f033d"
+      "path": "apps/cli-composition/src/dry.rs",
+      "content_hash": "84c7e77bec80a3cddd01b59758b5a3bf1845306935c1c1fe77382a929ded8a72"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "2428e242b2d62b01219730e533758dfe05196d6cd016bdd7363d14c4835bd7e8"
+      "path": "apps/cli/src/commands/dry.rs",
+      "content_hash": "6b0f2b7ab8bee9c55d3a3b7f2c0cf9574df8c80a1d10bc4402296f11bd438798"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "3e2857356d228a5b6eabd824217003a8d823160e4d1df3981839c46b8cfb510a"
+      "path": "apps/cli/src/commands/dry.rs",
+      "content_hash": "8b59a565aa3e3cbb35f8a34c900ea2c3f372598fb7031b0df2fa400772ea7844"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "4cc3f2c50ced89e0a88def0ee4c2b98e00967394b769eef52a5d5e7d0e63e4db"
+      "path": "apps/cli/src/commands/dry.rs",
+      "content_hash": "95ef1901aca1eb76c9f228b6fa657734571a8cb721a978eec8c68e8b5aeb0e4a"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "5783070f41fee33592e168337908bf22b70f014d5a6b37c23e51b3ae2a2fcbf0"
+      "path": "apps/cli/src/commands/dry.rs",
+      "content_hash": "f9b9fcf5dc446885b58ee1c435ff1555459eb1abe3ff8f442a8c64bff0c4d1e7"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "6f5d7b9b5430c321337f1a8a2bd44830cd200f5f6c1b1cbc4853b484076672b8"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "1d9d83e861c189522ef1b3ebfb0d953e2479e4d53c7418dcb0d38a48d0c1c6d5"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "92724bd28423ea0bf53614845951675b6c167ff4a258cf6e13cdf59b738e1170"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "445d1b0b53fa1db9111ab0c53e1129861f5dfc2ff2c8955497b43295cc45d06c"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "b145e1ed4e167dfc3b80d23efbe71032ed7653e82319d726b42adf9c6122938b"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "4f2e4676400742fa7d69bc74daa656450842da0e5f7114e0c460a0d6d029ffdf"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "b161c781c416713d54a4a395897205104a694427fd33d1e2289f3152660c87c8"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "82b52689afd259632bb1d6c6efad90320b488dacef104d2e8c380ab2715097ef"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "b4622cc5f0ad4aa5d0f4db4afde203560130b40be875de277376565ea448b815"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "98efcfcfeecfc7c141b75089c740030b7acecd2afcabf9f6f7690153fcb73503"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "bd56b90ced346d7919e3ce1c908236ffe56a06b9602c68cfc1956ebc10154bc1"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "99dfc5c3325f0172e5a28a6873b227731b8fc7c169a0d586c41f69f32de093c5"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "bfe8404cc2762e812e3487004e12bcd9d3fd3179ae86c0af18be951b40d393c3"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "9e8fde89c7353577b24a8c4b2431f4c05e7597e31371575676e0fe287d0b5130"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "dbdbdc77d5e5a0df67ca6275ae5c1a365462b48c4ecda4f4783f7237fec66280"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "b7906dd1f1dfd30f803d000ce500f9580dc9726a2892133540dad90bfecb66e3"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "f0ee802e4fab716549f00ea3e826c4a68041cfe9337fc6676abae13274776660"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "c492ca16878516cec16a8e753440c3d4a19f3af03793d99a9a86f8481838c557"
     },
     {
-      "path": "libs/usecase/src/dry_check/config.rs",
-      "content_hash": "f29231c8ca65e6c70d3b0cbeff0860cb0c9867ae1827456268cf92572e421034"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "c628df12bfda77d45e8065abb446d5ddf1a22008e351dcaa7b86e49e357a64ea"
     },
     {
-      "path": "libs/usecase/src/dry_check/errors.rs",
-      "content_hash": "8aa43f825f68bed5b9ba6e4783caa3d2c2ba2f11e8170b08d4efe1b914e78c63"
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "d90bd939a485026e37928b6401eca76e0074efccea9e930d232cc5463c7f5534"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "16b493f86a26accf8bf5a72d50d99be203c14fe94176ea688200ea70403b634b"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "189c1ce32565a60e7adf3b5b4c35d5ff19e5d755a6252df7e4eb993de96fcccf"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "21042c87207a5de8500f94a8d689594f325c205d81966e4a8cd043dbfb3de152"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "330c506ab6d905637dfd0e87393fc56dcaafe660df77d164d455a37105fcb0a0"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "3bab3a5247309895b2963221c53a572a2ea5991d1618b5ee3e61f623fda99f32"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "5327f72df13c43c52cb2a6380ead8fcf1ab98faf4a2a924955457871e1d85134"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "58438843372638309ea56f285bb398a3b50983813009a45b8ebff75d4d6a3e7b"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "71262f47cf809232addb62ece28c376d2d71df4a00d727f657d5d0e0a6b29d18"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "736914af8592cc9c3f3913d1737abf241254a9681a596f3c2387675f2fcc6a6c"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "84be874c00dc410af96b82a7de9339730aacbf5eca89489b6a8233fbe23d9f62"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "8b422b075f0466bb5334fc9b236898d3793c16184775c8054155da51edc9893e"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "9007224aec0eb8e992d44c711486690ee90a48c3e176dfb8ca94f333097bcf5b"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "bc720bd48fa1e1a65147cc6c6b658c12f5964f59234a9c50a459f6bd9b786553"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "d52b3b88e124ab974a280a5767ccd95ac6615e262ed8ef2fa48ec794f5997831"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "dcc34a3de3b732f2aca78791b0018c40bd3474c0f9bcb21d9934ac5f0b3c8b7f"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "f68080444fd5a376fb7b24d2d2ded44e28c4e5958364cbaf5afc8f3bc3567e72"
     },
     {
       "path": "libs/usecase/src/dry_check/mod.rs",
-      "content_hash": "39f293688c42c317df450f08c299d01b7ff5c5fe9539a0184bed13f9d1024ac7"
+      "content_hash": "76227c348684606d59b0129d343c330ff545af8e4ce2312edbf71b5ff35cb864"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/mod.rs",
+      "content_hash": "9a7ecbc9cabdf7f4275733c377c33e521d92663644adc29ab5046af710b6a8b5"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/mod.rs",
+      "content_hash": "dbadab095dad43d15bf3382b3d9b473ecaf21e7d704df35b5f3324df5b32c778"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/mod.rs",
+      "content_hash": "e4c11c93d13be355ffc31c1f2bbca1c3f463080d1affe2b26993119daadcc2c6"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/results_interactor.rs",
+      "content_hash": "7136fba0c177fb9fba6ffb23463b26fab7074e05cb157c91af8f95e06085d7bf"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/results_interactor.rs",
+      "content_hash": "81813eb0c496ab5efa5785af194b27c2e454f3eb2ab6394609ea3c37e5054a86"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/results_interactor.rs",
+      "content_hash": "a23292bb0172e75e3f8d101882234561d15f30054203c07ac13539a9c8b4f6ff"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/results_interactor.rs",
+      "content_hash": "f459b65f86201ddbc4917634881e7834cc922e2c1af75aac5f012abdbc042be9"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/shared.rs",
+      "content_hash": "44bedd9f0e671ec1daa651fe2ed2996391833b5f3c644e1b45b9c3d8e7664863"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/shared.rs",
+      "content_hash": "7303dbdf45af8695a73b51853387a404b76f7fc4e087648c0507633edac32d21"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/shared.rs",
+      "content_hash": "96556407be7367499e37e16601e2a5235d693cebb24c908ca6be1734a8cbdd5d"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/shared.rs",
+      "content_hash": "b73bcaedf8cad66e4d836921003740ec92801a568e29afc5f4e571e1d2786e18"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/shared.rs",
+      "content_hash": "cd723dc7467a157196720a86e194b873667131e91ece30dc9ac204a2a94f444b"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/shared.rs",
+      "content_hash": "f59717b5cf2df95d3d0f2cf857e4a6de9a2a17f2b4755bb9d227474d4cb0d0c8"
     }
   ]
 }

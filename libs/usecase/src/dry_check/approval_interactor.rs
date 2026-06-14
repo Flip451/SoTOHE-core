@@ -129,14 +129,13 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
 mod tests {
     use super::*;
     use domain::dry_check::{
-        DryCheckCoverageRecord, DryCheckEntry, DryCheckPairKey, DryCheckReaderError,
-        DryCheckRecord, DryCheckVerdict, FragmentRef, Rationale, RefactorProposal,
+        DryCheckCoverageRecord, DryCheckReaderError, DryCheckRecord, DryCheckVerdict, FragmentRef,
+        RefactorProposal,
     };
-    use domain::review_v2::types::FilePath;
-    use domain::semantic_dup::{SimilarityScore, SimilarityThreshold};
-    use domain::{CommitHash, Timestamp};
 
-    use crate::dry_check::shared::content_hash_of;
+    use crate::dry_check::shared::test_mocks::{
+        make_dry_check_record_for_tests, make_fragment_ref_for_tests,
+    };
 
     // ── Test doubles ──────────────────────────────────────────────────────────
 
@@ -207,58 +206,10 @@ mod tests {
         TrackId::try_new("test-track-2026").unwrap()
     }
 
-    fn make_fragment_ref(path: &str, hash_char: char) -> FragmentRef {
-        let content = hash_char.to_string();
-        FragmentRef::new(FilePath::new(path).unwrap(), content_hash_of(&content).unwrap())
-    }
-
-    fn make_record(
-        low: FragmentRef,
-        high: FragmentRef,
-        verdict: DryCheckVerdict,
-    ) -> DryCheckRecord {
-        make_record_at(low, high, verdict, "2026-06-13T00:00:00Z")
-    }
-
-    fn make_record_at(
-        low: FragmentRef,
-        high: FragmentRef,
-        verdict: DryCheckVerdict,
-        timestamp: &str,
-    ) -> DryCheckRecord {
-        let timestamp = Timestamp::new(timestamp).unwrap();
-        DryCheckRecord::from_entry_and_timestamp(make_entry(low, high, verdict), timestamp).unwrap()
-    }
-
-    fn make_entry(low: FragmentRef, high: FragmentRef, verdict: DryCheckVerdict) -> DryCheckEntry {
-        let changed_path = low.path().clone();
-        DryCheckEntry::new(
-            DryCheckPairKey::new(low, high).unwrap(),
-            changed_path,
-            verdict,
-            default_score(),
-            default_threshold(),
-            default_base_commit(),
-            default_rationale(),
-        )
-        .unwrap()
-    }
-
-    fn default_score() -> SimilarityScore {
-        SimilarityScore::new(0.9).unwrap()
-    }
-
-    fn default_threshold() -> SimilarityThreshold {
-        SimilarityThreshold::new(0.8).unwrap()
-    }
-
-    fn default_base_commit() -> CommitHash {
-        CommitHash::try_new("a".repeat(40)).unwrap()
-    }
-
-    fn default_rationale() -> Rationale {
-        Rationale::new("test").unwrap()
-    }
+    /// Default timestamp used by tests that do not care about the exact
+    /// `recorded_at` value. Tests that DO care pass an explicit timestamp to
+    /// [`make_dry_check_record_for_tests`] directly.
+    const DEFAULT_RECORDED_AT: &str = "2026-06-13T00:00:00Z";
 
     fn make_interactor(
         coverage: StubCoverage,
@@ -279,7 +230,7 @@ mod tests {
 
     #[test]
     fn test_check_approved_with_missing_coverage_returns_blocked() {
-        let a = make_fragment_ref("src/a.rs", 'a');
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
         let interactor = make_interactor(StubCoverage { record: None }, vec![]);
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
         assert!(matches!(result, DryCheckApprovalVerdict::Blocked { .. }));
@@ -289,8 +240,8 @@ mod tests {
 
     #[test]
     fn test_check_approved_all_covered_no_records_returns_approved() {
-        let a = make_fragment_ref("src/a.rs", 'a');
-        let b = make_fragment_ref("src/b.rs", 'b');
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
         let coverage = coverage_with(vec![a.clone(), b.clone()]);
         let interactor = make_interactor(coverage, vec![]);
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
@@ -304,8 +255,8 @@ mod tests {
         // Coverage records `src/a.rs` at hash 'a'. Current diff has `src/b.rs`
         // at the SAME hash 'a' — IN-06 / CN-08 require this to be treated as
         // stale (NOT covered).
-        let recorded = make_fragment_ref("src/a.rs", 'a');
-        let current = make_fragment_ref("src/b.rs", 'a');
+        let recorded = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let current = make_fragment_ref_for_tests("src/b.rs", 'a');
         assert_eq!(recorded.content_hash(), current.content_hash());
 
         let coverage = coverage_with(vec![recorded]);
@@ -319,14 +270,15 @@ mod tests {
 
     #[test]
     fn test_check_approved_latest_violation_returns_blocked() {
-        let a = make_fragment_ref("src/a.rs", 'a');
-        let b = make_fragment_ref("src/b.rs", 'b');
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
         let coverage = coverage_with(vec![a.clone(), b.clone()]);
         let proposal = RefactorProposal::new("Extract helper.").unwrap();
-        let record = make_record(
+        let record = make_dry_check_record_for_tests(
             a.clone(),
             b.clone(),
             DryCheckVerdict::Violation { refactor_proposal: proposal },
+            DEFAULT_RECORDED_AT,
         );
         let interactor = make_interactor(coverage, vec![record]);
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
@@ -337,18 +289,22 @@ mod tests {
 
     #[test]
     fn test_check_approved_older_violation_then_accepted_returns_approved() {
-        let a = make_fragment_ref("src/a.rs", 'a');
-        let b = make_fragment_ref("src/b.rs", 'b');
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
         let coverage = coverage_with(vec![a.clone(), b.clone()]);
         let proposal = RefactorProposal::new("Extract helper.").unwrap();
-        let violation = make_record_at(
+        let violation = make_dry_check_record_for_tests(
             a.clone(),
             b.clone(),
             DryCheckVerdict::Violation { refactor_proposal: proposal },
             "2026-06-01T00:00:00Z",
         );
-        let accepted =
-            make_record_at(a.clone(), b.clone(), DryCheckVerdict::Accepted, "2026-06-02T00:00:00Z");
+        let accepted = make_dry_check_record_for_tests(
+            a.clone(),
+            b.clone(),
+            DryCheckVerdict::Accepted,
+            "2026-06-02T00:00:00Z",
+        );
         // Reader returns records in chronological order; latest-per-pair takes the last.
         let interactor = make_interactor(coverage, vec![violation, accepted]);
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
@@ -359,10 +315,15 @@ mod tests {
 
     #[test]
     fn test_check_approved_latest_not_a_violation_returns_approved() {
-        let a = make_fragment_ref("src/a.rs", 'a');
-        let b = make_fragment_ref("src/b.rs", 'b');
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
         let coverage = coverage_with(vec![a.clone(), b.clone()]);
-        let record = make_record(a.clone(), b.clone(), DryCheckVerdict::NotAViolation);
+        let record = make_dry_check_record_for_tests(
+            a.clone(),
+            b.clone(),
+            DryCheckVerdict::NotAViolation,
+            DEFAULT_RECORDED_AT,
+        );
         let interactor = make_interactor(coverage, vec![record]);
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
         assert_eq!(result, DryCheckApprovalVerdict::Approved);
@@ -374,12 +335,17 @@ mod tests {
     fn test_check_approved_violation_unrelated_to_current_diff_is_ignored() {
         // Current diff touches only `src/c.rs`. History has a Violation between
         // `src/a.rs` and `src/b.rs` — irrelevant to this run.
-        let a = make_fragment_ref("src/a.rs", 'a');
-        let b = make_fragment_ref("src/b.rs", 'b');
-        let c = make_fragment_ref("src/c.rs", 'c');
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let c = make_fragment_ref_for_tests("src/c.rs", 'c');
         let coverage = coverage_with(vec![c.clone()]);
         let proposal = RefactorProposal::new("Extract helper.").unwrap();
-        let record = make_record(a, b, DryCheckVerdict::Violation { refactor_proposal: proposal });
+        let record = make_dry_check_record_for_tests(
+            a,
+            b,
+            DryCheckVerdict::Violation { refactor_proposal: proposal },
+            DEFAULT_RECORDED_AT,
+        );
         let interactor = make_interactor(coverage, vec![record]);
         let result = interactor.check_approved(&make_track(), &current_refs(vec![c])).unwrap();
         assert_eq!(result, DryCheckApprovalVerdict::Approved);
@@ -389,7 +355,7 @@ mod tests {
 
     #[test]
     fn test_check_approved_reader_error_propagated() {
-        let a = make_fragment_ref("src/a.rs", 'a');
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
         let coverage = coverage_with(vec![a.clone()]);
         let interactor = DryCheckApprovalInteractor::new(Arc::new(ErrorReader), Arc::new(coverage));
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a]));
@@ -400,7 +366,7 @@ mod tests {
 
     #[test]
     fn test_check_approved_coverage_error_propagated() {
-        let a = make_fragment_ref("src/a.rs", 'a');
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
         let interactor = DryCheckApprovalInteractor::new(
             Arc::new(StubReader { records: vec![] }),
             Arc::new(ErrorCoverage),
