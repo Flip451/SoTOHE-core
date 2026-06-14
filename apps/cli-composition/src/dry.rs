@@ -16,26 +16,24 @@
 
 use std::path::Path;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::Instant;
 
 use domain::dry_check::{DryCheckFinding, DryCheckReader as _, DryCheckVerdict};
-use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
+use domain::semantic_dup::SimilarityThreshold;
 use infrastructure::dry_check::{CodexDryChecker, FsDryCheckCoverageAdapter, FsDryCheckStore};
 use infrastructure::semantic_dup::embedding::FastEmbedAdapter;
 use usecase::dry_check::{
-    DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckApprovalInteractor,
-    DryCheckApprovalService as _, DryCheckCycleError, DryCheckInteractor, DryCheckJudgeTier,
+    DryCheckApprovalInteractor, DryCheckApprovalService as _, DryCheckInteractor,
     DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _, fragment_ref_of,
 };
 
-use crate::review_v2::record_instant_once;
 use crate::{CliApp, CommandOutcome};
 
 mod manifest;
 mod persistent_index;
 mod shared;
+mod tier_telemetry;
 
 use persistent_index::open_persistent_index_with_corpus;
 use shared::{
@@ -45,9 +43,19 @@ use shared::{
 };
 #[cfg(test)]
 use shared::{git_diff_path_key, normalize_fragment_paths};
+#[cfg(test)]
+use tier_telemetry::{
+    DryAgentRunRecorder, TieredDryAgentRecorder, dry_agent_error_is_subprocess_failure,
+};
+use tier_telemetry::{
+    RecordingDryAgent, dry_tiered_telemetry_for_result, emit_dry_tier_external_subprocess,
+    emit_dry_tier_review_round,
+};
 
 #[cfg(test)]
 use domain::dry_check::{DryCheckApprovalVerdict, VerdictFilter, fragments_overlapping_hunks};
+#[cfg(test)]
+use domain::semantic_dup::CodeFragment;
 #[cfg(test)]
 use infrastructure::semantic_dup::{
     extractor::extract_code_fragments, index::LanceDbSemanticIndexAdapter,
@@ -61,6 +69,11 @@ use manifest::{
 use persistent_index::{
     NullInsertIndexProxy, acquire_persistent_index_lock, clear_persistent_index_dir,
     persistent_index_lock_path, persistent_index_marker_path, write_persistent_index_marker,
+};
+#[cfg(test)]
+use usecase::dry_check::{
+    DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckCycleError,
+    DryCheckJudgeTier,
 };
 #[cfg(test)]
 use usecase::semantic_dup::SemanticIndexPort;
@@ -265,8 +278,8 @@ impl CliApp {
             .read_records()
             .map_err(|e| format!("dry-check read before write failed: {e}"))?
             .len();
-        let (agent, agent_recorder) = RecordingDryAgent::new(CodexDryChecker::new(
-            fast_model,
+        let (agent, tiered_recorder) = RecordingDryAgent::new(CodexDryChecker::new(
+            fast_model.clone(),
             infra_config.fast_reasoning_effort().to_owned(),
             effective_model.clone(),
             infra_config.final_reasoning_effort().to_owned(),
@@ -299,30 +312,45 @@ impl CliApp {
         let dry_start = std::time::Instant::now();
         let dry_result = interactor.run_dry_check(vec![], diff_fragments, threshold, base);
 
-        // T006 / AC-03 / IN-03: emit telemetry for completed runs and for subprocess-involved
-        // errors (Agent / Entry / Writer — failures after `judge()` ran). Pre-subprocess
-        // errors (Embedding / Index / Reader / Diff) don't emit.
+        // T013 / IN-07 / AC-09 / CN-10: emit per-tier ReviewRound telemetry.
+        // Fast tier uses `fast_model`; final tier uses `effective_model` (final model).
+        // New-field / new-event additions are forbidden (CN-10): we reuse the existing
+        // `round_type` field with "fast" / "final" values already accepted by the schema.
         if let Some((ref w, ref tid)) = telemetry_writer {
-            let round_telemetry = dry_round_telemetry_for_result(&dry_result, &agent_recorder);
-            if let Some(telemetry) = round_telemetry {
-                crate::telemetry_wiring::emit_review_round(
+            let (fast_telemetry, final_telemetry) =
+                dry_tiered_telemetry_for_result(&dry_result, &tiered_recorder);
+            if let Some(ref telemetry) = fast_telemetry {
+                // On escalated runs `duration_ms` is pre-computed as
+                // `(final_started_at - fast_started_at)` so that the fast
+                // ReviewRound does not include the final tier's time.
+                // The ExternalSubprocess event uses the same duration source so
+                // that both events are consistent with each other.
+                emit_dry_tier_review_round(
+                    w,
+                    tid,
+                    "codex",
+                    &fast_model,
+                    "fast",
+                    telemetry,
+                    dry_start,
+                );
+                if telemetry.subprocess_started_at.is_some() {
+                    emit_dry_tier_external_subprocess(w, tid, "codex", telemetry, dry_start);
+                }
+            }
+            if let Some(ref telemetry) = final_telemetry {
+                // Final tier uses its own started_at so duration excludes the fast tier.
+                emit_dry_tier_review_round(
                     w,
                     tid,
                     "codex",
                     &effective_model,
-                    "dry",
-                    telemetry.findings_count,
+                    "final",
+                    telemetry,
                     dry_start,
                 );
-                if let Some(subprocess_started_at) = telemetry.subprocess_started_at {
-                    crate::telemetry_wiring::emit_external_subprocess(
-                        w,
-                        tid,
-                        "codex",
-                        0,
-                        telemetry.verdict_parse_failed,
-                        subprocess_started_at,
-                    );
+                if telemetry.subprocess_started_at.is_some() {
+                    emit_dry_tier_external_subprocess(w, tid, "codex", telemetry, dry_start);
                 }
             }
         }
@@ -541,159 +569,6 @@ fn dry_check_approved_gate_eval_fields(
             ("error", format!("blocked: {unresolved_pair_count} unresolved pair(s)"))
         }
     }
-}
-
-#[derive(Clone)]
-struct DryAgentRunRecorder {
-    completed: Arc<AtomicBool>,
-    findings_count: Arc<AtomicU64>,
-    started_at: Arc<Mutex<Option<Instant>>>,
-}
-
-impl DryAgentRunRecorder {
-    fn new() -> Self {
-        Self {
-            completed: Arc::new(AtomicBool::new(false)),
-            findings_count: Arc::new(AtomicU64::new(0)),
-            started_at: Arc::new(Mutex::new(None)),
-        }
-    }
-
-    fn record_started(&self) {
-        record_instant_once(&self.started_at);
-    }
-
-    fn record_completed(&self) {
-        self.completed.store(true, Ordering::Relaxed);
-    }
-
-    fn record_violation(&self) {
-        let mut current = self.findings_count.load(Ordering::Relaxed);
-        while current < u64::from(u32::MAX) {
-            match self.findings_count.compare_exchange_weak(
-                current,
-                current + 1,
-                Ordering::Relaxed,
-                Ordering::Relaxed,
-            ) {
-                Ok(_) => return,
-                Err(next) => current = next,
-            }
-        }
-    }
-
-    fn has_completed(&self) -> bool {
-        self.completed.load(Ordering::Relaxed)
-    }
-
-    fn findings_count(&self) -> u32 {
-        self.findings_count.load(Ordering::Relaxed).try_into().unwrap_or(u32::MAX)
-    }
-
-    fn started_at(&self) -> Option<Instant> {
-        self.started_at.lock().ok().and_then(|started_at| *started_at)
-    }
-}
-
-struct RecordingDryAgent<A> {
-    inner: A,
-    recorder: DryAgentRunRecorder,
-}
-
-impl<A> RecordingDryAgent<A> {
-    fn new(inner: A) -> (Self, DryAgentRunRecorder) {
-        let recorder = DryAgentRunRecorder::new();
-        (Self { inner, recorder: recorder.clone() }, recorder)
-    }
-}
-
-impl<A: DryCheckAgentPort> DryCheckAgentPort for RecordingDryAgent<A> {
-    fn judge(
-        &self,
-        changed_fragment: &CodeFragment,
-        candidate_fragment: &CodeFragment,
-        tier: DryCheckJudgeTier,
-    ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
-        self.recorder.record_started();
-        let result = self.inner.judge(changed_fragment, candidate_fragment, tier);
-        if let Ok(judgment) = &result {
-            if matches!(judgment, DryCheckAgentJudgment::Violation { .. }) {
-                self.recorder.record_violation();
-            }
-            self.recorder.record_completed();
-        }
-        result
-    }
-}
-
-struct DryRoundTelemetry {
-    findings_count: u32,
-    verdict_parse_failed: bool,
-    subprocess_started_at: Option<std::time::Instant>,
-}
-
-fn dry_round_telemetry_for_result(
-    dry_result: &Result<Vec<DryCheckFinding>, DryCheckCycleError>,
-    agent_recorder: &DryAgentRunRecorder,
-) -> Option<DryRoundTelemetry> {
-    match dry_result {
-        Ok(findings) => Some(DryRoundTelemetry {
-            findings_count: findings.len().try_into().unwrap_or(u32::MAX),
-            verdict_parse_failed: false,
-            subprocess_started_at: agent_recorder.started_at(),
-        }),
-        // Map only subprocess-involved agent failures to telemetry.
-        // Unexpected(_) is overloaded by the adapter: some messages happen
-        // before spawn, while the prefixes recognized by
-        // dry_agent_error_is_subprocess_failure happen after the child exists.
-        // IllegalOutput is the only parse-failure variant.
-        Err(DryCheckCycleError::Agent(inner)) => {
-            if dry_agent_error_is_subprocess_failure(inner) {
-                let verdict_parse_failed = matches!(inner, DryCheckAgentError::IllegalOutput);
-                Some(DryRoundTelemetry {
-                    findings_count: agent_recorder.findings_count(),
-                    verdict_parse_failed,
-                    subprocess_started_at: agent_recorder.started_at(),
-                })
-            } else {
-                None
-            }
-        }
-        // Entry and Writer errors occur after the agent ran — not parse failures.
-        Err(DryCheckCycleError::Entry(_)) | Err(DryCheckCycleError::Writer(_)) => {
-            Some(DryRoundTelemetry {
-                findings_count: agent_recorder.findings_count(),
-                verdict_parse_failed: false,
-                subprocess_started_at: agent_recorder.started_at(),
-            })
-        }
-        // The interactor can also raise Index after a successful judge() call
-        // while converting the changed path for persistence.
-        Err(DryCheckCycleError::Index(_)) if agent_recorder.has_completed() => {
-            Some(DryRoundTelemetry {
-                findings_count: agent_recorder.findings_count(),
-                verdict_parse_failed: false,
-                subprocess_started_at: agent_recorder.started_at(),
-            })
-        }
-        Err(_) => None,
-    }
-}
-
-fn dry_agent_error_is_subprocess_failure(error: &DryCheckAgentError) -> bool {
-    match error {
-        DryCheckAgentError::UserAbort
-        | DryCheckAgentError::AgentAbort
-        | DryCheckAgentError::Timeout
-        | DryCheckAgentError::IllegalOutput => true,
-        DryCheckAgentError::Unexpected(message) => dry_agent_unexpected_after_spawn(message),
-    }
-}
-
-fn dry_agent_unexpected_after_spawn(message: &str) -> bool {
-    message.starts_with("failed to poll dry-check agent child:")
-        || message.starts_with("failed to reap dry-check agent child:")
-        || message.starts_with("failed to read output-last-message ")
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -1060,65 +935,77 @@ mod tests {
         assert!(!dry_agent_error_is_subprocess_failure(&error));
     }
 
+    fn make_tiered_recorder_fast_only(findings: u32) -> TieredDryAgentRecorder {
+        let fast = DryAgentRunRecorder::new();
+        fast.record_started();
+        for _ in 0..findings {
+            fast.record_violation();
+        }
+        fast.record_completed();
+        TieredDryAgentRecorder { fast, final_: DryAgentRunRecorder::new() }
+    }
+
     #[test]
-    fn test_dry_round_telemetry_for_result_index_after_agent_success_emits_failure() {
-        let recorder = DryAgentRunRecorder::new();
-        recorder.record_started();
-        recorder.record_violation();
-        recorder.record_violation();
-        recorder.record_completed();
+    fn test_dry_tiered_telemetry_for_result_index_after_fast_agent_success_emits_fast() {
+        let tiered = make_tiered_recorder_fast_only(2);
         let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Err(
             DryCheckCycleError::Index(usecase::semantic_dup::SemanticIndexError::SearchFailed {
                 source: "changed_path error: invalid path".to_owned(),
             }),
         );
 
-        let telemetry = dry_round_telemetry_for_result(&result, &recorder).unwrap();
-        assert_eq!(telemetry.findings_count, 2);
-        assert!(!telemetry.verdict_parse_failed);
-        assert!(telemetry.subprocess_started_at.is_some());
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        let fast_t = fast.unwrap();
+        assert_eq!(fast_t.findings_count, 2);
+        assert!(!fast_t.verdict_parse_failed);
+        assert!(fast_t.subprocess_started_at.is_some());
+        assert!(final_.is_none(), "final tier must not emit when only fast was invoked");
     }
 
     #[test]
-    fn test_dry_round_telemetry_for_result_index_before_agent_returns_none() {
-        let recorder = DryAgentRunRecorder::new();
+    fn test_dry_tiered_telemetry_for_result_index_before_agent_returns_none() {
+        let tiered = TieredDryAgentRecorder {
+            fast: DryAgentRunRecorder::new(),
+            final_: DryAgentRunRecorder::new(),
+        };
         let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Err(
             DryCheckCycleError::Index(usecase::semantic_dup::SemanticIndexError::SearchFailed {
                 source: "candidate index failed".to_owned(),
             }),
         );
 
-        assert!(dry_round_telemetry_for_result(&result, &recorder).is_none());
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        assert!(fast.is_none());
+        assert!(final_.is_none());
     }
 
     #[test]
-    fn test_dry_round_telemetry_for_result_writer_error_uses_agent_findings_count() {
-        let recorder = DryAgentRunRecorder::new();
-        recorder.record_started();
-        recorder.record_violation();
-        recorder.record_violation();
-        recorder.record_violation();
+    fn test_dry_tiered_telemetry_for_result_writer_error_uses_fast_findings_count() {
+        let tiered = make_tiered_recorder_fast_only(3);
         let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> =
             Err(DryCheckCycleError::Writer(domain::dry_check::DryCheckWriterError::Codec {
                 detail: "serialize failed".to_owned(),
             }));
 
-        let telemetry = dry_round_telemetry_for_result(&result, &recorder).unwrap();
-        assert_eq!(telemetry.findings_count, 3);
-        assert!(!telemetry.verdict_parse_failed);
-        assert!(telemetry.subprocess_started_at.is_some());
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        let fast_t = fast.unwrap();
+        assert_eq!(fast_t.findings_count, 3);
+        assert!(!fast_t.verdict_parse_failed);
+        assert!(fast_t.subprocess_started_at.is_some());
+        assert!(final_.is_none());
     }
 
     #[test]
-    fn test_dry_round_telemetry_for_result_success_without_agent_start_skips_subprocess() {
-        let recorder = DryAgentRunRecorder::new();
+    fn test_dry_tiered_telemetry_for_result_success_without_agent_start_skips_subprocess() {
+        let tiered = TieredDryAgentRecorder {
+            fast: DryAgentRunRecorder::new(),
+            final_: DryAgentRunRecorder::new(),
+        };
         let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Ok(vec![]);
 
-        let telemetry = dry_round_telemetry_for_result(&result, &recorder).unwrap();
-
-        assert_eq!(telemetry.findings_count, 0);
-        assert!(!telemetry.verdict_parse_failed);
-        assert!(telemetry.subprocess_started_at.is_none());
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        assert!(fast.is_none(), "no fast tier invoked → no fast telemetry");
+        assert!(final_.is_none());
     }
 
     #[test]
@@ -1134,7 +1021,9 @@ mod tests {
         assert_eq!(recorder.started_at(), first_start);
     }
 
-    struct ViolationAgent;
+    struct ViolationAgent {
+        rationale: &'static str,
+    }
 
     impl DryCheckAgentPort for ViolationAgent {
         fn judge(
@@ -1144,7 +1033,7 @@ mod tests {
             _tier: DryCheckJudgeTier,
         ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
             Ok(DryCheckAgentJudgment::Violation {
-                rationale: domain::Rationale::new("same control flow").unwrap(),
+                rationale: domain::Rationale::new(self.rationale).unwrap(),
                 finding: dry_check_finding_for_tests(),
             })
         }
@@ -1164,7 +1053,8 @@ mod tests {
 
     #[test]
     fn test_recording_dry_agent_counts_violation_judgment_before_persistence() {
-        let (agent, recorder) = RecordingDryAgent::new(ViolationAgent);
+        let (agent, tiered) =
+            RecordingDryAgent::new(ViolationAgent { rationale: "same control flow" });
         let changed =
             CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
         let candidate =
@@ -1173,8 +1063,118 @@ mod tests {
         let result = agent.judge(&changed, &candidate, DryCheckJudgeTier::Final);
 
         assert!(matches!(result, Ok(DryCheckAgentJudgment::Violation { .. })));
-        assert_eq!(recorder.findings_count(), 1);
-        assert!(recorder.has_completed());
+        // Final tier recorder must capture the violation; fast tier must be idle.
+        assert_eq!(tiered.final_.findings_count(), 1);
+        assert!(tiered.final_.has_completed());
+        assert_eq!(tiered.fast.findings_count(), 0);
+        assert!(!tiered.fast.has_completed());
+    }
+
+    // ── T013: per-tier ReviewRound telemetry (IN-07 / AC-09 / CN-10) ─────────
+
+    struct TieredDryAgent {
+        fast_model: String,
+        final_model: String,
+    }
+
+    impl DryCheckAgentPort for TieredDryAgent {
+        fn judge(
+            &self,
+            _changed_fragment: &CodeFragment,
+            _candidate_fragment: &CodeFragment,
+            tier: DryCheckJudgeTier,
+        ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
+            let _ = match tier {
+                DryCheckJudgeTier::Fast => &self.fast_model,
+                DryCheckJudgeTier::Final => &self.final_model,
+            };
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: domain::Rationale::new("distinct logic").unwrap(),
+            })
+        }
+    }
+
+    /// T013 AC: fast-tier-only run emits a ReviewRound with round_type="fast".
+    ///
+    /// Simulates a run where only the fast tier is invoked (no escalation).
+    /// Verifies that `dry_tiered_telemetry_for_result` returns:
+    /// - `fast` = Some with the correct findings_count and subprocess_started_at.
+    /// - `final_` = None (final tier was never invoked).
+    #[test]
+    fn test_tiered_recording_fast_only_run_emits_fast_round_type() {
+        let (agent, tiered) = RecordingDryAgent::new(TieredDryAgent {
+            fast_model: "fast-model-v1".to_string(),
+            final_model: "final-model-v1".to_string(),
+        });
+        let changed =
+            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
+        let candidate =
+            CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
+
+        // Invoke only fast tier.
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
+
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Ok(vec![]);
+        let (fast_t, final_t) = dry_tiered_telemetry_for_result(&result, &tiered);
+
+        let fast = fast_t.expect("fast tier was invoked → fast telemetry must be Some");
+        assert_eq!(fast.findings_count, 0, "no violations → findings_count=0");
+        assert!(fast.subprocess_started_at.is_some(), "fast tier started_at must be recorded");
+        assert!(final_t.is_none(), "final tier was not invoked → final telemetry must be None");
+    }
+
+    /// T013 AC: run escalated to final tier emits a ReviewRound with round_type="final".
+    ///
+    /// Simulates a run where both fast and final tiers are invoked (escalation path).
+    /// Verifies that `dry_tiered_telemetry_for_result` returns:
+    /// - `fast` = Some (fast tier was invoked).
+    /// - `final_` = Some (final tier was also invoked).
+    #[test]
+    fn test_tiered_recording_escalated_run_emits_both_fast_and_final_round_types() {
+        let (agent, tiered) = RecordingDryAgent::new(TieredDryAgent {
+            fast_model: "fast-model-v1".to_string(),
+            final_model: "final-model-v1".to_string(),
+        });
+        let changed =
+            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
+        let candidate =
+            CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
+
+        // Invoke fast tier first, then final tier (simulating escalation).
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Final).unwrap();
+
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Ok(vec![]);
+        let (fast_t, final_t) = dry_tiered_telemetry_for_result(&result, &tiered);
+
+        assert!(fast_t.is_some(), "fast tier was invoked → fast telemetry must be Some");
+        let final_ = final_t.expect("final tier was invoked → final telemetry must be Some");
+        assert!(final_.subprocess_started_at.is_some(), "final tier started_at must be recorded");
+    }
+
+    /// T013 AC: tier-specific models are correctly routed to per-tier recorders.
+    ///
+    /// `RecordingDryAgent` must route `judge()` calls to the correct per-tier
+    /// recorder. This test verifies that fast-tier calls increment the fast
+    /// recorder and final-tier calls increment the final recorder independently.
+    #[test]
+    fn test_tiered_recording_tier_specific_model_is_recorded_per_tier() {
+        let (agent, tiered) = RecordingDryAgent::new(ViolationAgent { rationale: "duplicated" });
+        let changed =
+            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
+        let candidate =
+            CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
+
+        // Two fast-tier violations.
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
+        // One final-tier violation.
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Final).unwrap();
+
+        assert_eq!(tiered.fast.findings_count(), 2, "fast recorder must count 2 violations");
+        assert_eq!(tiered.final_.findings_count(), 1, "final recorder must count 1 violation");
+        assert!(tiered.fast.started_at().is_some(), "fast tier must record started_at");
+        assert!(tiered.final_.started_at().is_some(), "final tier must record started_at");
     }
 
     /// Fragments whose path cannot be stripped (not under repo_root) are kept

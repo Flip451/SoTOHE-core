@@ -5489,6 +5489,291 @@
       "base_commit": "e46d01f7812de01d8b3af2f3cf70cded8134274a",
       "rationale": "The changed fragment only repeats a small amount of documentation from the service trait and immediately points readers to the trait as the authoritative algorithm description. It does not duplicate business logic, state, or independent implementation paths, so this is not a meaningful DRY violation.",
       "recorded_at": "2026-06-14T17:15:09Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "152f0460f047e79549475e4bf0bf4a45694f016dcb3c04127306c6e1873e57eb",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "87b2ca3cc54a534289780136e964500104c186aaed6b93d23315e5e9e358f397",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9493014216423036,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "These fragments are only two trait implementation headers for different concrete types, `ViolationTieredAgent` and `ViolationAgent`. The repeated `impl DryCheckAgentPort for ...` syntax is required Rust structure, and no duplicated behavior or reusable logic is shown in the provided fragments.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "2a8811764744950e825a80d3080bd1f599c86617e65673fffa673e978dec6409",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "3b54784bf2db37939c5a69bf9e33cf9a846219bed56d478000beec5cd541ff40",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9598255753517152,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two fragments share the same test fixture setup, but they exercise different behaviors: one verifies a fast-only run and the other verifies escalation to final. The repeated initialization is small, localized, and typical in tests; it does not indicate harmful copy-paste duplication that would warrant a DRY finding.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "2a8811764744950e825a80d3080bd1f599c86617e65673fffa673e978dec6409",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "a0fcf440211dd278e765862d6f6c40a8de1e145c89fa18d7fd6040395f0cbc75",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8625434637069702,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two fragments share a small amount of test setup, but they exercise different behaviors and make different assertions: one verifies tier-specific model routing and counts, the other verifies escalation records both fast and final telemetry. This is ordinary test fixture reuse, not harmful duplication, and the repeated code is limited to a few lines of setup.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "2a8811764744950e825a80d3080bd1f599c86617e65673fffa673e978dec6409",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "a64060a9cae3c9e29a16a4eb7041b643dbcf2ff13b10e3169c9f9e46121536fe",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8744589686393738,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two fragments share only small test setup boilerplate (`RecordingDryAgent::new` and `CodeFragment::new`), but they exercise different behaviors and assert different outcomes: one validates violation counting before persistence, the other validates fast/final tier escalation telemetry. The overlap is incidental and not enough to make the code DRY-violating.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "3b54784bf2db37939c5a69bf9e33cf9a846219bed56d478000beec5cd541ff40",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "a64060a9cae3c9e29a16a4eb7041b643dbcf2ff13b10e3169c9f9e46121536fe",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.851557195186615,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two fragments share only generic test setup patterns: constructing `CodeFragment`s, invoking `judge`, and asserting on tier-specific outcomes. They exercise different behaviors with different agents and different assertions, so this is normal test-level duplication rather than a meaningful DRY violation.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "426fe90bf524279abd9a8d1132f00f98f8ef5438b084dc3f254d669e8fbb8b73",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "a2cf7a00257fe049300f86cd0590c16ed271997a0042377f1e30e8d409652494",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared test double or helper such as `ViolationJudge { rationale: &'static str }` or `fn violation_judgment(rationale: &str) -> DryCheckAgentJudgment`, then let each test supply only the rationale text it needs."
+        }
+      },
+      "similarity_score": 0.8611599206924438,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "Both fragments implement the same test `judge` method with identical signature and control flow, constructing the same `DryCheckAgentJudgment::Violation` and same test finding. The only meaningful difference is the rationale string, which is configuration data rather than distinct behavior.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "42a76b67861cf9703fcec15a1c60b12efcb01abec4d4a216fa5b9b079e86bd8c",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "87b2ca3cc54a534289780136e964500104c186aaed6b93d23315e5e9e358f397",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8729552626609802,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "These fragments are only matching impl declarations for the same trait on two different types. By themselves they do not show duplicated logic, and the surrounding implementations serve different behaviors, so this is not a DRY violation.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "42a76b67861cf9703fcec15a1c60b12efcb01abec4d4a216fa5b9b079e86bd8c",
+      "high_path": "libs/usecase/src/dry_check/interactor.rs",
+      "high_hash": "0e31f426dc329715594508924bc54704d09e603b818c8d716751bfeb795f6137",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8967554569244385,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "These are implementations of the same trait for different types in different layers: `TieredDryAgent` is production code in `apps/cli-composition`, while `MockDryCheckAgentPort` is a test double generated inside the usecase test module. The shared trait name does not indicate duplicated business logic, and the mock exists specifically to satisfy tests, so this is not a DRY violation.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "4adb7311c6f8cc37898f39f910178aa69ee8e773d785a715d0026409b88b0317",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "896e92d7c159e5bbb84033c4acfaab8a1e35afa611d935be96d2e9262a137089",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8836233615875244,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two tests share setup and assertion shape, but they exercise different error variants and different expected counts. This is normal test-level repetition, and the duplicated scaffolding is small enough that extracting a helper would likely reduce readability more than it would improve maintainability.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "7aabe8f31f3117eeed2967b53f7867723646e1ba0ee6a73efd968adc49bb84ef",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "896e92d7c159e5bbb84033c4acfaab8a1e35afa611d935be96d2e9262a137089",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9121118783950806,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two fragments share a common test shape, but they are exercising different behavior and different setup paths: one verifies telemetry emission after a fast-agent success, while the other verifies that no telemetry is emitted before the agent runs. The overlap is small and expected in tests, so this is not meaningful duplication.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "a0fcf440211dd278e765862d6f6c40a8de1e145c89fa18d7fd6040395f0cbc75",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "a64060a9cae3c9e29a16a4eb7041b643dbcf2ff13b10e3169c9f9e46121536fe",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8886309266090393,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two fragments share a small amount of test setup (constructing `CodeFragment`s and invoking `judge` on a recording agent), but they exercise different behaviors and assert different outcomes. The existing test verifies per-tier model recording and counts across multiple judgments; the changed test verifies that a violation is recorded before persistence and that only the final tier recorder advances. This is normal test overlap, not a meaningful DRY violation.",
+      "recorded_at": "2026-06-14T17:55:05Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "2749aabb8e5863059c9894cab699481e37991b56e2fd19135829036749bc6da3",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "2a8811764744950e825a80d3080bd1f599c86617e65673fffa673e978dec6409",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.860509991645813,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The overlap is limited to standard test fixture setup and a small amount of repeated invocation boilerplate. The tests exercise different behaviors: one verifies escalation emits both fast and final telemetry, while the other verifies tier-specific model routing and per-tier counts. This is normal, intentional duplication in tests and does not indicate a meaningful DRY problem.",
+      "recorded_at": "2026-06-14T17:59:11Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "2749aabb8e5863059c9894cab699481e37991b56e2fd19135829036749bc6da3",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "8f129f6c679ade44dd7a3281769594c01a6a08f84d3998362bec4eb4f9206283",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8829328417778015,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The overlap is limited to standard test fixture setup: both tests create the same `RecordingDryAgent` wrapper and the same two `CodeFragment` values. The exercised behavior and assertions are different, so this does not look like substantive duplicate logic that would justify a DRY finding.",
+      "recorded_at": "2026-06-14T17:59:11Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "2a8811764744950e825a80d3080bd1f599c86617e65673fffa673e978dec6409",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "8f129f6c679ade44dd7a3281769594c01a6a08f84d3998362bec4eb4f9206283",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8745003342628479,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The new test reuses the same general test harness pattern, but it is not duplicating the candidate fragment’s logic in a way that creates a DRY problem. The two tests verify different behaviors: the candidate checks fast/final telemetry routing during escalation, while the changed fragment checks that a violation decision is recorded only in the final tier. The shared setup is small and conventional for tests, so this is acceptable repetition rather than redundant implementation logic.",
+      "recorded_at": "2026-06-14T17:59:11Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "3b54784bf2db37939c5a69bf9e33cf9a846219bed56d478000beec5cd541ff40",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "8f129f6c679ade44dd7a3281769594c01a6a08f84d3998362bec4eb4f9206283",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8530408143997192,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two fragments reuse only generic test setup (constructing a `RecordingDryAgent` and two `CodeFragment`s). Their assertions and exercised behavior are different: one verifies violation judgment persistence/telemetry, the other verifies fast-tier round telemetry. This is ordinary test boilerplate, not harmful DRY duplication.",
+      "recorded_at": "2026-06-14T17:59:11Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "7c61ebdcfceee539cda28a90afd8f9ea39909b01950c4a0a70d62ee31b3601c9",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "cfa3cb4ade4bd6d8dcb8c245db5cded739e835acf36fcc7846c01d38b8f14571",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8634235858917236,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "These fragments are not duplicating the same logic. The changed `judge` method wraps telemetry recording around a real delegated judgment call, while the candidate fragment is a test stub that ignores inputs and returns a fixed `NotAViolation` result. Any superficial similarity in the method signature or tier dispatch is incidental and not a DRY violation.",
+      "recorded_at": "2026-06-14T17:59:11Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "888c5180e026613bc82f27e35a95fbe3393ad2f23ee31bb247f034beb24d68c1",
+      "high_path": "libs/usecase/src/dry_check/services.rs",
+      "high_hash": "adf46fc06fb3714dbb4719e6f412ae312ae1ee391560181e09672e6e1058ab8a",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8617689609527588,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two fragments are at different abstraction levels and serve different purposes: `apps/cli-composition/src/dry.rs` wires CLI inputs and shared helpers for command execution, while `libs/usecase/src/dry_check/services.rs` only defines a service trait and associated documentation. There is no meaningful repeated implementation logic, control flow, or data-shaping that would constitute duplicated responsibility between them.",
+      "recorded_at": "2026-06-14T19:08:19Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "low_hash": "1b31e934e9f5de155ad5d65964700878d5dabe976e006c62fdb53a1e6585b978",
+      "high_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "high_hash": "97ced0811c2fd4224a215a917043d6932e4f126d7b6e005033a0e7f678cdbb3d",
+      "changed_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8799898624420166,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "These are not duplicate implementations of the same behavior. `impl<A> RecordingDryAgent<A>` is an inherent impl block that can hold constructors or helper methods, while `impl<A: DryCheckAgentPort> DryCheckAgentPort for RecordingDryAgent<A>` is a trait implementation that adapts the wrapper to the port. They serve different Rust language roles and do not indicate repeated logic by themselves.",
+      "recorded_at": "2026-06-14T19:08:19Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "low_hash": "4b0517de452a6e04e800bbc829f8ded294db00821d6001f3c5f1a607aaecf5b6",
+      "high_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "high_hash": "eea5fadb53753ce3d26073cda620d3c9750037bcc827cddd9a419500953520d6",
+      "changed_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a small helper such as `fn dry_duration_ms(duration_ms: Option<u64>, started_at: Option<Instant>, fallback_start: Instant) -> u64` and call it with `telemetry.round_started_at` or `telemetry.subprocess_started_at` from the two emitters. Keep the event construction separate because the event variants and fields are meaningfully different."
+        }
+      },
+      "similarity_score": 0.8664146065711975,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The fragments duplicate the same duration-resolution rule: prefer telemetry.duration_ms, otherwise compute elapsed milliseconds from a tier-specific start Instant with fallback_start and saturate conversion failures to u64::MAX. The event payloads differ, but this duration policy is shared behavior in the same module and already documented as intentionally identical, so changes to that policy would need to be kept in sync manually.",
+      "recorded_at": "2026-06-14T19:08:19Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "low_hash": "eea5fadb53753ce3d26073cda620d3c9750037bcc827cddd9a419500953520d6",
+      "high_path": "apps/cli-composition/src/telemetry_wiring.rs",
+      "high_hash": "0c08da5dadc0930195adc8ad84e6ca5348b84bbcfcd4b82e042bc10ea7b5b3b2",
+      "changed_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared helper that emits ExternalSubprocess from an already-computed duration_ms, retry_count, and verdict_parse_failed, for example emit_external_subprocess_with_duration_ms(writer, track_id, command, duration_ms, retry_count, verdict_parse_failed). Keep emit_external_subprocess as a thin wrapper that computes duration from start, and have emit_dry_tier_external_subprocess compute its telemetry-specific duration then call the shared helper with retry_count 0."
+        }
+      },
+      "similarity_score": 0.8551970720291138,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "Both fragments encode the same ExternalSubprocess telemetry emission knowledge: duration conversion to u64 with saturation, schema_version, track_id/command cloning, verdict_parse_failed, timestamp generation, fire-and-forget writer behavior, and the TelemetryEvent::ExternalSubprocess field layout. The changed fragment only varies how duration_ms is obtained and fixes retry_count to 0, so the duplicated event construction creates two places that must stay synchronized if the telemetry schema or suppression policy changes.",
+      "recorded_at": "2026-06-14T19:08:19Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "low_hash": "4614fa0ac9c18b2164d5a8d4c260f87a64441cde691fc683e9e5e59c6842e251",
+      "high_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "high_hash": "c52dd37d00651a86b210a1dfa8fcbef5bae1d75865d8611389111b306f04fc8b",
+      "changed_path": "apps/cli-composition/src/dry/tier_telemetry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.853939950466156,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e87f1bcffc6783bddabff495dfc1b64186f84921",
+      "rationale": "The two functions share a small, intentional shape, but they emit different telemetry event variants with different payload fields. The common behavior that matters for DRY has already been extracted into `dry_duration_ms`, and the remaining repetition is just straightforward event construction and write suppression, which is normal and not a meaningful DRY violation.",
+      "recorded_at": "2026-06-14T19:10:33Z"
     }
   ]
 }
