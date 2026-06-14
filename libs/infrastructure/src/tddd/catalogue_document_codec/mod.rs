@@ -2513,4 +2513,279 @@ mod tests {
             "empty Repository.aggregate must be rejected with InvalidEntry, got: {result:?}"
         );
     }
+
+    // -----------------------------------------------------------------------
+    // ADR 2026-05-25-0000: DataRole payload variant round-trip tests (T011)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_value_object_with_empty_invariants_round_trips() {
+        // ValueObject with no invariants: invariants field is omitted (skip_serializing_if).
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Money": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "plain", "fields": [] } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        assert_eq!(entry.role, DataRole::value_object());
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_value_object_with_invariant_decl_round_trips() {
+        // ValueObject with one non-empty invariants payload must survive a round-trip.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Email": {
+      "action": "add",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            { "name": "email_is_valid", "predicate": { "SelfMethod": "is_email_valid" } }
+          ]
+        }
+      },
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::ValueObject { invariants } => {
+                assert_eq!(invariants.len(), 1);
+                assert_eq!(invariants[0].name.as_str(), "email_is_valid");
+            }
+            other => panic!("expected ValueObject role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_entity_role_with_identity_and_invariants_round_trips() {
+        // Entity requires identity; invariants are optional.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "User": {
+      "action": "add",
+      "role": {
+        "Entity": {
+          "identity": { "method_name": "id" },
+          "invariants": [
+            { "name": "email_is_valid", "predicate": { "SelfMethod": "validate_email" } }
+          ]
+        }
+      },
+      "kind": { "kind": "struct", "shape": { "kind": "plain", "fields": [] } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::Entity { identity, invariants } => {
+                assert_eq!(identity.method_name().as_str(), "id");
+                assert_eq!(invariants.len(), 1);
+                assert_eq!(invariants[0].name.as_str(), "email_is_valid");
+            }
+            other => panic!("expected Entity role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_aggregate_root_role_with_all_payload_fields_round_trips() {
+        // AggregateRoot with all optional payload fields populated.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Order": {
+      "action": "add",
+      "role": {
+        "AggregateRoot": {
+          "identity": { "method_name": "order_id" },
+          "invariants": [
+            { "name": "total_is_positive", "predicate": { "SelfMethod": "is_total_positive" } }
+          ],
+          "exclusive_members": ["OrderLine"],
+          "shared_value_objects": ["Money"],
+          "emits": ["OrderPlaced"]
+        }
+      },
+      "kind": { "kind": "struct", "shape": { "kind": "plain", "fields": [] } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::AggregateRoot {
+                identity,
+                invariants,
+                exclusive_members,
+                shared_value_objects,
+                emits,
+            } => {
+                assert_eq!(identity.method_name().as_str(), "order_id");
+                assert_eq!(invariants.len(), 1);
+                assert_eq!(exclusive_members.len(), 1);
+                assert_eq!(exclusive_members[0].as_str(), "OrderLine");
+                assert_eq!(shared_value_objects.len(), 1);
+                assert_eq!(shared_value_objects[0].as_str(), "Money");
+                assert_eq!(emits.len(), 1);
+                assert_eq!(emits[0].as_str(), "OrderPlaced");
+            }
+            other => panic!("expected AggregateRoot role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_domain_service_role_with_emits_round_trips() {
+        // DomainService.emits is optional; when provided it must survive round-trip.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "PricingService": {
+      "action": "add",
+      "role": { "DomainService": { "emits": ["PriceCalculated"] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::DomainService { emits } => {
+                assert_eq!(emits.len(), 1);
+                assert_eq!(emits[0].as_str(), "PriceCalculated");
+            }
+            other => panic!("expected DomainService role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_use_case_role_with_handles_round_trips() {
+        // UseCase.handles is optional; when provided it must survive round-trip.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "RegisterUserUseCase": {
+      "action": "add",
+      "role": { "UseCase": { "handles": ["RegisterUserCommand"] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::UseCase { handles } => {
+                assert_eq!(handles.len(), 1);
+                assert_eq!(handles[0].as_str(), "RegisterUserCommand");
+            }
+            other => panic!("expected UseCase role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_repository_trait_role_with_missing_aggregate_field_returns_error() {
+        // D10: Repository requires the `aggregate` field. Omitting it must fail decode.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "MissingAggregateRepo": {
+      "action": "add",
+      "role": { "Repository": {} },
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            result.is_err(),
+            "Repository role with missing aggregate field must fail decode, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_data_role_unknown_variant_returns_error() {
+        // DataRoleDto uses deny_unknown_fields; an unknown role key must be rejected.
+        let json = r#"{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Foo": {
+      "action": "add",
+      "role": { "UnknownRole": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            result.is_err(),
+            "unknown DataRole variant must be rejected by deny_unknown_fields, got: {result:?}"
+        );
+    }
 }

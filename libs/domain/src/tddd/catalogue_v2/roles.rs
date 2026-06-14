@@ -767,6 +767,31 @@ mod tests {
     }
 
     #[test]
+    fn test_non_empty_vec_new_with_empty_rest_returns_single_element_slice() {
+        let first = TypeRef::new("OrderPlaced").unwrap();
+
+        let values = NonEmptyVec::new(first.clone(), vec![]);
+
+        assert_eq!(values.as_slice(), std::slice::from_ref(&first));
+        assert_eq!(values.first(), Some(&first));
+    }
+
+    #[test]
+    fn test_non_empty_vec_new_with_two_rest_elements_returns_three_element_slice() {
+        let first = TypeRef::new("OrderPlaced").unwrap();
+        let second = TypeRef::new("OrderShipped").unwrap();
+        let third = TypeRef::new("OrderDelivered").unwrap();
+
+        let values = NonEmptyVec::new(first.clone(), vec![second.clone(), third.clone()]);
+
+        let slice = values.as_slice();
+        assert_eq!(slice.len(), 3);
+        assert_eq!(slice.first(), Some(&first));
+        assert_eq!(slice.get(1), Some(&second));
+        assert_eq!(slice.get(2), Some(&third));
+    }
+
+    #[test]
     fn test_non_empty_vec_try_new_with_values_returns_values() {
         let event = TypeRef::new("UserRegistered").unwrap();
 
@@ -781,6 +806,74 @@ mod tests {
         let result = NonEmptyVec::<TypeRef>::try_new(vec![]);
 
         assert!(matches!(result, Err(ConstructionError::EmptyCollection)));
+    }
+
+    // -----------------------------------------------------------------------
+    // DataRole payload variant Clone and PartialEq
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_data_role_payload_variants_clone_returns_equal_value() {
+        let event_ref = TypeRef::new("OrderPlaced").unwrap();
+        let roles = [
+            DataRole::ValueObject { invariants: vec![] },
+            DataRole::entity().unwrap(),
+            DataRole::aggregate_root().unwrap(),
+            DataRole::DomainService { emits: vec![] },
+            DataRole::UseCase { handles: vec![] },
+            DataRole::EventPolicy { reacts_to: NonEmptyVec::new(event_ref, vec![]) },
+        ];
+        for role in roles {
+            let cloned = role.clone();
+            assert_eq!(cloned, role, "Clone must produce an equal value for {role:?}");
+        }
+    }
+
+    #[test]
+    fn test_data_role_partial_eq_same_payload_variant_returns_true() {
+        let a = DataRole::ValueObject { invariants: vec![] };
+        let b = DataRole::ValueObject { invariants: vec![] };
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn test_data_role_partial_eq_different_payload_variants_returns_false() {
+        let a = DataRole::ValueObject { invariants: vec![] };
+        let b = DataRole::DomainService { emits: vec![] };
+        assert_ne!(a, b);
+    }
+
+    // -----------------------------------------------------------------------
+    // ContractRole payload variant Clone and PartialEq
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_contract_role_payload_variants_clone_returns_equal_value() {
+        let aggregate = TypeRef::new("Order").unwrap();
+        let roles = [
+            ContractRole::SpecificationPort,
+            ContractRole::ApplicationService,
+            ContractRole::SecondaryPort,
+            ContractRole::Repository { aggregate },
+        ];
+        for role in roles {
+            let cloned = role.clone();
+            assert_eq!(cloned, role, "Clone must produce an equal value for {role:?}");
+        }
+    }
+
+    #[test]
+    fn test_contract_role_partial_eq_same_payload_returns_true() {
+        let a = ContractRole::Repository { aggregate: TypeRef::new("User").unwrap() };
+        let b = ContractRole::Repository { aggregate: TypeRef::new("User").unwrap() };
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn test_contract_role_partial_eq_different_aggregates_returns_false() {
+        let a = ContractRole::Repository { aggregate: TypeRef::new("User").unwrap() };
+        let b = ContractRole::Repository { aggregate: TypeRef::new("Order").unwrap() };
+        assert_ne!(a, b);
     }
 
     // -----------------------------------------------------------------------

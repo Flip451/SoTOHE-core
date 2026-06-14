@@ -60,7 +60,7 @@
     {
       "id": "T011",
       "description": "Stage 1 — unit tests: add TDD-first tests covering the Stage 1 schema-migration behavioral contracts. In domain: tests for `NonEmptyVec` (non-empty construction, `as_slice`), `InvariantName` (non-empty validation via `Identifier`), `IdentityAccessor` (round-trip), `DataRole` / `ContractRole` Clone / PartialEq / Display / FromStr with payload variants. In infrastructure (codec): round-trip tests for DataRole variants with all new payload fields, empty NonEmptyVec decode rejection, Repository decode with mandatory aggregate. Linter framework and linter-rule boundary tests are intentionally deferred to Stage 3 T016. Follows TDD (tests written before / alongside implementation in T001-T006). Depends on T001-T006 for the final Stage 1 compilation gate (T010 is skipped).",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T012",
