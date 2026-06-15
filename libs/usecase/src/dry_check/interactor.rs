@@ -167,6 +167,12 @@ impl DryCheckService for DryCheckInteractor {
         let mut first_error: Option<DryCheckCycleError> = None;
         let mut processed_refs: BTreeSet<FragmentRef> = BTreeSet::new();
 
+        // Track every DryCheckPairKey that is "current" in this run: pairs that
+        // are above-threshold candidates (whether newly judged or already in the
+        // verified-set). The gate uses this to distinguish stale historical
+        // Violation records (candidate side fixed/removed) from active ones.
+        let mut processed_pair_keys: BTreeSet<DryCheckPairKey> = BTreeSet::new();
+
         // Map from pair_key → (diff_fragment index, candidate_fragment, similarity_score).
         // Using BTreeMap so we iterate in DryCheckPairKey order for Phase 2.
         // The diff-fragment index lets us recover the changed_path in Phase 2
@@ -225,6 +231,13 @@ impl DryCheckService for DryCheckInteractor {
                 };
 
             for candidate_pair in candidate_pairs {
+                // Record this pair_key as current (above-threshold in this run),
+                // regardless of whether it is already verified. This allows the
+                // gate to distinguish historical Violations whose candidate side
+                // has since been fixed (pair_key no longer produced) from active
+                // ones that are still above-threshold.
+                processed_pair_keys.insert(candidate_pair.pair_key.clone());
+
                 // Skip already-verified pairs (CN-07 identifier matching).
                 if verified_set.contains_key(&candidate_pair.pair_key) {
                     continue;
@@ -482,12 +495,17 @@ impl DryCheckService for DryCheckInteractor {
         // as uncovered → Blocked. Without this, a partial write where some pairs failed
         // before `append_record` could publish `processed_refs` and let the gate report
         // Approved even though some current pairs have no verdict on record.
-        let coverage_refs = if calibration_error.is_some() || first_error.is_some() {
-            std::collections::BTreeSet::new()
-        } else {
-            processed_refs
-        };
-        let coverage_record = DryCheckCoverageRecord::new(coverage_refs);
+        //
+        // processed_pair_keys follows the same fail-closed policy: on any error we
+        // write an empty set, so the gate treats all historical Violation records as
+        // potentially active (cannot prove the candidate was re-checked).
+        let (coverage_refs, coverage_pair_keys) =
+            if calibration_error.is_some() || first_error.is_some() {
+                (std::collections::BTreeSet::new(), std::collections::BTreeSet::new())
+            } else {
+                (processed_refs, processed_pair_keys)
+            };
+        let coverage_record = DryCheckCoverageRecord::new(coverage_refs, coverage_pair_keys);
         let coverage_write_error =
             self.coverage.write_coverage(&self.track_id, coverage_record).err();
 
@@ -1479,6 +1497,60 @@ mod tests {
         assert_eq!(coverage.write_call_count(), 1);
         let recorded = coverage.last_written().expect("coverage written");
         assert!(recorded.fragment_refs().is_empty());
+    }
+
+    #[test]
+    fn test_run_dry_check_writes_coverage_record_with_processed_pair_keys() {
+        // When there is an above-threshold candidate pair, the coverage manifest
+        // must include the pair_key in `processed_pair_keys` so the gate can
+        // distinguish active Violations from stale ones.
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+        let cand_content = "fn b() {}";
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        index
+            .expect_search()
+            .returning(move |_, _| Ok(vec![make_similar_fragment("src/b.rs", cand_content, 0.9)]));
+
+        // Calibration probes and the single production pair all use NotAViolation.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("not a violation").unwrap(),
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let coverage = Arc::new(StubCoverage::new());
+        let interactor = make_interactor_with_coverage(
+            embed,
+            index,
+            agent,
+            Arc::clone(&writer),
+            vec![],
+            Arc::clone(&coverage),
+        );
+
+        interactor
+            .run_dry_check(vec![], vec![diff_frag.clone()], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        let recorded = coverage.last_written().expect("coverage written");
+
+        // The diff-fragment FragmentRef must appear in fragment_refs.
+        let expected_diff_ref = fragment_ref_of(&diff_frag).unwrap();
+        assert!(recorded.covers(&expected_diff_ref), "diff fragment ref must be covered");
+
+        // The pair_key (diff, candidate) must appear in processed_pair_keys.
+        let cand_frag = make_fragment("src/b.rs", cand_content);
+        let expected_diff_ref2 = fragment_ref_of(&diff_frag).unwrap();
+        let expected_cand_ref = fragment_ref_of(&cand_frag).unwrap();
+        let expected_pair = DryCheckPairKey::new(expected_diff_ref2, expected_cand_ref).unwrap();
+        assert!(
+            recorded.contains_pair(&expected_pair),
+            "processed pair_key must appear in coverage processed_pair_keys"
+        );
     }
 
     #[test]

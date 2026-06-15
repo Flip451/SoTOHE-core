@@ -137,6 +137,38 @@
         "kind": "pass",
         "citation": "各ゲートの公開インターフェース（exit code / 読み出し API）だけを合成し、dry-check.json / review.json / ref-verify cache の内部構造には依存しない"
       }
+    },
+    {
+      "claim_hash": "5ea0daf3bc7dd837e12d6b831ec01ddbaf70fae48a1fed99f2eae9f9048fe740",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "5ea0daf3bc7dd837e12d6b831ec01ddbaf70fae48a1fed99f2eae9f9048fe740",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。"
+      }
+    },
+    {
+      "claim_hash": "5ea0daf3bc7dd837e12d6b831ec01ddbaf70fae48a1fed99f2eae9f9048fe740",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "5ea0daf3bc7dd837e12d6b831ec01ddbaf70fae48a1fed99f2eae9f9048fe740",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
     }
   ]
 }

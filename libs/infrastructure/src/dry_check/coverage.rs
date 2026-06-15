@@ -4,7 +4,9 @@ use std::collections::BTreeSet;
 use std::path::PathBuf;
 
 use domain::TrackId;
-use domain::dry_check::{DryCheckCoverageRecord, FragmentContentHash, FragmentRef};
+use domain::dry_check::{
+    DryCheckCoverageRecord, DryCheckPairKey, FragmentContentHash, FragmentRef,
+};
 use domain::review_v2::FilePath;
 use usecase::dry_check::{DryCheckCoveragePort, DryCheckCycleError};
 
@@ -14,22 +16,66 @@ use crate::track::symlink_guard::reject_symlinks_below;
 // ── On-disk schema (private serde DTO) ────────────────────────────────────────
 
 /// Schema version written by this implementation.
-const CURRENT_SCHEMA_VERSION: u32 = 1;
+///
+/// Schema v2 adds the `processed_pair_keys` array alongside the existing
+/// `fragment_refs` array. Files written with schema_version 1 (which lack
+/// `processed_pair_keys`) are rejected as unsupported: an empty pair-key set
+/// would cause the gate to incorrectly skip historical violation filtering,
+/// so we fail-closed and require a fresh `dry write` to regenerate in v2 format.
+const CURRENT_SCHEMA_VERSION: u32 = 2;
 
-/// On-disk envelope: `{ "schema_version": 1, "fragment_refs": [{ "path": "...", "content_hash": "..." }] }`.
+/// On-disk envelope (schema v2):
+/// ```json
+/// {
+///   "schema_version": 2,
+///   "fragment_refs": [{ "path": "...", "content_hash": "..." }],
+///   "processed_pair_keys": [{ "low": { "path": "...", "content_hash": "..." }, "high": { ... } }]
+/// }
+/// ```
 ///
 /// Serde lives only here per the hexagonal principle — the domain
 /// `DryCheckCoverageRecord` stays serde-free.
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
-struct CoverageManifestV1 {
+struct CoverageManifestV2 {
     schema_version: u32,
     fragment_refs: Vec<FragmentRefDto>,
+    processed_pair_keys: Vec<PairKeyDto>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 struct FragmentRefDto {
     path: String,
     content_hash: String,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct PairKeyDto {
+    low: FragmentRefDto,
+    high: FragmentRefDto,
+}
+
+// ── DTO helpers ───────────────────────────────────────────────────────────────
+
+/// Convert a [`FragmentRef`] to its on-disk DTO representation.
+fn fragment_ref_to_dto(fr: &FragmentRef) -> FragmentRefDto {
+    FragmentRefDto {
+        path: fr.path().as_str().to_owned(),
+        content_hash: fr.content_hash().as_str().to_owned(),
+    }
+}
+
+/// Parse a [`FragmentRefDto`] into a domain [`FragmentRef`], returning a
+/// [`DryCheckCycleError::CoveragePort`] on invalid field values.
+fn parse_fragment_ref_dto(
+    dto: FragmentRefDto,
+    path_str: &str,
+) -> Result<FragmentRef, DryCheckCycleError> {
+    let path = FilePath::new(&dto.path)
+        .map_err(|e| DryCheckCycleError::CoveragePort(format!("{path_str}: invalid path: {e}")))?;
+    let content_hash = FragmentContentHash::new(&dto.content_hash).map_err(|e| {
+        DryCheckCycleError::CoveragePort(format!("{path_str}: invalid content_hash: {e}"))
+    })?;
+    Ok(FragmentRef::new(path, content_hash))
 }
 
 // ── FsDryCheckCoverageAdapter ─────────────────────────────────────────────────
@@ -90,28 +136,41 @@ impl DryCheckCoveragePort for FsDryCheckCoverageAdapter {
             return Ok(None);
         }
 
-        let manifest: CoverageManifestV1 = serde_json::from_str(&content)
+        let manifest: CoverageManifestV2 = serde_json::from_str(&content)
             .map_err(|e| DryCheckCycleError::CoveragePort(format!("parse {path_str}: {e}")))?;
 
         if manifest.schema_version != CURRENT_SCHEMA_VERSION {
+            // schema_version 1 files (pre-v2 format) lack processed_pair_keys.
+            // Treating them as having an empty pair-key set would cause the gate
+            // to skip all historical violation filtering → over-block or
+            // incorrect Approved. Fail-closed: reject and require a fresh
+            // `dry write` to regenerate a v2 manifest.
             return Err(DryCheckCycleError::CoveragePort(format!(
-                "{path_str}: unsupported schema_version {}",
-                manifest.schema_version
+                "{path_str}: unsupported schema_version {} (expected {}); \
+                 run `dry write` to regenerate the coverage manifest in the current format",
+                manifest.schema_version, CURRENT_SCHEMA_VERSION
             )));
         }
 
         let mut fragment_refs = BTreeSet::new();
         for dto in manifest.fragment_refs {
-            let path = FilePath::new(&dto.path).map_err(|e| {
-                DryCheckCycleError::CoveragePort(format!("{path_str}: invalid path: {e}"))
-            })?;
-            let content_hash = FragmentContentHash::new(&dto.content_hash).map_err(|e| {
-                DryCheckCycleError::CoveragePort(format!("{path_str}: invalid content_hash: {e}"))
-            })?;
-            fragment_refs.insert(FragmentRef::new(path, content_hash));
+            let fr = parse_fragment_ref_dto(dto, &path_str)?;
+            fragment_refs.insert(fr);
         }
 
-        Ok(Some(DryCheckCoverageRecord::new(fragment_refs)))
+        let mut processed_pair_keys = BTreeSet::new();
+        for dto in manifest.processed_pair_keys {
+            let low = parse_fragment_ref_dto(dto.low, &path_str)?;
+            let high = parse_fragment_ref_dto(dto.high, &path_str)?;
+            let pair_key = DryCheckPairKey::new(low, high).map_err(|e| {
+                DryCheckCycleError::CoveragePort(format!(
+                    "{path_str}: invalid pair key in processed_pair_keys: {e}"
+                ))
+            })?;
+            processed_pair_keys.insert(pair_key);
+        }
+
+        Ok(Some(DryCheckCoverageRecord::new(fragment_refs, processed_pair_keys)))
     }
 
     fn write_coverage(
@@ -123,14 +182,15 @@ impl DryCheckCoveragePort for FsDryCheckCoverageAdapter {
 
         self.reject_symlinks(&path_str)?;
 
-        let manifest = CoverageManifestV1 {
+        let manifest = CoverageManifestV2 {
             schema_version: CURRENT_SCHEMA_VERSION,
-            fragment_refs: record
-                .fragment_refs()
+            fragment_refs: record.fragment_refs().iter().map(fragment_ref_to_dto).collect(),
+            processed_pair_keys: record
+                .processed_pair_keys()
                 .iter()
-                .map(|fr| FragmentRefDto {
-                    path: fr.path().as_str().to_owned(),
-                    content_hash: fr.content_hash().as_str().to_owned(),
+                .map(|pk| PairKeyDto {
+                    low: fragment_ref_to_dto(pk.low()),
+                    high: fragment_ref_to_dto(pk.high()),
                 })
                 .collect(),
         };
@@ -182,6 +242,12 @@ mod tests {
         assert!(result.is_none());
     }
 
+    fn make_pair_key(path_a: &str, hash_a: char, path_b: &str, hash_b: char) -> DryCheckPairKey {
+        let a = make_fragment_ref(path_a, hash_a);
+        let b = make_fragment_ref(path_b, hash_b);
+        DryCheckPairKey::new(a, b).unwrap()
+    }
+
     #[test]
     fn test_write_then_read_round_trips_record() {
         let dir = tempfile::tempdir().unwrap();
@@ -192,7 +258,7 @@ mod tests {
         let mut refs = BTreeSet::new();
         refs.insert(a.clone());
         refs.insert(b.clone());
-        let record = DryCheckCoverageRecord::new(refs);
+        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new());
 
         adapter.write_coverage(&make_track_id(), record.clone()).unwrap();
 
@@ -201,11 +267,37 @@ mod tests {
     }
 
     #[test]
+    fn test_write_then_read_round_trips_record_with_pair_keys() {
+        // Schema v2: both fragment_refs and processed_pair_keys survive the round-trip.
+        let dir = tempfile::tempdir().unwrap();
+        let adapter = adapter_in_dir(&dir, "coverage.json");
+
+        let a = make_fragment_ref("src/a.rs", 'a');
+        let b = make_fragment_ref("src/b.rs", 'b');
+        let pair = make_pair_key("src/a.rs", 'a', "src/b.rs", 'b');
+
+        let mut refs = BTreeSet::new();
+        refs.insert(a.clone());
+        refs.insert(b.clone());
+        let mut pairs = BTreeSet::new();
+        pairs.insert(pair.clone());
+        let record = DryCheckCoverageRecord::new(refs, pairs);
+
+        adapter.write_coverage(&make_track_id(), record.clone()).unwrap();
+
+        let read = adapter.read_coverage(&make_track_id()).unwrap().unwrap();
+        assert_eq!(read, record);
+        assert!(read.covers(&a));
+        assert!(read.covers(&b));
+        assert!(read.contains_pair(&pair));
+    }
+
+    #[test]
     fn test_write_then_read_round_trips_empty_record() {
         let dir = tempfile::tempdir().unwrap();
         let adapter = adapter_in_dir(&dir, "coverage.json");
 
-        let record = DryCheckCoverageRecord::new(BTreeSet::new());
+        let record = DryCheckCoverageRecord::new(BTreeSet::new(), BTreeSet::new());
         adapter.write_coverage(&make_track_id(), record.clone()).unwrap();
 
         // A persisted empty-set coverage record serializes to a non-empty
@@ -226,8 +318,10 @@ mod tests {
         let path = blocker.join("coverage.json");
         let adapter = FsDryCheckCoverageAdapter::new(path, dir.path().to_owned());
 
-        let result =
-            adapter.write_coverage(&make_track_id(), DryCheckCoverageRecord::new(BTreeSet::new()));
+        let result = adapter.write_coverage(
+            &make_track_id(),
+            DryCheckCoverageRecord::new(BTreeSet::new(), BTreeSet::new()),
+        );
         assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
     }
 
@@ -235,7 +329,24 @@ mod tests {
     fn test_read_coverage_with_unsupported_schema_version_returns_coverage_port_error() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("coverage.json");
-        std::fs::write(&path, br#"{ "schema_version": 99, "fragment_refs": [] }"#).unwrap();
+        std::fs::write(
+            &path,
+            br#"{ "schema_version": 99, "fragment_refs": [], "processed_pair_keys": [] }"#,
+        )
+        .unwrap();
+        let adapter = FsDryCheckCoverageAdapter::new(path, dir.path().to_owned());
+
+        let result = adapter.read_coverage(&make_track_id());
+        assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
+    }
+
+    #[test]
+    fn test_read_coverage_with_schema_version_1_returns_coverage_port_error() {
+        // schema_version 1 files lack processed_pair_keys; the adapter must
+        // reject them (fail-closed) so the user is prompted to run `dry write`.
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("coverage.json");
+        std::fs::write(&path, br#"{ "schema_version": 1, "fragment_refs": [] }"#).unwrap();
         let adapter = FsDryCheckCoverageAdapter::new(path, dir.path().to_owned());
 
         let result = adapter.read_coverage(&make_track_id());
@@ -260,10 +371,11 @@ mod tests {
         std::fs::write(
             &path,
             br#"{
-  "schema_version": 1,
+  "schema_version": 2,
   "fragment_refs": [
     { "path": "../src/a.rs", "content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
-  ]
+  ],
+  "processed_pair_keys": []
 }"#,
         )
         .unwrap();
@@ -280,10 +392,11 @@ mod tests {
         std::fs::write(
             &path,
             br#"{
-  "schema_version": 1,
+  "schema_version": 2,
   "fragment_refs": [
     { "path": "src/a.rs", "content_hash": "not-a-sha256" }
-  ]
+  ],
+  "processed_pair_keys": []
 }"#,
         )
         .unwrap();
@@ -307,7 +420,7 @@ mod tests {
         refs.insert(a.clone());
         refs.insert(b.clone());
 
-        let record = DryCheckCoverageRecord::new(refs);
+        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new());
         adapter.write_coverage(&make_track_id(), record.clone()).unwrap();
 
         let read = adapter.read_coverage(&make_track_id()).unwrap().unwrap();
@@ -328,8 +441,10 @@ mod tests {
         let adapter =
             FsDryCheckCoverageAdapter::new(link.join("coverage.json"), dir.path().to_owned());
 
-        let result =
-            adapter.write_coverage(&make_track_id(), DryCheckCoverageRecord::new(BTreeSet::new()));
+        let result = adapter.write_coverage(
+            &make_track_id(),
+            DryCheckCoverageRecord::new(BTreeSet::new(), BTreeSet::new()),
+        );
         assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
     }
 }

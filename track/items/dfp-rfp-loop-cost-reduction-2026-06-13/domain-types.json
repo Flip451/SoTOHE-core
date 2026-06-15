@@ -117,14 +117,49 @@
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "fragment_refs", "ty": "std::collections::BTreeSet<FragmentRef>" }
+            { "name": "fragment_refs",       "ty": "std::collections::BTreeSet<FragmentRef>" },
+            { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" }
           ],
           "has_stripped_fields": false
         }
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "fragment_refs",       "ty": "std::collections::BTreeSet<FragmentRef>" },
+            { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" }
+          ],
+          "returns": "DryCheckCoverageRecord",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "covers",
+          "receiver": "&self",
+          "params": [ { "name": "fragment_ref", "ty": "&FragmentRef" } ],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "contains_pair",
+          "receiver": "&self",
+          "params": [ { "name": "pair_key", "ty": "&DryCheckPairKey" } ],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
       "module_path": "dry_check",
-      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run. If a current diff fragment's FragmentRef is absent from this set, `check-approved` returns Blocked (stale coverage), so the same content hash at a different path is not treated as covered. BTreeSet preserves deterministic serialization order (CN-05).",
+      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run (fragment_refs), plus the set of DryCheckPairKey values for all pairs that were considered current in that run (processed_pair_keys). If a current diff fragment's FragmentRef is absent from fragment_refs, `check-approved` returns Blocked (stale coverage). If a historical Violation record's pair_key is absent from processed_pair_keys, that record is treated as stale (candidate side fixed) and skipped by the gate. BTreeSet preserves deterministic serialization order (CN-05).",
       "spec_refs": [
         {
           "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",

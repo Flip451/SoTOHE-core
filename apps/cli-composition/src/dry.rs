@@ -3227,7 +3227,7 @@ exit 0
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(
             track_dir.join("dry-check-coverage.json"),
-            br#"{"schema_version":1,"fragment_refs":[]}"#,
+            br#"{"schema_version":2,"fragment_refs":[],"processed_pair_keys":[]}"#,
         )
         .unwrap();
         std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
@@ -3446,7 +3446,7 @@ exit 0
         let fragment_ref = FragmentRef::new(path, hash);
         let mut refs = BTreeSet::new();
         refs.insert(fragment_ref.clone());
-        let record = DryCheckCoverageRecord::new(refs);
+        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new());
         adapter.write_coverage(&track_id, record.clone()).unwrap();
 
         // After write, read must return the same record (write/read round-trip).

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-15T05:16:37Z",
-  "declaration_hash": "f9fba1d3101291a057ec559b9bf46717ae3d81cee3316973c80d56021dea7b65",
+  "generated_at": "2026-06-15T06:48:37Z",
+  "declaration_hash": "861cedc46991c7ea8ab59ccef5c7df208b8268242f02694e5450ee6f29c7c108",
   "signals": [
     {
       "type_name": "DryCheckCoverageRecord",

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f9fba1d3101291a057ec559b9bf46717ae3d81cee3316973c80d56021dea7b65",
+  "catalogue_declaration_hash": "861cedc46991c7ea8ab59ccef5c7df208b8268242f02694e5450ee6f29c7c108",
   "signals": [
     {
       "type_name": "DryCheckCoverageRecord",
       "signal": "blue",
-      "entry_hash": "4de28d89f1bed119acaf7d328609c739652f188885db270a321dd8e9f191c433"
+      "entry_hash": "5ea0daf3bc7dd837e12d6b831ec01ddbaf70fae48a1fed99f2eae9f9048fe740"
     },
     {
       "type_name": "FixpointStep",

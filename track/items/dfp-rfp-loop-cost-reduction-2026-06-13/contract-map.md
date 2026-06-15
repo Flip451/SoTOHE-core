@@ -30,6 +30,9 @@ subgraph domain["domain"]
   subgraph T36_domain_domain_DryCheckCoverageRecord["dry_check::DryCheckCoverageRecord"]
     direction TB
     T36_domain_domain_DryCheckCoverageRecord__self[DryCheckCoverageRecord]
+    T36_domain_domain_DryCheckCoverageRecord_new([new])
+    T36_domain_domain_DryCheckCoverageRecord_covers([covers])
+    T36_domain_domain_DryCheckCoverageRecord_contains_pair([contains_pair])
   end
   end
   subgraph domain_domain_module_track_phase["domain::track_phase"]
@@ -246,6 +249,7 @@ subgraph infrastructure["infrastructure"]
   end
   end
 end
+T36_domain_domain_DryCheckCoverageRecord_new --> T36_domain_domain_DryCheckCoverageRecord__self
 T26_domain_domain_FixpointStep_RunRfp --o|scopes| T28_domain_domain_ReviewScopeSet__self
 T28_domain_domain_ReviewScopeSet_try_new --> T33_domain_domain_ReviewScopeSetError__self
 T28_domain_domain_ReviewScopeSet_try_new --> T28_domain_domain_ReviewScopeSet__self
@@ -289,6 +293,9 @@ T44_infrastructure_infrastructure_DryCheckConfig_load --> T44_infrastructure_inf
 T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter_new --> T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter__self
 T45_infrastructure_infrastructure_CodexDryChecker__self -.impl.-> R33_usecase_usecase_DryCheckAgentPort__self
 T55_infrastructure_infrastructure_FsDryCheckCoverageAdapter__self -.impl.-> R36_usecase_usecase_DryCheckCoveragePort__self
+class T36_domain_domain_DryCheckCoverageRecord_new method_node
+class T36_domain_domain_DryCheckCoverageRecord_covers method_node
+class T36_domain_domain_DryCheckCoverageRecord_contains_pair method_node
 class T36_domain_domain_DryCheckCoverageRecord__self value_object
 class T26_domain_domain_FixpointStep_RunDfp variant_node
 class T26_domain_domain_FixpointStep_RunRfp variant_node

@@ -96,16 +96,29 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
         }
 
         // Count latest-violation records whose pair touches any current
-        // FragmentRef. (`covers` filters using the same coverage-record set
-        // we already proved is a superset of current_fragment_refs, but for
-        // the verdict step we strictly require touching the *current* refs
-        // — a Violation between two old fragments unrelated to the current
-        // diff does not block this run.)
+        // FragmentRef AND whose pair_key was re-examined in the latest `dry write`
+        // run (i.e., it is present in the coverage manifest's processed_pair_keys).
+        //
+        // `touches_current` ensures we do not block on Violations between old
+        // fragments unrelated to the current diff.
+        //
+        // `coverage_record.contains_pair` filters out stale historical Violations
+        // whose candidate side was fixed or removed: when the candidate side is
+        // fixed, the `DryCheckPairKey` changes (new content_hash → new FragmentRef
+        // → new pair_key), so the old pair_key is no longer produced by `dry write`
+        // and therefore absent from `processed_pair_keys`. Without this filter the
+        // gate would stay Blocked forever even though the violation is resolved.
         let mut unresolved_violation_pairs = 0usize;
         for record in latest_per_pair.values() {
             let touches_current = current_fragment_refs.contains(record.pair_key().low())
                 || current_fragment_refs.contains(record.pair_key().high());
             if !touches_current {
+                continue;
+            }
+            // Skip records whose pair_key was not re-judged in the latest run
+            // (stale candidate-side pair). Only Violations that were actively
+            // re-examined can block the gate.
+            if !coverage_record.contains_pair(record.pair_key()) {
                 continue;
             }
             if matches!(record.verdict(), DryCheckVerdict::Violation { .. }) {
@@ -129,8 +142,8 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
 mod tests {
     use super::*;
     use domain::dry_check::{
-        DryCheckCoverageRecord, DryCheckReaderError, DryCheckRecord, DryCheckVerdict, FragmentRef,
-        RefactorProposal,
+        DryCheckCoverageRecord, DryCheckPairKey, DryCheckReaderError, DryCheckRecord,
+        DryCheckVerdict, FragmentRef, RefactorProposal,
     };
 
     use crate::dry_check::shared::test_mocks::{
@@ -218,8 +231,28 @@ mod tests {
         DryCheckApprovalInteractor::new(Arc::new(StubReader { records }), Arc::new(coverage))
     }
 
+    /// Build a `StubCoverage` covering `refs` with an empty `processed_pair_keys` set.
+    ///
+    /// Use this for tests where no Violations exist in the history (no pair keys
+    /// need to be present) or for staleness-only checks.
     fn coverage_with(refs: Vec<FragmentRef>) -> StubCoverage {
-        StubCoverage { record: Some(DryCheckCoverageRecord::new(refs.into_iter().collect())) }
+        coverage_with_pairs(refs, Vec::new())
+    }
+
+    /// Build a `StubCoverage` covering `refs` and marking `pair_keys` as processed.
+    ///
+    /// Use this for tests where a Violation record must be treated as active
+    /// (i.e., the pair was re-judged in the latest `dry write` run).
+    fn coverage_with_pairs(
+        refs: Vec<FragmentRef>,
+        pair_keys: Vec<DryCheckPairKey>,
+    ) -> StubCoverage {
+        StubCoverage {
+            record: Some(DryCheckCoverageRecord::new(
+                refs.into_iter().collect(),
+                pair_keys.into_iter().collect(),
+            )),
+        }
     }
 
     fn current_refs(refs: Vec<FragmentRef>) -> BTreeSet<FragmentRef> {
@@ -266,13 +299,16 @@ mod tests {
         assert!(matches!(result, DryCheckApprovalVerdict::Blocked { .. }));
     }
 
-    // ── latest verdict Violation → Blocked ───────────────────────────────────
+    // ── latest verdict Violation (pair in coverage) → Blocked ────────────────
 
     #[test]
     fn test_check_approved_latest_violation_returns_blocked() {
         let a = make_fragment_ref_for_tests("src/a.rs", 'a');
         let b = make_fragment_ref_for_tests("src/b.rs", 'b');
-        let coverage = coverage_with(vec![a.clone(), b.clone()]);
+        let pair_key = DryCheckPairKey::new(a.clone(), b.clone()).unwrap();
+        // The pair must be in processed_pair_keys for the gate to treat the
+        // Violation as active (it was re-judged in the latest dry write run).
+        let coverage = coverage_with_pairs(vec![a.clone(), b.clone()], vec![pair_key]);
         let proposal = RefactorProposal::new("Extract helper.").unwrap();
         let record = make_dry_check_record_for_tests(
             a.clone(),
@@ -384,5 +420,45 @@ mod tests {
         let interactor = make_interactor(coverage_with(vec![]), vec![]);
         let result = interactor.check_approved(&make_track(), &current_refs(vec![])).unwrap();
         assert_eq!(result, DryCheckApprovalVerdict::Approved);
+    }
+
+    // ── stale Violation (pair NOT in processed_pair_keys) → Approved ─────────
+
+    #[test]
+    fn test_check_approved_skips_stale_violation_not_in_processed_pair_keys() {
+        // Scenario: a Violation was recorded for (src/a.rs, src/b.rs) in a
+        // previous run. The user then fixed src/b.rs (the candidate side) — the
+        // diff-side src/a.rs is unchanged, so the current diff's FragmentRef for
+        // src/a.rs IS still covered. However, the fixed src/b.rs produces a new
+        // content_hash → new FragmentRef → new DryCheckPairKey, so the old
+        // pair_key is NOT produced by the latest `dry write` run and is therefore
+        // absent from the coverage manifest's `processed_pair_keys`.
+        //
+        // The gate must return Approved: the stale Violation record is no longer
+        // relevant because the candidate side changed.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a'); // diff-side, unchanged
+        let b_old = make_fragment_ref_for_tests("src/b.rs", 'b'); // candidate, now fixed
+
+        // Coverage covers src/a.rs (it's in the current diff) but the pair (a, b_old)
+        // is NOT in processed_pair_keys — the fixed b produces a new pair_key.
+        let coverage = coverage_with(vec![a.clone()]);
+
+        let proposal = RefactorProposal::new("Extract helper.").unwrap();
+        let stale_record = make_dry_check_record_for_tests(
+            a.clone(),
+            b_old,
+            DryCheckVerdict::Violation { refactor_proposal: proposal },
+            DEFAULT_RECORDED_AT,
+        );
+
+        let interactor = make_interactor(coverage, vec![stale_record]);
+        // Current diff only touches src/a.rs (b was fixed and is no longer in diff).
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        // The stale Violation must NOT block the gate.
+        assert_eq!(
+            result,
+            DryCheckApprovalVerdict::Approved,
+            "stale Violation whose pair_key is absent from processed_pair_keys must not block"
+        );
     }
 }
