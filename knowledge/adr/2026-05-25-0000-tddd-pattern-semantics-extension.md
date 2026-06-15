@@ -48,7 +48,7 @@ decisions:
     user_decision_ref: "chat_segment:user-decision:make-illegal-states-unrepresentable-field-optionality:2026-05-25"
     status: proposed
   - id: D15
-    user_decision_ref: "chat_segment:user-decision:linter-opt-in-strict-no-advisory:2026-05-27"
+    user_decision_ref: "chat_segment:user-decision:linter-opt-in-strict-no-advisory:2026-05-27,chat_segment:user-decision:ddd-strict-as-distributed-file:2026-06-15"
     status: proposed
   - id: D16
     user_decision_ref: "chat_segment:user-decision:event-policy-independent-role:2026-06-13"
@@ -58,6 +58,9 @@ decisions:
     status: proposed
   - id: D18
     user_decision_ref: "chat_segment:user-decision:vo-equality-immutability-core:2026-06-13"
+    status: proposed
+  - id: D19
+    user_decision_ref: "chat_segment:user-decision:lint-config-file-mechanism-fail-closed:2026-06-15"
     status: proposed
 ---
 # TDDD カタログ taxonomy の意味論拡張 — パターン固有の機械検査ルールを持たせる
@@ -227,7 +230,7 @@ D4〜D11 および D16 / D18 で定める各 **opt-in linter ルール**は、`C
 | D18: ValueObject public mutation surface削減（`&mut self` 禁止） | `ForbiddenMethodReceiver` | `[ValueObject]` | — | `&mut self` 受信メソッドを持つ `ValueObject` は違反（D9 と同じ rule kind） |
 | D18: ValueObject struct public field 禁止 | `NoPublicField` | `[ValueObject]` | — | `StructShape::Plain` / `Tuple` の public field があれば違反（D9 と同じ rule kind） |
 
-**ddd-strict 既定プリセット**: 本 ADR の最小コアルール（D4〜D11 / D16 / D18 で定めた全最小コアルール）を一括で有効化するルールセットプリセットを `ddd-strict` として提供する。本 ADR が定める「機械処理可能な意味論」は `ddd-strict` プリセットの適用を前提とする。opt-in 方式は維持しつつ `ddd-strict` を既定プリセットとして提供することで、採用者が個別ルールを選ばずとも最小コアを一括有効化でき、ロールがラベルに戻ることを防ぐ。採用者は `ddd-strict` の全ルールをそのまま使うことも、一部を外して個別選択することも、独自カスタムルールを追加することもできる。
+**ddd-strict 配布プリセット**: 本 ADR の最小コアルール（D4〜D11 / D16 / D18 で定めた全最小コアルール）を一括で有効化するルールセットプリセットを `ddd-strict` として提供する。本 ADR が定める「機械処理可能な意味論」は `ddd-strict` プリセットの適用を前提とする。`ddd-strict` プリセットは Rust source にハードコードされた API 関数ではなく、**配布 config ファイル**（`.harness/catalogue-lint/presets/ddd-strict.json`）として提供する。ファイルの内容（最小コアの rules）は D4〜D11 / D16 / D18 から決定的に導出されるため、Rust source に書く必要はない。採用者はこのファイルを**コピーして `.harness/catalogue-lint/config.json` に置き、必要に応じて編集して使う**。config.json から preset を参照する機構は設けない（copy-and-edit ワークフローで十分なため）。opt-in 方式は維持しつつ採用者が個別ルールを選ばずとも最小コアを一括有効化でき、ロールがラベルに戻ることを防ぐ。採用者は配布プリセットをそのまま使うことも、カスタム rules を列挙した独自 `config.json` を作ることもできる。domain layer に `ddd_strict_preset()` 関数は設けない——preset 内容の SoT は JSON ファイルである。
 
 ### カスタム拡張例
 
@@ -251,6 +254,51 @@ D4〜D11 および D16 / D18 で定める各 **opt-in linter ルール**は、`C
 **既存 `CatalogueLinter` trait と `InMemoryCatalogueLinter` の扱い**: 評価ロジックを core に移す再設計は、`CatalogueLinter` trait（secondary port の位置づけ）を廃止または再定義することを意味する。廃止か再定義かは実装で判断する。いずれにせよ、評価関数（`run` 相当）は domain/application core に直接置く。application/core のユースケースがルール設定を受け取り（secondary port 経由で rule リスト等を入力）、純粋評価関数（domain/application core）を呼ぶ。infrastructure は codec / config adapter として外側に留まり、その port を実装する。依存方向は内向き（infra → core）であり、core が infra を直接呼ぶことはない。
 
 **D15 との分担**: D15 は「opt-in/厳格/advisory なし」という原則と rule kind 体系（`CatalogueLinterRule` の外部供給の仕組み）を定める。評価ロジックの層配置は本決定（D17）が定める。
+
+### D19: `sotp track lint` のルール解決は lint config file 機構で行う
+
+`sotp track lint` が使用するルールリストは、以下の優先順位で解決する。
+
+1. **CLI の明示指定**（例: `--rules-file <path>`）: 指定があればそのファイルを使用する（最高優先）。
+2. **プロジェクト設定ファイル**（`<workspace_root>/.harness/catalogue-lint/config.json`）: CLI 指定がなく、このファイルが存在する場合はそれを読み込む。設定ファイルは `rules` フィールドにルールを直接列挙する形のみを取り、配布プリセットを参照する形式は設けない（配布プリセットは copy 元として使う、D15 参照）。
+3. **(else) fail-closed**: いずれも見つからなければ「設定が無い」旨の明示エラーで停止する。設定なしで黙って動くフォールバックは設けない。
+
+**config file の形式**:
+
+- ファイル名: `config.json`（配置先は `.harness/catalogue-lint/` 固定）
+- フォーマット: JSON（既存の catalogue codec と同じ形式）
+- `schema_version` フィールドを持つ（将来の schema 進化に備えて v1 から開始）
+- `rules` フィールドに `LintRuleSpec` のリストを持つ（boundary 型として定義し、内部で domain の `CatalogueLinterRule` に変換する）
+
+```json
+// <!-- illustrative, non-canonical -->
+{
+  "schema_version": 1,
+  "rules": [
+    {
+      "target_roles": ["Entity"],
+      "kind": { "FieldNonEmpty": { "target_field": "invariants" } }
+    },
+    {
+      "target_roles": ["AggregateRoot"],
+      "kind": { "AccessorSignatureRequired": { "target_field": "identity" } }
+    }
+  ]
+}
+```
+
+**配置の根拠**:
+
+- **JSON を採用する理由**: 既存の catalogue codec（`schema_version` + serde ベースの JSON）と形式を統一する。
+- **`.harness/catalogue-lint/` に置く理由**: `.harness/` は harness 設定（capabilities / agent-profiles 等）を集約している既存ディレクトリであり、lint policy も project-wide な harness 設定の一部として一貫させる。`catalogue-lint/` サブディレクトリを切ることで、D15 が定める配布プリセットファイル群（`presets/`）を同じ階層に配置できる。
+- **fail-closed にする理由**: 「設定が無いので既定プリセットで動く」という静かなフォールバックは、採用者が意図しない違反検出に巻き込まれる原因になる。設定の不在を明示エラーにすることで、採用者は意図的に設定を作成してから lint を実行することになり、ルール適用が予測可能になる。
+- **CLI フラグを最高優先にする理由**: CI や one-shot のルール上書きに対応するため。
+
+**スコープ**:
+
+- 対象は workspace 全体（per-layer config は対象外）。
+- preset の subset 指定（部分有効化）は対象外——「preset 全体を使う」または「カスタム rules を列挙する」の二択。
+- 環境変数による override は対象外。
 
 ---
 
