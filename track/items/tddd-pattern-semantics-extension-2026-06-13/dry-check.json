@@ -5032,11 +5032,106 @@
       "high_hash": "5cf4fe78c70433989992a7de3dc64da7f9afa57eb1d19f486cb0063ba149745c",
       "changed_path": "libs/infrastructure/src/tddd/fs_lint_config_loader.rs",
       "verdict": "not-a-violation",
-      "similarity_score": 0.9247502684593201,
+      "similarity_score": 0.92475026845932,
       "threshold": 0.8500000238418579,
       "base_commit": "23098c4ffa79c99899e4e0ae4cdbe2a133415451",
       "rationale": "The fragments share a small amount of standard test setup and assertion shape, but they exercise distinct cases: one verifies a wrong schema version with an otherwise compatible body, while the other is a regression for wrong schema version with an incompatible/missing rules field. The repeated lines are incidental test boilerplate and keeping the scenarios separate preserves readable intent.",
       "recorded_at": "2026-06-15T11:09:07Z"
+    },
+    {
+      "low_path": "apps/cli/src/commands/track/dispatch.rs",
+      "low_hash": "507e87e430d05fbc0ae7e16ebcff19d1ea3dd8d983aeeecbbdd2e56829a1f915",
+      "high_path": "apps/cli/src/commands/track/mod.rs",
+      "high_hash": "e05a91f1148607905c2e803b320d2ae8b4b829f81330c654912752cba6ac170a",
+      "changed_path": "apps/cli/src/commands/track/mod.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8727716207504272,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f3a7da2de42b171bb51b38d3829122ccf31fdb33",
+      "rationale": "The fragments serve different responsibilities: `mod.rs` declares the CLI command/argument shape, while `dispatch.rs` imports that command type and related handler modules for execution. The visible overlap is only structural coupling between a command enum and its dispatcher, not duplicated logic or repeated source-of-truth data. No repeated validation, argument definitions, or business rules are shown in the candidate fragment.",
+      "recorded_at": "2026-06-15T11:20:08Z"
+    },
+    {
+      "low_path": "apps/cli/tests/cli_track_lint.rs",
+      "low_hash": "7474d6c311fe0aff24696724902cf267b22591d27d57415241b781e515949668",
+      "high_path": "apps/cli/tests/cli_track_lint.rs",
+      "high_hash": "ec36e238c469a372f4941ff1e75034391c56fb21478e4a7534976fb08c622432",
+      "changed_path": "apps/cli/tests/cli_track_lint.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared helper such as `run_track_lint_with_optional_rules_file(root: &Path, rules_file: Option<&Path>)` or a small argument-builder function, then have `run_track_lint` and `run_track_lint_with_rules_file` delegate to it."
+        }
+      },
+      "similarity_score": 0.8595086336135864,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f3a7da2de42b171bb51b38d3829122ccf31fdb33",
+      "rationale": "Both helpers encode the same `sotp track lint` invocation, fixed track/layer IDs, workspace-root conversion, process execution, and unwrap behavior in the same test file. The only behavioral difference is the optional `--rules-file` arguments, so changes to the base command contract could easily drift between the two helpers.",
+      "recorded_at": "2026-06-15T11:20:27Z"
+    },
+    {
+      "low_path": "apps/cli/tests/cli_track_lint.rs",
+      "low_hash": "16709a9c8f7d6e4cc9d897971f62000d037245d1ea9af1122f948c8585b7d08e",
+      "high_path": "apps/cli/tests/cli_track_lint.rs",
+      "high_hash": "c6084c50abf316f38b2876ab44777fa965c352d7f0d6050d0e158feba9c1d963",
+      "changed_path": "apps/cli/tests/cli_track_lint.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8746998310089111,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f3a7da2de42b171bb51b38d3829122ccf31fdb33",
+      "rationale": "The fragments share a small amount of test setup, but they exercise different behaviors: one proves the valid configured catalogue exits successfully, while the other intentionally omits the lint config and asserts fail-closed error reporting. The repeated lines are straightforward fixture construction, not duplicated business logic or a repeated rule that would create meaningful maintenance risk.",
+      "recorded_at": "2026-06-15T11:20:48Z"
+    },
+    {
+      "low_path": "apps/cli/tests/cli_track_lint.rs",
+      "low_hash": "16709a9c8f7d6e4cc9d897971f62000d037245d1ea9af1122f948c8585b7d08e",
+      "high_path": "apps/cli/tests/cli_track_lint.rs",
+      "high_hash": "cedd869719ba99b299e8a5cec3f7a46ef4a151e1d729b531c88bde54436fcc62",
+      "changed_path": "apps/cli/tests/cli_track_lint.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8709434866905212,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f3a7da2de42b171bb51b38d3829122ccf31fdb33",
+      "rationale": "The fragments share normal test scaffolding: create a temp root, write common fixtures, run the CLI, collect stdout/stderr, and assert failure. The duplicated setup supports two distinct behaviors: missing config versus malformed config. This is acceptable test repetition for clarity and independence, not duplicated domain logic or a repeated policy that would be risky to maintain separately.",
+      "recorded_at": "2026-06-15T11:21:07Z"
+    },
+    {
+      "low_path": "apps/cli/tests/cli_track_lint.rs",
+      "low_hash": "16709a9c8f7d6e4cc9d897971f62000d037245d1ea9af1122f948c8585b7d08e",
+      "high_path": "apps/cli/tests/cli_track_lint.rs",
+      "high_hash": "79ebb05ab43b428cc1d90497f8e9d5c6541752741a83e89bbd49b8f3e317aad8",
+      "changed_path": "apps/cli/tests/cli_track_lint.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8619282245635986,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f3a7da2de42b171bb51b38d3829122ccf31fdb33",
+      "rationale": "The fragments share ordinary test fixture setup for the same CLI path, but they validate different behavior: one asserts the default lint config is missing and reports the expected path, while the other asserts an explicit --rules-file override bypasses the default config. The repeated tempdir/root setup and fixture writes are small, local, and make each test's scenario clear rather than encoding duplicated business logic.",
+      "recorded_at": "2026-06-15T11:21:20Z"
+    },
+    {
+      "low_path": "apps/cli/tests/cli_track_lint.rs",
+      "low_hash": "cedd869719ba99b299e8a5cec3f7a46ef4a151e1d729b531c88bde54436fcc62",
+      "high_path": "apps/cli/tests/cli_track_lint.rs",
+      "high_hash": "ceed3ecf9d5cd92971d4f2a71c7c53e747d6416ee1d3a1c8c9ab6084876e96fb",
+      "changed_path": "apps/cli/tests/cli_track_lint.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9398013949394226,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f3a7da2de42b171bb51b38d3829122ccf31fdb33",
+      "rationale": "Both fragments share the standard test arrangement for `track lint`, but they exercise distinct failure modes: malformed JSON parsing versus unsupported `schema_version`. The duplicated setup is small, test-local, and the assertions intentionally differ in the expected diagnostic signal, so the fragments do not appear to duplicate domain logic or create a meaningful maintenance hazard.",
+      "recorded_at": "2026-06-15T11:21:36Z"
+    },
+    {
+      "low_path": "apps/cli/tests/cli_track_lint.rs",
+      "low_hash": "00ef328302d7d4a24f5dd4575fb5a4c8dcd7022dfc826ad8cfc21ae4551a1269",
+      "high_path": "apps/cli/tests/cli_track_lint.rs",
+      "high_hash": "157a6da3dafbd14e9e248984c085962414875dea0b4d717744f50f58cb96be60",
+      "changed_path": "apps/cli/tests/cli_track_lint.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8852130174636841,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f3a7da2de42b171bb51b38d3829122ccf31fdb33",
+      "rationale": "The fragments do not duplicate implementation logic. `run_track_lint` is a small convenience wrapper that delegates to `run_track_lint_impl(root, None)`, while the changed fragment contains the shared implementation that handles the fixed CLI args and optional rules file. The nearby doc comments overlap in subject matter but describe distinct helpers and do not create a maintainability burden.",
+      "recorded_at": "2026-06-15T11:23:22Z"
     }
   ]
 }

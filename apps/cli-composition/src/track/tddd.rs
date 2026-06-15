@@ -429,53 +429,47 @@ impl CliApp {
         track_id: Option<String>,
         layer_id: String,
         workspace_root: PathBuf,
+        rules_file: Option<PathBuf>,
     ) -> Result<CommandOutcome, String> {
         use infrastructure::tddd::contract_map_adapter::FsCatalogueLoader;
         use infrastructure::tddd::fs_lint_config_loader::FsLintConfigLoader;
         use usecase::catalogue_lint_workflow::{
-            LintRuleKind, LintRuleSpec, RunCatalogueLint, RunCatalogueLintCommand,
+            RunCatalogueLint, RunCatalogueLintCommand, RunCatalogueLintError,
             RunCatalogueLintInteractor,
         };
 
         let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)?;
 
-        // Demo rule set: FieldNonEmpty on value_object.invariants and
-        // KindLayerConstraint on domain_service.
-        // target_roles uses role kind names ("ValueObject", "DomainService").
-        //
-        // FieldNonEmpty on "invariants" fires for any ValueObject entry that declares
-        // no invariants in its role payload. This is an enforceable field that the
-        // evaluator supports via `field_vec_is_empty(&role, "invariants")`.
-        //
-        // TODO(T023): Replace this hard-coded demo rule set with config-file wiring.
-        // When command.rules is non-empty the interactor uses CLI rules (precedence 1),
-        // so existing tests that pass rules via command.rules are unaffected.
-        let rules = vec![
-            LintRuleSpec {
-                target_roles: vec!["ValueObject".to_owned()],
-                kind: LintRuleKind::FieldNonEmpty { target_field: "invariants".to_owned() },
-            },
-            LintRuleSpec {
-                target_roles: vec!["DomainService".to_owned()],
-                kind: LintRuleKind::KindLayerConstraint {
-                    permitted_layers: vec!["domain".to_owned(), "usecase".to_owned()],
-                },
-            },
-        ];
+        // Resolve the config file path: --rules-file overrides the default location.
+        let config_path = rules_file
+            .unwrap_or_else(|| workspace_root.join(".harness/catalogue-lint/config.json"));
 
         let items_dir = workspace_root.join("track/items");
         let rules_path = workspace_root.join("architecture-rules.json");
         let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.clone());
-        // Temporary: wire FsLintConfigLoader to the standard config path.
-        // T023 will wire this properly (replace demo rules with config-driven flow).
-        let config_loader =
-            FsLintConfigLoader::new(workspace_root.join(".harness/catalogue-lint/config.json"));
+        let config_loader = FsLintConfigLoader::new(config_path);
         let interactor = RunCatalogueLintInteractor::new(loader, config_loader);
 
         let runner: &dyn RunCatalogueLint = &interactor;
-        let violations = runner
-            .execute(RunCatalogueLintCommand { track_id: resolved_id, layer_id, rules })
-            .map_err(|e| format!("catalogue lint failed: {e}"))?;
+        let result = runner.execute(RunCatalogueLintCommand {
+            track_id: resolved_id,
+            layer_id,
+            rules: vec![],
+        });
+
+        let violations = match result {
+            Ok(v) => v,
+            Err(RunCatalogueLintError::ConfigMissing { path }) => {
+                let msg = format!(
+                    "lint config not found at {}. \
+                     Copy `.harness/catalogue-lint/presets/ddd-strict.json` to that location \
+                     to enable linting.",
+                    path.display()
+                );
+                return Ok(CommandOutcome { stdout: None, stderr: Some(msg), exit_code: 1 });
+            }
+            Err(e) => return Err(format!("catalogue lint failed: {e}")),
+        };
 
         let mut stdout_lines = Vec::new();
         for v in &violations {
