@@ -10,8 +10,8 @@ use std::sync::Arc;
 
 use domain::TrackId;
 use domain::dry_check::{
-    DryCheckApprovalVerdict, DryCheckPairKey, DryCheckReader, DryCheckRecord, DryCheckVerdict,
-    FragmentRef,
+    DryCheckApprovalVerdict, DryCheckConfigFingerprint, DryCheckPairKey, DryCheckReader,
+    DryCheckRecord, DryCheckVerdict, FragmentRef,
 };
 
 use super::errors::DryCheckCycleError;
@@ -22,15 +22,19 @@ use super::services::DryCheckApprovalService;
 
 /// Interactor implementing the D5 read-only [`DryCheckApprovalService`].
 ///
-/// Holds only a [`DryCheckReader`] (for verdict history) and a
-/// [`DryCheckCoveragePort`] (for the coverage manifest). The implementation
-/// performs hash matching and verdict scanning — no embedding / index ports.
+/// Holds only a [`DryCheckReader`] (for verdict history), a
+/// [`DryCheckCoveragePort`] (for the coverage manifest), and the
+/// `current_config_fingerprint` (SHA-256 fingerprint of the current
+/// `dry-check.json` settings). The implementation performs hash matching,
+/// config-fingerprint comparison, and verdict scanning — no embedding / index
+/// ports.
 ///
 /// The constructor return type is written as `DryCheckApprovalInteractor` (not
 /// `Self`) so the type-signal evaluator's exact-string match succeeds.
 pub struct DryCheckApprovalInteractor {
     reader: Arc<dyn DryCheckReader>,
     coverage: Arc<dyn DryCheckCoveragePort>,
+    current_config_fingerprint: DryCheckConfigFingerprint,
 }
 
 impl DryCheckApprovalInteractor {
@@ -40,12 +44,17 @@ impl DryCheckApprovalInteractor {
     ///
     /// - `reader`: port for reading the dry-check history (`DryCheckRecord`s).
     /// - `coverage`: port for reading the D5 coverage manifest.
+    /// - `current_config_fingerprint`: fingerprint of the current
+    ///   `dry-check.json` settings. `check_approved` compares this against the
+    ///   fingerprint stored in the coverage manifest; a mismatch means the config
+    ///   changed since the last `dry write` run → return `Blocked`.
     #[must_use]
     pub fn new(
         reader: Arc<dyn DryCheckReader>,
         coverage: Arc<dyn DryCheckCoveragePort>,
+        current_config_fingerprint: DryCheckConfigFingerprint,
     ) -> DryCheckApprovalInteractor {
-        DryCheckApprovalInteractor { reader, coverage }
+        DryCheckApprovalInteractor { reader, coverage, current_config_fingerprint }
     }
 }
 
@@ -68,6 +77,22 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
                 return Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
             }
         };
+
+        // ── Step 1b: Config fingerprint — reject coverage built under a different config.
+        //
+        // When `.harness/config/dry-check.json` changes (e.g., threshold lowered from
+        // 0.85 to 0.70) without changing source fragment contents, the old coverage
+        // manifest is still fragment-ref–fresh (all current FragmentRefs are covered)
+        // but was computed under a different threshold: new candidate pairs that would
+        // be in-scope under the new threshold are silently absent.
+        //
+        // By comparing fingerprints here we detect the config change and return Blocked
+        // immediately, forcing a fresh `dry write` run with the new config.  We report
+        // `unresolved_pair_count: 1` to mirror the missing-manifest fail-closed pattern
+        // (count unknown at this stage).
+        if coverage_record.config_fingerprint() != &self.current_config_fingerprint {
+            return Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
+        }
 
         // ── Step 2: Staleness — every current FragmentRef must be covered. ────
         //
@@ -142,8 +167,8 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
 mod tests {
     use super::*;
     use domain::dry_check::{
-        DryCheckCoverageRecord, DryCheckPairKey, DryCheckReaderError, DryCheckRecord,
-        DryCheckVerdict, FragmentRef, RefactorProposal,
+        DryCheckConfigFingerprint, DryCheckCoverageRecord, DryCheckPairKey, DryCheckReaderError,
+        DryCheckRecord, DryCheckVerdict, FragmentRef, RefactorProposal,
     };
 
     use crate::dry_check::shared::test_mocks::{
@@ -219,6 +244,12 @@ mod tests {
         TrackId::try_new("test-track-2026").unwrap()
     }
 
+    /// The canonical "current config fingerprint" used in tests that do not test
+    /// fingerprint mismatch behaviour (all other tests use this so they agree).
+    fn test_fingerprint() -> DryCheckConfigFingerprint {
+        DryCheckConfigFingerprint::new("a".repeat(64)).unwrap()
+    }
+
     /// Default timestamp used by tests that do not care about the exact
     /// `recorded_at` value. Tests that DO care pass an explicit timestamp to
     /// [`make_dry_check_record_for_tests`] directly.
@@ -228,10 +259,15 @@ mod tests {
         coverage: StubCoverage,
         records: Vec<DryCheckRecord>,
     ) -> DryCheckApprovalInteractor {
-        DryCheckApprovalInteractor::new(Arc::new(StubReader { records }), Arc::new(coverage))
+        DryCheckApprovalInteractor::new(
+            Arc::new(StubReader { records }),
+            Arc::new(coverage),
+            test_fingerprint(),
+        )
     }
 
-    /// Build a `StubCoverage` covering `refs` with an empty `processed_pair_keys` set.
+    /// Build a `StubCoverage` covering `refs` with an empty `processed_pair_keys` set
+    /// and the canonical test fingerprint.
     ///
     /// Use this for tests where no Violations exist in the history (no pair keys
     /// need to be present) or for staleness-only checks.
@@ -239,7 +275,8 @@ mod tests {
         coverage_with_pairs(refs, Vec::new())
     }
 
-    /// Build a `StubCoverage` covering `refs` and marking `pair_keys` as processed.
+    /// Build a `StubCoverage` covering `refs` and marking `pair_keys` as processed,
+    /// using the canonical test fingerprint.
     ///
     /// Use this for tests where a Violation record must be treated as active
     /// (i.e., the pair was re-judged in the latest `dry write` run).
@@ -247,10 +284,21 @@ mod tests {
         refs: Vec<FragmentRef>,
         pair_keys: Vec<DryCheckPairKey>,
     ) -> StubCoverage {
+        coverage_with_pairs_and_fingerprint(refs, pair_keys, test_fingerprint())
+    }
+
+    /// Build a `StubCoverage` covering `refs`, marking `pair_keys` as processed,
+    /// and using the provided `fingerprint`.
+    fn coverage_with_pairs_and_fingerprint(
+        refs: Vec<FragmentRef>,
+        pair_keys: Vec<DryCheckPairKey>,
+        fingerprint: DryCheckConfigFingerprint,
+    ) -> StubCoverage {
         StubCoverage {
             record: Some(DryCheckCoverageRecord::new(
                 refs.into_iter().collect(),
                 pair_keys.into_iter().collect(),
+                fingerprint,
             )),
         }
     }
@@ -393,7 +441,11 @@ mod tests {
     fn test_check_approved_reader_error_propagated() {
         let a = make_fragment_ref_for_tests("src/a.rs", 'a');
         let coverage = coverage_with(vec![a.clone()]);
-        let interactor = DryCheckApprovalInteractor::new(Arc::new(ErrorReader), Arc::new(coverage));
+        let interactor = DryCheckApprovalInteractor::new(
+            Arc::new(ErrorReader),
+            Arc::new(coverage),
+            test_fingerprint(),
+        );
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a]));
         assert!(matches!(result, Err(DryCheckCycleError::Reader(_))));
     }
@@ -406,6 +458,7 @@ mod tests {
         let interactor = DryCheckApprovalInteractor::new(
             Arc::new(StubReader { records: vec![] }),
             Arc::new(ErrorCoverage),
+            test_fingerprint(),
         );
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a]));
         assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
@@ -420,6 +473,73 @@ mod tests {
         let interactor = make_interactor(coverage_with(vec![]), vec![]);
         let result = interactor.check_approved(&make_track(), &current_refs(vec![])).unwrap();
         assert_eq!(result, DryCheckApprovalVerdict::Approved);
+    }
+
+    // ── config fingerprint mismatch → Blocked (round-5 fix) ─────────────────
+
+    #[test]
+    fn test_check_approved_with_different_config_fingerprint_returns_blocked() {
+        // Scenario: coverage was written under config A (fingerprint_a), but the
+        // current config is B (fingerprint_b, e.g., threshold was lowered).
+        // All current FragmentRefs ARE covered by the manifest (staleness check
+        // would pass), but the fingerprint mismatch must take priority and return
+        // Blocked so that `dry write` re-runs with the new config.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+
+        // Build coverage with a DIFFERENT fingerprint than the interactor's current one.
+        let old_fingerprint = DryCheckConfigFingerprint::new("b".repeat(64)).unwrap();
+        let coverage = StubCoverage {
+            record: Some(DryCheckCoverageRecord::new(
+                vec![a.clone()].into_iter().collect(),
+                std::collections::BTreeSet::new(),
+                old_fingerprint,
+            )),
+        };
+
+        // The interactor holds test_fingerprint() ("aaa..."), which differs from "bbb...".
+        let interactor = make_interactor(coverage, vec![]);
+
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "config fingerprint mismatch must return Blocked, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_approved_with_matching_config_fingerprint_and_covered_refs_returns_approved() {
+        // Scenario: coverage was written under the same config as the current one.
+        // All current FragmentRefs are covered, no Violations → Approved.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        // coverage_with uses test_fingerprint() which matches the interactor's fingerprint.
+        let coverage = coverage_with(vec![a.clone()]);
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert_eq!(
+            result,
+            DryCheckApprovalVerdict::Approved,
+            "matching fingerprint + covered refs + no Violation must yield Approved"
+        );
+    }
+
+    #[test]
+    fn test_check_approved_with_fail_closed_fingerprint_in_coverage_returns_blocked() {
+        // Scenario: the last `dry write` wrote the fail-closed sentinel fingerprint
+        // (all zeros) because calibration or a pair-level error occurred.
+        // The current config has a valid (non-zero) fingerprint.
+        // The gate must return Blocked even if all current FragmentRefs are covered.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+
+        let fail_closed = DryCheckConfigFingerprint::fail_closed();
+        let coverage = coverage_with_pairs_and_fingerprint(vec![a.clone()], vec![], fail_closed);
+
+        // test_fingerprint() ("aaa...") != fail_closed ("000...") → Blocked.
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "fail-closed fingerprint in coverage must return Blocked, got: {result:?}"
+        );
     }
 
     // ── stale Violation (pair NOT in processed_pair_keys) → Approved ─────────

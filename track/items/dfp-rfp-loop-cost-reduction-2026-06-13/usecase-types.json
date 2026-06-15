@@ -488,7 +488,7 @@
       },
       "methods": [],
       "module_path": "dry_check::approval_interactor",
-    "docs": "Implements `DryCheckApprovalService`. Updated for D5: now reads DryCheckCoverageRecord via DryCheckCoveragePort for staleness checking instead of performing embedding/similarity-search. For all-resolved checking it reads DryCheckReader history, derives the same latest-per-pair last-write-wins view as DryCheckResultsInteractor, and evaluates only latest records touching current FragmentRef values. Holds DryCheckReader + DryCheckCoveragePort injected dependencies as private fields.",
+    "docs": "Implements `DryCheckApprovalService`. Updated for D5: now reads DryCheckCoverageRecord via DryCheckCoveragePort for staleness checking instead of performing embedding/similarity-search. Staleness check includes two conditions: (1) all current FragmentRefs must be present in the stored coverage, and (2) the stored config_fingerprint must match the current_config_fingerprint injected at construction (config change → Blocked). For all-resolved checking it reads DryCheckReader history, derives the same latest-per-pair last-write-wins view as DryCheckResultsInteractor, and evaluates only latest records touching current FragmentRef values. Holds DryCheckReader + DryCheckCoveragePort + current_config_fingerprint as private fields.",
       "spec_refs": [
         {
           "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
@@ -750,7 +750,7 @@
       ],
       "supertrait_bounds": [],
       "module_path": "dry_check::services",
-  "docs": "Application service for the cheap dry gate approval check after D5. The caller supplies the active track_id and current diff FragmentRef set; the interactor reads only DryCheckCoveragePort + DryCheckReader state to decide Approved/Blocked, with no embedding or semantic-index lookup. DryCheckReader history is interpreted as latest-per-pair with last-write-wins, so a later Accepted/NotAViolation can resolve an older Violation for the same pair.",
+  "docs": "Application service for the cheap dry gate approval check after D5. The caller supplies the active track_id and current diff FragmentRef set. Decides Approved/Blocked using DryCheckCoveragePort (staleness check: (1) are all current FragmentRefs present in coverage, and (2) does the stored config_fingerprint match the current config fingerprint — a mismatch means the config changed and coverage is stale) + DryCheckReader (all-resolved check), with no embedding or semantic-index lookup. DryCheckReader history is interpreted as latest-per-pair with last-write-wins, so a later Accepted/NotAViolation can resolve an older Violation for the same pair.",
       "spec_refs": [
         {
           "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
@@ -847,7 +847,8 @@
             { "name": "dry_check_writer", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckWriter>" },
             { "name": "dry_check_reader", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" },
             { "name": "coverage",         "ty": "std::sync::Arc<dyn DryCheckCoveragePort>" },
-            { "name": "config", "ty": "DryCheckConfig" }
+            { "name": "config", "ty": "DryCheckConfig" },
+            { "name": "config_fingerprint", "ty": "domain::dry_check::DryCheckConfigFingerprint" }
           ],
           "returns": "Self",
           "is_async": false,
@@ -865,7 +866,8 @@
           "receiver": null,
           "params": [
             { "name": "reader",   "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" },
-            { "name": "coverage", "ty": "std::sync::Arc<dyn DryCheckCoveragePort>" }
+            { "name": "coverage", "ty": "std::sync::Arc<dyn DryCheckCoveragePort>" },
+            { "name": "current_config_fingerprint", "ty": "domain::dry_check::DryCheckConfigFingerprint" }
           ],
           "returns": "DryCheckApprovalInteractor",
           "is_async": false,

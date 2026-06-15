@@ -1,8 +1,34 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-15T06:48:37Z",
-  "declaration_hash": "861cedc46991c7ea8ab59ccef5c7df208b8268242f02694e5450ee6f29c7c108",
+  "generated_at": "2026-06-15T11:46:46Z",
+  "declaration_hash": "96fd2982b0e7ae9486135b445396327269a80aa7205ce68cc3b73fc990f6f5d3",
   "signals": [
+    {
+      "type_name": "DryCheckConfigFingerprint",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfigFingerprintError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
     {
       "type_name": "DryCheckCoverageRecord",
       "kind_tag": "value_object",

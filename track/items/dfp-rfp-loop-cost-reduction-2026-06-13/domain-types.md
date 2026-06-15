@@ -10,6 +10,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| DryCheckConfigFingerprint | value_object | — | — | 🟡 | 🔵 |
 | DryCheckCoverageRecord | value_object | — | — | 🟡 | 🔵 |
 | ReviewScopeSet | value_object | — | — | 🟡 | 🔵 |
 
@@ -17,5 +18,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| DryCheckConfigFingerprintError | error_type | — | InvalidFormat | 🔵 | 🟡 |
 | ReviewScopeSetError | error_type | — | Empty | 🔵 | 🔵 |
 

@@ -11,8 +11,8 @@ use std::sync::Arc;
 use domain::CommitHash;
 use domain::TrackId;
 use domain::dry_check::{
-    DryCheckCoverageRecord, DryCheckEntry, DryCheckFinding, DryCheckPairKey, DryCheckReader,
-    DryCheckVerdict, DryCheckWriter, FragmentRef, Rationale,
+    DryCheckConfigFingerprint, DryCheckCoverageRecord, DryCheckEntry, DryCheckFinding,
+    DryCheckPairKey, DryCheckReader, DryCheckVerdict, DryCheckWriter, FragmentRef, Rationale,
 };
 use domain::review_v2::types::FilePath;
 use domain::semantic_dup::{CodeFragment, SimilarityScore, SimilarityThreshold};
@@ -50,6 +50,7 @@ pub struct DryCheckInteractor {
     coverage: Arc<dyn DryCheckCoveragePort>,
     track_id: TrackId,
     config: DryCheckConfig,
+    config_fingerprint: DryCheckConfigFingerprint,
 }
 
 impl DryCheckInteractor {
@@ -68,12 +69,21 @@ impl DryCheckInteractor {
     /// D4 calibration percentages. Composition sources `max_parallelism` from
     /// the infrastructure `DryCheckConfig::load` and lifts it into the usecase
     /// newtype via `DryCheckParallelism::try_new`.
+    ///
+    /// `config_fingerprint` is the SHA-256 fingerprint of the `dry-check.json`
+    /// fields that affect `dry write` semantics. Composition computes it via
+    /// `infra_config.fingerprint()` after loading and passes it here so that the
+    /// interactor can include it in the coverage manifest it writes. A subsequent
+    /// `check_approved` call compares the manifest fingerprint against the current
+    /// config fingerprint to detect config changes.
+    ///
     /// # Arguments
     ///
-    /// Construction requires 8 parameters because `DryCheckInteractor` is a
+    /// Construction requires 9 parameters because `DryCheckInteractor` is a
     /// composition-layer value object that bundles all secondary ports with the
     /// domain config.  Each parameter is a distinct, non-groupable concern
-    /// (embedding, indexing, agent, write, read, coverage, identity, config).
+    /// (embedding, indexing, agent, write, read, coverage, identity, config,
+    /// config_fingerprint).
     #[must_use]
     #[allow(clippy::too_many_arguments)]
     pub fn new(
@@ -85,6 +95,7 @@ impl DryCheckInteractor {
         coverage: Arc<dyn DryCheckCoveragePort>,
         track_id: TrackId,
         config: DryCheckConfig,
+        config_fingerprint: DryCheckConfigFingerprint,
     ) -> DryCheckInteractor {
         DryCheckInteractor {
             embedding_port,
@@ -95,6 +106,7 @@ impl DryCheckInteractor {
             coverage,
             track_id,
             config,
+            config_fingerprint,
         }
     }
 }
@@ -499,13 +511,23 @@ impl DryCheckService for DryCheckInteractor {
         // processed_pair_keys follows the same fail-closed policy: on any error we
         // write an empty set, so the gate treats all historical Violation records as
         // potentially active (cannot prove the candidate was re-checked).
-        let (coverage_refs, coverage_pair_keys) =
+        //
+        // config_fingerprint: on any error (calibration or pair-level), write the
+        // fail-closed sentinel (all zeros) instead of the real fingerprint. This
+        // ensures `check_approved` returns Blocked regardless of which gate it hits,
+        // even if the real fingerprint happens to match the current config.
+        let (coverage_refs, coverage_pair_keys, coverage_fingerprint) =
             if calibration_error.is_some() || first_error.is_some() {
-                (std::collections::BTreeSet::new(), std::collections::BTreeSet::new())
+                (
+                    std::collections::BTreeSet::new(),
+                    std::collections::BTreeSet::new(),
+                    DryCheckConfigFingerprint::fail_closed(),
+                )
             } else {
-                (processed_refs, processed_pair_keys)
+                (processed_refs, processed_pair_keys, self.config_fingerprint.clone())
             };
-        let coverage_record = DryCheckCoverageRecord::new(coverage_refs, coverage_pair_keys);
+        let coverage_record =
+            DryCheckCoverageRecord::new(coverage_refs, coverage_pair_keys, coverage_fingerprint);
         let coverage_write_error =
             self.coverage.write_coverage(&self.track_id, coverage_record).err();
 
@@ -757,6 +779,10 @@ mod tests {
         )
     }
 
+    fn test_fingerprint() -> DryCheckConfigFingerprint {
+        DryCheckConfigFingerprint::new("a".repeat(64)).unwrap()
+    }
+
     fn make_interactor(
         embed: MockMockEmbeddingPort,
         index: MockMockSemanticIndexPort,
@@ -791,6 +817,7 @@ mod tests {
             coverage,
             make_track(),
             make_config(1),
+            test_fingerprint(),
         )
     }
 
@@ -1471,6 +1498,45 @@ mod tests {
     }
 
     #[test]
+    fn test_run_dry_check_writes_coverage_record_with_config_fingerprint() {
+        // A successful run must write the config fingerprint into the coverage record.
+        let frag_a = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().times(1).returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().times(1).withf(|items| items.is_empty()).returning(|_| Ok(()));
+        // No candidates above threshold.
+        index.expect_search().times(1).returning(|_, _| Ok(vec![]));
+
+        let agent = make_probe_only_agent("non-probe agent call not expected");
+
+        let writer = Arc::new(StubWriter::default());
+        let coverage = Arc::new(StubCoverage::new());
+        let interactor = make_interactor_with_coverage(
+            embed,
+            index,
+            agent,
+            Arc::clone(&writer),
+            vec![],
+            Arc::clone(&coverage),
+        );
+
+        let _ = interactor
+            .run_dry_check(vec![], vec![frag_a], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        let recorded = coverage.last_written().expect("coverage written");
+        // The coverage record must carry the test fingerprint (not fail-closed zeros).
+        assert_eq!(
+            recorded.config_fingerprint(),
+            &test_fingerprint(),
+            "successful run must write the real config fingerprint"
+        );
+    }
+
+    #[test]
     fn test_run_dry_check_with_empty_diff_writes_empty_coverage_record() {
         // Empty diff → write_coverage still called once, with an empty record.
         let embed = MockMockEmbeddingPort::new();
@@ -1622,6 +1688,7 @@ mod tests {
             Arc::new(StubCoverage::new()),
             make_track(),
             make_config(2),
+            test_fingerprint(),
         );
 
         let result = interactor
@@ -1667,6 +1734,7 @@ mod tests {
             Arc::new(StubCoverage::new()),
             make_track(),
             make_config(1),
+            test_fingerprint(),
         );
 
         interactor
@@ -1744,6 +1812,7 @@ mod tests {
             Arc::new(StubCoverage::new()),
             make_track(),
             make_config(1),
+            test_fingerprint(),
         );
 
         let result =
@@ -1859,6 +1928,7 @@ mod tests {
             Arc::new(StubCoverage::new()),
             make_track(),
             make_config(1), // serial for deterministic order assertion
+            test_fingerprint(),
         );
 
         interactor
@@ -1995,6 +2065,7 @@ mod tests {
             coverage,
             make_track(),
             config,
+            test_fingerprint(),
         )
     }
 

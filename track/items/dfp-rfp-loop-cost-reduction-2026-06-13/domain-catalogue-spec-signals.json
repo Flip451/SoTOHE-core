@@ -1,11 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "861cedc46991c7ea8ab59ccef5c7df208b8268242f02694e5450ee6f29c7c108",
+  "catalogue_declaration_hash": "96fd2982b0e7ae9486135b445396327269a80aa7205ce68cc3b73fc990f6f5d3",
   "signals": [
+    {
+      "type_name": "DryCheckConfigFingerprint",
+      "signal": "blue",
+      "entry_hash": "db0ff4f6c5fcdf158f6ebd4eb3c92b94dba5fc132a1e3975cd79ae9985fe04b9"
+    },
+    {
+      "type_name": "DryCheckConfigFingerprintError",
+      "signal": "yellow",
+      "entry_hash": "d4d02886fdc55500a8971e29388af6002ea1d8587fae775282415939327644a3"
+    },
     {
       "type_name": "DryCheckCoverageRecord",
       "signal": "blue",
-      "entry_hash": "5ea0daf3bc7dd837e12d6b831ec01ddbaf70fae48a1fed99f2eae9f9048fe740"
+      "entry_hash": "8c323537013826ddd48bf5ab1225eb9084cda399893b4cc8f33f4b470bf53df9"
     },
     {
       "type_name": "FixpointStep",

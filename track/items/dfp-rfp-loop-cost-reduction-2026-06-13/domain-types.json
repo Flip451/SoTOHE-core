@@ -109,6 +109,92 @@
       ],
       "informal_grounds": []
     },
+    "DryCheckConfigFingerprint": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [ "String" ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "s", "ty": "impl Into<String>" } ],
+          "returns": "Result<DryCheckConfigFingerprint, DryCheckConfigFingerprintError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fail_closed",
+          "receiver": null,
+          "params": [],
+          "returns": "DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_check",
+      "docs": "SHA-256 fingerprint (64-char lowercase hex string) over all dry-check.json fields that affect dry write semantics: threshold, max_parallelism, fast_reasoning_effort, final_reasoning_effort, known_bad_injection_rate_percent, known_bad_detection_threshold_percent. Written into the coverage manifest by dry write; compared by dry check-approved against the current config. A mismatch means the config changed and coverage must be regenerated (Blocked). The all-zeros sentinel (fail_closed()) is written on failed runs so check_approved returns Blocked regardless of current config.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckConfigFingerprintError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidFormat", "payload": { "kind": "tuple", "fields": [ "String" ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Validation error for DryCheckConfigFingerprint construction. InvalidFormat means the provided string is not exactly 64 lowercase hexadecimal characters.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-08"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "feedback",
+          "summary": "The 64-char lowercase hex format invariant (SHA-256 encoding) is an implementation detail of DryCheckConfigFingerprint's constructor: no spec anchor directly states the character-set or length constraint. CN-08 grounds the fail-closed response when the value is invalid; the format rule itself derives from the SHA-256 encoding chosen for the fingerprint."
+        }
+      ]
+    },
     "DryCheckCoverageRecord": {
       "action": "add",
       "role": "ValueObject",
@@ -118,7 +204,8 @@
           "kind": "plain",
           "fields": [
             { "name": "fragment_refs",       "ty": "std::collections::BTreeSet<FragmentRef>" },
-            { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" }
+            { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" },
+            { "name": "config_fingerprint",  "ty": "DryCheckConfigFingerprint" }
           ],
           "has_stripped_fields": false
         }
@@ -129,7 +216,8 @@
           "receiver": null,
           "params": [
             { "name": "fragment_refs",       "ty": "std::collections::BTreeSet<FragmentRef>" },
-            { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" }
+            { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" },
+            { "name": "config_fingerprint",  "ty": "DryCheckConfigFingerprint" }
           ],
           "returns": "DryCheckCoverageRecord",
           "is_async": false,
@@ -156,10 +244,20 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": []
+        },
+        {
+          "name": "config_fingerprint",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
         }
       ],
       "module_path": "dry_check",
-      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run (fragment_refs), plus the set of DryCheckPairKey values for all pairs that were considered current in that run (processed_pair_keys). If a current diff fragment's FragmentRef is absent from fragment_refs, `check-approved` returns Blocked (stale coverage). If a historical Violation record's pair_key is absent from processed_pair_keys, that record is treated as stale (candidate side fixed) and skipped by the gate. BTreeSet preserves deterministic serialization order (CN-05).",
+      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run (fragment_refs), plus the set of DryCheckPairKey values for all pairs that were considered current in that run (processed_pair_keys), plus the config_fingerprint of the dry-check.json settings used by that run. If a current diff fragment's FragmentRef is absent from fragment_refs, `check-approved` returns Blocked (stale coverage). If a historical Violation record's pair_key is absent from processed_pair_keys, that record is treated as stale (candidate side fixed) and skipped by the gate. If the stored config_fingerprint differs from the current config fingerprint, `check-approved` returns Blocked (config changed). BTreeSet preserves deterministic serialization order (CN-05).",
       "spec_refs": [
         {
           "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
@@ -202,6 +300,16 @@
     { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckCoverageRecord" },
     { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckCoverageRecord" },
     { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckCoverageRecord" },
-    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckCoverageRecord" }
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckCoverageRecord" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckConfigFingerprint" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckConfigFingerprint" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckConfigFingerprint" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckConfigFingerprint" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::fmt::Display",     "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::error::Error",     "for_type": "DryCheckConfigFingerprintError" }
   ]
 }

@@ -238,6 +238,66 @@ impl DryCheckConfig {
     pub fn known_bad_detection_threshold_percent(&self) -> u8 {
         self.known_bad_detection_threshold_percent
     }
+
+    /// Compute a SHA-256 fingerprint over all fields that affect `dry write` semantics,
+    /// using the provided `effective_threshold` in place of `self.threshold`.
+    ///
+    /// This is the canonical fingerprint implementation. Call [`fingerprint`](Self::fingerprint)
+    /// when the file-config threshold is the effective threshold, or call this method directly
+    /// when `--threshold` has been overridden at the CLI so the stored fingerprint reflects
+    /// the actual threshold used during the run.
+    ///
+    /// Canonical encoding: `field=value` pairs joined with `\n`, in the fixed
+    /// order below. The threshold is encoded as its raw IEEE 754 bits (`f32::to_bits()`)
+    /// to guarantee lossless, round-trip-stable serialization — decimal formatting would
+    /// silently collapse distinct values within the same rounding bucket. Negative zero
+    /// (`-0.0`) is normalized to positive zero (`+0.0`) before the bit conversion because
+    /// `SimilarityThreshold::new` accepts `-0.0` (IEEE 754 equality treats it as `0.0`),
+    /// and the two bit patterns must map to the same fingerprint.
+    ///
+    /// Fields included (all that affect which pairs are judged or how they are judged):
+    /// - `threshold`
+    /// - `max_parallelism`
+    /// - `fast_reasoning_effort`
+    /// - `final_reasoning_effort`
+    /// - `known_bad_injection_rate_percent`
+    /// - `known_bad_detection_threshold_percent`
+    pub fn fingerprint_with_threshold(
+        &self,
+        effective_threshold: domain::semantic_dup::SimilarityThreshold,
+    ) -> domain::dry_check::DryCheckConfigFingerprint {
+        let canonical = format!(
+            "threshold={}\nmax_parallelism={}\nfast_reasoning_effort={}\nfinal_reasoning_effort={}\nknown_bad_injection_rate_percent={}\nknown_bad_detection_threshold_percent={}",
+            (effective_threshold.value() + 0.0_f32).to_bits(),
+            self.max_parallelism,
+            self.fast_reasoning_effort,
+            self.final_reasoning_effort,
+            self.known_bad_injection_rate_percent,
+            self.known_bad_detection_threshold_percent,
+        );
+
+        // Compute SHA-256 using the sha2 crate (already a dependency of infrastructure).
+        // sha2::Digest::update takes bytes directly (no Write trait needed).
+        use sha2::Digest as _;
+        let hash_bytes = sha2::Sha256::digest(canonical.as_bytes());
+        let hex = hash_bytes.iter().map(|b| format!("{b:02x}")).collect::<String>();
+
+        // The hex string is always 64 lowercase chars (SHA-256 = 32 bytes = 64 hex chars).
+        // DryCheckConfigFingerprint::new only fails when the string is not 64 lowercase hex
+        // chars; sha2 always produces exactly that, so this unwrap cannot be reached at
+        // runtime. We use an unreachable fallback to avoid a hard panic.
+        domain::dry_check::DryCheckConfigFingerprint::new(hex)
+            .unwrap_or_else(|_| domain::dry_check::DryCheckConfigFingerprint::fail_closed())
+    }
+
+    /// Compute a SHA-256 fingerprint over all fields that affect `dry write` semantics.
+    ///
+    /// Delegates to [`fingerprint_with_threshold`](Self::fingerprint_with_threshold) using
+    /// `self.threshold` as the effective threshold. Use [`fingerprint_with_threshold`](Self::fingerprint_with_threshold)
+    /// directly when a CLI `--threshold` override changes the effective threshold for a run.
+    pub fn fingerprint(&self) -> domain::dry_check::DryCheckConfigFingerprint {
+        self.fingerprint_with_threshold(self.threshold)
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -604,5 +664,135 @@ mod tests {
                 "expected Ok for injection={injection} threshold={threshold}, got: {result:?}"
             );
         }
+    }
+
+    // ── fingerprint() tests ─────────────────────────────────────────────────────
+
+    /// Load a config from a JSON string and return the config.
+    fn load_from_str(json: &str) -> DryCheckConfig {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), "dry-check.json", json);
+        DryCheckConfig::load(&path).unwrap()
+    }
+
+    #[test]
+    fn test_fingerprint_is_deterministic_for_same_config() {
+        // Same config loaded twice must produce the same fingerprint.
+        let fp1 = load_from_str(VALID_CONFIG).fingerprint();
+        let fp2 = load_from_str(VALID_CONFIG).fingerprint();
+        assert_eq!(fp1, fp2, "fingerprint must be deterministic for identical config");
+    }
+
+    #[test]
+    fn test_fingerprint_changes_when_threshold_changes() {
+        let cfg_085 = load_from_str(VALID_CONFIG).fingerprint(); // threshold 0.85
+        let cfg_070 = load_from_str(&config_json_with_threshold(0.70)).fingerprint();
+        assert_ne!(cfg_085, cfg_070, "fingerprint must differ when threshold changes");
+    }
+
+    #[test]
+    fn test_fingerprint_changes_when_max_parallelism_changes() {
+        let cfg_4 = load_from_str(VALID_CONFIG).fingerprint(); // max_parallelism 4
+        let cfg_8 = load_from_str(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 8,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        )
+        .fingerprint();
+        assert_ne!(cfg_4, cfg_8, "fingerprint must differ when max_parallelism changes");
+    }
+
+    #[test]
+    fn test_fingerprint_changes_when_reasoning_efforts_change() {
+        let cfg_medium_high = load_from_str(VALID_CONFIG).fingerprint();
+        let cfg_low_low =
+            load_from_str(&config_json_with_reasoning_efforts("low", "low")).fingerprint();
+        assert_ne!(
+            cfg_medium_high, cfg_low_low,
+            "fingerprint must differ when reasoning efforts change"
+        );
+    }
+
+    #[test]
+    fn test_fingerprint_changes_when_known_bad_percents_change() {
+        let cfg_10_90 = load_from_str(VALID_CONFIG).fingerprint(); // injection 10, threshold 90
+        let cfg_20_80 = load_from_str(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 20,
+                "known_bad_detection_threshold_percent": 80
+            }"#,
+        )
+        .fingerprint();
+        assert_ne!(cfg_10_90, cfg_20_80, "fingerprint must differ when known-bad percents change");
+    }
+
+    #[test]
+    fn test_fingerprint_returns_64_char_lowercase_hex() {
+        let fp = load_from_str(VALID_CONFIG).fingerprint();
+        let s = fp.as_str();
+        assert_eq!(s.len(), 64, "fingerprint must be exactly 64 chars");
+        assert!(
+            s.chars().all(|c| matches!(c, '0'..='9' | 'a'..='f')),
+            "fingerprint must be lowercase hex"
+        );
+    }
+
+    #[test]
+    fn test_fingerprint_treats_negative_zero_threshold_as_positive_zero() {
+        // SimilarityThreshold::new accepts -0.0 (IEEE 754: -0.0 == 0.0).
+        // The two bit patterns are distinct (0x80000000 vs 0x00000000), so without
+        // normalization a config with threshold=-0.0 would produce a different
+        // fingerprint than one with threshold=+0.0 even though they are semantically
+        // identical, falsely invalidating an otherwise unchanged coverage manifest.
+        //
+        // We test by directly building two SimilarityThreshold values with different
+        // bit patterns (but equal semantics) and confirming the fingerprints match.
+        let pos_zero = domain::semantic_dup::SimilarityThreshold::new(0.0_f32).unwrap();
+        let neg_zero = domain::semantic_dup::SimilarityThreshold::new(-0.0_f32).unwrap();
+        // Confirm the two values are semantically equal but have different bit patterns.
+        assert_eq!(pos_zero.value(), neg_zero.value(), "test setup: +0.0 == -0.0");
+        assert_ne!(
+            pos_zero.value().to_bits(),
+            neg_zero.value().to_bits(),
+            "test setup: bit patterns must differ"
+        );
+        // Load a config and compute fingerprint_with_threshold for both bit-pattern variants.
+        let config = load_from_str(VALID_CONFIG);
+        let fp_pos = config.fingerprint_with_threshold(pos_zero);
+        let fp_neg = config.fingerprint_with_threshold(neg_zero);
+        assert_eq!(fp_pos, fp_neg, "fingerprint must be identical for +0.0 and -0.0 thresholds");
+    }
+
+    #[test]
+    fn test_fingerprint_distinguishes_adjacent_f32_threshold_values() {
+        // Regression guard: decimal formatting with {:.6} silently collapses distinct f32 values
+        // within the same 1e-6 bucket (e.g. 0.8500001 and 0.8500004 both format as "0.850000").
+        // The canonical encoding now uses f32::to_bits() which is lossless.
+        let a = 0.8500001_f32;
+        let b = 0.8500004_f32;
+        // Confirm the two values are distinct f32 bit patterns but collapse under {:.6}.
+        assert_ne!(a.to_bits(), b.to_bits(), "test setup: a and b must be distinct f32 values");
+        assert_eq!(
+            format!("{:.6}", a),
+            format!("{:.6}", b),
+            "test setup: both must format identically under 6-decimal formatting"
+        );
+        let fp_a = load_from_str(&config_json_with_threshold(a)).fingerprint();
+        let fp_b = load_from_str(&config_json_with_threshold(b)).fingerprint();
+        assert_ne!(
+            fp_a, fp_b,
+            "fingerprint must differ for adjacent f32 threshold values that 6-decimal formatting collapses"
+        );
     }
 }

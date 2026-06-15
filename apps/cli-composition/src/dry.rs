@@ -299,6 +299,14 @@ impl CliApp {
             embedding_port.as_ref(),
         )?;
 
+        // Compute the fingerprint using the *effective* threshold (which may have
+        // been overridden by `--threshold`).  `infra_config.fingerprint()` always
+        // uses the file-config threshold, so a `dry write --threshold X` run
+        // would store the file-config fingerprint (not X), causing `check-approved`
+        // to accept stale coverage as fresh (P1 correctness fix).
+        // `fingerprint_with_threshold` uses the supplied threshold instead.
+        let config_fingerprint = infra_config.fingerprint_with_threshold(threshold);
+
         let interactor = DryCheckInteractor::new(
             embedding_port,
             index_port,
@@ -308,6 +316,7 @@ impl CliApp {
             coverage,
             track_id.clone(),
             usecase_config,
+            config_fingerprint,
         );
 
         let dry_start = std::time::Instant::now();
@@ -488,13 +497,20 @@ impl CliApp {
             current_fragment_refs.insert(fragment_ref);
         }
 
+        // Load config to compute the current fingerprint for the gate comparison.
+        let config_path = root.join(".harness/config/dry-check.json");
+        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
+            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+        let current_config_fingerprint = infra_config.fingerprint();
+
         // Construct adapters: reader + coverage port — no embedding, no index.
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
         let coverage =
             Arc::new(FsDryCheckCoverageAdapter::new(dry_check_coverage_path, canonical_root));
 
         // D5 read-only interactor.
-        let interactor = DryCheckApprovalInteractor::new(store, coverage);
+        let interactor =
+            DryCheckApprovalInteractor::new(store, coverage, current_config_fingerprint);
 
         let verdict = interactor
             .check_approved(&track_id, &current_fragment_refs)
@@ -3190,6 +3206,25 @@ exit 0
         let items_dir = root.join("track/items");
         std::fs::create_dir_all(&items_dir).unwrap();
         std::fs::write(root.join("README.md"), "init\n").unwrap();
+
+        // Create a minimal valid dry-check.json so dry_check_approved can load
+        // the config fingerprint (required since the config-fingerprint fix).
+        let harness_config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 3,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "fast_reasoning_effort": "medium",
+  "final_reasoning_effort": "high",
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+
         GitRunner::at(root).assert_success(&["add", "."]);
         GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
 
@@ -3225,11 +3260,21 @@ exit 0
         // empty current_fragment_refs → Approved.
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(
-            track_dir.join("dry-check-coverage.json"),
-            br#"{"schema_version":2,"fragment_refs":[],"processed_pair_keys":[]}"#,
-        )
-        .unwrap();
+
+        // Compute the fingerprint from the config written by setup_gate_eval_repo
+        // so the v3 coverage manifest contains a matching fingerprint.
+        // A mismatch would cause DryCheckApprovalInteractor to return Blocked.
+        let dry_check_config_path = repo.path().join(".harness/config/dry-check.json");
+        let dry_check_config =
+            infrastructure::dry_check::DryCheckConfig::load(&dry_check_config_path)
+                .expect("dry-check.json written by setup_gate_eval_repo must load");
+        let fingerprint_hex = dry_check_config.fingerprint().as_str().to_owned();
+
+        let coverage_json = format!(
+            r#"{{"schema_version":3,"config_fingerprint":"{fingerprint_hex}","fragment_refs":[],"processed_pair_keys":[]}}"#
+        );
+        std::fs::write(track_dir.join("dry-check-coverage.json"), coverage_json.as_bytes())
+            .unwrap();
         std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
             .unwrap();
 
@@ -3427,7 +3472,9 @@ exit 0
     fn test_dry_check_approved_uses_coverage_adapter_for_staleness() {
         use std::collections::BTreeSet;
 
-        use domain::dry_check::{DryCheckCoverageRecord, FragmentContentHash, FragmentRef};
+        use domain::dry_check::{
+            DryCheckConfigFingerprint, DryCheckCoverageRecord, FragmentContentHash, FragmentRef,
+        };
         use domain::review_v2::FilePath;
         use usecase::dry_check::DryCheckCoveragePort as _;
 
@@ -3446,7 +3493,8 @@ exit 0
         let fragment_ref = FragmentRef::new(path, hash);
         let mut refs = BTreeSet::new();
         refs.insert(fragment_ref.clone());
-        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new());
+        let test_fp = DryCheckConfigFingerprint::new("a".repeat(64)).unwrap();
+        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new(), test_fp);
         adapter.write_coverage(&track_id, record.clone()).unwrap();
 
         // After write, read must return the same record (write/read round-trip).

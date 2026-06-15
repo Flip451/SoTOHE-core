@@ -258,6 +258,24 @@ mod tests {
         let head_sha = String::from_utf8_lossy(&head_sha.stdout).trim().to_owned();
         std::fs::write(track_dir.join(".commit_hash"), &head_sha).unwrap();
 
+        // Write a minimal valid dry-check.json so the composition layer can load
+        // the config fingerprint (added by the config-fingerprint fix).
+        let harness_config_dir = temp_fixture.path().join(".harness").join("config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 3,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "fast_reasoning_effort": "medium",
+  "final_reasoning_effort": "high",
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+
         // Call the composition directly (same as execute_fixpoint_resolve does).
         let outcome = CliApp::new()
             .fixpoint_resolve(cli_composition::FixpointResolveInput {

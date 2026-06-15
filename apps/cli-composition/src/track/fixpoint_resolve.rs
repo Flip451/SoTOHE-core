@@ -13,7 +13,9 @@ use std::sync::Arc;
 
 use domain::TrackId;
 use domain::dry_check::FragmentRef;
-use infrastructure::dry_check::{FsDryCheckCoverageAdapter, FsDryCheckStore};
+use infrastructure::dry_check::{
+    DryCheckConfig as InfraDryCheckConfig, FsDryCheckCoverageAdapter, FsDryCheckStore,
+};
 use usecase::dry_check::{DryCheckApprovalInteractor, fragment_ref_of};
 use usecase::fixpoint_resolve::{
     FixpointResolveCommand, FixpointResolveInteractor, FixpointResolveService as _,
@@ -148,8 +150,11 @@ impl RefVerifyGateStatePort for FsRefVerifyGateStateAdapter {
 /// 2. `Ok(None)` → fall back to `git rev-parse main`.
 /// 3. `Err(Format)` / other → warn and fall back to `git rev-parse main`.
 ///
-/// Git is discovered from `canonical_root` to anchor diff operations to the
-/// correct repository (not the process CWD).
+/// `repo_root` is the CWD-discovered git repository root (the caller's trust
+/// anchor).  It is passed as the `git_discovery_root` so that the fallback
+/// `git rev-parse main` uses the same repository as the hunk-discovery in
+/// `build_current_fragment_refs`, even when `canonical_root` (the project root,
+/// derived from `items_dir`) happens to lie inside a nested checkout.
 ///
 /// # Errors
 ///
@@ -157,12 +162,13 @@ impl RefVerifyGateStatePort for FsRefVerifyGateStateAdapter {
 fn resolve_dry_diff_base_for_track(
     track_dir: &std::path::Path,
     canonical_root: &std::path::Path,
+    repo_root: &std::path::Path,
 ) -> Result<domain::CommitHash, String> {
     let commit_hash_path = track_dir.join(".commit_hash");
     crate::dry::resolve_dry_diff_base_from_store(
         &commit_hash_path,
         canonical_root,
-        Some(canonical_root),
+        Some(repo_root),
         "fixpoint-resolve",
     )
 }
@@ -320,12 +326,26 @@ impl CliApp {
         }
 
         // ── Resolve items_dir and discover git repo ───────────────────────────
-        // The canonical items_dir is the source of truth for all subsequent
-        // path operations.  For absolute --items-dir values, canonicalize
-        // directly.  For relative values, anchor to the git repo root (discovered
-        // from CWD) so that `track/items` resolves correctly regardless of the
-        // caller's working directory — consistent with `resolve_existing_dir_under_repo`
-        // in `dry/shared.rs` and other track commands.
+        // Always discover the caller's git repo from CWD first so that `repo_root`
+        // is anchored to the caller's checkout, not to whatever repo happens to
+        // contain the (possibly absolute) --items-dir path.  This is the same
+        // policy used by all other track commands (`resolve_existing_dir_under_repo`
+        // in `dry/shared.rs`): CWD-discovery is the trust anchor, not path-based
+        // discovery from an untrusted input argument.
+        let cwd_repo =
+            SystemGitRepo::discover().map_err(|e| format!("cannot discover git repo: {e}"))?;
+        let repo_root = {
+            use infrastructure::git_cli::GitRepository as _;
+            cwd_repo
+                .root()
+                .canonicalize()
+                .map_err(|e| format!("cannot canonicalize repo root: {e}"))?
+        };
+
+        // Resolve the canonical items_dir path:
+        // - Absolute path: canonicalize directly.
+        // - Relative path: anchor to `repo_root` first (consistent with
+        //   `resolve_existing_dir_under_repo`) then canonicalize.
         let canonical_items_dir = if input.items_dir.is_absolute() {
             input.items_dir.canonicalize().map_err(|_| {
                 format!(
@@ -334,24 +354,23 @@ impl CliApp {
                 )
             })?
         } else {
-            // Discover the repo root from CWD first, then resolve the relative
-            // items_dir path against it.
-            let cwd_repo =
-                SystemGitRepo::discover().map_err(|e| format!("cannot discover git repo: {e}"))?;
-            let cwd_repo_root = {
-                use infrastructure::git_cli::GitRepository as _;
-                cwd_repo
-                    .root()
-                    .canonicalize()
-                    .map_err(|e| format!("cannot canonicalize repo root: {e}"))?
-            };
-            cwd_repo_root.join(&input.items_dir).canonicalize().map_err(|_| {
+            repo_root.join(&input.items_dir).canonicalize().map_err(|_| {
                 format!(
                     "--items-dir '{}' must be an existing directory under the repository root",
                     input.items_dir.display()
                 )
             })?
         };
+
+        // Validate that canonical_items_dir lies within the caller's repo root.
+        // This must be checked against the CWD-discovered `repo_root`, not against
+        // a repo discovered from `canonical_root` (which could be a different checkout).
+        if !canonical_items_dir.starts_with(&repo_root) {
+            return Err(format!(
+                "--items-dir '{}' must be an existing directory under the repository root",
+                input.items_dir.display()
+            ));
+        }
 
         // Derive canonical_root (project root = parent of track/) from the
         // canonical items_dir.  This is correct regardless of whether --items-dir
@@ -361,21 +380,6 @@ impl CliApp {
                 p.canonicalize().map_err(|e| format!("cannot canonicalize project root: {e}"))
             })
             .map_err(|e| format!("cannot derive project root from items_dir: {e}"))?;
-
-        // Verify the git repo is accessible from the validated project root.
-        let repo = SystemGitRepo::discover_from(&canonical_root)
-            .map_err(|e| format!("cannot discover git repo: {e}"))?;
-        let repo_root = {
-            use infrastructure::git_cli::GitRepository as _;
-            repo.root().canonicalize().map_err(|e| format!("cannot canonicalize repo root: {e}"))?
-        };
-
-        if !canonical_items_dir.starts_with(&repo_root) {
-            return Err(format!(
-                "--items-dir '{}' must be an existing directory under the repository root",
-                input.items_dir.display()
-            ));
-        }
 
         // Verify items_dir is actually a directory (not a file or missing).
         if !canonical_items_dir.is_dir() {
@@ -398,7 +402,7 @@ impl CliApp {
         std::env::set_current_dir(&repo_root)
             .map_err(|e| format!("cannot enter repo root '{}': {e}", repo_root.display()))?;
 
-        let base_result = resolve_dry_diff_base_for_track(&track_dir, &canonical_root);
+        let base_result = resolve_dry_diff_base_for_track(&track_dir, &canonical_root, &repo_root);
 
         // Restore CWD before `build_current_fragment_refs` (which manages its
         // own CWD guard internally).
@@ -413,12 +417,25 @@ impl CliApp {
         // ── Build dry-gate interactor (read-only) ─────────────────────────────
         let dry_check_json_path = track_dir.join("dry-check.json");
         let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
+
+        // Load the current config fingerprint for the gate comparison.
+        // Use `repo_root` (git repository root) to match `dry check-approved`, which
+        // also loads the config from `root.join(".harness/config/dry-check.json")` where
+        // `root` is the git repo root.  Using `canonical_root` (the project root, derived
+        // from `items_dir`) would load the wrong file in monorepo/nested-project layouts
+        // where the project root differs from the repository root.
+        let dry_config_path = repo_root.join(".harness/config/dry-check.json");
+        let dry_infra_config = InfraDryCheckConfig::load(&dry_config_path)
+            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+        let current_config_fingerprint = dry_infra_config.fingerprint();
+
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
         let coverage = Arc::new(FsDryCheckCoverageAdapter::new(
             dry_check_coverage_path,
             canonical_root.clone(),
         ));
-        let dry_approval = Arc::new(DryCheckApprovalInteractor::new(store, coverage));
+        let dry_approval =
+            Arc::new(DryCheckApprovalInteractor::new(store, coverage, current_config_fingerprint));
 
         // ── Build review and ref-verify gate adapters ─────────────────────────
         // Use the canonical (absolute, validated) items_dir so that these adapters
@@ -511,6 +528,7 @@ mod tests {
         let msg = result.unwrap_err();
         assert!(
             msg.contains("items_dir")
+                || msg.contains("items-dir")
                 || msg.contains("cannot discover git repo")
                 || msg.contains("cannot canonicalize"),
             "error must mention items_dir containment failure, got: {msg}"
@@ -629,6 +647,11 @@ mod tests {
             .expect("git rev-parse HEAD must succeed in workspace");
         let head_sha = String::from_utf8_lossy(&head_sha_output.stdout).trim().to_owned();
         std::fs::write(track_dir.join(".commit_hash"), &head_sha).unwrap();
+
+        // The config fingerprint is loaded from `repo_root/.harness/config/dry-check.json`
+        // (the git repository root, i.e. the workspace root in this test — same as
+        // `workspace_root`).  The workspace already has a real `.harness/config/dry-check.json`
+        // so no fixture file is needed here.
 
         // No dry-check-coverage.json → dry gate is Blocked.
         let outcome = CliApp::new()
