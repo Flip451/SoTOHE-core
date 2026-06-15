@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-15T11:46:46Z",
-  "declaration_hash": "96fd2982b0e7ae9486135b445396327269a80aa7205ce68cc3b73fc990f6f5d3",
+  "generated_at": "2026-06-15T13:57:11Z",
+  "declaration_hash": "5ae109567b3f36ddddea1a174d12c37b8a37317a1acb16504ea8d9881fd4cc76",
   "signals": [
     {
       "type_name": "DryCheckConfigFingerprint",
@@ -37,6 +37,28 @@
       "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckRecord",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
         "core::cmp::PartialEq",
         "core::fmt::Debug"
       ]
@@ -78,6 +100,18 @@
         "core::fmt::Debug",
         "core::fmt::Display"
       ]
+    },
+    {
+      "type_name": "DryCheckEntryError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryCheckRecordError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

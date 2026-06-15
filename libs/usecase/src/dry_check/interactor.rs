@@ -12,7 +12,8 @@ use domain::CommitHash;
 use domain::TrackId;
 use domain::dry_check::{
     DryCheckConfigFingerprint, DryCheckCoverageRecord, DryCheckEntry, DryCheckFinding,
-    DryCheckPairKey, DryCheckReader, DryCheckVerdict, DryCheckWriter, FragmentRef, Rationale,
+    DryCheckPairKey, DryCheckReader, DryCheckRecord, DryCheckVerdict, DryCheckWriter, FragmentRef,
+    Rationale,
 };
 use domain::review_v2::types::FilePath;
 use domain::semantic_dup::{CodeFragment, SimilarityScore, SimilarityThreshold};
@@ -153,11 +154,37 @@ impl DryCheckService for DryCheckInteractor {
         // CN-07: identifier matching — when content changes, content_hash
         // changes, so FragmentRef changes, so DryCheckPairKey changes → no
         // match → re-verified.  No separate hash-comparison step.
+        //
+        // Config-fingerprint filtering (round-6 P1 fix, corrected): seed
+        // `verified_set` only from pairs whose **latest** historical record
+        // carries the current config fingerprint.
+        //
+        // The fix first builds a latest-per-pair map (last-write-wins, same
+        // semantics as `DryCheckResultsInteractor` and `check_approved`).
+        // Only entries where the *latest* record's fingerprint matches the
+        // current config are added to `verified_set`.
+        //
+        // Without this two-step approach, iterating records in order and
+        // inserting any matching-fingerprint record could leave a stale "config A"
+        // record in `verified_set` even though a newer "config B" record exists
+        // for the same pair (the later B record does not match the current A
+        // fingerprint, so the guard skips it, but the already-inserted A entry
+        // is never removed). The pair would then be incorrectly skipped under
+        // a reverted-to-A config.
         let records = self.dry_check_reader.read_records().map_err(DryCheckCycleError::Reader)?;
 
-        let mut verified_set: BTreeMap<DryCheckPairKey, ()> = BTreeMap::new();
+        // Build latest-per-pair: iterate in record order; later records overwrite
+        // earlier ones for the same pair_key (last-write-wins).
+        let mut latest_per_pair: BTreeMap<DryCheckPairKey, DryCheckRecord> = BTreeMap::new();
         for record in records {
-            verified_set.insert(record.pair_key().clone(), ());
+            latest_per_pair.insert(record.pair_key().clone(), record);
+        }
+
+        let mut verified_set: BTreeMap<DryCheckPairKey, ()> = BTreeMap::new();
+        for (pair_key, record) in &latest_per_pair {
+            if record.config_fingerprint() == &self.config_fingerprint {
+                verified_set.insert(pair_key.clone(), ());
+            }
         }
 
         // Step 2: Build whole-codebase index from corpus_fragments.
@@ -455,6 +482,7 @@ impl DryCheckService for DryCheckInteractor {
                     threshold,
                     base_commit.clone(),
                     rationale,
+                    self.config_fingerprint.clone(),
                 ) {
                     Ok(e) => e,
                     Err(e) => {
@@ -606,8 +634,8 @@ mod tests {
 
     use domain::CommitHash;
     use domain::dry_check::{
-        DryCheckEntry, DryCheckFinding, DryCheckReaderError, DryCheckRecord, DryCheckVerdict,
-        DryCheckWriterError, Rationale,
+        DryCheckConfigFingerprint, DryCheckEntry, DryCheckFinding, DryCheckPairKey,
+        DryCheckReaderError, DryCheckRecord, DryCheckVerdict, DryCheckWriterError, Rationale,
     };
     use domain::semantic_dup::{
         CodeFragment, SimilarFragment, SimilarityScore, SimilarityThreshold,
@@ -2336,6 +2364,182 @@ mod tests {
             writer.entries.lock().unwrap().len(),
             1,
             "exactly 1 production entry after fast-fail + final-pass"
+        );
+    }
+
+    // ── Config-fingerprint verified_set filtering (round-6 P1) ──────────────
+
+    /// When a historical record carries a DIFFERENT config fingerprint, its pair
+    /// must NOT be added to `verified_set`, so the agent is called for that pair
+    /// in the new run.
+    ///
+    /// Scenario: one prior record under fingerprint `"b" * 64`; the interactor
+    /// uses `"a" * 64` (the test fingerprint).  The pair should be re-judged and
+    /// a new record should be written.
+    #[test]
+    fn test_run_dry_check_skips_verified_set_seeding_for_records_under_old_fingerprint() {
+        // Build a prior record for (src/a.rs, src/b.rs) under a DIFFERENT fingerprint.
+        let diff_content = "fn shared() {}";
+        let cand_content = "fn shared_candidate() {}";
+
+        let low_ref = make_fragment_ref_from_content("src/a.rs", diff_content);
+        let high_ref = make_fragment_ref_from_content("src/b.rs", cand_content);
+
+        // Stale fingerprint — differs from the test interactor's "a"*64.
+        let stale_fp = DryCheckConfigFingerprint::new("b".repeat(64)).unwrap();
+        let changed_path = low_ref.path().clone();
+        let stale_entry = DryCheckEntry::new(
+            DryCheckPairKey::new(low_ref, high_ref).unwrap(),
+            changed_path,
+            DryCheckVerdict::NotAViolation,
+            domain::semantic_dup::SimilarityScore::new(0.9).unwrap(),
+            domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap(),
+            make_commit(),
+            domain::dry_check::Rationale::new("test").unwrap(),
+            stale_fp,
+        )
+        .unwrap();
+        let stale_record = DryCheckRecord::from_entry_and_timestamp(
+            stale_entry,
+            domain::Timestamp::new("2026-06-01T00:00:00Z").unwrap(),
+        )
+        .unwrap();
+
+        let diff_frag = make_fragment("src/a.rs", diff_content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        // The search returns the candidate — the pair must not be skipped even
+        // though there is a historical record, because the fingerprint differs.
+        let results = vec![make_similar_fragment("src/b.rs", cand_content, 0.9)];
+        index.expect_search().returning(move |_, _| Ok(results.clone()));
+
+        // Agent IS called: the stale-fingerprint record must NOT populate
+        // verified_set, so the pair is treated as unverified.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("re-judged under new config").unwrap(),
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor =
+            make_interactor(embed, index, agent, Arc::clone(&writer), vec![stale_record]);
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty(), "NotAViolation should return no findings");
+        assert_eq!(
+            writer.entries.lock().unwrap().len(),
+            1,
+            "the pair must be re-judged and a new record must be written (stale fingerprint \
+             excluded from verified_set)"
+        );
+        // The new record must carry the current (test) fingerprint.
+        assert_eq!(
+            writer.entries.lock().unwrap()[0].config_fingerprint(),
+            &test_fingerprint(),
+            "written entry must carry the current config fingerprint, not the stale one"
+        );
+    }
+
+    /// When a pair's record history is [config_A, config_B], and the current config
+    /// reverts to A, the pair must NOT be treated as verified.
+    ///
+    /// The latest record for this pair is the B record. Because the latest record
+    /// carries fingerprint B (≠ current A), the pair must be re-judged even though
+    /// an older A record exists in the history. The non-latest A record must not
+    /// "resurrect" the verified status when B is the effective (latest) state.
+    #[test]
+    fn test_verified_set_uses_latest_per_pair_not_any_matching_record() {
+        let diff_content = "fn config_revert_test() {}";
+        let cand_content = "fn config_revert_cand() {}";
+
+        let low_ref = make_fragment_ref_from_content("src/a.rs", diff_content);
+        let high_ref = make_fragment_ref_from_content("src/b.rs", cand_content);
+
+        let fp_a = test_fingerprint(); // "a"*64 — the current config fingerprint
+        let fp_b = DryCheckConfigFingerprint::new("b".repeat(64)).unwrap(); // config B
+
+        // Record 1: judged under config A (old, but fingerprint matches current).
+        let changed_path_a = low_ref.path().clone();
+        let entry_a = DryCheckEntry::new(
+            DryCheckPairKey::new(low_ref.clone(), high_ref.clone()).unwrap(),
+            changed_path_a,
+            DryCheckVerdict::NotAViolation,
+            domain::semantic_dup::SimilarityScore::new(0.9).unwrap(),
+            domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap(),
+            make_commit(),
+            domain::dry_check::Rationale::new("old A judgment").unwrap(),
+            fp_a,
+        )
+        .unwrap();
+        let record_a = DryCheckRecord::from_entry_and_timestamp(
+            entry_a,
+            domain::Timestamp::new("2026-06-01T00:00:00Z").unwrap(),
+        )
+        .unwrap();
+
+        // Record 2: later judged under config B (the latest record for this pair).
+        let changed_path_b = low_ref.path().clone();
+        let entry_b = DryCheckEntry::new(
+            DryCheckPairKey::new(low_ref, high_ref).unwrap(),
+            changed_path_b,
+            DryCheckVerdict::NotAViolation,
+            domain::semantic_dup::SimilarityScore::new(0.9).unwrap(),
+            domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap(),
+            make_commit(),
+            domain::dry_check::Rationale::new("B judgment").unwrap(),
+            fp_b,
+        )
+        .unwrap();
+        let record_b = DryCheckRecord::from_entry_and_timestamp(
+            entry_b,
+            domain::Timestamp::new("2026-06-02T00:00:00Z").unwrap(),
+        )
+        .unwrap();
+
+        // History: [record_a (config A), record_b (config B)].
+        // Current config is A. Latest record is B → pair must be re-judged.
+        let diff_frag = make_fragment("src/a.rs", diff_content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        let results = vec![make_similar_fragment("src/b.rs", cand_content, 0.9)];
+        index.expect_search().returning(move |_, _| Ok(results.clone()));
+
+        // Agent MUST be called: the latest record carries B fingerprint (≠ current A),
+        // so the pair is not in verified_set.
+        let agent = make_probe_aware_agent(DryCheckAgentJudgment::NotAViolation {
+            rationale: Rationale::new("re-judged after config revert to A").unwrap(),
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor =
+            make_interactor(embed, index, agent, Arc::clone(&writer), vec![record_a, record_b]);
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty(), "NotAViolation should return no findings");
+        assert_eq!(
+            writer.entries.lock().unwrap().len(),
+            1,
+            "pair must be re-judged when latest record carries a different fingerprint, \
+             even though an older record with the current fingerprint exists"
+        );
+        // Written entry must carry the current (A) fingerprint.
+        assert_eq!(
+            writer.entries.lock().unwrap()[0].config_fingerprint(),
+            &test_fingerprint(),
+            "written entry must carry the current config fingerprint"
         );
     }
 

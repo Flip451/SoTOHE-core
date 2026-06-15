@@ -47,6 +47,43 @@ subgraph domain["domain"]
     T36_domain_domain_DryCheckCoverageRecord_contains_pair([contains_pair])
     T36_domain_domain_DryCheckCoverageRecord_config_fingerprint([config_fingerprint])
   end
+  subgraph T27_domain_domain_DryCheckEntry["dry_check::record::DryCheckEntry"]
+    direction TB
+    T27_domain_domain_DryCheckEntry__self[DryCheckEntry]
+    T27_domain_domain_DryCheckEntry_new([new])
+    T27_domain_domain_DryCheckEntry_pair_key([pair_key])
+    T27_domain_domain_DryCheckEntry_changed_path([changed_path])
+    T27_domain_domain_DryCheckEntry_verdict([verdict])
+    T27_domain_domain_DryCheckEntry_similarity_score([similarity_score])
+    T27_domain_domain_DryCheckEntry_threshold([threshold])
+    T27_domain_domain_DryCheckEntry_base_commit([base_commit])
+    T27_domain_domain_DryCheckEntry_rationale([rationale])
+    T27_domain_domain_DryCheckEntry_config_fingerprint([config_fingerprint])
+  end
+  subgraph T32_domain_domain_DryCheckEntryError["dry_check::record::DryCheckEntryError"]
+    direction TB
+    T32_domain_domain_DryCheckEntryError__self[DryCheckEntryError]
+    T32_domain_domain_DryCheckEntryError_ChangedPathOutsidePair[ChangedPathOutsidePair]
+  end
+  subgraph T28_domain_domain_DryCheckRecord["dry_check::record::DryCheckRecord"]
+    direction TB
+    T28_domain_domain_DryCheckRecord__self[DryCheckRecord]
+    T28_domain_domain_DryCheckRecord_from_entry_and_timestamp([from_entry_and_timestamp])
+    T28_domain_domain_DryCheckRecord_pair_key([pair_key])
+    T28_domain_domain_DryCheckRecord_changed_path([changed_path])
+    T28_domain_domain_DryCheckRecord_verdict([verdict])
+    T28_domain_domain_DryCheckRecord_similarity_score([similarity_score])
+    T28_domain_domain_DryCheckRecord_threshold([threshold])
+    T28_domain_domain_DryCheckRecord_base_commit([base_commit])
+    T28_domain_domain_DryCheckRecord_rationale([rationale])
+    T28_domain_domain_DryCheckRecord_recorded_at([recorded_at])
+    T28_domain_domain_DryCheckRecord_config_fingerprint([config_fingerprint])
+  end
+  subgraph T33_domain_domain_DryCheckRecordError["dry_check::record::DryCheckRecordError"]
+    direction TB
+    T33_domain_domain_DryCheckRecordError__self[DryCheckRecordError]
+    T33_domain_domain_DryCheckRecordError_ChangedPathOutsidePair[ChangedPathOutsidePair]
+  end
   end
   subgraph domain_domain_module_track_phase["domain::track_phase"]
     direction TB
@@ -269,6 +306,14 @@ T36_domain_domain_DryCheckCoverageRecord_new --o T39_domain_domain_DryCheckConfi
 T36_domain_domain_DryCheckCoverageRecord_new --> T36_domain_domain_DryCheckCoverageRecord__self
 T36_domain_domain_DryCheckCoverageRecord_config_fingerprint --> T39_domain_domain_DryCheckConfigFingerprint__self
 T36_domain_domain_DryCheckCoverageRecord__self --o|config_fingerprint| T39_domain_domain_DryCheckConfigFingerprint__self
+T27_domain_domain_DryCheckEntry_new --o T39_domain_domain_DryCheckConfigFingerprint__self
+T27_domain_domain_DryCheckEntry_new --> T27_domain_domain_DryCheckEntry__self
+T27_domain_domain_DryCheckEntry_new --> T32_domain_domain_DryCheckEntryError__self
+T27_domain_domain_DryCheckEntry_config_fingerprint --> T39_domain_domain_DryCheckConfigFingerprint__self
+T28_domain_domain_DryCheckRecord_from_entry_and_timestamp --o T27_domain_domain_DryCheckEntry__self
+T28_domain_domain_DryCheckRecord_from_entry_and_timestamp --> T28_domain_domain_DryCheckRecord__self
+T28_domain_domain_DryCheckRecord_from_entry_and_timestamp --> T33_domain_domain_DryCheckRecordError__self
+T28_domain_domain_DryCheckRecord_config_fingerprint --> T39_domain_domain_DryCheckConfigFingerprint__self
 T26_domain_domain_FixpointStep_RunRfp --o|scopes| T28_domain_domain_ReviewScopeSet__self
 T28_domain_domain_ReviewScopeSet_try_new --> T33_domain_domain_ReviewScopeSetError__self
 T28_domain_domain_ReviewScopeSet_try_new --> T28_domain_domain_ReviewScopeSet__self
@@ -325,6 +370,31 @@ class T36_domain_domain_DryCheckCoverageRecord_covers method_node
 class T36_domain_domain_DryCheckCoverageRecord_contains_pair method_node
 class T36_domain_domain_DryCheckCoverageRecord_config_fingerprint method_node
 class T36_domain_domain_DryCheckCoverageRecord__self value_object
+class T27_domain_domain_DryCheckEntry_new method_node
+class T27_domain_domain_DryCheckEntry_pair_key method_node
+class T27_domain_domain_DryCheckEntry_changed_path method_node
+class T27_domain_domain_DryCheckEntry_verdict method_node
+class T27_domain_domain_DryCheckEntry_similarity_score method_node
+class T27_domain_domain_DryCheckEntry_threshold method_node
+class T27_domain_domain_DryCheckEntry_base_commit method_node
+class T27_domain_domain_DryCheckEntry_rationale method_node
+class T27_domain_domain_DryCheckEntry_config_fingerprint method_node
+class T27_domain_domain_DryCheckEntry__self value_object
+class T32_domain_domain_DryCheckEntryError_ChangedPathOutsidePair variant_node
+class T32_domain_domain_DryCheckEntryError__self error_type
+class T28_domain_domain_DryCheckRecord_from_entry_and_timestamp method_node
+class T28_domain_domain_DryCheckRecord_pair_key method_node
+class T28_domain_domain_DryCheckRecord_changed_path method_node
+class T28_domain_domain_DryCheckRecord_verdict method_node
+class T28_domain_domain_DryCheckRecord_similarity_score method_node
+class T28_domain_domain_DryCheckRecord_threshold method_node
+class T28_domain_domain_DryCheckRecord_base_commit method_node
+class T28_domain_domain_DryCheckRecord_rationale method_node
+class T28_domain_domain_DryCheckRecord_recorded_at method_node
+class T28_domain_domain_DryCheckRecord_config_fingerprint method_node
+class T28_domain_domain_DryCheckRecord__self value_object
+class T33_domain_domain_DryCheckRecordError_ChangedPathOutsidePair variant_node
+class T33_domain_domain_DryCheckRecordError__self error_type
 class T26_domain_domain_FixpointStep_RunDfp variant_node
 class T26_domain_domain_FixpointStep_RunRfp variant_node
 class T26_domain_domain_FixpointStep_RunRefVerify variant_node

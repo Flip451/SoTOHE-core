@@ -196,7 +196,8 @@ pub(crate) fn candidate_pair_keys_for_diff(
 #[cfg(test)]
 pub(crate) mod test_mocks {
     use domain::dry_check::{
-        DryCheckEntry, DryCheckPairKey, DryCheckRecord, DryCheckVerdict, FragmentRef, Rationale,
+        DryCheckConfigFingerprint, DryCheckEntry, DryCheckPairKey, DryCheckRecord, DryCheckVerdict,
+        FragmentRef, Rationale,
     };
     use domain::review_v2::types::FilePath;
     use domain::semantic_dup::{
@@ -283,6 +284,13 @@ pub(crate) mod test_mocks {
     /// # Panics
     ///
     /// Panics on invalid inputs (only valid in `#[cfg(test)]` context).
+    ///
+    /// Records built by this helper carry a test fingerprint (`"a" * 64`) so
+    /// interactor tests that seed the reader with these records will treat them
+    /// as "verified under the same config" as the test interactor (which also
+    /// uses `test_fingerprint()`).  To build records that should be re-judged
+    /// (stale fingerprint), set `config_fingerprint` to
+    /// `DryCheckConfigFingerprint::fail_closed()` manually.
     #[allow(clippy::unwrap_used)]
     pub(crate) fn make_dry_check_record_for_tests(
         low: FragmentRef,
@@ -299,6 +307,10 @@ pub(crate) mod test_mocks {
             SimilarityThreshold::new(0.8).unwrap(),
             CommitHash::try_new("a".repeat(40)).unwrap(),
             Rationale::new("test").unwrap(),
+            // Use the canonical test fingerprint ("a" * 64) so the interactor's
+            // `verified_set` seeding includes these records (the test interactor
+            // is constructed with the same fingerprint via `test_fingerprint()`).
+            DryCheckConfigFingerprint::new("a".repeat(64)).unwrap(),
         )
         .unwrap();
         DryCheckRecord::from_entry_and_timestamp(entry, Timestamp::new(timestamp).unwrap()).unwrap()

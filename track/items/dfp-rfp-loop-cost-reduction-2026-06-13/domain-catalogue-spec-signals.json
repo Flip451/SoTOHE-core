@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "96fd2982b0e7ae9486135b445396327269a80aa7205ce68cc3b73fc990f6f5d3",
+  "catalogue_declaration_hash": "5ae109567b3f36ddddea1a174d12c37b8a37317a1acb16504ea8d9881fd4cc76",
   "signals": [
     {
       "type_name": "DryCheckConfigFingerprint",
@@ -16,6 +16,26 @@
       "type_name": "DryCheckCoverageRecord",
       "signal": "blue",
       "entry_hash": "8c323537013826ddd48bf5ab1225eb9084cda399893b4cc8f33f4b470bf53df9"
+    },
+    {
+      "type_name": "DryCheckEntry",
+      "signal": "blue",
+      "entry_hash": "865d85db1aa6fc2a0c7822000b352f39d6b97ad7c8a38d139f9a44750e9e06d1"
+    },
+    {
+      "type_name": "DryCheckEntryError",
+      "signal": "blue",
+      "entry_hash": "e8fbf3d7343093f35bc8dfc578c8f36df676ab042b0a72af70c1088891e53813"
+    },
+    {
+      "type_name": "DryCheckRecord",
+      "signal": "blue",
+      "entry_hash": "c3ac257a2286f9197d93c521cd259fa4b97c76dba91fa391d32ec270880fbfe7"
+    },
+    {
+      "type_name": "DryCheckRecordError",
+      "signal": "blue",
+      "entry_hash": "4b69d3410b16e6cfd9a300fa02835d56ecab93c524a1eede8f9e65d9cdd0ac09"
     },
     {
       "type_name": "FixpointStep",

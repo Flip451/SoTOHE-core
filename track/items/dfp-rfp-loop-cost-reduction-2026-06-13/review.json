@@ -1,6 +1,255 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:03:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:05:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:52:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ec8bb804b0ac738d90793d9118ac00eb92320eee8c07ce46d22978328867753",
+          "at": "2026-06-15T06:42:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ec8bb804b0ac738d90793d9118ac00eb92320eee8c07ce46d22978328867753",
+          "at": "2026-06-15T06:44:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f328bc986d4bf21cd3efa2e0284166ff29c4199ae7cf5b6823fa8f447bb2cb29",
+          "at": "2026-06-15T09:14:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f328bc986d4bf21cd3efa2e0284166ff29c4199ae7cf5b6823fa8f447bb2cb29",
+          "at": "2026-06-15T09:16:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a34389ef7ee0447b2bc8317be3f5cb92b089578383f0bad13ba693216e3d8e0",
+          "at": "2026-06-15T12:26:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a34389ef7ee0447b2bc8317be3f5cb92b089578383f0bad13ba693216e3d8e0",
+          "at": "2026-06-15T12:28:29Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:40:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:42:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
+          "at": "2026-06-14T04:18:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
+          "at": "2026-06-14T04:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
+          "at": "2026-06-14T04:32:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
+          "at": "2026-06-14T04:34:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f8ccdd4dc037c83d844720abe34f4ca8629af424183ffe6eae4c9b570aa541f",
+          "at": "2026-06-14T04:47:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
+          "at": "2026-06-14T05:02:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
+          "at": "2026-06-14T05:05:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
+          "at": "2026-06-14T05:12:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The unchanged Rules section now contradicts the new workflow: it says to always run `cargo make ci-rust` before re-running `sotp dry check-approved` and points to “step 3 above,” but Step 3 is now the zero-violation no-fix path that explicitly must skip `ci-rust`. This makes the agent policy ambiguous and can defeat the D1 fast path the change is meant to introduce. Update this rule to refer only to fix rounds / Step 4 verification.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 117,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
+          "at": "2026-06-14T05:14:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 treats a `dry write` run with zero reported `Violation` findings as either approved or an anomaly, but Step 2 explicitly says already-judged pairs are cache hits/no-ops. In that state, a previously recorded unresolved violation will not be re-emitted by `dry write`; `check-approved` will still block, and this workflow tells dfl to stop as `blocked` instead of retrieving the stored violation/proposal via `bin/sotp dry results --filter violation` and fixing it. This makes a normal re-entry/retry with cached violations fail even though autonomous fixes are still available.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 84,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:43c20f74d8e80ad92d12126ee2038140cb917c93611868dbaba4fd7cc2e312ba",
+          "at": "2026-06-14T05:17:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 can lose cached violations after a blocked follow-up gate check. `sotp dry write` returns no findings for already-verified pairs, including cached `Violation` records, so a non-zero `dry check-approved` after the follow-up write does not guarantee the “new finding set” is non-empty. Re-entering Step 4 using only that write output can spin/exhaust without applying available cached refactor proposals. The blocked branch should mirror Step 3 by reading unresolved cached violations before looping.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 103,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:ec1203a50d28ecd4e3486ffc434903b68659af286ab2d18cd607d1b166dfa405",
+          "at": "2026-06-14T05:20:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ed69050537ee92aa22adf8bec811d8997e5e7c75d71b16addad21f02ecdc1b1",
+          "at": "2026-06-14T05:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
+          "at": "2026-06-14T05:31:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
+          "at": "2026-06-14T05:31:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
+          "at": "2026-06-14T05:33:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
+          "at": "2026-06-14T07:12:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
+          "at": "2026-06-14T07:13:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
+          "at": "2026-06-14T13:14:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
+          "at": "2026-06-14T13:16:44Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -195,6 +444,635 @@
           "findings": [],
           "hash": "rvw1:sha256:385d5fb011472d38507d9b6c595374c9d0c2c47d1e112a554088ebe4bda776fd",
           "at": "2026-06-15T10:19:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This fallback turns any malformed `config_fingerprint` into the fail-closed sentinel, so a corrupted v2 record is accepted as stale history instead of surfacing `DryCheckReaderError::InvalidData`. Keep the serde default for missing v1 fields, but propagate `DryCheckConfigFingerprint::new` failures here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/store.rs",
+              "line": 315,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6e1a5f0fda7216adeb93b05cb721aa4e75723869179264a40d6e114eeb74aaa0",
+          "at": "2026-06-15T12:27:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[P1] [`/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/store.rs:315`] A schema-v2 record that is missing `config_fingerprint` is silently deserialized to the all-zeros sentinel via the serde default path, so a corrupted on-disk record is treated as stale history instead of surfacing `InvalidData`. Keep the v1 migration default, but make missing `config_fingerprint` in v2 fail closed with an error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/store.rs",
+              "line": 315,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:40706bc47dbd7bab61f927e02ea275867b2e19fc029a7eeb23ed4badb28e3703",
+          "at": "2026-06-15T12:32:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Using `Option<String>` here, together with `skip_serializing_if = \"Option::is_none\"`, breaks the v1->v2 migration on the first write. A legacy v1 file is read with `None` fingerprints, `append_record()` later rewrites the document with `schema_version: 2`, and the old records are still serialized without `config_fingerprint`. On the next `read_records()`, those historical rows are treated as schema-v2 records missing a required field and the store returns `InvalidData`, so appending to pre-upgrade history can brick the file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/codec.rs",
+              "line": 65,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5a8ec375e5141ef965b3254bf6f0c1a60400f20a30ef16898824912e9e494101",
+          "at": "2026-06-15T12:58:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [`store.rs:346`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/store.rs#L346) turns any malformed persisted `config_fingerprint` into `InvalidData`, which aborts the entire `read_records()` call. The migration intent here is fail-closed, not fatal: a bad fingerprint should degrade to `DryCheckConfigFingerprint::fail_closed()` so one corrupt historical row does not make the full dry-check history unreadable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/store.rs",
+              "line": 346,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: [`codec.rs:65`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/codec.rs#L65) and [`store.rs:225`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/store.rs#L225) keep `config_fingerprint` as `Option<String>` with `skip_serializing_if`, so a schema-v2 file missing the field is parsed as `None` and can be written back out without normalizing the fingerprint. That preserves a broken v2 record and lets later reads keep failing instead of repairing or rejecting the corrupted row.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/dry_check/codec.rs",
+              "line": 65,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a6383ce7c08528710ae9fc4355cf262d4971bd764ce651dcf0a46d12e7aaa234",
+          "at": "2026-06-15T13:04:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c70edd3e11b7942e6638727d42a0051b8b59cceb1e233a35997537b62db3d44b",
+          "at": "2026-06-15T13:11:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c70edd3e11b7942e6638727d42a0051b8b59cceb1e233a35997537b62db3d44b",
+          "at": "2026-06-15T13:14:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89494d6abdd29be281874be30cef2f9c13d38185a6b5068d144fd29ddec22396",
+          "at": "2026-06-15T13:34:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89494d6abdd29be281874be30cef2f9c13d38185a6b5068d144fd29ddec22396",
+          "at": "2026-06-15T13:41:49Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:03:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
+          "at": "2026-06-14T01:05:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T02:36:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T02:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
+          "at": "2026-06-14T03:02:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_ref_of` is still `pub(crate)` here, and `mod.rs` does not re-export it. The briefing’s new approval contract says composition must compute current `FragmentRef`s using this promoted helper; keeping it private either breaks that public usecase API or forces composition to duplicate the path/hash construction logic, which risks the gate using different identity semantics than the write path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/shared.rs",
+              "line": 46,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
+          "at": "2026-06-14T03:05:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
+          "at": "2026-06-14T03:08:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_run_dry_check_writes_coverage_record_with_all_diff_fragment_refs` is not runnable as written: it runs `run_dry_check` with two diff fragments but only configures one `expect_embed()` and one `index.expect_search()`, and it also leaves an unused `expect_embed_batch()` in place even though the corpus is empty. Mockall will fail on the second diff fragment (and again on drop for the unused corpus expectation), so the coverage assertions never run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 1087,
+              "category": "test"
+            },
+            {
+              "message": "`test_run_dry_check_with_empty_diff_writes_empty_coverage_record` and `test_run_dry_check_coverage_port_error_propagated` both set `expect_embed_batch()` even though `run_dry_check(vec![], ...)` never calls `embed_batch` for an empty corpus. Those expectations will remain unmet at drop, so both tests fail before asserting the new coverage behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 1136,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:d44cc2050957463dfc615559e37e4557aa6fc4819baf12262cbcd9ef51c3d615",
+          "at": "2026-06-14T03:47:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
+          "at": "2026-06-14T03:52:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
+          "at": "2026-06-14T03:55:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad936b3927fa9173f6afaee7327964f79b91579d37d6c926524daca54695ac59",
+          "at": "2026-06-14T07:48:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad936b3927fa9173f6afaee7327964f79b91579d37d6c926524daca54695ac59",
+          "at": "2026-06-14T07:50:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `append_record` errors still abort the loop immediately, so a single writer failure stops the remaining pairs from being judged/persisted. That violates the T010/CN-03 requirement that the batch run to completion and then return the first error afterward. The early return at `append_record(...)` means later pairs can be skipped entirely.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 303,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: The scoped fan-out can deadlock if `agent.judge()` panics after a semaphore slot is acquired. The slot is only released after `judge()` and `send()`, so a panic skips the decrement/notify path and the spawning thread can block forever in `sem_cvar.wait()`, preventing `std::thread::scope` from unwinding cleanly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 372,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2e263fa7568cbc6655f1a41a7df2e022b5168c659134f0d8938ba1e4f048f873",
+          "at": "2026-06-14T11:10:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The shared test-fixture refactor weakened the field-level assertions that used to guard `DryCheckRecord` round-trips: `assert_record_full_fields` now only checks that the hashes are 64 chars, and the `mod.rs` test no longer checks the exact rationale string. A broken `FragmentRef` hash derivation or a wrong persisted rationale could now pass these tests, so the helper no longer protects the record-field contract as strongly as before.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/shared.rs",
+              "line": 320,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:21a7ae07bbf7eb407b34791cccd6e2106d15d565a36485084e59220645253bb4",
+          "at": "2026-06-14T11:18:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This shared helper is documented as supporting non-`Violation` records via `expected_proposal: None`, but it still unconditionally asserts `DryCheckVerdict::Violation`. As written, it cannot validate `Accepted` or `NotAViolation` records, so the consolidation leaves a coverage hole for two public verdict variants.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/shared.rs",
+              "line": 343,
+              "category": "test coverage"
+            },
+            {
+              "message": "The new field-access test derives the expected hashes with `content_hash_of(...)`, the same helper used by `make_fragment_ref_for_tests` to build the actual record. That removes the independent oracle for hash derivation, so a regression in the hash input or algorithm would still pass. The same pattern appears in `results_interactor.rs`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/mod.rs",
+              "line": 129,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:aaf09baf9ff2102c9b20345c52a3b24f451cdd2931348824b01a4aef4bbd714a",
+          "at": "2026-06-14T11:26:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The inquiry phase still aborts the whole dry-check run on the first fragment-level failure: `fragment_ref_of`, `collect_above_threshold_candidates`, and `candidate_pair_keys_for_diff` all use `?` here instead of recording the error and continuing with the remaining diff fragments. That violates the intended aggregate-errors / no-premature-shutdown behavior and means one bad fragment can prevent later fragments from being judged.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 177,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:85b44ca0df7470ede25f3f8b0cf6b6b85d67aa45a5f6233cddb7c7286108d4a2",
+          "at": "2026-06-14T11:41:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new parallel path still spawns one scoped OS thread per candidate pair. `max_parallelism` only limits how many are active at once, not how many threads are created, so a large diff can still exhaust thread resources and panic inside `std::thread::scope::spawn` instead of returning a `DryCheckCycleError`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 449,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:62e43ddee994d6f88c9899a98943b71b39994fcda5ce8cb32790195fd6b8dce4",
+          "at": "2026-06-14T11:50:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_dry_check` now returns immediately when `first_error` is set, which skips `write_coverage` for the entire run. That regresses partial-failure runs: fragments that were successfully processed in the inquiry phase never get recorded in the coverage manifest, so the approval gate will later treat them as stale/uncovered. Coverage should be written before returning the aggregated error, or written unconditionally after phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 374,
+              "category": "correctness"
+            },
+            {
+              "message": "`assert_record_full_fields` does not actually require a refactor proposal when the expected verdict is `Violation`; if `expected_proposal` is `None`, the proposal check is silently skipped. That makes the shared record assertion incomplete and can let a broken `refactor_proposal` field slip through these tests without failing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/shared.rs",
+              "line": 355,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:80a6da16e1d289a0933ab28c13020d68bc8409dcd54e97e1f1312ff38a696ede",
+          "at": "2026-06-14T11:57:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_coverage()` is called before the aggregated `first_error` is returned, so a coverage I/O failure will mask any earlier agent/index/entry/writer error from the same run. That breaks the stated CN-03 policy of returning the first collected error after all pairs complete; if one pair times out and coverage persistence also fails, the caller gets `CoveragePort` instead of the original pair error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 385,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:8e5bc098b7dc811c12609ed74facd4688bc706506fa689b79abe640981fa652d",
+          "at": "2026-06-14T12:07:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Repeated candidates emitted by `collect_above_threshold_candidates()` during the k-doubling loop are collapsed here with `or_insert`, so only the first occurrence of a pair is ever judged. If that first occurrence hits an agent/entry/write error, later duplicate occurrences that the old sequential path would still attempt are skipped, which can drop a recoverable finding and violates the aggregate-all-errors/no-premature-shutdown behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 233,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:8e5bc098b7dc811c12609ed74facd4688bc706506fa689b79abe640981fa652d",
+          "at": "2026-06-14T12:07:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e3309ccbce52e24755ada035d1d32be98fff426559e2b411181134127b718c0",
+          "at": "2026-06-14T12:15:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e3309ccbce52e24755ada035d1d32be98fff426559e2b411181134127b718c0",
+          "at": "2026-06-14T12:15:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e3309ccbce52e24755ada035d1d32be98fff426559e2b411181134127b718c0",
+          "at": "2026-06-14T12:20:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e3309ccbce52e24755ada035d1d32be98fff426559e2b411181134127b718c0",
+          "at": "2026-06-14T12:20:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new calibration fail-closed path returns here before the coverage manifest is written. That regresses the existing guarantee that `run_dry_check` persists coverage unconditionally after processing diff fragments, so a calibration failure leaves the current fragments uncovered and keeps `dry check-approved` blocked on later runs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 383,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3ae92fe9f45d3bd609525f834387ed64694ef15b632d60d506193d4e98a33ee3",
+          "at": "2026-06-14T15:57:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When both calibration tiers fail, this branch returns `Err(\"calibration failed\")` after persisting coverage but before writing any production verdicts. `check_approved()` treats a diff as `Approved` when the current `FragmentRef`s are covered and there are no violation records touching them, so a failed run can still leave the current diff approvable instead of fail-closed.",
+              "severity": "P0",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
+              "line": 457,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:7d4a30837d4170e6b9620a23c41ba1226fd919427ef9f7b1759add317fb37f58",
+          "at": "2026-06-14T16:08:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4453006dff24b337b847e80aa1e9db526d48c27d7f01aae2c3b6ac48248060d",
+          "at": "2026-06-14T16:15:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The escalation test does not actually verify escalation. The mock used by this test ignores `DryCheckJudgeTier` and returns `Violation` for production calls regardless of whether the interactor calls Fast, Final, or never calls Final at all, so a regression that persisted the provisional Fast violation without re-judging it would still pass. T012 explicitly requires Violation/Err production results to be re-run with `Final`; add a tier-sensitive mock, for example Fast returns `Violation` and Final returns `NotAViolation`, then assert the persisted result comes from Final and both tiers were called.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
+              "line": 2090,
+              "category": "test coverage"
+            },
+            {
+              "message": "The fast-calibration-failure test does not prove that production pairs are re-run with the Final tier after Fast calibration fails. Its production branch returns the same `NotAViolation` for every tier, so an implementation that incorrectly reused the discarded Fast provisional result would still write one production entry and pass this test. The briefing calls out that the failure path must re-run the same production set with `Final`; make this mock record or vary production results by tier and assert every production pair receives a Final judgment before writing.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
+              "line": 2136,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e4453006dff24b337b847e80aa1e9db526d48c27d7f01aae2c3b6ac48248060d",
+          "at": "2026-06-14T16:19:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70415177963bec2fa1979e5546d292e538bd09b385cdc862c3531695b731b017",
+          "at": "2026-06-14T16:25:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: if `write_coverage()` fails on a calibration-failure run, the code still returns `calibration_error` first and drops the coverage error. That masks a failed fail-closed write, so the old coverage manifest can remain in place while the caller thinks only calibration failed. The coverage failure needs to take precedence or be combined with the calibration error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
+              "line": 480,
+              "category": "error handling"
+            },
+            {
+              "message": "P1: `known_bad_probe_pairs()` silently filters out any probe whose `CodeFragment::new(...)` construction fails. Because the returned vector size feeds directly into the calibration denominator, a malformed probe fixture would quietly weaken the barrier instead of failing closed. This helper should surface fixture-construction failure instead of dropping probes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/known_bad.rs",
+              "line": 49,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:543721b1c1f1069dbd48bbbd5c7711ff3e999c16f967f092bf6ef50702d7b092",
+          "at": "2026-06-14T16:50:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2acdea1c8950389f81a5562d09286543b0447491a290a2abba72212641136f22",
+          "at": "2026-06-14T16:58:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`interactor.rs` now has 703 non-test lines before the `#[cfg(test)]` block at line 704, exceeding the repository's 700-line production module maximum. The new calibration helpers pushed this already-large module over the enforced size limit; move one of the helper groups, such as known-bad calibration orchestration, into a sibling module to bring the production section back under the cap.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
+              "line": 704,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2acdea1c8950389f81a5562d09286543b0447491a290a2abba72212641136f22",
+          "at": "2026-06-14T17:03:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`mod.rs` declares the new `calibration` and `known_bad` modules, but both source files are currently untracked, so they are omitted from `git diff`. Applying this patch as-is leaves these module declarations pointing at missing files and the usecase crate will fail to compile. Add `libs/usecase/src/dry_check/calibration.rs` and `libs/usecase/src/dry_check/known_bad.rs` to the tracked change set.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/mod.rs",
+              "line": 15,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:c3e97080cf9b02e6af59bf704e4d330749329a6140a55db49d23b0120a99ce33",
+          "at": "2026-06-14T17:10:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3e97080cf9b02e6af59bf704e4d330749329a6140a55db49d23b0120a99ce33",
+          "at": "2026-06-14T17:13:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `FixpointResolveCommand.current_branch` is never consulted in `FixpointResolveInteractor::resolve` ([fixpoint_resolve.rs#L69](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/fixpoint_resolve.rs#L69), [fixpoint_resolve.rs#L265](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/fixpoint_resolve.rs#L265)). That leaves `FixpointResolveError::TrackNotActive` unreachable and removes the active-track guard expected for this workflow, so the resolver can drive DFP/RFP/ref-verify for a track while the user is on an unrelated branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/fixpoint_resolve.rs",
+              "line": 265,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:02966ccaae66ecc988ab8ebcd9a89e0e29206ab1e14006e011a20b13e71631e9",
+          "at": "2026-06-14T23:51:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe36c60a6936bf66dc8f87fe99eb7bd3897b55e6805dba4f0dc6d3bf12b65b29",
+          "at": "2026-06-14T23:58:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FixpointResolveInteractor::new` now requires a `TrackActiveBranchPort` and `resolve` performs an active-branch query before the three gate checks. The T014 usecase contract describes this resolver as a public-API composition of only the dry, review, and ref-verify gates, with the constructor wired from those three dependencies. This extra public port changes the DI surface and can force downstream composition to provide an uncatalogued dependency before the resolver can be used, so the fixpoint resolver API no longer matches the planned usecase boundary.",
+              "severity": "P1",
+              "file": "libs/usecase/src/fixpoint_resolve.rs",
+              "line": 269,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:fe36c60a6936bf66dc8f87fe99eb7bd3897b55e6805dba4f0dc6d3bf12b65b29",
+          "at": "2026-06-15T00:04:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d9576183951bad723b269eb37de96711b506c122948e6cc765f4081219fc778",
+          "at": "2026-06-15T00:09:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:033f3064d7c6804cba2b47a39822da9b90c65de6f1ce42b33287f262962bce07",
+          "at": "2026-06-15T05:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:033f3064d7c6804cba2b47a39822da9b90c65de6f1ce42b33287f262962bce07",
+          "at": "2026-06-15T05:10:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc6c13e399b72866bc9c18a53a358a5a5aa4014095baaca12c6eae4858a39ee0",
+          "at": "2026-06-15T06:43:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc6c13e399b72866bc9c18a53a358a5a5aa4014095baaca12c6eae4858a39ee0",
+          "at": "2026-06-15T06:45:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53861b5cbb84ac0460bed4d294beb4d2d91db775b05e84f6f62f73d12e7ce8da",
+          "at": "2026-06-15T09:14:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53861b5cbb84ac0460bed4d294beb4d2d91db775b05e84f6f62f73d12e7ce8da",
+          "at": "2026-06-15T09:17:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7577219c4a65b904b2c890e918daf924d742f2954c42754e7e42a52146ad7149",
+          "at": "2026-06-15T12:27:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The verified-set seeding accepts any historical record with the current config fingerprint, not the latest record for that pair. If a pair was judged under config A, then later under config B, and the current config returns to A, this code will skip re-judging because the old A record matches. It then writes coverage with fingerprint A, while `check_approved` uses latest-per-pair history and can still act on the newer B verdict, allowing the dry gate to approve or block based on stale config. Seed from the latest record per pair, or force a new append whenever the latest record's fingerprint differs from the current one.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
+              "line": 167,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7577219c4a65b904b2c890e918daf924d742f2954c42754e7e42a52146ad7149",
+          "at": "2026-06-15T12:30:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a9bd5f303a571c909b67031f194db117cd82547a5afe8886853376bd9dd7ce6",
+          "at": "2026-06-15T12:58:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a9bd5f303a571c909b67031f194db117cd82547a5afe8886853376bd9dd7ce6",
+          "at": "2026-06-15T13:17:21Z"
         }
       ]
     },
@@ -1322,739 +2200,64 @@
           "findings": [],
           "hash": "rvw1:sha256:1242d8f3789197d3a56fc0eb4d60bec80583bb59b644844c5fee58d3b942ba71",
           "at": "2026-06-15T11:46:14Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:03:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:05:16Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
-          "at": "2026-06-14T23:52:17Z"
+          "hash": "rvw1:sha256:73e32c0fa6e54e2a23e03312e56965a7c5b354d154ea6f4887e629f8a47a24af",
+          "at": "2026-06-15T12:27:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
-          "at": "2026-06-14T23:53:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ec8bb804b0ac738d90793d9118ac00eb92320eee8c07ce46d22978328867753",
-          "at": "2026-06-15T06:42:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ec8bb804b0ac738d90793d9118ac00eb92320eee8c07ce46d22978328867753",
-          "at": "2026-06-15T06:44:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f328bc986d4bf21cd3efa2e0284166ff29c4199ae7cf5b6823fa8f447bb2cb29",
-          "at": "2026-06-15T09:14:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f328bc986d4bf21cd3efa2e0284166ff29c4199ae7cf5b6823fa8f447bb2cb29",
-          "at": "2026-06-15T09:16:44Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
-          "at": "2026-06-14T01:03:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98212cdb6219a98108471b34eee3895c5a7f578ca4c8007a59339c64b6225871",
-          "at": "2026-06-14T01:05:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
-          "at": "2026-06-14T02:36:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
-          "at": "2026-06-14T02:38:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
-          "at": "2026-06-14T03:02:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragment_ref_of` is still `pub(crate)` here, and `mod.rs` does not re-export it. The briefing’s new approval contract says composition must compute current `FragmentRef`s using this promoted helper; keeping it private either breaks that public usecase API or forces composition to duplicate the path/hash construction logic, which risks the gate using different identity semantics than the write path.",
-              "severity": "P1",
-              "file": "libs/usecase/src/dry_check/shared.rs",
-              "line": 46,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:f1799575a61d503b081fe8be70f3ecec9b271f927f25ea03267fad2635b92263",
-          "at": "2026-06-14T03:05:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce8698f38f31fd5268e4e8db37e69e7c42a425672954a399d25ff1bc6cb3578f",
-          "at": "2026-06-14T03:08:56Z"
+          "hash": "rvw1:sha256:f712743d69853a5865bfea6b054b4a7fe1b978a390243d207c516e30e9ad70ad",
+          "at": "2026-06-15T12:30:19Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`test_run_dry_check_writes_coverage_record_with_all_diff_fragment_refs` is not runnable as written: it runs `run_dry_check` with two diff fragments but only configures one `expect_embed()` and one `index.expect_search()`, and it also leaves an unused `expect_embed_batch()` in place even though the corpus is empty. Mockall will fail on the second diff fragment (and again on drop for the unused corpus expectation), so the coverage assertions never run.",
+              "message": "Both `DryCheckEntryError` and `DryCheckRecordError` are introduced in this round, but they are tagged `reference` instead of a change action. That makes the catalogue treat them as pre-existing dependencies rather than part of this round's API surface, which is semantically wrong for this plan artifact; the rendered markdown mirrors the same classification.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 1087,
-              "category": "test"
-            },
-            {
-              "message": "`test_run_dry_check_with_empty_diff_writes_empty_coverage_record` and `test_run_dry_check_coverage_port_error_propagated` both set `expect_embed_batch()` even though `run_dry_check(vec![], ...)` never calls `embed_batch` for an empty corpus. Those expectations will remain unmet at drop, so both tests fail before asserting the new coverage behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 1136,
-              "category": "test"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/domain-types.json",
+              "line": 328,
+              "category": "factual error"
             }
           ],
-          "hash": "rvw1:sha256:d44cc2050957463dfc615559e37e4557aa6fc4819baf12262cbcd9ef51c3d615",
-          "at": "2026-06-14T03:47:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
-          "at": "2026-06-14T03:52:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:efb2c2f194bcf337ab6ebc79652db467750f7cac2360e8301809034733d2c453",
-          "at": "2026-06-14T03:55:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad936b3927fa9173f6afaee7327964f79b91579d37d6c926524daca54695ac59",
-          "at": "2026-06-14T07:48:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad936b3927fa9173f6afaee7327964f79b91579d37d6c926524daca54695ac59",
-          "at": "2026-06-14T07:50:58Z"
+          "hash": "rvw1:sha256:bbd17622e63f952319a5f8955b03bda6e2bf33cfa3535847678da51264a3a103",
+          "at": "2026-06-15T13:40:08Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `append_record` errors still abort the loop immediately, so a single writer failure stops the remaining pairs from being judged/persisted. That violates the T010/CN-03 requirement that the batch run to completion and then return the first error afterward. The early return at `append_record(...)` means later pairs can be skipped entirely.",
+              "message": "`T28_domain_domain_DryCheckRecord` and `T33_domain_domain_DryCheckRecordError` reuse node IDs that are already taken elsewhere in this same Mermaid graph (`T28_domain_domain_ReviewScopeSet`, `T33_domain_domain_ReviewScopeSetError`, and another `T33` in the usecase section). Mermaid treats node IDs globally, so these distinct types will merge in the rendered contract map and misrepresent the API surface.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 303,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: The scoped fan-out can deadlock if `agent.judge()` panics after a semaphore slot is acquired. The slot is only released after `judge()` and `send()`, so a panic skips the decrement/notify path and the spawning thread can block forever in `sem_cvar.wait()`, preventing `std::thread::scope` from unwinding cleanly.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 372,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/contract-map.md",
+              "line": 68,
+              "category": "factual error"
             }
           ],
-          "hash": "rvw1:sha256:2e263fa7568cbc6655f1a41a7df2e022b5168c659134f0d8938ba1e4f048f873",
-          "at": "2026-06-14T11:10:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The shared test-fixture refactor weakened the field-level assertions that used to guard `DryCheckRecord` round-trips: `assert_record_full_fields` now only checks that the hashes are 64 chars, and the `mod.rs` test no longer checks the exact rationale string. A broken `FragmentRef` hash derivation or a wrong persisted rationale could now pass these tests, so the helper no longer protects the record-field contract as strongly as before.",
-              "severity": "P1",
-              "file": "libs/usecase/src/dry_check/shared.rs",
-              "line": 320,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:21a7ae07bbf7eb407b34791cccd6e2106d15d565a36485084e59220645253bb4",
-          "at": "2026-06-14T11:18:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This shared helper is documented as supporting non-`Violation` records via `expected_proposal: None`, but it still unconditionally asserts `DryCheckVerdict::Violation`. As written, it cannot validate `Accepted` or `NotAViolation` records, so the consolidation leaves a coverage hole for two public verdict variants.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/shared.rs",
-              "line": 343,
-              "category": "test coverage"
-            },
-            {
-              "message": "The new field-access test derives the expected hashes with `content_hash_of(...)`, the same helper used by `make_fragment_ref_for_tests` to build the actual record. That removes the independent oracle for hash derivation, so a regression in the hash input or algorithm would still pass. The same pattern appears in `results_interactor.rs`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/mod.rs",
-              "line": 129,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:aaf09baf9ff2102c9b20345c52a3b24f451cdd2931348824b01a4aef4bbd714a",
-          "at": "2026-06-14T11:26:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The inquiry phase still aborts the whole dry-check run on the first fragment-level failure: `fragment_ref_of`, `collect_above_threshold_candidates`, and `candidate_pair_keys_for_diff` all use `?` here instead of recording the error and continuing with the remaining diff fragments. That violates the intended aggregate-errors / no-premature-shutdown behavior and means one bad fragment can prevent later fragments from being judged.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 177,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:85b44ca0df7470ede25f3f8b0cf6b6b85d67aa45a5f6233cddb7c7286108d4a2",
-          "at": "2026-06-14T11:41:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new parallel path still spawns one scoped OS thread per candidate pair. `max_parallelism` only limits how many are active at once, not how many threads are created, so a large diff can still exhaust thread resources and panic inside `std::thread::scope::spawn` instead of returning a `DryCheckCycleError`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 449,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:62e43ddee994d6f88c9899a98943b71b39994fcda5ce8cb32790195fd6b8dce4",
-          "at": "2026-06-14T11:50:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_dry_check` now returns immediately when `first_error` is set, which skips `write_coverage` for the entire run. That regresses partial-failure runs: fragments that were successfully processed in the inquiry phase never get recorded in the coverage manifest, so the approval gate will later treat them as stale/uncovered. Coverage should be written before returning the aggregated error, or written unconditionally after phase 2.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 374,
-              "category": "correctness"
-            },
-            {
-              "message": "`assert_record_full_fields` does not actually require a refactor proposal when the expected verdict is `Violation`; if `expected_proposal` is `None`, the proposal check is silently skipped. That makes the shared record assertion incomplete and can let a broken `refactor_proposal` field slip through these tests without failing.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/shared.rs",
-              "line": 355,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:80a6da16e1d289a0933ab28c13020d68bc8409dcd54e97e1f1312ff38a696ede",
-          "at": "2026-06-14T11:57:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`write_coverage()` is called before the aggregated `first_error` is returned, so a coverage I/O failure will mask any earlier agent/index/entry/writer error from the same run. That breaks the stated CN-03 policy of returning the first collected error after all pairs complete; if one pair times out and coverage persistence also fails, the caller gets `CoveragePort` instead of the original pair error.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 385,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:8e5bc098b7dc811c12609ed74facd4688bc706506fa689b79abe640981fa652d",
-          "at": "2026-06-14T12:07:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Repeated candidates emitted by `collect_above_threshold_candidates()` during the k-doubling loop are collapsed here with `or_insert`, so only the first occurrence of a pair is ever judged. If that first occurrence hits an agent/entry/write error, later duplicate occurrences that the old sequential path would still attempt are skipped, which can drop a recoverable finding and violates the aggregate-all-errors/no-premature-shutdown behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 233,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:8e5bc098b7dc811c12609ed74facd4688bc706506fa689b79abe640981fa652d",
-          "at": "2026-06-14T12:07:32Z"
+          "hash": "rvw1:sha256:bbd17622e63f952319a5f8955b03bda6e2bf33cfa3535847678da51264a3a103",
+          "at": "2026-06-15T13:46:20Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0e3309ccbce52e24755ada035d1d32be98fff426559e2b411181134127b718c0",
-          "at": "2026-06-14T12:15:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e3309ccbce52e24755ada035d1d32be98fff426559e2b411181134127b718c0",
-          "at": "2026-06-14T12:15:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e3309ccbce52e24755ada035d1d32be98fff426559e2b411181134127b718c0",
-          "at": "2026-06-14T12:20:01Z"
+          "hash": "rvw1:sha256:bbd17622e63f952319a5f8955b03bda6e2bf33cfa3535847678da51264a3a103",
+          "at": "2026-06-15T13:51:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0e3309ccbce52e24755ada035d1d32be98fff426559e2b411181134127b718c0",
-          "at": "2026-06-14T12:20:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new calibration fail-closed path returns here before the coverage manifest is written. That regresses the existing guarantee that `run_dry_check` persists coverage unconditionally after processing diff fragments, so a calibration failure leaves the current fragments uncovered and keeps `dry check-approved` blocked on later runs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 383,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3ae92fe9f45d3bd609525f834387ed64694ef15b632d60d506193d4e98a33ee3",
-          "at": "2026-06-14T15:57:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "When both calibration tiers fail, this branch returns `Err(\"calibration failed\")` after persisting coverage but before writing any production verdicts. `check_approved()` treats a diff as `Approved` when the current `FragmentRef`s are covered and there are no violation records touching them, so a failed run can still leave the current diff approvable instead of fail-closed.",
-              "severity": "P0",
-              "file": "libs/usecase/src/dry_check/interactor.rs",
-              "line": 457,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:7d4a30837d4170e6b9620a23c41ba1226fd919427ef9f7b1759add317fb37f58",
-          "at": "2026-06-14T16:08:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4453006dff24b337b847e80aa1e9db526d48c27d7f01aae2c3b6ac48248060d",
-          "at": "2026-06-14T16:15:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The escalation test does not actually verify escalation. The mock used by this test ignores `DryCheckJudgeTier` and returns `Violation` for production calls regardless of whether the interactor calls Fast, Final, or never calls Final at all, so a regression that persisted the provisional Fast violation without re-judging it would still pass. T012 explicitly requires Violation/Err production results to be re-run with `Final`; add a tier-sensitive mock, for example Fast returns `Violation` and Final returns `NotAViolation`, then assert the persisted result comes from Final and both tiers were called.",
-              "severity": "P1",
-              "file": "libs/usecase/src/dry_check/interactor.rs",
-              "line": 2090,
-              "category": "test coverage"
-            },
-            {
-              "message": "The fast-calibration-failure test does not prove that production pairs are re-run with the Final tier after Fast calibration fails. Its production branch returns the same `NotAViolation` for every tier, so an implementation that incorrectly reused the discarded Fast provisional result would still write one production entry and pass this test. The briefing calls out that the failure path must re-run the same production set with `Final`; make this mock record or vary production results by tier and assert every production pair receives a Final judgment before writing.",
-              "severity": "P1",
-              "file": "libs/usecase/src/dry_check/interactor.rs",
-              "line": 2136,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e4453006dff24b337b847e80aa1e9db526d48c27d7f01aae2c3b6ac48248060d",
-          "at": "2026-06-14T16:19:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70415177963bec2fa1979e5546d292e538bd09b385cdc862c3531695b731b017",
-          "at": "2026-06-14T16:25:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: if `write_coverage()` fails on a calibration-failure run, the code still returns `calibration_error` first and drops the coverage error. That masks a failed fail-closed write, so the old coverage manifest can remain in place while the caller thinks only calibration failed. The coverage failure needs to take precedence or be combined with the calibration error.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/interactor.rs",
-              "line": 480,
-              "category": "error handling"
-            },
-            {
-              "message": "P1: `known_bad_probe_pairs()` silently filters out any probe whose `CodeFragment::new(...)` construction fails. Because the returned vector size feeds directly into the calibration denominator, a malformed probe fixture would quietly weaken the barrier instead of failing closed. This helper should surface fixture-construction failure instead of dropping probes.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/dry_check/known_bad.rs",
-              "line": 49,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:543721b1c1f1069dbd48bbbd5c7711ff3e999c16f967f092bf6ef50702d7b092",
-          "at": "2026-06-14T16:50:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2acdea1c8950389f81a5562d09286543b0447491a290a2abba72212641136f22",
-          "at": "2026-06-14T16:58:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`interactor.rs` now has 703 non-test lines before the `#[cfg(test)]` block at line 704, exceeding the repository's 700-line production module maximum. The new calibration helpers pushed this already-large module over the enforced size limit; move one of the helper groups, such as known-bad calibration orchestration, into a sibling module to bring the production section back under the cap.",
-              "severity": "P1",
-              "file": "libs/usecase/src/dry_check/interactor.rs",
-              "line": 704,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:2acdea1c8950389f81a5562d09286543b0447491a290a2abba72212641136f22",
-          "at": "2026-06-14T17:03:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`mod.rs` declares the new `calibration` and `known_bad` modules, but both source files are currently untracked, so they are omitted from `git diff`. Applying this patch as-is leaves these module declarations pointing at missing files and the usecase crate will fail to compile. Add `libs/usecase/src/dry_check/calibration.rs` and `libs/usecase/src/dry_check/known_bad.rs` to the tracked change set.",
-              "severity": "P1",
-              "file": "libs/usecase/src/dry_check/mod.rs",
-              "line": 15,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:c3e97080cf9b02e6af59bf704e4d330749329a6140a55db49d23b0120a99ce33",
-          "at": "2026-06-14T17:10:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c3e97080cf9b02e6af59bf704e4d330749329a6140a55db49d23b0120a99ce33",
-          "at": "2026-06-14T17:13:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `FixpointResolveCommand.current_branch` is never consulted in `FixpointResolveInteractor::resolve` ([fixpoint_resolve.rs#L69](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/fixpoint_resolve.rs#L69), [fixpoint_resolve.rs#L265](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/fixpoint_resolve.rs#L265)). That leaves `FixpointResolveError::TrackNotActive` unreachable and removes the active-track guard expected for this workflow, so the resolver can drive DFP/RFP/ref-verify for a track while the user is on an unrelated branch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/fixpoint_resolve.rs",
-              "line": 265,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:02966ccaae66ecc988ab8ebcd9a89e0e29206ab1e14006e011a20b13e71631e9",
-          "at": "2026-06-14T23:51:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe36c60a6936bf66dc8f87fe99eb7bd3897b55e6805dba4f0dc6d3bf12b65b29",
-          "at": "2026-06-14T23:58:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FixpointResolveInteractor::new` now requires a `TrackActiveBranchPort` and `resolve` performs an active-branch query before the three gate checks. The T014 usecase contract describes this resolver as a public-API composition of only the dry, review, and ref-verify gates, with the constructor wired from those three dependencies. This extra public port changes the DI surface and can force downstream composition to provide an uncatalogued dependency before the resolver can be used, so the fixpoint resolver API no longer matches the planned usecase boundary.",
-              "severity": "P1",
-              "file": "libs/usecase/src/fixpoint_resolve.rs",
-              "line": 269,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:fe36c60a6936bf66dc8f87fe99eb7bd3897b55e6805dba4f0dc6d3bf12b65b29",
-          "at": "2026-06-15T00:04:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3d9576183951bad723b269eb37de96711b506c122948e6cc765f4081219fc778",
-          "at": "2026-06-15T00:09:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:033f3064d7c6804cba2b47a39822da9b90c65de6f1ce42b33287f262962bce07",
-          "at": "2026-06-15T05:08:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:033f3064d7c6804cba2b47a39822da9b90c65de6f1ce42b33287f262962bce07",
-          "at": "2026-06-15T05:10:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cc6c13e399b72866bc9c18a53a358a5a5aa4014095baaca12c6eae4858a39ee0",
-          "at": "2026-06-15T06:43:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cc6c13e399b72866bc9c18a53a358a5a5aa4014095baaca12c6eae4858a39ee0",
-          "at": "2026-06-15T06:45:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:53861b5cbb84ac0460bed4d294beb4d2d91db775b05e84f6f62f73d12e7ce8da",
-          "at": "2026-06-15T09:14:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:53861b5cbb84ac0460bed4d294beb4d2d91db775b05e84f6f62f73d12e7ce8da",
-          "at": "2026-06-15T09:17:22Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:40:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:42:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
-          "at": "2026-06-14T04:18:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
-          "at": "2026-06-14T04:20:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
-          "at": "2026-06-14T04:32:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
-          "at": "2026-06-14T04:34:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f8ccdd4dc037c83d844720abe34f4ca8629af424183ffe6eae4c9b570aa541f",
-          "at": "2026-06-14T04:47:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
-          "at": "2026-06-14T05:02:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
-          "at": "2026-06-14T05:05:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
-          "at": "2026-06-14T05:12:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The unchanged Rules section now contradicts the new workflow: it says to always run `cargo make ci-rust` before re-running `sotp dry check-approved` and points to “step 3 above,” but Step 3 is now the zero-violation no-fix path that explicitly must skip `ci-rust`. This makes the agent policy ambiguous and can defeat the D1 fast path the change is meant to introduce. Update this rule to refer only to fix rounds / Step 4 verification.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 117,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
-          "at": "2026-06-14T05:14:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 treats a `dry write` run with zero reported `Violation` findings as either approved or an anomaly, but Step 2 explicitly says already-judged pairs are cache hits/no-ops. In that state, a previously recorded unresolved violation will not be re-emitted by `dry write`; `check-approved` will still block, and this workflow tells dfl to stop as `blocked` instead of retrieving the stored violation/proposal via `bin/sotp dry results --filter violation` and fixing it. This makes a normal re-entry/retry with cached violations fail even though autonomous fixes are still available.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 84,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:43c20f74d8e80ad92d12126ee2038140cb917c93611868dbaba4fd7cc2e312ba",
-          "at": "2026-06-14T05:17:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 can lose cached violations after a blocked follow-up gate check. `sotp dry write` returns no findings for already-verified pairs, including cached `Violation` records, so a non-zero `dry check-approved` after the follow-up write does not guarantee the “new finding set” is non-empty. Re-entering Step 4 using only that write output can spin/exhaust without applying available cached refactor proposals. The blocked branch should mirror Step 3 by reading unresolved cached violations before looping.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 103,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:ec1203a50d28ecd4e3486ffc434903b68659af286ab2d18cd607d1b166dfa405",
-          "at": "2026-06-14T05:20:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ed69050537ee92aa22adf8bec811d8997e5e7c75d71b16addad21f02ecdc1b1",
-          "at": "2026-06-14T05:22:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
-          "at": "2026-06-14T05:31:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
-          "at": "2026-06-14T05:31:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
-          "at": "2026-06-14T05:33:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
-          "at": "2026-06-14T07:12:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
-          "at": "2026-06-14T07:13:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
-          "at": "2026-06-14T13:14:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
-          "at": "2026-06-14T13:16:44Z"
+          "hash": "rvw1:sha256:bbd17622e63f952319a5f8955b03bda6e2bf33cfa3535847678da51264a3a103",
+          "at": "2026-06-15T13:54:58Z"
         }
       ]
     },
