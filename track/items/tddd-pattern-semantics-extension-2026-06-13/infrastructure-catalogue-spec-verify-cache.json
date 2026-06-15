@@ -105,6 +105,30 @@
         "kind": "pass",
         "citation": "設定不在時の暗黙フォールバック動作（デフォルトプリセットで黙って実行する挙動）は設けない。CLI 指定も config.json も見つからない場合は明示エラーで停止する（fail-closed）。"
       }
+    },
+    {
+      "claim_hash": "d445a05aaff015985ba35feba64f807fbf111d5c0c73b2640f2023e86bb632e4",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DDD パターンの機械検査ルール（D4–D11 / D16 / D18 が定める各ルール）を、呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。"
+      }
+    },
+    {
+      "claim_hash": "d445a05aaff015985ba35feba64f807fbf111d5c0c73b2640f2023e86bb632e4",
+      "evidence_hash": "2fb0b608d104252e4551d10cd11665d3be76a3c4e5201f1d33b62cd840d9826a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp track lint` が読む `.harness/catalogue-lint/config.json` は workspace 全体に一つ適用されるファイルであり、crate ごと・layer ごとに異なる設定ファイルを指定する機構は設けない。"
+      }
+    },
+    {
+      "claim_hash": "d445a05aaff015985ba35feba64f807fbf111d5c0c73b2640f2023e86bb632e4",
+      "evidence_hash": "0e2819907ad0cc811dca66da2955053cfa0e74f8d24ddd9b8c335507392a8be3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 指定も config.json も見つからない場合は明示エラーで停止する（fail-closed）。このため「config.json がない状態でも lint を実行できるサイレントフォールバック」は実装対象外。"
+      }
     }
   ]
 }

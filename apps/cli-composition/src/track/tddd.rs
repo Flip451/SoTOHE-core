@@ -431,6 +431,7 @@ impl CliApp {
         workspace_root: PathBuf,
     ) -> Result<CommandOutcome, String> {
         use infrastructure::tddd::contract_map_adapter::FsCatalogueLoader;
+        use infrastructure::tddd::fs_lint_config_loader::FsLintConfigLoader;
         use usecase::catalogue_lint_workflow::{
             LintRuleKind, LintRuleSpec, RunCatalogueLint, RunCatalogueLintCommand,
             RunCatalogueLintInteractor,
@@ -445,6 +446,10 @@ impl CliApp {
         // FieldNonEmpty on "invariants" fires for any ValueObject entry that declares
         // no invariants in its role payload. This is an enforceable field that the
         // evaluator supports via `field_vec_is_empty(&role, "invariants")`.
+        //
+        // TODO(T023): Replace this hard-coded demo rule set with config-file wiring.
+        // When command.rules is non-empty the interactor uses CLI rules (precedence 1),
+        // so existing tests that pass rules via command.rules are unaffected.
         let rules = vec![
             LintRuleSpec {
                 target_roles: vec!["ValueObject".to_owned()],
@@ -461,7 +466,11 @@ impl CliApp {
         let items_dir = workspace_root.join("track/items");
         let rules_path = workspace_root.join("architecture-rules.json");
         let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.clone());
-        let interactor = RunCatalogueLintInteractor::new(loader);
+        // Temporary: wire FsLintConfigLoader to the standard config path.
+        // T023 will wire this properly (replace demo rules with config-driven flow).
+        let config_loader =
+            FsLintConfigLoader::new(workspace_root.join(".harness/catalogue-lint/config.json"));
+        let interactor = RunCatalogueLintInteractor::new(loader, config_loader);
 
         let runner: &dyn RunCatalogueLint = &interactor;
         let violations = runner

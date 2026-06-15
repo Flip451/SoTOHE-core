@@ -26,6 +26,75 @@ use domain::tddd::layer_id::LayerId;
 use thiserror::Error;
 
 // ---------------------------------------------------------------------------
+// Config file support (D19)
+// ---------------------------------------------------------------------------
+
+/// A loaded, validated lint configuration from a config file.
+///
+/// Carries the rule set to evaluate. Constructed by [`LintConfigLoader::load`].
+#[derive(Debug, Clone)]
+pub struct LintConfig {
+    rules: Vec<LintRuleSpec>,
+}
+
+impl LintConfig {
+    /// Creates a new `LintConfig` with the given rule set.
+    #[must_use]
+    pub fn new(rules: Vec<LintRuleSpec>) -> Self {
+        Self { rules }
+    }
+
+    /// Returns the lint rules declared in this config.
+    #[must_use]
+    pub fn rules(&self) -> &[LintRuleSpec] {
+        &self.rules
+    }
+}
+
+/// Error variants returned by [`LintConfigLoader::load`].
+#[derive(thiserror::Error, Debug)]
+pub enum LintConfigLoaderError {
+    /// The config file was not found at the expected path.
+    #[error("lint config file not found: {path}")]
+    MissingFile {
+        /// Path that was searched.
+        path: std::path::PathBuf,
+    },
+    /// The config file could not be parsed.
+    #[error("failed to parse lint config at {path}: {reason}")]
+    ParseError {
+        /// Path of the file that failed to parse.
+        path: std::path::PathBuf,
+        /// Human-readable parse failure description.
+        reason: String,
+    },
+    /// The config file declares an unsupported schema version.
+    #[error("lint config schema_version mismatch: expected {expected}, got {actual}")]
+    SchemaVersionMismatch {
+        /// The only version this loader supports.
+        expected: u32,
+        /// The version found in the file.
+        actual: u32,
+    },
+}
+
+/// Secondary port for loading lint configuration from a config file (D19).
+///
+/// The path is baked into the adapter at construction time; `load()` takes no
+/// path argument.
+pub trait LintConfigLoader: Send + Sync {
+    /// Load and validate the lint configuration.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`LintConfigLoaderError::MissingFile`] when the config file is absent.
+    /// Returns [`LintConfigLoaderError::ParseError`] when the file cannot be parsed.
+    /// Returns [`LintConfigLoaderError::SchemaVersionMismatch`] when the file uses an
+    /// unsupported schema version.
+    fn load(&self) -> Result<LintConfig, LintConfigLoaderError>;
+}
+
+// ---------------------------------------------------------------------------
 // Usecase-owned lint rule types (no domain imports in CLI / callers)
 // ---------------------------------------------------------------------------
 
@@ -34,7 +103,8 @@ use thiserror::Error;
 /// Callers (e.g. CLI) use this enum so they never import domain types
 /// directly (CN-01 / AC-03). All payload fields use `String` / `Vec<String>`
 /// as boundary representations; the interactor converts them to domain types.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum LintRuleKind {
     /// Rule asserts that the named field must be empty for matching entries.
     FieldEmpty { target_field: String },
@@ -73,7 +143,8 @@ pub enum LintRuleKind {
 /// Callers (e.g. CLI) construct `LintRuleSpec` values without importing
 /// domain types. The interactor converts them to `CatalogueLinterRule`
 /// internally.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LintRuleSpec {
     /// Roles to which this rule applies. An empty vec means "all roles".
     pub target_roles: Vec<String>,
@@ -114,6 +185,19 @@ pub enum RunCatalogueLintError {
     /// A [`LintRuleSpec`] could not be converted to a domain rule.
     #[error("invalid lint rule spec: {0}")]
     InvalidRuleSpec(String),
+
+    /// No lint rules were provided via CLI and the config file was absent
+    /// (D19 fail-closed: missing config is an error, not a no-op).
+    #[error("lint config file not found: {path}")]
+    ConfigMissing {
+        /// The path that was searched for the config file.
+        path: std::path::PathBuf,
+    },
+
+    /// The config file was found but could not be parsed or has an unsupported
+    /// schema version.
+    #[error(transparent)]
+    ConfigInvalid(#[from] LintConfigLoaderError),
 }
 
 /// Primary port for the catalogue lint use case.
@@ -140,21 +224,32 @@ pub trait RunCatalogueLint: Send + Sync {
 /// Default [`RunCatalogueLint`] implementation that composes
 /// [`CatalogueLoader`] and calls [`evaluate_catalogue_lint`] directly (D17).
 ///
-/// Generic over `L: CatalogueLoader` so callers (e.g. the CLI composition
-/// root) pass concrete types without importing domain port traits directly.
-pub struct RunCatalogueLintInteractor<L: CatalogueLoader> {
+/// Generic over `L: CatalogueLoader` and `C: LintConfigLoader` so callers
+/// (e.g. the CLI composition root) pass concrete types without importing
+/// domain port traits or usecase config port traits directly.
+///
+/// Rule source priority (D19 fail-closed precedence):
+/// 1. `command.rules` non-empty → use CLI-supplied rules.
+/// 2. `command.rules` empty → load from `config_loader.load()`.
+///    - [`LintConfigLoaderError::MissingFile`] → [`RunCatalogueLintError::ConfigMissing`].
+///    - Other load errors → [`RunCatalogueLintError::ConfigInvalid`].
+pub struct RunCatalogueLintInteractor<L: CatalogueLoader, C: LintConfigLoader> {
     loader: L,
+    config_loader: C,
 }
 
-impl<L: CatalogueLoader> RunCatalogueLintInteractor<L> {
-    /// Creates a new interactor wrapping the supplied catalogue loader.
+impl<L: CatalogueLoader, C: LintConfigLoader> RunCatalogueLintInteractor<L, C> {
+    /// Creates a new interactor wrapping the supplied catalogue loader and
+    /// config loader.
     #[must_use]
-    pub fn new(loader: L) -> Self {
-        Self { loader }
+    pub fn new(loader: L, config_loader: C) -> Self {
+        Self { loader, config_loader }
     }
 }
 
-impl<L: CatalogueLoader + Send + Sync> RunCatalogueLint for RunCatalogueLintInteractor<L> {
+impl<L: CatalogueLoader + Send + Sync, C: LintConfigLoader + Send + Sync> RunCatalogueLint
+    for RunCatalogueLintInteractor<L, C>
+{
     fn execute(
         &self,
         cmd: RunCatalogueLintCommand,
@@ -166,24 +261,37 @@ impl<L: CatalogueLoader + Send + Sync> RunCatalogueLint for RunCatalogueLintInte
             }
         })?;
 
-        // Step 2: convert LintRuleSpec values to domain CatalogueLinterRule values.
-        let rules: Vec<CatalogueLinterRule> = cmd
-            .rules
+        // Step 2: resolve lint rule specs.
+        // Priority: (1) CLI-explicit rules, (2) config file (fail-closed on missing).
+        let lint_rule_specs: Vec<LintRuleSpec> = if !cmd.rules.is_empty() {
+            cmd.rules
+        } else {
+            match self.config_loader.load() {
+                Ok(config) => config.rules().to_vec(),
+                Err(LintConfigLoaderError::MissingFile { path }) => {
+                    return Err(RunCatalogueLintError::ConfigMissing { path });
+                }
+                Err(other) => return Err(RunCatalogueLintError::ConfigInvalid(other)),
+            }
+        };
+
+        // Step 3: convert LintRuleSpec values to domain CatalogueLinterRule values.
+        let rules: Vec<CatalogueLinterRule> = lint_rule_specs
             .into_iter()
             .map(lint_rule_spec_to_domain)
             .collect::<Result<Vec<_>, _>>()
             .map_err(RunCatalogueLintError::InvalidRuleSpec)?;
 
-        // Step 3: load all TDDD-enabled layers for this track.
+        // Step 4: load all TDDD-enabled layers for this track.
         let (layer_order, catalogues) = self.loader.load_all(&track_id)?;
 
-        // Step 4: validate that the requested layer_id is TDDD-enabled.
+        // Step 5: validate that the requested layer_id is TDDD-enabled.
         let target_layer = layer_order
             .iter()
             .find(|l| l.as_ref() == cmd.layer_id.as_str())
             .ok_or_else(|| RunCatalogueLintError::InvalidLayer(cmd.layer_id.clone()))?;
 
-        // Step 5: evaluate rules via the domain pure function (D17).
+        // Step 6: evaluate rules via the domain pure function (D17).
         // Pass all catalogues so that cross-layer role references
         // (e.g. `UseCase.handles: ["domain::OrderPlaced"]`) are resolved
         // correctly against every enabled layer, not just the target layer.
@@ -327,6 +435,64 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
+    // Stub LintConfigLoader that always returns MissingFile.
+    // Used in existing unit tests where rules are supplied via command.rules
+    // (CLI-explicit path), so the config loader is never reached.
+    // ------------------------------------------------------------------
+
+    struct StubMissingConfigLoader;
+
+    impl LintConfigLoader for StubMissingConfigLoader {
+        fn load(&self) -> Result<LintConfig, LintConfigLoaderError> {
+            Err(LintConfigLoaderError::MissingFile {
+                path: std::path::PathBuf::from("/stub/config.json"),
+            })
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Stub LintConfigLoader that returns a successful config with one rule.
+    // ------------------------------------------------------------------
+
+    struct StubSuccessConfigLoader {
+        rules: Vec<LintRuleSpec>,
+    }
+
+    impl LintConfigLoader for StubSuccessConfigLoader {
+        fn load(&self) -> Result<LintConfig, LintConfigLoaderError> {
+            Ok(LintConfig::new(self.rules.clone()))
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Stub LintConfigLoader that returns a ParseError.
+    // ------------------------------------------------------------------
+
+    struct StubParseErrorConfigLoader;
+
+    impl LintConfigLoader for StubParseErrorConfigLoader {
+        fn load(&self) -> Result<LintConfig, LintConfigLoaderError> {
+            Err(LintConfigLoaderError::ParseError {
+                path: std::path::PathBuf::from("/stub/config.json"),
+                reason: "unexpected token".to_owned(),
+            })
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Stub LintConfigLoader that panics if called.
+    // Used to assert the config loader is NOT called when CLI rules are provided.
+    // ------------------------------------------------------------------
+
+    struct StubNeverCalledConfigLoader;
+
+    impl LintConfigLoader for StubNeverCalledConfigLoader {
+        fn load(&self) -> Result<LintConfig, LintConfigLoaderError> {
+            panic!("config_loader.load() must not be called when CLI rules are provided");
+        }
+    }
+
+    // ------------------------------------------------------------------
     // helpers
     // ------------------------------------------------------------------
 
@@ -385,6 +551,15 @@ mod tests {
         }
     }
 
+    /// Build a command with no CLI-supplied rules (triggers config-file path).
+    fn cmd_no_rules(track: &str, layer_name: &str) -> RunCatalogueLintCommand {
+        RunCatalogueLintCommand {
+            track_id: track.to_owned(),
+            layer_id: layer_name.to_owned(),
+            rules: vec![],
+        }
+    }
+
     // ------------------------------------------------------------------
     // T001: Happy path — evaluate_catalogue_lint skeleton returns empty violations
     // ------------------------------------------------------------------
@@ -399,7 +574,7 @@ mod tests {
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
 
-        let interactor = RunCatalogueLintInteractor::new(loader);
+        let interactor = RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader);
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(result.is_ok(), "expected Ok, got: {result:?}");
@@ -417,7 +592,7 @@ mod tests {
             Err(CatalogueLoaderError::LayerDiscoveryFailed { reason: "boom".to_owned() })
         });
 
-        let interactor = RunCatalogueLintInteractor::new(loader);
+        let interactor = RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader);
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(
@@ -439,7 +614,7 @@ mod tests {
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
 
-        let interactor = RunCatalogueLintInteractor::new(loader);
+        let interactor = RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader);
         let result = interactor.execute(cmd("my-track", "presentation")); // not in set
 
         match result {
@@ -662,7 +837,7 @@ mod tests {
         // Insert the target back so it compiles; we won't hit load_all anyway.
         let _ = (order, catalogues);
 
-        let interactor = RunCatalogueLintInteractor::new(loader2);
+        let interactor = RunCatalogueLintInteractor::new(loader2, StubMissingConfigLoader);
         let bad_cmd = RunCatalogueLintCommand {
             track_id: "my-track".to_owned(),
             layer_id: "domain".to_owned(),
@@ -676,5 +851,89 @@ mod tests {
             matches!(result, Err(RunCatalogueLintError::InvalidRuleSpec(_))),
             "expected InvalidRuleSpec, got: {result:?}"
         );
+    }
+
+    // ------------------------------------------------------------------
+    // T012: config-driven path — MissingFile loader error yields ConfigMissing
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_execute_with_empty_rules_and_missing_config_returns_config_missing() {
+        let mut loader = MockLoader::new();
+        loader.expect_load_all().times(0); // load_all is not reached before config check
+        // (Actually: track_id parse happens first, then config load, then load_all.)
+        // Re-check the execute() order: track_id parse → rules check → if empty: config load → load_all.
+        // So load_all IS NOT called when config is missing — loader times(0) is correct.
+
+        let interactor = RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader);
+        let result = interactor.execute(cmd_no_rules("my-track", "domain"));
+
+        match result {
+            Err(RunCatalogueLintError::ConfigMissing { path }) => {
+                assert_eq!(path, std::path::PathBuf::from("/stub/config.json"));
+            }
+            other => panic!("expected ConfigMissing, got: {other:?}"),
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // T013: config-driven path — non-MissingFile loader error yields ConfigInvalid
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_execute_with_empty_rules_and_parse_error_returns_config_invalid() {
+        let mut loader = MockLoader::new();
+        loader.expect_load_all().times(0);
+
+        let interactor = RunCatalogueLintInteractor::new(loader, StubParseErrorConfigLoader);
+        let result = interactor.execute(cmd_no_rules("my-track", "domain"));
+
+        assert!(
+            matches!(result, Err(RunCatalogueLintError::ConfigInvalid(_))),
+            "expected ConfigInvalid, got: {result:?}"
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // T014: config-driven path — successful config load runs lint with config rules
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_execute_with_empty_rules_and_valid_config_uses_config_rules() {
+        let (order, catalogues) = three_layer_result("domain");
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .with(mockall::predicate::function(|t: &TrackId| t.as_ref() == "my-track"))
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+
+        let config_loader = StubSuccessConfigLoader { rules: vec![no_public_field_rule_spec()] };
+
+        let interactor = RunCatalogueLintInteractor::new(loader, config_loader);
+        let result = interactor.execute(cmd_no_rules("my-track", "domain"));
+
+        assert!(result.is_ok(), "expected Ok when config provides rules, got: {result:?}");
+    }
+
+    // ------------------------------------------------------------------
+    // T015: CLI precedence — non-empty cmd.rules skips config loader entirely
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_execute_with_cli_rules_does_not_call_config_loader() {
+        let (order, catalogues) = three_layer_result("domain");
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+
+        // StubNeverCalledConfigLoader panics if load() is invoked.
+        let interactor = RunCatalogueLintInteractor::new(loader, StubNeverCalledConfigLoader);
+        // cmd() provides non-empty rules via CLI, so config_loader must not be called.
+        let result = interactor.execute(cmd("my-track", "domain"));
+
+        assert!(result.is_ok(), "expected Ok with CLI rules bypassing config, got: {result:?}");
     }
 }

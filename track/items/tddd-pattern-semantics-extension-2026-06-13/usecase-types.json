@@ -474,6 +474,16 @@
       "for_type": "LintRuleKind"
     },
     {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "LintRuleKind"
+    },
+    {
       "action": "modify",
       "trait_ref": "core::fmt::Debug",
       "for_type": "LintRuleSpec"
@@ -481,6 +491,16 @@
     {
       "action": "modify",
       "trait_ref": "core::clone::Clone",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
       "for_type": "LintRuleSpec"
     },
     {
@@ -510,6 +530,11 @@
     {
       "action": "reference",
       "trait_ref": "core::convert::From<domain::tddd::catalogue_ports::CatalogueLoaderError>",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<LintConfigLoaderError>",
       "for_type": "RunCatalogueLintError"
     },
     {

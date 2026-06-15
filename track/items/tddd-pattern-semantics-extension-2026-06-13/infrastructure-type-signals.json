@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-15T09:39:42Z",
-  "declaration_hash": "f3345eb5cd163cc4fda797342773ce3695a4671d52ca53580ea564d7ca8b1a4f",
+  "generated_at": "2026-06-15T11:10:12Z",
+  "declaration_hash": "3e1376559b0c78495770e85febb4250121842cb13b0932a524025308f5aff7fd",
   "signals": [
     {
       "type_name": "CatalogueDocumentCodec",
@@ -21,9 +21,9 @@
     {
       "type_name": "FsLintConfigLoader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "LintConfigLoader",
         "core::fmt::Debug"
       ]

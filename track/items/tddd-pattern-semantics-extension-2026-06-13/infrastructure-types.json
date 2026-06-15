@@ -164,10 +164,8 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "path", "ty": "std::path::PathBuf" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
