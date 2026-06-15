@@ -157,6 +157,38 @@
       ],
       "informal_grounds": []
     },
+    "FsLintConfigLoader": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "path", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::fs_lint_config_loader",
+      "docs": "Filesystem implementation of LintConfigLoader. Holds a fully-resolved path to the lint config file (either the workspace default .harness/catalogue-lint/config.json or a --rules-file CLI override). CLI composition resolves which path to use before constructing FsLintConfigLoader::new(path). load() reads from self.path with no additional argument. Fail-closed: returns LintConfigLoaderError::MissingFile if the file does not exist — no silent fallback to default rules (per OS-10).",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "OS-09"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "OS-10"
+        }
+      ],
+      "informal_grounds": []
+    },
     "InMemoryCatalogueLinter": {
       "action": "delete",
       "role": { "SecondaryAdapter": {} },
@@ -180,8 +212,37 @@
   },
   "traits": {},
   "functions": {},
-  "inherent_impls": [],
+  "inherent_impls": [
+    {
+      "type_name": "FsLintConfigLoader",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new FsLintConfigLoader with a fully-resolved path to the config file. The path is either the workspace default (.harness/catalogue-lint/config.json) or a --rules-file CLI override; CLI composition decides which before calling new()."
+        }
+      ]
+    }
+  ],
   "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsLintConfigLoader"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::catalogue_lint_workflow::LintConfigLoader",
+      "for_type": "FsLintConfigLoader"
+    },
     {
       "action": "modify",
       "trait_ref": "core::fmt::Debug",

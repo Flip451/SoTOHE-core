@@ -10,13 +10,21 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| LintConfig | value_object | — | — | 🟡 | 🔵 |
 | LintRuleSpec | value_object | modify | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RunCatalogueLintError | error_type | modify | CatalogueLoad, LintExecution, InvalidLayer, InvalidRuleSpec | 🔵 | 🔵 |
+| LintConfigLoaderError | error_type | — | MissingFile, ParseError, SchemaVersionMismatch | 🟡 | 🔵 |
+| RunCatalogueLintError | error_type | modify | CatalogueLoad, LintExecution, InvalidLayer, InvalidRuleSpec, ConfigMissing, ConfigInvalid | 🟡 | 🔵 |
+
+## Secondary Ports
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| LintConfigLoader | secondary_port | — | fn load(&self) -> Result<LintConfig, LintConfigLoaderError> | 🟡 | 🔵 |
 
 ## Application Services
 
@@ -28,7 +36,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RunCatalogueLintInteractor | interactor | modify | — | 🔵 | 🔵 |
+| RunCatalogueLintInteractor | interactor | modify | — | 🟡 | 🔵 |
 
 ## Commands
 

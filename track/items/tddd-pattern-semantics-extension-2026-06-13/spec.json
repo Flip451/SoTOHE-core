@@ -128,7 +128,7 @@
       },
       {
         "id": "IN-11",
-        "text": "DDD パターンの機械検査ルール（D4–D11 / D16 / D18 が定める各ルール）を、呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。opt-in したルールは厳格に適用し（違反を容認する「advisory」という中間状態は設けない）。ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。本 ADR が定める最小コアルール群を一括有効化する `ddd-strict` プリセットを提供する。",
+        "text": "DDD パターンの機械検査ルール（D4–D11 / D16 / D18 が定める各ルール）を、呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。opt-in したルールは厳格に適用し（違反を容認する「advisory」という中間状態は設けない）。ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。本 ADR が定める最小コアルール群を一括有効化する `ddd-strict` プリセットを `.harness/catalogue-lint/presets/ddd-strict.json` として配布する（domain layer の Rust API 関数としては提供しない）。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
@@ -245,6 +245,36 @@
           {
             "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
             "anchor": "D16"
+          }
+        ]
+      },
+      {
+        "id": "OS-09",
+        "text": "lint config file の per-layer 設定は本 track のスコープ外。`sotp track lint` が読む `.harness/catalogue-lint/config.json` は workspace 全体に一つ適用されるファイルであり、crate ごと・layer ごとに異なる設定ファイルを指定する機構は設けない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D19"
+          }
+        ]
+      },
+      {
+        "id": "OS-10",
+        "text": "設定不在時の暗黙フォールバック動作（デフォルトプリセットで黙って実行する挙動）は設けない。CLI 指定も config.json も見つからない場合は明示エラーで停止する（fail-closed）。このため「config.json がない状態でも lint を実行できるサイレントフォールバック」は実装対象外。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D19"
+          }
+        ]
+      },
+      {
+        "id": "OS-11",
+        "text": "`ddd-strict` プリセットを Rust source ハードコードの API 関数（例: `ddd_strict_preset()` 関数を domain layer に設ける）として提供する実装は行わない。プリセットの SoT は `.harness/catalogue-lint/presets/ddd-strict.json` として配布する JSON ファイルであり、採用者はこれをコピーして `.harness/catalogue-lint/config.json` に置いて使う（copy-and-edit ワークフロー）。config.json から presets/ を参照するインクルード機構も設けない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+            "anchor": "D15"
           }
         ]
       }
@@ -551,7 +581,7 @@
     },
     {
       "id": "AC-21",
-      "text": "段 3: `ddd-strict` プリセット（本 ADR の最小コアルール D4–D11 / D16 / D18 のすべてを一括有効化するルールセット）が実装されており、`&[CatalogueLinterRule]` として組み上げることができる。",
+      "text": "段 3: `ddd-strict` プリセット（本 ADR の最小コアルール D4–D11 / D16 / D18 のすべてを一括有効化するルールセット）が `.harness/catalogue-lint/presets/ddd-strict.json` として配布されている。採用者はこのファイルをコピーして `.harness/catalogue-lint/config.json` に置くことで最小コアルールを一括有効化できる。domain layer に `ddd_strict_preset()` 等の Rust API 関数は存在しない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
@@ -615,7 +645,7 @@
     }
   ],
   "signals": {
-    "blue": 56,
+    "blue": 59,
     "yellow": 0,
     "red": 0
   }

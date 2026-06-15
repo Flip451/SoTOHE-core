@@ -81,6 +81,30 @@
         "kind": "pass",
         "citation": "段 1: `DataRole` / `ContractRole` を data-carrying enum 化し、すべての payload 付き variant の schema を 1 回の breaking migration で確定する"
       }
+    },
+    {
+      "claim_hash": "e795920d2954d576e7f070a65e992586e047073c70c8f20cc80c8f3d77d47ab8",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。opt-in したルールは厳格に適用し（違反を容認する「advisory」という中間状態は設けない）。"
+      }
+    },
+    {
+      "claim_hash": "e795920d2954d576e7f070a65e992586e047073c70c8f20cc80c8f3d77d47ab8",
+      "evidence_hash": "2fb0b608d104252e4551d10cd11665d3be76a3c4e5201f1d33b62cd840d9826a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp track lint` が読む `.harness/catalogue-lint/config.json` は workspace 全体に一つ適用されるファイルであり、crate ごと・layer ごとに異なる設定ファイルを指定する機構は設けない。"
+      }
+    },
+    {
+      "claim_hash": "e795920d2954d576e7f070a65e992586e047073c70c8f20cc80c8f3d77d47ab8",
+      "evidence_hash": "0e2819907ad0cc811dca66da2955053cfa0e74f8d24ddd9b8c335507392a8be3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定不在時の暗黙フォールバック動作（デフォルトプリセットで黙って実行する挙動）は設けない。CLI 指定も config.json も見つからない場合は明示エラーで停止する（fail-closed）。"
+      }
     }
   ]
 }

@@ -1,6 +1,987 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
+          "at": "2026-06-14T05:53:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
+          "at": "2026-06-14T05:58:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T10:56:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T11:28:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
+          "at": "2026-06-14T17:55:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
+          "at": "2026-06-14T18:10:45Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DataRoleDto` still leaves the unit-like roles (`Specification`, `Factory`, `Interactor`, `Command`, `Query`, `Dto`, `ErrorType`, `SecondaryAdapter`) as unit variants, so serde continues to emit and accept bare strings for those cases. That means the new codec does not actually enforce the discriminated-object wire shape for the full role enum, and the legacy string form is still implicitly supported.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
+              "line": 32,
+              "category": "serialization"
+            },
+            {
+              "message": "`ContractRole::Repository` is rendered with the display tag `repository`, but `section_to_signal_kind_tag` never collapses that tag back to the evaluator's `secondary_port` bucket, and there is no dedicated repository section. Repository traits will therefore fall into `Other` with a blank Signal column even when `check_type_signals` has produced a matching `secondary_port` signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 208,
+              "category": "rendering"
+            }
+          ],
+          "hash": "rvw1:sha256:5e3237b12ca76bd05e2b84ce9ece8b10e92cf2c75f40c23d30f0732087f31e87",
+          "at": "2026-06-14T05:57:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_layer` now short-circuits on `binding.targets.len() > 1` before `Self::to_infra_binding(binding)` runs, so malformed multi-target bindings never go through the domain/infra validation path. In the absent-catalogue fast path that means bad `catalogue_file` / `baseline_file` / `layer_id` input can be accepted silently, and `track_dir.join(&binding.catalogue_file)` is probed before any path validation. That is a validation bypass and path-probing issue in the new early-return branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
+              "line": 146,
+              "category": "security"
+            },
+            {
+              "message": "The new codec payload variants (`DataRoleDto::EventPolicy` and `ContractRoleDto::Repository`) have no dedicated infrastructure tests covering their happy-path round trips and required rejection cases. In particular, there is no coverage for empty `reacts_to` being rejected or `Repository.aggregate` failing validation, so regressions in the new schema-invariant decode/encode paths would ship without a safety net.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
+              "line": 44,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7cb20b6343bb5696d05b6fcfb24f60d47334daeb20f9d25735431d6402a1ccf5",
+          "at": "2026-06-14T06:07:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
+          "at": "2026-06-14T06:23:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
+          "at": "2026-06-14T06:35:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
+          "at": "2026-06-14T08:11:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
+          "at": "2026-06-14T08:15:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
+          "at": "2026-06-14T08:41:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
+          "at": "2026-06-14T08:43:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
+          "at": "2026-06-14T10:53:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
+          "at": "2026-06-14T11:28:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
+          "at": "2026-06-14T12:33:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
+          "at": "2026-06-14T12:42:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueDocumentCodec::decode` now returns `SchemaVersionRequiresMigration` for schema_version 4, but this branch only special-cases `UnsupportedSchemaVersion`. v4 catalogues therefore fall through to the generic `failed to decode catalogue` error, which drops the actionable migration prompt this code path is trying to provide.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 228,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b4344d5b95fe1787c600b88d432c10e726efa130093dfdb70580db980701d50c",
+          "at": "2026-06-14T17:58:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
+          "at": "2026-06-14T18:06:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
+          "at": "2026-06-14T18:10:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
+          "at": "2026-06-14T18:21:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The v4 migration error tells users to regenerate the catalogue with `sotp track type-signals`, but that command consumes an existing catalogue to evaluate signals; it does not migrate the catalogue wire format. Several call sites surface this codec error directly via `to_string()`, so a schema_version=4 catalogue will get actionable-looking but wrong remediation and can leave users rerunning the failing path instead of regenerating the catalogue via the type-designer flow.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+              "line": 254,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
+          "at": "2026-06-14T18:24:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c26907823b1c50da36e88e503c7c725f0ff7d83be1d22f97a7f15deea08110b",
+          "at": "2026-06-14T18:31:00Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6759bdeac920ebbc6a26b127052c7a390740207e1dc473e1d0e936e30dd28f4",
+          "at": "2026-06-13T19:02:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 says schema-forcing changes must be done as a single migration because data-carrying `DataRole` / `ContractRole` changes force the same codec, renderer, evaluator, and role-comparison updates at once, but the ordered plan splits schema-bearing role changes across stage 1 (`DataRole` D4-D8) and stage 2 (`ContractRole::Repository { aggregate }` and `DataRole::EventPolicy { reacts_to }`). Following this sequence either requires repeating the migration the ADR says must be atomic, or leaves stage 1/2 boundaries ambiguous. Move all payload-bearing role schema changes into the schema migration step, or revise the rationale/order so the implementation plan is executable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+              "line": 138,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e6759bdeac920ebbc6a26b127052c7a390740207e1dc473e1d0e936e30dd28f4",
+          "at": "2026-06-13T19:05:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rule mapping assigns `EventPolicy.reacts_to` to D8, but D8 explicitly says `EventPolicy.reacts_to` is a separate D16 decision, and D16 owns the `EventPolicy` field/rules. This broken decision reference can mis-key implementation or coverage tracking for the `reacts_to` DomainEvent constraint under D8 instead of D16.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+              "line": 214,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:4b7c96f9513621cb701aed1ec39921a8efb894b76e769cad092bcf67804b6685",
+          "at": "2026-06-13T19:09:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `consistency` note says Saga support is deferred because Saga handling must come first and points readers to `D12`, but `D12` is now the Presenter/Controller rejection decision. The Saga/Process Manager rationale lives in the following addendum/reassess section, so this cross-reference now sends implementers to the wrong design decision and obscures the actual dependency for the UseCase consistency deferral.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+              "line": 435,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8a36c66ff688950b7fb0193520b96e2930e8b6f0a145d51eb2a32ba616e0f15c",
+          "at": "2026-06-13T19:12:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab417cde38a9a8681157033e75778935580d825b1d686d64b980f9cff9b26510",
+          "at": "2026-06-13T19:14:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 says the stage-1 migration rewrites `DataRole` from 13 to 15 variants, but the same task explicitly defers `DataRole::DomainEvent` to Stage 2. Stage 1 only introduces `EventPolicy` here, so the variant-count claim overstates the scope and is internally inconsistent with the rest of the task.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "T007 describes `CatalogueLinterRuleKind` as expanding to 12 \"data-carrying\" variants, but `NoPublicField` is still a unit variant in the generated catalogue model. The task should say 12 variants, not 12 data-carrying variants.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 42,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:9fef2ad1cfea824f5190fc36784074b2b726a2da9976fcfea8b1141015f908ce",
+          "at": "2026-06-14T01:00:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CN-03` and `AC-08` omit `T002`, even though `T002` is the task that actually rewrites `DataRole` / `ContractRole` into data-carrying enums and removes `Copy` / `Hash`. As written, the coverage file claims the breaking migration is covered by follow-up tasks only, which leaves the core schema change unmapped.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/task-coverage.json",
+              "line": 30,
+              "category": "factual error"
+            },
+            {
+              "message": "The D17 port redefinition is semantically hollow: `CatalogueLinter` is documented as an external-I/O-only secondary port, but its `methods` array is empty, and the infrastructure adapter only has `new`. That leaves no I/O boundary for `T009` to implement, so the claimed port/adapter split is not actually represented in the catalogue.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
+              "line": 721,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4616b53d4f36412ff98728338c9dddd879cf92c965cbc6ae1a383d6394978dc2",
+          "at": "2026-06-14T01:10:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Stage 1 T008 and Stage 3 T014 contradict each other about `evaluate_catalogue_lint`: T008 says to implement all 12 rule kinds now, while the S3/S6 descriptions treat T008 as a stub that T014 later expands. That leaves the stage boundary inconsistent and the plan ambiguous to execute.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:168a6fde6314441d119fb2c9ae38bf4d1ff5494c1666d3548aa8c8e2b682356b",
+          "at": "2026-06-14T01:19:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This section schedules the linter framework rewrite and port removal in Stage 1 (`T007`-`T009`), but ADR D3 explicitly says linter work comes after schema migration and the `DomainEvent` stage. Because these tasks are not just placeholders, the plan contradicts its required execution order and becomes ambiguous to execute.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 41,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6c7d9062eaedfee16688ca062805265490fd88558613fe9d2c69cbfc0cedc63f",
+          "at": "2026-06-14T01:25:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbf69ba3e0807a1633a2e7f8000e775c06d2153b7c1955c690f3e09d58dd9927",
+          "at": "2026-06-14T01:35:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 makes `RunCatalogueLintInteractor` call `evaluate_catalogue_lint` directly and changes `RunCatalogueLintInteractor::new` to a zero-argument constructor, while the usecase catalogue keeps the interactor as a unit struct and the command contains only `rules`. The domain function requires both `&CatalogueDocument` and `&LayerId`, so after removing the injected port there is no planned source for those required inputs. This makes the T009 usecase rewrite physically unexecutable unless the command or interactor retains/provides catalogue and layer inputs.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
+              "line": 176,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`CatalogueLinterRuleError` is documented as errors returned by `CatalogueLinterRule::new`, and T016 requires error-case tests for `CatalogueLinterRule::new`, but the type catalogue declares `CatalogueLinterRule::new` as returning `Self`. With that signature, the planned validation errors cannot be returned or tested, so the catalogue contradicts the implementation/test plan for rule validation.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
+              "line": 537,
+              "category": "contradiction"
+            },
+            {
+              "message": "The domain type catalogue's Free Functions section lists only `evaluate_catalogue_lint`, but the spec and T015 require a public `ddd_strict_preset() -> Vec<CatalogueLinterRule>` to satisfy AC-21. Because the typed catalogue omits that function, the plan has no type-level artifact/signature for the required preset even though the implementation plan depends on it.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.md",
+              "line": 38,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bbf69ba3e0807a1633a2e7f8000e775c06d2153b7c1955c690f3e09d58dd9927",
+          "at": "2026-06-14T01:43:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b51f89be43499ebfa9a37070eec38e133ed88fd1600dc389c56aaae64a99df",
+          "at": "2026-06-14T01:55:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb82a8bbd54f694f7a790b44984c300ce2454a5ff932e9840fa8486ba1715a23",
+          "at": "2026-06-14T02:29:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb82a8bbd54f694f7a790b44984c300ce2454a5ff932e9840fa8486ba1715a23",
+          "at": "2026-06-14T02:31:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e5c40c0fb9d033e0918a48f959500cf2681386858c975193ed9b088595dec58",
+          "at": "2026-06-14T02:47:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e5c40c0fb9d033e0918a48f959500cf2681386858c975193ed9b088595dec58",
+          "at": "2026-06-14T02:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fa2ec1fd3b77539871943c49a7674a738a1e8e88b34afe6233090b6ecb7c82f",
+          "at": "2026-06-14T03:04:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NonEmptyVec` is documented here as enforcing that empty collections are an illegal state, and both constructors establish that invariant, but the newly added `first` API returns `Option<&TypeRef>`. That exposes an impossible empty case to downstream code and contradicts the type's non-empty contract; the method should return `&TypeRef` or the catalogue should stop claiming non-emptiness is guaranteed.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
+              "line": 364,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5fa2ec1fd3b77539871943c49a7674a738a1e8e88b34afe6233090b6ecb7c82f",
+          "at": "2026-06-14T03:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3292f807e578f5ca8908e0662c17fa52c858f1c18bfcf87b5025c2bf4b585bd6",
+          "at": "2026-06-14T03:11:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7883ca79172b6d3cf6ca140fb070ad21a5b5150f8fc03cee797fa7119750341f",
+          "at": "2026-06-14T05:55:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7883ca79172b6d3cf6ca140fb070ad21a5b5150f8fc03cee797fa7119750341f",
+          "at": "2026-06-14T05:58:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`S3` still describes T010 as an active-track catalogue migration, but the task itself has been changed to `skipped`/N/A because migration is now explicitly out of scope. That leaves the section narrative and the task state contradictory, and the remaining T010 dependency text misleading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:48c8ba8d2672e6dbc6ae8635c01bf94de2cf5a0fad9bcd72ef5518957950e9d5",
+          "at": "2026-06-14T07:45:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T011` still says it depends on `T010`, but the surrounding Stage 1 summary and `impl-plan.json` now mark `T010` as skipped and say the Stage 1 test gate depends only on `T001-T006`. That leaves the generated plan graph internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f7e8a86e65aa5f37f91d2359f9a098907ff38853f9923cf1b22e37f745ad7df3",
+          "at": "2026-06-14T07:47:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d437f782f9b815dc090138b0932afb72b6e7469b6f48e8e9d63e02f6d0d02f76",
+          "at": "2026-06-14T07:49:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d437f782f9b815dc090138b0932afb72b6e7469b6f48e8e9d63e02f6d0d02f76",
+          "at": "2026-06-14T07:51:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8b3eb3cf33e02913fb238fdcdaa529129c4b28a6de1facd92929fb1ef78b2b8",
+          "at": "2026-06-14T08:10:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8b3eb3cf33e02913fb238fdcdaa529129c4b28a6de1facd92929fb1ef78b2b8",
+          "at": "2026-06-14T08:15:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:accf2e63734336b6617f8728c701537b71292b238bc1ab122b06caa94d48e280",
+          "at": "2026-06-14T08:38:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:accf2e63734336b6617f8728c701537b71292b238bc1ab122b06caa94d48e280",
+          "at": "2026-06-14T08:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunCatalogueLint` is documented as “unchanged from baseline” and “stable,” but the trait now adds `Send + Sync` supertrait bounds. That is a contract change, so the docs and signature conflict.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
+              "line": 264,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ab40622af3bf0eb796a3a3fa1f5c1ff18aa714c30203a2edb0dcee56d205a80f",
+          "at": "2026-06-14T10:56:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3af046f883710c9dc53d85f84908ba635aef63f9d0c64ffdc2d474f76d26a09e",
+          "at": "2026-06-14T11:06:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3af046f883710c9dc53d85f84908ba635aef63f9d0c64ffdc2d474f76d26a09e",
+          "at": "2026-06-14T11:30:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` and `impl-plan.json` still describe `ddd_strict_preset()` as returning `Vec<CatalogueLinterRule>`, but the updated type catalogue declares `Result<Vec<CatalogueLinterRule>, CatalogueLinterError>` in `domain-types.json`/`domain-types.md`. That leaves the plan artifacts internally inconsistent about the public API shape.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "line": 67,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b143f405144ec9b3006c66d0e7ef29f54c37178fa2e393dd569535619cd638ac",
+          "at": "2026-06-14T12:35:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3943313a725a8050dca331c93d4ea8549ca836accbc1a835c1bf57e064b1e656",
+          "at": "2026-06-14T12:39:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3943313a725a8050dca331c93d4ea8549ca836accbc1a835c1bf57e064b1e656",
+          "at": "2026-06-14T12:42:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6dd9ce93e4037d2b7207190efda117e839fa70767f6b69aa6dbbdb58dfd581b",
+          "at": "2026-06-14T15:35:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan declares the S6 work as sequential (`T009→T014→T015→T016→T017`), but the same section marks T014, T015, T016, and the final CI gate T017 all as in progress at once. Since T015/T016/T017 each depend on the previous task, the artifact now gives conflicting execution state for a dependency-ordered sequence.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "line": 64,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e6dd9ce93e4037d2b7207190efda117e839fa70767f6b69aa6dbbdb58dfd581b",
+          "at": "2026-06-14T15:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52eeda408c1b738357346aa2c0566006ef206e982e2f54538a90111b795e05e4",
+          "at": "2026-06-14T15:42:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:945cf08abed5779be7d0f87d950f89f63f45b1583a56460a7e0be38d65627fda",
+          "at": "2026-06-14T15:55:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:945cf08abed5779be7d0f87d950f89f63f45b1583a56460a7e0be38d65627fda",
+          "at": "2026-06-14T15:57:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:747586d9c37b4947d98a972457928fb4b4968784ca9b03308d4c6d28db978287",
+          "at": "2026-06-14T17:55:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:747586d9c37b4947d98a972457928fb4b4968784ca9b03308d4c6d28db978287",
+          "at": "2026-06-14T18:10:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83cb3db88983b58ba91c694faaafa7498ab8bdfcf0e4f6f6123abae525e82f2d",
+          "at": "2026-06-14T23:46:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLinterError` declares `InvalidRuleConfig` as a tuple `String` payload and `UnknownLayer` as the only variant with a `layer_id` field, but the docs say `layer_id` is `String` \"in both error variants.\" That contradicts the declared variant shapes and can make readers think `InvalidRuleConfig` also carries a `layer_id`. Reword this so the diagnostic `String` rationale applies to both payloads while `layer_id` is only attributed to `UnknownLayer`.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
+              "line": 884,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:83cb3db88983b58ba91c694faaafa7498ab8bdfcf0e4f6f6123abae525e82f2d",
+          "at": "2026-06-15T00:23:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa8a72d191b0574bb2e0b68c4fac638c0a0902a4e65514bf178efd025d02cc7f",
+          "at": "2026-06-15T00:26:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53693ad2e68507c2ec3c5569b3110f89ff479e7ab464fedd30c3fcbb2193f6e2",
+          "at": "2026-06-15T03:58:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D19 is currently nested under `## Layer ① — 意味論ゼロのロールラベルに初めて意味論を与える`, but D19 defines `sotp track lint` CLI/config-file rule resolution, not a role-label semantics or schema decision. This is a semantic layer-placement error in the ADR structure; it should sit with the general linter/config decisions near D15/D17 or in a separate config-mechanism section.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+              "line": 342,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:53693ad2e68507c2ec3c5569b3110f89ff479e7ab464fedd30c3fcbb2193f6e2",
+          "at": "2026-06-15T04:05:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07ac60c11f48e7ce989534831b7190310fbc8d027fdc42cd2fa0603f41f92e37",
+          "at": "2026-06-15T04:07:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T022/T024/T025 introduce `RunCatalogueLintError::ConfigMissing`, but the type catalogue and generated contract map still define `RunCatalogueLintError` with only `CatalogueLoad`, `LintExecution`, `InvalidLayer`, and `InvalidRuleSpec`. The plan and the artifact set disagree on the public error surface for the new fail-closed path.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 131,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `--rules-file` override path has no declared home in the usecase API: `RunCatalogueLintCommand` only carries `track_id`, `layer_id`, and `rules`; `RunCatalogueLintInteractor::new` only takes `loader` and `config_loader`; and `LintConfigLoader::load` requires a `PathBuf`. As written, T022/T023 cannot thread an override path into the loader or distinguish default-config missing from explicit-path missing.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
+              "line": 154,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7513f360661e59a69b6a7ca96d11cd46574710a27b46b085d59291eb2529662d",
+          "at": "2026-06-15T04:44:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T015` still claims responsibility for creating `.harness/catalogue-lint/presets/ddd-strict.json`, but the same task note says the actual file creation happens in `T019`, and `T019` repeats the same creation responsibility. That splits ownership of the preset file across two tasks and makes the stage plan internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 89,
+              "category": "contradiction"
+            },
+            {
+              "message": "`T019` is marked as depending on `T018`, yet the same description says it may run in parallel with `T018`. Those constraints cannot both hold, so the task ordering needs to choose one model or the other.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "line": 84,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:87232342f8cab549a8ec7db6219079a15964b99ad58484ffbc74e1a23fcb04e6",
+          "at": "2026-06-15T04:52:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This sentence contradicts itself: it declares a strict sequential dependency chain (`T018 → T019 → ...`) and then says `T019 may run in parallel with T018`. Since T019 already depends on T018 elsewhere in this stage, the parallelization note is not executable as written and should be removed or rewritten.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "line": 81,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f3ad7770f46e10725fca387dec4dda10c63eccbd209de485dc013d72980ac982",
+          "at": "2026-06-15T04:56:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T019 is sequenced after T018, but T018 removes the `ddd_strict_preset()` source that T019 says it must transcribe. In this order the preset JSON no longer has an in-repo source of truth, so the task is not deterministically executable unless another preserved source is added.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "line": 84,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b877749d212fb96996a05ee19d615d6df87a70577b5c7b2b44108a1b68917198",
+          "at": "2026-06-15T05:00:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T022` routes `config_loader.load()` through `RunCatalogueLintInteractor`, but the usecase error model only adds `RunCatalogueLintError::ConfigMissing` for `MissingFile`. `LintConfigLoaderError` also introduces `ParseError` and `SchemaVersionMismatch` in the same artifact set, and there is no plan text that says how those two failures leave the interactor. As written, stage 4 cannot be implemented without either adding corresponding `RunCatalogueLintError` variants or moving config loading out of the interactor.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "line": 130,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1708ac7c360c41dad7a9bf02e9165d7e30d7b068dd772716dfd1c97bd2160953",
+          "at": "2026-06-15T05:06:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T015` is assigned two incompatible responsibilities. In `plan.md` line 61, the Stage 3 summary says T015 creates `.harness/catalogue-lint/presets/ddd-strict.json`, but the task list at `plan.md` line 67 still defines T015 as the `ddd_strict_preset()` Rust function, and `impl-plan.json` line 113 assigns the JSON file creation to T019 instead. The preset-file ownership is therefore ambiguous and the plan is internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:48a08b2875a45b39099bda5c08ffeb5097e2d7b9d9339a973afc3d5de1b22968",
+          "at": "2026-06-15T05:10:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` leaves `T023` out of both `OS-09` and `OS-10` even though `T023` is the task that wires the workspace-default/`--rules-file` path selection and adds the fail-closed CLI test. Add `T023` to those coverage lists so the config-loading contract is fully tracked.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/task-coverage.json",
+              "line": 28,
+              "category": "task-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:a8bddbb5a13a539f519689cd972be29a78702eb4764bc5c24cfc5b76522bf7b1",
+          "at": "2026-06-15T05:14:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bea13333a8348e9a7ace3fc502714c815d81d1945cbc73e1bb006d44bb37de2",
+          "at": "2026-06-15T05:19:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Stage 4 rendered task list orders T018 before T019, but the same section states the dependency chain is T019 -> T018 and T018 itself depends on the JSON preset created by T019. This makes the implementation order contradictory for readers following the plan list: T018 cannot safely remove `ddd_strict_preset()` or update callers to the JSON fixture before T019 creates `.harness/catalogue-lint/presets/ddd-strict.json`. Reorder the S7 task list to put T019 before T018, or make the dependency narrative match the listed order.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "line": 83,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4bea13333a8348e9a7ace3fc502714c815d81d1945cbc73e1bb006d44bb37de2",
+          "at": "2026-06-15T05:23:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LintConfig` is declared with stripped/private fields and exposes only `rules(&self)`, but the new `LintConfigLoader` port returns `LintConfig` and the planned `FsLintConfigLoader` implementation lives in infrastructure. With no public constructor or conversion declared in the usecase catalogue, the infrastructure adapter has no legal way to construct the value it must return without adding an undeclared public API or making fields public, making the T021 plan infeasible as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
+              "line": 201,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:102de43c0a2b9a98ed74054923c6e85260331b5f5b607be49c1e75ed5e50eddd",
+          "at": "2026-06-15T05:28:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d081825294edfe845d44a47e079f6f58bf4c2ae8b72bdbffcddcfff878a56633",
+          "at": "2026-06-15T05:32:34Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
+          "at": "2026-06-14T05:57:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
+          "at": "2026-06-14T05:59:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 test coverage gap: the new boundary conversion path can now reject malformed public `RunCatalogueLintCommand` input via `InvalidRuleSpec`, but the added tests only cover valid `LintRuleSpec` values. Please add error-path coverage for cases such as an unknown `target_roles` entry, an empty `target_field`, and empty `permitted_layers` / `required_traits` / `forbidden_roles` so the public API’s validation contract is pinned down.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
+              "line": 175,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:21e2d02a7849cec388c231f9b3211eedaaa9247fb98c1483753d50a7bf3dceed",
+          "at": "2026-06-14T11:28:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5378faa92aaeca0dffb9d6b4327921d61e93516c708175342956a9d270130111",
+          "at": "2026-06-14T11:33:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
+          "at": "2026-06-14T23:49:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
+          "at": "2026-06-15T00:23:12Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:549edec9b94dfd016a378883220ffaf79fc4f5ed7d97370a2623744fbb1c3f91",
+          "at": "2026-06-14T05:53:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:549edec9b94dfd016a378883220ffaf79fc4f5ed7d97370a2623744fbb1c3f91",
+          "at": "2026-06-14T05:55:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
+          "at": "2026-06-14T10:52:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
+          "at": "2026-06-14T11:29:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ac59a99fe882cb18dd9b06a290895d085abef12d5907efa51bd01c4d18716e9",
+          "at": "2026-06-14T17:56:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ac59a99fe882cb18dd9b06a290895d085abef12d5907efa51bd01c4d18716e9",
+          "at": "2026-06-14T18:10:55Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -742,824 +1723,6 @@
           "findings": [],
           "hash": "rvw1:sha256:5e78d8cc6baa7dce80b6d3ecb679b3cfc00a3386f25a098eb75af17e2bb59379",
           "at": "2026-06-15T02:44:45Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DataRoleDto` still leaves the unit-like roles (`Specification`, `Factory`, `Interactor`, `Command`, `Query`, `Dto`, `ErrorType`, `SecondaryAdapter`) as unit variants, so serde continues to emit and accept bare strings for those cases. That means the new codec does not actually enforce the discriminated-object wire shape for the full role enum, and the legacy string form is still implicitly supported.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
-              "line": 32,
-              "category": "serialization"
-            },
-            {
-              "message": "`ContractRole::Repository` is rendered with the display tag `repository`, but `section_to_signal_kind_tag` never collapses that tag back to the evaluator's `secondary_port` bucket, and there is no dedicated repository section. Repository traits will therefore fall into `Other` with a blank Signal column even when `check_type_signals` has produced a matching `secondary_port` signal.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 208,
-              "category": "rendering"
-            }
-          ],
-          "hash": "rvw1:sha256:5e3237b12ca76bd05e2b84ce9ece8b10e92cf2c75f40c23d30f0732087f31e87",
-          "at": "2026-06-14T05:57:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_layer` now short-circuits on `binding.targets.len() > 1` before `Self::to_infra_binding(binding)` runs, so malformed multi-target bindings never go through the domain/infra validation path. In the absent-catalogue fast path that means bad `catalogue_file` / `baseline_file` / `layer_id` input can be accepted silently, and `track_dir.join(&binding.catalogue_file)` is probed before any path validation. That is a validation bypass and path-probing issue in the new early-return branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
-              "line": 146,
-              "category": "security"
-            },
-            {
-              "message": "The new codec payload variants (`DataRoleDto::EventPolicy` and `ContractRoleDto::Repository`) have no dedicated infrastructure tests covering their happy-path round trips and required rejection cases. In particular, there is no coverage for empty `reacts_to` being rejected or `Repository.aggregate` failing validation, so regressions in the new schema-invariant decode/encode paths would ship without a safety net.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
-              "line": 44,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7cb20b6343bb5696d05b6fcfb24f60d47334daeb20f9d25735431d6402a1ccf5",
-          "at": "2026-06-14T06:07:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
-          "at": "2026-06-14T06:23:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
-          "at": "2026-06-14T06:35:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
-          "at": "2026-06-14T08:11:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
-          "at": "2026-06-14T08:15:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
-          "at": "2026-06-14T08:41:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
-          "at": "2026-06-14T08:43:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
-          "at": "2026-06-14T10:53:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
-          "at": "2026-06-14T11:28:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
-          "at": "2026-06-14T12:33:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
-          "at": "2026-06-14T12:42:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueDocumentCodec::decode` now returns `SchemaVersionRequiresMigration` for schema_version 4, but this branch only special-cases `UnsupportedSchemaVersion`. v4 catalogues therefore fall through to the generic `failed to decode catalogue` error, which drops the actionable migration prompt this code path is trying to provide.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 228,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:b4344d5b95fe1787c600b88d432c10e726efa130093dfdb70580db980701d50c",
-          "at": "2026-06-14T17:58:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
-          "at": "2026-06-14T18:06:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
-          "at": "2026-06-14T18:10:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
-          "at": "2026-06-14T18:21:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The v4 migration error tells users to regenerate the catalogue with `sotp track type-signals`, but that command consumes an existing catalogue to evaluate signals; it does not migrate the catalogue wire format. Several call sites surface this codec error directly via `to_string()`, so a schema_version=4 catalogue will get actionable-looking but wrong remediation and can leave users rerunning the failing path instead of regenerating the catalogue via the type-designer flow.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-              "line": 254,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
-          "at": "2026-06-14T18:24:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c26907823b1c50da36e88e503c7c725f0ff7d83be1d22f97a7f15deea08110b",
-          "at": "2026-06-14T18:31:00Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e6759bdeac920ebbc6a26b127052c7a390740207e1dc473e1d0e936e30dd28f4",
-          "at": "2026-06-13T19:02:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 says schema-forcing changes must be done as a single migration because data-carrying `DataRole` / `ContractRole` changes force the same codec, renderer, evaluator, and role-comparison updates at once, but the ordered plan splits schema-bearing role changes across stage 1 (`DataRole` D4-D8) and stage 2 (`ContractRole::Repository { aggregate }` and `DataRole::EventPolicy { reacts_to }`). Following this sequence either requires repeating the migration the ADR says must be atomic, or leaves stage 1/2 boundaries ambiguous. Move all payload-bearing role schema changes into the schema migration step, or revise the rationale/order so the implementation plan is executable.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
-              "line": 138,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e6759bdeac920ebbc6a26b127052c7a390740207e1dc473e1d0e936e30dd28f4",
-          "at": "2026-06-13T19:05:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The rule mapping assigns `EventPolicy.reacts_to` to D8, but D8 explicitly says `EventPolicy.reacts_to` is a separate D16 decision, and D16 owns the `EventPolicy` field/rules. This broken decision reference can mis-key implementation or coverage tracking for the `reacts_to` DomainEvent constraint under D8 instead of D16.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
-              "line": 214,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:4b7c96f9513621cb701aed1ec39921a8efb894b76e769cad092bcf67804b6685",
-          "at": "2026-06-13T19:09:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `consistency` note says Saga support is deferred because Saga handling must come first and points readers to `D12`, but `D12` is now the Presenter/Controller rejection decision. The Saga/Process Manager rationale lives in the following addendum/reassess section, so this cross-reference now sends implementers to the wrong design decision and obscures the actual dependency for the UseCase consistency deferral.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
-              "line": 435,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:8a36c66ff688950b7fb0193520b96e2930e8b6f0a145d51eb2a32ba616e0f15c",
-          "at": "2026-06-13T19:12:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab417cde38a9a8681157033e75778935580d825b1d686d64b980f9cff9b26510",
-          "at": "2026-06-13T19:14:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T002 says the stage-1 migration rewrites `DataRole` from 13 to 15 variants, but the same task explicitly defers `DataRole::DomainEvent` to Stage 2. Stage 1 only introduces `EventPolicy` here, so the variant-count claim overstates the scope and is internally inconsistent with the rest of the task.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
-              "line": 12,
-              "category": "contradiction"
-            },
-            {
-              "message": "T007 describes `CatalogueLinterRuleKind` as expanding to 12 \"data-carrying\" variants, but `NoPublicField` is still a unit variant in the generated catalogue model. The task should say 12 variants, not 12 data-carrying variants.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
-              "line": 42,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:9fef2ad1cfea824f5190fc36784074b2b726a2da9976fcfea8b1141015f908ce",
-          "at": "2026-06-14T01:00:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CN-03` and `AC-08` omit `T002`, even though `T002` is the task that actually rewrites `DataRole` / `ContractRole` into data-carrying enums and removes `Copy` / `Hash`. As written, the coverage file claims the breaking migration is covered by follow-up tasks only, which leaves the core schema change unmapped.",
-              "severity": "P1",
-              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/task-coverage.json",
-              "line": 30,
-              "category": "factual error"
-            },
-            {
-              "message": "The D17 port redefinition is semantically hollow: `CatalogueLinter` is documented as an external-I/O-only secondary port, but its `methods` array is empty, and the infrastructure adapter only has `new`. That leaves no I/O boundary for `T009` to implement, so the claimed port/adapter split is not actually represented in the catalogue.",
-              "severity": "P1",
-              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
-              "line": 721,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:4616b53d4f36412ff98728338c9dddd879cf92c965cbc6ae1a383d6394978dc2",
-          "at": "2026-06-14T01:10:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Stage 1 T008 and Stage 3 T014 contradict each other about `evaluate_catalogue_lint`: T008 says to implement all 12 rule kinds now, while the S3/S6 descriptions treat T008 as a stub that T014 later expands. That leaves the stage boundary inconsistent and the plan ambiguous to execute.",
-              "severity": "P1",
-              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
-              "line": 48,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:168a6fde6314441d119fb2c9ae38bf4d1ff5494c1666d3548aa8c8e2b682356b",
-          "at": "2026-06-14T01:19:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This section schedules the linter framework rewrite and port removal in Stage 1 (`T007`-`T009`), but ADR D3 explicitly says linter work comes after schema migration and the `DomainEvent` stage. Because these tasks are not just placeholders, the plan contradicts its required execution order and becomes ambiguous to execute.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
-              "line": 41,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:6c7d9062eaedfee16688ca062805265490fd88558613fe9d2c69cbfc0cedc63f",
-          "at": "2026-06-14T01:25:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bbf69ba3e0807a1633a2e7f8000e775c06d2153b7c1955c690f3e09d58dd9927",
-          "at": "2026-06-14T01:35:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T009 makes `RunCatalogueLintInteractor` call `evaluate_catalogue_lint` directly and changes `RunCatalogueLintInteractor::new` to a zero-argument constructor, while the usecase catalogue keeps the interactor as a unit struct and the command contains only `rules`. The domain function requires both `&CatalogueDocument` and `&LayerId`, so after removing the injected port there is no planned source for those required inputs. This makes the T009 usecase rewrite physically unexecutable unless the command or interactor retains/provides catalogue and layer inputs.",
-              "severity": "P1",
-              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
-              "line": 176,
-              "category": "infeasibility"
-            },
-            {
-              "message": "`CatalogueLinterRuleError` is documented as errors returned by `CatalogueLinterRule::new`, and T016 requires error-case tests for `CatalogueLinterRule::new`, but the type catalogue declares `CatalogueLinterRule::new` as returning `Self`. With that signature, the planned validation errors cannot be returned or tested, so the catalogue contradicts the implementation/test plan for rule validation.",
-              "severity": "P1",
-              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
-              "line": 537,
-              "category": "contradiction"
-            },
-            {
-              "message": "The domain type catalogue's Free Functions section lists only `evaluate_catalogue_lint`, but the spec and T015 require a public `ddd_strict_preset() -> Vec<CatalogueLinterRule>` to satisfy AC-21. Because the typed catalogue omits that function, the plan has no type-level artifact/signature for the required preset even though the implementation plan depends on it.",
-              "severity": "P1",
-              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.md",
-              "line": 38,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:bbf69ba3e0807a1633a2e7f8000e775c06d2153b7c1955c690f3e09d58dd9927",
-          "at": "2026-06-14T01:43:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35b51f89be43499ebfa9a37070eec38e133ed88fd1600dc389c56aaae64a99df",
-          "at": "2026-06-14T01:55:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb82a8bbd54f694f7a790b44984c300ce2454a5ff932e9840fa8486ba1715a23",
-          "at": "2026-06-14T02:29:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb82a8bbd54f694f7a790b44984c300ce2454a5ff932e9840fa8486ba1715a23",
-          "at": "2026-06-14T02:31:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9e5c40c0fb9d033e0918a48f959500cf2681386858c975193ed9b088595dec58",
-          "at": "2026-06-14T02:47:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9e5c40c0fb9d033e0918a48f959500cf2681386858c975193ed9b088595dec58",
-          "at": "2026-06-14T02:49:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fa2ec1fd3b77539871943c49a7674a738a1e8e88b34afe6233090b6ecb7c82f",
-          "at": "2026-06-14T03:04:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`NonEmptyVec` is documented here as enforcing that empty collections are an illegal state, and both constructors establish that invariant, but the newly added `first` API returns `Option<&TypeRef>`. That exposes an impossible empty case to downstream code and contradicts the type's non-empty contract; the method should return `&TypeRef` or the catalogue should stop claiming non-emptiness is guaranteed.",
-              "severity": "P1",
-              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
-              "line": 364,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5fa2ec1fd3b77539871943c49a7674a738a1e8e88b34afe6233090b6ecb7c82f",
-          "at": "2026-06-14T03:07:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3292f807e578f5ca8908e0662c17fa52c858f1c18bfcf87b5025c2bf4b585bd6",
-          "at": "2026-06-14T03:11:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7883ca79172b6d3cf6ca140fb070ad21a5b5150f8fc03cee797fa7119750341f",
-          "at": "2026-06-14T05:55:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7883ca79172b6d3cf6ca140fb070ad21a5b5150f8fc03cee797fa7119750341f",
-          "at": "2026-06-14T05:58:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`S3` still describes T010 as an active-track catalogue migration, but the task itself has been changed to `skipped`/N/A because migration is now explicitly out of scope. That leaves the section narrative and the task state contradictory, and the remaining T010 dependency text misleading.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
-              "line": 30,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:48c8ba8d2672e6dbc6ae8635c01bf94de2cf5a0fad9bcd72ef5518957950e9d5",
-          "at": "2026-06-14T07:45:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T011` still says it depends on `T010`, but the surrounding Stage 1 summary and `impl-plan.json` now mark `T010` as skipped and say the Stage 1 test gate depends only on `T001-T006`. That leaves the generated plan graph internally inconsistent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
-              "line": 36,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f7e8a86e65aa5f37f91d2359f9a098907ff38853f9923cf1b22e37f745ad7df3",
-          "at": "2026-06-14T07:47:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d437f782f9b815dc090138b0932afb72b6e7469b6f48e8e9d63e02f6d0d02f76",
-          "at": "2026-06-14T07:49:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d437f782f9b815dc090138b0932afb72b6e7469b6f48e8e9d63e02f6d0d02f76",
-          "at": "2026-06-14T07:51:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8b3eb3cf33e02913fb238fdcdaa529129c4b28a6de1facd92929fb1ef78b2b8",
-          "at": "2026-06-14T08:10:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8b3eb3cf33e02913fb238fdcdaa529129c4b28a6de1facd92929fb1ef78b2b8",
-          "at": "2026-06-14T08:15:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:accf2e63734336b6617f8728c701537b71292b238bc1ab122b06caa94d48e280",
-          "at": "2026-06-14T08:38:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:accf2e63734336b6617f8728c701537b71292b238bc1ab122b06caa94d48e280",
-          "at": "2026-06-14T08:44:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RunCatalogueLint` is documented as “unchanged from baseline” and “stable,” but the trait now adds `Send + Sync` supertrait bounds. That is a contract change, so the docs and signature conflict.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
-              "line": 264,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ab40622af3bf0eb796a3a3fa1f5c1ff18aa714c30203a2edb0dcee56d205a80f",
-          "at": "2026-06-14T10:56:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3af046f883710c9dc53d85f84908ba635aef63f9d0c64ffdc2d474f76d26a09e",
-          "at": "2026-06-14T11:06:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3af046f883710c9dc53d85f84908ba635aef63f9d0c64ffdc2d474f76d26a09e",
-          "at": "2026-06-14T11:30:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan.md` and `impl-plan.json` still describe `ddd_strict_preset()` as returning `Vec<CatalogueLinterRule>`, but the updated type catalogue declares `Result<Vec<CatalogueLinterRule>, CatalogueLinterError>` in `domain-types.json`/`domain-types.md`. That leaves the plan artifacts internally inconsistent about the public API shape.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
-              "line": 67,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b143f405144ec9b3006c66d0e7ef29f54c37178fa2e393dd569535619cd638ac",
-          "at": "2026-06-14T12:35:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3943313a725a8050dca331c93d4ea8549ca836accbc1a835c1bf57e064b1e656",
-          "at": "2026-06-14T12:39:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3943313a725a8050dca331c93d4ea8549ca836accbc1a835c1bf57e064b1e656",
-          "at": "2026-06-14T12:42:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e6dd9ce93e4037d2b7207190efda117e839fa70767f6b69aa6dbbdb58dfd581b",
-          "at": "2026-06-14T15:35:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The plan declares the S6 work as sequential (`T009→T014→T015→T016→T017`), but the same section marks T014, T015, T016, and the final CI gate T017 all as in progress at once. Since T015/T016/T017 each depend on the previous task, the artifact now gives conflicting execution state for a dependency-ordered sequence.",
-              "severity": "P1",
-              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
-              "line": 64,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e6dd9ce93e4037d2b7207190efda117e839fa70767f6b69aa6dbbdb58dfd581b",
-          "at": "2026-06-14T15:39:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52eeda408c1b738357346aa2c0566006ef206e982e2f54538a90111b795e05e4",
-          "at": "2026-06-14T15:42:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:945cf08abed5779be7d0f87d950f89f63f45b1583a56460a7e0be38d65627fda",
-          "at": "2026-06-14T15:55:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:945cf08abed5779be7d0f87d950f89f63f45b1583a56460a7e0be38d65627fda",
-          "at": "2026-06-14T15:57:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:747586d9c37b4947d98a972457928fb4b4968784ca9b03308d4c6d28db978287",
-          "at": "2026-06-14T17:55:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:747586d9c37b4947d98a972457928fb4b4968784ca9b03308d4c6d28db978287",
-          "at": "2026-06-14T18:10:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83cb3db88983b58ba91c694faaafa7498ab8bdfcf0e4f6f6123abae525e82f2d",
-          "at": "2026-06-14T23:46:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueLinterError` declares `InvalidRuleConfig` as a tuple `String` payload and `UnknownLayer` as the only variant with a `layer_id` field, but the docs say `layer_id` is `String` \"in both error variants.\" That contradicts the declared variant shapes and can make readers think `InvalidRuleConfig` also carries a `layer_id`. Reword this so the diagnostic `String` rationale applies to both payloads while `layer_id` is only attributed to `UnknownLayer`.",
-              "severity": "P1",
-              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
-              "line": 884,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:83cb3db88983b58ba91c694faaafa7498ab8bdfcf0e4f6f6123abae525e82f2d",
-          "at": "2026-06-15T00:23:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa8a72d191b0574bb2e0b68c4fac638c0a0902a4e65514bf178efd025d02cc7f",
-          "at": "2026-06-15T00:26:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:53693ad2e68507c2ec3c5569b3110f89ff479e7ab464fedd30c3fcbb2193f6e2",
-          "at": "2026-06-15T03:58:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D19 is currently nested under `## Layer ① — 意味論ゼロのロールラベルに初めて意味論を与える`, but D19 defines `sotp track lint` CLI/config-file rule resolution, not a role-label semantics or schema decision. This is a semantic layer-placement error in the ADR structure; it should sit with the general linter/config decisions near D15/D17 or in a separate config-mechanism section.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
-              "line": 342,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:53693ad2e68507c2ec3c5569b3110f89ff479e7ab464fedd30c3fcbb2193f6e2",
-          "at": "2026-06-15T04:05:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:07ac60c11f48e7ce989534831b7190310fbc8d027fdc42cd2fa0603f41f92e37",
-          "at": "2026-06-15T04:07:51Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:57:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:59:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 test coverage gap: the new boundary conversion path can now reject malformed public `RunCatalogueLintCommand` input via `InvalidRuleSpec`, but the added tests only cover valid `LintRuleSpec` values. Please add error-path coverage for cases such as an unknown `target_roles` entry, an empty `target_field`, and empty `permitted_layers` / `required_traits` / `forbidden_roles` so the public API’s validation contract is pinned down.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
-              "line": 175,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:21e2d02a7849cec388c231f9b3211eedaaa9247fb98c1483753d50a7bf3dceed",
-          "at": "2026-06-14T11:28:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5378faa92aaeca0dffb9d6b4327921d61e93516c708175342956a9d270130111",
-          "at": "2026-06-14T11:33:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
-          "at": "2026-06-14T23:49:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
-          "at": "2026-06-15T00:23:12Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:549edec9b94dfd016a378883220ffaf79fc4f5ed7d97370a2623744fbb1c3f91",
-          "at": "2026-06-14T05:53:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:549edec9b94dfd016a378883220ffaf79fc4f5ed7d97370a2623744fbb1c3f91",
-          "at": "2026-06-14T05:55:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
-          "at": "2026-06-14T10:52:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
-          "at": "2026-06-14T11:29:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ac59a99fe882cb18dd9b06a290895d085abef12d5907efa51bd01c4d18716e9",
-          "at": "2026-06-14T17:56:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ac59a99fe882cb18dd9b06a290895d085abef12d5907efa51bd01c4d18716e9",
-          "at": "2026-06-14T18:10:55Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
-          "at": "2026-06-14T05:53:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
-          "at": "2026-06-14T05:58:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
-          "at": "2026-06-14T10:56:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
-          "at": "2026-06-14T11:28:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
-          "at": "2026-06-14T17:55:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
-          "at": "2026-06-14T18:10:45Z"
         }
       ]
     },

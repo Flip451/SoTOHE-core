@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e3cd54bdc605e1a07c7616836dfa3265696908b5461037691fefe4e2ec0a0e7d",
+  "catalogue_declaration_hash": "cdee19716590d831c50616ac047784c44b0c8c45d24e074767c71dc2b6f0b9bd",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
@@ -100,7 +100,7 @@
     {
       "type_name": "domain::tddd::catalogue_linter::preset::ddd_strict_preset",
       "signal": "blue",
-      "entry_hash": "efc70e37a5ddde0f734b0c15f45c79e9a378feaeec1c89f2539a6f48e563d921"
+      "entry_hash": "c90d7148703966997263228183b0c8bdf7b5afea4fb5a64c04af4bd3e67efe63"
     }
   ]
 }

@@ -1344,6 +1344,46 @@
         "kind": "pass",
         "citation": "実装フェーズは「型定義による schema 強制の意味論 → 新ロール追加 → linter」の機構軸で分ける。"
       }
+    },
+    {
+      "claim_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「D4〜D11 および D16 / D18 で定める各 **opt-in linter ルール**は、`CatalogueLinter` に対して外部から供給するルールリスト（`&[CatalogueLinterRule]`）として実現する。... opt-in したルールに違反があれば linter はそれを `CatalogueLintViolation` として報告し、違反を容認する『advisory』という扱いは設けない」「ルールは『**検査対象**』と『**検査内容**』を分けて指定できる構造とする。... payload を持たないロール種別 discriminant（参考スケッチでは `RoleKind`）を設ける方向で実装する」「本 ADR が定める最小コアルールを一括で有効化するルールセットプリセットを `ddd-strict` として提供する。... **配布 config ファイル**（`.harness/catalogue-lint/presets/ddd-strict.json`）として提供する。... domain layer に `ddd_strict_preset()` 関数は設けない」"
+      }
+    },
+    {
+      "claim_hash": "2fb0b608d104252e4551d10cd11665d3be76a3c4e5201f1d33b62cd840d9826a",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「対象は workspace 全体（per-layer config は対象外）」"
+      }
+    },
+    {
+      "claim_hash": "0e2819907ad0cc811dca66da2955053cfa0e74f8d24ddd9b8c335507392a8be3",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "3. **(else) fail-closed**: いずれも見つからなければ「設定が無い」旨の明示エラーで停止する。設定なしで黙って動くフォールバックは設けない。"
+      }
+    },
+    {
+      "claim_hash": "7f944bafb3567d48e0ce70f8556ea7483288c7273a3d87db70a168b2bc9dfd98",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ddd-strict` プリセットは Rust source にハードコードされた API 関数ではなく、**配布 config ファイル**（`.harness/catalogue-lint/presets/ddd-strict.json`）として提供する。 ... 採用者はこのファイルを**コピーして `.harness/catalogue-lint/config.json` に置き、必要に応じて編集して使う**。config.json から preset を参照する機構は設けない"
+      }
+    },
+    {
+      "claim_hash": "1f6509fe7de204544d0f76082072db8316e30ebfb45d23e3800aaa20eb3b001a",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「配布 config ファイル（`.harness/catalogue-lint/presets/ddd-strict.json`）として提供する。採用者はこのファイルをコピーして `.harness/catalogue-lint/config.json` に置き」"
+      }
     }
   ]
 }

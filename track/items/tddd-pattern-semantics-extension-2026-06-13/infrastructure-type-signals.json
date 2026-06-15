@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-15T04:10:10Z",
-  "declaration_hash": "3ddcf931b0f47601e3a204cac2fb3c7af681bc59b58d07fe98b48fd9309bbb75",
+  "generated_at": "2026-06-15T05:33:47Z",
+  "declaration_hash": "f3345eb5cd163cc4fda797342773ce3695a4671d52ca53580ea564d7ca8b1a4f",
   "signals": [
     {
       "type_name": "CatalogueDocumentCodec",
@@ -17,6 +17,16 @@
       "kind_tag": "error_type",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "FsLintConfigLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "LintConfigLoader",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "InMemoryCatalogueLinter",

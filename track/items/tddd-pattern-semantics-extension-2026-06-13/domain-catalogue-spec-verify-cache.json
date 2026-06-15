@@ -585,6 +585,70 @@
         "kind": "pass",
         "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。... 外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。"
       }
+    },
+    {
+      "claim_hash": "f4aac17365f8994e6f528f3fe2a7ed5aa7dbc52bd52526b9ddcf02d809c4e286",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DDD パターンの機械検査ルール（D4–D11 / D16 / D18 が定める各ルール）を、呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。opt-in したルールは厳格に適用し（違反を容認する「advisory」という中間状態は設けない）。"
+      }
+    },
+    {
+      "claim_hash": "95d165bed7a11020113512c83eada96ef760eed4766f7051b14ab0e6284dc541",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DDD パターンの機械検査ルール（D4–D11 / D16 / D18 が定める各ルール）を、呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "4a5a1db9efe9953853103ce2ece3381e43bf6f29aca2906f8fb41b895f71633f",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "a85d57ad188fe7acd57b8341fad6e4fd22c12c87dcc0ae96d2645830b163f69e",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成"
+      }
+    },
+    {
+      "claim_hash": "d7fa82abc5a1d48230ed41e076d24b3e4a8fe157038abce6818454b7f0596ff5",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "399ccd9002a38e706031d3aed355d551c12fddb1a0edd7e0d2808c47e95b9521",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "c90d7148703966997263228183b0c8bdf7b5afea4fb5a64c04af4bd3e67efe63",
+      "evidence_hash": "7f944bafb3567d48e0ce70f8556ea7483288c7273a3d87db70a168b2bc9dfd98",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ddd-strict` プリセットを Rust source ハードコードの API 関数（例: `ddd_strict_preset()` 関数を domain layer に設ける）として提供する実装は行わない。"
+      }
+    },
+    {
+      "claim_hash": "c90d7148703966997263228183b0c8bdf7b5afea4fb5a64c04af4bd3e67efe63",
+      "evidence_hash": "1f6509fe7de204544d0f76082072db8316e30ebfb45d23e3800aaa20eb3b001a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ddd-strict` プリセット（本 ADR の最小コアルール D4–D11 / D16 / D18 のすべてを一括有効化するルールセット）が `.harness/catalogue-lint/presets/ddd-strict.json` として配布されている。採用者はこのファイルをコピーして `.harness/catalogue-lint/config.json` に置くことで最小コアルールを一括有効化できる。domain layer に `ddd_strict_preset()` 等の Rust API 関数は存在しない。"
+      }
     }
   ]
 }

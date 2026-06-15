@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3ddcf931b0f47601e3a204cac2fb3c7af681bc59b58d07fe98b48fd9309bbb75",
+  "catalogue_declaration_hash": "f3345eb5cd163cc4fda797342773ce3695a4671d52ca53580ea564d7ca8b1a4f",
   "signals": [
     {
       "type_name": "CatalogueDocumentCodec",
@@ -11,6 +11,11 @@
       "type_name": "CatalogueDocumentCodecError",
       "signal": "blue",
       "entry_hash": "2ca06e5f536c05a43d1e648891ee090925625e5df7bfb051a23381bf7707d0c1"
+    },
+    {
+      "type_name": "FsLintConfigLoader",
+      "signal": "blue",
+      "entry_hash": "e795920d2954d576e7f070a65e992586e047073c70c8f20cc80c8f3d77d47ab8"
     },
     {
       "type_name": "InMemoryCatalogueLinter",

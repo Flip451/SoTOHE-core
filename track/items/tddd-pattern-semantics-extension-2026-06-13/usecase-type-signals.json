@@ -1,8 +1,35 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-15T04:10:06Z",
-  "declaration_hash": "73a081efeacb57a67869a6ec6bd3da4f62e6db38507c987d3396b880deefe87c",
+  "generated_at": "2026-06-15T05:33:43Z",
+  "declaration_hash": "49b3f289270852a0f1b469c938d01bfd1834baab072fc71eb58b52f09733d5da",
   "signals": [
+    {
+      "type_name": "LintConfig",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "LintConfigLoader",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "LintConfigLoaderError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
     {
       "type_name": "LintRuleKind",
       "kind_tag": "enum",
@@ -28,7 +55,7 @@
     {
       "type_name": "RunCatalogueLintError",
       "kind_tag": "error_type",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
         "core::error::Error",
@@ -39,7 +66,7 @@
     {
       "type_name": "RunCatalogueLintInteractor",
       "kind_tag": "interactor",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
         "RunCatalogueLint"
