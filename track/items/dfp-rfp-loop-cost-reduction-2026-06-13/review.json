@@ -1,78 +1,35 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:18:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/dry.rs",
-              "line": 425,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:21:19Z"
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:03:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
-          "at": "2026-06-14T04:23:50Z"
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:05:16Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:39:55Z"
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:52:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:42:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:07:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:09:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
-          "at": "2026-06-14T15:54:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
-          "at": "2026-06-14T15:56:10Z"
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:53:44Z"
         }
       ]
     },
@@ -485,461 +442,50 @@
           "findings": [],
           "hash": "rvw1:sha256:c3e97080cf9b02e6af59bf704e4d330749329a6140a55db49d23b0120a99ce33",
           "at": "2026-06-14T17:13:28Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
-          "at": "2026-06-14T02:35:12Z"
         },
         {
-          "type": "final",
+          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`dry_check_approved` now reads `track_dir/dry-check-coverage.json`, but this composition layer never writes that manifest on the `dry write` path. In this file the write flow still only constructs `FsDryCheckStore` and calls `run_dry_check`; `rg` shows no production `write_coverage` call. Since `FsDryCheckCoverageAdapter::read_coverage` returns `Ok(None)` for a missing file and the new approval interactor treats that as `Blocked`, a normal `sotp dry write` followed by `sotp dry check-approved` will fail closed forever unless a manifest is created out-of-band. Wire coverage persistence into the write flow or keep the approval bridge on an artifact that the write flow actually produces.",
+              "message": "P1: `FixpointResolveCommand.current_branch` is never consulted in `FixpointResolveInteractor::resolve` ([fixpoint_resolve.rs#L69](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/fixpoint_resolve.rs#L69), [fixpoint_resolve.rs#L265](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/fixpoint_resolve.rs#L265)). That leaves `FixpointResolveError::TrackNotActive` unreachable and removes the active-track guard expected for this workflow, so the resolver can drive DFP/RFP/ref-verify for a track while the user is on an unrelated branch.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 500,
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/fixpoint_resolve.rs",
+              "line": 265,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
-          "at": "2026-06-14T02:39:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T02:44:45Z"
+          "hash": "rvw1:sha256:02966ccaae66ecc988ab8ebcd9a89e0e29206ab1e14006e011a20b13e71631e9",
+          "at": "2026-06-14T23:51:54Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
-          "at": "2026-06-14T03:02:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
-          "at": "2026-06-14T03:06:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T03:17:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T03:22:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
-          "at": "2026-06-14T03:46:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
-          "at": "2026-06-14T03:48:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `db_path`, `threshold`, and `workspace_root` from `DryCheckApprovedInput` makes the existing `execute_dry_check_approved` construction in `apps/cli/src/commands/dry.rs:197-200` no longer compile. The DTO change needs the caller updated in the same change set, otherwise the workspace is broken.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 128,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:20:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:25:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:28:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `GateEval` path in `dry_check_approved` is not covered by tests. There is no assertion for the Approved case emitting `gate_name=\"dry\"` / `verdict=\"ok\"`, and no Blocked-case assertion for `verdict=\"error\"` plus the `blocked: N unresolved pair(s)` summary. This is public API behavior, so regressions here would be silent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 514,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:c0cf905ba18f3ae793aeaf00284a0da2a6330675eca4058520c0843a50bd3297",
-          "at": "2026-06-14T05:32:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
-          "at": "2026-06-14T05:37:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
-          "at": "2026-06-14T05:40:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new GateEval path is only covered by the pure mapping helper tests near the bottom of the file. There is no test that `dry_check_approved()` actually reaches `emit_gate_eval(...)` after a finalized verdict, so a regression that removes or reorders the telemetry call would be silent because the emitter suppresses errors. Add an end-to-end test for both Approved and Blocked flows that asserts the telemetry write occurs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 508,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:47c8fd4439776069504a0117cdbc43b272bf11118eba369966ac17d18adf4564",
-          "at": "2026-06-14T05:54:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
-          "at": "2026-06-14T06:06:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
-          "at": "2026-06-14T06:10:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
-          "at": "2026-06-14T11:08:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
-          "at": "2026-06-14T11:13:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
-          "at": "2026-06-14T12:40:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
-          "at": "2026-06-14T12:42:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
-          "at": "2026-06-14T13:15:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
-          "at": "2026-06-14T13:17:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
-          "at": "2026-06-14T13:43:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
-          "at": "2026-06-14T13:45:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
-          "at": "2026-06-14T15:57:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
-          "at": "2026-06-14T15:59:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
-          "at": "2026-06-14T17:25:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
-          "at": "2026-06-14T17:27:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_tiered_telemetry_for_result()` derives `findings_count` from the final `dry_result` and reuses it for both tiers. On escalated runs, the fast ReviewRound event will report the final-tier finding count instead of the fast-tier count, so the new per-tier telemetry is wrong whenever the tiers disagree.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 690,
-              "category": "correctness"
-            },
-            {
-              "message": "`dry_write()` passes the same `dry_start` instant to both `emit_review_round()` calls. That makes the final tier's duration include time spent in the fast tier, which defeats the per-tier timing this change is meant to capture.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 307,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:9b5883ba1e92c12c479870cee5c34b661c0b6b88702ebe909862d263575ab3e3",
-          "at": "2026-06-14T18:04:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `dry_tiered_telemetry_for_result()` copies the same `verdict_parse_failed` flag into both tier telemetry objects for subprocess failures. When the final tier is the one that hits `IllegalOutput` on an escalated run, the fast tier's `ReviewRound` and `ExternalSubprocess` events are also marked as parse failures, which misattributes the error to the wrong tier.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 709,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:7c4d29cf61e378b69698fc10ee1594658c0090367c960272adcadbffdd54d922",
-          "at": "2026-06-14T18:10:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_write()` emits the fast-tier `ReviewRound` and `ExternalSubprocess` telemetry only after `run_dry_check()` has finished the entire cycle. On runs that escalate to Final, both fast events therefore measure through the final tier as well, so the new per-tier telemetry does not report an accurate fast duration.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 306,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:bd7ca19eb02c7613a49969a0c5b2ef91facdef72a7b782908a735f4d132ced5c",
-          "at": "2026-06-14T18:16:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b2a59efdf07fa21e8d8e8397e406f01c7cbed00206d3b3a488efeca836dc626",
-          "at": "2026-06-14T18:24:07Z"
+          "hash": "rvw1:sha256:fe36c60a6936bf66dc8f87fe99eb7bd3897b55e6805dba4f0dc6d3bf12b65b29",
+          "at": "2026-06-14T23:58:57Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`RecordingDryAgent` records every `judge()` call and increments `findings_count` for every `Violation`, but the dry-check interactor also calls the same port for known-bad calibration probes. Those probes are expected to return `Violation` even when there are no production candidates, so `dry_tiered_telemetry_for_result` will emit fast/final `ReviewRound` telemetry, and nonzero `findings_count`, based only on calibration activity. This violates the intended production tier telemetry semantics, including empty/no-candidate runs and final-tier emission when only calibration ran. The recorder needs to distinguish production judgments from calibration probes, or the telemetry helper needs to exclude probe calls from emission/counts.",
+              "message": "`FixpointResolveInteractor::new` now requires a `TrackActiveBranchPort` and `resolve` performs an active-branch query before the three gate checks. The T014 usecase contract describes this resolver as a public-API composition of only the dry, review, and ref-verify gates, with the constructor wired from those three dependencies. This extra public port changes the DI surface and can force downstream composition to provide an uncatalogued dependency before the resolver can be used, so the fixpoint resolver API no longer matches the planned usecase boundary.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 664,
-              "category": "correctness"
-            },
-            {
-              "message": "The subprocess-error tier attribution uses `final_started_at.is_some() && !tiered.final_.has_completed()` to decide whether the final tier failed. `has_completed` is sticky after any successful final-tier call, so if one final judgment completes and a later final judgment returns `IllegalOutput`/subprocess failure, the final tier is incorrectly treated as not failing and `verdict_parse_failed` is assigned to the fast telemetry instead. Track the tier of the failing call directly, or record per-tier error state rather than inferring it from a sticky completion flag.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 767,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6b2a59efdf07fa21e8d8e8397e406f01c7cbed00206d3b3a488efeca836dc626",
-          "at": "2026-06-14T18:26:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On successful runs, the fast ReviewRound is built from the final production `findings.len()` rather than the fast recorder count. In an escalated case where fast reports a violation but final clears it, the fast tier event is emitted with `findings_count = 0`, which violates the per-tier telemetry contract and underreports fast-tier findings. Use `tiered.fast.findings_count()` for the fast event and `tiered.final_.findings_count()` for the final event.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 778,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:accb6e541f10b24246ddcaff0d63e743072f410aeacbd2871a6939a58d011010",
-          "at": "2026-06-14T18:31:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`findings_count` is now derived from `tiered.fast.findings_count()`, but `RecordingDryAgent` counts every `Violation` judgment, including the known-bad calibration probes that the interactor always runs. A clean dry run can therefore emit a fast `ReviewRound` with nonzero findings, and empty/no-production runs can still emit tier telemetry from probe activity. The previous success path used the actual `dry_result` findings, so this corrupts the per-tier telemetry counters with calibration-only verdicts.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 778,
-              "category": "correctness"
-            },
-            {
-              "message": "The new tiered recorder/telemetry code pushes `dry.rs` to about 899 lines before the `#[cfg(test)] mod tests` block, well beyond the 700-line production module cap in AGENTS.md. This is a newly introduced architecture violation; split the tiered recorder/telemetry helpers into a production submodule to keep the composition module within the limit.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 640,
+              "file": "libs/usecase/src/fixpoint_resolve.rs",
+              "line": 269,
               "category": "architecture"
             }
           ],
-          "hash": "rvw1:sha256:6c3e517e65a3596a76c690866eaf06b9ab9f9dd589ce4a3aca6ca094b2a6e020",
-          "at": "2026-06-14T18:36:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The `Ok` path uses `findings.len()` for both tier payloads, so the fast `ReviewRound` reports the final accepted violation count rather than the fast tier's violation count. When Fast flags a pair and Final downgrades it to `NotAViolation`, telemetry emits `round_type=\"fast\"` with `findings_count=0`, hiding the fast-tier escalation the design intent calls out as `fast_findings_count`. The fast count needs to come from production fast judgments, not the final result list.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
-              "line": 239,
-              "category": "telemetry"
-            },
-            {
-              "message": "P1: `tiered.fast.started_at()` is set by any fast `judge()` call, including calibration probes. `run_dry_check` still runs fast calibration probes even when there are no production work items, so an empty production diff can still emit fast `ReviewRound`/`ExternalSubprocess` telemetry here. That violates the requirement to skip tier telemetry when the production tier was never invoked and over-counts dry review rounds for calibration-only activity.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
-              "line": 240,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:e70eab01f92ff0762c481e2d4480f0348fda55f512e8da3db1ff76b8ab5bb824",
-          "at": "2026-06-14T18:48:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`is_calibration_probe` treats any repo-relative path whose first component is `probes` as a synthetic calibration fixture. Production fragments are normalized to repo-relative paths, so real code under a top-level `probes/` directory will be delegated but not recorded, causing `dry_tiered_telemetry_for_result` to suppress ReviewRound emission or undercount findings even though production `judge()` ran. Restrict this to the exact synthetic fixture identities or pass an explicit probe marker from the usecase layer.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
-              "line": 142,
-              "category": "telemetry"
-            },
-            {
-              "message": "On escalated runs the fast ReviewRound uses the precomputed fast-tier duration, but the following `emit_external_subprocess` call still passes the fast tier start instant. That helper computes `start.elapsed()` at emission time after final-tier work has completed, so the fast ExternalSubprocess duration includes final-tier processing and persistence time. This makes the per-tier telemetry internally inconsistent; use a duration-aware emission path or avoid emitting a separate fast ExternalSubprocess event with an elapsed-from-start timestamp.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 334,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:34a88aa94a4f0b25dccabca145f09ce9f8f39cdd2146e21fdeac4ac9d08ac298",
-          "at": "2026-06-14T18:55:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The calibration-probe guard skips recording when either fragment has one of the synthetic probe paths. A legitimate production pair involving a repo file such as `probes/changed_a.rs` or `probes/candidate_a.rs` will therefore call `judge()` but never set the tier recorder's `started_at` or finding count, causing the required fast/final `ReviewRound` telemetry to be omitted or undercounted. The guard should identify the exact known-bad probe pair, not any single fragment path match.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
-              "line": 173,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f01310498811823673554d21a66508851ead7dcd9429fb8518449b6b253d7202",
-          "at": "2026-06-14T19:01:21Z"
+          "hash": "rvw1:sha256:fe36c60a6936bf66dc8f87fe99eb7bd3897b55e6805dba4f0dc6d3bf12b65b29",
+          "at": "2026-06-15T00:04:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:20fca1ae3423f6dcaef6de6264a5084bc3288ab28fe36e5029eac7384e9d3da6",
-          "at": "2026-06-14T19:05:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91f85c64693e9186a82dfef38d585d7b3b357139b94a43f7e1d45ec413430ab3",
-          "at": "2026-06-14T19:15:10Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:03:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:05:16Z"
+          "hash": "rvw1:sha256:3d9576183951bad723b269eb37de96711b506c122948e6cc765f4081219fc778",
+          "at": "2026-06-15T00:09:28Z"
         }
       ]
     },
@@ -1834,6 +1380,546 @@
           "findings": [],
           "hash": "rvw1:sha256:b001aee5cffc35f9910ff04a358c1f4b8355f0c8179211659ba6b1f036b4a22e",
           "at": "2026-06-14T23:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e72c449b919113bd714e16a16f141bfb222229f1cbab846263a8d177b180c85",
+          "at": "2026-06-14T23:52:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e72c449b919113bd714e16a16f141bfb222229f1cbab846263a8d177b180c85",
+          "at": "2026-06-14T23:53:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08d3de38b86c2c799a15249308c30e8f033c0bf2e237cf87bab0610c91d19be2",
+          "at": "2026-06-15T00:14:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08d3de38b86c2c799a15249308c30e8f033c0bf2e237cf87bab0610c91d19be2",
+          "at": "2026-06-15T00:16:45Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:18:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/dry.rs",
+              "line": 425,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:21:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
+          "at": "2026-06-14T04:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:39:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:42:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:07:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:09:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
+          "at": "2026-06-14T15:54:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
+          "at": "2026-06-14T15:56:10Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:35:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_check_approved` now reads `track_dir/dry-check-coverage.json`, but this composition layer never writes that manifest on the `dry write` path. In this file the write flow still only constructs `FsDryCheckStore` and calls `run_dry_check`; `rg` shows no production `write_coverage` call. Since `FsDryCheckCoverageAdapter::read_coverage` returns `Ok(None)` for a missing file and the new approval interactor treats that as `Blocked`, a normal `sotp dry write` followed by `sotp dry check-approved` will fail closed forever unless a manifest is created out-of-band. Wire coverage persistence into the write flow or keep the approval bridge on an artifact that the write flow actually produces.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 500,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:39:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T02:44:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:02:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:06:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:17:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:22:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:46:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:48:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `db_path`, `threshold`, and `workspace_root` from `DryCheckApprovedInput` makes the existing `execute_dry_check_approved` construction in `apps/cli/src/commands/dry.rs:197-200` no longer compile. The DTO change needs the caller updated in the same change set, otherwise the workspace is broken.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 128,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:20:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:25:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:28:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `GateEval` path in `dry_check_approved` is not covered by tests. There is no assertion for the Approved case emitting `gate_name=\"dry\"` / `verdict=\"ok\"`, and no Blocked-case assertion for `verdict=\"error\"` plus the `blocked: N unresolved pair(s)` summary. This is public API behavior, so regressions here would be silent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 514,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:c0cf905ba18f3ae793aeaf00284a0da2a6330675eca4058520c0843a50bd3297",
+          "at": "2026-06-14T05:32:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
+          "at": "2026-06-14T05:37:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
+          "at": "2026-06-14T05:40:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new GateEval path is only covered by the pure mapping helper tests near the bottom of the file. There is no test that `dry_check_approved()` actually reaches `emit_gate_eval(...)` after a finalized verdict, so a regression that removes or reorders the telemetry call would be silent because the emitter suppresses errors. Add an end-to-end test for both Approved and Blocked flows that asserts the telemetry write occurs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 508,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:47c8fd4439776069504a0117cdbc43b272bf11118eba369966ac17d18adf4564",
+          "at": "2026-06-14T05:54:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
+          "at": "2026-06-14T06:06:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
+          "at": "2026-06-14T06:10:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
+          "at": "2026-06-14T11:08:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
+          "at": "2026-06-14T11:13:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
+          "at": "2026-06-14T12:40:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
+          "at": "2026-06-14T12:42:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
+          "at": "2026-06-14T13:15:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
+          "at": "2026-06-14T13:17:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
+          "at": "2026-06-14T13:43:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
+          "at": "2026-06-14T13:45:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
+          "at": "2026-06-14T15:57:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
+          "at": "2026-06-14T15:59:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
+          "at": "2026-06-14T17:25:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
+          "at": "2026-06-14T17:27:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_tiered_telemetry_for_result()` derives `findings_count` from the final `dry_result` and reuses it for both tiers. On escalated runs, the fast ReviewRound event will report the final-tier finding count instead of the fast-tier count, so the new per-tier telemetry is wrong whenever the tiers disagree.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 690,
+              "category": "correctness"
+            },
+            {
+              "message": "`dry_write()` passes the same `dry_start` instant to both `emit_review_round()` calls. That makes the final tier's duration include time spent in the fast tier, which defeats the per-tier timing this change is meant to capture.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 307,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:9b5883ba1e92c12c479870cee5c34b661c0b6b88702ebe909862d263575ab3e3",
+          "at": "2026-06-14T18:04:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `dry_tiered_telemetry_for_result()` copies the same `verdict_parse_failed` flag into both tier telemetry objects for subprocess failures. When the final tier is the one that hits `IllegalOutput` on an escalated run, the fast tier's `ReviewRound` and `ExternalSubprocess` events are also marked as parse failures, which misattributes the error to the wrong tier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 709,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7c4d29cf61e378b69698fc10ee1594658c0090367c960272adcadbffdd54d922",
+          "at": "2026-06-14T18:10:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_write()` emits the fast-tier `ReviewRound` and `ExternalSubprocess` telemetry only after `run_dry_check()` has finished the entire cycle. On runs that escalate to Final, both fast events therefore measure through the final tier as well, so the new per-tier telemetry does not report an accurate fast duration.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 306,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bd7ca19eb02c7613a49969a0c5b2ef91facdef72a7b782908a735f4d132ced5c",
+          "at": "2026-06-14T18:16:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b2a59efdf07fa21e8d8e8397e406f01c7cbed00206d3b3a488efeca836dc626",
+          "at": "2026-06-14T18:24:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RecordingDryAgent` records every `judge()` call and increments `findings_count` for every `Violation`, but the dry-check interactor also calls the same port for known-bad calibration probes. Those probes are expected to return `Violation` even when there are no production candidates, so `dry_tiered_telemetry_for_result` will emit fast/final `ReviewRound` telemetry, and nonzero `findings_count`, based only on calibration activity. This violates the intended production tier telemetry semantics, including empty/no-candidate runs and final-tier emission when only calibration ran. The recorder needs to distinguish production judgments from calibration probes, or the telemetry helper needs to exclude probe calls from emission/counts.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 664,
+              "category": "correctness"
+            },
+            {
+              "message": "The subprocess-error tier attribution uses `final_started_at.is_some() && !tiered.final_.has_completed()` to decide whether the final tier failed. `has_completed` is sticky after any successful final-tier call, so if one final judgment completes and a later final judgment returns `IllegalOutput`/subprocess failure, the final tier is incorrectly treated as not failing and `verdict_parse_failed` is assigned to the fast telemetry instead. Track the tier of the failing call directly, or record per-tier error state rather than inferring it from a sticky completion flag.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 767,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6b2a59efdf07fa21e8d8e8397e406f01c7cbed00206d3b3a488efeca836dc626",
+          "at": "2026-06-14T18:26:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On successful runs, the fast ReviewRound is built from the final production `findings.len()` rather than the fast recorder count. In an escalated case where fast reports a violation but final clears it, the fast tier event is emitted with `findings_count = 0`, which violates the per-tier telemetry contract and underreports fast-tier findings. Use `tiered.fast.findings_count()` for the fast event and `tiered.final_.findings_count()` for the final event.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 778,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:accb6e541f10b24246ddcaff0d63e743072f410aeacbd2871a6939a58d011010",
+          "at": "2026-06-14T18:31:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`findings_count` is now derived from `tiered.fast.findings_count()`, but `RecordingDryAgent` counts every `Violation` judgment, including the known-bad calibration probes that the interactor always runs. A clean dry run can therefore emit a fast `ReviewRound` with nonzero findings, and empty/no-production runs can still emit tier telemetry from probe activity. The previous success path used the actual `dry_result` findings, so this corrupts the per-tier telemetry counters with calibration-only verdicts.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 778,
+              "category": "correctness"
+            },
+            {
+              "message": "The new tiered recorder/telemetry code pushes `dry.rs` to about 899 lines before the `#[cfg(test)] mod tests` block, well beyond the 700-line production module cap in AGENTS.md. This is a newly introduced architecture violation; split the tiered recorder/telemetry helpers into a production submodule to keep the composition module within the limit.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 640,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:6c3e517e65a3596a76c690866eaf06b9ab9f9dd589ce4a3aca6ca094b2a6e020",
+          "at": "2026-06-14T18:36:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The `Ok` path uses `findings.len()` for both tier payloads, so the fast `ReviewRound` reports the final accepted violation count rather than the fast tier's violation count. When Fast flags a pair and Final downgrades it to `NotAViolation`, telemetry emits `round_type=\"fast\"` with `findings_count=0`, hiding the fast-tier escalation the design intent calls out as `fast_findings_count`. The fast count needs to come from production fast judgments, not the final result list.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
+              "line": 239,
+              "category": "telemetry"
+            },
+            {
+              "message": "P1: `tiered.fast.started_at()` is set by any fast `judge()` call, including calibration probes. `run_dry_check` still runs fast calibration probes even when there are no production work items, so an empty production diff can still emit fast `ReviewRound`/`ExternalSubprocess` telemetry here. That violates the requirement to skip tier telemetry when the production tier was never invoked and over-counts dry review rounds for calibration-only activity.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
+              "line": 240,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:e70eab01f92ff0762c481e2d4480f0348fda55f512e8da3db1ff76b8ab5bb824",
+          "at": "2026-06-14T18:48:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_calibration_probe` treats any repo-relative path whose first component is `probes` as a synthetic calibration fixture. Production fragments are normalized to repo-relative paths, so real code under a top-level `probes/` directory will be delegated but not recorded, causing `dry_tiered_telemetry_for_result` to suppress ReviewRound emission or undercount findings even though production `judge()` ran. Restrict this to the exact synthetic fixture identities or pass an explicit probe marker from the usecase layer.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
+              "line": 142,
+              "category": "telemetry"
+            },
+            {
+              "message": "On escalated runs the fast ReviewRound uses the precomputed fast-tier duration, but the following `emit_external_subprocess` call still passes the fast tier start instant. That helper computes `start.elapsed()` at emission time after final-tier work has completed, so the fast ExternalSubprocess duration includes final-tier processing and persistence time. This makes the per-tier telemetry internally inconsistent; use a duration-aware emission path or avoid emitting a separate fast ExternalSubprocess event with an elapsed-from-start timestamp.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 334,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:34a88aa94a4f0b25dccabca145f09ce9f8f39cdd2146e21fdeac4ac9d08ac298",
+          "at": "2026-06-14T18:55:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The calibration-probe guard skips recording when either fragment has one of the synthetic probe paths. A legitimate production pair involving a repo file such as `probes/changed_a.rs` or `probes/candidate_a.rs` will therefore call `judge()` but never set the tier recorder's `started_at` or finding count, causing the required fast/final `ReviewRound` telemetry to be omitted or undercounted. The guard should identify the exact known-bad probe pair, not any single fragment path match.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
+              "line": 173,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f01310498811823673554d21a66508851ead7dcd9429fb8518449b6b253d7202",
+          "at": "2026-06-14T19:01:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20fca1ae3423f6dcaef6de6264a5084bc3288ab28fe36e5029eac7384e9d3da6",
+          "at": "2026-06-14T19:05:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91f85c64693e9186a82dfef38d585d7b3b357139b94a43f7e1d45ec413430ab3",
+          "at": "2026-06-14T19:15:10Z"
         }
       ]
     },

@@ -2,160 +2,172 @@
   "schema_version": 1,
   "fragment_refs": [
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "113fc56b8687e313123cf5883e28a1960cf88a2549c7f4e4822a64a463b499ad"
+      "path": "libs/domain/src/lib.rs",
+      "content_hash": "1df6034976a7771439248feda69e50d97a63539b5e3e1b493cfd16578ade5802"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "2749aabb8e5863059c9894cab699481e37991b56e2fd19135829036749bc6da3"
+      "path": "libs/domain/src/track_phase.rs",
+      "content_hash": "0b2e8aaf29f9fd4bf1d88b82fb115c3cb083ee262ed69bbb44e20daa77b50ef9"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "2a8811764744950e825a80d3080bd1f599c86617e65673fffa673e978dec6409"
+      "path": "libs/domain/src/track_phase.rs",
+      "content_hash": "15691c9d204ecd1b50bb10859c09f86769dbf80ea4b569299c550c780c2c1111"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "3b54784bf2db37939c5a69bf9e33cf9a846219bed56d478000beec5cd541ff40"
+      "path": "libs/domain/src/track_phase.rs",
+      "content_hash": "50db9ddd4741bc11135c0e1bb6e0d55a64a51f4e36a30297aa5d902c7fd7cb30"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "42a76b67861cf9703fcec15a1c60b12efcb01abec4d4a216fa5b9b079e86bd8c"
+      "path": "libs/domain/src/track_phase.rs",
+      "content_hash": "65d47a482b278e9e5409a475e9e4beb6f42d11ffef9f281e0c41cc1f42af79f9"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "4adb7311c6f8cc37898f39f910178aa69ee8e773d785a715d0026409b88b0317"
+      "path": "libs/domain/src/track_phase.rs",
+      "content_hash": "93bc09945a04f57eaef3c83d692fb2916284c685945a3395f630784bc411a870"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "7aabe8f31f3117eeed2967b53f7867723646e1ba0ee6a73efd968adc49bb84ef"
+      "path": "libs/domain/src/track_phase.rs",
+      "content_hash": "b2728782abefac9d51c939324739596c8c029a2f71b72486cc72250f49560e2d"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "7c73580aa8e765a91b7f47c7ed55ca20cfb81fbeb303c826ada37b31dc1ec2f6"
+      "path": "libs/domain/src/track_phase.rs",
+      "content_hash": "b6944820705bef99964a2271428f93252cde08a2a374cd42516993b2e805aa58"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "888c5180e026613bc82f27e35a95fbe3393ad2f23ee31bb247f034beb24d68c1"
+      "path": "libs/domain/src/track_phase.rs",
+      "content_hash": "e2da0ab6eed147ba9ee9cc2e171963131850898c0e219784c7535b3a3092bb94"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "896e92d7c159e5bbb84033c4acfaab8a1e35afa611d935be96d2e9262a137089"
+      "path": "libs/domain/src/track_phase.rs",
+      "content_hash": "f892bb76b909a35a2b6efe391c47602bc8ce113b1558567ec6320460c5d59f75"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "8f129f6c679ade44dd7a3281769594c01a6a08f84d3998362bec4eb4f9206283"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "0429e2a4da4149398a751bdebff7e6ba6fbea3ae09905d6a7a507fd7fa992edc"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "9537f2907b5c422137872d4b16c77f2e84125d1f9656ccd20bd7f17ae72956de"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "1f9ca29780a419218cd1ecb9fa7c3dc20e90daf4e61cfa2f46d087aecc04cbcd"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "cfa3cb4ade4bd6d8dcb8c245db5cded739e835acf36fcc7846c01d38b8f14571"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "1fb2d497177d0cc4177bd8d95e0958143b368183a40637120934fabe773d9b02"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "e2e936870d12df7c23da79e26c8b475f6441e4cf2e2530cca0d361bcedda4ffe"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "20426aa7f7d45d2585c1a4e07865fa530a499acf4680c9f9275f51d57cf05601"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "fb415528b06523553e83abb4288faa8b1ab4bdb20e66ecd7f28dffd5b0412955"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "2b1f31b1bb9c9fea048897ddb616c6f5cb4bf8a7b62969f7b6cd712366a842eb"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "00ccbd0604fa587bc6ea7906ccdec7119ac2224faa2f3545094c4c456d7c58b9"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "2daf2ee7d46b1037794cf8700a179a15d84ab6bc21efee2a07c573dfe0227e45"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "0515a40e12d7dce29ef092e9663df92dda1806547b6373c4eb46c224e118743e"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "3bd193024bd5ce551ce08ce5fe896bd9b4e991e72278fe87a6875615d24c7d22"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "124b7020507a39face17538da47c6e1998dcdd4c5c9141bf4df16a1c64533ffb"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "4759f083e103a54b2296376ebe6f8bf3c0c7140860bd9d94e9094d9e720a5220"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "1b31e934e9f5de155ad5d65964700878d5dabe976e006c62fdb53a1e6585b978"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "48823bfda8d04160075166cc4b71d007708f80d3ea154087a787cf883739f0ad"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "2b1801dc288b99a7d9585c92d4d41108f41621e5dd5b835ccb555254c179ece6"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "4cbc3989dfd07ace043c8cad8312871e95778a31fc4e75678a9f62f7169bb4c4"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "2b5d31d7498c596b2438365794f51c5fa8137f003fb47436a688fec282d3e611"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "560caa184da7bc95526c06983a50e488632a6f28e6f4e5678110845415565c5d"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "3868e034327755c201c64ba1f0e30910f5e48faa59d7cfd5ad0ee0ec4cbe0f74"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "565fc1b1cdb18c46ec0d2f9fcae364bbd0c235f603ef9bbdfbefb3a827c34a66"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "39beeb2ebee5f6e5bd4de1acabcef62093ae8ffdbf200c89a3991dfa7b63d40e"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "5f87ec6131f3696c745796ee5010b574e90351fd58a4934e90e03262258b3d49"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "4614fa0ac9c18b2164d5a8d4c260f87a64441cde691fc683e9e5e59c6842e251"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "67f874351537baa911ce03ba40af0a098ea7ca4b581e007dda2450f098e8efe2"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "48048bcc514099ac92db6ab3b643b69fcdb2c97e57c382aee2bbd427a0630dbc"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "6b1df1be71457a4f3515abf25850688aab3d573430c91c2671b5ae3b4b3067bd"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "5aa8873249a3038a49f86b385aa3d2a11813ac8dc562e7974d66e077786d0498"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "6c8c5b69fcd3c60aeb5716e5775090fe21a5e6f4e35c6c78904c9b0343f8167a"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "69d3bb967f04dcf6d3df6e5d0be5512de03d1f6fb490c171b6d88ead1b001553"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "6edf4eb3e3e1949d4215a2eb64b9a8fba5ecff23b114d9d5d99c286b68c02f1a"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "7b4ae69f44be225afafaffa29b837d020c18f70ff836c860867bf8cf68d9aab7"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "775eeb2b578ff1e31c8d0e11b5884bb47d8cde3a03a687df1f69e30df8a5be8a"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "8773b5a937c6ee8e6aa01cdf1116556aef27b7f66ce04ebcd93cd6f64a08bf69"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "81284b367ba9b5efc82c4a5f5914999fed0c79518aab1dffc9fde935a179e4f5"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "91f543bbfed0d336fce26698500f7850d2b856d3ab0d03ab7ac6f7eb07fa5b4d"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "84a709a5badf5a0c1800f8d90758f7f1b031a3572a7ee77e5df9680f87338ad8"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "9315da60347120fde7994603c59289b0337272946ef21e8806c912efebabbb5c"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "93600669d1f5790d70933225e921ac76874d7bb4dc28cdccfaf2a1d82ff488e9"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "96801fbc3326222402f7cb46261dd39aa51050e5a72543a91b0d1ace2f77843a"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "a05a3696218b969818decb26e5c98872d3d09c7e3944827cc5a9801839dad96c"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "97ced0811c2fd4224a215a917043d6932e4f126d7b6e005033a0e7f678cdbb3d"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "b274f817f7f50490ef3f0f518b4c7dda6d3600285ad39731724ae8e5ca2f0879"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "a7bed0da7950a232c47fa2ba20bd0fd038745550eba0cd69414345d78d90bbc8"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "b3bfb8703b320f1ce2b1988776920254b6b4ec72fe5f84cb39adab79d7fc8124"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "aab50d7862cfcab477c34b06b9ad344a15dd9be174442c153deaf0d22ef0a904"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "b586585adbbc8215fa11f691d8acd58bd12d2057a4b18e531a1346f6eb40ecf9"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "c52dd37d00651a86b210a1dfa8fcbef5bae1d75865d8611389111b306f04fc8b"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "b6ac91a45b9904281e192867d2558fb4183b8ed7c7593dcb1669b4e0c6b9b47f"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "c59ad0933ffc5a9756be3b5a310c8d56ef56918d11f8fdecaf78ac191089d19d"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "ceaab04e3a9a6da18b02d54a176eab6da7fcd31ba58363b640667db1847a2cc1"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "dfe892024dd991052b5ad271b85a47dc4fe158ea84ac02aa2d2d97b42315e41f"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "e73664f305e908f907b1cae0b573b7f9564e4e2dd27b52e3136ddb69a4f33dc2"
     },
     {
-      "path": "apps/cli-composition/src/dry/tier_telemetry.rs",
-      "content_hash": "ed9132db4a60b4937c66fa40fa68109e9b74ad7baf81bd5fbe6da3a982eedea0"
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "eb9202aeba4a55d7d4f176ec13c09154d403f6eba58bf4ea2d12bbc25833019b"
+    },
+    {
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "ed53dce2bf43e6c1b28c55a1c12f20efe2aef7d83501e973d20d38f2138c0c41"
+    },
+    {
+      "path": "libs/usecase/src/fixpoint_resolve.rs",
+      "content_hash": "f618647380b4430a182f802520202a72eaa2175476e11344cad3e1026760dfd0"
+    },
+    {
+      "path": "libs/usecase/src/lib.rs",
+      "content_hash": "92d3f1b4e6c5d04c57921e63de8b200911b7a8c66eae9c46624e5fd93633c49e"
     }
   ]
 }

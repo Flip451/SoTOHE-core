@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "33de6229df34217d9a322a9c47550f7a6f2375f2da9747c701c71c1927e08c3f",
+  "catalogue_declaration_hash": "f9fba1d3101291a057ec559b9bf46717ae3d81cee3316973c80d56021dea7b65",
   "signals": [
     {
       "type_name": "DryCheckCoverageRecord",

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T23:33:16Z",
-  "declaration_hash": "91208c0adf5eac954e3e89ff0f248a3c2aaff4bff1583edc644be51815f5c8a6",
+  "generated_at": "2026-06-15T00:17:07Z",
+  "declaration_hash": "93650119aa5edc29140be114650fec87f2a0a3550f0ed43cc974c2839017ff88",
   "signals": [
     {
       "type_name": "DryCheckAgentError",
@@ -116,9 +116,9 @@
     {
       "type_name": "FixpointCurrentBranch",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -128,9 +128,9 @@
     {
       "type_name": "FixpointResolveCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -138,9 +138,12 @@
     {
       "type_name": "FixpointResolveError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -150,29 +153,29 @@
       "type_name": "FixpointResolveInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "FixpointResolveService"
       ]
     },
     {
       "type_name": "FixpointResolveService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RefVerifyGateStatePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RefVerifyGateStatus",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -182,15 +185,15 @@
     {
       "type_name": "ReviewGateStatePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ReviewGateStatus",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",

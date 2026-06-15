@@ -27,6 +27,7 @@ pub mod tddd;
 mod timestamp;
 mod track;
 pub mod track_phase;
+pub use track_phase::{FixpointStep, ReviewScopeSet, ReviewScopeSetError};
 pub mod verify;
 
 pub use adr_decision::{

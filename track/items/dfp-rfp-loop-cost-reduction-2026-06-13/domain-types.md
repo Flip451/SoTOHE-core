@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FixpointStep | enum | — | RunDfp, RunRfp, RunRefVerify, Commit | 🟡 | 🔵 |
+| FixpointStep | enum | — | RunDfp, RunRfp, RunRefVerify, Commit | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -17,5 +17,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ReviewScopeSetError | error_type | — | Empty | 🟡 | 🔵 |
+| ReviewScopeSetError | error_type | — | Empty | 🔵 | 🔵 |
 

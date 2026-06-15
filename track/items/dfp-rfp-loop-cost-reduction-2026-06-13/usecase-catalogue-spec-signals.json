@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "91208c0adf5eac954e3e89ff0f248a3c2aaff4bff1583edc644be51815f5c8a6",
+  "catalogue_declaration_hash": "93650119aa5edc29140be114650fec87f2a0a3550f0ed43cc974c2839017ff88",
   "signals": [
     {
       "type_name": "DryCheckAgentError",
