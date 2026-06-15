@@ -23,7 +23,7 @@ mod ref_verify;
 pub mod review_v2;
 mod semantic_dup;
 mod telemetry;
-mod track;
+pub mod track;
 mod verify;
 
 mod dry_fix_runner;
@@ -76,6 +76,10 @@ pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
 };
 pub use telemetry::TelemetryReportInput;
+pub use track::fixpoint_resolve::{
+    FixpointCurrentBranch, FixpointResolveError, FixpointResolveInput, FixpointStep,
+    ReviewScopeSet, format_fixpoint_step,
+};
 
 /// Build the argument vector for a `codex exec --sandbox read-only` invocation.
 ///

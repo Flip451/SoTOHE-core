@@ -505,6 +505,7 @@ fn track_command_label(cmd: &commands::track::TrackCommand) -> &'static str {
         TrackCommand::BaselineCapture { .. } => "track baseline-capture",
         TrackCommand::CatalogueImplSignals { .. } => "track catalogue-impl-signals",
         TrackCommand::Lint { .. } => "track lint",
+        TrackCommand::FixpointResolve(_) => "track fixpoint-resolve",
         TrackCommand::SetCommitHash(_) => "track set-commit-hash",
     }
 }

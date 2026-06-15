@@ -36,6 +36,7 @@ mod shared;
 mod tier_telemetry;
 
 use persistent_index::open_persistent_index_with_corpus;
+pub(crate) use shared::resolve_dry_diff_base_from_store;
 use shared::{
     build_diff_and_corpus_fragments, dry_check_approved_outcome, dry_write_outcome,
     parse_dry_track_id, parse_verdict_filter, resolve_dry_diff_base,

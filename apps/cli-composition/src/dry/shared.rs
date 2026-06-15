@@ -39,34 +39,72 @@ pub(super) fn resolve_dry_diff_base(
         return CommitHash::try_new(s).map_err(|e| format!("invalid --base-commit: {e}"));
     }
 
+    resolve_dry_diff_base_from_store(commit_hash_path, trusted_root, None, "dry-check")
+}
+
+/// Shared three-branch fail-closed diff-base resolution using the
+/// `FsDryCheckCommitHashStore`.
+///
+/// Branch 1: `FsDryCheckCommitHashStore::read()` -> `Ok(Some(hash))` -> use it.
+/// Branch 2: `Ok(None)` (file absent or non-ancestor) -> fall back to
+///   `git rev-parse main`.
+/// Branch 3: `Err(DryCheckCommitHashError::Format)` / other -> emit `eprintln!`
+///   warn and fall back to `git rev-parse main` (absorbed; must not abort the gate).
+///
+/// `git_discovery_root`: when `Some`, git is discovered from that path via
+/// `SystemGitRepo::discover_from`; when `None`, `SystemGitRepo::discover()` is
+/// used (CWD-based discovery).
+///
+/// `warning_prefix`: used in `[warn] <prefix>:` messages (e.g. `"dry-check"`,
+/// `"fixpoint-resolve"`).
+///
+/// # Errors
+///
+/// Returns `Err` only when `git rev-parse main` fails.
+pub(crate) fn resolve_dry_diff_base_from_store(
+    commit_hash_path: &Path,
+    trusted_root: &Path,
+    git_discovery_root: Option<&Path>,
+    warning_prefix: &str,
+) -> Result<CommitHash, String> {
     let store =
         FsDryCheckCommitHashStore::new(commit_hash_path.to_path_buf(), trusted_root.to_path_buf());
     match store.read() {
         Ok(Some(hash)) => return Ok(hash),
         Ok(None) => {}
         Err(DryCheckCommitHashError::Format(detail)) => {
-            eprintln!("[warn] dry-check: malformed .commit_hash ({detail}); falling back to main");
+            eprintln!(
+                "[warn] {warning_prefix}: malformed .commit_hash ({detail}); falling back to main"
+            );
         }
         Err(other) => {
             eprintln!(
-                "[warn] dry-check: failed to read .commit_hash ({other}); falling back to main"
+                "[warn] {warning_prefix}: failed to read .commit_hash ({other}); falling back to main"
             );
         }
     }
 
-    git_rev_parse_main()
+    git_rev_parse_main_at(git_discovery_root)
 }
 
 /// Run `git rev-parse main` and return the resulting `CommitHash`.
+///
+/// When `discovery_root` is `Some`, git is discovered from that path; otherwise
+/// CWD-based discovery is used.
 ///
 /// # Errors
 ///
 /// Returns `Err` when git cannot be discovered, the command fails, or the
 /// output is not a valid commit hash.
-fn git_rev_parse_main() -> Result<CommitHash, String> {
+pub(crate) fn git_rev_parse_main_at(discovery_root: Option<&Path>) -> Result<CommitHash, String> {
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
-    let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+    let git = match discovery_root {
+        Some(root) => {
+            SystemGitRepo::discover_from(root).map_err(|e| format!("git discover: {e}"))?
+        }
+        None => SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?,
+    };
     let output =
         git.output(&["rev-parse", "main"]).map_err(|e| format!("git rev-parse main: {e}"))?;
     if !output.status.success() {
