@@ -147,7 +147,8 @@
     {
       "id": "T025",
       "description": "Stage 4 — final CI gate: run `cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix all remaining issues. Confirm acceptance against AC-21 (ddd-strict.json exists and domain layer has no `ddd_strict_preset()` Rust API), OS-09 (no per-layer config), OS-10 (fail-closed: absent config causes explicit error), OS-11 (no Rust API preset function). Depends on T024.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f87cb85a"
     }
   ],
   "plan": {

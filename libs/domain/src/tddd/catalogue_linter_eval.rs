@@ -20,7 +20,7 @@ use super::{
 };
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
-use crate::tddd::catalogue_v2::roles::{InvariantPredicate, SelfReceiver};
+use crate::tddd::catalogue_v2::roles::{InvariantPredicate, ItemAction, SelfReceiver};
 use crate::tddd::layer_id::LayerId;
 
 // Cross-layer lookup helpers (strip_ref_sigils, resolve_type_role,
@@ -194,8 +194,10 @@ pub fn evaluate_catalogue_lint(
                         // while avoiding false positives from explicit layer qualifiers.
                         'sig_slot: for type_ref_str in sig_types {
                             for (cat_layer_id, cat) in all_catalogues {
-                                // Check type entries.
-                                for (tn, e) in cat.types.iter() {
+                                // Check type entries, excluding delete-action entries.
+                                for (tn, e) in
+                                    cat.types.iter().filter(|(_, e)| e.action != ItemAction::Delete)
+                                {
                                     let role = entry_role_kind(e);
                                     if forbidden_roles.as_slice().contains(&role)
                                         && sig_type_contains_entry(
@@ -220,8 +222,12 @@ pub fn evaluate_catalogue_lint(
                                         continue 'sig_slot;
                                     }
                                 }
-                                // Check trait entries (ContractRole) the same way.
-                                for (tn, e) in cat.traits.iter() {
+                                // Check trait entries (ContractRole), excluding delete-action entries.
+                                for (tn, e) in cat
+                                    .traits
+                                    .iter()
+                                    .filter(|(_, e)| e.action != ItemAction::Delete)
+                                {
                                     let role = RoleKind::from_contract_role(&e.role);
                                     if forbidden_roles.as_slice().contains(&role)
                                         && sig_type_contains_entry(
@@ -391,9 +397,11 @@ pub fn evaluate_catalogue_lint(
                             set.insert(tail);
                         }
                         // Shared value objects of this aggregate.
-                        if let Some((_name, entry)) =
-                            catalogue.types.iter().find(|(n, _)| n.as_str() == agg_name.as_str())
-                        {
+                        // Exclude delete-action aggregates: a deleted aggregate's
+                        // shared_value_objects no longer define the boundary set.
+                        if let Some((_name, entry)) = catalogue.types.iter().find(|(n, e)| {
+                            n.as_str() == agg_name.as_str() && e.action != ItemAction::Delete
+                        }) {
                             for r in field_type_refs(&entry.role, "shared_value_objects") {
                                 let tail =
                                     r.as_str().split("::").last().unwrap_or(r.as_str()).to_owned();
@@ -402,7 +410,11 @@ pub fn evaluate_catalogue_lint(
                         }
                         set
                     };
-                    for (other_name, other_entry) in &catalogue.types {
+                    // Exclude delete-action entries: a deleted type cannot have methods
+                    // that violate the exclusivity boundary.
+                    for (other_name, other_entry) in
+                        catalogue.types.iter().filter(|(_, e)| e.action != ItemAction::Delete)
+                    {
                         let other_bare =
                             other_name.as_str().split("::").last().unwrap_or(other_name.as_str());
                         if inside_bare.contains(other_bare) {

@@ -5132,6 +5132,71 @@
       "base_commit": "f3a7da2de42b171bb51b38d3829122ccf31fdb33",
       "rationale": "The fragments do not duplicate implementation logic. `run_track_lint` is a small convenience wrapper that delegates to `run_track_lint_impl(root, None)`, while the changed fragment contains the shared implementation that handles the fixed CLI args and optional rules file. The nearby doc comments overlap in subject matter but describe distinct helpers and do not create a maintainability burden.",
       "recorded_at": "2026-06-15T11:23:22Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "low_hash": "282bf9a9253a57d77840fa18cb8c816800b842e3cdc011033747ca67aecb40aa",
+      "high_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "high_hash": "6d82880d8088c903a5e779bfc19ce42bcf4dcd3f9c5f57eeb8485293134bf2b8",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9018672108650208,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f87cb85a0d268b5be8aed0e69fd0e75b28f317e3",
+      "rationale": "The two tests share setup shape, but they exercise different catalogue entry kinds and different linter rules: a Delete-marked TypeEntry must be invisible to ReferencedRoleConstraint and produce an unresolved-reference violation, while a Delete-marked TraitEntry must be invisible to NoRoleInMethodSignature and produce no violation. The repeated Arrange/Evaluate pattern is ordinary test fixture boilerplate, not duplicated business logic or duplicated assertions that should be centralized.",
+      "recorded_at": "2026-06-15T12:22:01Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+      "low_hash": "452c9a99a8d1742ba07e69c8b80eeb7cf0022c758956a0d57e7ae855120a88a6",
+      "high_path": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+      "high_hash": "b51dba24921e9ec492fba75c0122d3b54676fd70cd823c2e3bfd63e4e7ad96d4",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8690169453620911,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f87cb85a0d268b5be8aed0e69fd0e75b28f317e3",
+      "rationale": "The fragments share only routine module-level documentation and import context describing how sibling linter modules are wired through `#[path]`. There is no duplicated algorithm, rule evaluation logic, helper implementation, data transformation, or independently maintained business behavior. The changed fragment imports and documents the pure evaluation entry point plus cross-layer helper usage, while the candidate fragment is the helper module header and beginning of helper definitions.",
+      "recorded_at": "2026-06-15T12:22:18Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+      "low_hash": "452c9a99a8d1742ba07e69c8b80eeb7cf0022c758956a0d57e7ae855120a88a6",
+      "high_path": "libs/domain/src/tddd/catalogue_linter_eval_helpers.rs",
+      "high_hash": "ce341d3b6e96c6e931f2b7bcd62e64d4b6e240eab759f36a5c9333fcc5a8912e",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8513421416282654,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f87cb85a0d268b5be8aed0e69fd0e75b28f317e3",
+      "rationale": "The fragments share some module-level context and overlapping imports because one file is the evaluator entry point and the other is its helper module. The repeated wording documents the relationship from each side, and the duplicated imports are ordinary Rust module-local dependencies rather than repeated logic or knowledge that would create maintenance risk. No behavior, algorithm, validation rule, or substantial implementation is duplicated in the shown fragments.",
+      "recorded_at": "2026-06-15T12:22:38Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "low_hash": "6d82880d8088c903a5e779bfc19ce42bcf4dcd3f9c5f57eeb8485293134bf2b8",
+      "high_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "high_hash": "a8beacd56b4ab8f39168a0681ffcaec20d45305f7fbcf441af020b18a7b7dbdb",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8918834924697876,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f87cb85a0d268b5be8aed0e69fd0e75b28f317e3",
+      "rationale": "The fragments share test setup shape, but they exercise different regression paths and expected outcomes. The changed test verifies Delete-marked TypeEntry invisibility through resolve_type_role/find_in_catalogue and expects a fail-closed ReferencedRoleConstraint violation. The candidate test verifies Delete-marked TraitEntry filtering in the NoRoleInMethodSignature trait iteration path, specifically where a qualified signature bypasses find_in_catalogue, and expects no violation. The repeated layer/document/map/rule/evaluate scaffolding is ordinary test fixture boilerplate, not duplicated domain logic that should be unified.",
+      "recorded_at": "2026-06-15T13:11:10Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "low_hash": "370f7e3a1433e5c61129edaec9a9bf34b3be63030854706ddd7157bfe130a6cb",
+      "high_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "high_hash": "a8beacd56b4ab8f39168a0681ffcaec20d45305f7fbcf441af020b18a7b7dbdb",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.9114289879798889,
+      "threshold": 0.8500000238418579,
+      "base_commit": "f87cb85a0d268b5be8aed0e69fd0e75b28f317e3",
+      "rationale": "The fragments are intentionally parallel tests for two distinct catalogue paths: deleted TypeEntry values in cat.types.iter() and deleted TraitEntry values in cat.traits.iter(). Although the setup, comments, and assertion shape are very similar, the duplicated structure helps keep the regression cases explicit and confirms separate filters in separate loops. This is test-code duplication with distinct behavioral coverage, not a production DRY violation requiring refactor.",
+      "recorded_at": "2026-06-15T13:11:33Z"
     }
   ]
 }

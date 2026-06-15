@@ -2367,4 +2367,392 @@ mod tests {
         let is_unknown_layer = matches!(&result, Err(CatalogueLinterError::UnknownLayer { .. }));
         assert!(is_unknown_layer, "expected UnknownLayer error, got: {result:?}");
     }
+
+    // ===========================================================================
+    // Fail-closed semantics: action: Delete entries are excluded from lookups
+    // ===========================================================================
+
+    #[test]
+    fn test_resolve_type_role_skips_delete_action_type_entry() {
+        // A TypeEntry with action: Delete in the domain layer must not be found by
+        // find_in_catalogue, so resolve_type_role returns None for it.
+        // As a result, ReferencedRoleConstraint treats the reference as unresolvable
+        // and emits a violation (fail-closed semantics).
+        let domain_layer = layer("domain");
+        let usecase_layer = layer("usecase");
+
+        // domain layer: OrderPlaced is Delete-marked — must be invisible to lookups
+        let mut domain_doc = make_doc("domain");
+        let mut deleted_entry = make_type_entry(DataRole::DomainEvent);
+        deleted_entry.action = ItemAction::Delete;
+        domain_doc.types.insert(TypeName::new("OrderPlaced").unwrap(), deleted_entry);
+
+        // usecase layer: PlaceOrder.handles references "domain::OrderPlaced"
+        let mut usecase_doc =
+            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        usecase_doc.types.insert(
+            TypeName::new("PlaceOrder").unwrap(),
+            make_type_entry(DataRole::UseCase {
+                handles: vec![TypeRef::new("domain::OrderPlaced").unwrap()],
+            }),
+        );
+
+        let mut all = BTreeMap::new();
+        all.insert(domain_layer, domain_doc);
+        all.insert(usecase_layer.clone(), usecase_doc);
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "handles".to_owned(),
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let violations = evaluate_catalogue_lint(&[rule], &all, &usecase_layer).unwrap();
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation: Delete-marked TypeEntry must not satisfy role lookup, \
+             got: {violations:?}"
+        );
+        assert_eq!(violations[0].rule_kind(), "ReferencedRoleConstraint");
+        assert_eq!(violations[0].entry_name(), "PlaceOrder");
+        assert!(violations[0].message().contains("OrderPlaced"));
+    }
+
+    #[test]
+    fn test_resolve_type_role_skips_delete_action_trait_entry() {
+        // A TraitEntry with action: Delete in the domain layer must not be iterated
+        // by the NoRoleInMethodSignature trait loop in catalogue_linter_eval.rs.
+        //
+        // The method signature uses the layer-qualified form "domain::OrderRepo" so
+        // that sig_type_contains_entry takes Rule 1 (layer_qualified_name_in_sig →
+        // true) without consulting find_in_catalogue. This means the ONLY guard that
+        // prevents a false violation is the `action != Delete` filter on
+        // cat.traits.iter() in catalogue_linter_eval.rs — not find_in_catalogue.
+        // Without that filter the deleted trait would be iterated, sig_type_contains_entry
+        // would return true, and a forbidden-role violation would be emitted.
+        let domain_layer = layer("domain");
+        let usecase_layer = layer("usecase");
+
+        // domain layer: OrderRepo is Delete-marked — must not be iterated by the
+        // NoRoleInMethodSignature trait loop.
+        let mut domain_doc = make_doc("domain");
+        let mut deleted_trait = make_trait_entry(ContractRole::Repository {
+            aggregate: TypeRef::new("Order").unwrap(),
+        });
+        deleted_trait.action = ItemAction::Delete;
+        domain_doc.traits.insert(TraitName::new("OrderRepo").unwrap(), deleted_trait);
+
+        // usecase layer: MyDto method param uses the qualified form "domain::OrderRepo"
+        // so that sig_type_contains_entry resolves via Rule 1 (qualified layer match)
+        // without calling find_in_catalogue — making the eval.rs outer filter the
+        // decisive guard.
+        let mut usecase_doc =
+            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        usecase_doc.types.insert(
+            TypeName::new("MyDto").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::value_object(),
+                vec![method_with_params(
+                    "with_repo",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("repo", "domain::OrderRepo")],
+                    "()",
+                )],
+            ),
+        );
+
+        let mut all = BTreeMap::new();
+        all.insert(domain_layer, domain_doc);
+        all.insert(usecase_layer.clone(), usecase_doc);
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(RoleKind::Repository, vec![]),
+            },
+        )
+        .unwrap();
+        let violations = evaluate_catalogue_lint(&[rule], &all, &usecase_layer).unwrap();
+        assert!(
+            violations.is_empty(),
+            "expected no violations: Delete-marked TraitEntry must be skipped by the \
+             action != Delete filter in the NoRoleInMethodSignature trait loop — \
+             the qualified 'domain::OrderRepo' reference bypasses find_in_catalogue \
+             so the outer loop filter is the decisive guard, got: {violations:?}"
+        );
+    }
+
+    #[test]
+    fn test_no_role_in_method_signature_skips_delete_action_type_entry() {
+        // A TypeEntry with action: Delete in the domain layer must not be iterated
+        // by the NoRoleInMethodSignature TYPE loop in catalogue_linter_eval.rs.
+        //
+        // The method signature uses the layer-qualified form "domain::OrderPlaced" so
+        // that sig_type_contains_entry takes Rule 1 (layer_qualified_name_in_sig →
+        // true) without consulting find_in_catalogue. This means the ONLY guard that
+        // prevents a false violation is the `action != Delete` filter on
+        // cat.types.iter() in catalogue_linter_eval.rs — not find_in_catalogue.
+        // Without that filter the deleted type would be iterated, entry_role_kind
+        // would return DomainEvent, and a forbidden-role violation would be emitted.
+        let domain_layer = layer("domain");
+        let usecase_layer = layer("usecase");
+
+        // domain layer: OrderPlaced is Delete-marked — must not be iterated by the
+        // NoRoleInMethodSignature TYPE loop.
+        let mut domain_doc = make_doc("domain");
+        let mut deleted_type = make_type_entry(DataRole::DomainEvent);
+        deleted_type.action = ItemAction::Delete;
+        domain_doc.types.insert(TypeName::new("OrderPlaced").unwrap(), deleted_type);
+
+        // usecase layer: MyUseCase method return type uses the qualified form
+        // "domain::OrderPlaced" so that sig_type_contains_entry resolves via
+        // Rule 1 (qualified layer match) without calling find_in_catalogue —
+        // making the eval.rs outer cat.types.iter() filter the decisive guard.
+        let mut usecase_doc =
+            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        usecase_doc.types.insert(
+            TypeName::new("MyUseCase").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::UseCase { handles: vec![] },
+                vec![method_shared_ref_no_params("last_event", "domain::OrderPlaced")],
+            ),
+        );
+
+        let mut all = BTreeMap::new();
+        all.insert(domain_layer, domain_doc);
+        all.insert(usecase_layer.clone(), usecase_doc);
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(RoleKind::DomainEvent, vec![]),
+            },
+        )
+        .unwrap();
+        let violations = evaluate_catalogue_lint(&[rule], &all, &usecase_layer).unwrap();
+        assert!(
+            violations.is_empty(),
+            "expected no violations: Delete-marked TypeEntry must be skipped by the \
+             action != Delete filter in the NoRoleInMethodSignature type loop — \
+             the qualified 'domain::OrderPlaced' reference bypasses find_in_catalogue \
+             so the outer cat.types.iter() filter is the decisive guard, \
+             got: {violations:?}"
+        );
+    }
+
+    #[test]
+    fn test_has_trait_impl_skips_delete_action_impl() {
+        // A TraitImplDeclV2 with action: Delete must not be treated as a present impl.
+        // TraitImplRequired for "PartialEq" fires a violation because the only
+        // PartialEq impl entry is Delete-marked.
+        let mut doc = make_doc("domain");
+        doc.types
+            .insert(TypeName::new("MyValue").unwrap(), make_type_entry(DataRole::value_object()));
+
+        // Only a Delete-marked PartialEq impl exists — must be treated as absent.
+        let mut deleted_impl = TraitImplDeclV2::new(
+            TypeRef::new("PartialEq").unwrap(),
+            TypeRef::new("MyValue").unwrap(),
+        );
+        deleted_impl.action = ItemAction::Delete;
+        doc.trait_impls.push(deleted_impl);
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::TraitImplRequired {
+                required_traits: NonEmptyVec::new("PartialEq".to_owned(), vec![]),
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation: Delete-marked TraitImplDeclV2 must not satisfy TraitImplRequired, \
+             got: {violations:?}"
+        );
+        assert_eq!(violations[0].rule_kind(), "TraitImplRequired");
+        assert_eq!(violations[0].entry_name(), "MyValue");
+        assert!(violations[0].message().contains("PartialEq"));
+    }
+
+    #[test]
+    fn test_type_entries_for_target_skips_delete_action_entry_for_field_non_empty_and_no_public_field()
+     {
+        // A TypeEntry with action: Delete must not be scanned by any rule that
+        // routes through type_entries_for_target (FieldNonEmpty, NoPublicField, …).
+        //
+        // Each sub-case uses its own catalogue with only the Delete-action entry.
+        // Because the entry is Delete-marked, type_entries_for_target must exclude
+        // it, and no violation may appear regardless of how badly the entry would
+        // violate the rule if it were active.
+
+        // --- Sub-case 1: FieldNonEmpty ---
+        // The Delete-action entry has empty invariants, which would normally
+        // trigger a FieldNonEmpty("invariants") violation.  With the filter in
+        // place, no violation fires.
+        {
+            let mut doc = make_doc("domain");
+            let deleted_entry = TypeEntry {
+                action: ItemAction::Delete,
+                role: DataRole::ValueObject { invariants: vec![] }, // empty — would violate
+                kind: unit_struct_kind(),
+                methods: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            };
+            doc.types.insert(TypeName::new("DeletedValue").unwrap(), deleted_entry);
+
+            let violations = run_rule(
+                &doc,
+                RuleTarget::new(vec![RoleKind::ValueObject]),
+                CatalogueLinterRuleKind::FieldNonEmpty { target_field: "invariants".to_owned() },
+            );
+            assert!(
+                violations.is_empty(),
+                "FieldNonEmpty: expected no violations — Delete-action entry must be skipped, \
+                 got: {violations:?}"
+            );
+        }
+
+        // --- Sub-case 2: NoPublicField ---
+        // The Delete-action entry has a public field, which would normally
+        // trigger a NoPublicField violation.  With the filter in place, no
+        // violation fires.
+        {
+            let mut doc = make_doc("domain");
+            let deleted_entry = TypeEntry {
+                action: ItemAction::Delete,
+                role: DataRole::value_object(),
+                kind: plain_struct_kind(vec![field_decl("pub_field", "String")]), // public — would violate
+                methods: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            };
+            doc.types.insert(TypeName::new("DeletedValue").unwrap(), deleted_entry);
+
+            let violations = run_rule(
+                &doc,
+                RuleTarget::new(vec![RoleKind::ValueObject]),
+                CatalogueLinterRuleKind::NoPublicField,
+            );
+            assert!(
+                violations.is_empty(),
+                "NoPublicField: expected no violations — Delete-action entry must be skipped, \
+                 got: {violations:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_no_external_reference_in_methods_ignores_delete_action_aggregate_shared_value_objects()
+    {
+        // A delete-action AggregateRoot must not be scanned by the
+        // NoExternalReferenceInMethods rule — neither as an aggregate source (boundary
+        // builder) nor as an external entry whose methods are checked.
+        //
+        // Setup:
+        //   - OrderAgg (Add): exclusive_members: [OrderLine], shared_value_objects: [Money]
+        //   - DeletedAgg (Delete): exclusive_members: [OrderLine], shared_value_objects: [Money]
+        //     ALSO carries a method `get_line() -> OrderLine` (references the exclusive member).
+        //     If DeletedAgg were scanned as an external entry, that method reference
+        //     would trigger a second NoExternalReferenceInMethods violation.
+        //   - ExternalEntry (Add, ValueObject): method references "OrderLine" in return type.
+        //     With the active OrderAgg, this is an external-reference violation.
+        //   - ExternalEntry2 (Add, ValueObject): method references "Money" in return type.
+        //     Money is in OrderAgg.shared_value_objects → inside boundary → no violation.
+        //     Crucially, DeletedAgg also lists Money — but the fix ensures the deleted
+        //     aggregate does not pollute the active aggregate's boundary computation.
+        //
+        // The main assertion: the rule fires exactly ONE violation (OrderAgg / ExternalEntry
+        // for OrderLine), confirming that:
+        //   (a) DeletedAgg's shared_value_objects do not pollute the boundary set, AND
+        //   (b) DeletedAgg is not scanned in the other_entry.methods loop — if it were,
+        //       a second violation for OrderAgg / DeletedAgg would fire.
+        let mut doc = make_doc("domain");
+
+        // Active aggregate: exclusive_members = [OrderLine], shared_value_objects = [Money]
+        let order_agg = make_type_entry(DataRole::AggregateRoot {
+            identity: IdentityAccessor::new(MethodName::new("id").unwrap()),
+            invariants: vec![],
+            exclusive_members: vec![TypeRef::new("OrderLine").unwrap()],
+            shared_value_objects: vec![TypeRef::new("Money").unwrap()],
+            emits: vec![],
+        });
+        doc.types.insert(TypeName::new("OrderAgg").unwrap(), order_agg);
+
+        // Delete-action aggregate: also has exclusive_members=[OrderLine],
+        // shared_value_objects=[Money], and a method that references OrderLine.
+        // Must not be scanned as either an aggregate source or an external entry.
+        // Without the `action != Delete` filter in the other_entry.methods scan,
+        // this method would cause a second violation to fire for OrderAgg/DeletedAgg.
+        let deleted_agg = TypeEntry {
+            action: ItemAction::Delete,
+            role: DataRole::AggregateRoot {
+                identity: IdentityAccessor::new(MethodName::new("id").unwrap()),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("OrderLine").unwrap()],
+                shared_value_objects: vec![TypeRef::new("Money").unwrap()],
+                emits: vec![],
+            },
+            kind: unit_struct_kind(),
+            // Method references OrderLine — would trigger a second violation if
+            // the other_entry.methods scan were not guarded by action != Delete.
+            methods: vec![method_shared_ref_no_params("get_line", "OrderLine")],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new("DeletedAgg").unwrap(), deleted_agg);
+
+        // ExternalEntry: references OrderLine (exclusive member) — should be a violation.
+        let external_entry = make_type_entry_with_methods(
+            DataRole::value_object(),
+            vec![method_shared_ref_no_params("get_line", "OrderLine")],
+        );
+        doc.types.insert(TypeName::new("ExternalEntry").unwrap(), external_entry);
+
+        // ExternalEntry2: references Money (shared_value_object of active OrderAgg) —
+        // inside the boundary, so no violation expected.
+        let external_entry2 = make_type_entry_with_methods(
+            DataRole::value_object(),
+            vec![method_shared_ref_no_params("get_money", "Money")],
+        );
+        doc.types.insert(TypeName::new("ExternalEntry2").unwrap(), external_entry2);
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::NoExternalReferenceInMethods {
+                target_field: "exclusive_members".to_owned(),
+            },
+        );
+
+        // Expect exactly 1 violation: ExternalEntry leaks OrderLine from the active OrderAgg.
+        // DeletedAgg must not produce a second violation — neither as an aggregate source
+        // (boundary pollution) nor as an external entry (methods scan).
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected exactly 1 violation (OrderAgg/OrderLine via ExternalEntry); \
+             DeletedAgg must be skipped as a scan target, got: {violations:?}"
+        );
+        assert_eq!(violations[0].rule_kind(), "NoExternalReferenceInMethods");
+        assert_eq!(violations[0].entry_name(), "OrderAgg");
+        assert!(
+            violations[0].message().contains("OrderLine"),
+            "violation message must mention the exclusive member 'OrderLine'"
+        );
+        assert!(
+            violations[0].message().contains("ExternalEntry"),
+            "violation message must name the external entry 'ExternalEntry'"
+        );
+    }
 }

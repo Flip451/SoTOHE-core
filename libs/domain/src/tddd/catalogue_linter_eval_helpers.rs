@@ -13,6 +13,7 @@ use std::collections::BTreeMap;
 use super::super::RoleKind;
 use super::super::helpers::{bare_name_in_type_ref, entry_role_kind};
 use crate::tddd::catalogue_v2::CatalogueDocument;
+use crate::tddd::catalogue_v2::roles::ItemAction;
 use crate::tddd::layer_id::LayerId;
 
 /// Strips leading reference and pointer sigils from a type reference string.
@@ -479,18 +480,26 @@ pub(super) fn resolve_bare_name(
 
 /// Search a single `CatalogueDocument` for a type or trait entry with the
 /// given `bare_name`. Returns the [`RoleKind`] if found.
+///
+/// Entries with `action: Delete` are excluded from lookup so that
+/// fail-closed semantics are preserved: a delete-marked entry does not
+/// satisfy role checks that require the type to be present.
 pub(super) fn find_in_catalogue(
     catalogue: &CatalogueDocument,
     bare_name: &str,
 ) -> Option<RoleKind> {
-    // Check type entries first.
-    if let Some((_, entry)) = catalogue.types.iter().find(|(tn, _)| tn.as_str() == bare_name) {
+    // Check type entries first, excluding delete-action entries.
+    if let Some((_, entry)) = catalogue
+        .types
+        .iter()
+        .find(|(tn, entry)| tn.as_str() == bare_name && entry.action != ItemAction::Delete)
+    {
         return Some(entry_role_kind(entry));
     }
-    // Check trait entries.
+    // Check trait entries, excluding delete-action entries.
     catalogue
         .traits
         .iter()
-        .find(|(tn, _)| tn.as_str() == bare_name)
+        .find(|(tn, entry)| tn.as_str() == bare_name && entry.action != ItemAction::Delete)
         .map(|(_, e)| RoleKind::from_contract_role(&e.role))
 }

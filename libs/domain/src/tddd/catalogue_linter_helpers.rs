@@ -9,7 +9,7 @@ use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
 use crate::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
 use crate::tddd::catalogue_v2::identifiers::{TraitName, TypeName, TypeRef};
-use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole};
+use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
 
 // ---------------------------------------------------------------------------
 // Entry filtering helpers
@@ -27,24 +27,32 @@ pub(super) fn target_matches(target: &RuleTarget, role: RoleKind) -> bool {
 
 /// Iterates over `(type_name, entry)` pairs in `catalogue.types` where the
 /// entry's `DataRole` matches the rule's `RuleTarget`.
+///
+/// Entries with `action: Delete` are excluded so that fail-closed semantics
+/// are preserved: a delete-marked entry is treated as absent and no lint rule
+/// is applied against it.
 pub(super) fn type_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TypeName, &'a TypeEntry)> {
-    catalogue
-        .types
-        .iter()
-        .filter(move |(_name, entry)| target_matches(target, entry_role_kind(entry)))
+    catalogue.types.iter().filter(move |(_name, entry)| {
+        entry.action != ItemAction::Delete && target_matches(target, entry_role_kind(entry))
+    })
 }
 
 /// Iterates over `(trait_name, entry)` pairs in `catalogue.traits` where the
 /// entry's `ContractRole` matches the rule's `RuleTarget`.
+///
+/// Entries with `action: Delete` are excluded so that fail-closed semantics
+/// are preserved: a delete-marked entry is treated as absent and no lint rule
+/// is applied against it.
 pub(super) fn trait_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TraitName, &'a TraitEntry)> {
     catalogue.traits.iter().filter(move |(_name, entry)| {
-        target_matches(target, RoleKind::from_contract_role(&entry.role))
+        entry.action != ItemAction::Delete
+            && target_matches(target, RoleKind::from_contract_role(&entry.role))
     })
 }
 
@@ -103,6 +111,10 @@ pub(super) fn has_trait_impl(
 ) -> bool {
     let path_suffix = format!("::{trait_name_prefix}");
     catalogue.trait_impls.iter().any(|ti| {
+        // Exclude delete-action impl entries: a deleted impl does not count as present.
+        if ti.action == ItemAction::Delete {
+            return false;
+        }
         let for_type = ti.for_type.as_str();
         let trait_ref = ti.trait_ref.as_str();
         // Match `for_type` either exactly or as a generic self type (e.g. "Foo<T>").
