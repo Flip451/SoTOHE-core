@@ -135,17 +135,19 @@
     {
       "id": "T023",
       "description": "Stage 4 — CLI composition: update `apps/cli-composition/src/track/tddd.rs` `track_lint()` to wire `FsLintConfigLoader`, drop the hard-coded demo rule vec, and resolve the config path before constructing the adapter: if `--rules-file <path>` is given, pass that path to `FsLintConfigLoader::new(path)`; otherwise pass the workspace-default path (`workspace_root.join(\".harness/catalogue-lint/config.json\")`) to `FsLintConfigLoader::new(path)`. Do not pass a path to `load()` — `load()` takes no argument. Update `apps/cli/tests/cli_track_lint.rs` test fixtures: each test must create `.harness/catalogue-lint/config.json` in a temp workspace (or pass `--rules-file` pointing at the preset) as setup; add a fail-closed path test that asserts a non-zero exit code when neither config.json nor `--rules-file` is present. Depends on T022.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d3fafa03"
     },
     {
       "id": "T024",
       "description": "Stage 4 — tests: add unit and integration tests for T020-T023. LintConfigLoader happy path: `FsLintConfigLoader::new(valid_path).load()` succeeds when config.json is present and valid. ParseError path: malformed JSON returns `ParseError`. MissingFile path: absent config file path returns `MissingFile` (path is set at `new()` time, not passed to `load()`). SchemaVersionMismatch path: wrong schema_version returns `SchemaVersionMismatch`. Interactor fail-closed path: `RunCatalogueLintInteractor::execute` returns `ConfigMissing { path }` when no rules in command and config loader returns `MissingFile`. Interactor config-invalid path: execute returns `ConfigInvalid(err)` when loader returns `ParseError` or `SchemaVersionMismatch`. CLI integration end-to-end: `cargo make test` passes with the fixture configs created in T023. Depends on T023.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d3fafa03"
     },
     {
       "id": "T025",
       "description": "Stage 4 — final CI gate: run `cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix all remaining issues. Confirm acceptance against AC-21 (ddd-strict.json exists and domain layer has no `ddd_strict_preset()` Rust API), OS-09 (no per-layer config), OS-10 (fail-closed: absent config causes explicit error), OS-11 (no Rust API preset function). Depends on T024.",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {
