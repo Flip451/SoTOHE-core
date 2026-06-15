@@ -26,7 +26,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueLinterError | error_type | modify | InvalidRuleConfig | 🔵 | 🔵 |
+| CatalogueLinterError | error_type | modify | InvalidRuleConfig, UnknownLayer | 🔵 | 🔵 |
 | CatalogueLinterRuleError | error_type | modify | EmptyPermittedLayers, EmptyRequiredTraits, EmptyForbiddenRoles, EmptyTargetField | 🔵 | 🔵 |
 | CatalogueLoaderError | error_type | reference | CatalogueNotFound, LayerDiscoveryFailed, DecodeFailed, SymlinkRejected, IoError, TopologicalSortFailed | 🔵 | 🔵 |
 | ConstructionError | error_type | — | EmptyCollection | 🔵 | 🔵 |
@@ -42,6 +42,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint | free_function | — | fn(rules: &[CatalogueLinterRule], catalogue: &CatalogueDocument, layer_id: &LayerId) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> | 🔵 | 🔵 |
+| domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint | free_function | — | fn(rules: &[CatalogueLinterRule], all_catalogues: &std::collections::BTreeMap<LayerId, CatalogueDocument>, target_layer_id: &LayerId) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> | 🔵 | 🔵 |
 | domain::tddd::catalogue_linter::preset::ddd_strict_preset | free_function | — | fn() -> Result<Vec<CatalogueLinterRule>, CatalogueLinterError> | 🔵 | 🔵 |
 

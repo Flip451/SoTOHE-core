@@ -1,952 +1,57 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
-          "at": "2026-06-14T05:53:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
-          "at": "2026-06-14T05:58:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
-          "at": "2026-06-14T10:56:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
-          "at": "2026-06-14T11:28:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
-          "at": "2026-06-14T17:55:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
-          "at": "2026-06-14T18:10:45Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:549edec9b94dfd016a378883220ffaf79fc4f5ed7d97370a2623744fbb1c3f91",
-          "at": "2026-06-14T05:53:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:549edec9b94dfd016a378883220ffaf79fc4f5ed7d97370a2623744fbb1c3f91",
-          "at": "2026-06-14T05:55:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
-          "at": "2026-06-14T10:52:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
-          "at": "2026-06-14T11:29:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ac59a99fe882cb18dd9b06a290895d085abef12d5907efa51bd01c4d18716e9",
-          "at": "2026-06-14T17:56:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ac59a99fe882cb18dd9b06a290895d085abef12d5907efa51bd01c4d18716e9",
-          "at": "2026-06-14T18:10:55Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T18:59:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:02:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `reviewer` row still says `review-fix-lead.md` owns the loop and invokes Codex CLI, but `review-fix-lead` now resolves to Claude in `.harness/config/agent-profiles.json`. This makes the documented execution path stale.",
-              "severity": "P1",
-              "file": ".claude/agents/README.md",
-              "line": 26,
-              "category": "correctness"
-            },
-            {
-              "message": "The `dry-fix-lead` row still says the DFP loop invokes Codex CLI, but `dry-fix-lead` now resolves to Claude in `.harness/config/agent-profiles.json`. This makes the documented execution path stale.",
-              "severity": "P1",
-              "file": ".claude/agents/README.md",
-              "line": 27,
-              "category": "correctness"
-            },
-            {
-              "message": "The quick self-check still says every `traits` entry must use one of 3 trait-section role values, but the v3 schema section above now defines 4 (`SpecificationPort`, `ApplicationService`, `SecondaryPort`, `Repository`). As written, the checklist would falsely reject valid `Repository` trait entries.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 1029,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:7a344ab922a5416491e34d6722fbe1658123b15f06f41be80189ee39c9a2430c",
-          "at": "2026-06-14T05:56:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The cookbook still shows unannotated plain-string `role` examples (`\"role\": \"ValueObject\"`, `\"role\": \"SecondaryPort\"`, etc.) even though the new normative section says that form is no longer accepted. As written, the file now teaches two incompatible wire formats, which can make type-designer emit invalid catalogue JSON. Rewrite those examples to the discriminated-object form or mark them explicitly as legacy/non-normative.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
-              "line": 625,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:db3bfb25848ecbd53a91f5d3a24e64ac90b3d00d1bd8b73b663708e810110c09",
-          "at": "2026-06-14T06:02:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `Repository` trait role is defined in the schema reference above, but the role-selection guidance here still maps repository/store/writer traits to `SecondaryPort`. That makes the `Repository` variant effectively unreachable for the common repository case and can still produce catalogues that violate the updated schema/ADR.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
-              "line": 517,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4b9662ee1d7a1af21d0d3bfa45f714b70cb3c210c832e55b8a5755769ff8114a",
-          "at": "2026-06-14T06:10:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DataRole` now has 14 variants, including `EventPolicy`, but this reference and the quick self-check still claim there are only 13 type-section role values. That leaves the normative guidance internally inconsistent and can make valid `EventPolicy` catalogue entries look unsupported.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
-              "line": 262,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4b9662ee1d7a1af21d0d3bfa45f714b70cb3c210c832e55b8a5755769ff8114a",
-          "at": "2026-06-14T06:14:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated schema reference adds `EventPolicy` and `Repository`, but the role-selection guidance below still says `one of the 13 type-section role values` and maps repository-like driven ports to `SecondaryPort`. That is internally contradictory within the same capability doc and can lead type-designer to author catalogues that no longer match the new wire format.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
-              "line": 487,
-              "category": "correctness"
-            },
-            {
-              "message": "Removing the `Bash(while :*)`, `Bash(cat :*)`, `Bash(touch :*)`, `Bash(cp :*)`, and `Bash(mv :*)` deny patterns weakens the shell-guardrail layer without replacing it with an equivalent restriction. That re-opens the shell forms the repo policy relies on to keep file inspection and mutation behind the dedicated tools.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
-              "line": 195,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:f456c1cccac8a35dadfa36c73f853d1039f760c0f1b0ce33c9c055fc2da0794e",
-          "at": "2026-06-14T06:20:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The trait-selection guidance still maps repository traits to `SecondaryPort` and never introduces `Repository` as a selectable role, so the new `Repository` wire format (with required `aggregate`) is unreachable for anyone following the doc. Update the trait branch / trait-direction bullets to distinguish repositories from generic secondary ports.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
-              "line": 518,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8f2c7522737fa733f073270fc197ccec813f516ca755998d40481c424f929daa",
-          "at": "2026-06-14T06:25:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d514b3e75cb50f807b5d2fc6ceec2458e3b96faebf8c8c7786e1b4784e9d2d0",
-          "at": "2026-06-14T06:30:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The type-designer capability still instructs agents to create `schema_version: 3` catalogues, but the current catalogue codec writes and accepts schema version 4 only, rejecting v1/v2/v3 fail-closed. Following this SSoT would make newly authored catalogue files fail to decode; the schema reference and complete cookbook examples need to be updated to v4.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 226,
-              "category": "schema_mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:5d514b3e75cb50f807b5d2fc6ceec2458e3b96faebf8c8c7786e1b4784e9d2d0",
-          "at": "2026-06-14T06:33:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry-fix-lead` is now routed to `provider: \"claude\"`, but this table says the Claude subagent invokes `bin/sotp dry fix-local`. That subcommand is the external fixer dispatch path and currently only dispatches the Codex fixer, so following this README route under the new profile hits the unsupported-claude `fix-local` path instead of the intended `subagent_type: \"dry-fix-lead\"` loop. Reserve `dry fix-local` for the Codex path and document the Claude path as launching the subagent.",
-              "severity": "P1",
-              "file": ".claude/agents/README.md",
-              "line": 27,
-              "category": "broken_reference"
-            },
-            {
-              "message": "The type-designer subagent definition still advertises `schema_version: 3` and a `v3 schema reference`, while the updated SSoT says real catalogue files must use `schema_version: 4` and versions 1/2/3 are rejected. This stale wrapper text can frame the Claude type-designer toward generating fail-closed catalogue files; update it to v4, and also clear the same stale `v3 schema reference` wording in `.harness/capabilities/type-designer.md`'s authority stack.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 15,
-              "category": "spec_contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:582c7f52af1db3961e18522f8f38298c4a4788e833b2524d230a50fe6952a9e2",
-          "at": "2026-06-14T06:39:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The v4 schema reference now says plain-string TypeEntry roles are rejected, but the canonical interactor/service-wrapper example in the same normative section still uses `\"role\": \"Interactor\"`. This example sits outside the cookbook legacy-form disclaimer, so following it produces catalogue JSON that the v4 codec rejects at parse time. Update it to the discriminated-object form, e.g. `\"role\": { \"Interactor\": {} }`.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 427,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8f7bd2bffd6b4db11914d43cac5f8f54fbb108eecdc038aedbe79de5ba4e0fbc",
-          "at": "2026-06-14T06:43:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The review-fix-lead policy still treats catalogue `spec_refs[].hash` as present and tells the agent to refresh it after spec/impl-plan edits. In this change set the catalogue schema is v4 and the codec rejects `spec_refs[].hash` as an unknown field, so following this instruction can send the agent into an impossible remediation path or prompt type-designer to write invalid catalogues. The policy should be updated to the v4 behavior: validate anchor/file refs and stale declaration/signals through the current verifier/cache mechanism, without asking for `spec_refs[].hash` refreshes.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 133,
-              "category": "harness-policy"
-            }
-          ],
-          "hash": "rvw1:sha256:a6add69f524536bc6f31fd09bccb3b1a674412b130b798ca331f2235070500fd",
-          "at": "2026-06-14T06:48:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The capability correspondence table still has no `review-fix-lead` row even though `agent-profiles.json` now routes `capabilities.review-fix-lead` to Claude. Instead, the Claude subagent path is described inside the separate `reviewer` row, which remains `provider: codex`. That leaves the switched capability's provider-to-subagent mapping internally inconsistent for operators using this README to dispatch agents; add an explicit `review-fix-lead` row mapping to `review-fix-lead.md` / `subagent_type: \"review-fix-lead\"`.",
-              "severity": "P1",
-              "file": ".claude/agents/README.md",
-              "line": 26,
-              "category": "harness-policy"
-            },
-            {
-              "message": "The MUST READ precedence list still names this file's `v3 schema reference` as the authoritative JSON-structure source, while the same capability file now requires schema_version 4 and discriminated-object roles. Because this is the conflict-resolution section type-designers are instructed to obey, the stale v3 authority can send catalogue authors toward rejected schema/role formats. Update this authority text to v4 and limit any v3 wording to the explicitly legacy cookbook examples.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 19,
-              "category": "schema-contract"
-            }
-          ],
-          "hash": "rvw1:sha256:7139e55c4bba13f13631ae63cd314673bd9c6e1fa545fce54356101ea0210dd1",
-          "at": "2026-06-14T06:58:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The v4 schema reference says plain-string roles are rejected, but this earlier guidance still tells type-designers to write `role: \"ValueObject\"` / `role: \"ErrorType\"` outside the cookbook section whose legacy examples are explicitly disclaimed. Agents following this section can still emit schema_version 4 catalogues that fail codec parsing. Update these snippets to the discriminated-object form or add an explicit note that these are conceptual role names, not wire format.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 517,
-              "category": "schema-doc-contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:39b4c29a0ee9e963401a377a777a8149553c43f6174b763345fdc39cf2695bc8",
-          "at": "2026-06-14T07:03:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bf1a637bcb03e37593545ec7c8a2abab7db788f3baeb3fadb3e9c5a26d1264f",
-          "at": "2026-06-14T07:10:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The v4→v5 migration is incomplete in the authoritative guidance: this file still describes itself as a \"v4 schema reference\", points readers to the \"v4 Schema Reference\" in the mission bullets, labels the schema-field section as derived from v4, and refers to the cookbook's normative wire format as defined in the v4 reference. Those references should be updated or explicitly marked legacy, otherwise the document contradicts the new `schema_version: 5` guidance.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
-              "line": 19,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:53a0faff1161f933a3d77b955a61c81123bb0dd406db8c92c5e1660ca87152c8",
-          "at": "2026-06-14T19:00:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This wrapper still tells the subagent to follow a \"v4 schema reference\" even though the frontmatter and the canonical capability have been bumped to v5. That stale instruction keeps the agent anchored to the wrong contract.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 21,
-              "category": "correctness"
-            },
-            {
-              "message": "This section still labels the schema reference as v4 even though the surrounding contract has been updated to v5. The heading and checklist now say v5, so this leftover v4 text makes the authoritative SSoT internally inconsistent.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 245,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:af5a6d4a64c72855f106ebc8be03bba2a961e013f8352e32e457f5755a4eac29",
-          "at": "2026-06-14T19:02:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83a29f704637f21ef4cba529e59a09990d59219a719b86d1e755494af5fc7939",
-          "at": "2026-06-14T19:05:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated capability adds v5 `DomainEvent`/`EventPolicy` role guidance, but the same document still requires `knowledge/conventions/type-designer-kind-selection.md` to be obeyed as the SSoT for role/kind selection and to take precedence over this decision tree. That convention is still a v3/13-role matrix with no `DomainEvent` or `EventPolicy`, so a type-designer following these instructions can still reject or omit the newly documented v5 roles despite the schema reference. Update the precedence language or the referenced convention so the v5 role set is authoritative for role availability.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 12,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:83a29f704637f21ef4cba529e59a09990d59219a719b86d1e755494af5fc7939",
-          "at": "2026-06-14T19:08:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ee06fc6691cf0a1d5c02f4b302442684e7435984a56e3af637c53f326db6131",
-          "at": "2026-06-14T19:11:26Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
-          "at": "2026-06-14T02:30:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
-          "at": "2026-06-14T02:32:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
-          "at": "2026-06-14T02:49:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`NonEmptyVec` now only exposes `new(first, rest)`, so callers that receive a decoded array cannot ask the domain type to validate the non-empty invariant from a `Vec<T>`. The T001 briefing explicitly requires `NonEmptyVec<T>` to provide both `new(first, rest)` and `try_new(Vec<T>)`, with empty input rejected, and the removed tests covered that path. Without `try_new`, the infrastructure codec either cannot implement the documented JSON array -> `NonEmptyVec` conversion through the public domain API or must duplicate the invariant outside the value object.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 258,
-              "category": "api_contract"
-            }
-          ],
-          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
-          "at": "2026-06-14T02:51:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
-          "at": "2026-06-14T02:56:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`entries.rs` still only exercises the pre-migration role sets: `test_type_entry_all_data_roles_are_accepted` stops at `SecondaryAdapter`, and `test_trait_entry_all_contract_roles_are_accepted` stops at `SecondaryPort`. That leaves the new public variants from this change (`DataRole::EventPolicy` and `ContractRole::Repository`) without any `TypeEntry`/`TraitEntry` coverage, so regressions in the new payload-bearing role shapes could slip through CI.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-              "line": 329,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:47be683e82921066dc13ad301316994ef737f7216beb878c628e37c94c42edc0",
-          "at": "2026-06-14T05:57:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa7c7bb459ff902e0532481ff3452291578072aaf53165e1d5038b1176cd64f5",
-          "at": "2026-06-14T06:06:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa7c7bb459ff902e0532481ff3452291578072aaf53165e1d5038b1176cd64f5",
-          "at": "2026-06-14T06:13:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`role.clone()` here clones `&DataRole`, not `DataRole`, so this test never exercises the enum's `Clone` implementation. It will still pass even if `DataRole` loses a correct `Clone`; clone the value itself (for example `(*role).clone()`) or iterate by value instead.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 826,
-              "category": "testing"
-            },
-            {
-              "message": "`role.clone()` here clones `&ContractRole`, not `ContractRole`, so this test does not validate the enum's `Clone` implementation. The assertion can pass regardless of the actual `Clone` impl; clone the owned value instead.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 859,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1e2a671056a7e5b9ca68382b238e3e855425c3f06d1232c631783b0a6b03ada6",
-          "at": "2026-06-14T08:10:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eaf4c4d345d7c0302f5a5c539135d2112357f647a43b91cc17528939fce3eef1",
-          "at": "2026-06-14T08:13:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eaf4c4d345d7c0302f5a5c539135d2112357f647a43b91cc17528939fce3eef1",
-          "at": "2026-06-14T08:15:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe5283a45170fc879792564b4dda8173ecb146b9d76ccf635c16c4841b897c16",
-          "at": "2026-06-14T08:39:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe5283a45170fc879792564b4dda8173ecb146b9d76ccf635c16c4841b897c16",
-          "at": "2026-06-14T08:43:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueLinterRuleError::EmptyPermittedLayers` is still documented as a possible `CatalogueLinterRule::new` failure, but `KindLayerConstraint` now requires `NonEmptyVec<LayerId>`, so this constructor can never return that error. That makes the public contract false; either keep raw layer vectors here or remove the dead error path/docs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
-              "line": 317,
-              "category": "contract"
-            },
-            {
-              "message": "`CatalogueLinterRule::new` adds two new reachable failure branches (`EmptyRequiredTraits`, `EmptyForbiddenRoles`), but the test module only covers `EmptyTargetField` and happy paths. Add negative tests for those branches so the new public API surface is actually exercised.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
-              "line": 663,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:652e2aa4bebcaa3e3ee0428995d0cf3d72874a9cf836c44031fb5eea52a59aab",
-          "at": "2026-06-14T10:57:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueLinterRuleKind` uses `NonEmptyVec` for `KindLayerConstraint.permitted_layers`, `TraitImplRequired.required_traits`, and `NoRoleInMethodSignature.forbidden_roles`, but the ADR sketch for D15 models these payloads as plain `Vec`. This changes the domain contract by making empty rule payloads unrepresentable, so the codec can no longer round-trip the documented schema and valid empty-config cases are rejected before evaluation.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
-              "line": 217,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:527387b8b193cda66cb401efaee48df67f8c655f02f0f65b63ac43a5db73878c",
-          "at": "2026-06-14T11:07:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ForbiddenMethodReceiver` is the only `CatalogueLinterRuleKind` payload that is not validated in `CatalogueLinterRule::new`. Empty or malformed `forbidden_receiver` values are accepted, so a misconfigured rule becomes a silent no-op instead of failing fast like the other invalid rule inputs. This should be rejected or modeled with a validated receiver type.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter.rs",
-              "line": 379,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:527387b8b193cda66cb401efaee48df67f8c655f02f0f65b63ac43a5db73878c",
-          "at": "2026-06-14T11:14:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8374b6e6204bb7598d5c76583524f859ba22baa1a09643bc0479e0eb5940f08",
-          "at": "2026-06-14T11:25:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8374b6e6204bb7598d5c76583524f859ba22baa1a09643bc0479e0eb5940f08",
-          "at": "2026-06-14T11:28:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8374b6e6204bb7598d5c76583524f859ba22baa1a09643bc0479e0eb5940f08",
-          "at": "2026-06-14T11:29:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The D10 Repository aggregate rule never evaluates Repository entries. `ReferencedRoleConstraint` iterates only `type_entries_for_target(...)`, which is backed by `catalogue.types`, but `RoleKind::Repository` is a `ContractRole` stored in `catalogue.traits`; `field_type_refs(\"aggregate\")` also returns an empty slice for data roles. As a result the `ddd_strict_preset` rule for `Repository.aggregate -> AggregateRoot` silently accepts repositories pointing at missing or non-AggregateRoot types, contrary to ADR D10/AC-18.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter.rs",
-              "line": 653,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0a4eb23f52899fb1b60ac7444d974b4f3d20b08257e2d03c532c6eeb8eb159fc",
-          "at": "2026-06-14T12:42:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TraitImplRequired` will falsely report required equality impls as missing for real catalogues. `ddd_strict_preset()` requires `\"PartialEq\"`/`\"Eq\"`, but generated catalogues encode these as fully qualified refs like `\"core::cmp::PartialEq\"` and `\"core::cmp::Eq\"`; `has_trait_impl` only matches exact strings or strings starting with the bare name, so the D5/D18 rules reject compliant entries.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter.rs",
-              "line": 574,
-              "category": "correctness"
-            },
-            {
-              "message": "`FieldEmpty`/`FieldNonEmpty` cannot evaluate the `invariants` Vec even though it is a role-specific Vec field on ValueObject/Entity/AggregateRoot. `field_type_refs()` always returns an empty slice for `\"invariants\"`, so `FieldEmpty { target_field: \"invariants\" }` silently passes entries that declare invariants, while `FieldNonEmpty` reports entries even when invariants are present.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter.rs",
-              "line": 1091,
-              "category": "correctness"
-            },
-            {
-              "message": "The production portion of this module now runs to line 1326 before the `#[cfg(test)]` block, exceeding the repository's 700-line maximum for production modules. The rule evaluation helpers, rule arms, and preset construction need to be split to stay within the scoped architecture constraint.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter.rs",
-              "line": 1327,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:e52d07afc5b05908c2506d20ca152b7809ba9cead79d435a0d728c946923fe9b",
-          "at": "2026-06-14T12:53:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`KindLayerConstraint` only emits violations for matching `TypeEntry`s. Because `RuleTarget` is explicitly allowed to target `ContractRole`s as well, a layer rule targeting `Repository`, `ApplicationService`, `SecondaryPort`, or `all_roles()` silently ignores matching `TraitEntry`s. That leaves contract-role placement checks unenforced even when the catalogue is in a disallowed layer.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
-              "line": 69,
-              "category": "correctness"
-            },
-            {
-              "message": "Method-signature role checks only compare the whole `TypeRef` string against catalogue entry names, so forbidden roles nested in normal signature forms such as `Vec<OrderLine>`, `Option<OrderLine>`, `&OrderRepo`, or path-qualified references are missed. This weakens the D11/D16/D18 rules because an EventPolicy can depend on a Repository, or an aggregate-external method can expose an exclusive member, by wrapping the type in a generic/reference without producing a violation.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
-              "line": 168,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:eb0dcbb298310d777091b275bdda5024421fd258be981947278eca6209d3c0a6",
-          "at": "2026-06-14T13:25:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `ReferencedRoleConstraint` resolves references by exact string equality against `TypeName`/`TraitName`. `TypeRef` explicitly allows path-qualified forms like `domain_core::UserId`, while catalogue entry names are bare identifiers, so valid references such as `domain::OrderPlaced` or `domain::OrderAgg` will be reported as missing/wrong role by the ddd-strict D6/D7/D8/D10/D16 rules. Resolve qualified refs to their local tail/current crate form before role lookup, or otherwise define and enforce a canonical ref format.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
-              "line": 98,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: `NoRoleInMethodSignature` misses forbidden-role types when the method signature uses a path-qualified type. `bare_name_in_type_ref(\"ports::OrderRepo\", \"OrderRepo\")` returns false because `:` is not treated as a type boundary, so D16 EventPolicy signatures can accept a `Repository` parameter through a qualified path without a violation. This also affects the ValueObject Entity/AggregateRoot independence check. Treat `::`/`:` as a boundary or normalize TypeRefs before matching.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
-              "line": 128,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:48c4a34fb2e7cbe104828e05a1e9fd3283b7b02ce24112554cc2967a9d87c55b",
-          "at": "2026-06-14T13:33:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `FieldElementUniqueAcrossEntries` keys uniqueness by the raw `TypeRef` string, so the same catalogue type can be claimed by two aggregates when one `exclusive_members` entry is bare (`OrderLine`) and another is path-qualified (`domain::OrderLine`). `TypeRef` explicitly allows `::` paths, and the referenced-role rule already normalizes to the tail segment for this reason; without the same canonicalization here, the D11 exclusive-member uniqueness rule can be bypassed.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
-              "line": 307,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: `NoExternalReferenceInMethods` only checks exact parameter/return type equality via `type_appears_in_methods`, so aggregate-owned entities are not detected when they appear inside normal Rust type expressions such as `Option<OrderLine>`, `Vec<OrderLine>`, `&OrderLine`, or path-qualified references. D11 requires detecting an exclusive member appearing in another `TypeEntry` method signature, and the code already has `bare_name_in_type_ref` for this kind of signature scan; using exact equality here leaves common external references unreported.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
-              "line": 362,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2f1105871a9f7f165e25067bbcdd00a9020a6f65123dd471870056ad006e34dd",
-          "at": "2026-06-14T13:40:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `bare_name_in_type_ref` does not treat `[`/`]` (or array separators like `;`) as type boundaries, so normal Rust signatures such as `&[OrderRepo]` or `[OrderLine; 4]` are not recognized as containing the forbidden/catalogued type. That lets `NoRoleInMethodSignature` and `NoExternalReferenceInMethods` miss Repository/UseCase and aggregate-member references in common slice/array method signatures, undercutting AC-16/AC-19 enforcement.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
-              "line": 131,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: Unsupported `target_field` values for `MethodReferenceSignature` are silently skipped. Because rule specs come from strings, a typo or wrong field name like `\"identity\"` on this rule reports a clean result instead of `CatalogueLinterError::InvalidRuleConfig`, despite the evaluator contract saying invalid rule configuration should error. The same pattern appears in `AccessorSignatureRequired` at line 264.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
-              "line": 225,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:6eef0bd7a86dacafaeb3d8f63cd6d760fa146997d4b1535c8d247c185b2407d7",
-          "at": "2026-06-14T13:49:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TraitImplRequired` only accepts trait impls whose `for_type` string exactly equals the catalogue type key. `TraitImplDeclV2` supports generic self types such as `Foo<L, R, W>`, while the `TypeEntry` key remains the bare type name `Foo`; for a generic ValueObject/Entity/AggregateRoot with `impl PartialEq for Foo<T>`, the new preset rules will incorrectly report missing `PartialEq`/`Eq`. Normalize `for_type` to its bare self type before comparing, similar to the existing type-ref matching helpers.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
-              "line": 102,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:a3e6cae32306dcb62f6ae94c251d6f6a5d0412f0baea32b73c2d790129ab0efd",
-          "at": "2026-06-14T13:55:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`bare_name_in_type_ref` omits `+` from its delimiter sets, so `NoRoleInMethodSignature` can miss syntactically valid trait-object or impl-trait signatures written without spaces, such as `&dyn OrderRepository+Send`. In that case the substring `OrderRepository` is followed by `+`, `after_ok` is false, and an EventPolicy can depend on a Repository without a violation, bypassing the D16 side-effect-role rule. Include `+` as both a start and end type separator before relying on this matcher for role-signature enforcement.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
-              "line": 147,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:66988254d1423870d5b5f14eb40863612494a5c1b63b08486f6fa433358c5c3b",
-          "at": "2026-06-14T14:02:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96dbc7fbfdc60cddc921cb2038970b3921882e5e190f0f9f0318290c7b08fd83",
-          "at": "2026-06-14T14:08:12Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DataRoleDto` still leaves the unit-like roles (`Specification`, `Factory`, `Interactor`, `Command`, `Query`, `Dto`, `ErrorType`, `SecondaryAdapter`) as unit variants, so serde continues to emit and accept bare strings for those cases. That means the new codec does not actually enforce the discriminated-object wire shape for the full role enum, and the legacy string form is still implicitly supported.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
-              "line": 32,
-              "category": "serialization"
-            },
-            {
-              "message": "`ContractRole::Repository` is rendered with the display tag `repository`, but `section_to_signal_kind_tag` never collapses that tag back to the evaluator's `secondary_port` bucket, and there is no dedicated repository section. Repository traits will therefore fall into `Other` with a blank Signal column even when `check_type_signals` has produced a matching `secondary_port` signal.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 208,
-              "category": "rendering"
-            }
-          ],
-          "hash": "rvw1:sha256:5e3237b12ca76bd05e2b84ce9ece8b10e92cf2c75f40c23d30f0732087f31e87",
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
           "at": "2026-06-14T05:57:02Z"
         },
         {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_layer` now short-circuits on `binding.targets.len() > 1` before `Self::to_infra_binding(binding)` runs, so malformed multi-target bindings never go through the domain/infra validation path. In the absent-catalogue fast path that means bad `catalogue_file` / `baseline_file` / `layer_id` input can be accepted silently, and `track_dir.join(&binding.catalogue_file)` is probed before any path validation. That is a validation bypass and path-probing issue in the new early-return branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
-              "line": 146,
-              "category": "security"
-            },
-            {
-              "message": "The new codec payload variants (`DataRoleDto::EventPolicy` and `ContractRoleDto::Repository`) have no dedicated infrastructure tests covering their happy-path round trips and required rejection cases. In particular, there is no coverage for empty `reacts_to` being rejected or `Repository.aggregate` failing validation, so regressions in the new schema-invariant decode/encode paths would ship without a safety net.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
-              "line": 44,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7cb20b6343bb5696d05b6fcfb24f60d47334daeb20f9d25735431d6402a1ccf5",
-          "at": "2026-06-14T06:07:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
-          "at": "2026-06-14T06:23:47Z"
-        },
-        {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
-          "at": "2026-06-14T06:35:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
-          "at": "2026-06-14T08:11:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
-          "at": "2026-06-14T08:15:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
-          "at": "2026-06-14T08:41:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
-          "at": "2026-06-14T08:43:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
-          "at": "2026-06-14T10:53:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
-          "at": "2026-06-14T11:28:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
-          "at": "2026-06-14T12:33:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
-          "at": "2026-06-14T12:42:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueDocumentCodec::decode` now returns `SchemaVersionRequiresMigration` for schema_version 4, but this branch only special-cases `UnsupportedSchemaVersion`. v4 catalogues therefore fall through to the generic `failed to decode catalogue` error, which drops the actionable migration prompt this code path is trying to provide.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 228,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:b4344d5b95fe1787c600b88d432c10e726efa130093dfdb70580db980701d50c",
-          "at": "2026-06-14T17:58:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
-          "at": "2026-06-14T18:06:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
-          "at": "2026-06-14T18:10:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
-          "at": "2026-06-14T18:21:16Z"
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
+          "at": "2026-06-14T05:59:38Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The v4 migration error tells users to regenerate the catalogue with `sotp track type-signals`, but that command consumes an existing catalogue to evaluate signals; it does not migrate the catalogue wire format. Several call sites surface this codec error directly via `to_string()`, so a schema_version=4 catalogue will get actionable-looking but wrong remediation and can leave users rerunning the failing path instead of regenerating the catalogue via the type-designer flow.",
+              "message": "P1 test coverage gap: the new boundary conversion path can now reject malformed public `RunCatalogueLintCommand` input via `InvalidRuleSpec`, but the added tests only cover valid `LintRuleSpec` values. Please add error-path coverage for cases such as an unknown `target_roles` entry, an empty `target_field`, and empty `permitted_layers` / `required_traits` / `forbidden_roles` so the public API’s validation contract is pinned down.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-              "line": 254,
-              "category": "bug"
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
+              "line": 175,
+              "category": "test coverage"
             }
           ],
-          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
-          "at": "2026-06-14T18:24:57Z"
+          "hash": "rvw1:sha256:21e2d02a7849cec388c231f9b3211eedaaa9247fb98c1483753d50a7bf3dceed",
+          "at": "2026-06-14T11:28:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4c26907823b1c50da36e88e503c7c725f0ff7d83be1d22f97a7f15deea08110b",
-          "at": "2026-06-14T18:31:00Z"
+          "hash": "rvw1:sha256:5378faa92aaeca0dffb9d6b4327921d61e93516c708175342956a9d270130111",
+          "at": "2026-06-14T11:33:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
+          "at": "2026-06-14T23:49:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
+          "at": "2026-06-15T00:23:12Z"
         }
       ]
     },
@@ -1385,46 +490,1360 @@
           "findings": [],
           "hash": "rvw1:sha256:747586d9c37b4947d98a972457928fb4b4968784ca9b03308d4c6d28db978287",
           "at": "2026-06-14T18:10:06Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:57:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:59:38Z"
+          "hash": "rvw1:sha256:83cb3db88983b58ba91c694faaafa7498ab8bdfcf0e4f6f6123abae525e82f2d",
+          "at": "2026-06-14T23:46:12Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1 test coverage gap: the new boundary conversion path can now reject malformed public `RunCatalogueLintCommand` input via `InvalidRuleSpec`, but the added tests only cover valid `LintRuleSpec` values. Please add error-path coverage for cases such as an unknown `target_roles` entry, an empty `target_field`, and empty `permitted_layers` / `required_traits` / `forbidden_roles` so the public API’s validation contract is pinned down.",
+              "message": "`CatalogueLinterError` declares `InvalidRuleConfig` as a tuple `String` payload and `UnknownLayer` as the only variant with a `layer_id` field, but the docs say `layer_id` is `String` \"in both error variants.\" That contradicts the declared variant shapes and can make readers think `InvalidRuleConfig` also carries a `layer_id`. Reword this so the diagnostic `String` rationale applies to both payloads while `layer_id` is only attributed to `UnknownLayer`.",
               "severity": "P1",
-              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
-              "line": 175,
-              "category": "test coverage"
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/domain-types.json",
+              "line": 884,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:21e2d02a7849cec388c231f9b3211eedaaa9247fb98c1483753d50a7bf3dceed",
-          "at": "2026-06-14T11:28:52Z"
+          "hash": "rvw1:sha256:83cb3db88983b58ba91c694faaafa7498ab8bdfcf0e4f6f6123abae525e82f2d",
+          "at": "2026-06-15T00:23:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5378faa92aaeca0dffb9d6b4327921d61e93516c708175342956a9d270130111",
-          "at": "2026-06-14T11:33:43Z"
+          "hash": "rvw1:sha256:fa8a72d191b0574bb2e0b68c4fac638c0a0902a4e65514bf178efd025d02cc7f",
+          "at": "2026-06-15T00:26:38Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
+          "at": "2026-06-14T02:30:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
+          "at": "2026-06-14T02:32:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
+          "at": "2026-06-14T02:49:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NonEmptyVec` now only exposes `new(first, rest)`, so callers that receive a decoded array cannot ask the domain type to validate the non-empty invariant from a `Vec<T>`. The T001 briefing explicitly requires `NonEmptyVec<T>` to provide both `new(first, rest)` and `try_new(Vec<T>)`, with empty input rejected, and the removed tests covered that path. Without `try_new`, the infrastructure codec either cannot implement the documented JSON array -> `NonEmptyVec` conversion through the public domain API or must duplicate the invariant outside the value object.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 258,
+              "category": "api_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:732ce9318b45c5f24689ff0a67cbff7dd8068c63d4ddb90f0f259ac785e21791",
+          "at": "2026-06-14T02:51:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08da13c6dcd59204630162b1fc392d786a9561ff4be9621a06dd0da877167881",
+          "at": "2026-06-14T02:56:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`entries.rs` still only exercises the pre-migration role sets: `test_type_entry_all_data_roles_are_accepted` stops at `SecondaryAdapter`, and `test_trait_entry_all_contract_roles_are_accepted` stops at `SecondaryPort`. That leaves the new public variants from this change (`DataRole::EventPolicy` and `ContractRole::Repository`) without any `TypeEntry`/`TraitEntry` coverage, so regressions in the new payload-bearing role shapes could slip through CI.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 329,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:47be683e82921066dc13ad301316994ef737f7216beb878c628e37c94c42edc0",
+          "at": "2026-06-14T05:57:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa7c7bb459ff902e0532481ff3452291578072aaf53165e1d5038b1176cd64f5",
+          "at": "2026-06-14T06:06:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa7c7bb459ff902e0532481ff3452291578072aaf53165e1d5038b1176cd64f5",
+          "at": "2026-06-14T06:13:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`role.clone()` here clones `&DataRole`, not `DataRole`, so this test never exercises the enum's `Clone` implementation. It will still pass even if `DataRole` loses a correct `Clone`; clone the value itself (for example `(*role).clone()`) or iterate by value instead.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 826,
+              "category": "testing"
+            },
+            {
+              "message": "`role.clone()` here clones `&ContractRole`, not `ContractRole`, so this test does not validate the enum's `Clone` implementation. The assertion can pass regardless of the actual `Clone` impl; clone the owned value instead.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 859,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1e2a671056a7e5b9ca68382b238e3e855425c3f06d1232c631783b0a6b03ada6",
+          "at": "2026-06-14T08:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eaf4c4d345d7c0302f5a5c539135d2112357f647a43b91cc17528939fce3eef1",
+          "at": "2026-06-14T08:13:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eaf4c4d345d7c0302f5a5c539135d2112357f647a43b91cc17528939fce3eef1",
+          "at": "2026-06-14T08:15:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe5283a45170fc879792564b4dda8173ecb146b9d76ccf635c16c4841b897c16",
+          "at": "2026-06-14T08:39:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe5283a45170fc879792564b4dda8173ecb146b9d76ccf635c16c4841b897c16",
+          "at": "2026-06-14T08:43:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLinterRuleError::EmptyPermittedLayers` is still documented as a possible `CatalogueLinterRule::new` failure, but `KindLayerConstraint` now requires `NonEmptyVec<LayerId>`, so this constructor can never return that error. That makes the public contract false; either keep raw layer vectors here or remove the dead error path/docs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 317,
+              "category": "contract"
+            },
+            {
+              "message": "`CatalogueLinterRule::new` adds two new reachable failure branches (`EmptyRequiredTraits`, `EmptyForbiddenRoles`), but the test module only covers `EmptyTargetField` and happy paths. Add negative tests for those branches so the new public API surface is actually exercised.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 663,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:652e2aa4bebcaa3e3ee0428995d0cf3d72874a9cf836c44031fb5eea52a59aab",
+          "at": "2026-06-14T10:57:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLinterRuleKind` uses `NonEmptyVec` for `KindLayerConstraint.permitted_layers`, `TraitImplRequired.required_traits`, and `NoRoleInMethodSignature.forbidden_roles`, but the ADR sketch for D15 models these payloads as plain `Vec`. This changes the domain contract by making empty rule payloads unrepresentable, so the codec can no longer round-trip the documented schema and valid empty-config cases are rejected before evaluation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 217,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:527387b8b193cda66cb401efaee48df67f8c655f02f0f65b63ac43a5db73878c",
+          "at": "2026-06-14T11:07:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ForbiddenMethodReceiver` is the only `CatalogueLinterRuleKind` payload that is not validated in `CatalogueLinterRule::new`. Empty or malformed `forbidden_receiver` values are accepted, so a misconfigured rule becomes a silent no-op instead of failing fast like the other invalid rule inputs. This should be rejected or modeled with a validated receiver type.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 379,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:527387b8b193cda66cb401efaee48df67f8c655f02f0f65b63ac43a5db73878c",
+          "at": "2026-06-14T11:14:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8374b6e6204bb7598d5c76583524f859ba22baa1a09643bc0479e0eb5940f08",
+          "at": "2026-06-14T11:25:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8374b6e6204bb7598d5c76583524f859ba22baa1a09643bc0479e0eb5940f08",
+          "at": "2026-06-14T11:28:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8374b6e6204bb7598d5c76583524f859ba22baa1a09643bc0479e0eb5940f08",
+          "at": "2026-06-14T11:29:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The D10 Repository aggregate rule never evaluates Repository entries. `ReferencedRoleConstraint` iterates only `type_entries_for_target(...)`, which is backed by `catalogue.types`, but `RoleKind::Repository` is a `ContractRole` stored in `catalogue.traits`; `field_type_refs(\"aggregate\")` also returns an empty slice for data roles. As a result the `ddd_strict_preset` rule for `Repository.aggregate -> AggregateRoot` silently accepts repositories pointing at missing or non-AggregateRoot types, contrary to ADR D10/AC-18.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 653,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0a4eb23f52899fb1b60ac7444d974b4f3d20b08257e2d03c532c6eeb8eb159fc",
+          "at": "2026-06-14T12:42:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplRequired` will falsely report required equality impls as missing for real catalogues. `ddd_strict_preset()` requires `\"PartialEq\"`/`\"Eq\"`, but generated catalogues encode these as fully qualified refs like `\"core::cmp::PartialEq\"` and `\"core::cmp::Eq\"`; `has_trait_impl` only matches exact strings or strings starting with the bare name, so the D5/D18 rules reject compliant entries.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 574,
+              "category": "correctness"
+            },
+            {
+              "message": "`FieldEmpty`/`FieldNonEmpty` cannot evaluate the `invariants` Vec even though it is a role-specific Vec field on ValueObject/Entity/AggregateRoot. `field_type_refs()` always returns an empty slice for `\"invariants\"`, so `FieldEmpty { target_field: \"invariants\" }` silently passes entries that declare invariants, while `FieldNonEmpty` reports entries even when invariants are present.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 1091,
+              "category": "correctness"
+            },
+            {
+              "message": "The production portion of this module now runs to line 1326 before the `#[cfg(test)]` block, exceeding the repository's 700-line maximum for production modules. The rule evaluation helpers, rule arms, and preset construction need to be split to stay within the scoped architecture constraint.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 1327,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e52d07afc5b05908c2506d20ca152b7809ba9cead79d435a0d728c946923fe9b",
+          "at": "2026-06-14T12:53:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`KindLayerConstraint` only emits violations for matching `TypeEntry`s. Because `RuleTarget` is explicitly allowed to target `ContractRole`s as well, a layer rule targeting `Repository`, `ApplicationService`, `SecondaryPort`, or `all_roles()` silently ignores matching `TraitEntry`s. That leaves contract-role placement checks unenforced even when the catalogue is in a disallowed layer.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 69,
+              "category": "correctness"
+            },
+            {
+              "message": "Method-signature role checks only compare the whole `TypeRef` string against catalogue entry names, so forbidden roles nested in normal signature forms such as `Vec<OrderLine>`, `Option<OrderLine>`, `&OrderRepo`, or path-qualified references are missed. This weakens the D11/D16/D18 rules because an EventPolicy can depend on a Repository, or an aggregate-external method can expose an exclusive member, by wrapping the type in a generic/reference without producing a violation.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 168,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:eb0dcbb298310d777091b275bdda5024421fd258be981947278eca6209d3c0a6",
+          "at": "2026-06-14T13:25:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ReferencedRoleConstraint` resolves references by exact string equality against `TypeName`/`TraitName`. `TypeRef` explicitly allows path-qualified forms like `domain_core::UserId`, while catalogue entry names are bare identifiers, so valid references such as `domain::OrderPlaced` or `domain::OrderAgg` will be reported as missing/wrong role by the ddd-strict D6/D7/D8/D10/D16 rules. Resolve qualified refs to their local tail/current crate form before role lookup, or otherwise define and enforce a canonical ref format.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 98,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `NoRoleInMethodSignature` misses forbidden-role types when the method signature uses a path-qualified type. `bare_name_in_type_ref(\"ports::OrderRepo\", \"OrderRepo\")` returns false because `:` is not treated as a type boundary, so D16 EventPolicy signatures can accept a `Repository` parameter through a qualified path without a violation. This also affects the ValueObject Entity/AggregateRoot independence check. Treat `::`/`:` as a boundary or normalize TypeRefs before matching.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 128,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:48c4a34fb2e7cbe104828e05a1e9fd3283b7b02ce24112554cc2967a9d87c55b",
+          "at": "2026-06-14T13:33:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `FieldElementUniqueAcrossEntries` keys uniqueness by the raw `TypeRef` string, so the same catalogue type can be claimed by two aggregates when one `exclusive_members` entry is bare (`OrderLine`) and another is path-qualified (`domain::OrderLine`). `TypeRef` explicitly allows `::` paths, and the referenced-role rule already normalizes to the tail segment for this reason; without the same canonicalization here, the D11 exclusive-member uniqueness rule can be bypassed.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 307,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `NoExternalReferenceInMethods` only checks exact parameter/return type equality via `type_appears_in_methods`, so aggregate-owned entities are not detected when they appear inside normal Rust type expressions such as `Option<OrderLine>`, `Vec<OrderLine>`, `&OrderLine`, or path-qualified references. D11 requires detecting an exclusive member appearing in another `TypeEntry` method signature, and the code already has `bare_name_in_type_ref` for this kind of signature scan; using exact equality here leaves common external references unreported.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 362,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2f1105871a9f7f165e25067bbcdd00a9020a6f65123dd471870056ad006e34dd",
+          "at": "2026-06-14T13:40:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `bare_name_in_type_ref` does not treat `[`/`]` (or array separators like `;`) as type boundaries, so normal Rust signatures such as `&[OrderRepo]` or `[OrderLine; 4]` are not recognized as containing the forbidden/catalogued type. That lets `NoRoleInMethodSignature` and `NoExternalReferenceInMethods` miss Repository/UseCase and aggregate-member references in common slice/array method signatures, undercutting AC-16/AC-19 enforcement.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 131,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Unsupported `target_field` values for `MethodReferenceSignature` are silently skipped. Because rule specs come from strings, a typo or wrong field name like `\"identity\"` on this rule reports a clean result instead of `CatalogueLinterError::InvalidRuleConfig`, despite the evaluator contract saying invalid rule configuration should error. The same pattern appears in `AccessorSignatureRequired` at line 264.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 225,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6eef0bd7a86dacafaeb3d8f63cd6d760fa146997d4b1535c8d247c185b2407d7",
+          "at": "2026-06-14T13:49:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplRequired` only accepts trait impls whose `for_type` string exactly equals the catalogue type key. `TraitImplDeclV2` supports generic self types such as `Foo<L, R, W>`, while the `TypeEntry` key remains the bare type name `Foo`; for a generic ValueObject/Entity/AggregateRoot with `impl PartialEq for Foo<T>`, the new preset rules will incorrectly report missing `PartialEq`/`Eq`. Normalize `for_type` to its bare self type before comparing, similar to the existing type-ref matching helpers.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 102,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a3e6cae32306dcb62f6ae94c251d6f6a5d0412f0baea32b73c2d790129ab0efd",
+          "at": "2026-06-14T13:55:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bare_name_in_type_ref` omits `+` from its delimiter sets, so `NoRoleInMethodSignature` can miss syntactically valid trait-object or impl-trait signatures written without spaces, such as `&dyn OrderRepository+Send`. In that case the substring `OrderRepository` is followed by `+`, `after_ok` is false, and an EventPolicy can depend on a Repository without a violation, bypassing the D16 side-effect-role rule. Include `+` as both a start and end type separator before relying on this matcher for role-signature enforcement.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 147,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:66988254d1423870d5b5f14eb40863612494a5c1b63b08486f6fa433358c5c3b",
+          "at": "2026-06-14T14:02:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96dbc7fbfdc60cddc921cb2038970b3921882e5e190f0f9f0318290c7b08fd83",
+          "at": "2026-06-14T14:08:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`continue 'method_loop` stops after the first forbidden match in a method, so a signature with multiple bad slots only reports the first one. That regresses `NoRoleInMethodSignature` from the previous per-`sig_type` behavior and can silently miss additional forbidden params/returns.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 256,
+              "category": "correctness"
+            },
+            {
+              "message": "`resolve_type_role` ignores `target_layer_id` and scans `all_catalogues` in `BTreeMap` order, so an unqualified reference like `OrderPlaced` resolves to whichever layer sorts first rather than the target layer. If the same bare name exists in multiple layers, `ReferencedRoleConstraint` and `NoRoleInMethodSignature` can produce false positives or false negatives depending on map ordering; the briefing requires target-layer-first resolution.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 34,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:31852ee3c0c84bc9076038732ff163de00bee13723ee61984b26582145c26a1b",
+          "at": "2026-06-14T23:47:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `resolve_type_role` treats every `::` as a top-level layer separator. Because `TypeRef` explicitly allows generics and namespaced inner types, a valid ref like `Option<domain::OrderPlaced>` is parsed as the layer hint `Option<domain` with tail `OrderPlaced>`, so cross-layer role resolution can miss or misresolve common type forms and flip the lint result. The lookup needs to tokenize the type expression instead of splitting the whole string on the last `::`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 43,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `NoRoleInMethodSignature` no longer resolves the referenced type at all; it scans every catalogue by bare-name substring. That means a qualified signature such as `domain::OrderPlaced` can still be rejected because some unrelated layer happens to define another `OrderPlaced` with a forbidden role. This is a false positive for explicit layer-qualified references and is not equivalent to the new cross-layer resolution used by `ReferencedRoleConstraint`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 253,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5bd2e9338c7b97ac897d60808b153e5a9a349ce71ba3b6eea30d30844795e911",
+          "at": "2026-06-14T23:53:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 in [catalogue_linter_eval.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs#L286): `NoRoleInMethodSignature` now treats any top-level `::` as a layer qualifier and skips every catalogue that does not match that prefix. A token like `crate::OrderRepo` or `ports::OrderRepo` therefore scans zero catalogues when the prefix is not an actual `LayerId`, so a forbidden role can slip through undetected. The branch needs a fallback to the normal cross-catalogue search when the prefix is not a known layer.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 286,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6e5fd3d592df3ca3a4685faf69699f4c05e79b9483ae1c03e9651a59bb217aa7",
+          "at": "2026-06-15T00:02:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_top_level_layer_hint` returns `None` whenever a `<...>` appears before the last `::`, so wrapped path-qualified refs like `Vec<domain::OrderPlaced>` or `Result<domain::OrderPlaced, E>` lose their layer hint. `NoRoleInMethodSignature` then falls back to scanning every catalogue, which can report a forbidden role from the wrong layer, and `ReferencedRoleConstraint` cannot resolve valid wrapped cross-layer `TypeRef`s. This is a correctness regression for generic signatures.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 31,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5fc75036fd21203bd9cbd874e8b3179ea1d9ae1e577c6c50011c5ac376932ec3",
+          "at": "2026-06-15T00:08:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NoRoleInMethodSignature` still produces false positives when the same bare type name exists in multiple layers. The helper only suppresses an entry if the signature explicitly mentions another layer prefix, but unqualified refs are supposed to resolve to `target_layer_id` first. Example: if the target layer has `OrderRepo` as `ValueObject` and another layer has `OrderRepo` as `Repository`, a method signature `OrderRepo` in the target layer will be flagged as forbidden even though target-layer priority should pick the local `ValueObject` and stop there.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 78,
+              "category": "logic"
+            },
+            {
+              "message": "`resolve_type_role` does not actually handle unqualified generic wrappers such as `Vec<OrderPlaced>` or `Option<OrderPlaced>`. When case 2 fails to find a known layer prefix, case 3 falls back to `type_ref.split(\"::\").last()`, which leaves the full generic string intact (`Vec<OrderPlaced>`), so `ReferencedRoleConstraint` gets `None` and rejects valid references even when the inner type exists with the expected role.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 159,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:52ab2280ebe0ac38146be76c674366c2129bec4fd7e435f89961f501b4f11d5c",
+          "at": "2026-06-15T00:15:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_type_role` returns early after treating any top-level path-qualified generic as a layer hint. For inputs like `std::vec::Vec<OrderPlaced>`, the outer `std::vec::Vec` branch falls back to `resolve_bare_name(\"Vec<OrderPlaced>\")` and never reaches the generic-token scan, so cross-layer `ReferencedRoleConstraint` misses valid references. This is a false negative in the new cross-layer lookup.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 133,
+              "category": "correctness"
+            },
+            {
+              "message": "`sig_type_contains_entry` switched from boundary-aware matching to raw `contains()` for both the owned-layer and other-layer prefixes. That reintroduces substring collisions such as `domain::Order` matching `domain::OrderPlaced`, so `NoRoleInMethodSignature` can report on the wrong type or suppress the real one.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 74,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:52fe5c7a7cbda8b8cb466337209c32a5cc229bb7d5ebda1ce88674d2b9ff65d8",
+          "at": "2026-06-15T00:22:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_type_role` does not treat an explicit `layer::Type` reference as authoritative. After checking the hinted catalogue, it falls back to `resolve_bare_name(tail, ...)`, so `domain::OrderPlaced` can incorrectly resolve to another layer's `OrderPlaced` when the domain entry is missing or renamed. That makes `ReferencedRoleConstraint` validate against the wrong catalogue and hides broken cross-layer references.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 163,
+              "category": "correctness"
+            },
+            {
+              "message": "`layer_qualified_name_in_sig` claims to require a boundary-delimited `layer::Type`, but `find(&prefix)` matches the layer string anywhere in the signature. As written, `subdomain::Foo` can be treated as `domain::Foo`, and the same substring strategy is reused in the generic-argument path below. That can misattribute forbidden types to the wrong layer in `NoRoleInMethodSignature` and `ReferencedRoleConstraint`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 57,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b57ac3f77bdfdd888dbbf7dd9f7c02b66c7f42fa0bd1321120b96a293b079b50",
+          "at": "2026-06-15T00:29:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The known-layer branch resolves `tail` verbatim and never inspects generic arguments, so a reference like `domain::Result<OrderPlaced>` or `domain::Paged<OrderPlaced>` will return `None` unless the wrapper itself is a catalogue entry. That makes `ReferencedRoleConstraint` report false violations for path-qualified generic types.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 188,
+              "category": "correctness"
+            },
+            {
+              "message": "The generic fallback tokenizes the entire type expression and returns the first identifier that matches any catalogue entry. Wrapper/module tokens such as `Vec`, `Result`, or `domain` can therefore hijack resolution before the actual payload type is seen, which can make `ReferencedRoleConstraint` resolve the wrong role for valid generic signatures.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 201,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f2f31cad9a0b90d04769aabbc48f510c6a5042d946a92fad5092e7d2619da679",
+          "at": "2026-06-15T00:35:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_type_role` stops at the wrapper name for known-layer-qualified `TypeRef`s, so valid refs like `domain::Result<OrderPlaced>` or `domain::Paged<OrderPlaced>` are treated as missing unless the wrapper itself exists in the catalogue. That makes `ReferencedRoleConstraint` reject supported cross-layer generic refs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 188,
+              "category": "correctness"
+            },
+            {
+              "message": "The fallback path can resolve against wrapper/module tokens such as `Vec`, `Result`, or `domain` instead of the actual payload type, so generic `TypeRef`s can be checked against the wrong role or wrong layer. This breaks cross-layer lookup for valid generic signatures.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 201,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d033e372e96743879cbeec6906c158378cd4aac7618db3fe8cb46ed36001d863",
+          "at": "2026-06-15T00:51:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cross-layer lookup still assumes the layer prefix is immediately adjacent to the type name. A valid path like `domain::models::OrderPlaced` is treated as unqualified because `extract_top_level_layer_hint`/`layer_qualified_name_in_sig` only match `layer_id::Type` (or the last path segment), so `ReferencedRoleConstraint` and `NoRoleInMethodSignature` can resolve/flag against the wrong catalogue when names collide.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 241,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cd991ba8e84c932856875d00c2ed0b305064ef76bd01378d29f3d1c20713ecda",
+          "at": "2026-06-15T00:59:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`match_layer_prefix` only recognizes qualifiers that start with the layer id itself, so a documented path like `crate::domain::OrderPlaced` is downgraded to bare-name lookup instead of resolving the `domain` layer directly. That makes `ReferencedRoleConstraint` pick the wrong role when the same bare type name exists in another catalogue (or the target layer).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 78,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:61adabaa081bca32a83ed2e625c8dc88081af6bfe90bbf5b4f894151688a65c5",
+          "at": "2026-06-15T01:11:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_first_generic_arg` only tracks `<...>` nesting, so it splits on commas inside tuple/array/parenthesized first generic arguments. Valid refs like `Result<(OrderPlaced, E)>` will be truncated to `\"(OrderPlaced\"`, and `ReferencedRoleConstraint` will silently fail to resolve the real role-bearing type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 257,
+              "category": "correctness"
+            },
+            {
+              "message": "`match_layer_prefix` returns the first matching layer in `BTreeMap` order instead of the most specific matching segment. A qualified path like `crate::domain::Foo` can therefore resolve to the wrong catalogue when a layer id matches an outer path segment, which makes cross-layer lookup depend on unrelated map ordering.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 76,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d5adfc559c66a7348491c392b2986a691efac1fc1202c7795010808b984b723b",
+          "at": "2026-06-15T01:19:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_top_level_layer_hint()` drops the outer layer qualifier whenever any generic argument contains `::` (`sep_pos >= lt` returns `None`). For a type like `domain::Wrapper<crate::Foo>`, `resolve_type_role()` never checks `Wrapper` in the `domain` catalogue and instead falls back to the inner generic argument, so `ReferencedRoleConstraint` can validate the wrong role for layer-qualified generic wrappers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 43,
+              "category": "correctness"
+            },
+            {
+              "message": "This assertion will not compile: `matches!(result, ...)` moves `result`, and the panic message then formats `{result:?}` again. The new unknown-layer test needs to borrow or clone the result before matching.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 2575,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:27bfdc2c9624797a3687b518e6839296c42e41ae951939cebd583c28da0e2ccc",
+          "at": "2026-06-15T01:26:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test will not compile: `matches!(result, ...)` moves `result`, so the later `{result:?}` formatting in the same `assert!` uses a moved value. Borrow the result or precompute the debug string before the `matches!` check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 2575,
+              "category": "testing"
+            },
+            {
+              "message": "`sig_type_contains_entry` returns `false` as soon as it sees any other-layer-qualified occurrence of `bare_name`, which means a mixed type expression like `Result<Foo, domain::Bar>` can hide an unqualified forbidden `Foo` in the same slot. That creates false negatives in `NoRoleInMethodSignature`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 192,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6204e52e549bef3efeed9d1f5919ff383ad8d387742f5f74965f6e678cb90dda",
+          "at": "2026-06-15T01:36:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sig_type_contains_entry` treats every matching bare name in every catalogue as a candidate once the target layer does not own the name. That means `NoRoleInMethodSignature` can flag a forbidden `Foo` from a later catalogue even when the same unqualified `Foo` would resolve to a permitted earlier fallback catalogue, so cross-layer name collisions now produce false positives.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 233,
+              "category": "correctness"
+            },
+            {
+              "message": "`resolve_bare_name` returns the first non-target `BTreeMap` hit, so `ReferencedRoleConstraint` resolves unqualified names by layer-id sort order whenever more than one other catalogue defines the same bare name. That makes the lint result depend on incidental layer naming rather than a documented semantic, and renaming or adding a layer can flip the resolved role for the same source text.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 395,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:79f5060b9803849625a347fe84e65e2a0733b15923c3de1b4e0ebad2cbcfd0d4",
+          "at": "2026-06-15T01:48:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`matches!(result, ...)` moves `result` out of the `Result`, but the next assertion formats `{result:?}`. That is a borrow-of-moved-value compile error, so this test file will not build as written. Borrow `result` in the match (`matches!(&result, ...)`) or drop the later debug formatting.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 2575,
+              "category": "compile"
+            }
+          ],
+          "hash": "rvw1:sha256:015075c24ab45f46f3310ed1ffc692ae72ce6e019f0bd6fdd4ea78a316728381",
+          "at": "2026-06-15T01:57:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Bare-name cross-layer resolution is order-dependent: `resolve_bare_name` stops at the first non-target catalogue in `BTreeMap` order, and `sig_type_contains_entry` does the same for method signatures. If two non-target layers define the same name with different roles, a bare reference can miss a forbidden role or resolve to the wrong role purely because of layer-id ordering. That makes `ReferencedRoleConstraint` and `NoRoleInMethodSignature` silently depend on catalogue sort order instead of actual catalogue contents.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 420,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:92fae764a21b3212886a68f2380431d0d477e27b79fd02a1e93554b7606b13d9",
+          "at": "2026-06-15T02:04:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `resolve_type_role` does not normalize leading reference/pointer syntax before extracting the layer hint, so valid `TypeRef` forms like `&domain::OrderPlaced` or `*domain::OrderPlaced` are parsed as `&domain` / `*domain` and fall back to bare-name lookup. That can silently misresolve or miss cross-layer references in `ReferencedRoleConstraint`, even though the linter’s own type-ref scanning already treats `&`/`*` as valid boundaries. See [catalogue_linter_eval.rs:40](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs#L40) and [catalogue_linter_eval.rs:355](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs#L355).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 40,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b27333c31280ebd431ca39037bdfad3c140353f550b821df400fbb312d72e651",
+          "at": "2026-06-15T02:13:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f71efda4f7521d12a930e900132322b4dd7778a9d4953e097b9c96222df4f40",
+          "at": "2026-06-15T02:28:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `catalogue_linter_eval.rs` is production code and now has 943 lines, exceeding the AGENTS.md module-size hard maximum of 700 production lines. The cross-layer lookup helpers added at the top of this file pushed it from 445 lines to well over the limit, so this needs to be split into a helper submodule or moved into the existing helper module before the scope satisfies the repository review contract.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 23,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:0f71efda4f7521d12a930e900132322b4dd7778a9d4953e097b9c96222df4f40",
+          "at": "2026-06-15T02:34:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e78d8cc6baa7dce80b6d3ecb679b3cfc00a3386f25a098eb75af17e2bb59379",
+          "at": "2026-06-15T02:44:45Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T18:59:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:02:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `reviewer` row still says `review-fix-lead.md` owns the loop and invokes Codex CLI, but `review-fix-lead` now resolves to Claude in `.harness/config/agent-profiles.json`. This makes the documented execution path stale.",
+              "severity": "P1",
+              "file": ".claude/agents/README.md",
+              "line": 26,
+              "category": "correctness"
+            },
+            {
+              "message": "The `dry-fix-lead` row still says the DFP loop invokes Codex CLI, but `dry-fix-lead` now resolves to Claude in `.harness/config/agent-profiles.json`. This makes the documented execution path stale.",
+              "severity": "P1",
+              "file": ".claude/agents/README.md",
+              "line": 27,
+              "category": "correctness"
+            },
+            {
+              "message": "The quick self-check still says every `traits` entry must use one of 3 trait-section role values, but the v3 schema section above now defines 4 (`SpecificationPort`, `ApplicationService`, `SecondaryPort`, `Repository`). As written, the checklist would falsely reject valid `Repository` trait entries.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 1029,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7a344ab922a5416491e34d6722fbe1658123b15f06f41be80189ee39c9a2430c",
+          "at": "2026-06-14T05:56:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cookbook still shows unannotated plain-string `role` examples (`\"role\": \"ValueObject\"`, `\"role\": \"SecondaryPort\"`, etc.) even though the new normative section says that form is no longer accepted. As written, the file now teaches two incompatible wire formats, which can make type-designer emit invalid catalogue JSON. Rewrite those examples to the discriminated-object form or mark them explicitly as legacy/non-normative.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "line": 625,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:db3bfb25848ecbd53a91f5d3a24e64ac90b3d00d1bd8b73b663708e810110c09",
+          "at": "2026-06-14T06:02:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `Repository` trait role is defined in the schema reference above, but the role-selection guidance here still maps repository/store/writer traits to `SecondaryPort`. That makes the `Repository` variant effectively unreachable for the common repository case and can still produce catalogues that violate the updated schema/ADR.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "line": 517,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4b9662ee1d7a1af21d0d3bfa45f714b70cb3c210c832e55b8a5755769ff8114a",
+          "at": "2026-06-14T06:10:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DataRole` now has 14 variants, including `EventPolicy`, but this reference and the quick self-check still claim there are only 13 type-section role values. That leaves the normative guidance internally inconsistent and can make valid `EventPolicy` catalogue entries look unsupported.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "line": 262,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4b9662ee1d7a1af21d0d3bfa45f714b70cb3c210c832e55b8a5755769ff8114a",
+          "at": "2026-06-14T06:14:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated schema reference adds `EventPolicy` and `Repository`, but the role-selection guidance below still says `one of the 13 type-section role values` and maps repository-like driven ports to `SecondaryPort`. That is internally contradictory within the same capability doc and can lead type-designer to author catalogues that no longer match the new wire format.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "line": 487,
+              "category": "correctness"
+            },
+            {
+              "message": "Removing the `Bash(while :*)`, `Bash(cat :*)`, `Bash(touch :*)`, `Bash(cp :*)`, and `Bash(mv :*)` deny patterns weakens the shell-guardrail layer without replacing it with an equivalent restriction. That re-opens the shell forms the repo policy relies on to keep file inspection and mutation behind the dedicated tools.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
+              "line": 195,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f456c1cccac8a35dadfa36c73f853d1039f760c0f1b0ce33c9c055fc2da0794e",
+          "at": "2026-06-14T06:20:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The trait-selection guidance still maps repository traits to `SecondaryPort` and never introduces `Repository` as a selectable role, so the new `Repository` wire format (with required `aggregate`) is unreachable for anyone following the doc. Update the trait branch / trait-direction bullets to distinguish repositories from generic secondary ports.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "line": 518,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f2c7522737fa733f073270fc197ccec813f516ca755998d40481c424f929daa",
+          "at": "2026-06-14T06:25:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d514b3e75cb50f807b5d2fc6ceec2458e3b96faebf8c8c7786e1b4784e9d2d0",
+          "at": "2026-06-14T06:30:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The type-designer capability still instructs agents to create `schema_version: 3` catalogues, but the current catalogue codec writes and accepts schema version 4 only, rejecting v1/v2/v3 fail-closed. Following this SSoT would make newly authored catalogue files fail to decode; the schema reference and complete cookbook examples need to be updated to v4.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 226,
+              "category": "schema_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:5d514b3e75cb50f807b5d2fc6ceec2458e3b96faebf8c8c7786e1b4784e9d2d0",
+          "at": "2026-06-14T06:33:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry-fix-lead` is now routed to `provider: \"claude\"`, but this table says the Claude subagent invokes `bin/sotp dry fix-local`. That subcommand is the external fixer dispatch path and currently only dispatches the Codex fixer, so following this README route under the new profile hits the unsupported-claude `fix-local` path instead of the intended `subagent_type: \"dry-fix-lead\"` loop. Reserve `dry fix-local` for the Codex path and document the Claude path as launching the subagent.",
+              "severity": "P1",
+              "file": ".claude/agents/README.md",
+              "line": 27,
+              "category": "broken_reference"
+            },
+            {
+              "message": "The type-designer subagent definition still advertises `schema_version: 3` and a `v3 schema reference`, while the updated SSoT says real catalogue files must use `schema_version: 4` and versions 1/2/3 are rejected. This stale wrapper text can frame the Claude type-designer toward generating fail-closed catalogue files; update it to v4, and also clear the same stale `v3 schema reference` wording in `.harness/capabilities/type-designer.md`'s authority stack.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 15,
+              "category": "spec_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:582c7f52af1db3961e18522f8f38298c4a4788e833b2524d230a50fe6952a9e2",
+          "at": "2026-06-14T06:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The v4 schema reference now says plain-string TypeEntry roles are rejected, but the canonical interactor/service-wrapper example in the same normative section still uses `\"role\": \"Interactor\"`. This example sits outside the cookbook legacy-form disclaimer, so following it produces catalogue JSON that the v4 codec rejects at parse time. Update it to the discriminated-object form, e.g. `\"role\": { \"Interactor\": {} }`.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 427,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f7bd2bffd6b4db11914d43cac5f8f54fbb108eecdc038aedbe79de5ba4e0fbc",
+          "at": "2026-06-14T06:43:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The review-fix-lead policy still treats catalogue `spec_refs[].hash` as present and tells the agent to refresh it after spec/impl-plan edits. In this change set the catalogue schema is v4 and the codec rejects `spec_refs[].hash` as an unknown field, so following this instruction can send the agent into an impossible remediation path or prompt type-designer to write invalid catalogues. The policy should be updated to the v4 behavior: validate anchor/file refs and stale declaration/signals through the current verifier/cache mechanism, without asking for `spec_refs[].hash` refreshes.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 133,
+              "category": "harness-policy"
+            }
+          ],
+          "hash": "rvw1:sha256:a6add69f524536bc6f31fd09bccb3b1a674412b130b798ca331f2235070500fd",
+          "at": "2026-06-14T06:48:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The capability correspondence table still has no `review-fix-lead` row even though `agent-profiles.json` now routes `capabilities.review-fix-lead` to Claude. Instead, the Claude subagent path is described inside the separate `reviewer` row, which remains `provider: codex`. That leaves the switched capability's provider-to-subagent mapping internally inconsistent for operators using this README to dispatch agents; add an explicit `review-fix-lead` row mapping to `review-fix-lead.md` / `subagent_type: \"review-fix-lead\"`.",
+              "severity": "P1",
+              "file": ".claude/agents/README.md",
+              "line": 26,
+              "category": "harness-policy"
+            },
+            {
+              "message": "The MUST READ precedence list still names this file's `v3 schema reference` as the authoritative JSON-structure source, while the same capability file now requires schema_version 4 and discriminated-object roles. Because this is the conflict-resolution section type-designers are instructed to obey, the stale v3 authority can send catalogue authors toward rejected schema/role formats. Update this authority text to v4 and limit any v3 wording to the explicitly legacy cookbook examples.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 19,
+              "category": "schema-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:7139e55c4bba13f13631ae63cd314673bd9c6e1fa545fce54356101ea0210dd1",
+          "at": "2026-06-14T06:58:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The v4 schema reference says plain-string roles are rejected, but this earlier guidance still tells type-designers to write `role: \"ValueObject\"` / `role: \"ErrorType\"` outside the cookbook section whose legacy examples are explicitly disclaimed. Agents following this section can still emit schema_version 4 catalogues that fail codec parsing. Update these snippets to the discriminated-object form or add an explicit note that these are conceptual role names, not wire format.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 517,
+              "category": "schema-doc-contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:39b4c29a0ee9e963401a377a777a8149553c43f6174b763345fdc39cf2695bc8",
+          "at": "2026-06-14T07:03:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bf1a637bcb03e37593545ec7c8a2abab7db788f3baeb3fadb3e9c5a26d1264f",
+          "at": "2026-06-14T07:10:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The v4→v5 migration is incomplete in the authoritative guidance: this file still describes itself as a \"v4 schema reference\", points readers to the \"v4 Schema Reference\" in the mission bullets, labels the schema-field section as derived from v4, and refers to the cookbook's normative wire format as defined in the v4 reference. Those references should be updated or explicitly marked legacy, otherwise the document contradicts the new `schema_version: 5` guidance.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "line": 19,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:53a0faff1161f933a3d77b955a61c81123bb0dd406db8c92c5e1660ca87152c8",
+          "at": "2026-06-14T19:00:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This wrapper still tells the subagent to follow a \"v4 schema reference\" even though the frontmatter and the canonical capability have been bumped to v5. That stale instruction keeps the agent anchored to the wrong contract.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 21,
+              "category": "correctness"
+            },
+            {
+              "message": "This section still labels the schema reference as v4 even though the surrounding contract has been updated to v5. The heading and checklist now say v5, so this leftover v4 text makes the authoritative SSoT internally inconsistent.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 245,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:af5a6d4a64c72855f106ebc8be03bba2a961e013f8352e32e457f5755a4eac29",
+          "at": "2026-06-14T19:02:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83a29f704637f21ef4cba529e59a09990d59219a719b86d1e755494af5fc7939",
+          "at": "2026-06-14T19:05:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated capability adds v5 `DomainEvent`/`EventPolicy` role guidance, but the same document still requires `knowledge/conventions/type-designer-kind-selection.md` to be obeyed as the SSoT for role/kind selection and to take precedence over this decision tree. That convention is still a v3/13-role matrix with no `DomainEvent` or `EventPolicy`, so a type-designer following these instructions can still reject or omit the newly documented v5 roles despite the schema reference. Update the precedence language or the referenced convention so the v5 role set is authoritative for role availability.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 12,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:83a29f704637f21ef4cba529e59a09990d59219a719b86d1e755494af5fc7939",
+          "at": "2026-06-14T19:08:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ee06fc6691cf0a1d5c02f4b302442684e7435984a56e3af637c53f326db6131",
+          "at": "2026-06-14T19:11:26Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DataRoleDto` still leaves the unit-like roles (`Specification`, `Factory`, `Interactor`, `Command`, `Query`, `Dto`, `ErrorType`, `SecondaryAdapter`) as unit variants, so serde continues to emit and accept bare strings for those cases. That means the new codec does not actually enforce the discriminated-object wire shape for the full role enum, and the legacy string form is still implicitly supported.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
+              "line": 32,
+              "category": "serialization"
+            },
+            {
+              "message": "`ContractRole::Repository` is rendered with the display tag `repository`, but `section_to_signal_kind_tag` never collapses that tag back to the evaluator's `secondary_port` bucket, and there is no dedicated repository section. Repository traits will therefore fall into `Other` with a blank Signal column even when `check_type_signals` has produced a matching `secondary_port` signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 208,
+              "category": "rendering"
+            }
+          ],
+          "hash": "rvw1:sha256:5e3237b12ca76bd05e2b84ce9ece8b10e92cf2c75f40c23d30f0732087f31e87",
+          "at": "2026-06-14T05:57:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_layer` now short-circuits on `binding.targets.len() > 1` before `Self::to_infra_binding(binding)` runs, so malformed multi-target bindings never go through the domain/infra validation path. In the absent-catalogue fast path that means bad `catalogue_file` / `baseline_file` / `layer_id` input can be accepted silently, and `track_dir.join(&binding.catalogue_file)` is probed before any path validation. That is a validation bypass and path-probing issue in the new early-return branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
+              "line": 146,
+              "category": "security"
+            },
+            {
+              "message": "The new codec payload variants (`DataRoleDto::EventPolicy` and `ContractRoleDto::Repository`) have no dedicated infrastructure tests covering their happy-path round trips and required rejection cases. In particular, there is no coverage for empty `reacts_to` being rejected or `Repository.aggregate` failing validation, so regressions in the new schema-invariant decode/encode paths would ship without a safety net.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
+              "line": 44,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7cb20b6343bb5696d05b6fcfb24f60d47334daeb20f9d25735431d6402a1ccf5",
+          "at": "2026-06-14T06:07:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
+          "at": "2026-06-14T06:23:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
+          "at": "2026-06-14T06:35:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
+          "at": "2026-06-14T08:11:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
+          "at": "2026-06-14T08:15:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
+          "at": "2026-06-14T08:41:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
+          "at": "2026-06-14T08:43:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
+          "at": "2026-06-14T10:53:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
+          "at": "2026-06-14T11:28:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
+          "at": "2026-06-14T12:33:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
+          "at": "2026-06-14T12:42:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueDocumentCodec::decode` now returns `SchemaVersionRequiresMigration` for schema_version 4, but this branch only special-cases `UnsupportedSchemaVersion`. v4 catalogues therefore fall through to the generic `failed to decode catalogue` error, which drops the actionable migration prompt this code path is trying to provide.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 228,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b4344d5b95fe1787c600b88d432c10e726efa130093dfdb70580db980701d50c",
+          "at": "2026-06-14T17:58:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
+          "at": "2026-06-14T18:06:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
+          "at": "2026-06-14T18:10:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
+          "at": "2026-06-14T18:21:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The v4 migration error tells users to regenerate the catalogue with `sotp track type-signals`, but that command consumes an existing catalogue to evaluate signals; it does not migrate the catalogue wire format. Several call sites surface this codec error directly via `to_string()`, so a schema_version=4 catalogue will get actionable-looking but wrong remediation and can leave users rerunning the failing path instead of regenerating the catalogue via the type-designer flow.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+              "line": 254,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
+          "at": "2026-06-14T18:24:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c26907823b1c50da36e88e503c7c725f0ff7d83be1d22f97a7f15deea08110b",
+          "at": "2026-06-14T18:31:00Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
+          "at": "2026-06-14T05:53:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
+          "at": "2026-06-14T05:58:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T10:56:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T11:28:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
+          "at": "2026-06-14T17:55:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
+          "at": "2026-06-14T18:10:45Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:549edec9b94dfd016a378883220ffaf79fc4f5ed7d97370a2623744fbb1c3f91",
+          "at": "2026-06-14T05:53:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:549edec9b94dfd016a378883220ffaf79fc4f5ed7d97370a2623744fbb1c3f91",
+          "at": "2026-06-14T05:55:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
+          "at": "2026-06-14T10:52:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc09c192f686131108fc98395660643b2cc6d75ac960a322771aa0d119fc56",
+          "at": "2026-06-14T11:29:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ac59a99fe882cb18dd9b06a290895d085abef12d5907efa51bd01c4d18716e9",
+          "at": "2026-06-14T17:56:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ac59a99fe882cb18dd9b06a290895d085abef12d5907efa51bd01c4d18716e9",
+          "at": "2026-06-14T18:10:55Z"
         }
       ]
     }

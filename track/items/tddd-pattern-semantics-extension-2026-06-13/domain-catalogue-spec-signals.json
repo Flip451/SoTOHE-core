@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a675e6c044fce69a1b42bb28fc7ed6acafec8cc88131f002e700c4e8494794a0",
+  "catalogue_declaration_hash": "e3cd54bdc605e1a07c7616836dfa3265696908b5461037691fefe4e2ec0a0e7d",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
@@ -10,7 +10,7 @@
     {
       "type_name": "CatalogueLinterError",
       "signal": "blue",
-      "entry_hash": "82cdf3a3173f689ddedbe77cc67fc52981c0b3229ac5366ef9d50c72e65e8f94"
+      "entry_hash": "76b290d1649705b1b70859464e2410182b468efd2eb6022947fd4c496647d902"
     },
     {
       "type_name": "CatalogueLinterRule",
@@ -95,7 +95,7 @@
     {
       "type_name": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint",
       "signal": "blue",
-      "entry_hash": "4bca1fea903d11eef8360bfd3a4f160f24dbc5e7bec036b5614706bb2c6ac1a6"
+      "entry_hash": "5577b350a6e07253c83e644609dbc255fbf0ca68c4a202302de6037062edf673"
     },
     {
       "type_name": "domain::tddd::catalogue_linter::preset::ddd_strict_preset",

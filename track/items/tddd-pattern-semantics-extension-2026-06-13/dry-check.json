@@ -4582,6 +4582,84 @@
       "base_commit": "818696d2ab76afe42ce4d4d429bfb256afc9583e",
       "rationale": "The fragments sit at different abstraction layers and do not duplicate the same implementation logic. The CLI fragment performs local input validation, delegates to the infrastructure verifier, and translates the verifier result into a CommandOutcome with CLI-specific stdout/stderr behavior. The infrastructure fragment owns the actual verification workflow, including symlink guards, domain-level TrackId validation for direct-call safety, rules loading, catalogue discovery, and finding accumulation. The repeated track-id validation is intentional defense in depth across a trust boundary, not avoidable duplicated business logic.",
       "recorded_at": "2026-06-14T17:48:54Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "low_hash": "2e6acb490d7157c990309138e7482da40e25da7ef0306c6c9356a2119a92441b",
+      "high_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "high_hash": "8c7a78f546c044ec7b4f83664821f6987bad89c53f3de899e001facc7fddc24e",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.851182758808136,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d221c34cafe80bb916b2e8f5db327acc163d290c",
+      "rationale": "The fragments share a normal test harness shape: create a catalogue doc, build the preset, evaluate lint, and assert on violations. The duplicated setup is minimal and already uses shared helpers such as make_doc, make_type_entry_with_kind, method_shared_ref_no_params, and all_catalogues_single. The substantive catalogue contents are intentionally different: one constructs a compliant end-to-end DDD preset fixture expecting zero violations, while the other constructs a non-compliant fixture expecting violations. This is complementary test coverage rather than duplicated knowledge that should be centralized.",
+      "recorded_at": "2026-06-14T23:42:48Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "low_hash": "2a8d73bae33c4d5cccd46702d81cbbfa7124ca49c6e6e0aa010ce033ac0e8278",
+      "high_path": "libs/usecase/src/contract_map_workflow.rs",
+      "high_hash": "96aa9f2bf6f15135f142593a4e3e7ec390bb543d2399f5615d36de36efa6cd02",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8552378416061401,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d221c34cafe80bb916b2e8f5db327acc163d290c",
+      "rationale": "Both fragments are test fixture builders that assemble catalogue documents, but they encode different scenarios and different domain facts: the changed helper builds a two-layer domain/usecase catalogue with a domain event handled by a use case, while the candidate builds a three-layer domain/usecase/infrastructure catalogue with an entity, traits, and a function for contract map workflow tests. The overlap is only incidental setup mechanics such as creating LayerIds, CatalogueDocuments, and inserting into a BTreeMap, not duplicated business knowledge or a repeated algorithm that should be centralized.",
+      "recorded_at": "2026-06-14T23:43:03Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "low_hash": "f64ab1289a6492fcd87ef507c09b23a26ee307e1eeb71449959c1520d4b55e3b",
+      "high_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "high_hash": "f77d65fe61833d6f733f3aed1e8ffeec95794cea27e656c8aedd58a0be2b7bdf",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9228722453117372,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d221c34cafe80bb916b2e8f5db327acc163d290c",
+      "rationale": "The fragments are complementary tests for opposite outcomes of the same linter rule: one verifies cross-layer resolution succeeds when the referenced type is a DomainEvent in the domain layer, while the existing test verifies a violation when the referenced type has the wrong role. The repeated rule construction and evaluation call are small, local test scaffolding and do not duplicate distinct domain knowledge in a way that would create meaningful maintenance risk.",
+      "recorded_at": "2026-06-14T23:43:15Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "low_hash": "9e6c86e102897727e4e5ed070582332faa7fb12c2632d10b3f4fd909a125e2a5",
+      "high_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "high_hash": "f64ab1289a6492fcd87ef507c09b23a26ee307e1eeb71449959c1520d4b55e3b",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8558845520019531,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d221c34cafe80bb916b2e8f5db327acc163d290c",
+      "rationale": "The fragments are both unit tests for catalogue linter rules and share ordinary test structure, but they exercise different rule kinds, fixtures, and assertions. The changed test validates ReferencedRoleConstraint behavior for a UseCase.handles reference with the wrong referenced role across layers; the candidate validates KindLayerConstraint behavior for EventPolicy in disallowed layers. The overlap is incidental test scaffolding, not duplicated domain logic or copy-pasted behavior that should be unified.",
+      "recorded_at": "2026-06-14T23:43:27Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+      "low_hash": "c6bc4792cd233259250516b4e464e8bb2745b9b65698d6fa255ea8455863efe5",
+      "high_path": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+      "high_hash": "ff209ce5ba068b3c1d595a396f62dd8dd6a0dd3dc425bef4b50b52f07d879457",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8801360130310059,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d221c34cafe80bb916b2e8f5db327acc163d290c",
+      "rationale": "The overlap is limited to module-level documentation about private modules declared via #[path], plus imports and introductory comments. The changed fragment documents the evaluate_catalogue_lint entry point and role-resolution behavior, while the candidate fragment documents helper functions and helper visibility. This is contextual boilerplate, not duplicated executable logic or duplicated domain behavior that would require synchronized maintenance.",
+      "recorded_at": "2026-06-14T23:43:42Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+      "low_hash": "97e459c8cb362beb57bdfd83870560a4611065efda4d273e1dbed02d2b8a5462",
+      "high_path": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+      "high_hash": "ff209ce5ba068b3c1d595a396f62dd8dd6a0dd3dc425bef4b50b52f07d879457",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8778798580169678,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d221c34cafe80bb916b2e8f5db327acc163d290c",
+      "rationale": "The changed fragment does not duplicate the helper implementation from catalogue_linter_helpers.rs; it imports and reuses those helper functions. The overlapping module-level comments only describe shared module wiring and visibility conventions, which is minor contextual documentation rather than duplicated behavior or knowledge that would create a maintenance hazard.",
+      "recorded_at": "2026-06-15T02:46:35Z"
     }
   ]
 }

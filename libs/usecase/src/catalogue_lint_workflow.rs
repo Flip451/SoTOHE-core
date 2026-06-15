@@ -183,18 +183,11 @@ impl<L: CatalogueLoader + Send + Sync> RunCatalogueLint for RunCatalogueLintInte
             .find(|l| l.as_ref() == cmd.layer_id.as_str())
             .ok_or_else(|| RunCatalogueLintError::InvalidLayer(cmd.layer_id.clone()))?;
 
-        // Step 5: retrieve the catalogue for the target layer.
-        let catalogue = catalogues.get(target_layer).ok_or_else(|| {
-            CatalogueLoaderError::LayerDiscoveryFailed {
-                reason: format!(
-                    "loader returned layer '{}' in order but no catalogue entry",
-                    cmd.layer_id
-                ),
-            }
-        })?;
-
-        // Step 6: evaluate rules via the domain pure function (D17).
-        let violations = evaluate_catalogue_lint(&rules, catalogue, target_layer)?;
+        // Step 5: evaluate rules via the domain pure function (D17).
+        // Pass all catalogues so that cross-layer role references
+        // (e.g. `UseCase.handles: ["domain::OrderPlaced"]`) are resolved
+        // correctly against every enabled layer, not just the target layer.
+        let violations = evaluate_catalogue_lint(&rules, &catalogues, target_layer)?;
 
         Ok(violations)
     }

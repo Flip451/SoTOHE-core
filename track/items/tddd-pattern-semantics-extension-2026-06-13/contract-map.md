@@ -39,6 +39,7 @@ subgraph domain["domain"]
     direction TB
     T34_domain_domain_CatalogueLinterError__self[CatalogueLinterError]
     T34_domain_domain_CatalogueLinterError_InvalidRuleConfig[InvalidRuleConfig]
+    T34_domain_domain_CatalogueLinterError_UnknownLayer[UnknownLayer]
   end
   subgraph T33_domain_domain_CatalogueLinterRule["tddd::catalogue_linter::CatalogueLinterRule"]
     direction TB
@@ -333,6 +334,7 @@ class T36_domain_domain_CatalogueLintViolation_entry_name method_node
 class T36_domain_domain_CatalogueLintViolation_message method_node
 class T36_domain_domain_CatalogueLintViolation__self value_object
 class T34_domain_domain_CatalogueLinterError_InvalidRuleConfig variant_node
+class T34_domain_domain_CatalogueLinterError_UnknownLayer variant_node
 class T34_domain_domain_CatalogueLinterError__self error_type
 class T33_domain_domain_CatalogueLinterRule_new method_node
 class T33_domain_domain_CatalogueLinterRule_target method_node

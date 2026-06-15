@@ -3,6 +3,11 @@
 //! This module is declared by `catalogue_linter.rs` via `#[path]` and is not
 //! a public module. The `evaluate_catalogue_lint` function is re-exported from
 //! the parent module.
+//!
+//! Cross-layer type-role resolution helpers live in the sibling submodule
+//! `eval_helpers` (file `catalogue_linter_eval_helpers.rs`).
+
+use std::collections::BTreeMap;
 
 use super::helpers::{
     bare_name_in_type_ref, contract_role_type_ref, entry_role_kind, field_type_refs,
@@ -18,23 +23,47 @@ use crate::tddd::catalogue_v2::composite::TypeKindV2;
 use crate::tddd::catalogue_v2::roles::{InvariantPredicate, SelfReceiver};
 use crate::tddd::layer_id::LayerId;
 
-/// Evaluate `rules` against `catalogue` for the given `layer_id`.
+// Cross-layer lookup helpers (strip_ref_sigils, resolve_type_role,
+// sig_type_contains_entry, find_in_catalogue, etc.)
+#[path = "catalogue_linter_eval_helpers.rs"]
+mod eval_helpers;
+
+use eval_helpers::{resolve_type_role, sig_type_contains_entry};
+
+/// Evaluate `rules` against the catalogue identified by `target_layer_id`
+/// within `all_catalogues`.
 ///
 /// Returns the full list of violations found. An empty `Vec` means no rules
 /// fired.
+///
+/// Rules that resolve type roles (`ReferencedRoleConstraint`,
+/// `NoRoleInMethodSignature`) perform a **cross-layer lookup** across all
+/// entries in `all_catalogues` so that a `UseCase.handles: ["domain::OrderPlaced"]`
+/// reference is correctly resolved even when `OrderPlaced` is declared in the
+/// `domain` catalogue rather than the `usecase` catalogue.
+///
+/// `NoExternalReferenceInMethods` and all other rules remain single-layer
+/// (they check intra-catalogue structure only).
 ///
 /// This is the pure domain-layer entry point (D17): no I/O, no trait object,
 /// no infrastructure dependency.
 ///
 /// # Errors
 ///
+/// Returns [`CatalogueLinterError::UnknownLayer`] when `target_layer_id` is
+/// not present in `all_catalogues`.
+///
 /// Returns [`CatalogueLinterError::InvalidRuleConfig`] if the provided rule
 /// configuration is internally inconsistent and prevents execution.
 pub fn evaluate_catalogue_lint(
     rules: &[CatalogueLinterRule],
-    catalogue: &CatalogueDocument,
-    _layer_id: &LayerId,
+    all_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+    target_layer_id: &LayerId,
 ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
+    let catalogue = all_catalogues.get(target_layer_id).ok_or_else(|| {
+        CatalogueLinterError::UnknownLayer { layer_id: target_layer_id.as_ref().to_owned() }
+    })?;
+
     let mut violations: Vec<CatalogueLintViolation> = Vec::new();
 
     for rule in rules {
@@ -90,30 +119,12 @@ pub fn evaluate_catalogue_lint(
             }
 
             CatalogueLinterRuleKind::ReferencedRoleConstraint { target_field, expected_role } => {
-                let lookup_role = |ref_str: &str| -> Option<RoleKind> {
-                    // TypeRef may be path-qualified (e.g. "domain::OrderPlaced"), while catalogue
-                    // entry names are always bare identifiers. Extract the tail segment so that
-                    // "domain::OrderPlaced" resolves the same as "OrderPlaced".
-                    let tail = ref_str.split("::").last().unwrap_or(ref_str);
-                    let data_role = catalogue
-                        .types
-                        .iter()
-                        .find(|(tn, _)| tn.as_str() == ref_str || tn.as_str() == tail)
-                        .map(|(_, e)| entry_role_kind(e));
-                    if data_role.is_some() {
-                        return data_role;
-                    }
-                    catalogue
-                        .traits
-                        .iter()
-                        .find(|(tn, _)| tn.as_str() == ref_str || tn.as_str() == tail)
-                        .map(|(_, e)| RoleKind::from_contract_role(&e.role))
-                };
-
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
                     for type_ref in field_type_refs(&entry.role, target_field.as_str()) {
                         let ref_str = type_ref.as_str();
-                        if lookup_role(ref_str) != Some(*expected_role) {
+                        if resolve_type_role(ref_str, all_catalogues, target_layer_id)
+                            != Some(*expected_role)
+                        {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),
                                 name.as_str(),
@@ -133,7 +144,9 @@ pub fn evaluate_catalogue_lint(
                         contract_role_type_ref(&entry.role, target_field.as_str())
                     {
                         let ref_str = type_ref.as_str();
-                        if lookup_role(ref_str) != Some(*expected_role) {
+                        if resolve_type_role(ref_str, all_catalogues, target_layer_id)
+                            != Some(*expected_role)
+                        {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),
                                 name.as_str(),
@@ -175,44 +188,62 @@ pub fn evaluate_catalogue_lint(
                             .map(|p| p.ty.as_str())
                             .chain(std::iter::once(method.returns.as_str()))
                             .collect();
-                        for type_ref_str in sig_types {
-                            // Check type entries: match bare name or as a component in
-                            // generic / reference type expressions (e.g. Vec<T>, &T).
-                            for (tn, e) in catalogue.types.iter() {
-                                let role = entry_role_kind(e);
-                                if forbidden_roles.as_slice().contains(&role)
-                                    && bare_name_in_type_ref(type_ref_str, tn.as_str())
-                                {
-                                    violations.push(CatalogueLintViolation::new(
-                                        rule.kind().discriminant_name(),
-                                        name.as_str(),
-                                        format!(
-                                            "method '{}' signature contains type '{}' with forbidden role '{}'",
-                                            method.name.as_str(),
+                        // For each signature slot, search across all catalogues using
+                        // `sig_type_contains_entry`, which correctly handles both
+                        // plain and generic-wrapped refs (e.g. `Vec<domain::OrderPlaced>`)
+                        // while avoiding false positives from explicit layer qualifiers.
+                        'sig_slot: for type_ref_str in sig_types {
+                            for (cat_layer_id, cat) in all_catalogues {
+                                // Check type entries.
+                                for (tn, e) in cat.types.iter() {
+                                    let role = entry_role_kind(e);
+                                    if forbidden_roles.as_slice().contains(&role)
+                                        && sig_type_contains_entry(
                                             type_ref_str,
-                                            role.variant_name()
-                                        ),
-                                    ));
-                                    break; // one violation per (method, sig_type) slot is enough
+                                            tn.as_str(),
+                                            cat_layer_id,
+                                            target_layer_id,
+                                            all_catalogues,
+                                        )
+                                    {
+                                        violations.push(CatalogueLintViolation::new(
+                                            rule.kind().discriminant_name(),
+                                            name.as_str(),
+                                            format!(
+                                                "method '{}' signature contains type '{}' with forbidden role '{}'",
+                                                method.name.as_str(),
+                                                type_ref_str,
+                                                role.variant_name()
+                                            ),
+                                        ));
+                                        // One violation per (method, sig_type) slot is enough.
+                                        continue 'sig_slot;
+                                    }
                                 }
-                            }
-                            // Check trait entries (ContractRole) the same way.
-                            for (tn, e) in catalogue.traits.iter() {
-                                let role = RoleKind::from_contract_role(&e.role);
-                                if forbidden_roles.as_slice().contains(&role)
-                                    && bare_name_in_type_ref(type_ref_str, tn.as_str())
-                                {
-                                    violations.push(CatalogueLintViolation::new(
-                                        rule.kind().discriminant_name(),
-                                        name.as_str(),
-                                        format!(
-                                            "method '{}' signature contains type '{}' with forbidden role '{}'",
-                                            method.name.as_str(),
+                                // Check trait entries (ContractRole) the same way.
+                                for (tn, e) in cat.traits.iter() {
+                                    let role = RoleKind::from_contract_role(&e.role);
+                                    if forbidden_roles.as_slice().contains(&role)
+                                        && sig_type_contains_entry(
                                             type_ref_str,
-                                            role.variant_name()
-                                        ),
-                                    ));
-                                    break;
+                                            tn.as_str(),
+                                            cat_layer_id,
+                                            target_layer_id,
+                                            all_catalogues,
+                                        )
+                                    {
+                                        violations.push(CatalogueLintViolation::new(
+                                            rule.kind().discriminant_name(),
+                                            name.as_str(),
+                                            format!(
+                                                "method '{}' signature contains type '{}' with forbidden role '{}'",
+                                                method.name.as_str(),
+                                                type_ref_str,
+                                                role.variant_name()
+                                            ),
+                                        ));
+                                        continue 'sig_slot;
+                                    }
                                 }
                             }
                         }

@@ -867,12 +867,21 @@
               "kind": "tuple",
               "fields": ["String"]
             }
+          },
+          {
+            "name": "UnknownLayer",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "String" }
+              ]
+            }
           }
         ]
       },
       "methods": [],
       "module_path": "tddd::catalogue_linter",
-      "docs": "Errors returned by the catalogue linter evaluation function. Modify from baseline: semantics shift from port error (impl Trait) to domain evaluation function error. The single variant InvalidRuleConfig(String) is retained.",
+      "docs": "Errors returned by the catalogue linter evaluation function. Modify from baseline: semantics shift from port error (impl Trait) to domain evaluation function error. InvalidRuleConfig(String) retained; UnknownLayer { layer_id: String } added when the target layer is not found in the all_catalogues map. Both variants carry their diagnostic payload as String (not LayerId) because error payloads are diagnostic containers: the validated input is converted to String for the thiserror #[error(...)] display format. InvalidRuleConfig holds an unnamed tuple String; UnknownLayer holds a named field layer_id: String.",
       "spec_refs": [
         {
           "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
@@ -1003,14 +1012,14 @@
       "role": "FreeFunction",
       "params": [
         { "name": "rules", "ty": "&[CatalogueLinterRule]" },
-        { "name": "catalogue", "ty": "&CatalogueDocument" },
-        { "name": "layer_id", "ty": "&LayerId" }
+        { "name": "all_catalogues", "ty": "&std::collections::BTreeMap<LayerId, CatalogueDocument>" },
+        { "name": "target_layer_id", "ty": "&LayerId" }
       ],
       "returns": "Result<Vec<CatalogueLintViolation>, CatalogueLinterError>",
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Applies the given linter rules to the catalogue for the specified layer and returns all violations. Pure function with no external I/O — per D17, evaluation logic is placed in domain/application core. Returns the full list of violations found; an empty Vec means no rules fired. Errors if the rule configuration is internally inconsistent.",
+      "docs": "Applies the given linter rules to the catalogue for the specified target layer and returns all violations. Pure function with no external I/O — per D17, evaluation logic is placed in domain/application core. Signature change from initial add: params[1] changed from &CatalogueDocument to &BTreeMap<LayerId, CatalogueDocument> (enables cross-catalogue role resolution for ReferencedRoleConstraint and similar rules); params[2] renamed from layer_id to target_layer_id for clarity. Returns the full list of violations found; an empty Vec means no rules fired. Returns UnknownLayer if target_layer_id is not a key in all_catalogues.",
       "spec_refs": [
         {
           "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",

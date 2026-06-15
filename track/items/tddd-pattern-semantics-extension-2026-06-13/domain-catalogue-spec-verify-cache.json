@@ -569,6 +569,22 @@
         "kind": "pass",
         "citation": "本 ADR が定める最小コアルール群を一括有効化する `ddd-strict` プリセットを提供する。"
       }
+    },
+    {
+      "claim_hash": "76b290d1649705b1b70859464e2410182b468efd2eb6022947fd4c496647d902",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。... 外部 I/O を持たない純粋評価ロジック"
+      }
+    },
+    {
+      "claim_hash": "5577b350a6e07253c83e644609dbc255fbf0ca68c4a202302de6037062edf673",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。... 外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。"
+      }
     }
   ]
 }

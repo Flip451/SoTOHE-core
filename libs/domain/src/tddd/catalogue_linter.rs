@@ -489,6 +489,11 @@ pub enum CatalogueLinterError {
     /// The linter rule configuration is invalid and prevents execution.
     #[error("invalid linter rule configuration: {0}")]
     InvalidRuleConfig(String),
+
+    /// The `all_catalogues` map does not contain an entry for the requested
+    /// `target_layer_id`.
+    #[error("unknown target layer '{layer_id}': not found in all_catalogues")]
+    UnknownLayer { layer_id: String },
 }
 
 // ---------------------------------------------------------------------------
@@ -784,17 +789,21 @@ mod tests {
 
     #[test]
     fn test_evaluate_catalogue_lint_skeleton_returns_empty_violations() {
+        use std::collections::BTreeMap;
+
         use crate::tddd::catalogue_v2::document::CatalogueDocument;
         use crate::tddd::catalogue_v2::identifiers::CrateName;
 
-        let doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer("domain"));
+        let layer_id = layer("domain");
+        let doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer_id.clone());
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::NoPublicField,
         )
         .unwrap();
-        let layer_id = layer("domain");
-        let violations = evaluate_catalogue_lint(&[rule], &doc, &layer_id).unwrap();
+        let mut all = BTreeMap::new();
+        all.insert(layer_id.clone(), doc);
+        let violations = evaluate_catalogue_lint(&[rule], &all, &layer_id).unwrap();
         assert!(violations.is_empty(), "T008 skeleton must return empty violations");
     }
 
@@ -833,6 +842,8 @@ mod tests {
     // T016: Test fixture helpers
     // ===========================================================================
 
+    use std::collections::BTreeMap;
+
     use crate::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use crate::tddd::catalogue_v2::document::CatalogueDocument;
     use crate::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
@@ -850,6 +861,14 @@ mod tests {
 
     fn make_doc(layer_name: &str) -> CatalogueDocument {
         CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer(layer_name))
+    }
+
+    /// Wrap a single `CatalogueDocument` in a `BTreeMap` keyed by its layer and
+    /// call `evaluate_catalogue_lint`. Helper for single-layer tests.
+    fn all_catalogues_single(doc: &CatalogueDocument) -> BTreeMap<LayerId, CatalogueDocument> {
+        let mut map = BTreeMap::new();
+        map.insert(doc.layer.clone(), doc.clone());
+        map
     }
 
     fn plain_struct_kind(fields: Vec<FieldDecl>) -> TypeKindV2 {
@@ -974,7 +993,9 @@ mod tests {
         kind: CatalogueLinterRuleKind,
     ) -> Vec<CatalogueLintViolation> {
         let rule = CatalogueLinterRule::new(target, kind).unwrap();
-        evaluate_catalogue_lint(&[rule], doc, &layer("domain")).unwrap()
+        let all = all_catalogues_single(doc);
+        let target_layer = doc.layer.clone();
+        evaluate_catalogue_lint(&[rule], &all, &target_layer).unwrap()
     }
 
     // ===========================================================================
@@ -1794,7 +1815,9 @@ mod tests {
             },
         )
         .unwrap();
-        let violations = evaluate_catalogue_lint(&[rule], &doc, &layer("domain")).unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = layer("domain");
+        let violations = evaluate_catalogue_lint(&[rule], &all, &target_layer).unwrap();
         assert_eq!(violations.len(), 2, "expected 2 violations (missing PartialEq + missing Eq)");
         assert!(violations.iter().any(|v| v.message().contains("PartialEq")));
         assert!(violations.iter().any(|v| v.message().contains("Eq")));
@@ -1823,7 +1846,9 @@ mod tests {
             },
         )
         .unwrap();
-        let violations = evaluate_catalogue_lint(&[rule], &doc, &layer("domain")).unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = layer("domain");
+        let violations = evaluate_catalogue_lint(&[rule], &all, &target_layer).unwrap();
         assert!(violations.is_empty(), "expected no violations when PartialEq + Eq are present");
     }
 
@@ -2317,7 +2342,9 @@ mod tests {
         );
 
         let preset = ddd_strict_preset().unwrap();
-        let violations = evaluate_catalogue_lint(&preset, &doc, &layer("domain")).unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = layer("domain");
+        let violations = evaluate_catalogue_lint(&preset, &all, &target_layer).unwrap();
 
         // Filter out known limitation: D10 (Repository rule) will pass because
         // Repository is ContractRole in TraitEntry, not TypeEntry — produces 0 violations
@@ -2365,7 +2392,9 @@ mod tests {
         // BadEntity has no methods (no "id" getter) → violation
 
         let preset = ddd_strict_preset().unwrap();
-        let violations = evaluate_catalogue_lint(&preset, &doc, &layer("domain")).unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = layer("domain");
+        let violations = evaluate_catalogue_lint(&preset, &all, &target_layer).unwrap();
 
         // We expect at least 3 violations (mut receiver + public field + missing getter)
         // Plus missing PartialEq/Eq for ValueObject/Entity → more violations
@@ -2374,5 +2403,176 @@ mod tests {
             "expected at least 3 violations for non-compliant catalogue, got: {}",
             violations.len()
         );
+    }
+
+    // ===========================================================================
+    // Cross-layer lookup tests
+    // ===========================================================================
+
+    /// Build a two-layer BTreeMap for cross-layer testing.
+    /// `domain` layer contains `OrderPlaced` as `DomainEvent`,
+    /// `usecase` layer contains `PlaceOrder` as `UseCase` with `handles: ["domain::OrderPlaced"]`.
+    fn two_layer_catalogues() -> (BTreeMap<LayerId, CatalogueDocument>, LayerId, LayerId) {
+        let domain_layer = layer("domain");
+        let usecase_layer = layer("usecase");
+
+        let mut domain_doc = make_doc("domain");
+        domain_doc
+            .types
+            .insert(TypeName::new("OrderPlaced").unwrap(), make_type_entry(DataRole::DomainEvent));
+
+        let mut usecase_doc =
+            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        usecase_doc.types.insert(
+            TypeName::new("PlaceOrder").unwrap(),
+            make_type_entry(DataRole::UseCase {
+                handles: vec![TypeRef::new("domain::OrderPlaced").unwrap()],
+            }),
+        );
+
+        let mut all = BTreeMap::new();
+        all.insert(domain_layer.clone(), domain_doc);
+        all.insert(usecase_layer.clone(), usecase_doc);
+
+        (all, domain_layer, usecase_layer)
+    }
+
+    #[test]
+    fn test_cross_layer_referenced_role_constraint_resolves_domain_event_from_domain_layer() {
+        // UseCase in usecase layer handles "domain::OrderPlaced" which is DomainEvent in domain
+        // layer. Rule: ReferencedRoleConstraint on UseCase.handles must be DomainEvent.
+        // Expected: no violation (OrderPlaced is correctly declared DomainEvent in domain layer).
+        let (all, _domain_layer, usecase_layer) = two_layer_catalogues();
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "handles".to_owned(),
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let violations = evaluate_catalogue_lint(&[rule], &all, &usecase_layer).unwrap();
+        assert!(
+            violations.is_empty(),
+            "expected no violations: domain::OrderPlaced is DomainEvent in domain layer, \
+             got: {violations:?}"
+        );
+    }
+
+    #[test]
+    fn test_cross_layer_referenced_role_constraint_violation_when_wrong_role() {
+        // Put OrderPlaced in usecase layer as ValueObject (wrong role) and check that the
+        // rule fires a violation when the UseCase.handles entry declares wrong role.
+        let domain_layer = layer("domain");
+        let usecase_layer = layer("usecase");
+
+        let domain_doc = make_doc("domain");
+        // domain layer has NO OrderPlaced at all; usecase has it as ValueObject (wrong)
+        let mut usecase_doc =
+            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        usecase_doc.types.insert(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
+        usecase_doc.types.insert(
+            TypeName::new("PlaceOrder").unwrap(),
+            make_type_entry(DataRole::UseCase {
+                handles: vec![TypeRef::new("OrderPlaced").unwrap()],
+            }),
+        );
+
+        let mut all = BTreeMap::new();
+        all.insert(domain_layer, domain_doc);
+        all.insert(usecase_layer.clone(), usecase_doc);
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "handles".to_owned(),
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let violations = evaluate_catalogue_lint(&[rule], &all, &usecase_layer).unwrap();
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation: OrderPlaced is ValueObject, not DomainEvent, \
+             got: {violations:?}"
+        );
+        assert_eq!(violations[0].rule_kind(), "ReferencedRoleConstraint");
+        assert_eq!(violations[0].entry_name(), "PlaceOrder");
+        assert!(violations[0].message().contains("OrderPlaced"));
+        assert!(violations[0].message().contains("DomainEvent"));
+    }
+
+    #[test]
+    fn test_cross_layer_no_role_in_method_signature_detects_forbidden_role_from_other_layer() {
+        // ValueObject in usecase layer has a method returning "OrderRepo" which is a
+        // Repository declared in domain layer. Rule: no Repository in method sig.
+        let domain_layer = layer("domain");
+        let usecase_layer = layer("usecase");
+
+        let mut domain_doc = make_doc("domain");
+        domain_doc.traits.insert(
+            crate::tddd::catalogue_v2::identifiers::TraitName::new("OrderRepo").unwrap(),
+            make_trait_entry(ContractRole::Repository {
+                aggregate: TypeRef::new("OrderAgg").unwrap(),
+            }),
+        );
+
+        let mut usecase_doc =
+            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        usecase_doc.types.insert(
+            TypeName::new("MyDto").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::value_object(),
+                vec![method_with_params(
+                    "with_repo",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("repo", "OrderRepo")],
+                    "()",
+                )],
+            ),
+        );
+
+        let mut all = BTreeMap::new();
+        all.insert(domain_layer, domain_doc);
+        all.insert(usecase_layer.clone(), usecase_doc);
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(RoleKind::Repository, vec![]),
+            },
+        )
+        .unwrap();
+        let violations = evaluate_catalogue_lint(&[rule], &all, &usecase_layer).unwrap();
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation: OrderRepo (Repository, declared in domain) in method sig, \
+             got: {violations:?}"
+        );
+        assert_eq!(violations[0].rule_kind(), "NoRoleInMethodSignature");
+        assert_eq!(violations[0].entry_name(), "MyDto");
+        assert!(violations[0].message().contains("OrderRepo"));
+        assert!(violations[0].message().contains("Repository"));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_unknown_layer_returns_error() {
+        // Requesting evaluation for a layer not present in all_catalogues must return
+        // CatalogueLinterError::UnknownLayer.
+        let all: BTreeMap<LayerId, CatalogueDocument> = BTreeMap::new();
+        let target = layer("nonexistent");
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::NoPublicField,
+        )
+        .unwrap();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target);
+        let is_unknown_layer = matches!(&result, Err(CatalogueLinterError::UnknownLayer { .. }));
+        assert!(is_unknown_layer, "expected UnknownLayer error, got: {result:?}");
     }
 }

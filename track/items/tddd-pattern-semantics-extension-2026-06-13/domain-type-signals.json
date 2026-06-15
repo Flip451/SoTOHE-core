@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-14T19:12:25Z",
-  "declaration_hash": "a675e6c044fce69a1b42bb28fc7ed6acafec8cc88131f002e700c4e8494794a0",
+  "generated_at": "2026-06-15T02:47:27Z",
+  "declaration_hash": "e3cd54bdc605e1a07c7616836dfa3265696908b5461037691fefe4e2ec0a0e7d",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
