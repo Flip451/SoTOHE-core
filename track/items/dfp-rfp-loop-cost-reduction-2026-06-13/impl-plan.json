@@ -88,12 +88,13 @@
     {
       "id": "T015",
       "description": "D2: `sotp track fixpoint-resolve` CLI サブコマンドを実装し、`FixpointResolveInteractor` を DI 配線して 3 ゲートの状態を合成した `FixpointStep` を出力する (IN-02 / AC-03 / AC-04 / CN-02)。変更ファイル: `apps/cli/src/main.rs` (CliCommand variant 追加)、`apps/cli-composition/src/track/` (新規または既存ファイルへの追記)。CLI コマンド名: `sotp track fixpoint-resolve`。`FixpointResolveInput` DTO: `track_id: String` / `current_branch: String`。cli-composition 層で `current_branch` を `FixpointCurrentBranch::try_new` に通して `FixpointResolveCommand.current_branch` に入れ、現在の diff フラグメント FragmentRef 集合を算出して `FixpointResolveCommand.current_fragment_refs` に渡す。`FsDryCheckCoverageAdapter` / `FsDryCheckStore` / `DryCheckApprovalInteractor` を dry gate public API adapter として接続し、review state / ref-verify result の公開 API adapter (`ReviewGateStatePort`, `RefVerifyGateStatePort`) と合わせて `FixpointResolveInteractor` に渡す。出力: `FixpointStep` を machine-readable な行 (例: `run-dfp` / `run-rfp scopes=<scope1>,<scope2>` / `run-ref-verify` / `commit`) として stdout に書く。`RunRfp` の scopes は ReviewScopeSet の BTreeSet order で決定的に join する。unit tests: `sotp track fixpoint-resolve` が clap でパースされること / empty current_branch が `InvalidCurrentBranch` として拒否されること / dry Blocked の場合に `run-dfp` が出力されること / review gate が 2 scope を返す場合に `run-rfp scopes=...` が両 scope を deterministic order で出力すること / ref-verify Blocked の場合に `run-ref-verify` が出力されること / all green の場合に `commit` が出力されること。前提: T014 (FixpointResolveInteractor)。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "d5ffb358ad3d4879e238f3a8b0e7e3fbaa65021f"
     },
     {
       "id": "T016",
       "description": "D3 + D4 + D5 の composition 層最終統合を確認し、T003/T004/T005/T010/T012 で追加済みの `dry write` / `dry check-approved` 配線が一貫して動くことを smoke test で固める (IN-03 / IN-04 / AC-05 / CN-04)。変更ファイル: `apps/cli-composition/src/dry.rs` の integration-level tests と必要最小限の配線整理のみ。T003 で `dry_check_approved` の新 service signature への橋渡し、T004 で `FsDryCheckCoverageAdapter` の write/read coverage 配線、T005 で旧入力フィールド削除、T010 で `DryCheckInteractor::new` call site と max_parallelism 変換、T012 で tier-aware agent port、`CodexDryChecker::new` call site、fast/final model 変換、known-bad percent の usecase config 変換は完了済みである前提なので、T016 は interface-breaking constructor 変更を持ち込まない。確認内容: `dry_write` が infra DTO の `max_parallelism` / known-bad calibration settings を usecase config に渡し、`fast_reasoning_effort` / `final_reasoning_effort` / fast/final model を CodexDryChecker に渡すこと、2 相実行されること、coverage record を書き込むこと、`dry_check_approved` が同じ coverage adapter を読んで staleness 判定すること (mock 環境で可)。前提: T005, T008, T009, T010, T011, T012。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T017",

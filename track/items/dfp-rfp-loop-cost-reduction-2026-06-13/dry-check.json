@@ -6432,6 +6432,45 @@
       "base_commit": "5674aa28876b64eb3d78b32ff333d8e4f25ce1fa",
       "rationale": "The two fragments reuse a small amount of test setup, but they exercise different adapters and different outcomes (approved vs. gate query failure). The repetition is limited to standard arrangement code in nearby unit tests and does not indicate a meaningful DRY problem that would justify abstraction.",
       "recorded_at": "2026-06-15T04:25:03Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "53809da4d9bbd50a98de5ab93ee792a0de5063e92774fcf3e50207a58561a761",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "f862bfef63f445fb6f9b53b6184c2ffab288690eebc950ad3af14fadb2b9b535",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8546003103256226,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d5ffb358ad3d4879e238f3a8b0e7e3fbaa65021f",
+      "rationale": "The two fragments share a common test pattern, but they validate different configuration fields and different propagation paths. The repeated setup is incidental test structure rather than duplicated business logic, so this is not a meaningful DRY violation.",
+      "recorded_at": "2026-06-15T04:37:14Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "784cf9710ddba9abcaa190c74fedc2daa1bdf2e0aa898825f7192ff13f4c1f25",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "cadc7c1b719db88f9eedc4677c10e71a20e84edfea338a5e965cb5bb2cda1efa",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8819507956504822,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d5ffb358ad3d4879e238f3a8b0e7e3fbaa65021f",
+      "rationale": "These fragments are two separate tests covering different behavior: one verifies the fallback from `fast_model` to `model`, the other verifies the explicit `fast_model`/`model` split. The shared tempdir and JSON setup is ordinary test boilerplate, not harmful duplication, and it helps keep each case self-contained.",
+      "recorded_at": "2026-06-15T04:37:14Z"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "9643687bedf3e4f664dd4a20ce2ac7ae4528c7d2cc09e73db9d0337cf9fd3ae6",
+      "high_path": "apps/cli-composition/src/dry.rs",
+      "high_hash": "f25f6058448b4d1bed108a8e370b7bda0dbec0ce1de9b77cda860c60fe9de392",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9393028616905212,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d5ffb358ad3d4879e238f3a8b0e7e3fbaa65021f",
+      "rationale": "The fragments reuse the same test harness and telemetry assertions, but the repeated code is limited to straightforward setup/verification around two materially different scenarios (Approved vs Blocked). In a test module, that level of duplication is acceptable and does not rise to a DRY violation.",
+      "recorded_at": "2026-06-15T04:37:14Z"
     }
   ]
 }

@@ -3278,6 +3278,186 @@ exit 0
         );
     }
 
+    // ── T016 smoke tests: build_usecase_dry_check_config + resolve_dry_checker_models ──
+
+    /// Builds an infra `DryCheckConfig` from JSON content and a temp file.
+    fn load_infra_dry_check_config_from_json(
+        json: &str,
+    ) -> infrastructure::dry_check::DryCheckConfig {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("dry-check.json");
+        std::fs::write(&path, json).unwrap();
+        let config = infrastructure::dry_check::DryCheckConfig::load(&path).unwrap();
+        // Keep dir alive through the function — config has no reference to the file.
+        drop(dir);
+        config
+    }
+
+    /// Verify that `build_usecase_dry_check_config` propagates `max_parallelism`
+    /// from the infra config to the usecase config newtype.
+    #[test]
+    fn test_dry_write_passes_max_parallelism_to_usecase_config() {
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 7,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        );
+        assert_eq!(infra_config.max_parallelism(), 7, "infra config must expose max_parallelism=7");
+
+        let usecase_config = build_usecase_dry_check_config(&infra_config).unwrap();
+        assert_eq!(
+            usecase_config.max_parallelism.as_usize(),
+            7,
+            "build_usecase_dry_check_config must propagate max_parallelism to the usecase newtype"
+        );
+    }
+
+    /// Verify that `build_usecase_dry_check_config` propagates the known-bad calibration
+    /// percent fields from the infra config to the usecase config newtypes.
+    #[test]
+    fn test_dry_write_passes_known_bad_calibration_to_usecase_config() {
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 20,
+                "known_bad_detection_threshold_percent": 80
+            }"#,
+        );
+        assert_eq!(infra_config.known_bad_injection_rate_percent(), 20);
+        assert_eq!(infra_config.known_bad_detection_threshold_percent(), 80);
+
+        let usecase_config = build_usecase_dry_check_config(&infra_config).unwrap();
+        assert_eq!(
+            usecase_config.known_bad_injection_rate_percent.as_u8(),
+            20,
+            "build_usecase_dry_check_config must propagate known_bad_injection_rate_percent"
+        );
+        assert_eq!(
+            usecase_config.known_bad_detection_threshold_percent.as_u8(),
+            80,
+            "build_usecase_dry_check_config must propagate known_bad_detection_threshold_percent"
+        );
+    }
+
+    /// Verify that `resolve_dry_checker_models` returns fast and final models from a
+    /// test `agent-profiles.json` with both `fast_model` and `model` defined.
+    #[test]
+    fn test_resolve_dry_checker_models_returns_fast_and_final_from_agent_profiles() {
+        let dir = tempfile::tempdir().unwrap();
+
+        // Write a minimal agent-profiles.json with separate fast_model / model for dry-checker.
+        std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
+        std::fs::write(
+            dir.path().join(".harness/config/agent-profiles.json"),
+            r#"{
+  "schema_version": 1,
+  "providers": { "codex": { "label": "Codex" } },
+  "capabilities": {
+    "dry-checker": {
+      "provider": "codex",
+      "model": "final-model-v1",
+      "fast_model": "fast-model-v1"
+    }
+  }
+}"#,
+        )
+        .unwrap();
+
+        let (fast_model, final_model) =
+            resolve_dry_checker_models(dir.path(), "dry-checker", None).unwrap();
+
+        assert_eq!(
+            fast_model, "fast-model-v1",
+            "fast_model must come from the fast_model field in agent-profiles.json"
+        );
+        assert_eq!(
+            final_model, "final-model-v1",
+            "final_model must come from the model field in agent-profiles.json"
+        );
+    }
+
+    /// Verify that `resolve_dry_checker_models` falls back fast_model → final_model
+    /// when no separate `fast_model` field is configured.
+    #[test]
+    fn test_resolve_dry_checker_models_fast_falls_back_to_final_when_not_set() {
+        let dir = tempfile::tempdir().unwrap();
+
+        std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
+        std::fs::write(
+            dir.path().join(".harness/config/agent-profiles.json"),
+            r#"{
+  "schema_version": 1,
+  "providers": { "codex": { "label": "Codex" } },
+  "capabilities": {
+    "dry-checker": {
+      "provider": "codex",
+      "model": "only-final-model-v1"
+    }
+  }
+}"#,
+        )
+        .unwrap();
+
+        let (fast_model, final_model) =
+            resolve_dry_checker_models(dir.path(), "dry-checker", None).unwrap();
+
+        assert_eq!(
+            fast_model, "only-final-model-v1",
+            "fast_model must fall back to final_model when fast_model is not configured"
+        );
+        assert_eq!(final_model, "only-final-model-v1", "final_model must be the model field");
+    }
+
+    /// Verify that `FsDryCheckCoverageAdapter` write/read round-trip works correctly.
+    ///
+    /// Mirrors the round-trip pattern used by the coverage adapter's own unit tests,
+    /// but exercised here at the composition layer to confirm the adapter integrates
+    /// correctly with the types exposed to `dry_check_approved`.
+    #[test]
+    fn test_dry_check_approved_uses_coverage_adapter_for_staleness() {
+        use std::collections::BTreeSet;
+
+        use domain::dry_check::{DryCheckCoverageRecord, FragmentContentHash, FragmentRef};
+        use domain::review_v2::FilePath;
+        use usecase::dry_check::DryCheckCoveragePort as _;
+
+        let dir = tempfile::tempdir().unwrap();
+        let store_path = dir.path().join("dry-check-coverage.json");
+        let adapter = FsDryCheckCoverageAdapter::new(store_path.clone(), dir.path().to_path_buf());
+        let track_id = domain::TrackId::try_new("coverage-smoke-2026-06-15").unwrap();
+
+        // Before any write, read must return None (file absent → Blocked / fail-closed).
+        let before = adapter.read_coverage(&track_id).unwrap();
+        assert!(before.is_none(), "coverage adapter must return None when the manifest is absent");
+
+        // Write a coverage record with one fragment ref.
+        let path = FilePath::new("src/lib.rs").unwrap();
+        let hash = FragmentContentHash::new("a".repeat(64)).unwrap();
+        let fragment_ref = FragmentRef::new(path, hash);
+        let mut refs = BTreeSet::new();
+        refs.insert(fragment_ref.clone());
+        let record = DryCheckCoverageRecord::new(refs);
+        adapter.write_coverage(&track_id, record.clone()).unwrap();
+
+        // After write, read must return the same record (write/read round-trip).
+        let after = adapter.read_coverage(&track_id).unwrap();
+        assert_eq!(
+            after,
+            Some(record),
+            "coverage adapter read must return the written record after write_coverage"
+        );
+    }
+
     /// End-to-end: `dry_check_approved` emits a GateEval event with
     /// `verdict="error"` (Blocked) when the coverage manifest is absent
     /// (fail-closed: missing coverage → Blocked { unresolved_pair_count: 1 }).

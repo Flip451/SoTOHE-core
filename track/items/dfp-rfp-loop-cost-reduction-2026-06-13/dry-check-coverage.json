@@ -3,203 +3,31 @@
   "fragment_refs": [
     {
       "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "2b9f537672c4ca1b13bfcfdfa2821ca0b540586065e4d843210e27820665e641"
+      "content_hash": "008b82c6802320f9808884b71a62c33dbf4ae56fb688af0328570fb54a329b86"
     },
     {
-      "path": "apps/cli-composition/src/dry/shared.rs",
-      "content_hash": "15e3400ba69ff6d15720da1bea8843401a5405d3e97c63145bf45cb5d2c3ba21"
+      "path": "apps/cli-composition/src/dry.rs",
+      "content_hash": "53809da4d9bbd50a98de5ab93ee792a0de5063e92774fcf3e50207a58561a761"
     },
     {
-      "path": "apps/cli-composition/src/dry/shared.rs",
-      "content_hash": "1ec9df5d87956d2dd1c1ef9d681d8942df2a5591e2486501734cc81a19e49b98"
+      "path": "apps/cli-composition/src/dry.rs",
+      "content_hash": "784cf9710ddba9abcaa190c74fedc2daa1bdf2e0aa898825f7192ff13f4c1f25"
     },
     {
-      "path": "apps/cli-composition/src/dry/shared.rs",
-      "content_hash": "a7911218405d168c39ee747f752b6ca3645d6cf4ed1b03035a13b691b10c5907"
+      "path": "apps/cli-composition/src/dry.rs",
+      "content_hash": "8d512d0e0fa878793c79c7613877aa0a12962a7d7110e16bfb35ff1184a1aaa3"
     },
     {
-      "path": "apps/cli-composition/src/lib.rs",
-      "content_hash": "511266029260b9c05fde98de4a334642a993d653a931b660e17b61830c79f372"
+      "path": "apps/cli-composition/src/dry.rs",
+      "content_hash": "9643687bedf3e4f664dd4a20ce2ac7ae4528c7d2cc09e73db9d0337cf9fd3ae6"
     },
     {
-      "path": "apps/cli-composition/src/lib.rs",
-      "content_hash": "9638c227184c08083c3661155da2c973727e6e27e74c8595ac96bb4c24292cd0"
+      "path": "apps/cli-composition/src/dry.rs",
+      "content_hash": "cadc7c1b719db88f9eedc4677c10e71a20e84edfea338a5e965cb5bb2cda1efa"
     },
     {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "0283dc68bfd252aa699df90acf860e59792c92c1b0d05520c9d66206e6375680"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "0e3edae3a93276d565d7fdfbd605f1f32c0b007bc3839aca1272ebcbd8308a64"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "11d70bc036aa56c2d7930283bd97dcd5b41663c41056f9a8a1495b594cac15c4"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "149c1d0e19c2ab9b9da503309e0016c83e05b710b9e34923004b756deaed1532"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "1bce82b0628b889f82ce5ca70c87fe24e3983720b6e54b9b4c37bde75d7fa0d7"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "27d617ce55f5fe59d2266eaf98847830fa6d408e3692f805646d45157ea83728"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "30db59268d5a6699bbeed4ec1d5a270f6eea4d185153e04f74758786b455b069"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "4047900fb404bc550463606b0c7b8c79aa7499e26f299cd3248241dfffd49718"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "6485ee64e9ddcef1e43b933f0152304c8eb7fc3bf52346f5ab64e7f75d503a9e"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "7898a2910104bccda2e1c5dc591b60e90a200771a2af47f871ab94353f49c7de"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "80e5425731d6892084866ee47aea3854aa9f55e324a4524be712a0e1e4883bb7"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "9abdc0c94d87bbc58acb3856cc471e1f75a73e50726c88e45273a5c4269b5d81"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "9c18c83e78ba742af51cfa5fa4fcdd11d6ebd9ae0e7f24cc3f4e42a03bb07a15"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "9e4b9aa3254a788310904b262265fe6175b8b892ba8c510957554b889b7f3045"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "c1ed8e0a59a8cc5d074c093bfe818c405fbb17e7b987bfbbcf048080c1282d4c"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "c3bf9ba70195d3fe6a3b14f5f5b06a984ee79f43ee664ead8c1cf0c62d917797"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "e387d6d1d1f439048d6bda9d5a5703f7366193a299564f95fe2964dd31872470"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "e821ba2cb9f32cd6f212193932f4d3fdb610f68e6e929562817035ba934bfb7e"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "f547b5dc8f2f5559e2e5f086f82c91600557b80c071d40c7fccf6f418104635f"
-    },
-    {
-      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-      "content_hash": "fd52acc0ca430dc01992cdf65ffc9b36e0a829a3137789482c448fbb5df20a9a"
-    },
-    {
-      "path": "apps/cli-composition/src/track/mod.rs",
-      "content_hash": "3c3a03e458021239c062b429c2c8aa41acb1fdd9876639cf117bea63145c3cee"
-    },
-    {
-      "path": "apps/cli/src/commands/track/dispatch.rs",
-      "content_hash": "34e7c63387e032b801b281d7c9d2fe9935871a769ca7cd0e496d2825f2136c29"
-    },
-    {
-      "path": "apps/cli/src/commands/track/dispatch.rs",
-      "content_hash": "564060b6942c15b586c6e9ad2e9a78f236aee68a52509ba9d5cbd8440c7c041a"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "0561665112e9ab82cdf428f68e5f1ba563b870c4d9f111b2336f8a40a27f73ee"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "07c79a1de32b15488150c452d469e49fcb8856793beb725cb99efad48abf3f21"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "135baf0579995c21fa8821fd6400ba3a19de7d09b7711fec91203f97a3c088fc"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "178fda63763ce12377130a6795bd1854ca2efefc03e09444b692930c4d632a57"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "2b37911e4aa6ea651ce8e785c3a753af96a6676710f8f452633a471654ba7423"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "2fc2108c6fd568855c49d9f6da46604e68481a15253ec898970206e799526d6b"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "363169b2fdca7fd6ea162e2a7f8cf3b091f5ff9a5fa1297204c24a4446c121d8"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "39f8f68fc753a3e742a6e50e12a569c31035cc25acd37aebe802954d130ad32e"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "3d17cfa0a26c844d96076a2faf84bfc5e5b6cefbf77b2d59478c5ac264dd9ce6"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "6a18efb79db4c4956c5cb6fa4d43f3421ac60ee1c970bd3b8f382d83e8b9ed55"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "87ea66d648f6da4353fc818dce387d4ae6e9d14ea705133d390918db873951f9"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "96d90912aebfabd79da93073115af572f91aa6b5563679621bd4f981de019f93"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "b9c3c3828a405f0dad03cd5fc0e4711774ca3255ac1bf2be0beddd0ad4ddf267"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "d64a3408dd95f7eed57a7d31ba68d02927954ae4a241e36acaa92803e5757922"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "d73950b5e5079e80d06a3647bee76562543f1fe3117b7e88f6763fb9b3558dcc"
-    },
-    {
-      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-      "content_hash": "e94bc253accf389ecf55f6e302ea70d2979b3397698b2112387ce2630c7be03b"
-    },
-    {
-      "path": "apps/cli/src/commands/track/mod.rs",
-      "content_hash": "0d95370b2408113d6ddd441145e363ce80c17599f74ed91b2362a4fd1360fca4"
-    },
-    {
-      "path": "apps/cli/src/commands/track/mod.rs",
-      "content_hash": "7cf6818517b2670b533e21851835e24d58d9822fa3ebdeda418bc73500268293"
-    },
-    {
-      "path": "apps/cli/src/commands/track/mod.rs",
-      "content_hash": "ad471bca95e0086bb3ca71477ac5b89aa98c80ab5a88ed21ccc1e55b0b8f8536"
-    },
-    {
-      "path": "apps/cli/src/commands/track/mod.rs",
-      "content_hash": "b217fef06e87d4b284d996c6700272031dee41f225df6a611973fcc2b8159346"
-    },
-    {
-      "path": "apps/cli/src/main.rs",
-      "content_hash": "9f2e8275590f8c2062d5c4680b80826d1bc7faade7b2aa67ec9d77992a4bfee4"
+      "path": "apps/cli-composition/src/dry.rs",
+      "content_hash": "f862bfef63f445fb6f9b53b6184c2ffab288690eebc950ad3af14fadb2b9b535"
     }
   ]
 }

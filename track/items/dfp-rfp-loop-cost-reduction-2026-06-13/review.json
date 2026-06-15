@@ -215,1041 +215,6 @@
         }
       ]
     },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:40:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
-          "at": "2026-06-13T19:42:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
-          "at": "2026-06-14T04:18:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
-          "at": "2026-06-14T04:20:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
-          "at": "2026-06-14T04:32:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
-          "at": "2026-06-14T04:34:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f8ccdd4dc037c83d844720abe34f4ca8629af424183ffe6eae4c9b570aa541f",
-          "at": "2026-06-14T04:47:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
-          "at": "2026-06-14T05:02:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
-          "at": "2026-06-14T05:05:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
-          "at": "2026-06-14T05:12:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The unchanged Rules section now contradicts the new workflow: it says to always run `cargo make ci-rust` before re-running `sotp dry check-approved` and points to “step 3 above,” but Step 3 is now the zero-violation no-fix path that explicitly must skip `ci-rust`. This makes the agent policy ambiguous and can defeat the D1 fast path the change is meant to introduce. Update this rule to refer only to fix rounds / Step 4 verification.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 117,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
-          "at": "2026-06-14T05:14:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 treats a `dry write` run with zero reported `Violation` findings as either approved or an anomaly, but Step 2 explicitly says already-judged pairs are cache hits/no-ops. In that state, a previously recorded unresolved violation will not be re-emitted by `dry write`; `check-approved` will still block, and this workflow tells dfl to stop as `blocked` instead of retrieving the stored violation/proposal via `bin/sotp dry results --filter violation` and fixing it. This makes a normal re-entry/retry with cached violations fail even though autonomous fixes are still available.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 84,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:43c20f74d8e80ad92d12126ee2038140cb917c93611868dbaba4fd7cc2e312ba",
-          "at": "2026-06-14T05:17:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 can lose cached violations after a blocked follow-up gate check. `sotp dry write` returns no findings for already-verified pairs, including cached `Violation` records, so a non-zero `dry check-approved` after the follow-up write does not guarantee the “new finding set” is non-empty. Re-entering Step 4 using only that write output can spin/exhaust without applying available cached refactor proposals. The blocked branch should mirror Step 3 by reading unresolved cached violations before looping.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 103,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:ec1203a50d28ecd4e3486ffc434903b68659af286ab2d18cd607d1b166dfa405",
-          "at": "2026-06-14T05:20:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ed69050537ee92aa22adf8bec811d8997e5e7c75d71b16addad21f02ecdc1b1",
-          "at": "2026-06-14T05:22:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
-          "at": "2026-06-14T05:31:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
-          "at": "2026-06-14T05:31:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
-          "at": "2026-06-14T05:33:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
-          "at": "2026-06-14T07:12:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
-          "at": "2026-06-14T07:13:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
-          "at": "2026-06-14T13:14:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
-          "at": "2026-06-14T13:16:44Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f59559a57b71b02b31cf7e8be0f07e641b1445d4675f818692773a22d2873c27",
-          "at": "2026-06-13T19:41:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f59559a57b71b02b31cf7e8be0f07e641b1445d4675f818692773a22d2873c27",
-          "at": "2026-06-13T19:43:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 is internally inconsistent about `DryCheckApprovalService::check_approved`: the task first says to change it to `check_approved(&self) -> Result<...>` and then immediately changes it again to `check_approved(&self, current_fragment_hashes: &BTreeSet<FragmentContentHash>) -> Result<...>`. That leaves the approval API underspecified and conflicts with the existing type catalogue, which still records the service as parameterless.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
-              "line": 26,
-              "category": "contradiction"
-            },
-            {
-              "message": "T014/T015 do not allocate the ports needed to satisfy the documented D2 behavior. The interactor docs say it must combine dry approval, review-state, and ref-verify result ports, but the constructor in the task injects `dry_approval`, `dry_checker`, and `coverage`, where `coverage` is a D5-specific port and the review/ref-verify inputs are missing. As written, the resolver cannot compute the required 3-gate state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
-              "line": 78,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:b1be09a6e395b9ab7d0b37ff5f6bbf110baf266053cea95b315479e067148f4b",
-          "at": "2026-06-13T20:35:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T005` references `AN-12`, but this track only defines `AC-12` / `CN-09` anchors. As written, the regression-test requirement points at a nonexistent spec anchor and is a broken cross-reference.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
-              "line": 28,
-              "category": "broken reference"
-            },
-            {
-              "message": "`T012` / `T016` require `CodexDryChecker::new` to accept model or config inputs, but the infrastructure catalogue still models `CodexDryChecker::new` as parameterless. The planned API is inconsistent across the artefacts, so the checker cannot be wired to the new fast/final models as described.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
-              "line": 106,
-              "category": "contradiction"
-            },
-            {
-              "message": "`T008` adds a `max_parallelism()` accessor to `DryCheckConfig`, but the infrastructure catalogue only exposes `load()` and `threshold()`. The type catalogue and the task plan disagree on the public API needed by `T016`.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
-              "line": 21,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:518fc07b532ec7213747c079ebd04f050868870697d198c921fe0dc9ee18399e",
-          "at": "2026-06-13T20:47:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ea14f03ec626bd960f6e2cf9fc0e7ee9b096c3dd127beae63ea5691821d5a8c6",
-          "at": "2026-06-13T20:53:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-04 says an omitted `max_parallelism` must fall back to a nonzero default, but T008 instructs implementers to make a schema_version=2 config missing `max_parallelism` fail with a Parse error. Those are mutually exclusive config semantics, so the task can be implemented in a way that violates the spec-level constraint.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 48,
-              "category": "contradiction"
-            },
-            {
-              "message": "The `DryCheckConfig` DTO catalogue drops the existing `threshold` field while marking the field list as complete (`has_stripped_fields: false`), even though T008 explicitly says the existing `threshold` is preserved and the same type still exposes a `threshold()` accessor. This leaves the infrastructure config contract internally inconsistent and would remove the similarity threshold from the planned schema.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
-              "line": 13,
-              "category": "contradiction"
-            },
-            {
-              "message": "The usecase type catalogue changes `DryCheckInteractor::new` to accept only `config`, while the implementation plan says the constructor keeps its existing embedding/index/reader dependencies and later adds coverage wiring into `DryCheckInteractor::new`. With only `config` in the planned constructor, the interactor cannot be wired with the ports required by T004/T010/T016, so the catalogue and plan are semantically inconsistent.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
-              "line": 642,
-              "category": "contradiction"
-            },
-            {
-              "message": "T012 says `DryCheckAgentPort::judge` should process all pairs together with known-bad probes as a batch, but CN-03 and T010 require preserving the `1 pair 1 agent_port.judge()` granularity and explicitly forbid packing multiple pairs into one agent call. This conflicts with the bounded fan-out design and makes the D3/D4 behavior ambiguous.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 72,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ea14f03ec626bd960f6e2cf9fc0e7ee9b096c3dd127beae63ea5691821d5a8c6",
-          "at": "2026-06-13T20:57:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-07 requires the fast tier to mix known-bad probes into the batch, but CN-03 explicitly forbids putting multiple pairs into one agent call, and T012 then implements probes as separate one-pair calls. As written, the plan cannot satisfy both the acceptance criterion and the constraint; clarify whether probes are separate calibration calls or part of a batch.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
-              "line": 400,
-              "category": "contradiction"
-            },
-            {
-              "message": "CN-06 requires the known-bad probe injection rate to be configurable, and T011/T016 only add/pass the field. The actual two-tier implementation task T012 never says to use `known_bad_injection_rate_percent` to decide probe frequency or selection, so the implementation can ignore a required control while still completing the plan tasks.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 72,
-              "category": "semantic_gap"
-            },
-            {
-              "message": "AC-06 says wall-clock shortening must be confirmable via telemetry for runs with multiple unverified pairs, but T017 explicitly skips the wall-clock confirmation in CI and substitutes only a unit test that ReviewRound telemetry is emitted. That does not verify the acceptance criterion's performance claim, leaving AC-06 uncovered by the final validation task.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 102,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:6dc9303a94ac72004994717fe73cd53340941db9f3c76bcacb9d7290b46b53e8",
-          "at": "2026-06-13T21:03:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-04 requires adding both reasoning effort and probe settings to `.harness/config/dry-check.json`, but the D4 task only adds `known_bad_injection_rate_percent` and `known_bad_detection_threshold_percent`; the infrastructure config catalogue likewise lists no reasoning-effort field. As planned, T012 can only refer to an unspecified `reasoning_effort` setting, so the IN-04 requirement is not actually implementable from the plan artifacts.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 66,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5bd405074ec9ccb8dbc61ef6de7276751e6e10aed2484b206d39cd06d1c5f5c4",
-          "at": "2026-06-13T21:09:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-02 requires the fixpoint resolver to output the RFP target scope list, but the planned contract only models a single scope (`RunRfp { scope: String }`, `NeedsReview { scope: String }`, and CLI output `run-rfp scope=<scope>`). If more than one review scope is stale, the resolver cannot represent the required next work set, so the plan does not satisfy its own D2 contract.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/domain-types.json",
-              "line": 13,
-              "category": "contradiction"
-            },
-            {
-              "message": "`DryCheckCycleError::CoveragePort` is documented as covering coverage-record read/write failures, but the same variant is also assigned to `DryCheckParallelism::try_new` and `DryCheckPercent::try_new` validation failures. That collapses config validation errors into a coverage I/O error, making the error contract semantically wrong for callers and tests that need to distinguish invalid configuration from coverage-store failures.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
-              "line": 300,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:1c8479ad10f76ed09f7c80a135d14c9c563cd925cf04b078473237675dd7f928",
-          "at": "2026-06-13T21:19:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Interface-breaking changes are split from their required composition rewiring, so the planned task order is not independently CI-passable. T010 changes `DryCheckInteractor::new` and T012 changes `CodexDryChecker::new`, but the `dry_write` call-site/config wiring for both is deferred to T016 after T008-T012 are complete. That leaves intermediate commits after T010/T012 unable to compile, and T013 is scheduled on top of that broken composition path. Move each required call-site update into the task that changes the interface, or insert an earlier wiring task before requiring CI between these steps.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
-              "line": 86,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:33a6012fb1ad008ef9d2f2e3f83d355dd830af90967ed25ae6bb2572084012a3",
-          "at": "2026-06-13T21:28:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T012 puts D4 calibration inside `DryCheckAgentPort::judge`, while also defining that call as judging exactly one production pair and then claiming a fast-tier calibration failure means all production pairs go to the final tier. That does not satisfy CN-07's all-pair retry guarantee: once `judge` is called per pair, a failure detected in one call cannot invalidate or re-run fast results already returned for other pairs unless there is a run-level/shared calibration mechanism. The plan needs to move calibration/failover to the batch/run level or specify a shared fail-closed coordination point before any fast result can be accepted.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 72,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:71119f0cfda88a44286374a9637d1ea6593f8b2826328ea7fdd848b1bfda3f6a",
-          "at": "2026-06-13T21:33:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06 requires proving `sotp dry write` wall-clock improves versus a serial baseline using telemetry or measured wall-clock, and the implementation plan assigns that actual fixed-delay baseline/integration verification to T017. However `task-coverage.json` maps AC-06 only to T010/T013: T010 covers the parallel fan-out mechanics with unit tests, while T013 covers fast/final telemetry tagging. This leaves the artifact coverage map semantically inconsistent with the plan and can let the AC-06 performance verification be treated as covered before the only task that actually verifies it runs.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/task-coverage.json",
-              "line": 39,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:98e4e4252e2fe8205d2625d3dc1a005d15c30e4d1e9632dc84e72715050fc38b",
-          "at": "2026-06-13T21:44:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FixpointResolveCommand` documents `current_branch` as having a non-empty invariant, but the catalogue models it as a raw `String` on a plain struct with no constructor or validation method. That leaves an explicitly illegal command state representable at the usecase API boundary, contrary to the plan briefing's type-design rule to make illegal states unrepresentable. Add a validated branch/current-branch value object or define a `try_new`/validation path for the command before exposing it to `FixpointResolveService::resolve`.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
-              "line": 15,
-              "category": "architecture violation"
-            }
-          ],
-          "hash": "rvw1:sha256:4738a41b88aa12261e8758857ef95888f827c20be87fed7f96e670f2ed62cb13",
-          "at": "2026-06-13T21:49:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T004 directs the composition work through `dry_write`'s `DryCheckApprovalInteractor` construction and also updates the `dry_check_approved` path, but that is the check-approved interactor/path owned by T003/T005. T004's stated interface change is adding a coverage port to `DryCheckInteractor::run_dry_check`, so the plan is pointing implementers at the wrong composition seam for the dry-write wiring and can leave the actual dry-write constructor path unresolved.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 24,
-              "category": "factual error (semantic)"
-            },
-            {
-              "message": "The S5 section says T010's only prerequisite is T009, while the T010 task itself requires T008 because it loads infra `DryCheckConfig` and consumes the new `max_parallelism` DTO. Following the section-level dependency lets T010 start before T008 exists, so the task is not independently compile-passable in the advertised order.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 159,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2831048fd0726c5afc1959553cd4c6d21956d0f72e7e10803b18eb4c05de37e0",
-          "at": "2026-06-13T21:56:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003's new approval algorithm scans `reader.read_records()` and blocks whenever any record involving a current fragment hash has verdict `Violation`, but dry-check history is append-only and the current semantics derive the latest verdict per pair with last-write-wins. If a pair has an older `Violation` followed by a later `Accepted`/`NotAViolation`, this plan would still block `dry check-approved`, contradicting the all-resolved requirement and potentially making the pure-read gate unable to approve resolved pairs. The task should derive latest-per-pair before evaluating verdicts.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 18,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f1fe1bd31fccd3ec61b7c0c6b0c268b9ab7c7aad0da8540d6177df3a9bcab734",
-          "at": "2026-06-13T22:02:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-04 carries the D4 requirement to move dry-checker reasoning-effort configuration into `.harness/config/dry-check.json`, but the planned config/adapter surface only models `fast_reasoning_effort`: `CodexDryChecker::new` accepts `fast_reasoning_effort` plus `final_model`, with no final-tier reasoning-effort input. If implemented as planned, the final tier necessarily keeps an implicit or hard-coded effort, so the D4/tiered reasoning-effort configuration requirement is not actually implementable from these artifacts.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
-              "line": 160,
-              "category": "contradiction"
-            },
-            {
-              "message": "This in-scope telemetry requirement says the work stays within the existing telemetry schema, but then allows adding new fields or event types if needed. That conflicts with the same D4 telemetry plan in T013, which explicitly says to use existing `round_type` and add no new fields or event types, leaving implementers with two incompatible schema-change rules.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
-              "line": 121,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f3f0f73f7e2a6544258f05cbdb1144c1758a3d9bafdaf6c092ea4961b62661a4",
-          "at": "2026-06-13T22:08:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T008 defines `.harness/config/dry-check.json` schema_version 2 as the D3 schema with only `max_parallelism` added, while T011 later adds the D4 reasoning/probe fields but explicitly keeps the schema at 2. The final infrastructure catalogue models those new fields as required, so the same schema_version now describes two incompatible config shapes depending on task order. That makes the plan's config migration semantically inconsistent; either bump the schema again for the D4 fields or make the new fields explicitly defaulted/optional under schema_version 2.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 66,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8a9052a1b19b0d8f8c78815463dd8bf19e610b19550de08fc60044e9bc3234f3",
-          "at": "2026-06-13T22:17:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 changes the public `DryCheckApprovalInteractor::new` constructor and `DryCheckApprovalService::check_approved` signature, but the composition call-site migration is explicitly deferred to T005 while the section also requires each task to be committed with `cargo make ci-rust` passing. That makes T003 physically unexecutable as an independent green task unless T003 also updates the composition call sites or preserves a compatibility path until T005.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 18,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:ba8b7aad761f0293bd2396a5ca7d004291c4eb19d0a608dd7af0a050f55fac3a",
-          "at": "2026-06-13T22:21:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DryCheckCoverageRecord` and the new approval API track only `FragmentContentHash` values, so `check-approved` cannot prove that the current diff fragment itself was processed by the latest `dry write`. If a new or renamed diff fragment has the same content hash as a previously covered fragment at another path, the staleness check described in T003 will see the hash in `fragment_hashes` and can approve without forcing `dry write`, despite CN-08/AC-11 requiring fail-closed coverage for the current diff. The coverage key needs enough fragment identity to distinguish paths, not just content hashes.",
-              "severity": "P0",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/domain-types.json",
-              "line": 120,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a6a014cf0961962aba8748019e3b40267ea838cf418da91ac9a4d64384c2a2d0",
-          "at": "2026-06-13T22:28:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8579c4c97361419a3bf7395a71157996913ebfe40a6250ddf37e3e1a09b5015c",
-          "at": "2026-06-13T22:36:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cca5edc2194f56fd2885d5b0e3b4da4f3bf7d525eb7a6080ed845d0b0cd5894",
-          "at": "2026-06-13T23:02:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cca5edc2194f56fd2885d5b0e3b4da4f3bf7d525eb7a6080ed845d0b0cd5894",
-          "at": "2026-06-13T23:06:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62739183a3b4b697a6af04adfabaf71ae0dda3d6b03393a75f555eee8e33a7da",
-          "at": "2026-06-14T01:03:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DryCheckCoveragePort`'s Signal changed from 🟡 to 🔵 even though this round is documented as a T001 progression marker only and `impl-plan.json` still marks T001, the task that introduces this port, as only `in_progress`. That makes the plan artifacts semantically inconsistent: one view now presents the port signal as resolved while the task state says the owning work has not completed. Keep this signal unchanged for the progression-only update, or move the task/artifacts together in a later completion transition.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
-              "line": 32,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:62739183a3b4b697a6af04adfabaf71ae0dda3d6b03393a75f555eee8e33a7da",
-          "at": "2026-06-14T01:07:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:58d2ca6be5557e3d23069cc9a88347ce6f8ef5f2af71739c7113ba67b96c2e37",
-          "at": "2026-06-14T01:14:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:58d2ca6be5557e3d23069cc9a88347ce6f8ef5f2af71739c7113ba67b96c2e37",
-          "at": "2026-06-14T01:16:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78173d098fd06cec05c1b3b5b673f7a2b92e8a9be16e54b20b4dce559e269057",
-          "at": "2026-06-14T01:40:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78173d098fd06cec05c1b3b5b673f7a2b92e8a9be16e54b20b4dce559e269057",
-          "at": "2026-06-14T01:42:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a9bc011e2ec5b64c57d38558e7f87ef70c2f8b771d03da98aeaa59f1779f172",
-          "at": "2026-06-14T02:33:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a9bc011e2ec5b64c57d38558e7f87ef70c2f8b771d03da98aeaa59f1779f172",
-          "at": "2026-06-14T02:35:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71bfb6f370d13fe676ac86ec064d9db50072f3663c376310759b4fa1783af929",
-          "at": "2026-06-14T03:15:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 is marked done in the plan artifacts, but the generated usecase catalogue still reports the core T003 API changes as incomplete: `DryCheckApprovalService` remains Signal 🟡 here and `DryCheckApprovalInteractor` remains 🟡 at line 48. That contradicts the T003 completion claim and leaves downstream tasks depending on a supposedly completed pure-read approval gate while the catalogue still says the main service/interactor changes are not complete. Regenerate or update the plan/type artifacts so T003 completion and the type signals agree.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
-              "line": 40,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:71bfb6f370d13fe676ac86ec064d9db50072f3663c376310759b4fa1783af929",
-          "at": "2026-06-14T03:18:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cd6acdfb9889b2a19ce503a538cef0b922fb5d7a0ecb693cace9f3fefe6fb01",
-          "at": "2026-06-14T03:24:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d0cf79c8e96cda92e7364170c5c5c4a85a2be132007dab418ba404b083386e0",
-          "at": "2026-06-14T03:45:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d0cf79c8e96cda92e7364170c5c5c4a85a2be132007dab418ba404b083386e0",
-          "at": "2026-06-14T03:47:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c7f2bd091856979f5ea26293843f52eb3500d9ad2d76d263e94fbd161128624",
-          "at": "2026-06-14T04:18:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c7f2bd091856979f5ea26293843f52eb3500d9ad2d76d263e94fbd161128624",
-          "at": "2026-06-14T04:21:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4ca7cd2252d804c2e15a2d2b8be87c667a48d7021111354dc2978ffcdc8610fd",
-          "at": "2026-06-14T05:11:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4ca7cd2252d804c2e15a2d2b8be87c667a48d7021111354dc2978ffcdc8610fd",
-          "at": "2026-06-14T05:13:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d62a517f7fd1e12f62f6344d93fb715bfa365c9b28d685579b96bd9a99927bca",
-          "at": "2026-06-14T05:30:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d62a517f7fd1e12f62f6344d93fb715bfa365c9b28d685579b96bd9a99927bca",
-          "at": "2026-06-14T05:33:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b470b1299dd163531e67838a3c0f489111ef78114a54bf5c44a7b321e40a13df",
-          "at": "2026-06-14T07:13:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b470b1299dd163531e67838a3c0f489111ef78114a54bf5c44a7b321e40a13df",
-          "at": "2026-06-14T07:16:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 contradiction: this round’s briefing says T009 deliberately did **not** add `Default` for `DryCheckConfig` and switched to `DryCheckConfig::new(...)`, but the plan artifacts still encode the old contract. `impl-plan.json` still says `DryCheckConfig` has a `Default` implementation, `plan.md` repeats that, and T010 still relies on `DryCheckConfig::default()`. As written, the plan is internally inconsistent and hands T010 an API the same round says should not exist. See [impl-plan.json](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json#L53), [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md#L46), and [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md#L54).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 53,
-              "category": "contradiction"
-            },
-            {
-              "message": "P1 factual error: the regenerated catalogue view still marks `DryCheckParallelism` and `DryCheckPercent` as red, but the briefing says T009 is completed and these entries should be moving toward blue in the type-signal regeneration. That makes the artifact state misleading for the downstream plan gate. See [usecase-types.md](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md#L16) and [usecase-types.md](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md#L17).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
-              "line": 16,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:b639c160668c7894bcf9639bbd859b6fa0b90f8b1c766c809ebdb8b52376329e",
-          "at": "2026-06-14T07:49:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The catalogue view regresses the two new `DryCheckParallelism`/`DryCheckPercent` entries from 🟡 to 🔴 even though T009 is marked done and the round briefing says these T009-owned types should move toward Blue. That makes the generated catalogue contradict the completion state instead of reflecting it.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
-              "line": 16,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c005cc5898cff2fa53c75dd882ddc2547add34d3c6ea0cea2e16a8dba046be22",
-          "at": "2026-06-14T07:54:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc575bf7ff8ddd012732d35211e61f55cb05f68663ef40e3f78fd35a3fa63cfd",
-          "at": "2026-06-14T08:01:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc575bf7ff8ddd012732d35211e61f55cb05f68663ef40e3f78fd35a3fa63cfd",
-          "at": "2026-06-14T08:04:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da8332dfb78923a3aea7a3669fa4866fe175779db013ed015efc4e1a1c91c279",
-          "at": "2026-06-14T11:08:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da8332dfb78923a3aea7a3669fa4866fe175779db013ed015efc4e1a1c91c279",
-          "at": "2026-06-14T11:11:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b3b0822cf7ac93fa05a10506a223e57e267769ae8dda0e1150015bf337e2ee1",
-          "at": "2026-06-14T12:24:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b3b0822cf7ac93fa05a10506a223e57e267769ae8dda0e1150015bf337e2ee1",
-          "at": "2026-06-14T12:25:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84447d4aa4a0c2d07aa12edfc843411d4ab3ecfcaa79bfd49d19626594182db4",
-          "at": "2026-06-14T12:47:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T010 is marked `done`, but the task entry still has no `commit_hash`; the rendered plan likewise shows T010 checked off without the trailing commit hash shown for other completed tasks. This contradicts the briefing's transition contract that T010 should be completed with its post-commit hash populated, leaving the plan artifacts unable to trace the completed task to its implementation commit.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
-              "line": 61,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:84447d4aa4a0c2d07aa12edfc843411d4ab3ecfcaa79bfd49d19626594182db4",
-          "at": "2026-06-14T12:49:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84447d4aa4a0c2d07aa12edfc843411d4ab3ecfcaa79bfd49d19626594182db4",
-          "at": "2026-06-14T12:53:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13c5a0a70eff19f405596ee584ac745be8dfeee4c30d6c03b123799ce56c9574",
-          "at": "2026-06-14T13:13:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13c5a0a70eff19f405596ee584ac745be8dfeee4c30d6c03b123799ce56c9574",
-          "at": "2026-06-14T13:15:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3cc6898dde8c7edfefe1e324c98711d850ffb4d4174efd274fcd269846f4ba37",
-          "at": "2026-06-14T13:36:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3cc6898dde8c7edfefe1e324c98711d850ffb4d4174efd274fcd269846f4ba37",
-          "at": "2026-06-14T13:38:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b463053e23d4b8f328872a7c53ad2f555e92d191c2f19fae6f66c881db9b35e5",
-          "at": "2026-06-14T13:51:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b463053e23d4b8f328872a7c53ad2f555e92d191c2f19fae6f66c881db9b35e5",
-          "at": "2026-06-14T13:53:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan.md` marks T012 as done, but this catalogue still leaves `DryCheckInteractor` at 🟡 even though T012 explicitly includes changing `DryCheckInteractor` to the calibrated two-stage flow. The plan artifact and the type catalogue disagree on whether the core interactor work is complete.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
-              "line": 49,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
-          "at": "2026-06-14T15:57:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase-types.md` marks the T012-mutated rows `DryCheckJudgeTier` and `DryCheckAgentPort` as already present (🔵), but the review briefing says the T012 commit has not been created yet and these type-signal rows should still be 🟡. That makes the generated type-signal artifact inconsistent with the stated plan state.",
-              "severity": "P1",
-              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
-              "line": 7,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
-          "at": "2026-06-14T16:01:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
-          "at": "2026-06-14T16:04:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
-          "at": "2026-06-14T16:06:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30e84b4ce28f0e9fead737989dc33f276910ca899495a04acfed5ace24ca8ef1",
-          "at": "2026-06-14T16:49:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30e84b4ce28f0e9fead737989dc33f276910ca899495a04acfed5ace24ca8ef1",
-          "at": "2026-06-14T16:50:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f7eb30420313721c97a527a3e1270c552b29c24ef84b1f958ec7d01d7f7a218",
-          "at": "2026-06-14T17:41:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f7eb30420313721c97a527a3e1270c552b29c24ef84b1f958ec7d01d7f7a218",
-          "at": "2026-06-14T17:44:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:92f17be6ea8f0db40b479e4f862a0ccf0d11de333a41497415c96950880c7222",
-          "at": "2026-06-14T18:03:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:92f17be6ea8f0db40b479e4f862a0ccf0d11de333a41497415c96950880c7222",
-          "at": "2026-06-14T18:05:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b001aee5cffc35f9910ff04a358c1f4b8355f0c8179211659ba6b1f036b4a22e",
-          "at": "2026-06-14T23:31:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b001aee5cffc35f9910ff04a358c1f4b8355f0c8179211659ba6b1f036b4a22e",
-          "at": "2026-06-14T23:32:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3e72c449b919113bd714e16a16f141bfb222229f1cbab846263a8d177b180c85",
-          "at": "2026-06-14T23:52:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3e72c449b919113bd714e16a16f141bfb222229f1cbab846263a8d177b180c85",
-          "at": "2026-06-14T23:53:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08d3de38b86c2c799a15249308c30e8f033c0bf2e237cf87bab0610c91d19be2",
-          "at": "2026-06-15T00:14:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08d3de38b86c2c799a15249308c30e8f033c0bf2e237cf87bab0610c91d19be2",
-          "at": "2026-06-15T00:16:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5a2b95c8a3bebe1802b4b74c8905174566fdec1cbb69795eb08890a69620081",
-          "at": "2026-06-15T01:07:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5a2b95c8a3bebe1802b4b74c8905174566fdec1cbb69795eb08890a69620081",
-          "at": "2026-06-15T01:30:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5a2b95c8a3bebe1802b4b74c8905174566fdec1cbb69795eb08890a69620081",
-          "at": "2026-06-15T02:13:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5a2b95c8a3bebe1802b4b74c8905174566fdec1cbb69795eb08890a69620081",
-          "at": "2026-06-15T02:59:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:372748061f402adc31bbafcc4a5b921888cde7d7d384cf25c91d36cef9040c62",
-          "at": "2026-06-15T03:37:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:372748061f402adc31bbafcc4a5b921888cde7d7d384cf25c91d36cef9040c62",
-          "at": "2026-06-15T03:39:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91b0c6bca3c0ef5156b2238e4fc9981259eac30d8c1b843efd388dc63c427c99",
-          "at": "2026-06-15T04:27:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91b0c6bca3c0ef5156b2238e4fc9981259eac30d8c1b843efd388dc63c427c99",
-          "at": "2026-06-15T04:29:35Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -2361,38 +1326,20 @@
           "findings": [],
           "hash": "rvw1:sha256:db3926b00814cba4c3ea1b5538692f066f086bf45cde46b9371cb004381ae2f4",
           "at": "2026-06-15T04:23:43Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:03:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:05:16Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
-          "at": "2026-06-14T23:52:17Z"
+          "hash": "rvw1:sha256:ca800281fba6485c12a8665e5a1cbaddef985120dd4212d111c5a5dacc2e155b",
+          "at": "2026-06-15T04:40:37Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
-          "at": "2026-06-14T23:53:44Z"
+          "hash": "rvw1:sha256:ca800281fba6485c12a8665e5a1cbaddef985120dd4212d111c5a5dacc2e155b",
+          "at": "2026-06-15T04:43:33Z"
         }
       ]
     },
@@ -2511,6 +1458,1102 @@
           "findings": [],
           "hash": "rvw1:sha256:9e589a1ff515a00b17646e247781b7da198aaca7c8573fbc3bea4b053bfa0575",
           "at": "2026-06-14T16:00:59Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59559a57b71b02b31cf7e8be0f07e641b1445d4675f818692773a22d2873c27",
+          "at": "2026-06-13T19:41:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59559a57b71b02b31cf7e8be0f07e641b1445d4675f818692773a22d2873c27",
+          "at": "2026-06-13T19:43:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is internally inconsistent about `DryCheckApprovalService::check_approved`: the task first says to change it to `check_approved(&self) -> Result<...>` and then immediately changes it again to `check_approved(&self, current_fragment_hashes: &BTreeSet<FragmentContentHash>) -> Result<...>`. That leaves the approval API underspecified and conflicts with the existing type catalogue, which still records the service as parameterless.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
+              "line": 26,
+              "category": "contradiction"
+            },
+            {
+              "message": "T014/T015 do not allocate the ports needed to satisfy the documented D2 behavior. The interactor docs say it must combine dry approval, review-state, and ref-verify result ports, but the constructor in the task injects `dry_approval`, `dry_checker`, and `coverage`, where `coverage` is a D5-specific port and the review/ref-verify inputs are missing. As written, the resolver cannot compute the required 3-gate state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
+              "line": 78,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b1be09a6e395b9ab7d0b37ff5f6bbf110baf266053cea95b315479e067148f4b",
+          "at": "2026-06-13T20:35:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` references `AN-12`, but this track only defines `AC-12` / `CN-09` anchors. As written, the regression-test requirement points at a nonexistent spec anchor and is a broken cross-reference.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
+              "line": 28,
+              "category": "broken reference"
+            },
+            {
+              "message": "`T012` / `T016` require `CodexDryChecker::new` to accept model or config inputs, but the infrastructure catalogue still models `CodexDryChecker::new` as parameterless. The planned API is inconsistent across the artefacts, so the checker cannot be wired to the new fast/final models as described.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
+              "line": 106,
+              "category": "contradiction"
+            },
+            {
+              "message": "`T008` adds a `max_parallelism()` accessor to `DryCheckConfig`, but the infrastructure catalogue only exposes `load()` and `threshold()`. The type catalogue and the task plan disagree on the public API needed by `T016`.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
+              "line": 21,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:518fc07b532ec7213747c079ebd04f050868870697d198c921fe0dc9ee18399e",
+          "at": "2026-06-13T20:47:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea14f03ec626bd960f6e2cf9fc0e7ee9b096c3dd127beae63ea5691821d5a8c6",
+          "at": "2026-06-13T20:53:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04 says an omitted `max_parallelism` must fall back to a nonzero default, but T008 instructs implementers to make a schema_version=2 config missing `max_parallelism` fail with a Parse error. Those are mutually exclusive config semantics, so the task can be implemented in a way that violates the spec-level constraint.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `DryCheckConfig` DTO catalogue drops the existing `threshold` field while marking the field list as complete (`has_stripped_fields: false`), even though T008 explicitly says the existing `threshold` is preserved and the same type still exposes a `threshold()` accessor. This leaves the infrastructure config contract internally inconsistent and would remove the similarity threshold from the planned schema.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
+              "line": 13,
+              "category": "contradiction"
+            },
+            {
+              "message": "The usecase type catalogue changes `DryCheckInteractor::new` to accept only `config`, while the implementation plan says the constructor keeps its existing embedding/index/reader dependencies and later adds coverage wiring into `DryCheckInteractor::new`. With only `config` in the planned constructor, the interactor cannot be wired with the ports required by T004/T010/T016, so the catalogue and plan are semantically inconsistent.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
+              "line": 642,
+              "category": "contradiction"
+            },
+            {
+              "message": "T012 says `DryCheckAgentPort::judge` should process all pairs together with known-bad probes as a batch, but CN-03 and T010 require preserving the `1 pair 1 agent_port.judge()` granularity and explicitly forbid packing multiple pairs into one agent call. This conflicts with the bounded fan-out design and makes the D3/D4 behavior ambiguous.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 72,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ea14f03ec626bd960f6e2cf9fc0e7ee9b096c3dd127beae63ea5691821d5a8c6",
+          "at": "2026-06-13T20:57:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07 requires the fast tier to mix known-bad probes into the batch, but CN-03 explicitly forbids putting multiple pairs into one agent call, and T012 then implements probes as separate one-pair calls. As written, the plan cannot satisfy both the acceptance criterion and the constraint; clarify whether probes are separate calibration calls or part of a batch.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+              "line": 400,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-06 requires the known-bad probe injection rate to be configurable, and T011/T016 only add/pass the field. The actual two-tier implementation task T012 never says to use `known_bad_injection_rate_percent` to decide probe frequency or selection, so the implementation can ignore a required control while still completing the plan tasks.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 72,
+              "category": "semantic_gap"
+            },
+            {
+              "message": "AC-06 says wall-clock shortening must be confirmable via telemetry for runs with multiple unverified pairs, but T017 explicitly skips the wall-clock confirmation in CI and substitutes only a unit test that ReviewRound telemetry is emitted. That does not verify the acceptance criterion's performance claim, leaving AC-06 uncovered by the final validation task.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6dc9303a94ac72004994717fe73cd53340941db9f3c76bcacb9d7290b46b53e8",
+          "at": "2026-06-13T21:03:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-04 requires adding both reasoning effort and probe settings to `.harness/config/dry-check.json`, but the D4 task only adds `known_bad_injection_rate_percent` and `known_bad_detection_threshold_percent`; the infrastructure config catalogue likewise lists no reasoning-effort field. As planned, T012 can only refer to an unspecified `reasoning_effort` setting, so the IN-04 requirement is not actually implementable from the plan artifacts.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5bd405074ec9ccb8dbc61ef6de7276751e6e10aed2484b206d39cd06d1c5f5c4",
+          "at": "2026-06-13T21:09:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-02 requires the fixpoint resolver to output the RFP target scope list, but the planned contract only models a single scope (`RunRfp { scope: String }`, `NeedsReview { scope: String }`, and CLI output `run-rfp scope=<scope>`). If more than one review scope is stale, the resolver cannot represent the required next work set, so the plan does not satisfy its own D2 contract.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/domain-types.json",
+              "line": 13,
+              "category": "contradiction"
+            },
+            {
+              "message": "`DryCheckCycleError::CoveragePort` is documented as covering coverage-record read/write failures, but the same variant is also assigned to `DryCheckParallelism::try_new` and `DryCheckPercent::try_new` validation failures. That collapses config validation errors into a coverage I/O error, making the error contract semantically wrong for callers and tests that need to distinguish invalid configuration from coverage-store failures.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
+              "line": 300,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:1c8479ad10f76ed09f7c80a135d14c9c563cd925cf04b078473237675dd7f928",
+          "at": "2026-06-13T21:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Interface-breaking changes are split from their required composition rewiring, so the planned task order is not independently CI-passable. T010 changes `DryCheckInteractor::new` and T012 changes `CodexDryChecker::new`, but the `dry_write` call-site/config wiring for both is deferred to T016 after T008-T012 are complete. That leaves intermediate commits after T010/T012 unable to compile, and T013 is scheduled on top of that broken composition path. Move each required call-site update into the task that changes the interface, or insert an earlier wiring task before requiring CI between these steps.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md",
+              "line": 86,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:33a6012fb1ad008ef9d2f2e3f83d355dd830af90967ed25ae6bb2572084012a3",
+          "at": "2026-06-13T21:28:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T012 puts D4 calibration inside `DryCheckAgentPort::judge`, while also defining that call as judging exactly one production pair and then claiming a fast-tier calibration failure means all production pairs go to the final tier. That does not satisfy CN-07's all-pair retry guarantee: once `judge` is called per pair, a failure detected in one call cannot invalidate or re-run fast results already returned for other pairs unless there is a run-level/shared calibration mechanism. The plan needs to move calibration/failover to the batch/run level or specify a shared fail-closed coordination point before any fast result can be accepted.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 72,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:71119f0cfda88a44286374a9637d1ea6593f8b2826328ea7fdd848b1bfda3f6a",
+          "at": "2026-06-13T21:33:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 requires proving `sotp dry write` wall-clock improves versus a serial baseline using telemetry or measured wall-clock, and the implementation plan assigns that actual fixed-delay baseline/integration verification to T017. However `task-coverage.json` maps AC-06 only to T010/T013: T010 covers the parallel fan-out mechanics with unit tests, while T013 covers fast/final telemetry tagging. This leaves the artifact coverage map semantically inconsistent with the plan and can let the AC-06 performance verification be treated as covered before the only task that actually verifies it runs.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/task-coverage.json",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:98e4e4252e2fe8205d2625d3dc1a005d15c30e4d1e9632dc84e72715050fc38b",
+          "at": "2026-06-13T21:44:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FixpointResolveCommand` documents `current_branch` as having a non-empty invariant, but the catalogue models it as a raw `String` on a plain struct with no constructor or validation method. That leaves an explicitly illegal command state representable at the usecase API boundary, contrary to the plan briefing's type-design rule to make illegal states unrepresentable. Add a validated branch/current-branch value object or define a `try_new`/validation path for the command before exposing it to `FixpointResolveService::resolve`.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
+              "line": 15,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:4738a41b88aa12261e8758857ef95888f827c20be87fed7f96e670f2ed62cb13",
+          "at": "2026-06-13T21:49:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 directs the composition work through `dry_write`'s `DryCheckApprovalInteractor` construction and also updates the `dry_check_approved` path, but that is the check-approved interactor/path owned by T003/T005. T004's stated interface change is adding a coverage port to `DryCheckInteractor::run_dry_check`, so the plan is pointing implementers at the wrong composition seam for the dry-write wiring and can leave the actual dry-write constructor path unresolved.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 24,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "The S5 section says T010's only prerequisite is T009, while the T010 task itself requires T008 because it loads infra `DryCheckConfig` and consumes the new `max_parallelism` DTO. Following the section-level dependency lets T010 start before T008 exists, so the task is not independently compile-passable in the advertised order.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 159,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2831048fd0726c5afc1959553cd4c6d21956d0f72e7e10803b18eb4c05de37e0",
+          "at": "2026-06-13T21:56:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003's new approval algorithm scans `reader.read_records()` and blocks whenever any record involving a current fragment hash has verdict `Violation`, but dry-check history is append-only and the current semantics derive the latest verdict per pair with last-write-wins. If a pair has an older `Violation` followed by a later `Accepted`/`NotAViolation`, this plan would still block `dry check-approved`, contradicting the all-resolved requirement and potentially making the pure-read gate unable to approve resolved pairs. The task should derive latest-per-pair before evaluating verdicts.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f1fe1bd31fccd3ec61b7c0c6b0c268b9ab7c7aad0da8540d6177df3a9bcab734",
+          "at": "2026-06-13T22:02:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-04 carries the D4 requirement to move dry-checker reasoning-effort configuration into `.harness/config/dry-check.json`, but the planned config/adapter surface only models `fast_reasoning_effort`: `CodexDryChecker::new` accepts `fast_reasoning_effort` plus `final_model`, with no final-tier reasoning-effort input. If implemented as planned, the final tier necessarily keeps an implicit or hard-coded effort, so the D4/tiered reasoning-effort configuration requirement is not actually implementable from these artifacts.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/infrastructure-types.json",
+              "line": 160,
+              "category": "contradiction"
+            },
+            {
+              "message": "This in-scope telemetry requirement says the work stays within the existing telemetry schema, but then allows adding new fields or event types if needed. That conflicts with the same D4 telemetry plan in T013, which explicitly says to use existing `round_type` and add no new fields or event types, leaving implementers with two incompatible schema-change rules.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+              "line": 121,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f3f0f73f7e2a6544258f05cbdb1144c1758a3d9bafdaf6c092ea4961b62661a4",
+          "at": "2026-06-13T22:08:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 defines `.harness/config/dry-check.json` schema_version 2 as the D3 schema with only `max_parallelism` added, while T011 later adds the D4 reasoning/probe fields but explicitly keeps the schema at 2. The final infrastructure catalogue models those new fields as required, so the same schema_version now describes two incompatible config shapes depending on task order. That makes the plan's config migration semantically inconsistent; either bump the schema again for the D4 fields or make the new fields explicitly defaulted/optional under schema_version 2.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8a9052a1b19b0d8f8c78815463dd8bf19e610b19550de08fc60044e9bc3234f3",
+          "at": "2026-06-13T22:17:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 changes the public `DryCheckApprovalInteractor::new` constructor and `DryCheckApprovalService::check_approved` signature, but the composition call-site migration is explicitly deferred to T005 while the section also requires each task to be committed with `cargo make ci-rust` passing. That makes T003 physically unexecutable as an independent green task unless T003 also updates the composition call sites or preserves a compatibility path until T005.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 18,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:ba8b7aad761f0293bd2396a5ca7d004291c4eb19d0a608dd7af0a050f55fac3a",
+          "at": "2026-06-13T22:21:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckCoverageRecord` and the new approval API track only `FragmentContentHash` values, so `check-approved` cannot prove that the current diff fragment itself was processed by the latest `dry write`. If a new or renamed diff fragment has the same content hash as a previously covered fragment at another path, the staleness check described in T003 will see the hash in `fragment_hashes` and can approve without forcing `dry write`, despite CN-08/AC-11 requiring fail-closed coverage for the current diff. The coverage key needs enough fragment identity to distinguish paths, not just content hashes.",
+              "severity": "P0",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/domain-types.json",
+              "line": 120,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a6a014cf0961962aba8748019e3b40267ea838cf418da91ac9a4d64384c2a2d0",
+          "at": "2026-06-13T22:28:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8579c4c97361419a3bf7395a71157996913ebfe40a6250ddf37e3e1a09b5015c",
+          "at": "2026-06-13T22:36:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cca5edc2194f56fd2885d5b0e3b4da4f3bf7d525eb7a6080ed845d0b0cd5894",
+          "at": "2026-06-13T23:02:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cca5edc2194f56fd2885d5b0e3b4da4f3bf7d525eb7a6080ed845d0b0cd5894",
+          "at": "2026-06-13T23:06:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62739183a3b4b697a6af04adfabaf71ae0dda3d6b03393a75f555eee8e33a7da",
+          "at": "2026-06-14T01:03:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckCoveragePort`'s Signal changed from 🟡 to 🔵 even though this round is documented as a T001 progression marker only and `impl-plan.json` still marks T001, the task that introduces this port, as only `in_progress`. That makes the plan artifacts semantically inconsistent: one view now presents the port signal as resolved while the task state says the owning work has not completed. Keep this signal unchanged for the progression-only update, or move the task/artifacts together in a later completion transition.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:62739183a3b4b697a6af04adfabaf71ae0dda3d6b03393a75f555eee8e33a7da",
+          "at": "2026-06-14T01:07:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58d2ca6be5557e3d23069cc9a88347ce6f8ef5f2af71739c7113ba67b96c2e37",
+          "at": "2026-06-14T01:14:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58d2ca6be5557e3d23069cc9a88347ce6f8ef5f2af71739c7113ba67b96c2e37",
+          "at": "2026-06-14T01:16:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78173d098fd06cec05c1b3b5b673f7a2b92e8a9be16e54b20b4dce559e269057",
+          "at": "2026-06-14T01:40:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78173d098fd06cec05c1b3b5b673f7a2b92e8a9be16e54b20b4dce559e269057",
+          "at": "2026-06-14T01:42:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a9bc011e2ec5b64c57d38558e7f87ef70c2f8b771d03da98aeaa59f1779f172",
+          "at": "2026-06-14T02:33:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a9bc011e2ec5b64c57d38558e7f87ef70c2f8b771d03da98aeaa59f1779f172",
+          "at": "2026-06-14T02:35:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71bfb6f370d13fe676ac86ec064d9db50072f3663c376310759b4fa1783af929",
+          "at": "2026-06-14T03:15:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is marked done in the plan artifacts, but the generated usecase catalogue still reports the core T003 API changes as incomplete: `DryCheckApprovalService` remains Signal 🟡 here and `DryCheckApprovalInteractor` remains 🟡 at line 48. That contradicts the T003 completion claim and leaves downstream tasks depending on a supposedly completed pure-read approval gate while the catalogue still says the main service/interactor changes are not complete. Regenerate or update the plan/type artifacts so T003 completion and the type signals agree.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:71bfb6f370d13fe676ac86ec064d9db50072f3663c376310759b4fa1783af929",
+          "at": "2026-06-14T03:18:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cd6acdfb9889b2a19ce503a538cef0b922fb5d7a0ecb693cace9f3fefe6fb01",
+          "at": "2026-06-14T03:24:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0cf79c8e96cda92e7364170c5c5c4a85a2be132007dab418ba404b083386e0",
+          "at": "2026-06-14T03:45:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0cf79c8e96cda92e7364170c5c5c4a85a2be132007dab418ba404b083386e0",
+          "at": "2026-06-14T03:47:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c7f2bd091856979f5ea26293843f52eb3500d9ad2d76d263e94fbd161128624",
+          "at": "2026-06-14T04:18:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c7f2bd091856979f5ea26293843f52eb3500d9ad2d76d263e94fbd161128624",
+          "at": "2026-06-14T04:21:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ca7cd2252d804c2e15a2d2b8be87c667a48d7021111354dc2978ffcdc8610fd",
+          "at": "2026-06-14T05:11:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ca7cd2252d804c2e15a2d2b8be87c667a48d7021111354dc2978ffcdc8610fd",
+          "at": "2026-06-14T05:13:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d62a517f7fd1e12f62f6344d93fb715bfa365c9b28d685579b96bd9a99927bca",
+          "at": "2026-06-14T05:30:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d62a517f7fd1e12f62f6344d93fb715bfa365c9b28d685579b96bd9a99927bca",
+          "at": "2026-06-14T05:33:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b470b1299dd163531e67838a3c0f489111ef78114a54bf5c44a7b321e40a13df",
+          "at": "2026-06-14T07:13:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b470b1299dd163531e67838a3c0f489111ef78114a54bf5c44a7b321e40a13df",
+          "at": "2026-06-14T07:16:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 contradiction: this round’s briefing says T009 deliberately did **not** add `Default` for `DryCheckConfig` and switched to `DryCheckConfig::new(...)`, but the plan artifacts still encode the old contract. `impl-plan.json` still says `DryCheckConfig` has a `Default` implementation, `plan.md` repeats that, and T010 still relies on `DryCheckConfig::default()`. As written, the plan is internally inconsistent and hands T010 an API the same round says should not exist. See [impl-plan.json](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json#L53), [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md#L46), and [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/plan.md#L54).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 53,
+              "category": "contradiction"
+            },
+            {
+              "message": "P1 factual error: the regenerated catalogue view still marks `DryCheckParallelism` and `DryCheckPercent` as red, but the briefing says T009 is completed and these entries should be moving toward blue in the type-signal regeneration. That makes the artifact state misleading for the downstream plan gate. See [usecase-types.md](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md#L16) and [usecase-types.md](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md#L17).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 16,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:b639c160668c7894bcf9639bbd859b6fa0b90f8b1c766c809ebdb8b52376329e",
+          "at": "2026-06-14T07:49:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The catalogue view regresses the two new `DryCheckParallelism`/`DryCheckPercent` entries from 🟡 to 🔴 even though T009 is marked done and the round briefing says these T009-owned types should move toward Blue. That makes the generated catalogue contradict the completion state instead of reflecting it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 16,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c005cc5898cff2fa53c75dd882ddc2547add34d3c6ea0cea2e16a8dba046be22",
+          "at": "2026-06-14T07:54:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc575bf7ff8ddd012732d35211e61f55cb05f68663ef40e3f78fd35a3fa63cfd",
+          "at": "2026-06-14T08:01:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc575bf7ff8ddd012732d35211e61f55cb05f68663ef40e3f78fd35a3fa63cfd",
+          "at": "2026-06-14T08:04:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da8332dfb78923a3aea7a3669fa4866fe175779db013ed015efc4e1a1c91c279",
+          "at": "2026-06-14T11:08:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da8332dfb78923a3aea7a3669fa4866fe175779db013ed015efc4e1a1c91c279",
+          "at": "2026-06-14T11:11:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b3b0822cf7ac93fa05a10506a223e57e267769ae8dda0e1150015bf337e2ee1",
+          "at": "2026-06-14T12:24:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b3b0822cf7ac93fa05a10506a223e57e267769ae8dda0e1150015bf337e2ee1",
+          "at": "2026-06-14T12:25:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84447d4aa4a0c2d07aa12edfc843411d4ab3ecfcaa79bfd49d19626594182db4",
+          "at": "2026-06-14T12:47:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 is marked `done`, but the task entry still has no `commit_hash`; the rendered plan likewise shows T010 checked off without the trailing commit hash shown for other completed tasks. This contradicts the briefing's transition contract that T010 should be completed with its post-commit hash populated, leaving the plan artifacts unable to trace the completed task to its implementation commit.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:84447d4aa4a0c2d07aa12edfc843411d4ab3ecfcaa79bfd49d19626594182db4",
+          "at": "2026-06-14T12:49:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84447d4aa4a0c2d07aa12edfc843411d4ab3ecfcaa79bfd49d19626594182db4",
+          "at": "2026-06-14T12:53:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c5a0a70eff19f405596ee584ac745be8dfeee4c30d6c03b123799ce56c9574",
+          "at": "2026-06-14T13:13:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c5a0a70eff19f405596ee584ac745be8dfeee4c30d6c03b123799ce56c9574",
+          "at": "2026-06-14T13:15:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cc6898dde8c7edfefe1e324c98711d850ffb4d4174efd274fcd269846f4ba37",
+          "at": "2026-06-14T13:36:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cc6898dde8c7edfefe1e324c98711d850ffb4d4174efd274fcd269846f4ba37",
+          "at": "2026-06-14T13:38:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b463053e23d4b8f328872a7c53ad2f555e92d191c2f19fae6f66c881db9b35e5",
+          "at": "2026-06-14T13:51:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b463053e23d4b8f328872a7c53ad2f555e92d191c2f19fae6f66c881db9b35e5",
+          "at": "2026-06-14T13:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` marks T012 as done, but this catalogue still leaves `DryCheckInteractor` at 🟡 even though T012 explicitly includes changing `DryCheckInteractor` to the calibrated two-stage flow. The plan artifact and the type catalogue disagree on whether the core interactor work is complete.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 49,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
+          "at": "2026-06-14T15:57:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` marks the T012-mutated rows `DryCheckJudgeTier` and `DryCheckAgentPort` as already present (🔵), but the review briefing says the T012 commit has not been created yet and these type-signal rows should still be 🟡. That makes the generated type-signal artifact inconsistent with the stated plan state.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
+          "at": "2026-06-14T16:01:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
+          "at": "2026-06-14T16:04:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:914cca67254961de600e04ab65176b31d3dfac1e1b49326e8dc9a49225893b8b",
+          "at": "2026-06-14T16:06:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30e84b4ce28f0e9fead737989dc33f276910ca899495a04acfed5ace24ca8ef1",
+          "at": "2026-06-14T16:49:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30e84b4ce28f0e9fead737989dc33f276910ca899495a04acfed5ace24ca8ef1",
+          "at": "2026-06-14T16:50:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f7eb30420313721c97a527a3e1270c552b29c24ef84b1f958ec7d01d7f7a218",
+          "at": "2026-06-14T17:41:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f7eb30420313721c97a527a3e1270c552b29c24ef84b1f958ec7d01d7f7a218",
+          "at": "2026-06-14T17:44:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92f17be6ea8f0db40b479e4f862a0ccf0d11de333a41497415c96950880c7222",
+          "at": "2026-06-14T18:03:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92f17be6ea8f0db40b479e4f862a0ccf0d11de333a41497415c96950880c7222",
+          "at": "2026-06-14T18:05:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b001aee5cffc35f9910ff04a358c1f4b8355f0c8179211659ba6b1f036b4a22e",
+          "at": "2026-06-14T23:31:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b001aee5cffc35f9910ff04a358c1f4b8355f0c8179211659ba6b1f036b4a22e",
+          "at": "2026-06-14T23:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e72c449b919113bd714e16a16f141bfb222229f1cbab846263a8d177b180c85",
+          "at": "2026-06-14T23:52:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e72c449b919113bd714e16a16f141bfb222229f1cbab846263a8d177b180c85",
+          "at": "2026-06-14T23:53:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08d3de38b86c2c799a15249308c30e8f033c0bf2e237cf87bab0610c91d19be2",
+          "at": "2026-06-15T00:14:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08d3de38b86c2c799a15249308c30e8f033c0bf2e237cf87bab0610c91d19be2",
+          "at": "2026-06-15T00:16:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5a2b95c8a3bebe1802b4b74c8905174566fdec1cbb69795eb08890a69620081",
+          "at": "2026-06-15T01:07:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5a2b95c8a3bebe1802b4b74c8905174566fdec1cbb69795eb08890a69620081",
+          "at": "2026-06-15T01:30:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5a2b95c8a3bebe1802b4b74c8905174566fdec1cbb69795eb08890a69620081",
+          "at": "2026-06-15T02:13:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5a2b95c8a3bebe1802b4b74c8905174566fdec1cbb69795eb08890a69620081",
+          "at": "2026-06-15T02:59:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:372748061f402adc31bbafcc4a5b921888cde7d7d384cf25c91d36cef9040c62",
+          "at": "2026-06-15T03:37:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:372748061f402adc31bbafcc4a5b921888cde7d7d384cf25c91d36cef9040c62",
+          "at": "2026-06-15T03:39:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91b0c6bca3c0ef5156b2238e4fc9981259eac30d8c1b843efd388dc63c427c99",
+          "at": "2026-06-15T04:27:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91b0c6bca3c0ef5156b2238e4fc9981259eac30d8c1b843efd388dc63c427c99",
+          "at": "2026-06-15T04:29:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acac65119450346a45953ec3d682be06ef3b9890b6758dbefad738058ecb92a0",
+          "at": "2026-06-15T04:39:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T016` is marked `done` in the plan artifacts even though the briefing's design intent and checklist describe only completing `T015`. This also makes the rendered plan claim `16/17 resolved`, so the plan state now advances an additional task outside the described T015 update. Unless T016 is intentionally part of this review, this is a semantic plan-state contradiction and should remain `todo` in this change.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/impl-plan.json",
+              "line": 97,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:acac65119450346a45953ec3d682be06ef3b9890b6758dbefad738058ecb92a0",
+          "at": "2026-06-15T04:41:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acac65119450346a45953ec3d682be06ef3b9890b6758dbefad738058ecb92a0",
+          "at": "2026-06-15T04:44:03Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:03:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:05:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:52:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:53:44Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:40:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fa9ffefb5943f40a1636c96792dcc906b6882fb7a0b6d52d789189bed4bba3",
+          "at": "2026-06-13T19:42:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
+          "at": "2026-06-14T04:18:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2447eb6e741b5b97c6f8f241c2c782454b6393242f629b5caf359904e4e4a4d4",
+          "at": "2026-06-14T04:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
+          "at": "2026-06-14T04:32:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8209c02385984cfbfca9d9e707ef9655d2d0a3f25d9ce3a803a30c81687e58f",
+          "at": "2026-06-14T04:34:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f8ccdd4dc037c83d844720abe34f4ca8629af424183ffe6eae4c9b570aa541f",
+          "at": "2026-06-14T04:47:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
+          "at": "2026-06-14T05:02:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:190f2c1e81f5c135fa138923f49857920b106015aed9376efdadf06e88c13523",
+          "at": "2026-06-14T05:05:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
+          "at": "2026-06-14T05:12:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The unchanged Rules section now contradicts the new workflow: it says to always run `cargo make ci-rust` before re-running `sotp dry check-approved` and points to “step 3 above,” but Step 3 is now the zero-violation no-fix path that explicitly must skip `ci-rust`. This makes the agent policy ambiguous and can defeat the D1 fast path the change is meant to introduce. Update this rule to refer only to fix rounds / Step 4 verification.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 117,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:826bfd403387ccc08e7dfe5d3d3df4575644338615d0df23b251f752daafdb1c",
+          "at": "2026-06-14T05:14:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 treats a `dry write` run with zero reported `Violation` findings as either approved or an anomaly, but Step 2 explicitly says already-judged pairs are cache hits/no-ops. In that state, a previously recorded unresolved violation will not be re-emitted by `dry write`; `check-approved` will still block, and this workflow tells dfl to stop as `blocked` instead of retrieving the stored violation/proposal via `bin/sotp dry results --filter violation` and fixing it. This makes a normal re-entry/retry with cached violations fail even though autonomous fixes are still available.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 84,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:43c20f74d8e80ad92d12126ee2038140cb917c93611868dbaba4fd7cc2e312ba",
+          "at": "2026-06-14T05:17:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 can lose cached violations after a blocked follow-up gate check. `sotp dry write` returns no findings for already-verified pairs, including cached `Violation` records, so a non-zero `dry check-approved` after the follow-up write does not guarantee the “new finding set” is non-empty. Re-entering Step 4 using only that write output can spin/exhaust without applying available cached refactor proposals. The blocked branch should mirror Step 3 by reading unresolved cached violations before looping.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 103,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:ec1203a50d28ecd4e3486ffc434903b68659af286ab2d18cd607d1b166dfa405",
+          "at": "2026-06-14T05:20:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ed69050537ee92aa22adf8bec811d8997e5e7c75d71b16addad21f02ecdc1b1",
+          "at": "2026-06-14T05:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
+          "at": "2026-06-14T05:31:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
+          "at": "2026-06-14T05:31:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:752357638b6fc921118366555390617f3d1b20a0712c5eb0650726f03fc4285f",
+          "at": "2026-06-14T05:33:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
+          "at": "2026-06-14T07:12:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3395df4f34f4647ddb31f1dd02cbc7fd71bfd737128ceda32661bf3998aff88",
+          "at": "2026-06-14T07:13:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
+          "at": "2026-06-14T13:14:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8463757de115da4b3f65cc9e4e11aea819560d6c272da31d716efceedd9916d7",
+          "at": "2026-06-14T13:16:44Z"
         }
       ]
     }
