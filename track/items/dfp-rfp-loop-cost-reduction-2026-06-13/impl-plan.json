@@ -100,7 +100,8 @@
     {
       "id": "T017",
       "description": "全体 CI gate を確認し、全 acceptance criteria を満たすことを検証する。T001–T016 完了後に `cargo make ci` を実行し、fmt-check + clippy + nextest + deny + check-layers + verify-* すべての gate が pass することを確認する (AC-13)。確認する AC 一覧: AC-01 (dry-fix-lead.md が violation ゼロ分岐を持つ) / AC-02 (violation ゼロ dfl run の wall-clock が ci-rust を含まない floor に収束、またはGateEval が発行される) / AC-03 (fixpoint-resolve コマンドが 3 ゲートを合成した FixpointStep を出力し、RFP next step が scope list を表せる) / AC-04 (fixpoint-resolve が公開 API のみ合成している) / AC-05 (dry write が 2 相で動き max_parallelism 並列化し、記録がペア識別子順) / AC-06 (mock agent に固定 delay を入れ、max_parallelism=1 の直列 baseline と max_parallelism>1 の run を比較し、dry ReviewRound の `duration_ms` または計測 wall-clock が短縮されることを CI 内の integration test で確認する) / AC-07 (dry-checker が fast / final 2 段で動く) / AC-08 (較正失敗時の全ペア再判定と fail-closed) / AC-09 (テレメトリに round_type と model が記録される) / AC-10 (check-approved が埋め込み・検索なしで動く) / AC-11 (dry write が coverage record を書き込み、check-approved がその記録を staleness 判定に使う) / AC-12 (check-approved が安価で繰り返し実行可能) / AC-13 (cargo make ci + review check-approved + dry check-approved が pass する)。failing gate や clippy warning が出た場合は同タスク内で修正する。前提: T001–T016 全完了。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "157f153af95e43c3b4b293dd0743b040602ad2cc"
     }
   ],
   "plan": {

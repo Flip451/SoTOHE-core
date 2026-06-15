@@ -477,8 +477,12 @@ impl DryCheckService for DryCheckInteractor {
         // no prior pair-level error was recorded.  This preserves the original
         // pair-level error rather than masking it with a coverage I/O error, while
         // still surfacing the coverage error when it is the only failure.
-        let coverage_refs = if calibration_error.is_some() {
-            // Fail-closed: empty coverage → all current fragments appear stale.
+        // Fail-closed: any error in this run (calibration OR pair-level: embed/index/agent/
+        // entry/writer) leaves coverage empty so `check_approved` sees ALL current fragments
+        // as uncovered → Blocked. Without this, a partial write where some pairs failed
+        // before `append_record` could publish `processed_refs` and let the gate report
+        // Approved even though some current pairs have no verdict on record.
+        let coverage_refs = if calibration_error.is_some() || first_error.is_some() {
             std::collections::BTreeSet::new()
         } else {
             processed_refs
@@ -1682,6 +1686,67 @@ mod tests {
         // The other two pairs must still have been processed and written.
         let entries = writer.entries.lock().unwrap();
         assert_eq!(entries.len(), 2, "the two successful pairs must be persisted");
+    }
+
+    /// Fail-closed: when a pair-level error (agent/entry/writer) sets `first_error`,
+    /// the coverage manifest must be written with an EMPTY ref set.
+    ///
+    /// Background: the fix changed `if calibration_error.is_some()` to
+    /// `if calibration_error.is_some() || first_error.is_some()` when selecting
+    /// `coverage_refs`.  This test pins that behaviour: any pair-level failure forces
+    /// empty coverage so `check_approved` sees all current fragments as uncovered →
+    /// Blocked, preserving fail-closed semantics.
+    #[test]
+    fn test_pair_level_error_forces_empty_coverage_fail_closed() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        // Return one candidate so the agent is called for a production pair.
+        index
+            .expect_search()
+            .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
+
+        // Calibration passes (probe → Violation); the single production pair
+        // fails with an agent Timeout → first_error is set.
+        let agent = make_probe_agent_with_non_probe(|_changed, _candidate| {
+            Err(DryCheckAgentError::Timeout)
+        });
+
+        let coverage = Arc::new(StubCoverage::new());
+        let interactor = make_interactor_with_coverage(
+            embed,
+            index,
+            agent,
+            Arc::new(StubWriter::default()),
+            vec![],
+            Arc::clone(&coverage),
+        );
+
+        let result =
+            interactor.run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit());
+
+        // The pair-level error must be returned.
+        assert!(
+            matches!(result, Err(DryCheckCycleError::Agent(DryCheckAgentError::Timeout))),
+            "expected Agent(Timeout) error, got: {result:?}"
+        );
+
+        // Coverage MUST be written exactly once — but with an EMPTY ref set.
+        // An empty record means all current diff fragments are uncovered →
+        // `check_approved` returns Blocked (fail-closed).
+        assert_eq!(
+            coverage.write_call_count(),
+            1,
+            "coverage must be written exactly once even when a pair-level error occurs"
+        );
+        assert!(
+            coverage.last_written().is_some_and(|r| r.fragment_refs().is_empty()),
+            "coverage written on pair-level error must be empty (fail-closed)"
+        );
     }
 
     /// Records are appended in DryCheckPairKey sort order regardless of search

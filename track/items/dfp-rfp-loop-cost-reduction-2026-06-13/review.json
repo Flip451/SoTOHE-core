@@ -1,6 +1,220 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:18:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/dry.rs",
+              "line": 425,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:21:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
+          "at": "2026-06-14T04:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:39:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:42:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:07:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:09:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
+          "at": "2026-06-14T15:54:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
+          "at": "2026-06-14T15:56:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FixpointResolve` is classified as display-only here, so `execute_track_with_telemetry()` will return early and skip telemetry for `sotp track fixpoint-resolve`. That contradicts the command contract in the briefing and should be removed from the display-only match.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/main.rs",
+              "line": 537,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1bd5eac9d6b8dd1e278e7cf775030823399628dd2c04f0f25727782db39eddbe",
+          "at": "2026-06-15T00:39:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: this new CLI entrypoint has no happy-path or error-path tests. The module only exercises clap parsing and `format_fixpoint_step`, so regressions in `execute_fixpoint_resolve` itself (mapping `FixpointResolveInput` into `CliApp::fixpoint_resolve`, stdout/stderr emission, and exit-code propagation) would be untested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 32,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6956dab414e82d87df43f780a06bb1076008b7d3e41c3b241d32d93308bc4739",
+          "at": "2026-06-15T00:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: the new public CLI entrypoint is not covered by any happy-path or error-path test. The module only exercises clap parsing and `format_fixpoint_step`, so regressions in `execute_fixpoint_resolve` itself (mapping `FixpointResolveInput` into `CliApp::fixpoint_resolve`, stdout/stderr emission, and exit-code propagation) would slip through.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 32,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6956dab414e82d87df43f780a06bb1076008b7d3e41c3b241d32d93308bc4739",
+          "at": "2026-06-15T01:01:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1, testing: the new public wrapper [`execute_fixpoint_resolve`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs:32 ) is only covered by error-path tests; the only wrapper tests start at [`apps/cli/src/commands/track/fixpoint_resolve.rs:175`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs:175 ). There is no test that exercises the success path and asserts `CommandOutcome::success` is printed and `ExitCode::SUCCESS` is returned, so a regression in the CLI forwarding layer would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 32,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:73256b180ce1c0b2040f40d3a7ceca2ada8f59a056ac90bccfd52472ff225a2d",
+          "at": "2026-06-15T01:14:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackCommand::FixpointResolve` exposes `fixpoint_resolve::FixpointResolveArgs` from a crate-private module. With workspace `warnings = \"deny\"`, rustc will emit a `private_interfaces`/`private_in_public` warning for this public enum variant and fail the build. Move `FixpointResolveArgs` to a publicly reachable module (or re-export it from `mod.rs`) before exposing it in `TrackCommand`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/mod.rs",
+              "line": 382,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:aec3b2f916affbb3e5c25f15f6ec91b53d21fa37fc2c662946010ca798e24133",
+          "at": "2026-06-15T01:21:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
+          "at": "2026-06-15T01:28:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
+          "at": "2026-06-15T01:28:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
+          "at": "2026-06-15T01:31:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `TrackCommand::FixpointResolve` branch in `items_dir()` is not covered by the accessor test suite in this file. That accessor feeds telemetry path resolution in `main.rs`, so a regression here would silently anchor telemetry to the wrong track tree. Add a unit test asserting `TrackCommand::FixpointResolve(args).items_dir()` returns `args.items_dir`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/mod.rs",
+              "line": 505,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
+          "at": "2026-06-15T02:17:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
+          "at": "2026-06-15T02:28:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
+          "at": "2026-06-15T03:02:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
+          "at": "2026-06-15T03:40:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
+          "at": "2026-06-15T03:43:23Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -629,6 +843,20 @@
           "findings": [],
           "hash": "rvw1:sha256:3d9576183951bad723b269eb37de96711b506c122948e6cc765f4081219fc778",
           "at": "2026-06-15T00:09:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:033f3064d7c6804cba2b47a39822da9b90c65de6f1ce42b33287f262962bce07",
+          "at": "2026-06-15T05:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:033f3064d7c6804cba2b47a39822da9b90c65de6f1ce42b33287f262962bce07",
+          "at": "2026-06-15T05:10:27Z"
         }
       ]
     },
@@ -1419,38 +1647,6 @@
           "findings": [],
           "hash": "rvw1:sha256:ca800281fba6485c12a8665e5a1cbaddef985120dd4212d111c5a5dacc2e155b",
           "at": "2026-06-15T04:43:33Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:03:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:05:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
-          "at": "2026-06-14T23:52:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
-          "at": "2026-06-14T23:53:44Z"
         }
       ]
     },
@@ -2354,220 +2550,52 @@
           "findings": [],
           "hash": "rvw1:sha256:263558aca11949642c992593fc1bc49b1ad25583b78c1b4ede5b47b69ef65932",
           "at": "2026-06-15T04:52:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9c0439050bad8f78087499bc367125367f0fd14941b636023db70db4755782",
+          "at": "2026-06-15T05:14:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9c0439050bad8f78087499bc367125367f0fd14941b636023db70db4755782",
+          "at": "2026-06-15T05:15:57Z"
         }
       ]
     },
-    "cli": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:18:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/dry.rs",
-              "line": 425,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:21:19Z"
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:03:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
-          "at": "2026-06-14T04:23:50Z"
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:05:16Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:39:55Z"
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:52:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:42:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:07:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:09:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
-          "at": "2026-06-14T15:54:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
-          "at": "2026-06-14T15:56:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FixpointResolve` is classified as display-only here, so `execute_track_with_telemetry()` will return early and skip telemetry for `sotp track fixpoint-resolve`. That contradicts the command contract in the briefing and should be removed from the display-only match.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/main.rs",
-              "line": 537,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1bd5eac9d6b8dd1e278e7cf775030823399628dd2c04f0f25727782db39eddbe",
-          "at": "2026-06-15T00:39:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: this new CLI entrypoint has no happy-path or error-path tests. The module only exercises clap parsing and `format_fixpoint_step`, so regressions in `execute_fixpoint_resolve` itself (mapping `FixpointResolveInput` into `CliApp::fixpoint_resolve`, stdout/stderr emission, and exit-code propagation) would be untested.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 32,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:6956dab414e82d87df43f780a06bb1076008b7d3e41c3b241d32d93308bc4739",
-          "at": "2026-06-15T00:48:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: the new public CLI entrypoint is not covered by any happy-path or error-path test. The module only exercises clap parsing and `format_fixpoint_step`, so regressions in `execute_fixpoint_resolve` itself (mapping `FixpointResolveInput` into `CliApp::fixpoint_resolve`, stdout/stderr emission, and exit-code propagation) would slip through.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 32,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:6956dab414e82d87df43f780a06bb1076008b7d3e41c3b241d32d93308bc4739",
-          "at": "2026-06-15T01:01:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1, testing: the new public wrapper [`execute_fixpoint_resolve`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs:32 ) is only covered by error-path tests; the only wrapper tests start at [`apps/cli/src/commands/track/fixpoint_resolve.rs:175`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs:175 ). There is no test that exercises the success path and asserts `CommandOutcome::success` is printed and `ExitCode::SUCCESS` is returned, so a regression in the CLI forwarding layer would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 32,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:73256b180ce1c0b2040f40d3a7ceca2ada8f59a056ac90bccfd52472ff225a2d",
-          "at": "2026-06-15T01:14:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackCommand::FixpointResolve` exposes `fixpoint_resolve::FixpointResolveArgs` from a crate-private module. With workspace `warnings = \"deny\"`, rustc will emit a `private_interfaces`/`private_in_public` warning for this public enum variant and fail the build. Move `FixpointResolveArgs` to a publicly reachable module (or re-export it from `mod.rs`) before exposing it in `TrackCommand`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/mod.rs",
-              "line": 382,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:aec3b2f916affbb3e5c25f15f6ec91b53d21fa37fc2c662946010ca798e24133",
-          "at": "2026-06-15T01:21:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
-          "at": "2026-06-15T01:28:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
-          "at": "2026-06-15T01:28:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
-          "at": "2026-06-15T01:31:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `TrackCommand::FixpointResolve` branch in `items_dir()` is not covered by the accessor test suite in this file. That accessor feeds telemetry path resolution in `main.rs`, so a regression here would silently anchor telemetry to the wrong track tree. Add a unit test asserting `TrackCommand::FixpointResolve(args).items_dir()` returns `args.items_dir`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/mod.rs",
-              "line": 505,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
-          "at": "2026-06-15T02:17:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
-          "at": "2026-06-15T02:28:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
-          "at": "2026-06-15T03:02:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
-          "at": "2026-06-15T03:40:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
-          "at": "2026-06-15T03:43:23Z"
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:53:44Z"
         }
       ]
     }

@@ -6471,6 +6471,32 @@
       "base_commit": "d5ffb358ad3d4879e238f3a8b0e7e3fbaa65021f",
       "rationale": "The fragments reuse the same test harness and telemetry assertions, but the repeated code is limited to straightforward setup/verification around two materially different scenarios (Approved vs Blocked). In a test module, that level of duplication is acceptable and does not rise to a DRY violation.",
       "recorded_at": "2026-06-15T04:37:14Z"
+    },
+    {
+      "low_path": "libs/usecase/src/dry_check/interactor.rs",
+      "low_hash": "208ecdd91807da3f17d18464f16d0870dbb4af06b360dbb19c759da63d6e0921",
+      "high_path": "libs/usecase/src/dry_check/interactor.rs",
+      "high_hash": "6403d6e2ba2bd1988ba23556ef8e9a39a8fb4bdf51292cc0043dbc87a2112502",
+      "changed_path": "libs/usecase/src/dry_check/interactor.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8612306118011475,
+      "threshold": 0.8500000238418579,
+      "base_commit": "157f153af95e43c3b4b293dd0743b040602ad2cc",
+      "rationale": "The fragments share common test scaffolding in the same file, but they exercise different behaviors: one verifies partial completion with one agent failure and remaining pairs processed, while the other verifies same-path/different-hash pairing is still considered valid. The overlap is limited to standard setup code and does not duplicate a single business rule or implementation path enough to constitute a DRY violation.",
+      "recorded_at": "2026-06-15T05:11:27Z"
+    },
+    {
+      "low_path": "libs/usecase/src/dry_check/interactor.rs",
+      "low_hash": "208ecdd91807da3f17d18464f16d0870dbb4af06b360dbb19c759da63d6e0921",
+      "high_path": "libs/usecase/src/dry_check/interactor.rs",
+      "high_hash": "d45789d3c770d78f2ae8bc88ee21c4930914277556175f67aa8dda84d765ad55",
+      "changed_path": "libs/usecase/src/dry_check/interactor.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9195850491523743,
+      "threshold": 0.8500000238418579,
+      "base_commit": "157f153af95e43c3b4b293dd0743b040602ad2cc",
+      "rationale": "The new test reuses the same fixture setup as the existing one, but it exercises a different behavior: one agent call fails while the remaining pairs must still be processed and persisted. The overlap is limited to standard test scaffolding, not duplicated business logic, so this does not rise to a meaningful DRY violation.",
+      "recorded_at": "2026-06-15T05:11:27Z"
     }
   ]
 }

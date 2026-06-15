@@ -2,32 +2,16 @@
   "schema_version": 1,
   "fragment_refs": [
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "008b82c6802320f9808884b71a62c33dbf4ae56fb688af0328570fb54a329b86"
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "208ecdd91807da3f17d18464f16d0870dbb4af06b360dbb19c759da63d6e0921"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "53809da4d9bbd50a98de5ab93ee792a0de5063e92774fcf3e50207a58561a761"
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "a20e58e545b243f63803f88e90eac138704259895ab4ab05d0f7ffb4bf03aeba"
     },
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "784cf9710ddba9abcaa190c74fedc2daa1bdf2e0aa898825f7192ff13f4c1f25"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "8d512d0e0fa878793c79c7613877aa0a12962a7d7110e16bfb35ff1184a1aaa3"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "9643687bedf3e4f664dd4a20ce2ac7ae4528c7d2cc09e73db9d0337cf9fd3ae6"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "cadc7c1b719db88f9eedc4677c10e71a20e84edfea338a5e965cb5bb2cda1efa"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "f862bfef63f445fb6f9b53b6184c2ffab288690eebc950ad3af14fadb2b9b535"
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "c9302930c5807df17fac94d1acff41374477570034120928632149c66fef5b46"
     }
   ]
 }
