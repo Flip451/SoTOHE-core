@@ -1027,27 +1027,6 @@
         }
       ],
       "informal_grounds": []
-    },
-    "domain::tddd::catalogue_linter::preset::ddd_strict_preset": {
-      "action": "add",
-      "role": "FreeFunction",
-      "params": [],
-      "returns": "Result<Vec<CatalogueLinterRule>, CatalogueLinterError>",
-      "is_async": false,
-      "generics": [],
-      "where_predicates": [],
-      "docs": "Interim declaration: function was added to source before Phase 2. Per D15 amend (OS-11/AC-21), this function will NOT be part of the final implementation — the ddd-strict preset is delivered as a distributed JSON file (.harness/catalogue-lint/presets/ddd-strict.json). Phase 3 implementation will remove this function from source; this entry will be removed from the catalogue when the function is deleted.",
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
-          "anchor": "OS-11"
-        },
-        {
-          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
-          "anchor": "AC-21"
-        }
-      ],
-      "informal_grounds": []
     }
   },
   "inherent_impls": [

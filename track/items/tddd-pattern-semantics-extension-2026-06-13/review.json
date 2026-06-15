@@ -1,228 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
-          "at": "2026-06-14T05:53:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
-          "at": "2026-06-14T05:58:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
-          "at": "2026-06-14T10:56:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
-          "at": "2026-06-14T11:28:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
-          "at": "2026-06-14T17:55:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
-          "at": "2026-06-14T18:10:45Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DataRoleDto` still leaves the unit-like roles (`Specification`, `Factory`, `Interactor`, `Command`, `Query`, `Dto`, `ErrorType`, `SecondaryAdapter`) as unit variants, so serde continues to emit and accept bare strings for those cases. That means the new codec does not actually enforce the discriminated-object wire shape for the full role enum, and the legacy string form is still implicitly supported.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
-              "line": 32,
-              "category": "serialization"
-            },
-            {
-              "message": "`ContractRole::Repository` is rendered with the display tag `repository`, but `section_to_signal_kind_tag` never collapses that tag back to the evaluator's `secondary_port` bucket, and there is no dedicated repository section. Repository traits will therefore fall into `Other` with a blank Signal column even when `check_type_signals` has produced a matching `secondary_port` signal.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 208,
-              "category": "rendering"
-            }
-          ],
-          "hash": "rvw1:sha256:5e3237b12ca76bd05e2b84ce9ece8b10e92cf2c75f40c23d30f0732087f31e87",
-          "at": "2026-06-14T05:57:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_layer` now short-circuits on `binding.targets.len() > 1` before `Self::to_infra_binding(binding)` runs, so malformed multi-target bindings never go through the domain/infra validation path. In the absent-catalogue fast path that means bad `catalogue_file` / `baseline_file` / `layer_id` input can be accepted silently, and `track_dir.join(&binding.catalogue_file)` is probed before any path validation. That is a validation bypass and path-probing issue in the new early-return branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
-              "line": 146,
-              "category": "security"
-            },
-            {
-              "message": "The new codec payload variants (`DataRoleDto::EventPolicy` and `ContractRoleDto::Repository`) have no dedicated infrastructure tests covering their happy-path round trips and required rejection cases. In particular, there is no coverage for empty `reacts_to` being rejected or `Repository.aggregate` failing validation, so regressions in the new schema-invariant decode/encode paths would ship without a safety net.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
-              "line": 44,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7cb20b6343bb5696d05b6fcfb24f60d47334daeb20f9d25735431d6402a1ccf5",
-          "at": "2026-06-14T06:07:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
-          "at": "2026-06-14T06:23:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
-          "at": "2026-06-14T06:35:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
-          "at": "2026-06-14T08:11:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
-          "at": "2026-06-14T08:15:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
-          "at": "2026-06-14T08:41:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
-          "at": "2026-06-14T08:43:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
-          "at": "2026-06-14T10:53:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
-          "at": "2026-06-14T11:28:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
-          "at": "2026-06-14T12:33:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
-          "at": "2026-06-14T12:42:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueDocumentCodec::decode` now returns `SchemaVersionRequiresMigration` for schema_version 4, but this branch only special-cases `UnsupportedSchemaVersion`. v4 catalogues therefore fall through to the generic `failed to decode catalogue` error, which drops the actionable migration prompt this code path is trying to provide.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 228,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:b4344d5b95fe1787c600b88d432c10e726efa130093dfdb70580db980701d50c",
-          "at": "2026-06-14T17:58:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
-          "at": "2026-06-14T18:06:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
-          "at": "2026-06-14T18:10:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
-          "at": "2026-06-14T18:21:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The v4 migration error tells users to regenerate the catalogue with `sotp track type-signals`, but that command consumes an existing catalogue to evaluate signals; it does not migrate the catalogue wire format. Several call sites surface this codec error directly via `to_string()`, so a schema_version=4 catalogue will get actionable-looking but wrong remediation and can leave users rerunning the failing path instead of regenerating the catalogue via the type-designer flow.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-              "line": 254,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
-          "at": "2026-06-14T18:24:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c26907823b1c50da36e88e503c7c725f0ff7d83be1d22f97a7f15deea08110b",
-          "at": "2026-06-14T18:31:00Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -879,60 +657,196 @@
           "findings": [],
           "hash": "rvw1:sha256:d081825294edfe845d44a47e079f6f58bf4c2ae8b72bdbffcddcfff878a56633",
           "at": "2026-06-15T05:32:34Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:57:02Z"
+          "hash": "rvw1:sha256:49ade601b377a38ec0a2990e1493b52f7f96be4ec2c216f8be3687a5ca777e7d",
+          "at": "2026-06-15T06:12:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
-          "at": "2026-06-14T05:59:38Z"
+          "hash": "rvw1:sha256:49ade601b377a38ec0a2990e1493b52f7f96be4ec2c216f8be3687a5ca777e7d",
+          "at": "2026-06-15T06:16:54Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DataRoleDto` still leaves the unit-like roles (`Specification`, `Factory`, `Interactor`, `Command`, `Query`, `Dto`, `ErrorType`, `SecondaryAdapter`) as unit variants, so serde continues to emit and accept bare strings for those cases. That means the new codec does not actually enforce the discriminated-object wire shape for the full role enum, and the legacy string form is still implicitly supported.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
+              "line": 32,
+              "category": "serialization"
+            },
+            {
+              "message": "`ContractRole::Repository` is rendered with the display tag `repository`, but `section_to_signal_kind_tag` never collapses that tag back to the evaluator's `secondary_port` bucket, and there is no dedicated repository section. Repository traits will therefore fall into `Other` with a blank Signal column even when `check_type_signals` has produced a matching `secondary_port` signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 208,
+              "category": "rendering"
+            }
+          ],
+          "hash": "rvw1:sha256:5e3237b12ca76bd05e2b84ce9ece8b10e92cf2c75f40c23d30f0732087f31e87",
+          "at": "2026-06-14T05:57:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_layer` now short-circuits on `binding.targets.len() > 1` before `Self::to_infra_binding(binding)` runs, so malformed multi-target bindings never go through the domain/infra validation path. In the absent-catalogue fast path that means bad `catalogue_file` / `baseline_file` / `layer_id` input can be accepted silently, and `track_dir.join(&binding.catalogue_file)` is probed before any path validation. That is a validation bypass and path-probing issue in the new early-return branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
+              "line": 146,
+              "category": "security"
+            },
+            {
+              "message": "The new codec payload variants (`DataRoleDto::EventPolicy` and `ContractRoleDto::Repository`) have no dedicated infrastructure tests covering their happy-path round trips and required rejection cases. In particular, there is no coverage for empty `reacts_to` being rejected or `Repository.aggregate` failing validation, so regressions in the new schema-invariant decode/encode paths would ship without a safety net.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
+              "line": 44,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7cb20b6343bb5696d05b6fcfb24f60d47334daeb20f9d25735431d6402a1ccf5",
+          "at": "2026-06-14T06:07:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
+          "at": "2026-06-14T06:23:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55218a409b82bb4321a08f70393bd969a5903397da2a31a71c3eca7f91e9f4da",
+          "at": "2026-06-14T06:35:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
+          "at": "2026-06-14T08:11:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1540b827da6e6c612420525fffd57d7c428eebde92189048553cb162cd9c2b29",
+          "at": "2026-06-14T08:15:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
+          "at": "2026-06-14T08:41:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d30ed3e5ca5079121dcdf6626f3eaa8aaff1f8146eacaafed413625c4c0af773",
+          "at": "2026-06-14T08:43:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
+          "at": "2026-06-14T10:53:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86187a58dd40bd3e0d374791854c0b4b99904d06154fc4af5cf7aeabd38d2eeb",
+          "at": "2026-06-14T11:28:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
+          "at": "2026-06-14T12:33:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2061ca8972570a96b05f225a9383f966959c0a843ba2b34ab2c9389b30aed6a",
+          "at": "2026-06-14T12:42:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueDocumentCodec::decode` now returns `SchemaVersionRequiresMigration` for schema_version 4, but this branch only special-cases `UnsupportedSchemaVersion`. v4 catalogues therefore fall through to the generic `failed to decode catalogue` error, which drops the actionable migration prompt this code path is trying to provide.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 228,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b4344d5b95fe1787c600b88d432c10e726efa130093dfdb70580db980701d50c",
+          "at": "2026-06-14T17:58:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
+          "at": "2026-06-14T18:06:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1640e45ccfa11707df5bf77037d56dee0b1f23f9a42c0a2c21f8ebe319f93c3a",
+          "at": "2026-06-14T18:10:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
+          "at": "2026-06-14T18:21:16Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1 test coverage gap: the new boundary conversion path can now reject malformed public `RunCatalogueLintCommand` input via `InvalidRuleSpec`, but the added tests only cover valid `LintRuleSpec` values. Please add error-path coverage for cases such as an unknown `target_roles` entry, an empty `target_field`, and empty `permitted_layers` / `required_traits` / `forbidden_roles` so the public API’s validation contract is pinned down.",
+              "message": "The v4 migration error tells users to regenerate the catalogue with `sotp track type-signals`, but that command consumes an existing catalogue to evaluate signals; it does not migrate the catalogue wire format. Several call sites surface this codec error directly via `to_string()`, so a schema_version=4 catalogue will get actionable-looking but wrong remediation and can leave users rerunning the failing path instead of regenerating the catalogue via the type-designer flow.",
               "severity": "P1",
-              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
-              "line": 175,
-              "category": "test coverage"
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+              "line": 254,
+              "category": "bug"
             }
           ],
-          "hash": "rvw1:sha256:21e2d02a7849cec388c231f9b3211eedaaa9247fb98c1483753d50a7bf3dceed",
-          "at": "2026-06-14T11:28:52Z"
+          "hash": "rvw1:sha256:a3f7bd2734c16db1ae81646e43585e394180794ced552dc9fb83416271a2fba6",
+          "at": "2026-06-14T18:24:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5378faa92aaeca0dffb9d6b4327921d61e93516c708175342956a9d270130111",
-          "at": "2026-06-14T11:33:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
-          "at": "2026-06-14T23:49:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
-          "at": "2026-06-15T00:23:12Z"
+          "hash": "rvw1:sha256:4c26907823b1c50da36e88e503c7c725f0ff7d83be1d22f97a7f15deea08110b",
+          "at": "2026-06-14T18:31:00Z"
         }
       ]
     },
@@ -979,6 +893,52 @@
           "findings": [],
           "hash": "rvw1:sha256:6ac59a99fe882cb18dd9b06a290895d085abef12d5907efa51bd01c4d18716e9",
           "at": "2026-06-14T18:10:55Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
+          "at": "2026-06-14T05:53:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:078aa27a17b4fa904175dec801fb0e2a6feea4e483810f7d0cf0a605c3ab0fe1",
+          "at": "2026-06-14T05:58:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T10:56:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ee99f4bb7f10c249aabfaa1b0b3b8c2632cb2a09444aa7c836e34bc6ed9516",
+          "at": "2026-06-14T11:28:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
+          "at": "2026-06-14T17:55:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bd285729bb5a8aa69ed9b0a9e9039e899f3329f3dda2a1df54a86aaccd91026",
+          "at": "2026-06-14T18:10:45Z"
         }
       ]
     },
@@ -1723,6 +1683,20 @@
           "findings": [],
           "hash": "rvw1:sha256:5e78d8cc6baa7dce80b6d3ecb679b3cfc00a3386f25a098eb75af17e2bb59379",
           "at": "2026-06-15T02:44:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d3764caf2948a9321f33e520bcdb9d9662e08b07f54a6699e39f506203d83c2",
+          "at": "2026-06-15T06:12:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d3764caf2948a9321f33e520bcdb9d9662e08b07f54a6699e39f506203d83c2",
+          "at": "2026-06-15T09:38:55Z"
         }
       ]
     },
@@ -2036,6 +2010,74 @@
           "findings": [],
           "hash": "rvw1:sha256:5ee06fc6691cf0a1d5c02f4b302442684e7435984a56e3af637c53f326db6131",
           "at": "2026-06-14T19:11:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac8d88441bc560480900a82730663596c39095e313955abe834d21d7e8fbc229",
+          "at": "2026-06-15T06:13:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac8d88441bc560480900a82730663596c39095e313955abe834d21d7e8fbc229",
+          "at": "2026-06-15T06:17:57Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
+          "at": "2026-06-14T05:57:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68ac3c2d63c016a12c2a4117fe8da72de5b5109b415e998c37b95fed33961606",
+          "at": "2026-06-14T05:59:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 test coverage gap: the new boundary conversion path can now reject malformed public `RunCatalogueLintCommand` input via `InvalidRuleSpec`, but the added tests only cover valid `LintRuleSpec` values. Please add error-path coverage for cases such as an unknown `target_roles` entry, an empty `target_field`, and empty `permitted_layers` / `required_traits` / `forbidden_roles` so the public API’s validation contract is pinned down.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
+              "line": 175,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:21e2d02a7849cec388c231f9b3211eedaaa9247fb98c1483753d50a7bf3dceed",
+          "at": "2026-06-14T11:28:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5378faa92aaeca0dffb9d6b4327921d61e93516c708175342956a9d270130111",
+          "at": "2026-06-14T11:33:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
+          "at": "2026-06-14T23:49:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baab428a14d20c422581063d1eabd14bed2644f0c7b1e8532733c902aec42016",
+          "at": "2026-06-15T00:23:12Z"
         }
       ]
     }

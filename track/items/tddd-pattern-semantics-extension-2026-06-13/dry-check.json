@@ -4660,6 +4660,19 @@
       "base_commit": "d221c34cafe80bb916b2e8f5db327acc163d290c",
       "rationale": "The changed fragment does not duplicate the helper implementation from catalogue_linter_helpers.rs; it imports and reuses those helper functions. The overlapping module-level comments only describe shared module wiring and visibility conventions, which is minor contextual documentation rather than duplicated behavior or knowledge that would create a maintenance hazard.",
       "recorded_at": "2026-06-15T02:46:35Z"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+      "low_hash": "97e459c8cb362beb57bdfd83870560a4611065efda4d273e1dbed02d2b8a5462",
+      "high_path": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+      "high_hash": "ff7167f76f163cb7ad9862469418389b7e48781bfee9f0196c7e5e1d9fedc3e4",
+      "changed_path": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8659745454788208,
+      "threshold": 0.8500000238418579,
+      "base_commit": "fc80f3437b00df33c0359244f73ce19985c5f9fc",
+      "rationale": "The overlap is limited to module-level documentation, import lists, and sibling-module wiring. The changed fragment introduces a helper module with narrow visibility and imports the catalogue types it needs; the candidate fragment is the evaluator entry point importing those helpers. This is structural boilerplate, not duplicated business logic or independently maintained behavior.",
+      "recorded_at": "2026-06-15T06:09:18Z"
     }
   ]
 }

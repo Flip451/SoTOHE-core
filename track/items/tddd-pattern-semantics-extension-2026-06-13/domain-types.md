@@ -43,5 +43,4 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint | free_function | — | fn(rules: &[CatalogueLinterRule], all_catalogues: &std::collections::BTreeMap<LayerId, CatalogueDocument>, target_layer_id: &LayerId) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> | 🔵 | 🔵 |
-| domain::tddd::catalogue_linter::preset::ddd_strict_preset | free_function | — | fn() -> Result<Vec<CatalogueLinterRule>, CatalogueLinterError> | 🔵 | 🔵 |
 

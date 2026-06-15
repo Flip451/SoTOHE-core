@@ -2,8 +2,7 @@
 //!
 //! This module is declared by `catalogue_linter.rs` via `#[path]` and is not
 //! a public module. All items are `pub(super)` so they are visible to
-//! `evaluate_catalogue_lint` in `catalogue_linter_eval.rs` and to
-//! `ddd_strict_preset` in `catalogue_linter_preset.rs`.
+//! `evaluate_catalogue_lint` in `catalogue_linter_eval.rs`.
 
 use super::{RoleKind, RuleTarget};
 use crate::tddd::catalogue_v2::CatalogueDocument;
