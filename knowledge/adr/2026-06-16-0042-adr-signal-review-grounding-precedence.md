@@ -83,7 +83,7 @@ D1 の優先規則反転により、`user_decision_ref` と `review_finding_ref`
   - `2026-05-29-1118-semantic-dup-detection-discoverability-gate.md`: D1 / D2 / D3 / D4
   - `2026-05-18-1223-make-catalogue-schema-permissive.md`: D3
   - `2026-05-26-1813-track-id-default-active-track.md`: D6
-- この per-decision 確認・grounding 付与は本 ADR 実装 track の code/artifact 変更には含めず、別途の手動 follow-up として扱う（既存 ADR の front-matter 編集が必要になった場合は adr-editor 経由、1 ファイル 1 writer 原則）。
+- この per-decision 確認・grounding 付与は、ユーザーが track ライフサイクル内（本 ADR を実装する track の PR 中）に各判断を提供した場合は**同一 track 内で adjudication を完了させる**。ユーザー判断が後追いで提供される場合は別 track に follow-up してよい（どちらも許容）。既存 ADR の front-matter 編集が必要になった場合は adr-editor 経由、1 ファイル 1 writer 原則。
 
 ## Rejected Alternatives
 
@@ -116,7 +116,7 @@ newtype を作らず構築関数内で空チェックする案。検証が構築
 
 - 実装更新が必要: `classify_grounds` の判定順反転（`evaluator.rs`）、doc コメント（`grounds.rs`）、テスト `test_evaluate_adr_decision_user_ref_takes_priority_over_review_ref` の期待値反転、grounding 参照のドメイン値オブジェクト新設（`try_new` で空・空白を `Err`）、`AdrDecisionCommon` のフィールド型を `Option<String>` → `Option<newtype>` に変更、DTO→domain 変換でのエラー伝播追加、検証テスト（空・空白で `Err` / 正常値で `Ok`）の追加。
 - convention `knowledge/conventions/adr.md` の YAML front-matter 表（`review_finding_ref` 行）を「review あり → 🟡（`user_decision_ref` の有無を問わず）」に更新する必要がある。
-- D1 の反転により `user_decision_ref` と `review_finding_ref` を両方持つ既存 decision が 🔵 → 🟡 に変わる。**本 ADR 起票時点で該当は 6 件（3 ファイル、D4 に列挙）**。`verify adr-signals` 上は 🟡 は warning（CI を block しない）として可視化される。来歴の正確性のため、D4 に従い一件ずつユーザーが確認して grounding を確定する。
+- D1 の反転により `user_decision_ref` と `review_finding_ref` を両方持つ既存 decision が 🔵 → 🟡 に変わる。**本 ADR 起票時点で該当は 6 件（3 ファイル、D4 に列挙）**。`verify adr-signals` 上は 🟡 は warning（CI を block しない）として可視化される。来歴の正確性のため、D4 に従い一件ずつユーザーが確認して grounding を確定する（ユーザー判断が同一 PR 内に提供された場合は同一 track で完結; 後追い提供の場合は別 track で follow-up）。
 
 ### Neutral
 

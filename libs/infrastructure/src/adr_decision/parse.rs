@@ -116,6 +116,25 @@ fn check_decision_key_presence(raw: &serde_yaml::Value) -> Result<(), AdrFrontMa
                 "decision '{id}': `superseded_by` key is only allowed when status is 'superseded' (got '{status}')"
             )));
         }
+
+        // ADR 2026-06-16-0042 §D2 fail-closed: an explicit YAML null on
+        // user_decision_ref / review_finding_ref is an unfilled placeholder
+        // that `serde` would silently fold into `None`, bypassing
+        // `DecisionGroundRef::try_new`. Reject it at the raw layer so the
+        // grounds signal cannot be influenced by a key the author wrote and
+        // forgot to fill.
+        for key in ["user_decision_ref", "review_finding_ref"] {
+            let yaml_key = serde_yaml::Value::String(key.to_owned());
+            if let Some(value) = map.get(yaml_key) {
+                if value.is_null() {
+                    return Err(AdrFrontMatterCodecError::InvalidDecisionField(format!(
+                        "decision '{id}': `{key}` is present but null — \
+                         an explicit null is an unfilled placeholder; \
+                         either remove the key entirely or supply a non-empty value"
+                    )));
+                }
+            }
+        }
     }
 
     Ok(())
@@ -537,6 +556,50 @@ decisions:
             AdrFrontMatterCodecError::InvalidDecisionField(msg) => {
                 assert!(msg.contains("user_decision_ref"), "got: {msg}");
                 assert!(msg.contains("D1"), "got: {msg}");
+            }
+            other => panic!("expected InvalidDecisionField, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_parse_adr_frontmatter_null_user_decision_ref_returns_invalid_decision_field() {
+        // ADR 2026-06-16-0042 §D2 fail-closed: an explicit YAML null on
+        // user_decision_ref must be rejected before the DTO layer, because
+        // `serde` would silently fold it into `None` and bypass try_new.
+        let content = wrap(
+            r#"adr_id: foo
+decisions:
+  - id: D1
+    status: proposed
+    user_decision_ref: null"#,
+        );
+        let err = parse_adr_frontmatter(&content).unwrap_err();
+        match err {
+            AdrFrontMatterCodecError::InvalidDecisionField(msg) => {
+                assert!(msg.contains("user_decision_ref"), "got: {msg}");
+                assert!(msg.contains("present but null"), "got: {msg}");
+                assert!(msg.contains("D1"), "got: {msg}");
+            }
+            other => panic!("expected InvalidDecisionField, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_parse_adr_frontmatter_bare_review_finding_ref_returns_invalid_decision_field() {
+        // The bare-key form (`review_finding_ref:` with nothing after) is also
+        // an explicit null in YAML and must be rejected for the same reason.
+        let content = wrap(
+            r#"adr_id: foo
+decisions:
+  - id: D1
+    status: accepted
+    review_finding_ref:"#,
+        );
+        let err = parse_adr_frontmatter(&content).unwrap_err();
+        match err {
+            AdrFrontMatterCodecError::InvalidDecisionField(msg) => {
+                assert!(msg.contains("review_finding_ref"), "got: {msg}");
+                assert!(msg.contains("present but null"), "got: {msg}");
             }
             other => panic!("expected InvalidDecisionField, got {other:?}"),
         }
