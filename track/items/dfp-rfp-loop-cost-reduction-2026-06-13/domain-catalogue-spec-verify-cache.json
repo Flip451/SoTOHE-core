@@ -441,6 +441,318 @@
         "kind": "pass",
         "citation": "カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する"
       }
+    },
+    {
+      "claim_hash": "6f6996dbfc000354102d8fcc748b1df1378bc22f3417620be34281b63f379e56",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "6f6996dbfc000354102d8fcc748b1df1378bc22f3417620be34281b63f379e56",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "610ef62aa14e12f41d4d771487dd8625d67caf67a53cd34fd8a0b8016169b659",
+      "evidence_hash": "d4b4e31a1a57f735a81956b537a4379bb1d6633bae03a606b0dc384102aeefb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録は FragmentRef（path + content_hash）単位で照合し、同一 content_hash の別 path を covered と誤認しない。"
+      }
+    },
+    {
+      "claim_hash": "fdd0818ea73936d9ec041f6c1787fce85f3201c6302db70223894208bb73aff0",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "fdd0818ea73936d9ec041f6c1787fce85f3201c6302db70223894208bb73aff0",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。類似検索は `dry write`（resolver）にのみ残す。"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "eba2ceaf24d7025f2fc1bccda6f877690f369171176cfba76c1fc81598c245de",
+      "evidence_hash": "a7e52f86e3eca539c5231d1d984cd55b537757d5cfc9c208754e4bc36f3b0993",
+      "verdict": {
+        "kind": "pass",
+        "citation": "次に必要なフェーズ（DFP 再入 / RFP 対象 scope 列挙 / ref-verify 再実行 / commit 可）を出力する単一の決定的コマンド"
+      }
+    },
+    {
+      "claim_hash": "eba2ceaf24d7025f2fc1bccda6f877690f369171176cfba76c1fc81598c245de",
+      "evidence_hash": "a820dd3f46bef0d917cd87b08bd1d9e1efa2f7128a0ade3943b7133ff4c912fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry gate / review per-scope 状態 / ref-verify gate の 3 ゲートを合成した次フェーズ（DFP / RFP(scope list) / ref-verify / commit）を決定的に出力する。orchestrator はこの出力に従うだけで収束判定ロジックを持たない。"
+      }
+    },
+    {
+      "claim_hash": "eba2ceaf24d7025f2fc1bccda6f877690f369171176cfba76c1fc81598c245de",
+      "evidence_hash": "47a973c35061aa1c3388a887a91ec85db08759653a4695760dc2d055f49461a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D2 の fixpoint 解決コマンドは各ゲートの公開インターフェース（exit code / 読み出し API）だけを合成し、dry-check.json / review.json / ref-verify cache の内部構造には依存しない"
+      }
+    },
+    {
+      "claim_hash": "6f6996dbfc000354102d8fcc748b1df1378bc22f3417620be34281b63f379e56",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction / new behavioral commitment: the evidence says check-approved determines Approved / Blocked using only two conditions, staleness defined as current diff FragmentRef being present in coverage and all-resolved. The claim adds an additional config-fingerprint mismatch and fail-closed sentinel that make check_approved return Blocked regardless of those two conditions."
+      }
+    },
+    {
+      "claim_hash": "c1b0955f3c260c0f3506f3fcb3544a402b98d0d5ad2fea5cb9184597edd8c471",
+      "evidence_hash": "d4b4e31a1a57f735a81956b537a4379bb1d6633bae03a606b0dc384102aeefb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録の欠落・不整合時は fail-closed（Blocked）で安全側に倒す。カバレッジ記録は FragmentRef（path + content_hash）単位で照合し"
+      }
+    },
+    {
+      "claim_hash": "6f6996dbfc000354102d8fcc748b1df1378bc22f3417620be34281b63f379e56",
+      "evidence_hash": "c21398df74f4f2f3c2f8294993e08585a0f2f1b8eb288b5cfef885a1daecbc4d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(2) staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか — 不一致なら Blocked（設定変更により coverage 再生成が必要）。(4) fail-closed sentinel: カバレッジ記録のいずれかのフィンガープリントが all-zeros（`fail_closed()` 値）の場合は問答無用で Blocked"
+      }
+    },
+    {
+      "claim_hash": "6f6996dbfc000354102d8fcc748b1df1378bc22f3417620be34281b63f379e56",
+      "evidence_hash": "37f4efb8c4d1d02ef3359436fe205a5820efa21fba5e09989f74c607d3dd47ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(2) staleness-config（config_fingerprint 一致確認、不一致なら Blocked）、(4) fail-closed sentinel（all-zeros フィンガープリント検出、Blocked）"
+      }
+    },
+    {
+      "claim_hash": "6f6996dbfc000354102d8fcc748b1df1378bc22f3417620be34281b63f379e56",
+      "evidence_hash": "3161bf8841d3b2847b280aa202d58c12aa1fa31a99c7ff04786a9f6dfecccfbe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（`DryCheckCoverageRecord`：処理した diff フラグメントの FragmentRef 集合 + 処理済みペアキー集合 + config_fingerprint + corpus_fingerprint）を記録し、その記録を `dry check-approved` が staleness 判定に使う。(b) dry-check.json 設定変更 → config_fingerprint 不一致 → Blocked → `dry write` 強制"
+      }
+    },
+    {
+      "claim_hash": "fdd0818ea73936d9ec041f6c1787fce85f3201c6302db70223894208bb73aff0",
+      "evidence_hash": "37f4efb8c4d1d02ef3359436fe205a5820efa21fba5e09989f74c607d3dd47ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(3) staleness-corpus（corpus_fingerprint 一致確認、不一致なら Blocked）、(4) fail-closed sentinel（all-zeros フィンガープリント検出、Blocked）"
+      }
+    },
+    {
+      "claim_hash": "fdd0818ea73936d9ec041f6c1787fce85f3201c6302db70223894208bb73aff0",
+      "evidence_hash": "3161bf8841d3b2847b280aa202d58c12aa1fa31a99c7ff04786a9f6dfecccfbe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（`DryCheckCoverageRecord`：処理した diff フラグメントの FragmentRef 集合 + 処理済みペアキー集合 + config_fingerprint + corpus_fingerprint）を記録し、その記録を `dry check-approved` が staleness 判定に使う。... (c) corpus 変更 → corpus_fingerprint 不一致 → Blocked → `dry write` 強制、(d) `dry write` 失敗時は all-zeros フィンガープリント（`fail_closed()` 値）を書き込み"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "c21398df74f4f2f3c2f8294993e08585a0f2f1b8eb288b5cfef885a1daecbc4d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録を読んで次の条件で Approved / Blocked を判定する。(1) staleness-fragment: 現在の diff フラグメントの FragmentRef（path + content_hash）がカバレッジ記録の fragment_refs に在るか — 無ければ Blocked。(2) staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか — 不一致なら Blocked（設定変更により coverage 再生成が必要）。(3) staleness-corpus: カバレッジ記録の corpus_fingerprint が現在のワークスペース corpus から導出したフィンガープリントと一致するか — 不一致なら Blocked（corpus 変更により coverage が陳腐化）。"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "37f4efb8c4d1d02ef3359436fe205a5820efa21fba5e09989f74c607d3dd47ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録だけを読んで、(1) staleness-fragment（FragmentRef 照合）、(2) staleness-config（config_fingerprint 一致確認、不一致なら Blocked）、(3) staleness-corpus（corpus_fingerprint 一致確認、不一致なら Blocked）、(4) fail-closed sentinel（all-zeros フィンガープリント検出、Blocked）、(5) all-resolved（violation ペア不在確認）の 5 条件で Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "3161bf8841d3b2847b280aa202d58c12aa1fa31a99c7ff04786a9f6dfecccfbe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DryCheckCoverageRecord`：処理した diff フラグメントの FragmentRef 集合 + 処理済みペアキー集合 + config_fingerprint + corpus_fingerprint"
+      }
+    },
+    {
+      "claim_hash": "865d85db1aa6fc2a0c7822000b352f39d6b97ad7c8a38d139f9a44750e9e06d1",
+      "evidence_hash": "c21398df74f4f2f3c2f8294993e08585a0f2f1b8eb288b5cfef885a1daecbc4d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録を読んで次の条件で Approved / Blocked を判定する。(2) staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか — 不一致なら Blocked（設定変更により coverage 再生成が必要）。"
+      }
+    },
+    {
+      "claim_hash": "865d85db1aa6fc2a0c7822000b352f39d6b97ad7c8a38d139f9a44750e9e06d1",
+      "evidence_hash": "37f4efb8c4d1d02ef3359436fe205a5820efa21fba5e09989f74c607d3dd47ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`staleness-config（config_fingerprint 一致確認、不一致なら Blocked）`"
+      }
+    },
+    {
+      "claim_hash": "865d85db1aa6fc2a0c7822000b352f39d6b97ad7c8a38d139f9a44750e9e06d1",
+      "evidence_hash": "3161bf8841d3b2847b280aa202d58c12aa1fa31a99c7ff04786a9f6dfecccfbe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（`DryCheckCoverageRecord`：処理した diff フラグメントの FragmentRef 集合 + 処理済みペアキー集合 + config_fingerprint + corpus_fingerprint）を記録し、その記録を `dry check-approved` が staleness 判定に使う。(b) dry-check.json 設定変更 → config_fingerprint 不一致 → Blocked → `dry write` 強制"
+      }
+    },
+    {
+      "claim_hash": "c3ac257a2286f9197d93c521cd259fa4b97c76dba91fa391d32ec270880fbfe7",
+      "evidence_hash": "c21398df74f4f2f3c2f8294993e08585a0f2f1b8eb288b5cfef885a1daecbc4d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry-check.json の verdict 記録を読んで次の条件で Approved / Blocked を判定する。(2) staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか — 不一致なら Blocked"
+      }
+    },
+    {
+      "claim_hash": "c3ac257a2286f9197d93c521cd259fa4b97c76dba91fa391d32ec270880fbfe7",
+      "evidence_hash": "37f4efb8c4d1d02ef3359436fe205a5820efa21fba5e09989f74c607d3dd47ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録だけを読んで、(1) staleness-fragment（FragmentRef 照合）、(2) staleness-config（config_fingerprint 一致確認、不一致なら Blocked）、(3) staleness-corpus（corpus_fingerprint 一致確認、不一致なら Blocked）、(4) fail-closed sentinel（all-zeros フィンガープリント検出、Blocked）、(5) all-resolved（violation ペア不在確認）の 5 条件で Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "c3ac257a2286f9197d93c521cd259fa4b97c76dba91fa391d32ec270880fbfe7",
+      "evidence_hash": "3161bf8841d3b2847b280aa202d58c12aa1fa31a99c7ff04786a9f6dfecccfbe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"dry-check.json 設定変更 → config_fingerprint 不一致 → Blocked → `dry write` 強制\""
+      }
+    },
+    {
+      "claim_hash": "6f6996dbfc000354102d8fcc748b1df1378bc22f3417620be34281b63f379e56",
+      "evidence_hash": "5ab18fac1480c03be38cbffd8c6345bf643a318154871926b06a7ef1ae7aa74b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか — 不一致なら Blocked（設定変更により coverage 再生成が必要）"
+      }
+    },
+    {
+      "claim_hash": "6f6996dbfc000354102d8fcc748b1df1378bc22f3417620be34281b63f379e56",
+      "evidence_hash": "dac78768c20acab739f9359be6e941a4193233e6ccdcfca5cf1b271e90983f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(2) staleness-config（config_fingerprint 一致確認、不一致なら Blocked） ... (4) fail-closed sentinel（all-zeros フィンガープリント検出、Blocked）"
+      }
+    },
+    {
+      "claim_hash": "00dcff91e1b54511324b90b7d9fb82a315116d67438911dae14da7763ba93893",
+      "evidence_hash": "dac78768c20acab739f9359be6e941a4193233e6ccdcfca5cf1b271e90983f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`(3) staleness-corpus（corpus_fingerprint 一致確認、不一致なら Blocked）、(4) fail-closed sentinel（all-zeros フィンガープリント検出、Blocked）`"
+      }
+    },
+    {
+      "claim_hash": "00dcff91e1b54511324b90b7d9fb82a315116d67438911dae14da7763ba93893",
+      "evidence_hash": "3161bf8841d3b2847b280aa202d58c12aa1fa31a99c7ff04786a9f6dfecccfbe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（`DryCheckCoverageRecord`：処理した diff フラグメントの FragmentRef 集合 + 処理済みペアキー集合 + config_fingerprint + corpus_fingerprint）を記録し、その記録を `dry check-approved` が staleness 判定に使う。(c) corpus 変更 → corpus_fingerprint 不一致 → Blocked → `dry write` 強制、(d) `dry write` 失敗時は all-zeros フィンガープリント（`fail_closed()` 値）を書き込み → 次回 `check-approved` で Blocked → `dry write` 再実行強制"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "5ab18fac1480c03be38cbffd8c6345bf643a318154871926b06a7ef1ae7aa74b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録を読んで次の条件で Approved / Blocked を判定する。(1) staleness-fragment: 現在の diff フラグメントの FragmentRef（path + content_hash）がカバレッジ記録の fragment_refs に在るか — 無ければ Blocked。(2) staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか — 不一致なら Blocked（設定変更により coverage 再生成が必要）。(3) staleness-corpus: カバレッジ記録の corpus_fingerprint が現在のワークスペース corpus から導出したフィンガープリントと一致するか — 不一致なら Blocked（corpus 変更により coverage が陳腐化）。(5) all-resolved: processed_pair_keys に含まれ、かつ変更フラグメントに触れる最新記録ペアが全て not-a-violation / accepted か — 対象ペアに violation があれば Blocked。processed_pair_keys に含まれない履歴記録は過去 coverage の残存としてこの確認から除外する。"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "535235134d20a4091d9ca179c19cd54f3a6ae55ca7972949deb2686787125d8e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` が `DryCheckCoverageRecord`（fragment_refs: 処理した diff フラグメントの FragmentRef 集合、processed_pair_keys: 判定対象として確定したペアキー集合、config_fingerprint: 実行時 dry-check.json 設定のフィンガープリント、corpus_fingerprint: 実行時 workspace corpus のフィンガープリント）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。"
+      }
+    },
+    {
+      "claim_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4",
+      "evidence_hash": "dac78768c20acab739f9359be6e941a4193233e6ccdcfca5cf1b271e90983f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録だけを読んで、(1) staleness-fragment（FragmentRef 照合）、(2) staleness-config（config_fingerprint 一致確認、不一致なら Blocked）、(3) staleness-corpus（corpus_fingerprint 一致確認、不一致なら Blocked）、(4) fail-closed sentinel（all-zeros フィンガープリント検出、Blocked）、(5) all-resolved（processed_pair_keys に含まれ、変更 FragmentRef に触れる最新記録ペアの violation 不在確認）の 5 条件で Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "865d85db1aa6fc2a0c7822000b352f39d6b97ad7c8a38d139f9a44750e9e06d1",
+      "evidence_hash": "5ab18fac1480c03be38cbffd8c6345bf643a318154871926b06a7ef1ae7aa74b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry-check.json` の verdict 記録を読んで次の条件で Approved / Blocked を判定する。(2) staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか"
+      }
+    },
+    {
+      "claim_hash": "865d85db1aa6fc2a0c7822000b352f39d6b97ad7c8a38d139f9a44750e9e06d1",
+      "evidence_hash": "dac78768c20acab739f9359be6e941a4193233e6ccdcfca5cf1b271e90983f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録だけを読んで、(2) staleness-config（config_fingerprint 一致確認、不一致なら Blocked）"
+      }
+    },
+    {
+      "claim_hash": "c3ac257a2286f9197d93c521cd259fa4b97c76dba91fa391d32ec270880fbfe7",
+      "evidence_hash": "5ab18fac1480c03be38cbffd8c6345bf643a318154871926b06a7ef1ae7aa74b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録と dry-check.json の verdict 記録を読んで次の条件で Approved / Blocked を判定する。(2) staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか — 不一致なら Blocked（設定変更により coverage 再生成が必要）。"
+      }
+    },
+    {
+      "claim_hash": "c3ac257a2286f9197d93c521cd259fa4b97c76dba91fa391d32ec270880fbfe7",
+      "evidence_hash": "dac78768c20acab739f9359be6e941a4193233e6ccdcfca5cf1b271e90983f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録だけを読んで、(2) staleness-config（config_fingerprint 一致確認、不一致なら Blocked）... の 5 条件で Approved / Blocked を判定する。"
+      }
     }
   ]
 }

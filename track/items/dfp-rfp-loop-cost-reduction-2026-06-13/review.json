@@ -212,1448 +212,6 @@
         }
       ]
     },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:03:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
-          "at": "2026-06-14T01:05:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
-          "at": "2026-06-14T23:52:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
-          "at": "2026-06-14T23:53:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ec8bb804b0ac738d90793d9118ac00eb92320eee8c07ce46d22978328867753",
-          "at": "2026-06-15T06:42:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ec8bb804b0ac738d90793d9118ac00eb92320eee8c07ce46d22978328867753",
-          "at": "2026-06-15T06:44:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f328bc986d4bf21cd3efa2e0284166ff29c4199ae7cf5b6823fa8f447bb2cb29",
-          "at": "2026-06-15T09:14:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f328bc986d4bf21cd3efa2e0284166ff29c4199ae7cf5b6823fa8f447bb2cb29",
-          "at": "2026-06-15T09:16:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a34389ef7ee0447b2bc8317be3f5cb92b089578383f0bad13ba693216e3d8e0",
-          "at": "2026-06-15T12:26:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a34389ef7ee0447b2bc8317be3f5cb92b089578383f0bad13ba693216e3d8e0",
-          "at": "2026-06-15T12:28:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fail_closed()` returns the same all-zero value that `new()` accepts as a normal fingerprint, so a failed write and a failed read can both produce equal corpus fingerprints. In that case `check_approved` will not block, which breaks the fail-closed guarantee documented here.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/dry_check/coverage.rs",
-              "line": 55,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:53bcf7f5ce2dafe7516fbaaadb19024ace6ea4ecb5c79986fd3a092ff3cec8a7",
-          "at": "2026-06-16T01:49:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52817088c21e64652e1a0515ad5af6be00fbdc010831ae336e2171486f429b8e",
-          "at": "2026-06-16T03:39:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52817088c21e64652e1a0515ad5af6be00fbdc010831ae336e2171486f429b8e",
-          "at": "2026-06-16T03:43:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c835de83e9cfe1c09b6fae31ca84e0ee4fd86457514bc5b41b0ea8560ecb7c2a",
-          "at": "2026-06-16T05:08:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c835de83e9cfe1c09b6fae31ca84e0ee4fd86457514bc5b41b0ea8560ecb7c2a",
-          "at": "2026-06-16T05:11:27Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:18:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/dry.rs",
-              "line": 425,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
-          "at": "2026-06-14T04:21:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
-          "at": "2026-06-14T04:23:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:39:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
-          "at": "2026-06-14T04:42:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:07:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
-          "at": "2026-06-14T11:09:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
-          "at": "2026-06-14T15:54:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
-          "at": "2026-06-14T15:56:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FixpointResolve` is classified as display-only here, so `execute_track_with_telemetry()` will return early and skip telemetry for `sotp track fixpoint-resolve`. That contradicts the command contract in the briefing and should be removed from the display-only match.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/main.rs",
-              "line": 537,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1bd5eac9d6b8dd1e278e7cf775030823399628dd2c04f0f25727782db39eddbe",
-          "at": "2026-06-15T00:39:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: this new CLI entrypoint has no happy-path or error-path tests. The module only exercises clap parsing and `format_fixpoint_step`, so regressions in `execute_fixpoint_resolve` itself (mapping `FixpointResolveInput` into `CliApp::fixpoint_resolve`, stdout/stderr emission, and exit-code propagation) would be untested.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 32,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:6956dab414e82d87df43f780a06bb1076008b7d3e41c3b241d32d93308bc4739",
-          "at": "2026-06-15T00:48:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: the new public CLI entrypoint is not covered by any happy-path or error-path test. The module only exercises clap parsing and `format_fixpoint_step`, so regressions in `execute_fixpoint_resolve` itself (mapping `FixpointResolveInput` into `CliApp::fixpoint_resolve`, stdout/stderr emission, and exit-code propagation) would slip through.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 32,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:6956dab414e82d87df43f780a06bb1076008b7d3e41c3b241d32d93308bc4739",
-          "at": "2026-06-15T01:01:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1, testing: the new public wrapper [`execute_fixpoint_resolve`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs:32 ) is only covered by error-path tests; the only wrapper tests start at [`apps/cli/src/commands/track/fixpoint_resolve.rs:175`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs:175 ). There is no test that exercises the success path and asserts `CommandOutcome::success` is printed and `ExitCode::SUCCESS` is returned, so a regression in the CLI forwarding layer would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 32,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:73256b180ce1c0b2040f40d3a7ceca2ada8f59a056ac90bccfd52472ff225a2d",
-          "at": "2026-06-15T01:14:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackCommand::FixpointResolve` exposes `fixpoint_resolve::FixpointResolveArgs` from a crate-private module. With workspace `warnings = \"deny\"`, rustc will emit a `private_interfaces`/`private_in_public` warning for this public enum variant and fail the build. Move `FixpointResolveArgs` to a publicly reachable module (or re-export it from `mod.rs`) before exposing it in `TrackCommand`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/mod.rs",
-              "line": 382,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:aec3b2f916affbb3e5c25f15f6ec91b53d21fa37fc2c662946010ca798e24133",
-          "at": "2026-06-15T01:21:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
-          "at": "2026-06-15T01:28:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
-          "at": "2026-06-15T01:28:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
-          "at": "2026-06-15T01:31:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `TrackCommand::FixpointResolve` branch in `items_dir()` is not covered by the accessor test suite in this file. That accessor feeds telemetry path resolution in `main.rs`, so a regression here would silently anchor telemetry to the wrong track tree. Add a unit test asserting `TrackCommand::FixpointResolve(args).items_dir()` returns `args.items_dir`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/mod.rs",
-              "line": 505,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
-          "at": "2026-06-15T02:17:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
-          "at": "2026-06-15T02:28:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
-          "at": "2026-06-15T03:02:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
-          "at": "2026-06-15T03:40:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
-          "at": "2026-06-15T03:43:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f0696059c2857802208b0f77d20bc3152b7c17e166e3a2e3cee059ba132fd426",
-          "at": "2026-06-15T09:11:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f0696059c2857802208b0f77d20bc3152b7c17e166e3a2e3cee059ba132fd426",
-          "at": "2026-06-15T09:16:10Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
-          "at": "2026-06-14T02:35:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_check_approved` now reads `track_dir/dry-check-coverage.json`, but this composition layer never writes that manifest on the `dry write` path. In this file the write flow still only constructs `FsDryCheckStore` and calls `run_dry_check`; `rg` shows no production `write_coverage` call. Since `FsDryCheckCoverageAdapter::read_coverage` returns `Ok(None)` for a missing file and the new approval interactor treats that as `Blocked`, a normal `sotp dry write` followed by `sotp dry check-approved` will fail closed forever unless a manifest is created out-of-band. Wire coverage persistence into the write flow or keep the approval bridge on an artifact that the write flow actually produces.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 500,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
-          "at": "2026-06-14T02:39:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T02:44:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
-          "at": "2026-06-14T03:02:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
-          "at": "2026-06-14T03:06:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T03:17:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
-          "at": "2026-06-14T03:22:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
-          "at": "2026-06-14T03:46:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
-          "at": "2026-06-14T03:48:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `db_path`, `threshold`, and `workspace_root` from `DryCheckApprovedInput` makes the existing `execute_dry_check_approved` construction in `apps/cli/src/commands/dry.rs:197-200` no longer compile. The DTO change needs the caller updated in the same change set, otherwise the workspace is broken.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 128,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:20:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:25:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
-          "at": "2026-06-14T04:28:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `GateEval` path in `dry_check_approved` is not covered by tests. There is no assertion for the Approved case emitting `gate_name=\"dry\"` / `verdict=\"ok\"`, and no Blocked-case assertion for `verdict=\"error\"` plus the `blocked: N unresolved pair(s)` summary. This is public API behavior, so regressions here would be silent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 514,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:c0cf905ba18f3ae793aeaf00284a0da2a6330675eca4058520c0843a50bd3297",
-          "at": "2026-06-14T05:32:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
-          "at": "2026-06-14T05:37:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
-          "at": "2026-06-14T05:40:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new GateEval path is only covered by the pure mapping helper tests near the bottom of the file. There is no test that `dry_check_approved()` actually reaches `emit_gate_eval(...)` after a finalized verdict, so a regression that removes or reorders the telemetry call would be silent because the emitter suppresses errors. Add an end-to-end test for both Approved and Blocked flows that asserts the telemetry write occurs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 508,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:47c8fd4439776069504a0117cdbc43b272bf11118eba369966ac17d18adf4564",
-          "at": "2026-06-14T05:54:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
-          "at": "2026-06-14T06:06:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
-          "at": "2026-06-14T06:10:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
-          "at": "2026-06-14T11:08:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
-          "at": "2026-06-14T11:13:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
-          "at": "2026-06-14T12:40:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
-          "at": "2026-06-14T12:42:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
-          "at": "2026-06-14T13:15:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
-          "at": "2026-06-14T13:17:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
-          "at": "2026-06-14T13:43:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
-          "at": "2026-06-14T13:45:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
-          "at": "2026-06-14T15:57:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
-          "at": "2026-06-14T15:59:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
-          "at": "2026-06-14T17:25:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
-          "at": "2026-06-14T17:27:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_tiered_telemetry_for_result()` derives `findings_count` from the final `dry_result` and reuses it for both tiers. On escalated runs, the fast ReviewRound event will report the final-tier finding count instead of the fast-tier count, so the new per-tier telemetry is wrong whenever the tiers disagree.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 690,
-              "category": "correctness"
-            },
-            {
-              "message": "`dry_write()` passes the same `dry_start` instant to both `emit_review_round()` calls. That makes the final tier's duration include time spent in the fast tier, which defeats the per-tier timing this change is meant to capture.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 307,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:9b5883ba1e92c12c479870cee5c34b661c0b6b88702ebe909862d263575ab3e3",
-          "at": "2026-06-14T18:04:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `dry_tiered_telemetry_for_result()` copies the same `verdict_parse_failed` flag into both tier telemetry objects for subprocess failures. When the final tier is the one that hits `IllegalOutput` on an escalated run, the fast tier's `ReviewRound` and `ExternalSubprocess` events are also marked as parse failures, which misattributes the error to the wrong tier.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 709,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:7c4d29cf61e378b69698fc10ee1594658c0090367c960272adcadbffdd54d922",
-          "at": "2026-06-14T18:10:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_write()` emits the fast-tier `ReviewRound` and `ExternalSubprocess` telemetry only after `run_dry_check()` has finished the entire cycle. On runs that escalate to Final, both fast events therefore measure through the final tier as well, so the new per-tier telemetry does not report an accurate fast duration.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 306,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:bd7ca19eb02c7613a49969a0c5b2ef91facdef72a7b782908a735f4d132ced5c",
-          "at": "2026-06-14T18:16:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b2a59efdf07fa21e8d8e8397e406f01c7cbed00206d3b3a488efeca836dc626",
-          "at": "2026-06-14T18:24:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RecordingDryAgent` records every `judge()` call and increments `findings_count` for every `Violation`, but the dry-check interactor also calls the same port for known-bad calibration probes. Those probes are expected to return `Violation` even when there are no production candidates, so `dry_tiered_telemetry_for_result` will emit fast/final `ReviewRound` telemetry, and nonzero `findings_count`, based only on calibration activity. This violates the intended production tier telemetry semantics, including empty/no-candidate runs and final-tier emission when only calibration ran. The recorder needs to distinguish production judgments from calibration probes, or the telemetry helper needs to exclude probe calls from emission/counts.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 664,
-              "category": "correctness"
-            },
-            {
-              "message": "The subprocess-error tier attribution uses `final_started_at.is_some() && !tiered.final_.has_completed()` to decide whether the final tier failed. `has_completed` is sticky after any successful final-tier call, so if one final judgment completes and a later final judgment returns `IllegalOutput`/subprocess failure, the final tier is incorrectly treated as not failing and `verdict_parse_failed` is assigned to the fast telemetry instead. Track the tier of the failing call directly, or record per-tier error state rather than inferring it from a sticky completion flag.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 767,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6b2a59efdf07fa21e8d8e8397e406f01c7cbed00206d3b3a488efeca836dc626",
-          "at": "2026-06-14T18:26:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On successful runs, the fast ReviewRound is built from the final production `findings.len()` rather than the fast recorder count. In an escalated case where fast reports a violation but final clears it, the fast tier event is emitted with `findings_count = 0`, which violates the per-tier telemetry contract and underreports fast-tier findings. Use `tiered.fast.findings_count()` for the fast event and `tiered.final_.findings_count()` for the final event.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 778,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:accb6e541f10b24246ddcaff0d63e743072f410aeacbd2871a6939a58d011010",
-          "at": "2026-06-14T18:31:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`findings_count` is now derived from `tiered.fast.findings_count()`, but `RecordingDryAgent` counts every `Violation` judgment, including the known-bad calibration probes that the interactor always runs. A clean dry run can therefore emit a fast `ReviewRound` with nonzero findings, and empty/no-production runs can still emit tier telemetry from probe activity. The previous success path used the actual `dry_result` findings, so this corrupts the per-tier telemetry counters with calibration-only verdicts.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 778,
-              "category": "correctness"
-            },
-            {
-              "message": "The new tiered recorder/telemetry code pushes `dry.rs` to about 899 lines before the `#[cfg(test)] mod tests` block, well beyond the 700-line production module cap in AGENTS.md. This is a newly introduced architecture violation; split the tiered recorder/telemetry helpers into a production submodule to keep the composition module within the limit.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 640,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:6c3e517e65a3596a76c690866eaf06b9ab9f9dd589ce4a3aca6ca094b2a6e020",
-          "at": "2026-06-14T18:36:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The `Ok` path uses `findings.len()` for both tier payloads, so the fast `ReviewRound` reports the final accepted violation count rather than the fast tier's violation count. When Fast flags a pair and Final downgrades it to `NotAViolation`, telemetry emits `round_type=\"fast\"` with `findings_count=0`, hiding the fast-tier escalation the design intent calls out as `fast_findings_count`. The fast count needs to come from production fast judgments, not the final result list.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
-              "line": 239,
-              "category": "telemetry"
-            },
-            {
-              "message": "P1: `tiered.fast.started_at()` is set by any fast `judge()` call, including calibration probes. `run_dry_check` still runs fast calibration probes even when there are no production work items, so an empty production diff can still emit fast `ReviewRound`/`ExternalSubprocess` telemetry here. That violates the requirement to skip tier telemetry when the production tier was never invoked and over-counts dry review rounds for calibration-only activity.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
-              "line": 240,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:e70eab01f92ff0762c481e2d4480f0348fda55f512e8da3db1ff76b8ab5bb824",
-          "at": "2026-06-14T18:48:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`is_calibration_probe` treats any repo-relative path whose first component is `probes` as a synthetic calibration fixture. Production fragments are normalized to repo-relative paths, so real code under a top-level `probes/` directory will be delegated but not recorded, causing `dry_tiered_telemetry_for_result` to suppress ReviewRound emission or undercount findings even though production `judge()` ran. Restrict this to the exact synthetic fixture identities or pass an explicit probe marker from the usecase layer.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
-              "line": 142,
-              "category": "telemetry"
-            },
-            {
-              "message": "On escalated runs the fast ReviewRound uses the precomputed fast-tier duration, but the following `emit_external_subprocess` call still passes the fast tier start instant. That helper computes `start.elapsed()` at emission time after final-tier work has completed, so the fast ExternalSubprocess duration includes final-tier processing and persistence time. This makes the per-tier telemetry internally inconsistent; use a duration-aware emission path or avoid emitting a separate fast ExternalSubprocess event with an elapsed-from-start timestamp.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 334,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:34a88aa94a4f0b25dccabca145f09ce9f8f39cdd2146e21fdeac4ac9d08ac298",
-          "at": "2026-06-14T18:55:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The calibration-probe guard skips recording when either fragment has one of the synthetic probe paths. A legitimate production pair involving a repo file such as `probes/changed_a.rs` or `probes/candidate_a.rs` will therefore call `judge()` but never set the tier recorder's `started_at` or finding count, causing the required fast/final `ReviewRound` telemetry to be omitted or undercounted. The guard should identify the exact known-bad probe pair, not any single fragment path match.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
-              "line": 173,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f01310498811823673554d21a66508851ead7dcd9429fb8518449b6b253d7202",
-          "at": "2026-06-14T19:01:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:20fca1ae3423f6dcaef6de6264a5084bc3288ab28fe36e5029eac7384e9d3da6",
-          "at": "2026-06-14T19:05:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91f85c64693e9186a82dfef38d585d7b3b357139b94a43f7e1d45ec413430ab3",
-          "at": "2026-06-14T19:15:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `CliApp::fixpoint_resolve` derives `project_root` only from the literal shape of `--items-dir` (`resolve_project_root(&input.items_dir)`), then uses that derived path to resolve `.commit_hash` and the diff base. Because it never verifies that `items_dir` is actually inside the discovered repo root, an absolute or nested path ending in `track/items` can steer the command at an unrelated tree and make the fixpoint result read the wrong gate state. This needs the same repo-containment check used by the other composition helpers.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 313,
-              "category": "security"
-            },
-            {
-              "message": "P1: the new public entry point `CliApp::fixpoint_resolve` has no dedicated happy-path or error-path tests in this change set. The file only adds formatting/parsing coverage in `apps/cli`, so the branch guard, dry-base fallback, and gate-adapter error mapping are unexercised. That leaves a new public API without the required test coverage.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 291,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:73a73963a2f46cd02ae201770d99e9ad7ec8cfff03ffb3d2f13735fdac553b51",
-          "at": "2026-06-15T00:45:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22d078669da90d2ac92350e8873bcb5292207a714fca990b73c7f1fe1987f327",
-          "at": "2026-06-15T01:06:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `canonical_items_dir` is only checked with `starts_with(repo_root)` here, but the code never verifies that the path is actually a directory. A regular file named `track/items` inside the repo will pass validation, and the resolver will then treat `<file>/<track_id>` as a track tree instead of rejecting the input. This should mirror the `is_dir()` guard used by the other repo-root helpers.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 329,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: the new public API is only exercised for invalid inputs and the `run-dfp` path. There are no tests covering the successful `run-rfp`, `run-ref-verify`, or `commit` branches, so regressions in the new adapter wiring or `format_fixpoint_step` behavior on those paths would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 437,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:22d078669da90d2ac92350e8873bcb5292207a714fca990b73c7f1fe1987f327",
-          "at": "2026-06-15T01:35:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc420430ff2d2deb2a7216fa582e688246d520b252f4f6dd771b871da94a9dbe",
-          "at": "2026-06-15T02:12:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_current_fragment_refs()` still lets `GitDryCheckDiffGetter` discover the repository from the process CWD. `fixpoint_resolve()` validates `canonical_root`, but it never rebinds git operations to that root before calling `list_changed_hunks()`, so running the command from a different checkout or subdirectory can build `current_fragment_refs` for the wrong repo and return the wrong next step. Anchor the diff discovery to the validated repo root (or wrap the whole resolve in a repo-cwd guard).",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 203,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:bc420430ff2d2deb2a7216fa582e688246d520b252f4f6dd771b871da94a9dbe",
-          "at": "2026-06-15T02:22:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_current_fragment_refs` temporarily changes the process working directory, but the tests in this file do not serialize on `crate::test_support::process_env_lock()` like the other env-mutating composition tests. `test_fixpoint_resolve_missing_coverage_record_returns_run_dfp` can therefore race with any concurrent test that also touches cwd and become flaky. Use the shared guarded pattern or lock these tests around the helper.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 193,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:00b4fd090f52f0d312fa56bdff2a005a85f6c4911ba9b83e1a90ebf7ad877680",
-          "at": "2026-06-15T02:29:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54eea2a1cedff8625bffa0403fb83b67c05953674dab881916c2650f7deb6141",
-          "at": "2026-06-15T02:58:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_current_fragment_refs()` normalizes fragments against `canonical_root` (the parent of `track/items`) instead of the repository root used by `GitDryCheckDiffGetter`. That works only when the track lives exactly at the repo root. If `--items-dir` points at a nested project inside the repo, the diff hunks stay repo-relative while the fragment refs become project-root-relative, so they stop matching and the dry gate can compute the wrong next step.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 224,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:54eea2a1cedff8625bffa0403fb83b67c05953674dab881916c2650f7deb6141",
-          "at": "2026-06-15T03:06:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `resolve_dry_diff_base_for_track` still depends on the ambient process CWD when it reads `.commit_hash` via `FsDryCheckCommitHashStore::read()`, but this command never anchors that read to the validated repo root. If `fixpoint_resolve` is invoked from outside the repository, the ancestry check can fail closed to `Ok(None)` and silently fall back to `git rev-parse main`, which can produce the wrong fixpoint step for a valid track. The new dry-base call site at [apps/cli-composition/src/track/fixpoint_resolve.rs]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs#L391 ) should be wrapped with the same repo-CWD guard used elsewhere, or the store/read path should be made cwd-independent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 391,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:a8226dc955f956009ebf934c2127db422137b3fa16a7785ecb21f7b9062e37dc",
-          "at": "2026-06-15T03:16:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Relative `--items-dir` is rebased against `canonical_root` here, which is derived from the caller's current working directory, not the discovered repo root. That makes `fixpoint_resolve` resolve `track/items` to the wrong tree when the command is run from a nested subdirectory, unlike the other track commands that resolve paths through the git repo root.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 347,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4fd6ab6bf6be2cacbab40aba026cbb43d2acd24e628fd67c4d28621a58a6c77e",
-          "at": "2026-06-15T03:46:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Passing the raw `input.items_dir` into the gate adapters reintroduces CWD dependence after `canonical_items_dir` has already been resolved and validated. In particular, `FsRefVerifyGateStateAdapter` re-derives its project root from that path, so running `fixpoint_resolve` from a repo subdirectory can make ref-verify inspect the wrong track tree or fail even though the validated canonical path is correct. Use the validated canonical path here instead.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 424,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:576fbe8cb5c992fc359a1868287fa9b6e225a4ad27c23123ea814b5d1e7b9e0e",
-          "at": "2026-06-15T03:56:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:576fbe8cb5c992fc359a1868287fa9b6e225a4ad27c23123ea814b5d1e7b9e0e",
-          "at": "2026-06-15T03:59:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fixpoint_resolve` validates and canonicalizes `--items-dir`, but then passes the raw `input.items_dir` into both `FsReviewGateStateAdapter` and `FsRefVerifyGateStateAdapter`. When the CLI is invoked with a relative `--items-dir` from any directory other than the repo root, those adapters re-resolve the path against the restored CWD instead of the already-validated repo-relative location, so review/ref-verify can fail or inspect the wrong track artifacts. Pass `canonical_items_dir` (or another absolute path) into both adapters.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 424,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:576fbe8cb5c992fc359a1868287fa9b6e225a4ad27c23123ea814b5d1e7b9e0e",
-          "at": "2026-06-15T03:59:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_fs_ref_verify_gate_state_adapter_returns_approved_when_no_production_pairs` is tied to the current checkout branch (`track/dfp-rfp-loop-cost-reduction-2026-06-13`) instead of setting up its own repo/branch. That makes the test environment-dependent and brittle: it will fail on any run from a different branch or detached HEAD, which violates the test independence requirement.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 731,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:f8cb0b20666e49476b781d8a23a891ba04297353bb56cb8b022176e402dbd2a7",
-          "at": "2026-06-15T04:07:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `test_fs_ref_verify_gate_state_adapter_returns_approved_when_no_production_pairs` is not independent: it assumes the workspace checkout is currently on `track/dfp-rfp-loop-cost-reduction-2026-06-13` and uses the live repo branch as an external precondition. On any other branch, or in detached-HEAD CI, `FsRefVerifyGateStateAdapter::ref_verify_status` will return the branch-mismatch error instead of `Ok(Approved)`, so the test becomes flaky. Build the fixture in a temp git repo with the expected branch, like `seed_track_repo`, rather than relying on host checkout state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 742,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:f8cb0b20666e49476b781d8a23a891ba04297353bb56cb8b022176e402dbd2a7",
-          "at": "2026-06-15T04:09:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db3926b00814cba4c3ea1b5538692f066f086bf45cde46b9371cb004381ae2f4",
-          "at": "2026-06-15T04:18:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db3926b00814cba4c3ea1b5538692f066f086bf45cde46b9371cb004381ae2f4",
-          "at": "2026-06-15T04:23:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca800281fba6485c12a8665e5a1cbaddef985120dd4212d111c5a5dacc2e155b",
-          "at": "2026-06-15T04:40:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca800281fba6485c12a8665e5a1cbaddef985120dd4212d111c5a5dacc2e155b",
-          "at": "2026-06-15T04:43:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b2e27ab57811f7d58de68229789aab14e9971fc73759611ce0919c90456dffc1",
-          "at": "2026-06-15T06:42:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b2e27ab57811f7d58de68229789aab14e9971fc73759611ce0919c90456dffc1",
-          "at": "2026-06-15T06:44:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The coverage fingerprint is computed from `infra_config` after `--threshold` has already changed the effective write threshold, so a `dry write --threshold ...` records the same fingerprint as the file config. `dry check-approved` will then treat coverage produced under a different effective threshold as fresh, which can miss unresolved pairs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 302,
-              "category": "correctness"
-            },
-            {
-              "message": "This reads `.harness/config/dry-check.json` from `canonical_root` (the project root), but the dry-check writer and approval gate use the discovered repo root. In nested-project/monorepo layouts this loads the wrong config file or fails outright, so fixpoint resolution compares coverage against a fingerprint that does not match `dry write`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 420,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:49e159541dad7dcfc2dd1f7fc6e7f5cbc88ec2d3ed892e44525c92ad431d8131",
-          "at": "2026-06-15T09:20:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`--items-dir` is no longer anchored to the caller's repo before repo discovery. For an absolute path that happens to live under some other git checkout, `discover_from(&canonical_root)` will switch the command onto that other repo and the later `starts_with(repo_root)` check will still pass, so `fixpoint_resolve` can return a step for the wrong repository instead of rejecting the input.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 331,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:bee0fe0fc4bc901c1f856110503fedba5c422c245255aa4fb3231e4fa6255152",
-          "at": "2026-06-15T09:31:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ace25b722e977a92da9defca45710b3e7e8916feffc23e91087afb52b7f389ff",
-          "at": "2026-06-15T09:43:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fixpoint_resolve` now establishes the caller's CWD-discovered `repo_root` as the trust anchor, but the diff-base fallback still discovers git from `canonical_root` via `resolve_dry_diff_base_from_store(..., Some(canonical_root), ...)`. For a valid `--items-dir` inside the caller repo but under a nested checkout/project, a missing or malformed `.commit_hash` falls back to that nested repo's `main` SHA, then `build_current_fragment_refs` runs the diff from `repo_root`; this can make fixpoint resolution error or evaluate against the wrong base. Pass the CWD-discovered `repo_root` into the diff-base resolver so fallback and hunk discovery use the same repository.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 164,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ace25b722e977a92da9defca45710b3e7e8916feffc23e91087afb52b7f389ff",
-          "at": "2026-06-15T09:48:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1be6434830e02f5b74ea5fdf556683c4ec0102e16e192b43a938daad61a22910",
-          "at": "2026-06-15T09:52:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5c3e3df9bf4fe3132d36c704aa54269e0f0a052d41ed0fc551b71d6849def8e6",
-          "at": "2026-06-15T10:18:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5c3e3df9bf4fe3132d36c704aa54269e0f0a052d41ed0fc551b71d6849def8e6",
-          "at": "2026-06-15T10:19:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_write` now stores `infra_config.fingerprint()` even when `--threshold` changes the effective threshold. That drops the override from the coverage fingerprint, so a write run with a higher override than the file config can later be accepted by `dry check-approved` even though the manifest was built under a looser threshold and may be missing pairs in the current config range. This reintroduces the stale-coverage false-approval case that `fingerprint_with_threshold()` was designed to prevent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 311,
-              "category": "correctness"
-            },
-            {
-              "message": "The added test does not exercise `CliApp::dry_write` or the persisted manifest path; it only compares two `DryCheckConfig` fingerprint methods on the same config object. As written, it will pass even if the production code still stamps the wrong fingerprint, so it does not guard the regression.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 3607,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:36984eef79370cc846f209b9d104ccb6ab2aa71ea39f16f35febe400b6d0b1a1",
-          "at": "2026-06-15T23:32:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2bcfa7b25926c281a06f8bd189a71d106da4a2c411f67e00ec77ae3c1baeed68",
-          "at": "2026-06-15T23:43:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2bcfa7b25926c281a06f8bd189a71d106da4a2c411f67e00ec77ae3c1baeed68",
-          "at": "2026-06-15T23:46:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This fingerprints the project root derived from `items_dir`, but `dry write` persists `corpus_fingerprint` from `workspace_root` and the approval path recomputes it from the repo root. A valid `dry write --workspace-root <subdir>` run will therefore write a manifest that this gate can never approve, so the new corpus check blocks those tracks forever.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 435,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ff8342eb46d09f2b6e81b42a98ff96c7e46e125e3cac375daad615360f00b5e6",
-          "at": "2026-06-16T01:52:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new corpus fingerprint is recomputed from `canonical_root`, but `dry write` stores the fingerprint for `workspace_root`. In any non-default layout where those roots differ, a freshly written coverage manifest will never match `dry check-approved`, so the gate will stay blocked even when nothing changed. The approval path needs to use the same scan root that produced the manifest, or persist that root alongside the manifest.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 543,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1e577a928f2decb2559be6d63935544a1341a5fedfe580c260b32ec85cfbb280",
-          "at": "2026-06-16T03:39:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 correctness issue: `dry check-approved` recomputes the corpus fingerprint from `canonical_root`, but `dry write` fingerprints the corpus that the indexer actually scans via `workspace_root`. In any layout where those roots differ, a fresh manifest will never match approval, so the gate will stay blocked even when nothing changed. The approval path needs to use the same scan root as the write path, or the manifest must persist that scan root.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 543,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:97e59459ffbbd4fa1b32d3264c7ae61253a9900a089ecd1f1828dd901c124032",
-          "at": "2026-06-16T03:46:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_check_approved` recomputes the corpus fingerprint with `canonical_root` here, but the new sidecar stores the actual `workspace_root` from `dry write` and `workspace_root` is only guaranteed to be under the repo root. In a nested checkout this rejects valid manifests whenever the workspace root is the repo root or any sibling outside the project subtree, so a successful `dry write` can still be blocked by `dry check-approved`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
-              "line": 635,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:001184ae69cb504197ac85bb6f78d363c8d09088e11b293fe38aed798f77902f",
-          "at": "2026-06-16T03:57:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed1c6f5b0d3d7af16d0ce1d5601d6770fed7ed879c9dcdc1edca2778c6ab9cff",
-          "at": "2026-06-16T04:06:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`write_dry_corpus_root_manifest` writes the new sidecar with raw `std::fs::write` and no symlink guard. A repository can pre-create `track/items/<id>/dry-check-corpus-root.json` as a symlink, and `sotp dry write` will follow it and overwrite an arbitrary file the user can write. Existing dry artifacts reject symlinks before writing; this sidecar needs the same guard/atomic write path before it is safe.",
-              "severity": "P0",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 266,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:ed1c6f5b0d3d7af16d0ce1d5601d6770fed7ed879c9dcdc1edca2778c6ab9cff",
-          "at": "2026-06-16T04:10:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry write` persists the canonical `workspace_root` directly into `dry-check-corpus-root.json`. That path is checkout-local, so once this track artifact is copied or committed and evaluated in another checkout/CI runner, `resolve_dry_corpus_fingerprint_root` will canonicalize a path that either does not exist or is outside the current repo and the dry/fixpoint gate will fail closed even though the coverage was otherwise valid. This is especially problematic for subdirectory workspaces where the sidecar is required to avoid falling back to the repo root. Store a repo-relative workspace root and resolve it against the current repo root on read.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 268,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d3d5eee9bc29162e3e9f2bd02b3ecc5a96a7fdcf851e40f2759ad0583c34985a",
-          "at": "2026-06-16T04:15:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_write` now writes the corpus-root sidecar before the dry-check store/coverage writers run, but `write_dry_corpus_root_manifest` calls `atomic_write_file` without creating `track_dir`. A first `sotp dry write` for an existing `items_dir` whose `<items_dir>/<track_id>` directory has not been materialized will now fail with a filesystem error instead of letting the existing dry-check writers initialize the track directory. Create the parent directory with the same guarded policy used by the dry-check adapters before writing the sidecar.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 286,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:91a3afac24fc371008bc408f28a8ed64d73068d2817c4b105a60481ee3ee6e9d",
-          "at": "2026-06-16T04:20:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_write` records the corpus fingerprint by rescanning `workspace_root` after `build_diff_and_corpus_fragments` has already extracted the corpus and after `open_persistent_index_with_corpus` has built/opened the index from that earlier snapshot. If a Rust file is added or changed in that window, the coverage manifest can store the fingerprint for the newer corpus while the actual DRY analysis used the older corpus; later `dry check-approved` and `fixpoint-resolve` will recompute the same newer fingerprint and may approve without ever checking pairs from the changed corpus. The fingerprint needs to be derived from the same snapshot used for the index/analysis, or the command needs to detect and fail closed on snapshot drift.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 469,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:be47e481e12c04f98fdaa903aeff0b3d280b4a508c263cafc8c26f4694663932",
-          "at": "2026-06-16T04:26:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55af1c6b37d866c4d1a13178c075f85fee9f8a84defe1da2747ee8365104d482",
-          "at": "2026-06-16T04:33:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `compute_dry_corpus_fingerprint_from_fragments()` now hashes `start_line`/`end_line` in addition to the repo-relative path and content hash. That makes the corpus fingerprint change on whitespace-only edits that merely shift fragment line numbers, even when the extracted fragments and index contents are unchanged. Because `DryCheckApprovalInteractor` treats a corpus fingerprint mismatch as stale coverage, `dry check-approved` will false-block on these non-semantic edits. The corpus fingerprint contract in this flow is path+content-hash based, so the line-span bytes should not be part of the hash unless the rest of the pipeline is changed to depend on them too.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 253,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2ccbacdcb83ac5e9cd27dd7ea5d9cc9521becace231afc394c4f17eba6284122",
-          "at": "2026-06-16T05:11:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_dry_corpus_fingerprint_root` treats a symlink-guard failure as a legacy fallback and returns `repo_root` instead of rejecting the manifest. That silently swallows tampering/corruption of `dry-check-corpus-root.json` and makes approval use a different workspace snapshot than the one recorded. This should fail closed with an error.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 357,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:a2da987ca049f0476e650ce8baff34e0fb3943b7af8f3ea16d90a4fd3a472ed6",
-          "at": "2026-06-16T05:16:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebbaf9df8d829de42e3d9bbd7cd042c17a28d41bbee3c228153e41a7a563f3a6",
-          "at": "2026-06-16T05:26:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebbaf9df8d829de42e3d9bbd7cd042c17a28d41bbee3c228153e41a7a563f3a6",
-          "at": "2026-06-16T05:31:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d713d079899b3fd96126e868770740f90b6f3b6f52821e5c035c0f87a184289f",
-          "at": "2026-06-16T06:19:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d713d079899b3fd96126e868770740f90b6f3b6f52821e5c035c0f87a184289f",
-          "at": "2026-06-16T07:03:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:12a0ba3c750c3015e8108cf79535ace049b0ca7586d5568a4a8b02933124b4b1",
-          "at": "2026-06-16T08:00:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_dry_corpus_fingerprint_root` can fail for malformed, unsupported, symlinked, or otherwise invalid sidecars, and this new `?` returns an error before the approval interactor sees the fail-closed corpus fingerprint. The existing `compute_current_dry_corpus_fingerprint` path intentionally converts those same sidecar errors into `DryCheckCorpusFingerprint::fail_closed()`, which makes `dry check-approved` return the normal blocked gate result. With this change, an invalid recorded corpus-root sidecar changes gate behavior from fail-closed BLOCKED to a command error, contrary to the existing fail-closed approval semantics. Handle the root-resolution failure here without aborting, and let the fail-closed fingerprint block approval.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 545,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:12a0ba3c750c3015e8108cf79535ace049b0ca7586d5568a4a8b02933124b4b1",
-          "at": "2026-06-16T08:04:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The scoped `dry check-approved` behavior added here is not covered by a regression test. Existing tests exercise the corpus-root resolver and repo-root approval path, but not the public `dry_check_approved` path with a `dry-check-corpus-root.json` pointing at a subdirectory and changed files both inside and outside that scope. That means the original regression could return if this call went back to `canonical_repo_root` and the current tests would still pass. Add an end-to-end approval test that proves `current_fragment_refs` is built from the recorded workspace root.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 561,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:9d9fc21ac2668506ab38f92a09571a0a9b2d2330b5d54b99c4fbd887f3fff2ee",
-          "at": "2026-06-16T08:09:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9bd15b8252396737525e603ec6ed003a80de57a948199ee1c3870504af3b8b1",
-          "at": "2026-06-16T08:15:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This should mirror `dry check-approved` by resolving the corpus-root sidecar against the repo root used by `dry write`, not `canonical_root`: the manifest stores `workspace_root` relative to the repo root, so passing `canonical_root` will misinterpret relative paths in nested/monorepo layouts and can fail or point at the wrong directory. The direct `?` here also turns malformed/symlinked sidecars into hard `fixpoint-resolve` errors, whereas the existing approval path treats the same cases as stale and continues fail-closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 419,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:a8560c1fa4fc64284084d1745cddf6f9a2bfb70a0b8d5421a44def57eccb064d",
-          "at": "2026-06-16T08:53:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The no-sidecar fallback still resolves against `repo_root`, so `build_current_fragment_refs` scans the whole repo instead of the scoped workspace/project root. In nested checkouts where `canonical_root != repo_root`, legacy tracks without the corpus-root sidecar can still make `fixpoint_resolve` reason over out-of-scope fragments and reproduce the original scope drift. Thread the project root through this fallback instead of defaulting to `repo_root`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 420,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e2fce68f919db213d1aa4bf28bcb3400e8d8f2db877fca83bf94ce9e2bf15253",
-          "at": "2026-06-16T08:59:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Legacy no-sidecar runs are still split across two different roots: `approval_workspace_root` now falls back to `canonical_root`, but `current_corpus_fingerprint` is still recomputed via `compute_current_dry_corpus_fingerprint(&track_dir, &repo_root)`, whose missing-manifest path resolves to `repo_root`. In nested checkouts where `canonical_root != repo_root`, fixpoint resolution will scan project-root fragments but compare them against a repo-root corpus fingerprint, so old tracks without `dry-check-corpus-root.json` can never approve and will keep returning `run-dfp`. The fingerprint path needs the same root selection as the fragment-ref path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 417,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:423c3f041d8bf51f6b2885cd3428820b4c9a91a375178d7bbf5d2c7477d9c1a9",
-          "at": "2026-06-16T09:08:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3fa8ca579d5caa38c736ca4e2dd4b3fe1a82068f801693e90495caafb11cddaa",
-          "at": "2026-06-16T09:15:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3fa8ca579d5caa38c736ca4e2dd4b3fe1a82068f801693e90495caafb11cddaa",
-          "at": "2026-06-16T09:19:22Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -3535,6 +2093,102 @@
           "findings": [],
           "hash": "rvw1:sha256:155d16d539404c347aa341714704ba5e5249fac02796478f71eb6face1f31c90",
           "at": "2026-06-16T09:31:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df6945445de98899409f60695515054fd6bec770295775985072a43479d4bc6f",
+          "at": "2026-06-16T11:09:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GO-05`/`CN-09` still describe `sotp dry check-approved` as a FragmentRef-only staleness gate plus `all-resolved`, but `IN-05` and `AC-10`/`AC-11` now require additional `config_fingerprint`, `corpus_fingerprint`, and fail-closed sentinel checks. The spec no longer agrees on what `check-approved` must evaluate.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.md",
+              "line": 15,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b1fbd25b0716a5a0b3f9a4ec0e6437b10b3e045e50708d2959471db4b5f071d5",
+          "at": "2026-06-16T11:32:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51455bf62ce1ade4bdd93b9f65aecfc3ce0a222a39146496d016815d640f519b",
+          "at": "2026-06-16T11:39:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-06 is still the old write-side invariant: it says `dry write` records a coverage record consisting of the processed diff FragmentRef set and uses that for staleness. That conflicts with the expanded D5 semantics in IN-05/AC-11, which require `DryCheckCoverageRecord` to also carry processed_pair_keys, config_fingerprint, and corpus_fingerprint so config/corpus/sentinel changes can force Blocked. As written, an implementer could satisfy IN-06 without writing the fields needed by the new five-condition approval gate.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+              "line": 111,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:51455bf62ce1ade4bdd93b9f65aecfc3ce0a222a39146496d016815d640f519b",
+          "at": "2026-06-16T11:47:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckApprovalInteractor` narrows the fail-closed sentinel rule to corpus fingerprints only, while the expanded spec requires `dry check-approved` to block when any coverage fingerprint is all-zero. That leaves the plan internally inconsistent about an all-zero `config_fingerprint`: `spec.json` IN-05/CN-09/AC-10 require it to be Blocked, but this usecase catalogue text only mandates blocking for an all-zero corpus fingerprint, so an implementation following the catalogue could approve a failed `dry write` run whose config fingerprint is the sentinel.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/usecase-types.json",
+              "line": 491,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0545e0ba842cd23d5d7ee8b4b812025268b455d0e1bd46522e8716c6a4c65dc3",
+          "at": "2026-06-16T11:52:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckCoverageRecord` adds a rule that historical violation records whose `pair_key` is absent from `processed_pair_keys` are skipped, but the updated spec contract says `check-approved` uses only the five listed conditions and blocks on any violation pair touching changed fragments. That gives conflicting outcomes for a stale violation touching the current fragment: the spec's all-resolved condition blocks it, while the catalogue says to skip it. Clarify whether `processed_pair_keys` is part of the approval semantics and update IN-05/AC-10/CN-09 or the catalogue accordingly.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/domain-types.json",
+              "line": 490,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:04337a558dbaf60e7cb36afcf06661a30699b8acad0f7cdc48790b2c69fabcba",
+          "at": "2026-06-16T11:59:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckCorpusFingerprint` is documented as mirroring `DryCheckConfigFingerprint` in structure, but the same catalogue records `DryCheckConfigFingerprint` as a tuple struct while `DryCheckCorpusFingerprint` is recorded as a plain struct. That leaves the plan artifact internally inconsistent about the intended domain shape; either the corpus fingerprint shape or the “mirrors” claim needs to be corrected.",
+              "severity": "P1",
+              "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/domain-types.json",
+              "line": 444,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:09b6db5c6794cd93e0bb2c95ce73205a723dbc53136fb0830cac3d96bd674964",
+          "at": "2026-06-16T12:05:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc479186aab5398802c162fc06cad66be7cb3a68ad668de5d13d40e457c262a6",
+          "at": "2026-06-16T12:10:01Z"
         }
       ]
     },
@@ -4198,6 +2852,1448 @@
           "findings": [],
           "hash": "rvw1:sha256:8a297e2a0eb65ba8e4212303d607ea4875ad79e999739cb489d14aeff731f2c6",
           "at": "2026-06-16T09:31:05Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:35:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_check_approved` now reads `track_dir/dry-check-coverage.json`, but this composition layer never writes that manifest on the `dry write` path. In this file the write flow still only constructs `FsDryCheckStore` and calls `run_dry_check`; `rg` shows no production `write_coverage` call. Since `FsDryCheckCoverageAdapter::read_coverage` returns `Ok(None)` for a missing file and the new approval interactor treats that as `Blocked`, a normal `sotp dry write` followed by `sotp dry check-approved` will fail closed forever unless a manifest is created out-of-band. Wire coverage persistence into the write flow or keep the approval bridge on an artifact that the write flow actually produces.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 500,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cc2b086c81c7e9386d60c05201f5736f37a0a7223f89dcbc8b6c1c5d713f003f",
+          "at": "2026-06-14T02:39:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T02:44:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:02:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:827cb7a02a6e3339eb01493085a438e558174c6ad0df7b8bb7f8c93d3628d31f",
+          "at": "2026-06-14T03:06:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:17:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da0c07ee0f03f89aae79380195cdbc5d1ed56c2700c280a0b7ca74c7e6a2378f",
+          "at": "2026-06-14T03:22:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:46:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8878c46cf4b72cd33bb06e2380ea57d9b489058fd3911fb29ec8b09ffe49998",
+          "at": "2026-06-14T03:48:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `db_path`, `threshold`, and `workspace_root` from `DryCheckApprovedInput` makes the existing `execute_dry_check_approved` construction in `apps/cli/src/commands/dry.rs:197-200` no longer compile. The DTO change needs the caller updated in the same change set, otherwise the workspace is broken.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 128,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:20:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:25:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9e304c5a663344c81e677e4c1a4b4371ad772791c1b7e4dc88e50b915956ea5",
+          "at": "2026-06-14T04:28:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `GateEval` path in `dry_check_approved` is not covered by tests. There is no assertion for the Approved case emitting `gate_name=\"dry\"` / `verdict=\"ok\"`, and no Blocked-case assertion for `verdict=\"error\"` plus the `blocked: N unresolved pair(s)` summary. This is public API behavior, so regressions here would be silent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 514,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:c0cf905ba18f3ae793aeaf00284a0da2a6330675eca4058520c0843a50bd3297",
+          "at": "2026-06-14T05:32:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
+          "at": "2026-06-14T05:37:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3b0e6a54b096b1425347884a37cf0ee26bfc5dae245a387c902f08c02cc1c25",
+          "at": "2026-06-14T05:40:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new GateEval path is only covered by the pure mapping helper tests near the bottom of the file. There is no test that `dry_check_approved()` actually reaches `emit_gate_eval(...)` after a finalized verdict, so a regression that removes or reorders the telemetry call would be silent because the emitter suppresses errors. Add an end-to-end test for both Approved and Blocked flows that asserts the telemetry write occurs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 508,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:47c8fd4439776069504a0117cdbc43b272bf11118eba369966ac17d18adf4564",
+          "at": "2026-06-14T05:54:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
+          "at": "2026-06-14T06:06:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a03ab798968cb677f7b031c689e44b52ba9ddf3cd46104bb40d94bb3a7d487cb",
+          "at": "2026-06-14T06:10:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
+          "at": "2026-06-14T11:08:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cd64186f62c5f40f6eb26695bf763c8b54fbe06fa383a62f820e3e3c07bb050",
+          "at": "2026-06-14T11:13:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
+          "at": "2026-06-14T12:40:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f9f7d9bc00a7d575cc2c19fc905231bf52b929499e1b97b625eef4d8a434163",
+          "at": "2026-06-14T12:42:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
+          "at": "2026-06-14T13:15:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:676308fac762eda815db877ab2a761d151d9d923d403bd92a272e37c1b08d25b",
+          "at": "2026-06-14T13:17:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
+          "at": "2026-06-14T13:43:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60c7c07338116ca4af1b1b0c94650393cd5980e96960c8b15b1977ea7e04d1a0",
+          "at": "2026-06-14T13:45:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
+          "at": "2026-06-14T15:57:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e751715aeeef66fd82c76e658a1de7a25c2e4db61d11079a1bfac97c3878ddf",
+          "at": "2026-06-14T15:59:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
+          "at": "2026-06-14T17:25:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dda7e5cf0d2aa114bc277b669bfc158792d570151f0034b8dfb585f0ae41406",
+          "at": "2026-06-14T17:27:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_tiered_telemetry_for_result()` derives `findings_count` from the final `dry_result` and reuses it for both tiers. On escalated runs, the fast ReviewRound event will report the final-tier finding count instead of the fast-tier count, so the new per-tier telemetry is wrong whenever the tiers disagree.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 690,
+              "category": "correctness"
+            },
+            {
+              "message": "`dry_write()` passes the same `dry_start` instant to both `emit_review_round()` calls. That makes the final tier's duration include time spent in the fast tier, which defeats the per-tier timing this change is meant to capture.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 307,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:9b5883ba1e92c12c479870cee5c34b661c0b6b88702ebe909862d263575ab3e3",
+          "at": "2026-06-14T18:04:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `dry_tiered_telemetry_for_result()` copies the same `verdict_parse_failed` flag into both tier telemetry objects for subprocess failures. When the final tier is the one that hits `IllegalOutput` on an escalated run, the fast tier's `ReviewRound` and `ExternalSubprocess` events are also marked as parse failures, which misattributes the error to the wrong tier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 709,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7c4d29cf61e378b69698fc10ee1594658c0090367c960272adcadbffdd54d922",
+          "at": "2026-06-14T18:10:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_write()` emits the fast-tier `ReviewRound` and `ExternalSubprocess` telemetry only after `run_dry_check()` has finished the entire cycle. On runs that escalate to Final, both fast events therefore measure through the final tier as well, so the new per-tier telemetry does not report an accurate fast duration.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 306,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bd7ca19eb02c7613a49969a0c5b2ef91facdef72a7b782908a735f4d132ced5c",
+          "at": "2026-06-14T18:16:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b2a59efdf07fa21e8d8e8397e406f01c7cbed00206d3b3a488efeca836dc626",
+          "at": "2026-06-14T18:24:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RecordingDryAgent` records every `judge()` call and increments `findings_count` for every `Violation`, but the dry-check interactor also calls the same port for known-bad calibration probes. Those probes are expected to return `Violation` even when there are no production candidates, so `dry_tiered_telemetry_for_result` will emit fast/final `ReviewRound` telemetry, and nonzero `findings_count`, based only on calibration activity. This violates the intended production tier telemetry semantics, including empty/no-candidate runs and final-tier emission when only calibration ran. The recorder needs to distinguish production judgments from calibration probes, or the telemetry helper needs to exclude probe calls from emission/counts.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 664,
+              "category": "correctness"
+            },
+            {
+              "message": "The subprocess-error tier attribution uses `final_started_at.is_some() && !tiered.final_.has_completed()` to decide whether the final tier failed. `has_completed` is sticky after any successful final-tier call, so if one final judgment completes and a later final judgment returns `IllegalOutput`/subprocess failure, the final tier is incorrectly treated as not failing and `verdict_parse_failed` is assigned to the fast telemetry instead. Track the tier of the failing call directly, or record per-tier error state rather than inferring it from a sticky completion flag.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 767,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6b2a59efdf07fa21e8d8e8397e406f01c7cbed00206d3b3a488efeca836dc626",
+          "at": "2026-06-14T18:26:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On successful runs, the fast ReviewRound is built from the final production `findings.len()` rather than the fast recorder count. In an escalated case where fast reports a violation but final clears it, the fast tier event is emitted with `findings_count = 0`, which violates the per-tier telemetry contract and underreports fast-tier findings. Use `tiered.fast.findings_count()` for the fast event and `tiered.final_.findings_count()` for the final event.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 778,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:accb6e541f10b24246ddcaff0d63e743072f410aeacbd2871a6939a58d011010",
+          "at": "2026-06-14T18:31:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`findings_count` is now derived from `tiered.fast.findings_count()`, but `RecordingDryAgent` counts every `Violation` judgment, including the known-bad calibration probes that the interactor always runs. A clean dry run can therefore emit a fast `ReviewRound` with nonzero findings, and empty/no-production runs can still emit tier telemetry from probe activity. The previous success path used the actual `dry_result` findings, so this corrupts the per-tier telemetry counters with calibration-only verdicts.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 778,
+              "category": "correctness"
+            },
+            {
+              "message": "The new tiered recorder/telemetry code pushes `dry.rs` to about 899 lines before the `#[cfg(test)] mod tests` block, well beyond the 700-line production module cap in AGENTS.md. This is a newly introduced architecture violation; split the tiered recorder/telemetry helpers into a production submodule to keep the composition module within the limit.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 640,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:6c3e517e65a3596a76c690866eaf06b9ab9f9dd589ce4a3aca6ca094b2a6e020",
+          "at": "2026-06-14T18:36:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The `Ok` path uses `findings.len()` for both tier payloads, so the fast `ReviewRound` reports the final accepted violation count rather than the fast tier's violation count. When Fast flags a pair and Final downgrades it to `NotAViolation`, telemetry emits `round_type=\"fast\"` with `findings_count=0`, hiding the fast-tier escalation the design intent calls out as `fast_findings_count`. The fast count needs to come from production fast judgments, not the final result list.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
+              "line": 239,
+              "category": "telemetry"
+            },
+            {
+              "message": "P1: `tiered.fast.started_at()` is set by any fast `judge()` call, including calibration probes. `run_dry_check` still runs fast calibration probes even when there are no production work items, so an empty production diff can still emit fast `ReviewRound`/`ExternalSubprocess` telemetry here. That violates the requirement to skip tier telemetry when the production tier was never invoked and over-counts dry review rounds for calibration-only activity.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
+              "line": 240,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:e70eab01f92ff0762c481e2d4480f0348fda55f512e8da3db1ff76b8ab5bb824",
+          "at": "2026-06-14T18:48:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_calibration_probe` treats any repo-relative path whose first component is `probes` as a synthetic calibration fixture. Production fragments are normalized to repo-relative paths, so real code under a top-level `probes/` directory will be delegated but not recorded, causing `dry_tiered_telemetry_for_result` to suppress ReviewRound emission or undercount findings even though production `judge()` ran. Restrict this to the exact synthetic fixture identities or pass an explicit probe marker from the usecase layer.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
+              "line": 142,
+              "category": "telemetry"
+            },
+            {
+              "message": "On escalated runs the fast ReviewRound uses the precomputed fast-tier duration, but the following `emit_external_subprocess` call still passes the fast tier start instant. That helper computes `start.elapsed()` at emission time after final-tier work has completed, so the fast ExternalSubprocess duration includes final-tier processing and persistence time. This makes the per-tier telemetry internally inconsistent; use a duration-aware emission path or avoid emitting a separate fast ExternalSubprocess event with an elapsed-from-start timestamp.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 334,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:34a88aa94a4f0b25dccabca145f09ce9f8f39cdd2146e21fdeac4ac9d08ac298",
+          "at": "2026-06-14T18:55:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The calibration-probe guard skips recording when either fragment has one of the synthetic probe paths. A legitimate production pair involving a repo file such as `probes/changed_a.rs` or `probes/candidate_a.rs` will therefore call `judge()` but never set the tier recorder's `started_at` or finding count, causing the required fast/final `ReviewRound` telemetry to be omitted or undercounted. The guard should identify the exact known-bad probe pair, not any single fragment path match.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
+              "line": 173,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f01310498811823673554d21a66508851ead7dcd9429fb8518449b6b253d7202",
+          "at": "2026-06-14T19:01:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20fca1ae3423f6dcaef6de6264a5084bc3288ab28fe36e5029eac7384e9d3da6",
+          "at": "2026-06-14T19:05:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91f85c64693e9186a82dfef38d585d7b3b357139b94a43f7e1d45ec413430ab3",
+          "at": "2026-06-14T19:15:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `CliApp::fixpoint_resolve` derives `project_root` only from the literal shape of `--items-dir` (`resolve_project_root(&input.items_dir)`), then uses that derived path to resolve `.commit_hash` and the diff base. Because it never verifies that `items_dir` is actually inside the discovered repo root, an absolute or nested path ending in `track/items` can steer the command at an unrelated tree and make the fixpoint result read the wrong gate state. This needs the same repo-containment check used by the other composition helpers.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 313,
+              "category": "security"
+            },
+            {
+              "message": "P1: the new public entry point `CliApp::fixpoint_resolve` has no dedicated happy-path or error-path tests in this change set. The file only adds formatting/parsing coverage in `apps/cli`, so the branch guard, dry-base fallback, and gate-adapter error mapping are unexercised. That leaves a new public API without the required test coverage.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 291,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:73a73963a2f46cd02ae201770d99e9ad7ec8cfff03ffb3d2f13735fdac553b51",
+          "at": "2026-06-15T00:45:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22d078669da90d2ac92350e8873bcb5292207a714fca990b73c7f1fe1987f327",
+          "at": "2026-06-15T01:06:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `canonical_items_dir` is only checked with `starts_with(repo_root)` here, but the code never verifies that the path is actually a directory. A regular file named `track/items` inside the repo will pass validation, and the resolver will then treat `<file>/<track_id>` as a track tree instead of rejecting the input. This should mirror the `is_dir()` guard used by the other repo-root helpers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 329,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: the new public API is only exercised for invalid inputs and the `run-dfp` path. There are no tests covering the successful `run-rfp`, `run-ref-verify`, or `commit` branches, so regressions in the new adapter wiring or `format_fixpoint_step` behavior on those paths would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 437,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:22d078669da90d2ac92350e8873bcb5292207a714fca990b73c7f1fe1987f327",
+          "at": "2026-06-15T01:35:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc420430ff2d2deb2a7216fa582e688246d520b252f4f6dd771b871da94a9dbe",
+          "at": "2026-06-15T02:12:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_current_fragment_refs()` still lets `GitDryCheckDiffGetter` discover the repository from the process CWD. `fixpoint_resolve()` validates `canonical_root`, but it never rebinds git operations to that root before calling `list_changed_hunks()`, so running the command from a different checkout or subdirectory can build `current_fragment_refs` for the wrong repo and return the wrong next step. Anchor the diff discovery to the validated repo root (or wrap the whole resolve in a repo-cwd guard).",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 203,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bc420430ff2d2deb2a7216fa582e688246d520b252f4f6dd771b871da94a9dbe",
+          "at": "2026-06-15T02:22:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_current_fragment_refs` temporarily changes the process working directory, but the tests in this file do not serialize on `crate::test_support::process_env_lock()` like the other env-mutating composition tests. `test_fixpoint_resolve_missing_coverage_record_returns_run_dfp` can therefore race with any concurrent test that also touches cwd and become flaky. Use the shared guarded pattern or lock these tests around the helper.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 193,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:00b4fd090f52f0d312fa56bdff2a005a85f6c4911ba9b83e1a90ebf7ad877680",
+          "at": "2026-06-15T02:29:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54eea2a1cedff8625bffa0403fb83b67c05953674dab881916c2650f7deb6141",
+          "at": "2026-06-15T02:58:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_current_fragment_refs()` normalizes fragments against `canonical_root` (the parent of `track/items`) instead of the repository root used by `GitDryCheckDiffGetter`. That works only when the track lives exactly at the repo root. If `--items-dir` points at a nested project inside the repo, the diff hunks stay repo-relative while the fragment refs become project-root-relative, so they stop matching and the dry gate can compute the wrong next step.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 224,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:54eea2a1cedff8625bffa0403fb83b67c05953674dab881916c2650f7deb6141",
+          "at": "2026-06-15T03:06:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `resolve_dry_diff_base_for_track` still depends on the ambient process CWD when it reads `.commit_hash` via `FsDryCheckCommitHashStore::read()`, but this command never anchors that read to the validated repo root. If `fixpoint_resolve` is invoked from outside the repository, the ancestry check can fail closed to `Ok(None)` and silently fall back to `git rev-parse main`, which can produce the wrong fixpoint step for a valid track. The new dry-base call site at [apps/cli-composition/src/track/fixpoint_resolve.rs]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs#L391 ) should be wrapped with the same repo-CWD guard used elsewhere, or the store/read path should be made cwd-independent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 391,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8226dc955f956009ebf934c2127db422137b3fa16a7785ecb21f7b9062e37dc",
+          "at": "2026-06-15T03:16:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Relative `--items-dir` is rebased against `canonical_root` here, which is derived from the caller's current working directory, not the discovered repo root. That makes `fixpoint_resolve` resolve `track/items` to the wrong tree when the command is run from a nested subdirectory, unlike the other track commands that resolve paths through the git repo root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 347,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4fd6ab6bf6be2cacbab40aba026cbb43d2acd24e628fd67c4d28621a58a6c77e",
+          "at": "2026-06-15T03:46:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Passing the raw `input.items_dir` into the gate adapters reintroduces CWD dependence after `canonical_items_dir` has already been resolved and validated. In particular, `FsRefVerifyGateStateAdapter` re-derives its project root from that path, so running `fixpoint_resolve` from a repo subdirectory can make ref-verify inspect the wrong track tree or fail even though the validated canonical path is correct. Use the validated canonical path here instead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 424,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:576fbe8cb5c992fc359a1868287fa9b6e225a4ad27c23123ea814b5d1e7b9e0e",
+          "at": "2026-06-15T03:56:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:576fbe8cb5c992fc359a1868287fa9b6e225a4ad27c23123ea814b5d1e7b9e0e",
+          "at": "2026-06-15T03:59:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fixpoint_resolve` validates and canonicalizes `--items-dir`, but then passes the raw `input.items_dir` into both `FsReviewGateStateAdapter` and `FsRefVerifyGateStateAdapter`. When the CLI is invoked with a relative `--items-dir` from any directory other than the repo root, those adapters re-resolve the path against the restored CWD instead of the already-validated repo-relative location, so review/ref-verify can fail or inspect the wrong track artifacts. Pass `canonical_items_dir` (or another absolute path) into both adapters.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 424,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:576fbe8cb5c992fc359a1868287fa9b6e225a4ad27c23123ea814b5d1e7b9e0e",
+          "at": "2026-06-15T03:59:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_fs_ref_verify_gate_state_adapter_returns_approved_when_no_production_pairs` is tied to the current checkout branch (`track/dfp-rfp-loop-cost-reduction-2026-06-13`) instead of setting up its own repo/branch. That makes the test environment-dependent and brittle: it will fail on any run from a different branch or detached HEAD, which violates the test independence requirement.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 731,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cb0b20666e49476b781d8a23a891ba04297353bb56cb8b022176e402dbd2a7",
+          "at": "2026-06-15T04:07:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `test_fs_ref_verify_gate_state_adapter_returns_approved_when_no_production_pairs` is not independent: it assumes the workspace checkout is currently on `track/dfp-rfp-loop-cost-reduction-2026-06-13` and uses the live repo branch as an external precondition. On any other branch, or in detached-HEAD CI, `FsRefVerifyGateStateAdapter::ref_verify_status` will return the branch-mismatch error instead of `Ok(Approved)`, so the test becomes flaky. Build the fixture in a temp git repo with the expected branch, like `seed_track_repo`, rather than relying on host checkout state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 742,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cb0b20666e49476b781d8a23a891ba04297353bb56cb8b022176e402dbd2a7",
+          "at": "2026-06-15T04:09:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db3926b00814cba4c3ea1b5538692f066f086bf45cde46b9371cb004381ae2f4",
+          "at": "2026-06-15T04:18:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db3926b00814cba4c3ea1b5538692f066f086bf45cde46b9371cb004381ae2f4",
+          "at": "2026-06-15T04:23:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca800281fba6485c12a8665e5a1cbaddef985120dd4212d111c5a5dacc2e155b",
+          "at": "2026-06-15T04:40:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca800281fba6485c12a8665e5a1cbaddef985120dd4212d111c5a5dacc2e155b",
+          "at": "2026-06-15T04:43:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2e27ab57811f7d58de68229789aab14e9971fc73759611ce0919c90456dffc1",
+          "at": "2026-06-15T06:42:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2e27ab57811f7d58de68229789aab14e9971fc73759611ce0919c90456dffc1",
+          "at": "2026-06-15T06:44:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The coverage fingerprint is computed from `infra_config` after `--threshold` has already changed the effective write threshold, so a `dry write --threshold ...` records the same fingerprint as the file config. `dry check-approved` will then treat coverage produced under a different effective threshold as fresh, which can miss unresolved pairs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 302,
+              "category": "correctness"
+            },
+            {
+              "message": "This reads `.harness/config/dry-check.json` from `canonical_root` (the project root), but the dry-check writer and approval gate use the discovered repo root. In nested-project/monorepo layouts this loads the wrong config file or fails outright, so fixpoint resolution compares coverage against a fingerprint that does not match `dry write`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 420,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:49e159541dad7dcfc2dd1f7fc6e7f5cbc88ec2d3ed892e44525c92ad431d8131",
+          "at": "2026-06-15T09:20:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--items-dir` is no longer anchored to the caller's repo before repo discovery. For an absolute path that happens to live under some other git checkout, `discover_from(&canonical_root)` will switch the command onto that other repo and the later `starts_with(repo_root)` check will still pass, so `fixpoint_resolve` can return a step for the wrong repository instead of rejecting the input.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 331,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:bee0fe0fc4bc901c1f856110503fedba5c422c245255aa4fb3231e4fa6255152",
+          "at": "2026-06-15T09:31:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace25b722e977a92da9defca45710b3e7e8916feffc23e91087afb52b7f389ff",
+          "at": "2026-06-15T09:43:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fixpoint_resolve` now establishes the caller's CWD-discovered `repo_root` as the trust anchor, but the diff-base fallback still discovers git from `canonical_root` via `resolve_dry_diff_base_from_store(..., Some(canonical_root), ...)`. For a valid `--items-dir` inside the caller repo but under a nested checkout/project, a missing or malformed `.commit_hash` falls back to that nested repo's `main` SHA, then `build_current_fragment_refs` runs the diff from `repo_root`; this can make fixpoint resolution error or evaluate against the wrong base. Pass the CWD-discovered `repo_root` into the diff-base resolver so fallback and hunk discovery use the same repository.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 164,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ace25b722e977a92da9defca45710b3e7e8916feffc23e91087afb52b7f389ff",
+          "at": "2026-06-15T09:48:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1be6434830e02f5b74ea5fdf556683c4ec0102e16e192b43a938daad61a22910",
+          "at": "2026-06-15T09:52:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c3e3df9bf4fe3132d36c704aa54269e0f0a052d41ed0fc551b71d6849def8e6",
+          "at": "2026-06-15T10:18:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c3e3df9bf4fe3132d36c704aa54269e0f0a052d41ed0fc551b71d6849def8e6",
+          "at": "2026-06-15T10:19:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_write` now stores `infra_config.fingerprint()` even when `--threshold` changes the effective threshold. That drops the override from the coverage fingerprint, so a write run with a higher override than the file config can later be accepted by `dry check-approved` even though the manifest was built under a looser threshold and may be missing pairs in the current config range. This reintroduces the stale-coverage false-approval case that `fingerprint_with_threshold()` was designed to prevent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 311,
+              "category": "correctness"
+            },
+            {
+              "message": "The added test does not exercise `CliApp::dry_write` or the persisted manifest path; it only compares two `DryCheckConfig` fingerprint methods on the same config object. As written, it will pass even if the production code still stamps the wrong fingerprint, so it does not guard the regression.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 3607,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:36984eef79370cc846f209b9d104ccb6ab2aa71ea39f16f35febe400b6d0b1a1",
+          "at": "2026-06-15T23:32:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bcfa7b25926c281a06f8bd189a71d106da4a2c411f67e00ec77ae3c1baeed68",
+          "at": "2026-06-15T23:43:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bcfa7b25926c281a06f8bd189a71d106da4a2c411f67e00ec77ae3c1baeed68",
+          "at": "2026-06-15T23:46:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This fingerprints the project root derived from `items_dir`, but `dry write` persists `corpus_fingerprint` from `workspace_root` and the approval path recomputes it from the repo root. A valid `dry write --workspace-root <subdir>` run will therefore write a manifest that this gate can never approve, so the new corpus check blocks those tracks forever.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 435,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ff8342eb46d09f2b6e81b42a98ff96c7e46e125e3cac375daad615360f00b5e6",
+          "at": "2026-06-16T01:52:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new corpus fingerprint is recomputed from `canonical_root`, but `dry write` stores the fingerprint for `workspace_root`. In any non-default layout where those roots differ, a freshly written coverage manifest will never match `dry check-approved`, so the gate will stay blocked even when nothing changed. The approval path needs to use the same scan root that produced the manifest, or persist that root alongside the manifest.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 543,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e577a928f2decb2559be6d63935544a1341a5fedfe580c260b32ec85cfbb280",
+          "at": "2026-06-16T03:39:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 correctness issue: `dry check-approved` recomputes the corpus fingerprint from `canonical_root`, but `dry write` fingerprints the corpus that the indexer actually scans via `workspace_root`. In any layout where those roots differ, a fresh manifest will never match approval, so the gate will stay blocked even when nothing changed. The approval path needs to use the same scan root as the write path, or the manifest must persist that scan root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 543,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:97e59459ffbbd4fa1b32d3264c7ae61253a9900a089ecd1f1828dd901c124032",
+          "at": "2026-06-16T03:46:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_check_approved` recomputes the corpus fingerprint with `canonical_root` here, but the new sidecar stores the actual `workspace_root` from `dry write` and `workspace_root` is only guaranteed to be under the repo root. In a nested checkout this rejects valid manifests whenever the workspace root is the repo root or any sibling outside the project subtree, so a successful `dry write` can still be blocked by `dry check-approved`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/dry.rs",
+              "line": 635,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:001184ae69cb504197ac85bb6f78d363c8d09088e11b293fe38aed798f77902f",
+          "at": "2026-06-16T03:57:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed1c6f5b0d3d7af16d0ce1d5601d6770fed7ed879c9dcdc1edca2778c6ab9cff",
+          "at": "2026-06-16T04:06:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_dry_corpus_root_manifest` writes the new sidecar with raw `std::fs::write` and no symlink guard. A repository can pre-create `track/items/<id>/dry-check-corpus-root.json` as a symlink, and `sotp dry write` will follow it and overwrite an arbitrary file the user can write. Existing dry artifacts reject symlinks before writing; this sidecar needs the same guard/atomic write path before it is safe.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 266,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ed1c6f5b0d3d7af16d0ce1d5601d6770fed7ed879c9dcdc1edca2778c6ab9cff",
+          "at": "2026-06-16T04:10:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry write` persists the canonical `workspace_root` directly into `dry-check-corpus-root.json`. That path is checkout-local, so once this track artifact is copied or committed and evaluated in another checkout/CI runner, `resolve_dry_corpus_fingerprint_root` will canonicalize a path that either does not exist or is outside the current repo and the dry/fixpoint gate will fail closed even though the coverage was otherwise valid. This is especially problematic for subdirectory workspaces where the sidecar is required to avoid falling back to the repo root. Store a repo-relative workspace root and resolve it against the current repo root on read.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 268,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d3d5eee9bc29162e3e9f2bd02b3ecc5a96a7fdcf851e40f2759ad0583c34985a",
+          "at": "2026-06-16T04:15:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_write` now writes the corpus-root sidecar before the dry-check store/coverage writers run, but `write_dry_corpus_root_manifest` calls `atomic_write_file` without creating `track_dir`. A first `sotp dry write` for an existing `items_dir` whose `<items_dir>/<track_id>` directory has not been materialized will now fail with a filesystem error instead of letting the existing dry-check writers initialize the track directory. Create the parent directory with the same guarded policy used by the dry-check adapters before writing the sidecar.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 286,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:91a3afac24fc371008bc408f28a8ed64d73068d2817c4b105a60481ee3ee6e9d",
+          "at": "2026-06-16T04:20:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_write` records the corpus fingerprint by rescanning `workspace_root` after `build_diff_and_corpus_fragments` has already extracted the corpus and after `open_persistent_index_with_corpus` has built/opened the index from that earlier snapshot. If a Rust file is added or changed in that window, the coverage manifest can store the fingerprint for the newer corpus while the actual DRY analysis used the older corpus; later `dry check-approved` and `fixpoint-resolve` will recompute the same newer fingerprint and may approve without ever checking pairs from the changed corpus. The fingerprint needs to be derived from the same snapshot used for the index/analysis, or the command needs to detect and fail closed on snapshot drift.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 469,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:be47e481e12c04f98fdaa903aeff0b3d280b4a508c263cafc8c26f4694663932",
+          "at": "2026-06-16T04:26:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55af1c6b37d866c4d1a13178c075f85fee9f8a84defe1da2747ee8365104d482",
+          "at": "2026-06-16T04:33:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `compute_dry_corpus_fingerprint_from_fragments()` now hashes `start_line`/`end_line` in addition to the repo-relative path and content hash. That makes the corpus fingerprint change on whitespace-only edits that merely shift fragment line numbers, even when the extracted fragments and index contents are unchanged. Because `DryCheckApprovalInteractor` treats a corpus fingerprint mismatch as stale coverage, `dry check-approved` will false-block on these non-semantic edits. The corpus fingerprint contract in this flow is path+content-hash based, so the line-span bytes should not be part of the hash unless the rest of the pipeline is changed to depend on them too.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 253,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2ccbacdcb83ac5e9cd27dd7ea5d9cc9521becace231afc394c4f17eba6284122",
+          "at": "2026-06-16T05:11:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_dry_corpus_fingerprint_root` treats a symlink-guard failure as a legacy fallback and returns `repo_root` instead of rejecting the manifest. That silently swallows tampering/corruption of `dry-check-corpus-root.json` and makes approval use a different workspace snapshot than the one recorded. This should fail closed with an error.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 357,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a2da987ca049f0476e650ce8baff34e0fb3943b7af8f3ea16d90a4fd3a472ed6",
+          "at": "2026-06-16T05:16:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebbaf9df8d829de42e3d9bbd7cd042c17a28d41bbee3c228153e41a7a563f3a6",
+          "at": "2026-06-16T05:26:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebbaf9df8d829de42e3d9bbd7cd042c17a28d41bbee3c228153e41a7a563f3a6",
+          "at": "2026-06-16T05:31:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d713d079899b3fd96126e868770740f90b6f3b6f52821e5c035c0f87a184289f",
+          "at": "2026-06-16T06:19:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d713d079899b3fd96126e868770740f90b6f3b6f52821e5c035c0f87a184289f",
+          "at": "2026-06-16T07:03:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12a0ba3c750c3015e8108cf79535ace049b0ca7586d5568a4a8b02933124b4b1",
+          "at": "2026-06-16T08:00:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_dry_corpus_fingerprint_root` can fail for malformed, unsupported, symlinked, or otherwise invalid sidecars, and this new `?` returns an error before the approval interactor sees the fail-closed corpus fingerprint. The existing `compute_current_dry_corpus_fingerprint` path intentionally converts those same sidecar errors into `DryCheckCorpusFingerprint::fail_closed()`, which makes `dry check-approved` return the normal blocked gate result. With this change, an invalid recorded corpus-root sidecar changes gate behavior from fail-closed BLOCKED to a command error, contrary to the existing fail-closed approval semantics. Handle the root-resolution failure here without aborting, and let the fail-closed fingerprint block approval.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 545,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:12a0ba3c750c3015e8108cf79535ace049b0ca7586d5568a4a8b02933124b4b1",
+          "at": "2026-06-16T08:04:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The scoped `dry check-approved` behavior added here is not covered by a regression test. Existing tests exercise the corpus-root resolver and repo-root approval path, but not the public `dry_check_approved` path with a `dry-check-corpus-root.json` pointing at a subdirectory and changed files both inside and outside that scope. That means the original regression could return if this call went back to `canonical_repo_root` and the current tests would still pass. Add an end-to-end approval test that proves `current_fragment_refs` is built from the recorded workspace root.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 561,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9d9fc21ac2668506ab38f92a09571a0a9b2d2330b5d54b99c4fbd887f3fff2ee",
+          "at": "2026-06-16T08:09:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9bd15b8252396737525e603ec6ed003a80de57a948199ee1c3870504af3b8b1",
+          "at": "2026-06-16T08:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This should mirror `dry check-approved` by resolving the corpus-root sidecar against the repo root used by `dry write`, not `canonical_root`: the manifest stores `workspace_root` relative to the repo root, so passing `canonical_root` will misinterpret relative paths in nested/monorepo layouts and can fail or point at the wrong directory. The direct `?` here also turns malformed/symlinked sidecars into hard `fixpoint-resolve` errors, whereas the existing approval path treats the same cases as stale and continues fail-closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 419,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8560c1fa4fc64284084d1745cddf6f9a2bfb70a0b8d5421a44def57eccb064d",
+          "at": "2026-06-16T08:53:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The no-sidecar fallback still resolves against `repo_root`, so `build_current_fragment_refs` scans the whole repo instead of the scoped workspace/project root. In nested checkouts where `canonical_root != repo_root`, legacy tracks without the corpus-root sidecar can still make `fixpoint_resolve` reason over out-of-scope fragments and reproduce the original scope drift. Thread the project root through this fallback instead of defaulting to `repo_root`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 420,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e2fce68f919db213d1aa4bf28bcb3400e8d8f2db877fca83bf94ce9e2bf15253",
+          "at": "2026-06-16T08:59:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Legacy no-sidecar runs are still split across two different roots: `approval_workspace_root` now falls back to `canonical_root`, but `current_corpus_fingerprint` is still recomputed via `compute_current_dry_corpus_fingerprint(&track_dir, &repo_root)`, whose missing-manifest path resolves to `repo_root`. In nested checkouts where `canonical_root != repo_root`, fixpoint resolution will scan project-root fragments but compare them against a repo-root corpus fingerprint, so old tracks without `dry-check-corpus-root.json` can never approve and will keep returning `run-dfp`. The fingerprint path needs the same root selection as the fragment-ref path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 417,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:423c3f041d8bf51f6b2885cd3428820b4c9a91a375178d7bbf5d2c7477d9c1a9",
+          "at": "2026-06-16T09:08:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fa8ca579d5caa38c736ca4e2dd4b3fe1a82068f801693e90495caafb11cddaa",
+          "at": "2026-06-16T09:15:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fa8ca579d5caa38c736ca4e2dd4b3fe1a82068f801693e90495caafb11cddaa",
+          "at": "2026-06-16T09:19:22Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:18:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 removes three public `dry check-approved` flags, but the negative parse coverage only exercises `--threshold`. Please add rejection cases for `--db-path` and `--workspace-root` as well so the CLI contract for all removed flags is pinned by tests.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/dry.rs",
+              "line": 425,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dcc095fb3b87745bbad7aa32181cd876ac3fc24c325c66af32c9b077f3a66509",
+          "at": "2026-06-14T04:21:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33ad9fb637049f112a95c0b45762744c51a8282299fbcda6302c71358d27a4a0",
+          "at": "2026-06-14T04:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:39:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f71af1816aba1b45a1b87d6c0360dc25012462e6910c01aed59843aea1d553c4",
+          "at": "2026-06-14T04:42:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:07:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a093dad34afde0e89472881654c1e819d5a9b9b1759f6d1c46d812c5a369a72e",
+          "at": "2026-06-14T11:09:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
+          "at": "2026-06-14T15:54:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8122853a3b4e44d5eac4e217fe24e711e5c69066d4c72154b4bfeb424c2ad586",
+          "at": "2026-06-14T15:56:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FixpointResolve` is classified as display-only here, so `execute_track_with_telemetry()` will return early and skip telemetry for `sotp track fixpoint-resolve`. That contradicts the command contract in the briefing and should be removed from the display-only match.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/main.rs",
+              "line": 537,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1bd5eac9d6b8dd1e278e7cf775030823399628dd2c04f0f25727782db39eddbe",
+          "at": "2026-06-15T00:39:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: this new CLI entrypoint has no happy-path or error-path tests. The module only exercises clap parsing and `format_fixpoint_step`, so regressions in `execute_fixpoint_resolve` itself (mapping `FixpointResolveInput` into `CliApp::fixpoint_resolve`, stdout/stderr emission, and exit-code propagation) would be untested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 32,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6956dab414e82d87df43f780a06bb1076008b7d3e41c3b241d32d93308bc4739",
+          "at": "2026-06-15T00:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: the new public CLI entrypoint is not covered by any happy-path or error-path test. The module only exercises clap parsing and `format_fixpoint_step`, so regressions in `execute_fixpoint_resolve` itself (mapping `FixpointResolveInput` into `CliApp::fixpoint_resolve`, stdout/stderr emission, and exit-code propagation) would slip through.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 32,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6956dab414e82d87df43f780a06bb1076008b7d3e41c3b241d32d93308bc4739",
+          "at": "2026-06-15T01:01:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1, testing: the new public wrapper [`execute_fixpoint_resolve`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs:32 ) is only covered by error-path tests; the only wrapper tests start at [`apps/cli/src/commands/track/fixpoint_resolve.rs:175`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs:175 ). There is no test that exercises the success path and asserts `CommandOutcome::success` is printed and `ExitCode::SUCCESS` is returned, so a regression in the CLI forwarding layer would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 32,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:73256b180ce1c0b2040f40d3a7ceca2ada8f59a056ac90bccfd52472ff225a2d",
+          "at": "2026-06-15T01:14:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackCommand::FixpointResolve` exposes `fixpoint_resolve::FixpointResolveArgs` from a crate-private module. With workspace `warnings = \"deny\"`, rustc will emit a `private_interfaces`/`private_in_public` warning for this public enum variant and fail the build. Move `FixpointResolveArgs` to a publicly reachable module (or re-export it from `mod.rs`) before exposing it in `TrackCommand`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/mod.rs",
+              "line": 382,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:aec3b2f916affbb3e5c25f15f6ec91b53d21fa37fc2c662946010ca798e24133",
+          "at": "2026-06-15T01:21:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
+          "at": "2026-06-15T01:28:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
+          "at": "2026-06-15T01:28:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
+          "at": "2026-06-15T01:31:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `TrackCommand::FixpointResolve` branch in `items_dir()` is not covered by the accessor test suite in this file. That accessor feeds telemetry path resolution in `main.rs`, so a regression here would silently anchor telemetry to the wrong track tree. Add a unit test asserting `TrackCommand::FixpointResolve(args).items_dir()` returns `args.items_dir`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/mod.rs",
+              "line": 505,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a6a8bcf73b3bf6eb896c8c1f6bd13418e159b2ae3b41239feb6b02170b2c0a83",
+          "at": "2026-06-15T02:17:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
+          "at": "2026-06-15T02:28:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
+          "at": "2026-06-15T03:02:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
+          "at": "2026-06-15T03:40:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491099a756bbe71bddc1dccabfafd57cacd92a45d643d5842a1221859c7053",
+          "at": "2026-06-15T03:43:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0696059c2857802208b0f77d20bc3152b7c17e166e3a2e3cee059ba132fd426",
+          "at": "2026-06-15T09:11:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0696059c2857802208b0f77d20bc3152b7c17e166e3a2e3cee059ba132fd426",
+          "at": "2026-06-15T09:16:10Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:03:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e51b526865198a1d072b0e2f9510b8fcab3cef07bc06f12f3ed20a7635e01",
+          "at": "2026-06-14T01:05:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:52:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05449748916c1c2b97709694ee6a8459fe069ce1fdc8ea5f81c99372642d59fe",
+          "at": "2026-06-14T23:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ec8bb804b0ac738d90793d9118ac00eb92320eee8c07ce46d22978328867753",
+          "at": "2026-06-15T06:42:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ec8bb804b0ac738d90793d9118ac00eb92320eee8c07ce46d22978328867753",
+          "at": "2026-06-15T06:44:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f328bc986d4bf21cd3efa2e0284166ff29c4199ae7cf5b6823fa8f447bb2cb29",
+          "at": "2026-06-15T09:14:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f328bc986d4bf21cd3efa2e0284166ff29c4199ae7cf5b6823fa8f447bb2cb29",
+          "at": "2026-06-15T09:16:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a34389ef7ee0447b2bc8317be3f5cb92b089578383f0bad13ba693216e3d8e0",
+          "at": "2026-06-15T12:26:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a34389ef7ee0447b2bc8317be3f5cb92b089578383f0bad13ba693216e3d8e0",
+          "at": "2026-06-15T12:28:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fail_closed()` returns the same all-zero value that `new()` accepts as a normal fingerprint, so a failed write and a failed read can both produce equal corpus fingerprints. In that case `check_approved` will not block, which breaks the fail-closed guarantee documented here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/dry_check/coverage.rs",
+              "line": 55,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:53bcf7f5ce2dafe7516fbaaadb19024ace6ea4ecb5c79986fd3a092ff3cec8a7",
+          "at": "2026-06-16T01:49:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52817088c21e64652e1a0515ad5af6be00fbdc010831ae336e2171486f429b8e",
+          "at": "2026-06-16T03:39:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52817088c21e64652e1a0515ad5af6be00fbdc010831ae336e2171486f429b8e",
+          "at": "2026-06-16T03:43:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c835de83e9cfe1c09b6fae31ca84e0ee4fd86457514bc5b41b0ea8560ecb7c2a",
+          "at": "2026-06-16T05:08:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c835de83e9cfe1c09b6fae31ca84e0ee4fd86457514bc5b41b0ea8560ecb7c2a",
+          "at": "2026-06-16T05:11:27Z"
         }
       ]
     }

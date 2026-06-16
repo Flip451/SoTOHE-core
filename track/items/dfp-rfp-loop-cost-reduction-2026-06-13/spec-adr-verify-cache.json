@@ -824,6 +824,70 @@
         "kind": "pass",
         "citation": "実装は dfl 定義（`.md`）に分岐を 1 つ足すだけで、Rust 変更は不要。"
       }
+    },
+    {
+      "claim_hash": "c21398df74f4f2f3c2f8294993e08585a0f2f1b8eb288b5cfef885a1daecbc4d",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「類似検索は `dry write`（resolver）にのみ置く。`dry check-approved` は読み取り + FragmentRef 照合のみで判定する」"
+      }
+    },
+    {
+      "claim_hash": "37f4efb8c4d1d02ef3359436fe205a5820efa21fba5e09989f74c607d3dd47ed",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry check-approved は読み取り + FragmentRef 照合のみ」"
+      }
+    },
+    {
+      "claim_hash": "3161bf8841d3b2847b280aa202d58c12aa1fa31a99c7ff04786a9f6dfecccfbe",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry check-approved は読み取り + FragmentRef 照合のみで判定する」"
+      }
+    },
+    {
+      "claim_hash": "b182564641a58e6c4920e009460741ce15ed60fad5f06557d1240881a63e10b3",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「sotp dry check-approved を、ref-verify / review の check-approved と同型の安価な純読み取りゲートにする。」「類似検索は dry write（resolver）にのみ置く。」「dry check-approved は読み取り + FragmentRef 照合のみで判定する。」「all-resolved: 変更フラグメントに触れる記録ペアが全て not-a-violation / accepted か。violation あれば → Blocked。」"
+      }
+    },
+    {
+      "claim_hash": "535235134d20a4091d9ca179c19cd54f3a6ae55ca7972949deb2686787125d8e",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry write は処理した diff フラグメントの FragmentRef（= path + content_hash の組。カバレッジ記録）と発見ペア + verdict を記録する。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。」「dry check-approved は読み取り + FragmentRef 照合のみで判定する」"
+      }
+    },
+    {
+      "claim_hash": "f5b67489bad5d712b83eba04a8330185556e55c1c0f8e6c380f545866ea722f3",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「類似検索は `dry write`（resolver）にのみ置く。」「`dry check-approved` は読み取り + FragmentRef 照合のみで判定する」「5. それ以外 → Approved。」"
+      }
+    },
+    {
+      "claim_hash": "5ab18fac1480c03be38cbffd8c6345bf643a318154871926b06a7ef1ae7aa74b",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**`dry check-approved` は読み取り + FragmentRef 照合のみ**で判定する:\n  1. 現在の diff フラグメントと各フラグメントの FragmentRef（path + content_hash）を git diff から得る（埋め込み・検索不要）。\n  2. カバレッジ記録 + ペア記録（dry-check.json）を読む。\n  3. **staleness**: 各 diff フラグメントの現 FragmentRef（path + content_hash）がカバレッジ記録に在るか。無ければ（編集または path 変更により未 `dry write`）→ Blocked。content_hash が一致しても path が異なる FragmentRef は covered と見なさない。\n  4. **all-resolved**: 変更フラグメントに触れる記録ペアが全て not-a-violation / accepted か。violation あれば → Blocked。\n  5. それ以外 → Approved。"
+      }
+    },
+    {
+      "claim_hash": "dac78768c20acab739f9359be6e941a4193233e6ccdcfca5cf1b271e90983f41",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` を、ref-verify / review の check-approved と同型の**安価な純読み取りゲート**にする。現在は呼び出しごとに `corpus_fragments` からインデックスを再構築し埋め込み + 類似検索して現在の above-threshold ペアを導出している（`libs/usecase/src/dry_check/approval_interactor.rs`）が、これをやめる:\n\n- **類似検索は `dry write`（resolver）にのみ置く。** `dry write` は処理した diff フラグメントの FragmentRef（= path + content_hash の組。カバレッジ記録）と発見ペア + verdict を記録する。\n- **`dry check-approved` は読み取り + FragmentRef 照合のみ**で判定する:"
+      }
     }
   ]
 }

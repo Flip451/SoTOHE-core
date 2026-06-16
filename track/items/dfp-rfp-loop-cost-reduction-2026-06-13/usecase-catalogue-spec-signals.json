@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a1b8977d2b6bc3bd2e31b2fe1eb4c631c07aeecfe441d65448880b6487ee8068",
+  "catalogue_declaration_hash": "41cb6080e3c1e240601e6885bac9bbc1cb856340e509a1d7a23186d6df40eee6",
   "signals": [
     {
       "type_name": "DryCheckAgentError",
@@ -10,7 +10,7 @@
     {
       "type_name": "DryCheckApprovalInteractor",
       "signal": "blue",
-      "entry_hash": "d6e2ab9a994440c9ad1174b0e114cb058b80a7644c8c560b3c1dd22cfe553979"
+      "entry_hash": "527f7e2b37ed6d565de60b0680bcb8ae6e5867420797507e25e023e19ddf95ec"
     },
     {
       "type_name": "DryCheckConfig",
@@ -20,7 +20,7 @@
     {
       "type_name": "DryCheckCycleError",
       "signal": "blue",
-      "entry_hash": "3c94806b03e6823a05e4f85d8c0f0e8b159631b8ac88d4220ea6f89e96b9c57a"
+      "entry_hash": "217a2c57be0fc85c91667a37d6e07d47a220e37c18afd8b18f3911a7d230a148"
     },
     {
       "type_name": "DryCheckInteractor",
@@ -35,12 +35,12 @@
     {
       "type_name": "DryCheckParallelism",
       "signal": "blue",
-      "entry_hash": "82e651e5ef56c853a65f49715ee6cf661b4b0c8ebf3112a886a8a604e309d8f6"
+      "entry_hash": "ed36569e453996918259038e1b6136b72fbf6703cd444b061a23f0cb4b356919"
     },
     {
       "type_name": "DryCheckPercent",
       "signal": "blue",
-      "entry_hash": "4c4805c50d17f65c048d730c96784d00166e9af5ca44ba6a9d7b42e9d9753629"
+      "entry_hash": "913732caef0d43c43a8aa08a1b70478707963a605475a20dbdc47699e56349d9"
     },
     {
       "type_name": "FixpointCurrentBranch",
@@ -80,7 +80,7 @@
     {
       "type_name": "DryCheckApprovalService",
       "signal": "blue",
-      "entry_hash": "3620e617ab4ce1b7d158081eb25baa1f1f7d135ca633381b62f7af38ae3d740d"
+      "entry_hash": "b650ad04281ffdb15e06bfa558ccb05750977819616e1e3aa144aab00395826a"
     },
     {
       "type_name": "DryCheckCoveragePort",

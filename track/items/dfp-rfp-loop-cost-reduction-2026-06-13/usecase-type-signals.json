@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-16T09:32:46Z",
-  "declaration_hash": "a1b8977d2b6bc3bd2e31b2fe1eb4c631c07aeecfe441d65448880b6487ee8068",
+  "generated_at": "2026-06-16T12:17:57Z",
+  "declaration_hash": "41cb6080e3c1e240601e6885bac9bbc1cb856340e509a1d7a23186d6df40eee6",
   "signals": [
     {
       "type_name": "DryCheckAgentError",
@@ -36,16 +36,13 @@
     {
       "type_name": "DryCheckConfig",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug"
-      ],
-      "missing_items": [
-        "core::default::Default"
       ]
     },
     {
@@ -57,7 +54,7 @@
     {
       "type_name": "DryCheckCycleError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::error::Error",
@@ -90,7 +87,7 @@
     {
       "type_name": "DryCheckParallelism",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -103,7 +100,7 @@
     {
       "type_name": "DryCheckPercent",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -152,7 +149,7 @@
     {
       "type_name": "FixpointResolveInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "FixpointResolveService"

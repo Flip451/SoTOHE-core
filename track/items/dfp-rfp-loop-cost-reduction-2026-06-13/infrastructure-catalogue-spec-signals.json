@@ -1,26 +1,26 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "ea00015c84e0910547f670b4e83da1eab537c83438c6e57744dc096b7c93e292",
+  "catalogue_declaration_hash": "aa0ba2fe00f6904a83323ef55cda7c40029c2d91554b62338952f00fe149b86b",
   "signals": [
     {
       "type_name": "CodexDryChecker",
       "signal": "blue",
-      "entry_hash": "2c9ff5513e1623c89a599c9693d5b2f9db41dcae0a9e86123c819b0c8c1d432f"
+      "entry_hash": "67f3e2269d93f1cfe3b45e0672a5c3ed297b8e1cecb38916e74d656916f1046e"
     },
     {
       "type_name": "DryCheckConfig",
       "signal": "blue",
-      "entry_hash": "b8e8a29d865b8ee075cb717a0cff9950aa8073f1160e1edfb98f2d8b54b3b4a5"
+      "entry_hash": "849d414d964764b24646e316a4a261a1dfbef4631f0a83ac7dde88d1ca027b2e"
     },
     {
       "type_name": "DryCheckConfigError",
       "signal": "blue",
-      "entry_hash": "bf5307b6ae67381842fbb080f6f4f62836b3ce627e86d3796441c2849f04e772"
+      "entry_hash": "c8527bef930088f72cc6322a24db94ad32bba6d571acbb4c4513a3daedc4c20b"
     },
     {
       "type_name": "FsDryCheckCoverageAdapter",
       "signal": "blue",
-      "entry_hash": "6aff2cab71c5c22a23f0b5250cac7476e4da8ed6a884b49e3220bcd7a6357448"
+      "entry_hash": "31ade11b5ccfbc62c71bf6b31dcf179c761a1562a90458801e2176ee550d71ac"
     },
     {
       "type_name": "TelemetryEvent",

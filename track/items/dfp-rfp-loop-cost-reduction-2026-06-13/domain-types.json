@@ -37,36 +37,11 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "scopes", "ty": "std::collections::BTreeSet<String>" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
-      "methods": [
-        {
-          "name": "try_new",
-          "receiver": null,
-          "params": [
-            { "name": "scopes", "ty": "std::collections::BTreeSet<String>" }
-          ],
-          "returns": "Result<Self, ReviewScopeSetError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "as_set",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&std::collections::BTreeSet<String>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ],
+      "methods": [],
       "module_path": "track_phase",
       "docs": "Non-empty deterministic set of review scopes that must run through RFP before the fixpoint can advance. Scope labels remain opaque Strings owned by the orchestrator/review infrastructure; this value object only rejects the empty set so FixpointStep::RunRfp cannot represent 'run RFP for no scopes'. BTreeSet keeps CLI output deterministic.",
       "spec_refs": [
@@ -116,42 +91,11 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": [ "String" ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
-      "methods": [
-        {
-          "name": "new",
-          "receiver": null,
-          "params": [ { "name": "s", "ty": "impl Into<String>" } ],
-          "returns": "Result<DryCheckConfigFingerprint, DryCheckConfigFingerprintError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "fail_closed",
-          "receiver": null,
-          "params": [],
-          "returns": "DryCheckConfigFingerprint",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "as_str",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&str",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ],
+      "methods": [],
       "module_path": "dry_check",
       "docs": "SHA-256 fingerprint (64-char lowercase hex string) over all dry-check.json fields that affect dry write semantics: threshold, max_parallelism, fast_reasoning_effort, final_reasoning_effort, known_bad_injection_rate_percent, known_bad_detection_threshold_percent. Written into the coverage manifest by dry write; compared by dry check-approved against the current config. A mismatch means the config changed and coverage must be regenerated (Blocked). The all-zeros sentinel (fail_closed()) is written on failed runs so check_approved returns Blocked regardless of current config.",
       "spec_refs": [
@@ -188,12 +132,7 @@
           "anchor": "CN-08"
         }
       ],
-      "informal_grounds": [
-        {
-          "kind": "feedback",
-          "summary": "The 64-char lowercase hex format invariant (SHA-256 encoding) is an implementation detail of DryCheckConfigFingerprint's constructor: no spec anchor directly states the character-set or length constraint. CN-08 grounds the fail-closed response when the value is invalid; the format rule itself derives from the SHA-256 encoding chosen for the fingerprint."
-        }
-      ]
+      "informal_grounds": []
     },
     "DryCheckEntry": {
       "action": "modify",
@@ -495,11 +434,146 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "kind": "tuple",
-          "fields": [ "String" ],
-          "has_stripped_fields": false
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "SHA-256 fingerprint (64-char lowercase hex string) over the full set of (repo_relative_path, content_hash) pairs scanned by the corpus indexer during a `dry write` run. Written into the coverage manifest by `dry write` so readers can identify which workspace corpus produced the manifest. Comparing the stored value with a separately computed current corpus fingerprint detects corpus changes (added, removed, or modified files) and marks the coverage stale; this domain value does not prescribe the approval-usecase wiring for that comparison. The all-zeros sentinel (fail_closed()) is written on failed runs as fail-closed provenance. Mirrors DryCheckConfigFingerprint validation and fail-closed sentinel semantics while carrying additional internal state to distinguish current read failures from persisted failure sentinels.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckCorpusFingerprintError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidFormat", "payload": { "kind": "tuple", "fields": [ "String" ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Validation error for DryCheckCorpusFingerprint construction. InvalidFormat means the provided string is not exactly 64 lowercase hexadecimal characters.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-08"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckCoverageRecord": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run (fragment_refs), plus the set of DryCheckPairKey values for all pairs that were considered current in that run (processed_pair_keys), plus the config_fingerprint of the dry-check.json settings used by that run, plus the corpus_fingerprint of the workspace corpus files scanned by the indexer. If a current diff fragment's FragmentRef is absent from fragment_refs, `check-approved` returns Blocked (stale coverage). If a historical Violation record's pair_key is absent from processed_pair_keys, that record is treated as stale (candidate side fixed) and skipped by the gate. If the stored config_fingerprint differs from the current config fingerprint, `check-approved` returns Blocked (config changed). The stored corpus_fingerprint is provenance for detecting that the manifest was built from a different workspace corpus when compared with a current corpus fingerprint; such a mismatch means coverage is stale and must be regenerated. BTreeSet preserves deterministic serialization order (CN-05).",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-06"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "ReviewScopeSet",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [ { "name": "scopes", "ty": "std::collections::BTreeSet<String>" } ],
+          "returns": "Result<Self, ReviewScopeSetError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_set",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeSet<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckConfigFingerprint",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "s", "ty": "impl Into<String>" } ],
+          "returns": "Result<DryCheckConfigFingerprint, DryCheckConfigFingerprintError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fail_closed",
+          "receiver": null,
+          "params": [],
+          "returns": "DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckCorpusFingerprint",
       "methods": [
         {
           "name": "new",
@@ -531,67 +605,10 @@
           "has_default_impl": false,
           "where_predicates": []
         }
-      ],
-      "module_path": "dry_check",
-      "docs": "SHA-256 fingerprint (64-char lowercase hex string) over the full set of (repo_relative_path, content_hash) pairs scanned by the corpus indexer during a `dry write` run. Written into the coverage manifest by `dry write` so readers can identify which workspace corpus produced the manifest. Comparing the stored value with a separately computed current corpus fingerprint detects corpus changes (added, removed, or modified files) and marks the coverage stale; this domain value does not prescribe the approval-usecase wiring for that comparison. The all-zeros sentinel (fail_closed()) is written on failed runs as fail-closed provenance. Mirrors DryCheckConfigFingerprint in structure and fail-closed convention.",
-      "spec_refs": [
-        {
-          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
-          "anchor": "AC-10"
-        },
-        {
-          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
-          "anchor": "AC-11"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "feedback",
-          "summary": "The corpus fingerprint concept (SHA-256 over sorted (path, content_hash) pairs of all candidate corpus files) is an implementation detail added in Round 9. No spec anchor directly states the corpus fingerprint field; AC-10 and AC-11 capture the coverage-record-based staleness gate that this fingerprint can support when a current corpus fingerprint is available for comparison. CN-08 grounds the fail-closed response when coverage is missing or inconsistent. The format invariant (64-char lowercase hex) mirrors DryCheckConfigFingerprint's constructor invariant."
-        }
       ]
     },
-    "DryCheckCorpusFingerprintError": {
-      "action": "add",
-      "role": "ErrorType",
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          { "name": "InvalidFormat", "payload": { "kind": "tuple", "fields": [ "String" ] } }
-        ]
-      },
-      "methods": [],
-      "module_path": "dry_check",
-      "docs": "Validation error for DryCheckCorpusFingerprint construction. InvalidFormat means the provided string is not exactly 64 lowercase hexadecimal characters.",
-      "spec_refs": [
-        {
-          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
-          "anchor": "CN-08"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "feedback",
-          "summary": "The 64-char lowercase hex format invariant (SHA-256 encoding) is an implementation detail of DryCheckCorpusFingerprint's constructor: no spec anchor directly states the character-set or length constraint. CN-08 grounds the fail-closed response when the value is invalid; the format rule itself derives from the SHA-256 encoding chosen for the corpus fingerprint. Mirrors DryCheckConfigFingerprintError."
-        }
-      ]
-    },
-    "DryCheckCoverageRecord": {
-      "action": "add",
-      "role": "ValueObject",
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [
-            { "name": "fragment_refs",       "ty": "std::collections::BTreeSet<FragmentRef>" },
-            { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" },
-            { "name": "config_fingerprint",  "ty": "DryCheckConfigFingerprint" },
-            { "name": "corpus_fingerprint",  "ty": "DryCheckCorpusFingerprint" }
-          ],
-          "has_stripped_fields": false
-        }
-      },
+    {
+      "type_name": "DryCheckCoverageRecord",
       "methods": [
         {
           "name": "new",
@@ -668,33 +685,9 @@
           "has_default_impl": false,
           "where_predicates": []
         }
-      ],
-      "module_path": "dry_check",
-      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run (fragment_refs), plus the set of DryCheckPairKey values for all pairs that were considered current in that run (processed_pair_keys), plus the config_fingerprint of the dry-check.json settings used by that run, plus the corpus_fingerprint of the workspace corpus files scanned by the indexer. If a current diff fragment's FragmentRef is absent from fragment_refs, `check-approved` returns Blocked (stale coverage). If a historical Violation record's pair_key is absent from processed_pair_keys, that record is treated as stale (candidate side fixed) and skipped by the gate. If the stored config_fingerprint differs from the current config fingerprint, `check-approved` returns Blocked (config changed). The stored corpus_fingerprint is provenance for detecting that the manifest was built from a different workspace corpus when compared with a current corpus fingerprint; such a mismatch means coverage is stale and must be regenerated. BTreeSet preserves deterministic serialization order (CN-05).",
-      "spec_refs": [
-        {
-          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
-          "anchor": "IN-05"
-        },
-        {
-          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
-          "anchor": "IN-06"
-        },
-        {
-          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
-          "anchor": "AC-10"
-        },
-        {
-          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
-          "anchor": "AC-11"
-        }
-      ],
-      "informal_grounds": []
+      ]
     }
-  },
-  "traits": {},
-  "functions": {},
-  "inherent_impls": [],
+  ],
   "trait_impls": [
     { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "FixpointStep" },
     { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "FixpointStep" },

@@ -10,20 +10,20 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckConfigError | error_type | modify | Io, Parse, UnsupportedSchemaVersion, InvalidThreshold, InvalidParallelism, InvalidReasoningEffort | 🟡 | 🔵 |
+| DryCheckConfigError | error_type | modify | Io, Parse, UnsupportedSchemaVersion, InvalidThreshold, InvalidParallelism, InvalidReasoningEffort, InvalidPercent | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckConfig | dto | modify | — | 🟡 | 🔵 |
+| DryCheckConfig | dto | modify | — | 🔵 | 🔵 |
 
 ## Secondary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CodexDryChecker | secondary_adapter | modify | impl Debug, impl DryCheckAgentPort | 🟡 | 🔵 |
-| FsDryCheckCoverageAdapter | secondary_adapter | — | impl DryCheckCoveragePort, impl Debug | 🟡 | 🔵 |
+| CodexDryChecker | secondary_adapter | modify | impl Debug, impl DryCheckAgentPort | 🔵 | 🔵 |
+| FsDryCheckCoverageAdapter | secondary_adapter | — | impl DryCheckCoveragePort, impl Debug | 🔵 | 🔵 |
 
 ## Free Functions
 

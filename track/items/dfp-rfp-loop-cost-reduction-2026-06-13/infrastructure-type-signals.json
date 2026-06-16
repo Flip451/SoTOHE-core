@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-16T09:32:50Z",
-  "declaration_hash": "ea00015c84e0910547f670b4e83da1eab537c83438c6e57744dc096b7c93e292",
+  "generated_at": "2026-06-16T12:18:01Z",
+  "declaration_hash": "aa0ba2fe00f6904a83323ef55cda7c40029c2d91554b62338952f00fe149b86b",
   "signals": [
     {
       "type_name": "CodexDryChecker",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "DryCheckAgentPort"
@@ -15,7 +15,7 @@
     {
       "type_name": "DryCheckConfig",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::fmt::Debug"
@@ -24,7 +24,7 @@
     {
       "type_name": "DryCheckConfigError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::convert::From<Error>",
@@ -36,7 +36,7 @@
     {
       "type_name": "FsDryCheckCoverageAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "DryCheckCoveragePort",

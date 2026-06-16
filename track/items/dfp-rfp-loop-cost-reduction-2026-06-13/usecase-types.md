@@ -12,9 +12,9 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckConfig | value_object | — | — | 🟡 | 🔵 |
-| DryCheckParallelism | value_object | — | — | 🟡 | 🔵 |
-| DryCheckPercent | value_object | — | — | 🟡 | 🔵 |
+| DryCheckConfig | value_object | — | — | 🔵 | 🔵 |
+| DryCheckParallelism | value_object | — | — | 🔵 | 🔵 |
+| DryCheckPercent | value_object | — | — | 🔵 | 🔵 |
 | FixpointCurrentBranch | value_object | — | — | 🔵 | 🔵 |
 
 ## Error Types
@@ -22,7 +22,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | DryCheckAgentError | error_type | modify | UserAbort, AgentAbort, Timeout, IllegalOutput, Unexpected | 🔵 | 🔵 |
-| DryCheckCycleError | error_type | modify | Embedding, Index, Agent, Reader, Writer, Diff, Entry, CoveragePort, InvalidParallelism, InvalidPercent | 🟡 | 🔵 |
+| DryCheckCycleError | error_type | modify | Embedding, Index, Agent, Reader, Writer, Diff, Entry, CoveragePort, InvalidParallelism, InvalidPercent | 🔵 | 🔵 |
 | FixpointResolveError | error_type | — | InvalidTrackId, InvalidCurrentBranch, TrackNotActive, GateQueryFailed | 🔵 | 🔵 |
 
 ## Secondary Ports
@@ -48,7 +48,7 @@
 |------|------|--------|---------|--------|----------|
 | DryCheckApprovalInteractor | interactor | modify | — | 🔵 | 🔵 |
 | DryCheckInteractor | interactor | modify | — | 🔵 | 🔵 |
-| FixpointResolveInteractor | interactor | — | — | 🟡 | 🔵 |
+| FixpointResolveInteractor | interactor | — | — | 🔵 | 🔵 |
 
 ## Commands
 

@@ -211,7 +211,7 @@
           "name": "try_new",
           "receiver": null,
           "params": [ { "name": "value", "ty": "usize" } ],
-          "returns": "Result<Self, DryCheckCycleError>",
+          "returns": "Result<DryCheckParallelism, DryCheckCycleError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -219,7 +219,7 @@
         },
         {
           "name": "as_usize",
-          "receiver": "self",
+          "receiver": "&self",
           "params": [],
           "returns": "usize",
           "is_async": false,
@@ -258,7 +258,7 @@
           "name": "try_new",
           "receiver": null,
           "params": [ { "name": "value", "ty": "u8" } ],
-          "returns": "Result<Self, DryCheckCycleError>",
+          "returns": "Result<DryCheckPercent, DryCheckCycleError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -266,7 +266,7 @@
         },
         {
           "name": "as_u8",
-          "receiver": "self",
+          "receiver": "&self",
           "params": [],
           "returns": "u8",
           "is_async": false,
@@ -398,16 +398,16 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Embedding",    "payload": { "kind": "unit" } },
-          { "name": "Index",        "payload": { "kind": "unit" } },
+          { "name": "Embedding",    "payload": { "kind": "tuple", "fields": [ "EmbeddingError" ] } },
+          { "name": "Index",        "payload": { "kind": "tuple", "fields": [ "SemanticIndexError" ] } },
           { "name": "Agent",        "payload": { "kind": "tuple", "fields": [ "DryCheckAgentError" ] } },
-          { "name": "Reader",       "payload": { "kind": "unit" } },
-          { "name": "Writer",       "payload": { "kind": "unit" } },
+          { "name": "Reader",       "payload": { "kind": "tuple", "fields": [ "domain::dry_check::DryCheckReaderError" ] } },
+          { "name": "Writer",       "payload": { "kind": "tuple", "fields": [ "domain::dry_check::DryCheckWriterError" ] } },
           { "name": "Diff",         "payload": { "kind": "tuple", "fields": [ "DryCheckDiffError" ] } },
-          { "name": "Entry",        "payload": { "kind": "unit" } },
-          { "name": "CoveragePort",       "payload": { "kind": "unit" } },
+          { "name": "Entry",        "payload": { "kind": "tuple", "fields": [ "domain::dry_check::DryCheckEntryError" ] } },
+          { "name": "CoveragePort",       "payload": { "kind": "tuple", "fields": [ "String" ] } },
           { "name": "InvalidParallelism", "payload": { "kind": "unit" } },
-          { "name": "InvalidPercent",     "payload": { "kind": "unit" } }
+          { "name": "InvalidPercent",     "payload": { "kind": "tuple", "fields": [ "u8" ] } }
         ]
       },
       "methods": [],
@@ -488,7 +488,7 @@
       },
       "methods": [],
       "module_path": "dry_check::approval_interactor",
-      "docs": "Implements `DryCheckApprovalService`. Updated for D5: now reads DryCheckCoverageRecord via DryCheckCoveragePort for staleness checking instead of performing embedding/similarity-search. Staleness check includes three conditions: (1) all current FragmentRefs must be present in the stored coverage, (2) the stored config_fingerprint must match the current_config_fingerprint injected at construction (config change → Blocked), and (3) the stored corpus_fingerprint must match the current_corpus_fingerprint injected at construction (corpus change → Blocked). Fail-closed sentinel corpus fingerprints (all-zero) always block. For all-resolved checking it reads DryCheckReader history, derives the same latest-per-pair last-write-wins view as DryCheckResultsInteractor, and evaluates only latest records touching current FragmentRef values. Holds DryCheckReader + DryCheckCoveragePort + current_config_fingerprint + current_corpus_fingerprint as private fields.",
+      "docs": "Implements `DryCheckApprovalService`. Updated for D5: now reads DryCheckCoverageRecord via DryCheckCoveragePort for staleness checking instead of performing embedding/similarity-search. Staleness check includes four conditions: (1) all current FragmentRefs must be present in the stored coverage, (2) the stored config_fingerprint must match the current_config_fingerprint injected at construction (config change → Blocked), (3) the stored corpus_fingerprint must match the current_corpus_fingerprint injected at construction (corpus change → Blocked), and (4) either stored coverage fingerprint being the fail-closed sentinel (all-zero) blocks. For all-resolved checking it reads DryCheckReader history, derives the same latest-per-pair last-write-wins view as DryCheckResultsInteractor, and evaluates only latest records whose pair_key is present in coverage.processed_pair_keys and that touch current FragmentRef values. Holds DryCheckReader + DryCheckCoveragePort + current_config_fingerprint + current_corpus_fingerprint as private fields.",
       "spec_refs": [
         {
           "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
@@ -750,7 +750,7 @@
       ],
       "supertrait_bounds": [],
       "module_path": "dry_check::services",
-      "docs": "Application service for the cheap dry gate approval check after D5. The caller supplies the active track_id and current diff FragmentRef set. Decides Approved/Blocked using DryCheckCoveragePort (staleness check: (1) are all current FragmentRefs present in coverage, (2) does the stored config_fingerprint match the current config fingerprint — a mismatch means the config changed and coverage is stale, and (3) does the stored corpus_fingerprint match the current corpus fingerprint — a mismatch means the corpus changed (file added/removed/modified) and coverage is stale; fail-closed sentinel corpus fingerprints always block) + DryCheckReader (all-resolved check), with no embedding or semantic-index lookup. DryCheckReader history is interpreted as latest-per-pair with last-write-wins, so a later Accepted/NotAViolation can resolve an older Violation for the same pair.",
+      "docs": "Application service for the cheap dry gate approval check after D5. The caller supplies the active track_id and current diff FragmentRef set. Decides Approved/Blocked using DryCheckCoveragePort (staleness check: (1) are all current FragmentRefs present in coverage, (2) does the stored config_fingerprint match the current config fingerprint — a mismatch means the config changed and coverage is stale, (3) does the stored corpus_fingerprint match the current corpus fingerprint — a mismatch means the corpus changed (file added/removed/modified) and coverage is stale, and (4) either stored coverage fingerprint being the fail-closed sentinel blocks) + DryCheckReader (all-resolved check scoped to latest records whose pair_key is in coverage.processed_pair_keys and that touch the current diff), with no embedding or semantic-index lookup. DryCheckReader history is interpreted as latest-per-pair with last-write-wins, so a later Accepted/NotAViolation can resolve an older Violation for the same pair.",
       "spec_refs": [
         {
           "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
@@ -822,11 +822,30 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "dry_approval",      "ty": "std::sync::Arc<dyn DryCheckApprovalService>" },
-            { "name": "review_state",      "ty": "std::sync::Arc<dyn ReviewGateStatePort>" },
+            { "name": "dry_approval",       "ty": "std::sync::Arc<dyn DryCheckApprovalService + Send + Sync>" },
+            { "name": "review_state",       "ty": "std::sync::Arc<dyn ReviewGateStatePort>" },
             { "name": "ref_verify_results", "ty": "std::sync::Arc<dyn RefVerifyGateStatePort>" }
           ],
           "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckConfig",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "known_bad_injection_rate_percent",      "ty": "DryCheckPercent" },
+            { "name": "known_bad_detection_threshold_percent", "ty": "DryCheckPercent" },
+            { "name": "max_parallelism",                       "ty": "DryCheckParallelism" }
+          ],
+          "returns": "DryCheckConfig",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -922,7 +941,6 @@
     { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "DryCheckConfig" },
     { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "DryCheckConfig" },
     { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "DryCheckConfig" },
-    { "action": "add",       "trait_ref": "core::default::Default",  "for_type": "DryCheckConfig" },
     { "action": "reference", "trait_ref": "core::fmt::Debug",        "for_type": "DryCheckAgentError" },
     { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "DryCheckAgentError" },
     { "action": "reference", "trait_ref": "core::fmt::Display",      "for_type": "DryCheckAgentError" },

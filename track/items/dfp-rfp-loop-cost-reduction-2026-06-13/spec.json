@@ -45,7 +45,7 @@
     },
     {
       "id": "GO-05",
-      "text": "`sotp dry check-approved` を埋め込み・類似検索なしの純読み取りゲート（staleness FragmentRef 照合 + all-resolved 確認）にし、dfl ループの先頭 check・fixpoint 合成・commit ゲートの反復評価コストを下げる（D5）。",
+      "text": "`sotp dry check-approved` を埋め込み・類似検索なしの純読み取りゲート（FragmentRef / config_fingerprint / corpus_fingerprint / fail-closed sentinel の staleness 確認 + all-resolved 確認）にし、dfl ループの先頭 check・fixpoint 合成・commit ゲートの反復評価コストを下げる（D5）。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
@@ -98,7 +98,7 @@
       },
       {
         "id": "IN-05",
-        "text": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。類似検索は `dry write`（resolver）にのみ残す。",
+        "text": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録を読んで次の条件で Approved / Blocked を判定する。(1) staleness-fragment: 現在の diff フラグメントの FragmentRef（path + content_hash）がカバレッジ記録の fragment_refs に在るか — 無ければ Blocked。(2) staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか — 不一致なら Blocked（設定変更により coverage 再生成が必要）。(3) staleness-corpus: カバレッジ記録の corpus_fingerprint が現在のワークスペース corpus から導出したフィンガープリントと一致するか — 不一致なら Blocked（corpus 変更により coverage が陳腐化）。(4) fail-closed sentinel: カバレッジ記録のいずれかのフィンガープリントが all-zeros（`fail_closed()` 値）の場合は問答無用で Blocked（`dry write` が失敗したランで書き込まれた fail-closed プロビナンスを検出）。(5) all-resolved: processed_pair_keys に含まれ、かつ変更フラグメントに触れる最新記録ペアが全て not-a-violation / accepted か — 対象ペアに violation があれば Blocked。processed_pair_keys に含まれない履歴記録は過去 coverage の残存としてこの確認から除外する。上記 (1)-(5) が全て満たされたときのみ Approved。類似検索は `dry write`（resolver）にのみ残す。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
@@ -108,7 +108,7 @@
       },
       {
         "id": "IN-06",
-        "text": "`dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。",
+        "text": "`dry write` が `DryCheckCoverageRecord`（fragment_refs: 処理した diff フラグメントの FragmentRef 集合、processed_pair_keys: 判定対象として確定したペアキー集合、config_fingerprint: 実行時 dry-check.json 設定のフィンガープリント、corpus_fingerprint: 実行時 workspace corpus のフィンガープリント）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。`dry write` が信頼できるカバレッジを作れない失敗ランでは fail_closed() フィンガープリントを記録し、次回 `dry check-approved` が Blocked へ倒れるようにする。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
@@ -315,7 +315,7 @@
     },
     {
       "id": "CN-09",
-      "text": "D5 の `dry check-approved` は staleness 判定を diff フラグメントの FragmentRef（path + content_hash）とカバレッジ記録の FragmentRef 照合で行い、埋め込み・類似検索を呼ばない。これにより `check-approved` は何度実行しても実害がなくなり、D1/D2 の組み合わせで二重実行が生じても問題にならない。",
+      "text": "D5 の `dry check-approved` は staleness 判定を diff フラグメントの FragmentRef（path + content_hash）、config_fingerprint、corpus_fingerprint、fail-closed sentinel（all-zeros フィンガープリント）の照合で行い、これに processed_pair_keys で現在 coverage の対象ペアに絞った all-resolved 確認を加えた 5 条件だけで Approved / Blocked を判定する。埋め込み・類似検索は呼ばないため、`check-approved` は何度実行しても実害がなくなり、D1/D2 の組み合わせで二重実行が生じても問題にならない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
@@ -427,7 +427,7 @@
     },
     {
       "id": "AC-10",
-      "text": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。",
+      "text": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録だけを読んで、(1) staleness-fragment（FragmentRef 照合）、(2) staleness-config（config_fingerprint 一致確認、不一致なら Blocked）、(3) staleness-corpus（corpus_fingerprint 一致確認、不一致なら Blocked）、(4) fail-closed sentinel（all-zeros フィンガープリント検出、Blocked）、(5) all-resolved（processed_pair_keys に含まれ、変更 FragmentRef に触れる最新記録ペアの violation 不在確認）の 5 条件で Approved / Blocked を判定する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
@@ -437,7 +437,7 @@
     },
     {
       "id": "AC-11",
-      "text": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。",
+      "text": "`sotp dry write` がカバレッジ記録（`DryCheckCoverageRecord`：処理した diff フラグメントの FragmentRef 集合 + 処理済みペアキー集合 + config_fingerprint + corpus_fingerprint）を記録し、その記録を `dry check-approved` が staleness 判定に使う。(a) フラグメント編集または path 変更 → FragmentRef 変化 → fragment_refs に不在 → Blocked → `dry write` 強制、(b) dry-check.json 設定変更 → config_fingerprint 不一致 → Blocked → `dry write` 強制、(c) corpus 変更 → corpus_fingerprint 不一致 → Blocked → `dry write` 強制、(d) `dry write` 失敗時は all-zeros フィンガープリント（`fail_closed()` 値）を書き込み → 次回 `check-approved` で Blocked → `dry write` 再実行強制、という意味論が維持される。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",

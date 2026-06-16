@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-16T09:32:46Z",
-  "declaration_hash": "e58bab6d48f8d7a8c986a991209935d29232d03e33fb339e17b615f9765b05d6",
+  "generated_at": "2026-06-16T12:17:57Z",
+  "declaration_hash": "db80917149cfa32a9098e035c160c821826ae8e9d1a4a2b473d0c2d5c8ca6b8b",
   "signals": [
     {
       "type_name": "DryCheckConfigFingerprint",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -32,7 +32,7 @@
     {
       "type_name": "DryCheckCorpusFingerprint",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -58,7 +58,7 @@
     {
       "type_name": "DryCheckCoverageRecord",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -104,7 +104,7 @@
     {
       "type_name": "ReviewScopeSet",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
