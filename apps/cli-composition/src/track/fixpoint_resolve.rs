@@ -411,8 +411,34 @@ impl CliApp {
         }
 
         let base = base_result?;
+        // Mirror `dry check-approved` for recorded sidecars while preserving
+        // the legacy no-sidecar project-root scan.
+        let corpus_root_manifest_path = track_dir.join("dry-check-corpus-root.json");
+        let (approval_workspace_root, current_corpus_fingerprint) =
+            match std::fs::symlink_metadata(&corpus_root_manifest_path) {
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (
+                    canonical_root.clone(),
+                    crate::dry::compute_current_dry_corpus_fingerprint(&track_dir, &canonical_root),
+                ),
+                _ => {
+                    let workspace_root = match crate::dry::resolve_dry_corpus_fingerprint_root(
+                        &track_dir, &repo_root,
+                    ) {
+                        Ok(workspace_root) => workspace_root,
+                        Err(e) => {
+                            eprintln!(
+                                "[warn] fixpoint-resolve: {e}; treating corpus fingerprint as stale"
+                            );
+                            repo_root.clone()
+                        }
+                    };
+                    let fingerprint =
+                        crate::dry::compute_current_dry_corpus_fingerprint(&track_dir, &repo_root);
+                    (workspace_root, fingerprint)
+                }
+            };
         let current_fragment_refs =
-            build_current_fragment_refs(&canonical_root, &repo_root, &base)?;
+            build_current_fragment_refs(&approval_workspace_root, &repo_root, &base)?;
 
         // ── Build dry-gate interactor (read-only) ─────────────────────────────
         let dry_check_json_path = track_dir.join("dry-check.json");
@@ -428,12 +454,6 @@ impl CliApp {
         let dry_infra_config = InfraDryCheckConfig::load(&dry_config_path)
             .map_err(|e| format!("failed to load dry-check config: {e}"))?;
         let current_config_fingerprint = dry_infra_config.fingerprint();
-
-        // D5: mirror `dry check-approved` by recomputing from the workspace root
-        // recorded by the latest `dry write`, falling back to the repo root for
-        // older manifests that predate the sidecar.
-        let current_corpus_fingerprint =
-            crate::dry::compute_current_dry_corpus_fingerprint(&track_dir, &repo_root);
 
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
         let coverage = Arc::new(FsDryCheckCoverageAdapter::new(

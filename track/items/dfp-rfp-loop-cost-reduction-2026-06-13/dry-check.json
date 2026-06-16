@@ -11516,6 +11516,76 @@
       "rationale": "These fragments live at different abstraction layers and do different jobs: `libs/usecase/src/dry_check/services.rs` defines the dry-check application service trait, while `apps/cli-composition/src/dry.rs` wires CLI inputs into the use case and shared helpers. There is no repeated implementation logic between them, so this is not a DRY violation.",
       "recorded_at": "2026-06-16T08:18:01Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/dry.rs",
+      "low_hash": "b2f84f8f5e0fa9930b5d0977f6e8c0845a09334ade31b175edf14cb7b4183794",
+      "high_path": "libs/usecase/src/dry_check/services.rs",
+      "high_hash": "adf46fc06fb3714dbb4719e6f412ae312ae1ee391560181e09672e6e1058ab8a",
+      "changed_path": "apps/cli-composition/src/dry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8602102994918823,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a8a4a62ea1e6e769c867b3f8164279be850fc284",
+      "rationale": "These fragments are not duplicating the same implementation logic. The changed file is CLI composition code that explicitly factors shared behavior into helpers, while the candidate file only defines the `DryCheckService` trait and related service documentation. There is no repeated algorithm or code path between them.",
+      "recorded_at": "2026-06-16T08:47:55Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/dry_check/interactor.rs",
+      "low_hash": "2bc517137e7722114287e8946e03a050cb2591ddaa23d7d4b2739f312e94f899",
+      "high_path": "libs/usecase/src/dry_check/interactor.rs",
+      "high_hash": "2d87aec4a82027155e8f7d417f9f55b230cc8d4cb8ef37508aabbf24d4d80d4e",
+      "changed_path": "libs/usecase/src/dry_check/interactor.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8561722040176392,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a8a4a62ea1e6e769c867b3f8164279be850fc284",
+      "rationale": "The two fragments follow the same test pattern, but they exercise different behaviors and assert different outcomes: one covers a calibration-failure fail-closed path, the other covers successful escalation and final-tier verdict persistence. The overlap is limited to standard test scaffolding and commentary, which is reasonable in adjacent tests and does not indicate harmful duplicate logic.",
+      "recorded_at": "2026-06-16T09:24:52Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/dry_check/interactor.rs",
+      "low_hash": "2bc517137e7722114287e8946e03a050cb2591ddaa23d7d4b2739f312e94f899",
+      "high_path": "libs/usecase/src/dry_check/interactor.rs",
+      "high_hash": "326e004b9ab2b0cd42fbedc36272933973990f0528815073263640fff403114d",
+      "changed_path": "libs/usecase/src/dry_check/interactor.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9223154187202454,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a8a4a62ea1e6e769c867b3f8164279be850fc284",
+      "rationale": "The two fragments overlap in scenario setup and high-level commentary, but they are not duplicating the same test logic. The changed test verifies the fail-closed outcome and coverage persistence, while the existing test verifies the stricter no-production-call behavior at Final tier. They share a helper because they exercise the same calibration-failure path, which is appropriate reuse rather than a DRY violation.",
+      "recorded_at": "2026-06-16T09:24:52Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/dry_check/interactor.rs",
+      "low_hash": "2bc517137e7722114287e8946e03a050cb2591ddaa23d7d4b2739f312e94f899",
+      "high_path": "libs/usecase/src/dry_check/interactor.rs",
+      "high_hash": "717a3379c0c21288240446f7e08725e9d70671149ef18689b05817f403470c8d",
+      "changed_path": "libs/usecase/src/dry_check/interactor.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8931581974029541,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a8a4a62ea1e6e769c867b3f8164279be850fc284",
+      "rationale": "The new test reuses the same scenario helper and fail-closed assertion, but it exercises a distinct behavior: one variant ensures the production pair is never called by panicking if it is, while the new variant verifies the same path with a non-panicking sentinel result and documents the coverage-manifest expectation. This is shared test harness code, not meaningful logic duplication.",
+      "recorded_at": "2026-06-16T09:24:52Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/dry_check/interactor.rs",
+      "low_hash": "326e004b9ab2b0cd42fbedc36272933973990f0528815073263640fff403114d",
+      "high_path": "libs/usecase/src/dry_check/interactor.rs",
+      "high_hash": "717a3379c0c21288240446f7e08725e9d70671149ef18689b05817f403470c8d",
+      "changed_path": "libs/usecase/src/dry_check/interactor.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8627956509590149,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a8a4a62ea1e6e769c867b3f8164279be850fc284",
+      "rationale": "The changed fragment is a distinct test covering a different behavior path: final calibration failure with production pairs expected not to be called. The existing fragment verifies a separate calibration-success case where a NotAViolation pair is not escalated to Final. They share the same test file and some helper-style structure, but they do not duplicate the same logic or assertion target, so this is not a DRY violation.",
+      "recorded_at": "2026-06-16T09:24:52Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }

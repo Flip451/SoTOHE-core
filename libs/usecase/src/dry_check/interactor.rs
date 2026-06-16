@@ -2112,14 +2112,38 @@ mod tests {
         make_probe_agent_with_non_probe(move |_, _| panic!("{non_probe_panic_msg}"))
     }
 
+    #[derive(Clone, Copy)]
+    enum FinalProductionPairBehavior {
+        ReturnNotAViolation,
+        PanicIfCalled(&'static str),
+    }
+
     /// Helper: build an agent where probe paths always return `NotAViolation`
-    /// (calibration fails) and production paths return `NotAViolation` as well.
-    fn make_always_not_violation_agent() -> MockMockDryCheckAgentPort {
+    /// so both Fast and Final calibration fail. Fast production calls return
+    /// `NotAViolation`; Final production behavior is the test-specific variant.
+    fn make_final_calibration_failure_agent(
+        final_production_behavior: FinalProductionPairBehavior,
+    ) -> MockMockDryCheckAgentPort {
         let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().returning(|_, _, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new("not a violation").unwrap(),
-            })
+        agent.expect_judge().returning(move |changed, _, tier| {
+            if changed.source_path.to_string_lossy().starts_with("probes/") {
+                Ok(DryCheckAgentJudgment::NotAViolation {
+                    rationale: Rationale::new("probe: not detected").unwrap(),
+                })
+            } else if tier == DryCheckJudgeTier::Final {
+                match final_production_behavior {
+                    FinalProductionPairBehavior::ReturnNotAViolation => {
+                        Ok(DryCheckAgentJudgment::NotAViolation {
+                            rationale: Rationale::new("production final: not a violation").unwrap(),
+                        })
+                    }
+                    FinalProductionPairBehavior::PanicIfCalled(message) => panic!("{message}"),
+                }
+            } else {
+                Ok(DryCheckAgentJudgment::NotAViolation {
+                    rationale: Rationale::new("production fast: not a violation").unwrap(),
+                })
+            }
         });
         agent
     }
@@ -2171,7 +2195,7 @@ mod tests {
     }
 
     fn run_final_calibration_failure_scenario(
-        agent: MockMockDryCheckAgentPort,
+        final_production_behavior: FinalProductionPairBehavior,
     ) -> (Result<Vec<DryCheckFinding>, DryCheckCycleError>, Arc<StubWriter>, Arc<StubCoverage>)
     {
         let diff_frag = make_fragment("src/a.rs", "fn a() {}");
@@ -2193,6 +2217,7 @@ mod tests {
 
         let writer = Arc::new(StubWriter::default());
         let coverage = Arc::new(StubCoverage::new());
+        let agent = make_final_calibration_failure_agent(final_production_behavior);
         let interactor = make_interactor_with_config_and_coverage(
             embed,
             index,
@@ -2272,9 +2297,9 @@ mod tests {
     /// assertion.
     #[test]
     fn test_fast_calibration_failure_final_also_fails_returns_calibration_error() {
-        // All judge calls return NotAViolation — probes not detected.
-        let (result, writer, coverage) =
-            run_final_calibration_failure_scenario(make_always_not_violation_agent());
+        let (result, writer, coverage) = run_final_calibration_failure_scenario(
+            FinalProductionPairBehavior::ReturnNotAViolation,
+        );
         // Pair-level writer must NOT be called: agent quality is untrusted, so no
         // production verdicts are persisted when calibration fails.
         // Coverage manifest MUST be written on calibration failure — but with an
@@ -2303,30 +2328,10 @@ mod tests {
     /// re-run was skipped.
     #[test]
     fn test_fast_calibration_failure_final_also_fails_production_pairs_not_called() {
-        // Probe calls return NotAViolation (both tiers fail calibration: 0% < 90%).
-        // Production pairs may be called at Fast tier (STEP B runs before calibration),
-        // but must NOT be called at Final tier once both calibration tiers have failed.
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().returning(|changed, _, tier| {
-            if changed.source_path.to_string_lossy().starts_with("probes/") {
-                // Probe path: always return NotAViolation so calibration fails.
-                Ok(DryCheckAgentJudgment::NotAViolation {
-                    rationale: Rationale::new("probe: not detected").unwrap(),
-                })
-            } else if tier == DryCheckJudgeTier::Final {
-                // Production pair at Final tier must NOT happen after both tiers fail.
-                panic!(
-                    "production pair must NOT be judged at Final tier when both calibration tiers fail"
-                )
-            } else {
-                // Production pair at Fast tier (STEP B, before calibration) is expected.
-                Ok(DryCheckAgentJudgment::NotAViolation {
-                    rationale: Rationale::new("production fast: not a violation").unwrap(),
-                })
-            }
-        });
-
-        let (result, writer, coverage) = run_final_calibration_failure_scenario(agent);
+        let (result, writer, coverage) =
+            run_final_calibration_failure_scenario(FinalProductionPairBehavior::PanicIfCalled(
+                "production pair must NOT be judged at Final tier when both calibration tiers fail",
+            ));
 
         // Calibration error must still be returned fail-closed.
         // No production entries written.
