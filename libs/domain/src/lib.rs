@@ -31,8 +31,8 @@ pub mod verify;
 
 pub use adr_decision::{
     AcceptedDecision, AdrDecisionCommon, AdrDecisionCommonError, AdrDecisionEntry, AdrFilePort,
-    AdrFilePortError, AdrFrontMatter, AdrFrontMatterError, AdrVerifyReport, DecisionGrounds,
-    DeprecatedDecision, ImplementedDecision, ProposedDecision, SupersededDecision,
+    AdrFilePortError, AdrFrontMatter, AdrFrontMatterError, AdrVerifyReport, DecisionGroundRef,
+    DecisionGrounds, DeprecatedDecision, ImplementedDecision, ProposedDecision, SupersededDecision,
     evaluate_adr_decision,
 };
 pub use decision::Decision;

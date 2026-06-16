@@ -36,7 +36,7 @@ pub use entry::AdrDecisionEntry;
 pub use evaluator::evaluate_adr_decision;
 pub use file_port::{AdrFilePort, AdrFilePortError};
 pub use front_matter::{AdrFrontMatter, AdrFrontMatterError};
-pub use grounds::DecisionGrounds;
+pub use grounds::{DecisionGroundRef, DecisionGrounds};
 pub use state::{
     AcceptedDecision, DeprecatedDecision, ImplementedDecision, ProposedDecision, SupersededDecision,
 };

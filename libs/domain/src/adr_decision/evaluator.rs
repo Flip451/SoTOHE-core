@@ -11,12 +11,18 @@ use super::grounds::DecisionGrounds;
 /// classification. All five lifecycle variants carry `AdrDecisionCommon`, so
 /// classification is uniform.
 ///
-/// Priority (highest first):
+/// Priority (highest first), per the review-priority rule of
+/// `knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md`
+/// §D1 (supersedes 2026-04-27-1234 §D1):
 ///
 /// 1. `grandfathered: true` → [`DecisionGrounds::Grandfathered`] (D4 exemption,
 ///    skipped by `verify-adr-signals`).
-/// 2. `user_decision_ref: Some(_)` → [`DecisionGrounds::UserDecisionRef`] (🔵).
-/// 3. `review_finding_ref: Some(_)` → [`DecisionGrounds::ReviewFindingRef`] (🟡).
+/// 2. `review_finding_ref: Some(_)` → [`DecisionGrounds::ReviewFindingRef`] (🟡)
+///    — checked **before** `user_decision_ref` so any decision still carrying
+///    an unresolved review-derived grounding stays at 🟡 regardless of whether
+///    a `user_decision_ref` is also present.
+/// 3. `user_decision_ref: Some(_)` and no `review_finding_ref` →
+///    [`DecisionGrounds::UserDecisionRef`] (🔵).
 /// 4. otherwise → [`DecisionGrounds::NoGrounds`] (🔴).
 ///
 /// Infallible: every reachable [`AdrDecisionEntry`] is well-formed because the
@@ -37,11 +43,11 @@ fn classify_grounds(common: &AdrDecisionCommon) -> DecisionGrounds {
     if common.grandfathered() {
         return DecisionGrounds::Grandfathered;
     }
-    if common.user_decision_ref().is_some() {
-        return DecisionGrounds::UserDecisionRef;
-    }
     if common.review_finding_ref().is_some() {
         return DecisionGrounds::ReviewFindingRef;
+    }
+    if common.user_decision_ref().is_some() {
+        return DecisionGrounds::UserDecisionRef;
     }
     DecisionGrounds::NoGrounds
 }
@@ -51,9 +57,13 @@ fn classify_grounds(common: &AdrDecisionCommon) -> DecisionGrounds {
 mod tests {
     use super::*;
     use crate::adr_decision::{
-        AcceptedDecision, AdrDecisionCommon, DeprecatedDecision, ImplementedDecision,
-        ProposedDecision, SupersededDecision,
+        AcceptedDecision, AdrDecisionCommon, DecisionGroundRef, DeprecatedDecision,
+        ImplementedDecision, ProposedDecision, SupersededDecision,
     };
+
+    fn ref_from(value: Option<&str>) -> Option<DecisionGroundRef> {
+        value.map(|s| DecisionGroundRef::try_new(s).unwrap())
+    }
 
     fn common_with(
         id: &str,
@@ -61,14 +71,8 @@ mod tests {
         review_ref: Option<&str>,
         grandfathered: bool,
     ) -> AdrDecisionCommon {
-        AdrDecisionCommon::new(
-            id,
-            user_ref.map(str::to_string),
-            review_ref.map(str::to_string),
-            None,
-            grandfathered,
-        )
-        .unwrap()
+        AdrDecisionCommon::new(id, ref_from(user_ref), ref_from(review_ref), None, grandfathered)
+            .unwrap()
     }
 
     #[test]
@@ -137,14 +141,18 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_adr_decision_user_ref_takes_priority_over_review_ref() {
+    fn test_evaluate_adr_decision_review_ref_takes_priority_over_user_ref() {
+        // Review-priority rule (ADR 2026-06-16-0042 §D1, supersedes 2026-04-27-1234 §D1):
+        // when both refs are present, the decision still carries an unresolved
+        // review-derived grounding and must stay 🟡 rather than be silently
+        // promoted to 🔵 by the user_decision_ref.
         let entry = AdrDecisionEntry::AcceptedDecision(AcceptedDecision::new(common_with(
             "D7",
             Some("chat"),
             Some("RF"),
             false,
         )));
-        assert_eq!(evaluate_adr_decision(entry), DecisionGrounds::UserDecisionRef);
+        assert_eq!(evaluate_adr_decision(entry), DecisionGrounds::ReviewFindingRef);
     }
 
     // Full 5 typestate × 4 grounds matrix

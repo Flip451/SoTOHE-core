@@ -2,21 +2,17 @@
 adr_id: 2026-05-29-1118-semantic-dup-detection-discoverability-gate
 decisions:
   - id: D1
-    review_finding_ref: "deep-research-2026-05-29:semantic-dup-detection"
     user_decision_ref: "chat_segment:adr-add:2026-05-29:semantic-dup-detection"
     candidate_selection: "from:[discoverability-first+soft-gate,hard-block-gate] chose:discoverability-first+soft-gate"
     status: proposed
   - id: D2
-    review_finding_ref: "deep-research-2026-05-29:semantic-dup-detection"
     user_decision_ref: "chat_segment:adr-add:2026-05-29:semantic-dup-detection"
     candidate_selection: "from:[caseA-fastembed-jina-lancedb,caseB-nomic-7b,external-api] chose:caseA-fastembed-jina-lancedb"
     status: proposed
   - id: D3
-    review_finding_ref: "deep-research-2026-05-29:semantic-dup-detection"
     user_decision_ref: "chat_segment:adr-add:2026-05-29:semantic-dup-detection"
     status: proposed
   - id: D4
-    review_finding_ref: "impl-discovery:2026-05-30:lancedb-protoc-and-license-gate"
     user_decision_ref: "chat_segment:adr2pr:2026-05-30:lancedb-toolchain-license-prereqs"
     status: proposed
 ---

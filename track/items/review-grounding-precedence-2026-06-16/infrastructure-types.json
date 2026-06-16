@@ -1,0 +1,76 @@
+{
+  "schema_version": 4,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "AdrFrontMatterCodecError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "YamlParse",           "payload": { "kind": "tuple", "fields": ["serde_yaml::Error"] } },
+          { "name": "MissingAdrId",        "payload": { "kind": "unit" } },
+          { "name": "InvalidDecisionField","payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_decision::error",
+      "docs": "Carried for edge exposure. Structure unchanged — InvalidDecisionField already covers the new DecisionGroundRef construction error path (IN-06).",
+      "spec_refs": [
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "FsAdrFileAdapter": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "adr_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "adr_decision::adapter",
+      "docs": "Carried for edge exposure (R7: FsAdrFileAdapter implements domain::AdrFilePort). Not changed by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::adr_decision::parse::parse_adr_frontmatter": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "content", "ty": "&str" }
+      ],
+      "returns": "Result<domain::AdrFrontMatter, AdrFrontMatterCodecError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Decode an ADR file's full text into a domain AdrFrontMatter aggregate. This track modifies decision_dto_to_entry to call DecisionGroundRef::try_new on user_decision_ref and review_finding_ref strings from the DTO, mapping Err to AdrFrontMatterCodecError::InvalidDecisionField (IN-06 / AC-08 / CN-01 fail-closed).",
+      "spec_refs": [
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "CN-01" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "CN-04" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "domain::AdrFilePort",
+      "for_type": "FsAdrFileAdapter"
+    }
+  ]
+}

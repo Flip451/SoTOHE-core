@@ -153,7 +153,8 @@ mod tests {
     use std::sync::Mutex;
 
     use domain::{
-        AcceptedDecision, AdrDecisionCommon, AdrDecisionEntry, AdrFrontMatter, ProposedDecision,
+        AcceptedDecision, AdrDecisionCommon, AdrDecisionEntry, AdrFrontMatter, DecisionGroundRef,
+        ProposedDecision,
     };
 
     use super::*;
@@ -173,20 +174,18 @@ mod tests {
         }
     }
 
+    fn ref_from(value: Option<&str>) -> Option<DecisionGroundRef> {
+        value.map(|s| DecisionGroundRef::try_new(s).unwrap())
+    }
+
     fn proposed_with(
         id: &str,
         user_ref: Option<&str>,
         review_ref: Option<&str>,
     ) -> AdrDecisionEntry {
         AdrDecisionEntry::ProposedDecision(ProposedDecision::new(
-            AdrDecisionCommon::new(
-                id,
-                user_ref.map(str::to_string),
-                review_ref.map(str::to_string),
-                None,
-                false,
-            )
-            .unwrap(),
+            AdrDecisionCommon::new(id, ref_from(user_ref), ref_from(review_ref), None, false)
+                .unwrap(),
         ))
     }
 

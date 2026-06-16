@@ -254,13 +254,21 @@ impl DeprecatedDecision {
 mod tests {
     use super::*;
     use crate::adr_decision::common::AdrDecisionCommon;
+    use crate::adr_decision::grounds::DecisionGroundRef;
 
     fn common(id: &str) -> AdrDecisionCommon {
         AdrDecisionCommon::new(id, None, None, None, false).unwrap()
     }
 
     fn common_with_user_ref(id: &str, uref: &str) -> AdrDecisionCommon {
-        AdrDecisionCommon::new(id, Some(uref.to_string()), None, None, false).unwrap()
+        AdrDecisionCommon::new(
+            id,
+            Some(DecisionGroundRef::try_new(uref).unwrap()),
+            None,
+            None,
+            false,
+        )
+        .unwrap()
     }
 
     // ── Constructor happy paths ───────────────────────────────────────────────
@@ -318,7 +326,10 @@ mod tests {
         let proposed = ProposedDecision::new(common_with_user_ref("D1", "chat:2026-04-25"));
         let accepted = proposed.accept();
         assert_eq!(accepted.common.id(), "D1");
-        assert_eq!(accepted.common.user_decision_ref(), Some("chat:2026-04-25"));
+        assert_eq!(
+            accepted.common.user_decision_ref().map(DecisionGroundRef::as_str),
+            Some("chat:2026-04-25")
+        );
     }
 
     #[test]
