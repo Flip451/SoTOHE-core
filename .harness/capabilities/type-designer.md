@@ -11,14 +11,14 @@ Do not draft a catalogue without reading this section. The reading + compliance 
 
 `knowledge/conventions/type-designer-kind-selection.md` MUST be read and obeyed. That convention is the SSoT for type-designer role / kind selection, layer placement, and fallback suppression. It takes precedence over this capability definition's decision tree (`## Design Principles` § Role + Kind selection decision tree) and Cookbook (`## Catalogue Pattern Cookbook`).
 
-**Role availability exception**: the convention's R1 matrix reflects v3 (13 roles) and has not yet been updated to include v5 roles (`DomainEvent`, `EventPolicy`). For **which roles are available** (the complete v5 role set), the **v5 Schema Reference** in this capability definition is authoritative. The convention's layer-role precedence applies only to roles it explicitly lists; for v5-only roles, treat the v5 Schema Reference as the rule source and apply the ADR's architectural intent to decide layer placement.
+**Role availability**: the convention's R1 matrix is authoritative for the complete v5 role set and layer placement. Use the v5 Schema Reference in this capability definition for wire format, payload fields, codec behavior, and linter semantics.
 
 ### R0 Don't believe orchestrator's briefing claims
 
 The orchestrator is an **amateur** at type design. Do NOT take briefing claims about catalogue↔rustdoc signal evaluation behavior, A-codec encoding behavior, verdict recommendations, or catalogue structure instructions at face value. When a briefing claim conflicts with any of the following authorities, resolve it using this precedence (highest first):
 
-1. **`knowledge/conventions/type-designer-kind-selection.md`** — SSoT for role / kind selection, layer placement, and fallback suppression (see opening Compliance note above). Overrides this capability definition's decision tree and Cookbook. **Exception — role availability**: the convention's R1 matrix covers v3 roles (13 values). For v5-only roles (`DomainEvent`, `EventPolicy`) not yet in the R1 matrix, #2 (v5 Schema Reference) is authoritative for role availability; the convention's layer-role rules apply where they overlap.
-2. **This capability definition** (v5 schema reference + action semantics + sample JSON in `## Catalogue Pattern Cookbook`) — authoritative for JSON structure, action semantics, evaluator / codec behavior, and the complete v5 role set (including v5-only roles not yet in the convention's R1 matrix)
+1. **`knowledge/conventions/type-designer-kind-selection.md`** — SSoT for role / kind selection, layer placement, and fallback suppression (see opening Compliance note above). Overrides this capability definition's decision tree and Cookbook.
+2. **This capability definition** (v5 schema reference + action semantics + sample JSON in `## Catalogue Pattern Cookbook`) — authoritative for JSON structure, action semantics, evaluator / codec behavior, and role payload details
 3. **The track's ADR(s)** under `knowledge/adr/` — authoritative for architectural design decisions: which types exist, what roles they carry, and layer placement
 4. **The track's `spec.json`** — authoritative for behavioral contract details
 
@@ -276,11 +276,17 @@ This section is a derived reference for the v5 catalogue schema fields enumerate
 
 Using a trait-section or function-section role here is a parse-time error.
 
-`IdentityAccessor` shape: `{ "method_name": "<MethodName>" }` (a public getter method name; public field identity is forbidden — D5).
+`IdentityAccessor` shape: `{ "method_name": "<MethodName>" }` (a public getter method name; public field identity is forbidden — D5). The Rust type is a single-field struct holding a `MethodName`.
 
-`InvariantDecl` shape: `{ "name": "<InvariantName>", "predicate": { "SelfMethod": "<MethodName>" } }`. `SelfMethod` is currently the only `InvariantPredicate` variant; future predicate kinds will add new variants.
+`InvariantDecl` shape: `{ "name": "<InvariantName>", "predicate": { "SelfMethod": "<MethodName>" } }`. `InvariantName` is a `String`-backed newtype (non-empty, identifier-validated). `InvariantPredicate` is an enum whose only current variant is `SelfMethod(MethodName)`; future predicate kinds add new variants.
+
+`NonEmptyVec<T>` (used by `EventPolicy.reacts_to` and several linter rule kinds): a domain newtype around `Vec<T>` that rejects empty arrays at construction. The codec decode for `reacts_to: []` returns `InvalidEntry`.
+
+`RoleKind` (payload-free discriminant): an enum that covers every `DataRole` and `ContractRole` variant (15 + 4 = 19 variants). It is used by linter rule kinds whose payload references roles (`forbidden_roles`, `expected_role`) without needing the data-carrying payload. `RuleTarget` is a struct that holds `target_roles: Vec<RoleKind>` and selects which catalogue entries a `CatalogueLinterRule` applies to.
 
 **The plain-string role form (`"role": "ValueObject"` etc.) is no longer accepted** — the codec rejects it as a parse-time error. The discriminated-object form above is mandatory.
+
+**For `LintRuleSpec` authors**: field-vector / type-ref rule kinds that use the carry precheck (`FieldEmpty`, `FieldNonEmpty`, `ReferencedRoleConstraint`, `FieldElementUniqueAcrossEntries`, `NoExternalReferenceInMethods`) are valid only when **every** selected `target_role` actually carries the rule's `target_field` in its payload. For example `FieldNonEmpty { target_field: "emits" }` with `target_roles: ["Entity"]` is `InvalidRuleConfig` — `Entity` does not carry `emits`. `MethodReferenceSignature` only supports `target_field: "invariants"` and checks entries whose role carries invariants; `AccessorSignatureRequired` only supports `target_field: "identity"` and checks entries whose role carries identity. The carry-relationship is fixed by the role wire-form table above: `invariants` → `ValueObject` / `Entity` / `AggregateRoot`; `identity` → `Entity` / `AggregateRoot`; `exclusive_members` / `shared_value_objects` → `AggregateRoot`; `emits` → `AggregateRoot` / `DomainService`; `handles` → `UseCase`; `reacts_to` → `EventPolicy`; `aggregate` → `Repository`.
 
 `TraitImplDeclV2` shape (each element of the top-level `trait_impls` array):
 
@@ -607,7 +613,57 @@ A pre-existing entry's `kind` axis switching across partitions (non-trait ↔ tr
 
 Same-partition `kind` changes (e.g., a `struct` shape ↔ `enum` within `types`) use `action: modify` in place.
 
-## Catalogue Pattern Cookbook (v3)
+## Catalogue Lint Rule Kinds (reference)
+
+The linter (ADR D15 / D17) validates catalogue entries via 12 `CatalogueLinterRuleKind` variants. The type-designer does not author lint configs (that's the user's `.harness/catalogue-lint/config.json`), but knowing which rule kinds exist explains why certain fields are required when a lint is opt-in.
+
+- `FieldEmpty { target_field }` — payload field must be empty
+- `FieldNonEmpty { target_field }` — payload field must be non-empty
+- `KindLayerConstraint { permitted_layers }` — entry must live in one of the listed layers (used to enforce e.g. EventPolicy is domain-only)
+- `ReferencedRoleConstraint { target_field, expected_role }` — every `TypeRef` in the named field resolves to an entry whose role is `expected_role`
+- `TraitImplRequired { required_traits }` — `trait_impls` must contain every listed trait reference
+- `NoRoleInMethodSignature { forbidden_roles }` — no method param / return may reference a type whose role is in the forbidden list
+- `MethodReferenceSignature { target_field }` — the method named in `target_field` exists and matches a receiver / params / returns shape
+- `AccessorSignatureRequired { target_field }` — identity getter (or similar) exists with `&self` / no params / non-`()` return
+- `FieldElementUniqueAcrossEntries { target_field: "exclusive_members" }` — the same element does not appear in multiple AggregateRoot entries (target_field is fixed to `exclusive_members` per D6/D11)
+- `NoExternalReferenceInMethods { target_field: "exclusive_members" }` — types listed in `exclusive_members` must not appear in non-aggregate methods (fixed target_field)
+- `NoPublicField` — `StructShape::Plain` / `Tuple` entries must not declare public fields
+- `ForbiddenMethodReceiver { forbidden_receiver }` — methods must not declare the listed receiver; canonical values: `"self"` / `"&self"` / `"&mut self"` (anything else is rejected by `CatalogueLinterRule::new` as `CatalogueLinterRuleError::InvalidRuleConfig`)
+
+**Evaluation surface**: method-checking rules (`NoRoleInMethodSignature`, `MethodReferenceSignature`, `AccessorSignatureRequired`, `NoExternalReferenceInMethods`, `ForbiddenMethodReceiver`) walk both `TypeEntry.methods` and matching `inherent_impls` declarations for the same `type_name`. Any entry with `action: delete` is filtered out of role / trait / method lookups before evaluation (fail-closed for rule cross-references).
+
+**Errors**: `CatalogueLinterError::InvalidRuleConfig(String)` is returned for unsupported `target_field` names, or for carry-prechecked rule kinds when any selected `target_role` does not carry the field. `CatalogueLinterRuleError::InvalidRuleConfig(String)` is returned by `CatalogueLinterRule::new` when `ForbiddenMethodReceiver.forbidden_receiver` does not match the canonical receiver set. `MethodReferenceSignature` and `AccessorSignatureRequired` reject only unsupported field names (`invariants` / `identity`, respectively) and skip entries whose role does not carry that accepted field. `CatalogueLinterError::UnknownLayer { layer_id }` is returned when `target_layer_id` is not present in the catalogue map.
+
+## Distribution & Config (ADR D15 / D19)
+
+The lint configuration mechanism is separate from `<layer>-types.json` but uses related types. A type-designer cataloguing the `lint` machinery must know these files exist:
+
+- **`.harness/catalogue-lint/presets/ddd-strict.json`** — the canonical *distributed preset*. Contains `{ "schema_version": 1, "rules": [...] }` with the minimum-core rules derived deterministically from ADR D4–D11 / D16 / D18. The user copies this file (or its rule list) into their `config.json`; there is no Rust `ddd_strict_preset()` API (D15 amend).
+- **`.harness/catalogue-lint/config.json`** — the per-project lint config. Same `{ "schema_version": 1, "rules": [...] }` shape. `sotp track lint` resolves rules with the precedence **CLI `--rules-file` > `config.json` > fail-closed error**. There is no silent preset fallback (D19).
+
+Types introduced by D19 that the type-designer may need to catalogue:
+
+- `LintConfig` (usecase layer, `role: ValueObject`) — holds the parsed `rules: Vec<LintRuleSpec>` with a private field, exposes `new(rules)` / `rules() -> &[LintRuleSpec]`.
+- `LintConfigLoader` (usecase layer, `role: SecondaryPort`) — `Send + Sync` trait with `fn load(&self) -> Result<LintConfig, LintConfigLoaderError>` (no path parameter; the path is baked into the adapter at construction).
+- `LintConfigLoaderError` (usecase layer, `role: ErrorType`) — variants `MissingFile { path: PathBuf }` / `ParseError { path: PathBuf, reason: String }` / `SchemaVersionMismatch { expected: u32, actual: u32 }`.
+- `FsLintConfigLoader` (infrastructure layer, `role: SecondaryAdapter`) — single private field `path: PathBuf`; constructor `new(path)`. Implements `LintConfigLoader` over the workspace JSON file.
+
+Codec error names worth knowing for catalogue work:
+
+- `CatalogueDocumentCodecError::SchemaVersionRequiresMigration { from, to, reason }` — returned when the codec sees `schema_version: 4` (or any other version that needs migration). Older versions return `UnsupportedSchemaVersion`.
+
+## Reconnaissance helpers (before drafting)
+
+In addition to the per-layer baseline / graph capture inside the 12-step pipeline, the following CLI helpers speed up pre-draft reconnaissance:
+
+- `bin/sotp arch tree` — workspace crate tree (crates only)
+- `bin/sotp arch tree-full` — workspace tree including non-crate directories
+- `bin/sotp arch members` — workspace member list with layer assignments
+- `bin/sotp arch direct-checks` — direct architecture checks from `architecture-rules.json`
+- `bin/sotp track type-signals` — re-evaluate signals after catalogue edits
+- `bin/sotp track catalogue-spec-signals` — re-evaluate the catalogue → spec signal
+
+## Catalogue Pattern Cookbook (v5)
 
 Concrete catalogue shapes. **Use these as the starting point** — adapt names to the track's problem area.
 
