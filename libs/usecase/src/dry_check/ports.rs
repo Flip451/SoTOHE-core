@@ -1,11 +1,26 @@
 //! Secondary port traits for the dry-check use case layer.
 
 use domain::CommitHash;
-use domain::dry_check::DiffFileHunks;
+use domain::TrackId;
+use domain::dry_check::{DiffFileHunks, DryCheckCoverageRecord};
 use domain::semantic_dup::CodeFragment;
 
-use super::errors::{DryCheckAgentError, DryCheckDiffError};
+use super::errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
 use super::judgment::DryCheckAgentJudgment;
+
+// ── DryCheckJudgeTier ────────────────────────────────────────────────────────
+
+/// Tier selector for the 2-stage DRY-check calibration barrier (D4 / T012).
+///
+/// `Fast` uses the lower-cost fast model; `Final` uses the higher-accuracy
+/// final model. The interactor selects the tier per-call during the judgment phase.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DryCheckJudgeTier {
+    /// Fast tier: low-cost model for the initial screening pass.
+    Fast,
+    /// Final tier: high-accuracy model for escalated or all-final runs.
+    Final,
+}
 
 // ── DryCheckAgentPort ─────────────────────────────────────────────────────────
 
@@ -32,8 +47,11 @@ use super::judgment::DryCheckAgentJudgment;
 /// Analogous to `Reviewer`. Placed in usecase because agent invocation is an
 /// infrastructure capability with no domain entity semantics.
 pub trait DryCheckAgentPort: Send + Sync {
-    /// Judge whether the `changed_fragment` duplicates the `candidate_fragment`
-    /// in a DRY-violating way.
+    /// Judge whether `changed_fragment` duplicates `candidate_fragment`.
+    ///
+    /// `tier` selects the model/reasoning-effort combination:
+    /// - `DryCheckJudgeTier::Fast`: fast/cheap model for initial screening.
+    /// - `DryCheckJudgeTier::Final`: accurate model for escalation or all-final runs.
     ///
     /// # Errors
     ///
@@ -43,6 +61,7 @@ pub trait DryCheckAgentPort: Send + Sync {
         &self,
         changed_fragment: &CodeFragment,
         candidate_fragment: &CodeFragment,
+        tier: DryCheckJudgeTier,
     ) -> Result<DryCheckAgentJudgment, DryCheckAgentError>;
 }
 
@@ -74,4 +93,46 @@ pub trait DryCheckDiffSource: Send + Sync {
         &self,
         base: &CommitHash,
     ) -> Result<Vec<DiffFileHunks>, DryCheckDiffError>;
+}
+
+// ── DryCheckCoveragePort ──────────────────────────────────────────────────────
+
+/// Secondary port for persisting and retrieving the [`DryCheckCoverageRecord`]
+/// that backs the read-only `dry check-approved` staleness gate (D5).
+///
+/// `dry write` records the set of `FragmentRef`s it processed via
+/// [`write_coverage`](DryCheckCoveragePort::write_coverage); `dry check-approved`
+/// reads it via [`read_coverage`](DryCheckCoveragePort::read_coverage) and
+/// compares each current diff fragment's `FragmentRef` against the recorded set.
+///
+/// CN-08: when no coverage manifest exists yet, `read_coverage` returns
+/// `Ok(None)` — the calling interactor treats `None` as Blocked (fail-closed),
+/// NOT as an error. Genuine I/O / serialization failures are surfaced as
+/// [`DryCheckCycleError::CoveragePort`].
+///
+/// Implemented by `infrastructure::FsDryCheckCoverageAdapter`.
+pub trait DryCheckCoveragePort: Send + Sync {
+    /// Read the coverage record for `track_id`, or `Ok(None)` when no manifest
+    /// has been written yet.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DryCheckCycleError::CoveragePort`] on I/O / deserialization
+    /// failure (a missing manifest is `Ok(None)`, not an error).
+    fn read_coverage(
+        &self,
+        track_id: &TrackId,
+    ) -> Result<Option<DryCheckCoverageRecord>, DryCheckCycleError>;
+
+    /// Persist the coverage `record` for `track_id`, replacing any prior record.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DryCheckCycleError::CoveragePort`] on I/O / serialization
+    /// failure.
+    fn write_coverage(
+        &self,
+        track_id: &TrackId,
+        record: DryCheckCoverageRecord,
+    ) -> Result<(), DryCheckCycleError>;
 }

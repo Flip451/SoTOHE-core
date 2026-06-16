@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "aa0ba2fe00f6904a83323ef55cda7c40029c2d91554b62338952f00fe149b86b",
+  "signals": [
+    {
+      "type_name": "CodexDryChecker",
+      "signal": "blue",
+      "entry_hash": "67f3e2269d93f1cfe3b45e0672a5c3ed297b8e1cecb38916e74d656916f1046e"
+    },
+    {
+      "type_name": "DryCheckConfig",
+      "signal": "blue",
+      "entry_hash": "849d414d964764b24646e316a4a261a1dfbef4631f0a83ac7dde88d1ca027b2e"
+    },
+    {
+      "type_name": "DryCheckConfigError",
+      "signal": "blue",
+      "entry_hash": "c8527bef930088f72cc6322a24db94ad32bba6d571acbb4c4513a3daedc4c20b"
+    },
+    {
+      "type_name": "FsDryCheckCoverageAdapter",
+      "signal": "blue",
+      "entry_hash": "31ade11b5ccfbc62c71bf6b31dcf179c761a1562a90458801e2176ee550d71ac"
+    },
+    {
+      "type_name": "TelemetryEvent",
+      "signal": "blue",
+      "entry_hash": "e347443c5df1d47b62e9e920d02076ec610d1e77541c72312403dda462652831"
+    },
+    {
+      "type_name": "infrastructure::codex_common::build_codex_read_only_invocation",
+      "signal": "blue",
+      "entry_hash": "60dae1b05badafa4cb4db67413e35b65a722f87d49382281a11fc71c445f2ce7"
+    },
+    {
+      "type_name": "infrastructure::dry_check::corpus::compute_corpus_fingerprint",
+      "signal": "blue",
+      "entry_hash": "645e0534c642c6bb1422f3082fb9d4b0ec832d49d05f914a4584d92fa0105311"
+    },
+    {
+      "type_name": "infrastructure::dry_check::corpus::sha256_hex",
+      "signal": "blue",
+      "entry_hash": "be6fd8b857d12991ac0110838a2b85ac042fcbb77c1d19ac69117119b5afc7e7"
+    }
+  ]
+}

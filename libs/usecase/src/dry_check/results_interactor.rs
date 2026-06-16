@@ -101,15 +101,14 @@ mod tests {
     use std::sync::Arc;
 
     use domain::dry_check::{
-        DryCheckEntry, DryCheckPairKey, DryCheckReaderError, DryCheckRecord, DryCheckVerdict,
-        FragmentContentHash, FragmentRef, Rationale, RefactorProposal, VerdictFilter,
+        DryCheckReaderError, DryCheckRecord, DryCheckVerdict, RefactorProposal, VerdictFilter,
     };
-    use domain::review_v2::types::FilePath;
-    use domain::semantic_dup::{SimilarityScore, SimilarityThreshold};
-    use domain::{CommitHash, Timestamp};
 
     use super::*;
     use crate::dry_check::services::DryCheckResultsService;
+    use crate::dry_check::shared::test_mocks::{
+        assert_record_full_fields, make_dry_check_record_for_tests, make_fragment_ref_for_tests,
+    };
 
     // ── Stubs ────────────────────────────────────────────────────────────────
 
@@ -142,12 +141,10 @@ mod tests {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    fn make_fragment_ref(path: &str, hash_char: char) -> FragmentRef {
-        let hash = hash_char.to_string().repeat(64);
-        let file_path = FilePath::new(path).unwrap();
-        FragmentRef::new(file_path, FragmentContentHash::new(hash).unwrap())
-    }
-
+    /// Build a `DryCheckRecord` from path/hash-char pairs and a verdict.
+    ///
+    /// Thin local wrapper over `make_dry_check_record_for_tests` that converts
+    /// path+char pairs to `FragmentRef`s so callers can stay concise.
     fn make_record(
         low_path: &str,
         low_hash_char: char,
@@ -155,30 +152,9 @@ mod tests {
         high_hash_char: char,
         verdict: DryCheckVerdict,
     ) -> DryCheckRecord {
-        let low = make_fragment_ref(low_path, low_hash_char);
-        let high = make_fragment_ref(high_path, high_hash_char);
-        let pair_key = DryCheckPairKey::new(low.clone(), high).unwrap();
-        // changed_path must be one of low.path() or high.path()
-        let changed_path = FilePath::new(low_path).unwrap();
-        let score = SimilarityScore::new(0.9).unwrap();
-        let threshold = SimilarityThreshold::new(0.8).unwrap();
-        let base_commit = CommitHash::try_new("a".repeat(40)).unwrap();
-        let rationale = Rationale::new("test rationale").unwrap();
-        let entry = DryCheckEntry::new(
-            pair_key,
-            changed_path,
-            verdict,
-            score,
-            threshold,
-            base_commit,
-            rationale,
-        )
-        .unwrap();
-        DryCheckRecord::from_entry_and_timestamp(
-            entry,
-            Timestamp::new("2026-06-02T00:00:00Z").unwrap(),
-        )
-        .unwrap()
+        let low = make_fragment_ref_for_tests(low_path, low_hash_char);
+        let high = make_fragment_ref_for_tests(high_path, high_hash_char);
+        make_dry_check_record_for_tests(low, high, verdict, "2026-06-02T00:00:00Z")
     }
 
     fn make_violation_record(
@@ -314,28 +290,14 @@ mod tests {
 
     #[test]
     fn test_get_results_records_carry_full_fields() {
-        let low = make_fragment_ref("src/a.rs", 'a');
-        let high = make_fragment_ref("src/b.rs", 'b');
-        let pair_key = DryCheckPairKey::new(low, high).unwrap();
-        let changed_path = FilePath::new("src/a.rs").unwrap();
+        // Build a record directly with custom field values to verify all
+        // DryCheckRecord fields are accessible via the service output.
+        let low = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let high = make_fragment_ref_for_tests("src/b.rs", 'b');
         let proposal = RefactorProposal::new("Extract shared module.").unwrap();
         let verdict = DryCheckVerdict::Violation { refactor_proposal: proposal };
-        let score = SimilarityScore::new(0.95).unwrap();
-        let threshold = SimilarityThreshold::new(0.85).unwrap();
-        let base_commit = CommitHash::try_new("b".repeat(40)).unwrap();
-        let rationale = Rationale::new("Genuine duplication identified.").unwrap();
-        let entry = DryCheckEntry::new(
-            pair_key,
-            changed_path,
-            verdict,
-            score,
-            threshold,
-            base_commit.clone(),
-            rationale.clone(),
-        )
-        .unwrap();
-        let timestamp = Timestamp::new("2026-06-03T10:00:00Z").unwrap();
-        let record = DryCheckRecord::from_entry_and_timestamp(entry, timestamp.clone()).unwrap();
+        // Use a custom timestamp so we can assert the exact recorded_at value.
+        let record = make_dry_check_record_for_tests(low, high, verdict, "2026-06-03T10:00:00Z");
 
         let interactor = make_interactor(vec![record]);
         let results = interactor.get_results(VerdictFilter::All).unwrap();
@@ -343,21 +305,25 @@ mod tests {
         assert_eq!(results.records.len(), 1);
         let r = &results.records[0];
 
-        // pair_key fields
-        assert_eq!(r.pair_key().low().path().as_str(), "src/a.rs");
-        assert_eq!(r.pair_key().low().content_hash().as_str(), "a".repeat(64));
-        assert_eq!(r.pair_key().high().path().as_str(), "src/b.rs");
-        assert_eq!(r.pair_key().high().content_hash().as_str(), "b".repeat(64));
-        // changed_path (display-only)
-        assert_eq!(r.changed_path().as_str(), "src/a.rs");
-        // verdict
-        assert!(matches!(r.verdict(), DryCheckVerdict::Violation { .. }));
-        if let DryCheckVerdict::Violation { refactor_proposal } = r.verdict() {
-            assert_eq!(refactor_proposal.as_str(), "Extract shared module.");
-        }
-        // rationale
-        assert_eq!(r.rationale().as_str(), rationale.as_str());
-        // recorded_at
-        assert_eq!(r.recorded_at().as_str(), timestamp.as_str());
+        // Known-correct SHA-256 hex constants (independent oracle — not derived
+        // via `content_hash_of` at runtime so a broken hash derivation is caught).
+        // SHA-256("a") and SHA-256("b") respectively.
+        const LOW_HASH: &str = "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb";
+        const HIGH_HASH: &str = "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d";
+
+        assert_record_full_fields(
+            r,
+            "src/a.rs",
+            LOW_HASH,
+            "src/b.rs",
+            HIGH_HASH,
+            "src/a.rs",
+            "test", // rationale fixed by make_dry_check_record_for_tests
+            "2026-06-03T10:00:00Z",
+            &DryCheckVerdict::Violation {
+                refactor_proposal: RefactorProposal::new("Extract shared module.").unwrap(),
+            },
+            Some("Extract shared module."),
+        );
     }
 }

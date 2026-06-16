@@ -1,36 +1,48 @@
-//! [`DryCheckApprovalInteractor`] — implementation of [`DryCheckApprovalService`].
+//! [`DryCheckApprovalInteractor`] — read-only D5 dry-check approval gate.
 //!
-//! Evaluates the dry-check approval gate from current diff fragments and
-//! previously recorded DRY verdicts.
+//! Evaluates the dry-check approval gate from a pre-computed set of current
+//! diff fragment `FragmentRef`s, the persisted coverage manifest, and the
+//! dry-check verdict history. No embedding, no similarity search, no agent
+//! invocation — composition computes the current `FragmentRef` set.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
+use domain::TrackId;
 use domain::dry_check::{
-    DryCheckApprovalVerdict, DryCheckPairKey, DryCheckReader, DryCheckRecord, DryCheckVerdict,
+    DryCheckApprovalVerdict, DryCheckConfigFingerprint, DryCheckCorpusFingerprint, DryCheckPairKey,
+    DryCheckReader, DryCheckRecord, DryCheckVerdict, FragmentRef,
 };
-use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
 
 use super::errors::DryCheckCycleError;
+use super::ports::DryCheckCoveragePort;
 use super::services::DryCheckApprovalService;
-use super::shared::{
-    build_corpus_index, candidate_pair_keys_for_diff, collect_above_threshold_candidates,
-};
-use crate::semantic_dup::{EmbeddingPort, SemanticIndexPort};
+
+const FAIL_CLOSED_CORPUS_FINGERPRINT_HEX: &str =
+    "0000000000000000000000000000000000000000000000000000000000000000";
+
+fn is_fail_closed_corpus_fingerprint(fingerprint: &DryCheckCorpusFingerprint) -> bool {
+    fingerprint.as_str() == FAIL_CLOSED_CORPUS_FINGERPRINT_HEX
+}
 
 // ── DryCheckApprovalInteractor ────────────────────────────────────────────────
 
-/// Interactor implementing [`DryCheckApprovalService`].
+/// Interactor implementing the D5 read-only [`DryCheckApprovalService`].
 ///
-/// Coordinates dry-check history reads, semantic search ports, and approval
-/// gate evaluation.
+/// Holds only a [`DryCheckReader`] (for verdict history), a
+/// [`DryCheckCoveragePort`] (for the coverage manifest), and the
+/// `current_config_fingerprint` (SHA-256 fingerprint of the current
+/// `dry-check.json` settings). The implementation performs hash matching,
+/// config-fingerprint comparison, and verdict scanning — no embedding / index
+/// ports.
 ///
 /// The constructor return type is written as `DryCheckApprovalInteractor` (not
-/// `Self`) so the ③ evaluator exact-string match succeeds.
+/// `Self`) so the type-signal evaluator's exact-string match succeeds.
 pub struct DryCheckApprovalInteractor {
     reader: Arc<dyn DryCheckReader>,
-    index_port: Arc<dyn SemanticIndexPort>,
-    embedding_port: Arc<dyn EmbeddingPort>,
+    coverage: Arc<dyn DryCheckCoveragePort>,
+    current_config_fingerprint: DryCheckConfigFingerprint,
+    current_corpus_fingerprint: DryCheckCorpusFingerprint,
 }
 
 impl DryCheckApprovalInteractor {
@@ -38,64 +50,107 @@ impl DryCheckApprovalInteractor {
     ///
     /// # Parameters
     ///
-    /// - `reader`: port for reading the dry-check history.
-    /// - `index_port`: port for the semantic vector index.
-    /// - `embedding_port`: port for embedding computation.
+    /// - `reader`: port for reading the dry-check history (`DryCheckRecord`s).
+    /// - `coverage`: port for reading the D5 coverage manifest.
+    /// - `current_config_fingerprint`: fingerprint of the current
+    ///   `dry-check.json` settings. `check_approved` compares this against the
+    ///   fingerprint stored in the coverage manifest; a mismatch means the config
+    ///   changed since the last `dry write` run → return `Blocked`.
+    /// - `current_corpus_fingerprint`: SHA-256 fingerprint of the current corpus
+    ///   (all `*.rs` files in the workspace). `check_approved` compares this
+    ///   against the fingerprint stored in the coverage manifest; a mismatch means
+    ///   the corpus changed (file added/removed/modified) since the last
+    ///   `dry write` run → return `Blocked`.
     #[must_use]
     pub fn new(
         reader: Arc<dyn DryCheckReader>,
-        index_port: Arc<dyn SemanticIndexPort>,
-        embedding_port: Arc<dyn EmbeddingPort>,
+        coverage: Arc<dyn DryCheckCoveragePort>,
+        current_config_fingerprint: DryCheckConfigFingerprint,
+        current_corpus_fingerprint: DryCheckCorpusFingerprint,
     ) -> DryCheckApprovalInteractor {
-        DryCheckApprovalInteractor { reader, index_port, embedding_port }
+        DryCheckApprovalInteractor {
+            reader,
+            coverage,
+            current_config_fingerprint,
+            current_corpus_fingerprint,
+        }
     }
 }
 
 impl DryCheckApprovalService for DryCheckApprovalInteractor {
-    /// Evaluate the dry-check gate for the current diff scope.
+    /// Evaluate the dry-check gate for the current diff scope (pure-read).
     ///
-    /// # Algorithm
-    ///
-    /// 1. Build a fresh whole-codebase index from `corpus_fragments`
-    ///    (`EmbeddingPort` + `SemanticIndexPort`).
-    /// 2. Read all records via `DryCheckReader::read_records()` and derive the
-    ///    latest-per-pair map (key = `record.pair_key()`, value = full
-    ///    `DryCheckRecord`).
-    /// 3. For each `diff_fragment`:
-    ///    a. Compute `changed_ref` (SHA-256 of content + `FilePath`).
-    ///    b. Run exhaustive growing-k threshold-boundary loop (k, 2k, 4k, …).
-    ///    c. For each above-threshold candidate:
-    ///       - Compute `candidate_ref`.
-    ///       - `DryCheckPairKey::new(changed_ref, candidate_ref)`:
-    ///         `Err(SelfMatch)` → skip (excluded from gate).
-    ///         `Ok(pair_key)` → look up in latest-per-pair map (CN-07).
-    ///       - Absent → unresolved.
-    ///       - Present, verdict `NotAViolation` or `Accepted` → resolved.
-    ///       - Present, verdict `Violation { .. }` → unresolved (AC-04/CN-06).
-    /// 4. Return `Approved` when zero unresolved pairs; else `Blocked { unresolved_pair_count }`.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`DryCheckCycleError`] on embedding, index, or reader failures.
+    /// See [`DryCheckApprovalService::check_approved`] for the algorithm.
     fn check_approved(
         &self,
-        corpus_fragments: Vec<CodeFragment>,
-        diff_fragments: &[CodeFragment],
-        threshold: SimilarityThreshold,
+        track_id: &TrackId,
+        current_fragment_refs: &BTreeSet<FragmentRef>,
     ) -> Result<DryCheckApprovalVerdict, DryCheckCycleError> {
-        // ── Step 1: Build whole-codebase index from corpus_fragments ──────────
-        build_corpus_index(
-            corpus_fragments,
-            self.embedding_port.as_ref(),
-            self.index_port.as_ref(),
-        )?;
+        // ── Step 1: Read coverage manifest (CN-08 fail-closed when missing). ──
+        let coverage_record = match self.coverage.read_coverage(track_id)? {
+            Some(record) => record,
+            None => {
+                // Convention: report 1 unresolved pair to communicate "Blocked"
+                // without overstating the actual count (the count is unknown
+                // at this stage — there is no manifest to compare against).
+                return Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
+            }
+        };
 
-        // ── Step 2: Build latest-per-pair map from history ────────────────────
+        // ── Step 1b: Config fingerprint — reject coverage built under a different config.
         //
-        // CN-07: identifier matching — when content changes, content_hash
-        // changes, so FragmentRef changes, so DryCheckPairKey changes → no
-        // match → the pair is unresolved (unverified).  No separate
-        // hash-comparison step.
+        // When `.harness/config/dry-check.json` changes (e.g., threshold lowered from
+        // 0.85 to 0.70) without changing source fragment contents, the old coverage
+        // manifest is still fragment-ref–fresh (all current FragmentRefs are covered)
+        // but was computed under a different threshold: new candidate pairs that would
+        // be in-scope under the new threshold are silently absent.
+        //
+        // By comparing fingerprints here we detect the config change and return Blocked
+        // immediately, forcing a fresh `dry write` run with the new config.  We report
+        // `unresolved_pair_count: 1` to mirror the missing-manifest fail-closed pattern
+        // (count unknown at this stage).
+        if coverage_record.config_fingerprint() != &self.current_config_fingerprint {
+            return Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
+        }
+
+        // ── Step 1c: Corpus fingerprint — reject coverage built under a different corpus.
+        //
+        // When the workspace corpus changes (a `*.rs` file is added, removed, or
+        // modified) while the diff fragments keep the same `(path, content_hash)`,
+        // the old coverage manifest looks fragment-ref–fresh but was computed against
+        // a different corpus: new corpus pairs that would be in-scope are silently
+        // absent.
+        //
+        // By comparing the stored corpus fingerprint against the current one we detect
+        // the corpus change and return Blocked immediately, forcing a fresh `dry write`
+        // run.  We report `unresolved_pair_count: 1` to mirror the missing-manifest
+        // fail-closed pattern (count unknown at this stage).
+        if is_fail_closed_corpus_fingerprint(coverage_record.corpus_fingerprint())
+            || is_fail_closed_corpus_fingerprint(&self.current_corpus_fingerprint)
+            || coverage_record.corpus_fingerprint() != &self.current_corpus_fingerprint
+        {
+            return Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
+        }
+
+        // ── Step 2: Staleness — every current FragmentRef must be covered. ────
+        //
+        // FragmentRef = (path + content_hash) identity (IN-06 / CN-08): an
+        // identical content_hash at a different path is NOT covered.
+        let mut stale_count = 0usize;
+        for fragment_ref in current_fragment_refs {
+            if !coverage_record.covers(fragment_ref) {
+                stale_count += 1;
+            }
+        }
+        if stale_count > 0 {
+            return Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count: stale_count });
+        }
+
+        // ── Step 3: All-resolved — latest-per-pair verdict scan. ──────────────
+        //
+        // Build the latest-per-pair map: history is iterated in order; later
+        // records overwrite earlier ones for the same `DryCheckPairKey`. This
+        // is the last-write-wins semantics used by `DryCheckResultsInteractor`.
         let records = self.reader.read_records().map_err(DryCheckCycleError::Reader)?;
 
         let mut latest_per_pair: BTreeMap<DryCheckPairKey, DryCheckRecord> = BTreeMap::new();
@@ -103,110 +158,95 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
             latest_per_pair.insert(record.pair_key().clone(), record);
         }
 
-        // ── Step 3: Per diff_fragment loop ────────────────────────────────────
-        let mut checked_pairs: BTreeSet<DryCheckPairKey> = BTreeSet::new();
-        let mut unresolved_pairs: BTreeSet<DryCheckPairKey> = BTreeSet::new();
-
-        for diff_fragment in diff_fragments {
-            let above_threshold_candidates = collect_above_threshold_candidates(
-                diff_fragment,
-                threshold,
-                self.embedding_port.as_ref(),
-                self.index_port.as_ref(),
-            )?;
-            let candidate_pairs =
-                candidate_pair_keys_for_diff(diff_fragment, above_threshold_candidates)?;
-
-            // ── Per candidate: gate check ─────────────────────────────────────
-            for candidate_pair in candidate_pairs {
-                // Growing top-k searches return overlapping windows. Count and
-                // check each pair identity once so Blocked reports distinct pairs.
-                if !checked_pairs.insert(candidate_pair.pair_key.clone()) {
-                    continue;
-                }
-
-                // Look up in latest-per-pair map (CN-07 identifier matching).
-                let unresolved = match latest_per_pair.get(&candidate_pair.pair_key) {
-                    None => {
-                        // Absent → unresolved (unverified pair).
-                        true
-                    }
-                    Some(record) => {
-                        // Present: check verdict (AC-04/CN-06).
-                        if !matches!(
-                            record.verdict(),
-                            DryCheckVerdict::NotAViolation | DryCheckVerdict::Accepted
-                        ) {
-                            // Violation { .. } counts as unresolved.
-                            true
-                        } else {
-                            // NotAViolation | Accepted → resolved.
-                            false
-                        }
-                    }
-                };
-
-                if unresolved {
-                    unresolved_pairs.insert(candidate_pair.pair_key);
-                }
+        // Count latest-violation records whose pair touches any current
+        // FragmentRef AND whose pair_key was re-examined in the latest `dry write`
+        // run (i.e., it is present in the coverage manifest's processed_pair_keys).
+        //
+        // `touches_current` ensures we do not block on Violations between old
+        // fragments unrelated to the current diff.
+        //
+        // `coverage_record.contains_pair` filters out stale historical Violations
+        // whose candidate side was fixed or removed: when the candidate side is
+        // fixed, the `DryCheckPairKey` changes (new content_hash → new FragmentRef
+        // → new pair_key), so the old pair_key is no longer produced by `dry write`
+        // and therefore absent from `processed_pair_keys`. Without this filter the
+        // gate would stay Blocked forever even though the violation is resolved.
+        let mut unresolved_violation_pairs = 0usize;
+        for record in latest_per_pair.values() {
+            let touches_current = current_fragment_refs.contains(record.pair_key().low())
+                || current_fragment_refs.contains(record.pair_key().high());
+            if !touches_current {
+                continue;
+            }
+            // Skip records whose pair_key was not re-judged in the latest run
+            // (stale candidate-side pair). Only Violations that were actively
+            // re-examined can block the gate.
+            if !coverage_record.contains_pair(record.pair_key()) {
+                continue;
+            }
+            if matches!(record.verdict(), DryCheckVerdict::Violation { .. }) {
+                unresolved_violation_pairs += 1;
             }
         }
-
-        if unresolved_pairs.is_empty() {
-            Ok(DryCheckApprovalVerdict::Approved)
-        } else {
-            Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count: unresolved_pairs.len() })
+        if unresolved_violation_pairs > 0 {
+            return Ok(DryCheckApprovalVerdict::Blocked {
+                unresolved_pair_count: unresolved_violation_pairs,
+            });
         }
+
+        // ── Step 4: Missing-verdict scan — every processed pair touching the
+        // current refs must have a corresponding latest verdict.
+        //
+        // Without this scan, a manifest whose fingerprints and FragmentRefs are
+        // consistent but whose companion `dry-check.json` is missing or truncated
+        // (e.g. partial restore, manual edit) would Approve silently — the loop
+        // above only visits pairs that actually have records, so a processed_pair
+        // with no record at all falls through. Treat any such missing verdict as
+        // unresolved.
+        let mut missing_verdict_pairs = 0usize;
+        for pair_key in coverage_record.processed_pair_keys() {
+            let touches_current = current_fragment_refs.contains(pair_key.low())
+                || current_fragment_refs.contains(pair_key.high());
+            if !touches_current {
+                continue;
+            }
+            if !latest_per_pair.contains_key(pair_key) {
+                missing_verdict_pairs += 1;
+            }
+        }
+        if missing_verdict_pairs > 0 {
+            return Ok(DryCheckApprovalVerdict::Blocked {
+                unresolved_pair_count: missing_verdict_pairs,
+            });
+        }
+
+        Ok(DryCheckApprovalVerdict::Approved)
     }
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[allow(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    clippy::panic,
-    clippy::indexing_slicing,
-    clippy::type_complexity
-)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
-    use std::path::PathBuf;
-    use std::sync::Arc;
-
-    use domain::dry_check::{
-        DryCheckApprovalVerdict, DryCheckEntry, DryCheckPairKey, DryCheckReaderError,
-        DryCheckRecord, DryCheckVerdict, FragmentRef, Rationale, RefactorProposal,
-    };
-    use domain::review_v2::types::FilePath;
-    use domain::semantic_dup::{
-        CodeFragment, SimilarFragment, SimilarityScore, SimilarityThreshold,
-    };
-    use domain::{CommitHash, Timestamp};
-
     use super::*;
-    use crate::dry_check::shared::content_hash_of;
-    use crate::dry_check::shared::test_mocks::{MockMockEmbeddingPort, MockMockSemanticIndexPort};
-    use crate::semantic_dup::{EmbeddingError, SemanticIndexError};
+    use domain::dry_check::{
+        DryCheckConfigFingerprint, DryCheckCorpusFingerprint, DryCheckCoverageRecord,
+        DryCheckPairKey, DryCheckReaderError, DryCheckRecord, DryCheckVerdict, FragmentRef,
+        RefactorProposal,
+    };
 
-    // ── Mock port definitions ─────────────────────────────────────────────────
-    //
-    // `MockMockEmbeddingPort` and `MockMockSemanticIndexPort` are defined once in
-    // `crate::dry_check::shared::test_mocks` and imported above.
+    use crate::dry_check::shared::test_mocks::{
+        make_dry_check_record_for_tests, make_fragment_ref_for_tests,
+    };
 
-    // ── Stubs ─────────────────────────────────────────────────────────────────
+    // ── Test doubles ──────────────────────────────────────────────────────────
 
     struct StubReader {
         records: Vec<DryCheckRecord>,
     }
 
-    impl StubReader {
-        fn new(records: Vec<DryCheckRecord>) -> Self {
-            Self { records }
-        }
-    }
-
-    impl domain::dry_check::DryCheckReader for StubReader {
+    impl DryCheckReader for StubReader {
         fn read_records(&self) -> Result<Vec<DryCheckRecord>, DryCheckReaderError> {
             Ok(self.records.clone())
         }
@@ -214,7 +254,7 @@ mod tests {
 
     struct ErrorReader;
 
-    impl domain::dry_check::DryCheckReader for ErrorReader {
+    impl DryCheckReader for ErrorReader {
         fn read_records(&self) -> Result<Vec<DryCheckRecord>, DryCheckReaderError> {
             Err(DryCheckReaderError::Io {
                 path: "dry-check.json".to_owned(),
@@ -223,467 +263,520 @@ mod tests {
         }
     }
 
+    /// Coverage port that returns a fixed `Option<DryCheckCoverageRecord>`.
+    struct StubCoverage {
+        record: Option<DryCheckCoverageRecord>,
+    }
+
+    impl DryCheckCoveragePort for StubCoverage {
+        fn read_coverage(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<Option<DryCheckCoverageRecord>, DryCheckCycleError> {
+            Ok(self.record.clone())
+        }
+        fn write_coverage(
+            &self,
+            _track_id: &TrackId,
+            _record: DryCheckCoverageRecord,
+        ) -> Result<(), DryCheckCycleError> {
+            panic!("approval interactor never writes coverage")
+        }
+    }
+
+    /// Coverage port that returns an error.
+    struct ErrorCoverage;
+
+    impl DryCheckCoveragePort for ErrorCoverage {
+        fn read_coverage(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<Option<DryCheckCoverageRecord>, DryCheckCycleError> {
+            Err(DryCheckCycleError::CoveragePort("simulated read error".to_owned()))
+        }
+        fn write_coverage(
+            &self,
+            _track_id: &TrackId,
+            _record: DryCheckCoverageRecord,
+        ) -> Result<(), DryCheckCycleError> {
+            panic!("approval interactor never writes coverage")
+        }
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    fn make_fragment(path: &str, content: &str) -> CodeFragment {
-        CodeFragment::new(PathBuf::from(path), content.to_owned(), 1, 1).unwrap()
+    fn make_track() -> TrackId {
+        TrackId::try_new("test-track-2026").unwrap()
     }
 
-    fn make_score(v: f32) -> SimilarityScore {
-        SimilarityScore::new(v).unwrap()
+    /// The canonical "current config fingerprint" used in tests that do not test
+    /// fingerprint mismatch behaviour (all other tests use this so they agree).
+    fn test_fingerprint() -> DryCheckConfigFingerprint {
+        DryCheckConfigFingerprint::new("a".repeat(64)).unwrap()
     }
 
-    fn make_threshold(v: f32) -> SimilarityThreshold {
-        SimilarityThreshold::new(v).unwrap()
+    /// The canonical "current corpus fingerprint" used in tests that do not test
+    /// corpus fingerprint mismatch behaviour.
+    fn test_corpus_fingerprint() -> DryCheckCorpusFingerprint {
+        DryCheckCorpusFingerprint::new("c".repeat(64)).unwrap()
     }
 
-    fn make_similar_fragment(path: &str, content: &str, score: f32) -> SimilarFragment {
-        SimilarFragment { fragment: make_fragment(path, content), score: make_score(score) }
-    }
-
-    fn make_record_for_fragments(
-        diff_frag: &CodeFragment,
-        cand_frag: &CodeFragment,
-        verdict: DryCheckVerdict,
-    ) -> DryCheckRecord {
-        let diff_hash = content_hash_of(diff_frag.content()).unwrap();
-        let cand_hash = content_hash_of(cand_frag.content()).unwrap();
-        let diff_path = FilePath::new(diff_frag.source_path.to_string_lossy().as_ref()).unwrap();
-        let cand_path = FilePath::new(cand_frag.source_path.to_string_lossy().as_ref()).unwrap();
-        let diff_ref = FragmentRef::new(diff_path.clone(), diff_hash);
-        let cand_ref = FragmentRef::new(cand_path, cand_hash);
-        let pair_key = DryCheckPairKey::new(diff_ref, cand_ref).unwrap();
-        let changed_path = diff_path;
-        let score = SimilarityScore::new(0.9).unwrap();
-        let threshold = SimilarityThreshold::new(0.8).unwrap();
-        let base_commit = CommitHash::try_new("a".repeat(40)).unwrap();
-        let rationale = Rationale::new("test rationale").unwrap();
-        let entry = DryCheckEntry::new(
-            pair_key,
-            changed_path,
-            verdict,
-            score,
-            threshold,
-            base_commit,
-            rationale,
-        )
-        .unwrap();
-        DryCheckRecord::from_entry_and_timestamp(
-            entry,
-            Timestamp::new("2026-06-02T00:00:00Z").unwrap(),
-        )
-        .unwrap()
-    }
+    /// Default timestamp used by tests that do not care about the exact
+    /// `recorded_at` value. Tests that DO care pass an explicit timestamp to
+    /// [`make_dry_check_record_for_tests`] directly.
+    const DEFAULT_RECORDED_AT: &str = "2026-06-13T00:00:00Z";
 
     fn make_interactor(
-        embed: MockMockEmbeddingPort,
-        index: MockMockSemanticIndexPort,
+        coverage: StubCoverage,
         records: Vec<DryCheckRecord>,
     ) -> DryCheckApprovalInteractor {
+        make_interactor_with_corpus_fingerprint(coverage, records, test_corpus_fingerprint())
+    }
+
+    fn make_interactor_with_corpus_fingerprint(
+        coverage: StubCoverage,
+        records: Vec<DryCheckRecord>,
+        current_corpus_fingerprint: DryCheckCorpusFingerprint,
+    ) -> DryCheckApprovalInteractor {
         DryCheckApprovalInteractor::new(
-            Arc::new(StubReader::new(records)),
-            Arc::new(index),
-            Arc::new(embed),
+            Arc::new(StubReader { records }),
+            Arc::new(coverage),
+            test_fingerprint(),
+            current_corpus_fingerprint,
         )
     }
 
-    fn make_interactor_empty_history(
-        embed: MockMockEmbeddingPort,
-        index: MockMockSemanticIndexPort,
-    ) -> DryCheckApprovalInteractor {
-        make_interactor(embed, index, vec![])
+    /// Build a `StubCoverage` covering `refs` with an empty `processed_pair_keys` set
+    /// and the canonical test fingerprint.
+    ///
+    /// Use this for tests where no Violations exist in the history (no pair keys
+    /// need to be present) or for staleness-only checks.
+    fn coverage_with(refs: Vec<FragmentRef>) -> StubCoverage {
+        coverage_with_pairs(refs, Vec::new())
     }
 
-    // ── all-clean returns Approved ────────────────────────────────────────────
+    /// Build a `StubCoverage` covering `refs` and marking `pair_keys` as processed,
+    /// using the canonical test fingerprint.
+    ///
+    /// Use this for tests where a Violation record must be treated as active
+    /// (i.e., the pair was re-judged in the latest `dry write` run).
+    fn coverage_with_pairs(
+        refs: Vec<FragmentRef>,
+        pair_keys: Vec<DryCheckPairKey>,
+    ) -> StubCoverage {
+        coverage_with_pairs_and_fingerprint(refs, pair_keys, test_fingerprint())
+    }
+
+    /// Build a `StubCoverage` covering `refs`, marking `pair_keys` as processed,
+    /// and using the provided `config_fingerprint` and `corpus_fingerprint`.
+    fn coverage_with_pairs_and_fingerprints(
+        refs: Vec<FragmentRef>,
+        pair_keys: Vec<DryCheckPairKey>,
+        config_fingerprint: DryCheckConfigFingerprint,
+        corpus_fingerprint: DryCheckCorpusFingerprint,
+    ) -> StubCoverage {
+        StubCoverage {
+            record: Some(DryCheckCoverageRecord::new(
+                refs.into_iter().collect(),
+                pair_keys.into_iter().collect(),
+                config_fingerprint,
+                corpus_fingerprint,
+            )),
+        }
+    }
+
+    /// Build a `StubCoverage` covering `refs`, marking `pair_keys` as processed,
+    /// and using the provided `config_fingerprint` with the canonical corpus fingerprint.
+    fn coverage_with_pairs_and_fingerprint(
+        refs: Vec<FragmentRef>,
+        pair_keys: Vec<DryCheckPairKey>,
+        config_fingerprint: DryCheckConfigFingerprint,
+    ) -> StubCoverage {
+        coverage_with_pairs_and_fingerprints(
+            refs,
+            pair_keys,
+            config_fingerprint,
+            test_corpus_fingerprint(),
+        )
+    }
+
+    fn current_refs(refs: Vec<FragmentRef>) -> BTreeSet<FragmentRef> {
+        refs.into_iter().collect()
+    }
+
+    // ── coverage missing → Blocked ────────────────────────────────────────────
 
     #[test]
-    fn test_all_clean_no_above_threshold_candidates_returns_approved() {
-        let diff_frag = make_fragment("src/a.rs", "fn unique() {}");
+    fn test_check_approved_with_missing_coverage_returns_blocked() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let interactor = make_interactor(StubCoverage { record: None }, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(matches!(result, DryCheckApprovalVerdict::Blocked { .. }));
+    }
 
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+    // ── all current refs covered, no records → Approved ──────────────────────
 
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        // No candidates above threshold — return empty.
-        index.expect_search().returning(|_, _| Ok(vec![]));
-
-        let interactor = make_interactor_empty_history(embed, index);
-
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8)).unwrap();
+    #[test]
+    fn test_check_approved_all_covered_no_records_returns_approved() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let coverage = coverage_with(vec![a.clone(), b.clone()]);
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
         assert_eq!(result, DryCheckApprovalVerdict::Approved);
     }
 
-    // ── cached Violation returns Blocked ──────────────────────────────────────
+    // ── same hash but different path is stale → Blocked ──────────────────────
 
     #[test]
-    fn test_cached_violation_returns_blocked() {
-        let diff_frag = make_fragment("src/a.rs", "fn duplicated() {}");
-        let cand_frag = make_fragment("src/b.rs", "fn also_duplicated() {}");
+    fn test_check_approved_same_hash_different_path_is_stale() {
+        // Coverage records `src/a.rs` at hash 'a'. Current diff has `src/b.rs`
+        // at the SAME hash 'a' — IN-06 / CN-08 require this to be treated as
+        // stale (NOT covered).
+        let recorded = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let current = make_fragment_ref_for_tests("src/b.rs", 'a');
+        assert_eq!(recorded.content_hash(), current.content_hash());
 
-        let proposal = RefactorProposal::new("Extract to shared module.").unwrap();
-        let violation_record = make_record_for_fragments(
-            &diff_frag,
-            &cand_frag,
+        let coverage = coverage_with(vec![recorded]);
+        let interactor = make_interactor(coverage, vec![]);
+        let result =
+            interactor.check_approved(&make_track(), &current_refs(vec![current])).unwrap();
+        assert!(matches!(result, DryCheckApprovalVerdict::Blocked { .. }));
+    }
+
+    // ── latest verdict Violation (pair in coverage) → Blocked ────────────────
+
+    #[test]
+    fn test_check_approved_latest_violation_returns_blocked() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let pair_key = DryCheckPairKey::new(a.clone(), b.clone()).unwrap();
+        // The pair must be in processed_pair_keys for the gate to treat the
+        // Violation as active (it was re-judged in the latest dry write run).
+        let coverage = coverage_with_pairs(vec![a.clone(), b.clone()], vec![pair_key]);
+        let proposal = RefactorProposal::new("Extract helper.").unwrap();
+        let record = make_dry_check_record_for_tests(
+            a.clone(),
+            b.clone(),
             DryCheckVerdict::Violation { refactor_proposal: proposal },
+            DEFAULT_RECORDED_AT,
         );
-
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        let cand_clone = cand_frag.clone();
-        index.expect_search().returning(move |_, _| {
-            Ok(vec![SimilarFragment { fragment: cand_clone.clone(), score: make_score(0.9) }])
-        });
-
-        let interactor = make_interactor(embed, index, vec![violation_record]);
-
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8)).unwrap();
+        let interactor = make_interactor(coverage, vec![record]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
         assert_eq!(result, DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
     }
 
-    // ── unverified pair returns Blocked ───────────────────────────────────────
+    // ── older Violation, later Accepted → Approved (last-write-wins) ────────
 
     #[test]
-    fn test_unverified_pair_not_in_history_returns_blocked() {
-        let diff_frag = make_fragment("src/a.rs", "fn new_code() {}");
-        let cand_frag = make_fragment("src/b.rs", "fn similar_new_code() {}");
+    fn test_check_approved_older_violation_then_accepted_returns_approved() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let coverage = coverage_with(vec![a.clone(), b.clone()]);
+        let proposal = RefactorProposal::new("Extract helper.").unwrap();
+        let violation = make_dry_check_record_for_tests(
+            a.clone(),
+            b.clone(),
+            DryCheckVerdict::Violation { refactor_proposal: proposal },
+            "2026-06-01T00:00:00Z",
+        );
+        let accepted = make_dry_check_record_for_tests(
+            a.clone(),
+            b.clone(),
+            DryCheckVerdict::Accepted,
+            "2026-06-02T00:00:00Z",
+        );
+        // Reader returns records in chronological order; latest-per-pair takes the last.
+        let interactor = make_interactor(coverage, vec![violation, accepted]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
+        assert_eq!(result, DryCheckApprovalVerdict::Approved);
+    }
 
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+    // ── latest NotAViolation → Approved ──────────────────────────────────────
 
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        let cand_clone = cand_frag.clone();
-        index.expect_search().returning(move |_, _| {
-            Ok(vec![SimilarFragment { fragment: cand_clone.clone(), score: make_score(0.9) }])
-        });
+    #[test]
+    fn test_check_approved_latest_not_a_violation_returns_approved() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let coverage = coverage_with(vec![a.clone(), b.clone()]);
+        let record = make_dry_check_record_for_tests(
+            a.clone(),
+            b.clone(),
+            DryCheckVerdict::NotAViolation,
+            DEFAULT_RECORDED_AT,
+        );
+        let interactor = make_interactor(coverage, vec![record]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
+        assert_eq!(result, DryCheckApprovalVerdict::Approved);
+    }
 
-        // Empty history → pair not found → unresolved.
-        let interactor = make_interactor_empty_history(embed, index);
+    // ── processed pair without verdict (history missing / truncated) → Blocked ──
 
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8)).unwrap();
+    #[test]
+    fn test_check_approved_processed_pair_missing_verdict_returns_blocked() {
+        // Scenario: coverage manifest survives (FragmentRefs covered, fingerprints
+        // match) but `dry-check.json` is missing / truncated, so the pair_key in
+        // `processed_pair_keys` has no corresponding record. The pair touches a
+        // current FragmentRef, so the gate must Block rather than silently Approve.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let pair_key = DryCheckPairKey::new(a.clone(), b.clone()).unwrap();
+        let coverage = coverage_with_pairs(vec![a.clone(), b.clone()], vec![pair_key]);
+        // No records — dry-check.json was lost / never written for this pair.
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
         assert_eq!(result, DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
     }
 
-    #[test]
-    fn test_check_approved_growing_k_duplicate_windows_counts_distinct_unresolved_pairs() {
-        let diff_frag = make_fragment("src/a.rs", "fn new_code() {}");
-        let repeated_candidates: Vec<SimilarFragment> = (0..10)
-            .map(|i| {
-                let path = format!("src/candidate_{i}.rs");
-                let content = format!("fn candidate_{i}() {{}}");
-                make_similar_fragment(&path, &content, 0.9)
-            })
-            .collect();
-
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        let mut search_call = 0usize;
-        index.expect_search().times(2).returning(move |_, top_k| {
-            search_call += 1;
-            match search_call {
-                1 => {
-                    assert_eq!(top_k.value(), 10);
-                    Ok(repeated_candidates.clone())
-                }
-                2 => {
-                    assert_eq!(top_k.value(), 20);
-                    let mut batch = repeated_candidates.clone();
-                    batch.push(make_similar_fragment("src/boundary.rs", "fn boundary() {}", 0.1));
-                    Ok(batch)
-                }
-                _ => panic!("unexpected search call"),
-            }
-        });
-
-        let interactor = make_interactor_empty_history(embed, index);
-
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8)).unwrap();
-        assert_eq!(result, DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 10 });
-    }
-
-    // ── content-changed pair (new hash) returns Blocked ───────────────────────
+    // ── Violation between fragments not in current diff → Approved ───────────
 
     #[test]
-    fn test_content_changed_pair_new_hash_returns_blocked() {
-        // Old history has a NotAViolation for (src/a.rs, old content) × (src/b.rs, cand content).
-        let old_diff = make_fragment("src/a.rs", "fn old_impl() {}");
-        let cand_frag = make_fragment("src/b.rs", "fn candidate() {}");
-        let not_a_violation_record =
-            make_record_for_fragments(&old_diff, &cand_frag, DryCheckVerdict::NotAViolation);
-
-        // Now the diff has CHANGED content → new hash → new pair_key → no match → Blocked.
-        let new_diff = make_fragment("src/a.rs", "fn new_impl() {}");
-
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        let cand_clone = cand_frag.clone();
-        index.expect_search().returning(move |_, _| {
-            Ok(vec![SimilarFragment { fragment: cand_clone.clone(), score: make_score(0.9) }])
-        });
-
-        let interactor = make_interactor(embed, index, vec![not_a_violation_record]);
-
-        let result = interactor.check_approved(vec![], &[new_diff], make_threshold(0.8)).unwrap();
-        assert_eq!(result, DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
-    }
-
-    // ── roles-swapped same-content returns Approved ───────────────────────────
-
-    #[test]
-    fn test_roles_swapped_same_content_returns_approved() {
-        // Record stored with (diff, cand) order → DryCheckPairKey normalizes.
-        // Now checking with (cand, diff) order → same DryCheckPairKey → Approved.
-        let frag_a = make_fragment("src/a.rs", "fn shared_logic() {}");
-        let frag_b = make_fragment("src/b.rs", "fn also_shared_logic() {}");
-
-        // Record was stored when diff=frag_a, cand=frag_b.
-        let nat_record =
-            make_record_for_fragments(&frag_a, &frag_b, DryCheckVerdict::NotAViolation);
-
-        // Now checking with diff=frag_b, cand=frag_a (roles swapped).
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        let frag_a_clone = frag_a.clone();
-        index.expect_search().returning(move |_, _| {
-            Ok(vec![SimilarFragment { fragment: frag_a_clone.clone(), score: make_score(0.9) }])
-        });
-
-        let interactor = make_interactor(embed, index, vec![nat_record]);
-
-        // diff=frag_b, cand=frag_a → DryCheckPairKey same as stored → Approved.
-        let result = interactor.check_approved(vec![], &[frag_b], make_threshold(0.8)).unwrap();
+    fn test_check_approved_violation_unrelated_to_current_diff_is_ignored() {
+        // Current diff touches only `src/c.rs`. History has a Violation between
+        // `src/a.rs` and `src/b.rs` — irrelevant to this run.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let c = make_fragment_ref_for_tests("src/c.rs", 'c');
+        let coverage = coverage_with(vec![c.clone()]);
+        let proposal = RefactorProposal::new("Extract helper.").unwrap();
+        let record = make_dry_check_record_for_tests(
+            a,
+            b,
+            DryCheckVerdict::Violation { refactor_proposal: proposal },
+            DEFAULT_RECORDED_AT,
+        );
+        let interactor = make_interactor(coverage, vec![record]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![c])).unwrap();
         assert_eq!(result, DryCheckApprovalVerdict::Approved);
     }
 
-    // ── self-match (path AND hash equal) excluded ─────────────────────────────
+    // ── reader error propagates ──────────────────────────────────────────────
 
     #[test]
-    fn test_self_match_excluded_from_gate() {
-        // Diff fragment and candidate share BOTH path AND content → self-match → excluded.
-        let content = "fn self_fn() {}";
-        let diff_frag = make_fragment("src/a.rs", content);
-
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        // Candidate is literally the same fragment.
-        index
-            .expect_search()
-            .returning(move |_, _| Ok(vec![make_similar_fragment("src/a.rs", content, 1.0)]));
-
-        let interactor = make_interactor_empty_history(embed, index);
-
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8)).unwrap();
-        // Self-match excluded → no unresolved pairs → Approved.
-        assert_eq!(result, DryCheckApprovalVerdict::Approved);
-    }
-
-    // ── paths-same-hash-different is valid pair ───────────────────────────────
-
-    #[test]
-    fn test_paths_same_hash_different_is_valid_pair_not_excluded() {
-        // Same path but DIFFERENT content → different hash → valid pair → NOT excluded.
-        let diff_content = "fn impl_a() {}";
-        let cand_content = "fn impl_b() {}"; // different content → different hash
-        let diff_frag = make_fragment("src/a.rs", diff_content);
-
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        // Same path, different content.
-        index
-            .expect_search()
-            .returning(move |_, _| Ok(vec![make_similar_fragment("src/a.rs", cand_content, 0.9)]));
-
-        // Empty history → pair not found → Blocked (valid pair, not excluded).
-        let interactor = make_interactor_empty_history(embed, index);
-
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8)).unwrap();
-        assert_eq!(result, DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
-    }
-
-    // ── cached NotAViolation returns Approved ────────────────────────────────
-
-    #[test]
-    fn test_cached_not_a_violation_returns_approved() {
-        let diff_frag = make_fragment("src/a.rs", "fn clean_fn() {}");
-        let cand_frag = make_fragment("src/b.rs", "fn similar_clean() {}");
-        let record =
-            make_record_for_fragments(&diff_frag, &cand_frag, DryCheckVerdict::NotAViolation);
-
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        let cand_clone = cand_frag.clone();
-        index.expect_search().returning(move |_, _| {
-            Ok(vec![SimilarFragment { fragment: cand_clone.clone(), score: make_score(0.9) }])
-        });
-
-        let interactor = make_interactor(embed, index, vec![record]);
-
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8)).unwrap();
-        assert_eq!(result, DryCheckApprovalVerdict::Approved);
-    }
-
-    // ── cached Accepted returns Approved ─────────────────────────────────────
-
-    #[test]
-    fn test_cached_accepted_returns_approved() {
-        let diff_frag = make_fragment("src/a.rs", "fn cross_layer() {}");
-        let cand_frag = make_fragment("src/b.rs", "fn cross_layer_mirror() {}");
-        let record = make_record_for_fragments(&diff_frag, &cand_frag, DryCheckVerdict::Accepted);
-
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        let cand_clone = cand_frag.clone();
-        index.expect_search().returning(move |_, _| {
-            Ok(vec![SimilarFragment { fragment: cand_clone.clone(), score: make_score(0.9) }])
-        });
-
-        let interactor = make_interactor(embed, index, vec![record]);
-
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8)).unwrap();
-        assert_eq!(result, DryCheckApprovalVerdict::Approved);
-    }
-
-    // ── reader error propagated as DryCheckCycleError::Reader ────────────────
-
-    #[test]
-    fn test_reader_error_propagated() {
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-
+    fn test_check_approved_reader_error_propagated() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let coverage = coverage_with(vec![a.clone()]);
         let interactor = DryCheckApprovalInteractor::new(
             Arc::new(ErrorReader),
-            Arc::new(index),
-            Arc::new(embed),
+            Arc::new(coverage),
+            test_fingerprint(),
+            test_corpus_fingerprint(),
         );
-
-        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8));
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a]));
         assert!(matches!(result, Err(DryCheckCycleError::Reader(_))));
     }
 
+    // ── coverage error propagates ────────────────────────────────────────────
+
     #[test]
-    fn test_check_approved_embedding_error_propagated() {
-        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+    fn test_check_approved_coverage_error_propagated() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let interactor = DryCheckApprovalInteractor::new(
+            Arc::new(StubReader { records: vec![] }),
+            Arc::new(ErrorCoverage),
+            test_fingerprint(),
+            test_corpus_fingerprint(),
+        );
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a]));
+        assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
+    }
 
-        let mut embed = MockMockEmbeddingPort::new();
-        embed
-            .expect_embed()
-            .returning(|_| Err(EmbeddingError::InferenceFailed { source: "simulated".to_owned() }));
+    // ── empty current refs + coverage Some(empty) → Approved ─────────────────
 
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
+    #[test]
+    fn test_check_approved_with_empty_current_and_empty_coverage_returns_approved() {
+        // Empty diff over an empty coverage record: nothing to be stale, nothing
+        // to verify → Approved. (Distinct from the "coverage absent" case.)
+        let interactor = make_interactor(coverage_with(vec![]), vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![])).unwrap();
+        assert_eq!(result, DryCheckApprovalVerdict::Approved);
+    }
 
-        let interactor = make_interactor_empty_history(embed, index);
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8));
+    // ── config fingerprint mismatch → Blocked (round-5 fix) ─────────────────
 
-        assert!(matches!(result, Err(DryCheckCycleError::Embedding(_))));
+    #[test]
+    fn test_check_approved_with_different_config_fingerprint_returns_blocked() {
+        // Scenario: coverage was written under config A (fingerprint_a), but the
+        // current config is B (fingerprint_b, e.g., threshold was lowered).
+        // All current FragmentRefs ARE covered by the manifest (staleness check
+        // would pass), but the fingerprint mismatch must take priority and return
+        // Blocked so that `dry write` re-runs with the new config.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+
+        // Build coverage with a DIFFERENT fingerprint than the interactor's current one.
+        let old_fingerprint = DryCheckConfigFingerprint::new("b".repeat(64)).unwrap();
+        let coverage = StubCoverage {
+            record: Some(DryCheckCoverageRecord::new(
+                vec![a.clone()].into_iter().collect(),
+                std::collections::BTreeSet::new(),
+                old_fingerprint,
+                test_corpus_fingerprint(),
+            )),
+        };
+
+        // The interactor holds test_fingerprint() ("aaa..."), which differs from "bbb...".
+        let interactor = make_interactor(coverage, vec![]);
+
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "config fingerprint mismatch must return Blocked, got: {result:?}"
+        );
     }
 
     #[test]
-    fn test_check_approved_index_insert_error_propagated() {
-        let corpus_frag = make_fragment("src/corpus.rs", "fn corpus() {}");
-
-        let mut embed = MockMockEmbeddingPort::new();
-        // Corpus build now uses embed_batch (one call for all fragments).
-        embed
-            .expect_embed_batch()
-            .returning(|frags| Ok(frags.iter().map(|_| vec![0.1_f32]).collect()));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| {
-            Err(SemanticIndexError::InsertFailed { source: "simulated".to_owned() })
-        });
-
-        let interactor = make_interactor_empty_history(embed, index);
-        let result = interactor.check_approved(vec![corpus_frag], &[], make_threshold(0.8));
-
-        assert!(matches!(result, Err(DryCheckCycleError::Index(_))));
+    fn test_check_approved_with_matching_config_fingerprint_and_covered_refs_returns_approved() {
+        // Scenario: coverage was written under the same config as the current one.
+        // All current FragmentRefs are covered, no Violations → Approved.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        // coverage_with uses test_fingerprint() which matches the interactor's fingerprint.
+        let coverage = coverage_with(vec![a.clone()]);
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert_eq!(
+            result,
+            DryCheckApprovalVerdict::Approved,
+            "matching fingerprint + covered refs + no Violation must yield Approved"
+        );
     }
 
     #[test]
-    fn test_check_approved_index_search_error_propagated() {
-        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+    fn test_check_approved_with_fail_closed_fingerprint_in_coverage_returns_blocked() {
+        // Scenario: the last `dry write` wrote the fail-closed sentinel fingerprint
+        // (all zeros) because calibration or a pair-level error occurred.
+        // The current config has a valid (non-zero) fingerprint.
+        // The gate must return Blocked even if all current FragmentRefs are covered.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
 
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+        let fail_closed = DryCheckConfigFingerprint::fail_closed();
+        let coverage = coverage_with_pairs_and_fingerprint(vec![a.clone()], vec![], fail_closed);
 
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        index.expect_search().returning(|_, _| {
-            Err(SemanticIndexError::SearchFailed { source: "simulated".to_owned() })
-        });
-
-        let interactor = make_interactor_empty_history(embed, index);
-        let result = interactor.check_approved(vec![], &[diff_frag], make_threshold(0.8));
-
-        assert!(matches!(result, Err(DryCheckCycleError::Index(_))));
+        // test_fingerprint() ("aaa...") != fail_closed ("000...") → Blocked.
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "fail-closed fingerprint in coverage must return Blocked, got: {result:?}"
+        );
     }
 
-    // ── multiple diff_fragments — one resolved, one not → Blocked ────────────
+    // ── corpus fingerprint mismatch → Blocked ────────────────────────────────
 
     #[test]
-    fn test_multiple_diff_fragments_partial_resolved_returns_blocked() {
-        let diff_a = make_fragment("src/a.rs", "fn fn_a() {}");
-        let cand_a = make_fragment("src/x.rs", "fn fn_x() {}");
+    fn test_check_approved_skips_when_corpus_fingerprint_drifted() {
+        // Scenario: coverage was written when the corpus had fingerprint X.
+        // The current corpus has fingerprint Y (a file was added, removed, or
+        // modified in the workspace).  The diff fragment and config are unchanged,
+        // so the fragment-ref staleness check and config-fingerprint check would
+        // both pass — but the corpus fingerprint mismatch must cause Blocked.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
 
-        let diff_b = make_fragment("src/b.rs", "fn fn_b() {}");
-        let cand_b = make_fragment("src/y.rs", "fn fn_y() {}");
+        // Build coverage with a DIFFERENT corpus fingerprint than the interactor's.
+        let old_corpus_fp = DryCheckCorpusFingerprint::new("d".repeat(64)).unwrap();
+        let coverage = coverage_with_pairs_and_fingerprints(
+            vec![a.clone()],
+            vec![],
+            test_fingerprint(),
+            old_corpus_fp,
+        );
 
-        // Record for (diff_a, cand_a) → NotAViolation → resolved.
-        let record_a = make_record_for_fragments(&diff_a, &cand_a, DryCheckVerdict::NotAViolation);
-        // (diff_b, cand_b) → NOT in history → unresolved.
+        // The interactor holds test_corpus_fingerprint() ("ccc..."), which differs
+        // from "ddd..." stored in the coverage record.
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "corpus fingerprint mismatch must return Blocked, got: {result:?}"
+        );
+    }
 
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+    #[test]
+    fn test_check_approved_with_fail_closed_corpus_fingerprint_in_coverage_returns_blocked() {
+        // Scenario: the last `dry write` wrote the fail-closed corpus sentinel
+        // (all zeros) because an I/O error occurred during corpus fingerprint
+        // computation. The current corpus has a valid (non-zero) fingerprint.
+        // The gate must return Blocked even if all current FragmentRefs are covered
+        // and the config fingerprint matches.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
 
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
+        let fail_closed_corpus = DryCheckCorpusFingerprint::fail_closed();
+        let coverage = coverage_with_pairs_and_fingerprints(
+            vec![a.clone()],
+            vec![],
+            test_fingerprint(),
+            fail_closed_corpus,
+        );
 
-        // First search (for diff_a): returns cand_a.
-        // Second search (for diff_b): returns cand_b.
-        let cand_a_clone = cand_a.clone();
-        let cand_b_clone = cand_b.clone();
-        let mut search_call = 0u32;
-        index.expect_search().returning(move |_, _| {
-            search_call += 1;
-            if search_call == 1 {
-                Ok(vec![SimilarFragment { fragment: cand_a_clone.clone(), score: make_score(0.9) }])
-            } else {
-                Ok(vec![SimilarFragment { fragment: cand_b_clone.clone(), score: make_score(0.9) }])
-            }
-        });
+        // test_corpus_fingerprint() ("ccc...") != fail_closed ("000...") → Blocked.
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "fail-closed corpus fingerprint in coverage must return Blocked, got: {result:?}"
+        );
+    }
 
-        let interactor = make_interactor(embed, index, vec![record_a]);
+    #[test]
+    fn test_check_approved_with_zero_corpus_fingerprint_on_both_sides_returns_blocked() {
+        // Scenario: both the persisted manifest and the current read carry the
+        // serialized fail-closed sentinel. Equality alone would treat them as a
+        // match, but the all-zero fingerprint is never a valid approval basis.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
 
-        let result =
-            interactor.check_approved(vec![], &[diff_a, diff_b], make_threshold(0.8)).unwrap();
-        assert_eq!(result, DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
+        let zero_corpus = DryCheckCorpusFingerprint::new("0".repeat(64)).unwrap();
+        let coverage = coverage_with_pairs_and_fingerprints(
+            vec![a.clone()],
+            vec![],
+            test_fingerprint(),
+            zero_corpus.clone(),
+        );
+
+        let interactor =
+            make_interactor_with_corpus_fingerprint(coverage, vec![], zero_corpus.clone());
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "serialized zero corpus fingerprints must return Blocked, got: {result:?}"
+        );
+    }
+
+    // ── stale Violation (pair NOT in processed_pair_keys) → Approved ─────────
+
+    #[test]
+    fn test_check_approved_skips_stale_violation_not_in_processed_pair_keys() {
+        // Scenario: a Violation was recorded for (src/a.rs, src/b.rs) in a
+        // previous run. The user then fixed src/b.rs (the candidate side) — the
+        // diff-side src/a.rs is unchanged, so the current diff's FragmentRef for
+        // src/a.rs IS still covered. However, the fixed src/b.rs produces a new
+        // content_hash → new FragmentRef → new DryCheckPairKey, so the old
+        // pair_key is NOT produced by the latest `dry write` run and is therefore
+        // absent from the coverage manifest's `processed_pair_keys`.
+        //
+        // The gate must return Approved: the stale Violation record is no longer
+        // relevant because the candidate side changed.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a'); // diff-side, unchanged
+        let b_old = make_fragment_ref_for_tests("src/b.rs", 'b'); // candidate, now fixed
+
+        // Coverage covers src/a.rs (it's in the current diff) but the pair (a, b_old)
+        // is NOT in processed_pair_keys — the fixed b produces a new pair_key.
+        let coverage = coverage_with(vec![a.clone()]);
+
+        let proposal = RefactorProposal::new("Extract helper.").unwrap();
+        let stale_record = make_dry_check_record_for_tests(
+            a.clone(),
+            b_old,
+            DryCheckVerdict::Violation { refactor_proposal: proposal },
+            DEFAULT_RECORDED_AT,
+        );
+
+        let interactor = make_interactor(coverage, vec![stale_record]);
+        // Current diff only touches src/a.rs (b was fixed and is no longer in diff).
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        // The stale Violation must NOT block the gate.
+        assert_eq!(
+            result,
+            DryCheckApprovalVerdict::Approved,
+            "stale Violation whose pair_key is absent from processed_pair_keys must not block"
+        );
     }
 }

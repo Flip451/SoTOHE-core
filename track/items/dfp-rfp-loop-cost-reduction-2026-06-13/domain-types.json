@@ -1,0 +1,743 @@
+{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "FixpointStep": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "RunDfp",       "payload": { "kind": "unit" } },
+          { "name": "RunRfp",       "payload": { "kind": "struct", "fields": [ { "name": "scopes", "ty": "ReviewScopeSet" } ] } },
+          { "name": "RunRefVerify", "payload": { "kind": "unit" } },
+          { "name": "Commit",       "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_phase",
+      "docs": "Output of the mechanized fixpoint resolver (D2). Each variant names the one phase the orchestrator must execute next to move toward convergence: RunDfp (dry gate open), RunRfp { scopes } (one or more review scopes are open), RunRefVerify (ref-verify gate open), Commit (all gates green; safe to commit). scopes is a non-empty ReviewScopeSet of opaque orchestrator-assigned review-group labels; the domain validates only non-emptiness, not review-group naming.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewScopeSet": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "track_phase",
+      "docs": "Non-empty deterministic set of review scopes that must run through RFP before the fixpoint can advance. Scope labels remain opaque Strings owned by the orchestrator/review infrastructure; this value object only rejects the empty set so FixpointStep::RunRfp cannot represent 'run RFP for no scopes'. BTreeSet keeps CLI output deterministic.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewScopeSetError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Empty", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_phase",
+      "docs": "Validation error for ReviewScopeSet construction. Empty means the review gate attempted to request RFP with no target scopes, which is not a valid FixpointStep::RunRfp payload.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckConfigFingerprint": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "SHA-256 fingerprint (64-char lowercase hex string) over all dry-check.json fields that affect dry write semantics: threshold, max_parallelism, fast_reasoning_effort, final_reasoning_effort, known_bad_injection_rate_percent, known_bad_detection_threshold_percent. Written into the coverage manifest by dry write; compared by dry check-approved against the current config. A mismatch means the config changed and coverage must be regenerated (Blocked). The all-zeros sentinel (fail_closed()) is written on failed runs so check_approved returns Blocked regardless of current config.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckConfigFingerprintError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidFormat", "payload": { "kind": "tuple", "fields": [ "String" ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Validation error for DryCheckConfigFingerprint construction. InvalidFormat means the provided string is not exactly 64 lowercase hexadecimal characters.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-08"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckEntry": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "pair_key",           "ty": "DryCheckPairKey" },
+            { "name": "changed_path",        "ty": "FilePath" },
+            { "name": "verdict",             "ty": "DryCheckVerdict" },
+            { "name": "similarity_score",    "ty": "SimilarityScore" },
+            { "name": "threshold",           "ty": "SimilarityThreshold" },
+            { "name": "base_commit",         "ty": "CommitHash" },
+            { "name": "rationale",           "ty": "Rationale" },
+            { "name": "config_fingerprint",  "ty": "DryCheckConfigFingerprint" }
+          ],
+          "returns": "Result<DryCheckEntry, DryCheckEntryError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "pair_key",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckPairKey",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "changed_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FilePath",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verdict",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckVerdict",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "similarity_score",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&SimilarityScore",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "threshold",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&SimilarityThreshold",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "base_commit",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&CommitHash",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "rationale",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Rationale",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "config_fingerprint",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_check::record",
+      "docs": "Write-input type for the dry-check persistence path (write-read separation). Carries the 8 fields the interactor knows at verdict time; does not carry recorded_at. config_fingerprint identifies which dry-check.json configuration was active when this entry was judged; on read the interactor uses it to filter the verified_set seed (records whose fingerprint differs from the current config are excluded and will be re-judged under the new config). Eq is not derived because SimilarityScore and SimilarityThreshold wrap f32.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckEntryError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ChangedPathOutsidePair", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check::record",
+      "docs": "Error from DryCheckEntry::new. ChangedPathOutsidePair means changed_path is neither pair_key.low().path() nor pair_key.high().path().",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryCheckRecord": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "from_entry_and_timestamp",
+          "receiver": null,
+          "params": [
+            { "name": "entry",       "ty": "DryCheckEntry" },
+            { "name": "recorded_at", "ty": "Timestamp" }
+          ],
+          "returns": "Result<DryCheckRecord, DryCheckRecordError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "pair_key",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckPairKey",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "changed_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FilePath",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verdict",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckVerdict",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "similarity_score",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&SimilarityScore",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "threshold",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&SimilarityThreshold",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "base_commit",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&CommitHash",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "rationale",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Rationale",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "recorded_at",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Timestamp",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "config_fingerprint",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_check::record",
+      "docs": "A single entry in the dry-check history (read/persistent form). Constructed exclusively by FsDryCheckStore::append_record which stamps Timestamp. config_fingerprint is the fingerprint of the dry-check.json settings active when this record was written; the interactor uses it during verified_set seeding to skip records written under a different config. Eq is not derived because SimilarityScore and SimilarityThreshold wrap f32.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckRecordError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ChangedPathOutsidePair", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check::record",
+      "docs": "Error from DryCheckRecord::from_entry_and_timestamp. ChangedPathOutsidePair is unreachable in correct usage because DryCheckEntry::new already validates changed_path.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryCheckCorpusFingerprint": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "SHA-256 fingerprint (64-char lowercase hex string) over the full set of (repo_relative_path, content_hash) pairs scanned by the corpus indexer during a `dry write` run. Written into the coverage manifest by `dry write` so readers can identify which workspace corpus produced the manifest. Comparing the stored value with a separately computed current corpus fingerprint detects corpus changes (added, removed, or modified files) and marks the coverage stale; this domain value does not prescribe the approval-usecase wiring for that comparison. The all-zeros sentinel (fail_closed()) is written on failed runs as fail-closed provenance. Mirrors DryCheckConfigFingerprint validation and fail-closed sentinel semantics while carrying additional internal state to distinguish current read failures from persisted failure sentinels.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckCorpusFingerprintError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidFormat", "payload": { "kind": "tuple", "fields": [ "String" ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Validation error for DryCheckCorpusFingerprint construction. InvalidFormat means the provided string is not exactly 64 lowercase hexadecimal characters.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-08"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckCoverageRecord": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run (fragment_refs), plus the set of DryCheckPairKey values for all pairs that were considered current in that run (processed_pair_keys), plus the config_fingerprint of the dry-check.json settings used by that run, plus the corpus_fingerprint of the workspace corpus files scanned by the indexer. If a current diff fragment's FragmentRef is absent from fragment_refs, `check-approved` returns Blocked (stale coverage). If a historical Violation record's pair_key is absent from processed_pair_keys, that record is treated as stale (candidate side fixed) and skipped by the gate. If the stored config_fingerprint differs from the current config fingerprint, `check-approved` returns Blocked (config changed). The stored corpus_fingerprint is provenance for detecting that the manifest was built from a different workspace corpus when compared with a current corpus fingerprint; such a mismatch means coverage is stale and must be regenerated. BTreeSet preserves deterministic serialization order (CN-05).",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-06"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "ReviewScopeSet",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [ { "name": "scopes", "ty": "std::collections::BTreeSet<String>" } ],
+          "returns": "Result<Self, ReviewScopeSetError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_set",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeSet<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckConfigFingerprint",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "s", "ty": "impl Into<String>" } ],
+          "returns": "Result<DryCheckConfigFingerprint, DryCheckConfigFingerprintError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fail_closed",
+          "receiver": null,
+          "params": [],
+          "returns": "DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckCorpusFingerprint",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "s", "ty": "impl Into<String>" } ],
+          "returns": "Result<DryCheckCorpusFingerprint, DryCheckCorpusFingerprintError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fail_closed",
+          "receiver": null,
+          "params": [],
+          "returns": "DryCheckCorpusFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckCoverageRecord",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "fragment_refs",       "ty": "std::collections::BTreeSet<FragmentRef>" },
+            { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" },
+            { "name": "config_fingerprint",  "ty": "DryCheckConfigFingerprint" },
+            { "name": "corpus_fingerprint",  "ty": "DryCheckCorpusFingerprint" }
+          ],
+          "returns": "DryCheckCoverageRecord",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fragment_refs",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeSet<FragmentRef>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "processed_pair_keys",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeSet<DryCheckPairKey>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "config_fingerprint",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "corpus_fingerprint",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckCorpusFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "covers",
+          "receiver": "&self",
+          "params": [ { "name": "fragment_ref", "ty": "&FragmentRef" } ],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "contains_pair",
+          "receiver": "&self",
+          "params": [ { "name": "pair_key", "ty": "&DryCheckPairKey" } ],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "FixpointStep" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "FixpointStep" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "FixpointStep" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "FixpointStep" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "ReviewScopeSet" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "ReviewScopeSet" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "ReviewScopeSet" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "ReviewScopeSet" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "ReviewScopeSetError" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "ReviewScopeSetError" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "ReviewScopeSetError" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "ReviewScopeSetError" },
+    { "action": "add", "trait_ref": "core::fmt::Display",     "for_type": "ReviewScopeSetError" },
+    { "action": "add", "trait_ref": "core::error::Error",     "for_type": "ReviewScopeSetError" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug",     "for_type": "DryCheckEntry" },
+    { "action": "modify", "trait_ref": "core::clone::Clone",  "for_type": "DryCheckEntry" },
+    { "action": "modify", "trait_ref": "core::cmp::PartialEq","for_type": "DryCheckEntry" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",   "for_type": "DryCheckEntryError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display", "for_type": "DryCheckEntryError" },
+    { "action": "reference", "trait_ref": "core::error::Error", "for_type": "DryCheckEntryError" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug",     "for_type": "DryCheckRecord" },
+    { "action": "modify", "trait_ref": "core::clone::Clone",  "for_type": "DryCheckRecord" },
+    { "action": "modify", "trait_ref": "core::cmp::PartialEq","for_type": "DryCheckRecord" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",   "for_type": "DryCheckRecordError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display", "for_type": "DryCheckRecordError" },
+    { "action": "reference", "trait_ref": "core::error::Error", "for_type": "DryCheckRecordError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckCoverageRecord" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckCoverageRecord" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckCoverageRecord" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckCoverageRecord" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckConfigFingerprint" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckConfigFingerprint" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckConfigFingerprint" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckConfigFingerprint" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::fmt::Display",     "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::error::Error",     "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckCorpusFingerprint" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckCorpusFingerprint" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckCorpusFingerprint" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckCorpusFingerprint" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::fmt::Display",     "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::error::Error",     "for_type": "DryCheckCorpusFingerprintError" }
+  ]
+}

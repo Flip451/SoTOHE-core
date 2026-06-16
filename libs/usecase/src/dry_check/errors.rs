@@ -12,7 +12,7 @@ use crate::semantic_dup::{EmbeddingError, SemanticIndexError};
 ///
 /// Mirrors `ReviewerError`. Covers agent abort, timeout, illegal schema output,
 /// and unexpected failures.
-#[derive(Debug, Error)]
+#[derive(Debug, Clone, Error)]
 pub enum DryCheckAgentError {
     /// The user requested abort during the agent run.
     #[error("dry-check agent aborted by user")]
@@ -87,4 +87,20 @@ pub enum DryCheckCycleError {
     /// invariant violation.
     #[error("dry-check cycle entry error: {0}")]
     Entry(DryCheckEntryError),
+    /// The dry-check coverage port (D5 read-only staleness gate) returned an
+    /// error — e.g. the coverage manifest could not be read or written.
+    /// CN-08: a missing manifest is reported as `Ok(None)` by the port, not as
+    /// this error; this variant is reserved for genuine I/O / serialization
+    /// failures.
+    #[error("dry-check cycle coverage port error: {0}")]
+    CoveragePort(String),
+
+    /// D3 (T009 / CN-04): `DryCheckParallelism::try_new` rejected a zero value.
+    #[error("invalid dry-check parallelism: must be nonzero")]
+    InvalidParallelism,
+
+    /// D4 (T009 / CN-06): `DryCheckPercent::try_new` rejected a value outside
+    /// the inclusive range `1..=100`.
+    #[error("invalid dry-check percent: must be in 1..=100 (got {0})")]
+    InvalidPercent(u8),
 }

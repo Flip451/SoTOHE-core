@@ -1,0 +1,492 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "DFP⇄RFP 往復コストの削減",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "dfl の DFP ループを効率化し、violation が無い場合（no-fix run）は `cargo make ci-rust` と冗長な 2 度目の `dry write` を省略する。violation ゼロの定常ケースで DFP のコストを `dry write`（判定）コストに近づける（D1）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "DFP⇄RFP の fixpoint 判定（3 ゲートすべてが同時に green になったか）を単一の決定的コマンドに機械化し、orchestrator が収束判定ロジックをプロンプト運用で抱える必要をなくす（D2）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "`sotp dry write` の判定 fan-out を直列から上限付き並列に変え、未検証ペアが多い run の wall-clock を削減する（D3）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "GO-04",
+      "text": "dry-checker の判定を較正付き 2 段構成（fast tier 軽量モデル + 既知違反プローブ較正 → 必要時のみ重量級 tier へ escalation）にし、判定 1 回あたりの単価を削減する（D4）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "GO-05",
+      "text": "`sotp dry check-approved` を埋め込み・類似検索なしの純読み取りゲート（FragmentRef / config_fingerprint / corpus_fingerprint / fail-closed sentinel の staleness 確認 + all-resolved 確認）にし、dfl ループの先頭 check・fixpoint 合成・commit ゲートの反復評価コストを下げる（D5）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D5"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "dfl の DFP ループ定義（`.claude/agents/dry-fix-lead.md`）を変更し、violation ゼロ時は step 1 の `sotp dry check-approved`（Approved）→ completed で終わり、`cargo make ci-rust` と 2 度目の `dry write` をスキップする分岐を追加する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "DFP⇄RFP の収束状態（dry gate / review per-scope hash 失効 + verdict / ref-verify gate の 3 ゲート）を合成し、次に必要なフェーズ（DFP 再入 / RFP 対象 scope 列挙 / ref-verify 再実行 / commit 可）を出力する単一の決定的コマンド（`sotp track fixpoint-resolve` 相当）を新設する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "`sotp dry write` の処理を 2 相（照会相: 全 diff fragment の類似照会 → ペア識別子重複排除 → 未検証ペア確定、判定相: 確定ペアへの上限付き並列 fan-out）に分け、並列度上限を `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "dry-checker を較正付き 2 段構成に変える: fast tier（軽量モデル）で全ペアを判定し、既知違反プローブの検出率で信頼性を較正する。較正が健全なら not-a-violation / accepted を確定し、violation および不正出力のみ重量級 tier へ escalation する。較正失敗時は全ペアを重量級 tier で再判定し、重量級でも較正失敗なら fail-closed でエスカレーション。fast tier の `fast_model` を `agent-profiles.json` に追加し、fast / final tier の reasoning effort とプローブ設定を `.harness/config/dry-check.json` に追加する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録を読んで次の条件で Approved / Blocked を判定する。(1) staleness-fragment: 現在の diff フラグメントの FragmentRef（path + content_hash）がカバレッジ記録の fragment_refs に在るか — 無ければ Blocked。(2) staleness-config: カバレッジ記録の config_fingerprint が現在の dry-check.json 設定から導出したフィンガープリントと一致するか — 不一致なら Blocked（設定変更により coverage 再生成が必要）。(3) staleness-corpus: カバレッジ記録の corpus_fingerprint が現在のワークスペース corpus から導出したフィンガープリントと一致するか — 不一致なら Blocked（corpus 変更により coverage が陳腐化）。(4) fail-closed sentinel: カバレッジ記録のいずれかのフィンガープリントが all-zeros（`fail_closed()` 値）の場合は問答無用で Blocked（`dry write` が失敗したランで書き込まれた fail-closed プロビナンスを検出）。(5) all-resolved: processed_pair_keys に含まれ、かつ変更フラグメントに触れる最新記録ペアが全て not-a-violation / accepted か — 対象ペアに violation があれば Blocked。processed_pair_keys に含まれない履歴記録は過去 coverage の残存としてこの確認から除外する。上記 (1)-(5) が全て満たされたときのみ Approved。類似検索は `dry write`（resolver）にのみ残す。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "`dry write` が `DryCheckCoverageRecord`（fragment_refs: 処理した diff フラグメントの FragmentRef 集合、processed_pair_keys: 判定対象として確定したペアキー集合、config_fingerprint: 実行時 dry-check.json 設定のフィンガープリント、corpus_fingerprint: 実行時 workspace corpus のフィンガープリント）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。`dry write` が信頼できるカバレッジを作れない失敗ランでは fail_closed() フィンガープリントを記録し、次回 `dry check-approved` が Blocked へ倒れるようにする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "テレメトリ計装の追加: D1 の効果測定のために no-fix completed 識別用 `GateEval`（gate_name=`dry`, verdict Approved→ok / Blocked→error）を追加できる。D4 の効果測定のために dry ラウンドに `round_type`（fast / final）+ tier 別 `model` タグを付与する `emit_review_round` 呼び出しを追加する。いずれも既存テレメトリ schema の範囲内で対応し、新フィールド・新イベント型は追加しない（既存の `GateEval` / `ReviewRound` と `round_type` / `model` タグを使う）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D4"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "DFP と RFP の条件付き並列実行（dry violation が触る path 集合と review scope 集合の交差が空な場合に両フェーズを同時並列で走らせること）。本 ADR の低リスク改善で往復回数を削った後に実測して再検討する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "per-task DFP の間引き（全コードベース gate を PR 前 1 回に限定する変更）。既存決定（`2026-06-02-0716-dry-checker.md` D7/D13）の改訂が必要なうえ、D1 により per-task DFP の定常コストが大幅に下がるため間引きの動機が弱い。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "偽陽性ペアの再燃対策（内容の微変更でペア識別子が変わり、判定済み偽陽性ペアが再判定に回る問題の解消）および DRY 検証のシフトレフト（設計・実装フェーズへの DRY 検証前倒し）。別草案に分離して保留する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "セマンティックインデックス構築・永続化・増分維持の設計変更。インデックス BUILD の最適化は `2026-06-04-1042-dry-checker-operability-and-batch-index.md` D6/D7 で決定済みであり、本トラックは索引の作り方を変えない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D6"
+          },
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "dry-checker / review / ref-verify の fix パス統合（DRY findings と review findings を 1 つの fix-lead に渡して 1 パスで直す）。`2026-06-02-0716-dry-checker.md` D12 で既に却下済みであり、本トラックで再検討しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-02-0716-dry-checker.md",
+            "anchor": "D12"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "fixpoint 解決コマンド（D2）を既存の `bin/sotp track resolve`（lifecycle 用純関数）へ統合すること。両者は入力・cadence・失敗様式が異なる別コマンドとして設計する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "blocking gate の意味論（`2026-06-02-0716-dry-checker.md` D7/D8）・全コードベース単一スコープ（D13）・修正役分離（D12）・verdict 書き込み経路（D10/D11）の変更。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-02-0716-dry-checker.md",
+            "anchor": "D7"
+          },
+          {
+            "file": "knowledge/adr/2026-06-02-0716-dry-checker.md",
+            "anchor": "D12"
+          },
+          {
+            "file": "knowledge/adr/2026-06-02-0716-dry-checker.md",
+            "anchor": "D13"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "D1 の効率化後も、blocking gate の fail-closed 性（`2026-06-02-0716-dry-checker.md` D7）は変えない。`sotp dry check-approved` が Blocked のときは必ず judge が走り、未解決 violation は通過できない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-02-0716-dry-checker.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "D2 の fixpoint 解決コマンドは各ゲートの公開インターフェース（exit code / 読み出し API）だけを合成し、dry-check.json / review.json / ref-verify cache の内部構造には依存しない（ゲート間の疎結合 `2026-06-02-0716-dry-checker.md` D1 を維持）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-02-0716-dry-checker.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "D3 の判定並列化は、1 ペア 1 agent 呼び出しの粒度を変えない（複数ペアを 1 呼び出しに詰める批量判定はしない）。エラーは収集・報告し、1 件の判定エラーで残りの判定結果を破棄しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "D3 の並列度上限は provider の rate limit / アカウント同時実行制限に合わせて運用側が調整できるよう `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にし、無制限並列は行わない。未指定なら nonzero の既定値を使用する。これは ref-verify が `max_parallelism` を `.harness/config/ref-verify.json` から読む実装と同じ分離方針に従う。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "D3 の並列判定において、dry-check.json への記録は完了順ではなくペア識別子順で append し、dry-check.json の記録順を決定的に保つ。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "D4 の較正付き 2 段化において、既知違反プローブの verdict は dry-check.json の production 記録には残さない（プローブと production の記録を分離する）。プローブ injection rate・detection threshold 閾値は `.harness/config/dry-check.json` で調整可能にする。tier 別 model（`fast_model` / 既存 `model`）は `agent-profiles.json` の dry-checker capability に追加する。これは ref-verify の known-bad probe 設定（`known_bad_injection_rate_percent` / `known_bad_detection_threshold_percent` を `.harness/config/ref-verify.json` に置く方針）と同じ配置に従う。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "D4 の較正失敗時（fast tier のプローブ検出率が閾値未満）は fast 非違反判定を信頼せず、全ペアを重量級 tier で再判定する。重量級 tier でもプローブ検出率が閾値未満なら fail-closed で人間にエスカレーションし、gate を通過させない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "D5 の純読み取りゲート化において、カバレッジ記録の欠落・不整合時は fail-closed（Blocked）で安全側に倒す。カバレッジ記録は FragmentRef（path + content_hash）単位で照合し、同一 content_hash の別 path を covered と誤認しない。ゲートは自己完結性を手放し `dry write` が記録したカバレッジ記録の存在に依存することを受け入れる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-09",
+      "text": "D5 の `dry check-approved` は staleness 判定を diff フラグメントの FragmentRef（path + content_hash）、config_fingerprint、corpus_fingerprint、fail-closed sentinel（all-zeros フィンガープリント）の照合で行い、これに processed_pair_keys で現在 coverage の対象ペアに絞った all-resolved 確認を加えた 5 条件だけで Approved / Blocked を判定する。埋め込み・類似検索は呼ばないため、`check-approved` は何度実行しても実害がなくなり、D1/D2 の組み合わせで二重実行が生じても問題にならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-10",
+      "text": "効果計測は既存テレメトリ（wall-clock `duration_ms` / 構造カウント `findings_count` / round 数 / subprocess 数）で行い、トークン建て絶対コストは測定対象としない。`cargo make ci-rust` はテレメトリに出ないため、D1 の効果は dfl run の総 wall-clock 崩落で代理測定する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`.claude/agents/dry-fix-lead.md` が変更され、violation ゼロ時に `cargo make ci-rust` と 2 度目の `sotp dry write` をスキップして `completed` に到達するループ分岐を持つ。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "violation ゼロで終わる dfl run の wall-clock span が `cargo make ci-rust`（フル CI、分単位）を含まない floor（`dry write` ≤ 1 回 + check のみ）に収束することをテレメトリ（dfl の dry ReviewRound 群の `duration_ms`）で確認できる、または no-fix completed を識別する `GateEval`（gate_name=`dry`）が発行されることで確認できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`sotp track fixpoint-resolve`（仮称）または相当のコマンドが存在し、dry gate / review per-scope 状態 / ref-verify gate の 3 ゲートを合成した次フェーズ（DFP / RFP(scope list) / ref-verify / commit）を決定的に出力する。orchestrator はこの出力に従うだけで収束判定ロジックを持たない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "fixpoint 解決コマンドが各ゲートの公開 API（exit code / 読み出し API）のみを使い、dry-check.json / review.json / ref-verify cache の内部構造を直接読まないことを review で確認できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "`sotp dry write` が 2 相（照会相 → 判定相）で動き、判定相が設定可能な `max_parallelism` 上限（`.harness/config/dry-check.json`）で並列 fan-out を行う。dry-check.json への記録がペア識別子順で append される（記録順が決定的）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "未検証ペアが複数存在する run において、`sotp dry write` の wall-clock が（並列度を 1 超に設定した場合）直列実行ベースラインより短縮されることをテレメトリ（dry ReviewRound の `duration_ms`）で確認できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "dry-checker が fast tier（軽量モデル、`agent-profiles.json` の `fast_model`）と重量級 tier（既存 `model`）の 2 段で動く。fast tier は production ペアとは別の 1 ペア 1 agent 呼び出しで既知違反プローブを判定してプローブ検出率を較正し、較正が健全なら not-a-violation / accepted を確定し、violation および不正出力のみ重量級 tier へ escalation する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "較正失敗時（fast tier プローブ検出率 < threshold）に全ペアを重量級 tier で再判定し、重量級でも較正失敗なら gate が fail-closed になることを unit または integration test で確認できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "テレメトリに dry ラウンドの `round_type`（fast / final）と tier 別 `model` が記録され、fast 完結率（同 scope で final 後続なし / fast round 数）と昇格率（final / fast round 数）を後から集計できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録だけを読んで、(1) staleness-fragment（FragmentRef 照合）、(2) staleness-config（config_fingerprint 一致確認、不一致なら Blocked）、(3) staleness-corpus（corpus_fingerprint 一致確認、不一致なら Blocked）、(4) fail-closed sentinel（all-zeros フィンガープリント検出、Blocked）、(5) all-resolved（processed_pair_keys に含まれ、変更 FragmentRef に触れる最新記録ペアの violation 不在確認）の 5 条件で Approved / Blocked を判定する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`sotp dry write` がカバレッジ記録（`DryCheckCoverageRecord`：処理した diff フラグメントの FragmentRef 集合 + 処理済みペアキー集合 + config_fingerprint + corpus_fingerprint）を記録し、その記録を `dry check-approved` が staleness 判定に使う。(a) フラグメント編集または path 変更 → FragmentRef 変化 → fragment_refs に不在 → Blocked → `dry write` 強制、(b) dry-check.json 設定変更 → config_fingerprint 不一致 → Blocked → `dry write` 強制、(c) corpus 変更 → corpus_fingerprint 不一致 → Blocked → `dry write` 強制、(d) `dry write` 失敗時は all-zeros フィンガープリント（`fail_closed()` 値）を書き込み → 次回 `check-approved` で Blocked → `dry write` 再実行強制、という意味論が維持される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "`dry check-approved` を繰り返し呼んでも安価（埋め込み・検索なし）であり、D1 の dfl ループ先頭 check と D2 の fixpoint 合成が同一の `dry check-approved` を重複実行しても実害がない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "実装完了後、`cargo make ci`、`bin/sotp review check-approved`、`bin/sotp dry check-approved` が pass する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-0413-dfp-rfp-loop-cost-reduction.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/dry-check-workflow.md",
+      "anchor": "2. DFP → RFP の 2 フェーズ実行順序"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "Make Illegal States Unrepresentable"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    }
+  ],
+  "signals": {
+    "blue": 42,
+    "yellow": 0,
+    "red": 0
+  }
+}

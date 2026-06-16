@@ -7,6 +7,7 @@ use clap::{Args, Subcommand};
 mod archive;
 mod branch_ops;
 mod dispatch;
+pub mod fixpoint_resolve;
 mod resolve;
 pub(crate) mod set_commit_hash;
 mod signals;
@@ -370,6 +371,16 @@ pub enum TrackCommand {
         layer: Option<String>,
     },
 
+    /// Resolve the next fixpoint step (DFP / RFP / ref-verify / commit) for the active track.
+    ///
+    /// Queries the three gate states (dry → review → ref-verify) in priority order
+    /// and prints one of:
+    /// - `run-dfp` — DRY gate is open; run DFP first.
+    /// - `run-rfp scopes=<s1>,<s2>...` — one or more review scopes are stale.
+    /// - `run-ref-verify` — ref-verify gate is blocked.
+    /// - `commit` — all gates are green; safe to commit.
+    FixpointResolve(fixpoint_resolve::FixpointResolveArgs),
+
     /// Persist the current HEAD SHA to `.commit_hash` for the active track (v2 diff base).
     ///
     /// Writes the HEAD SHA to `track/items/<track-id>/.commit_hash`.
@@ -490,6 +501,9 @@ impl TrackCommand {
             | TrackCommand::ContractMap { items_dir, .. }
             | TrackCommand::CatalogueSpecSignals { items_dir, .. }
             | TrackCommand::SpecElementHash { items_dir, .. } => items_dir.clone(),
+
+            // FixpointResolve embeds items_dir inside FixpointResolveArgs.
+            TrackCommand::FixpointResolve(args) => args.items_dir.clone(),
 
             // Branch sub-variants embed items_dir inside BranchArgs.
             TrackCommand::Branch { action: BranchAction::Create(args) }
@@ -1133,6 +1147,21 @@ mod tests {
     fn test_items_dir_accessor_returns_custom_items_dir_for_next_task() {
         let custom = PathBuf::from("alt/track/items");
         let cmd = TrackCommand::NextTask { items_dir: custom.clone(), track_id: None };
+        assert_eq!(cmd.items_dir(), custom.as_path());
+    }
+
+    /// `TrackCommand::FixpointResolve.items_dir()` must return `args.items_dir`.
+    ///
+    /// This exercises the `FixpointResolve` branch of the accessor, which feeds
+    /// telemetry path resolution in `main.rs`.
+    #[test]
+    fn test_items_dir_accessor_returns_items_dir_for_fixpoint_resolve() {
+        let custom = PathBuf::from("alt/track/items");
+        let cmd = TrackCommand::FixpointResolve(fixpoint_resolve::FixpointResolveArgs {
+            items_dir: custom.clone(),
+            track_id: "my-track-2026".to_owned(),
+            current_branch: "track/my-track-2026".to_owned(),
+        });
         assert_eq!(cmd.items_dir(), custom.as_path());
     }
 }

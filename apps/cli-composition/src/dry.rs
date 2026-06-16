@@ -16,42 +16,61 @@
 
 use std::path::Path;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::Instant;
 
 use domain::dry_check::{DryCheckFinding, DryCheckReader as _, DryCheckVerdict};
-use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
-use infrastructure::dry_check::{CodexDryChecker, FsDryCheckStore};
+use domain::semantic_dup::SimilarityThreshold;
+use infrastructure::dry_check::{CodexDryChecker, FsDryCheckCoverageAdapter, FsDryCheckStore};
 use infrastructure::semantic_dup::embedding::FastEmbedAdapter;
 use usecase::dry_check::{
-    DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckApprovalInteractor,
-    DryCheckApprovalService as _, DryCheckCycleError, DryCheckInteractor,
-    DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _,
+    DryCheckApprovalInteractor, DryCheckApprovalService as _, DryCheckInteractor,
+    DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _, fragment_ref_of,
 };
 
-use crate::review_v2::record_instant_once;
 use crate::{CliApp, CommandOutcome};
 
+mod corpus_root;
 mod manifest;
 mod persistent_index;
 mod shared;
+mod tier_telemetry;
 
+pub(crate) use corpus_root::{
+    compute_current_dry_corpus_fingerprint, resolve_dry_corpus_fingerprint_root,
+};
+use corpus_root::{
+    compute_dry_corpus_fingerprint_from_fragments, compute_dry_corpus_fingerprint_from_root,
+    write_dry_corpus_root_manifest,
+};
 use persistent_index::open_persistent_index_with_corpus;
+#[cfg(test)]
+use shared::git_diff_path_key;
+#[cfg(test)]
+use shared::normalize_fragment_paths;
+pub(crate) use shared::resolve_dry_diff_base_from_store;
 use shared::{
     build_diff_and_corpus_fragments, dry_check_approved_outcome, dry_write_outcome,
     parse_dry_track_id, parse_verdict_filter, resolve_dry_diff_base,
     resolve_existing_dir_under_repo,
 };
 #[cfg(test)]
-use shared::{git_diff_path_key, normalize_fragment_paths};
+use tier_telemetry::{
+    DryAgentRunRecorder, TieredDryAgentRecorder, dry_agent_error_is_subprocess_failure,
+};
+use tier_telemetry::{
+    RecordingDryAgent, dry_tiered_telemetry_for_result, emit_dry_tier_external_subprocess,
+    emit_dry_tier_review_round,
+};
 
 #[cfg(test)]
 use domain::dry_check::{DryCheckApprovalVerdict, VerdictFilter, fragments_overlapping_hunks};
 #[cfg(test)]
-use infrastructure::semantic_dup::{
-    extractor::extract_code_fragments, index::LanceDbSemanticIndexAdapter,
-};
+use domain::semantic_dup::CodeFragment;
+#[cfg(test)]
+use infrastructure::semantic_dup::extractor::extract_code_fragments;
+#[cfg(test)]
+use infrastructure::semantic_dup::index::LanceDbSemanticIndexAdapter;
 #[cfg(test)]
 use manifest::{
     EMBEDDING_MODEL_ID, IndexManifest, compute_manifest_diff, file_content_hash,
@@ -61,6 +80,11 @@ use manifest::{
 use persistent_index::{
     NullInsertIndexProxy, acquire_persistent_index_lock, clear_persistent_index_dir,
     persistent_index_lock_path, persistent_index_marker_path, write_persistent_index_marker,
+};
+#[cfg(test)]
+use usecase::dry_check::{
+    DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckCycleError,
+    DryCheckJudgeTier,
 };
 #[cfg(test)]
 use usecase::semantic_dup::SemanticIndexPort;
@@ -120,18 +144,16 @@ pub struct RunDryFixLocalInput {
 }
 
 /// Input DTO for `sotp dry check-approved`.
+///
+/// D5 / T005: `dry check-approved` is a pure-read staleness + all-resolved gate
+/// (no embedding, no similarity search, no corpus / index / threshold), so the
+/// old `db_path` / `threshold` / `workspace_root` fields are removed.
 #[derive(Debug, Clone)]
 pub struct DryCheckApprovedInput {
     /// Track ID used to locate the per-track dry-check.json and .commit_hash.
     pub track_id: String,
     /// Optional explicit base commit (overrides FsDryCheckCommitHashStore lookup).
     pub base_commit: Option<String>,
-    /// Path to the LanceDB semantic index database.
-    pub db_path: PathBuf,
-    /// Cosine similarity threshold (0.0–1.0).
-    pub threshold: Option<f32>,
-    /// Root of the workspace to scan for Rust sources (corpus extraction).
-    pub workspace_root: PathBuf,
     /// Path to the track items directory.
     pub items_dir: PathBuf,
 }
@@ -183,6 +205,32 @@ fn resolve_dry_write_telemetry_writer(
         .filter(|(_, telemetry_track_id)| telemetry_track_id.as_str() == dry_track_id)
 }
 
+/// Resolve the config fingerprint to store in the coverage manifest for `dry write`.
+///
+/// The fingerprint controls whether `dry check-approved` can match this manifest.
+/// `dry check-approved` always calls `infra_config.fingerprint()` (file-config threshold),
+/// so the stored fingerprint must be chosen accordingly:
+///
+/// - If `effective_threshold <= file_threshold` (stricter or equal): use `fingerprint()`
+///   (file-config threshold). The manifest covers at least as many pairs as the file config
+///   requires, so approval is safe.
+/// - If `effective_threshold > file_threshold` (more permissive override): use
+///   `fingerprint_with_threshold(effective_threshold)`. The manifest was built under a looser
+///   threshold and may be missing pairs in the `[file_threshold, effective_threshold)` range.
+///   `dry check-approved` will see a fingerprint mismatch and correctly block approval.
+fn resolve_write_config_fingerprint(
+    infra_config: &infrastructure::dry_check::DryCheckConfig,
+    effective_threshold: domain::semantic_dup::SimilarityThreshold,
+) -> domain::dry_check::DryCheckConfigFingerprint {
+    // Higher threshold value = more permissive (fewer pairs detected).
+    // Only use the override fingerprint when the override is MORE permissive than the file config.
+    if effective_threshold.value() > infra_config.threshold().value() {
+        infra_config.fingerprint_with_threshold(effective_threshold)
+    } else {
+        infra_config.fingerprint()
+    }
+}
+
 // ── CliApp impl — dry write ───────────────────────────────────────────────────
 
 impl CliApp {
@@ -197,7 +245,6 @@ impl CliApp {
     /// Returns `Err` on arg validation, diff acquisition, fragment extraction,
     /// adapter construction, or interactor failures.
     pub fn dry_write(&self, input: DryWriteInput) -> Result<CommandOutcome, String> {
-        use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
         // Resolve repo root to anchor paths.
@@ -209,32 +256,8 @@ impl CliApp {
         let telemetry_writer =
             resolve_dry_write_telemetry_writer(&input.items_dir, track_id.as_ref());
 
-        // Resolve the effective model: explicit --model overrides; otherwise read
-        // the `dry-checker` capability model from agent-profiles.json (same pattern
-        // as `dry fix-local` uses for the `dry-fix-lead` capability).
-        let effective_model = match input.model.clone() {
-            Some(m) => m,
-            None => {
-                let profiles_path = root.join(AGENT_PROFILES_PATH);
-                let profiles = AgentProfiles::load(&profiles_path)
-                    .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
-                let resolved = profiles
-                    .resolve_execution(&input.capability_name, RoundType::Final)
-                    .ok_or_else(|| {
-                        format!(
-                            "[ERROR] '{}' capability not defined in agent-profiles.json",
-                            input.capability_name
-                        )
-                    })?;
-                resolved.model.ok_or_else(|| {
-                    format!(
-                        "[ERROR] no model specified: pass --model or set model in \
-                         agent-profiles.json '{}' capability",
-                        input.capability_name
-                    )
-                })?
-            }
-        };
+        let (fast_model, effective_model) =
+            resolve_dry_checker_models(&root, &input.capability_name, input.model.clone())?;
 
         // Locate per-track directory.
         let items_dir_abs =
@@ -243,6 +266,7 @@ impl CliApp {
 
         let commit_hash_path = track_dir.join(".commit_hash");
         let dry_check_json_path = track_dir.join("dry-check.json");
+        let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
 
         // Resolve diff base (fail-closed three-branch policy).
         let base = resolve_dry_diff_base(
@@ -251,18 +275,19 @@ impl CliApp {
             &canonical_root,
         )?;
 
-        // Resolve threshold: explicit --threshold wins; otherwise load from dry-check config.
+        // Always load infra config for max_parallelism (D3 / T010); --threshold overrides its threshold.
+        let config_path = root.join(".harness/config/dry-check.json");
+        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
+            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+
         let threshold = match input.threshold {
             Some(t) => {
                 SimilarityThreshold::new(t).map_err(|e| format!("invalid --threshold: {e}"))?
             }
-            None => {
-                let config_path = root.join(".harness/config/dry-check.json");
-                let config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
-                    .map_err(|e| format!("failed to load dry-check config: {e}"))?;
-                config.threshold()
-            }
+            None => infra_config.threshold(),
         };
+
+        let usecase_config = build_usecase_dry_check_config(&infra_config)?;
 
         let workspace_root = resolve_existing_dir_under_repo(
             &input.workspace_root,
@@ -275,16 +300,27 @@ impl CliApp {
         let (diff_fragments, corpus_fragments) =
             build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)?;
         let diff_fragments_processed = diff_fragments.len();
+        let corpus_fingerprint = compute_dry_corpus_fingerprint_from_fragments(&corpus_fragments);
 
         // Construct adapters.
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
+        // D5 (T004): the coverage manifest is written by `DryCheckInteractor`
+        // at the end of `run_dry_check`. Composition just constructs the
+        // adapter and hands it to the interactor.
+        let coverage = Arc::new(FsDryCheckCoverageAdapter::new(
+            dry_check_coverage_path,
+            canonical_root.clone(),
+        ));
         let store_for_summary = store.clone();
         let records_before = store_for_summary
             .read_records()
             .map_err(|e| format!("dry-check read before write failed: {e}"))?
             .len();
-        let (agent, agent_recorder) = RecordingDryAgent::new(CodexDryChecker::new(
+        let (agent, tiered_recorder) = RecordingDryAgent::new(CodexDryChecker::new(
+            fast_model.clone(),
+            infra_config.fast_reasoning_effort().to_owned(),
             effective_model.clone(),
+            infra_config.final_reasoning_effort().to_owned(),
             input.capability_name.clone(),
         ));
         let agent = Arc::new(agent);
@@ -292,69 +328,89 @@ impl CliApp {
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
 
-        // D7/IN-10: Open (or incrementally update) the persistent index at
-        // `--db-path` using the file-level content-hash manifest.  Only changed
-        // or new files are re-embedded; unchanged files are reused.  Deleted
-        // files are removed from the index.  The returned adapter is wrapped in
-        // `NullInsertIndexProxy` so that the interactor's unconditional
-        // `build_corpus_index` call is a no-op — corpus is always correct before
-        // the interactor runs.
+        // D7/IN-10: persistent index keyed by file-level content hash; `NullInsertIndexProxy`
+        // makes the interactor's `build_corpus_index` a no-op (corpus already correct).
         let index_port = open_persistent_index_with_corpus(
             &input.db_path,
             corpus_fragments,
             embedding_port.as_ref(),
         )?;
 
-        // Construct interactor (5-param; diff_source NOT injected).
-        // Pass an empty corpus — the index is already populated above; the
-        // interactor's build_corpus_index call will be a no-op via NullInsertIndexProxy.
+        // Resolve the stored fingerprint using the safe-approval rule:
+        // - If the effective threshold is stricter or equal to the file config threshold,
+        //   use `infra_config.fingerprint()` so `dry check-approved` can match.
+        // - If the effective threshold is MORE permissive (higher value), use
+        //   `fingerprint_with_threshold(threshold)` so `dry check-approved` sees a
+        //   mismatch and correctly blocks approval for a manifest built under looser criteria.
+        // See `resolve_write_config_fingerprint` for the full policy.
+        let config_fingerprint = resolve_write_config_fingerprint(&infra_config, threshold);
+
+        // D5: persist the corpus root beside coverage so pure-read approval paths
+        // can recompute the same fragment-snapshot fingerprint.
+        write_dry_corpus_root_manifest(&track_dir, &workspace_root, &canonical_root)?;
+
         let interactor = DryCheckInteractor::new(
             embedding_port,
             index_port,
             agent,
-            store.clone(), // writer
-            store,         // reader
+            store.clone(),
+            store,
+            coverage,
+            track_id.clone(),
+            usecase_config,
+            config_fingerprint,
+            corpus_fingerprint,
         );
 
-        // Run the dry-check write cycle with empty corpus (index pre-built above).
         let dry_start = std::time::Instant::now();
         let dry_result = interactor.run_dry_check(vec![], diff_fragments, threshold, base);
 
-        // Emit ReviewRound + ExternalSubprocess telemetry for the dry round
-        // (T006 / AC-03 / IN-03). round_type = "dry" (per spec IN-03 shared variant).
-        // Placement rationale: composition layer has effective_model, findings count,
-        // and timing; no usecase/domain change required (CN-04).
-        // Emit for Ok (completed) and for subprocess-involved errors (Agent, Entry,
-        // Writer — errors that occur after DryCheckAgentPort::judge() was invoked).
-        // Pre-subprocess errors (Embedding, Index, Reader, Diff) do not emit, as no
-        // subprocess ran for those.
+        // T013 / IN-07 / AC-09 / CN-10: emit per-tier ReviewRound telemetry.
+        // Fast tier uses `fast_model`; final tier uses `effective_model` (final model).
+        // New-field / new-event additions are forbidden (CN-10): we reuse the existing
+        // `round_type` field with "fast" / "final" values already accepted by the schema.
         if let Some((ref w, ref tid)) = telemetry_writer {
-            let round_telemetry = dry_round_telemetry_for_result(&dry_result, &agent_recorder);
-            if let Some(telemetry) = round_telemetry {
-                crate::telemetry_wiring::emit_review_round(
+            let (fast_telemetry, final_telemetry) =
+                dry_tiered_telemetry_for_result(&dry_result, &tiered_recorder);
+            if let Some(ref telemetry) = fast_telemetry {
+                // On escalated runs `duration_ms` is pre-computed as
+                // `(final_started_at - fast_started_at)` so that the fast
+                // ReviewRound does not include the final tier's time.
+                // The ExternalSubprocess event uses the same duration source so
+                // that both events are consistent with each other.
+                emit_dry_tier_review_round(
+                    w,
+                    tid,
+                    "codex",
+                    &fast_model,
+                    "fast",
+                    telemetry,
+                    dry_start,
+                );
+                if telemetry.subprocess_started_at.is_some() {
+                    emit_dry_tier_external_subprocess(w, tid, "codex", telemetry, dry_start);
+                }
+            }
+            if let Some(ref telemetry) = final_telemetry {
+                // Final tier uses its own started_at so duration excludes the fast tier.
+                emit_dry_tier_review_round(
                     w,
                     tid,
                     "codex",
                     &effective_model,
-                    "dry",
-                    telemetry.findings_count,
+                    "final",
+                    telemetry,
                     dry_start,
                 );
-                if let Some(subprocess_started_at) = telemetry.subprocess_started_at {
-                    crate::telemetry_wiring::emit_external_subprocess(
-                        w,
-                        tid,
-                        "codex",
-                        0,
-                        telemetry.verdict_parse_failed,
-                        subprocess_started_at,
-                    );
+                if telemetry.subprocess_started_at.is_some() {
+                    emit_dry_tier_external_subprocess(w, tid, "codex", telemetry, dry_start);
                 }
             }
         }
 
         let findings: Vec<DryCheckFinding> =
             dry_result.map_err(|e| format!("dry-check write cycle failed: {e}"))?;
+        // D5 (T004): coverage is now written inside `DryCheckInteractor::run_dry_check`.
 
         let records_after = store_for_summary
             .read_records()
@@ -379,18 +435,22 @@ impl CliApp {
 
         let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
         let root = git.root().to_path_buf();
-        let canonical_root =
+        let canonical_repo_root =
             root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
         let track_id = parse_dry_track_id(&input.track_id)?;
 
-        let items_dir_abs =
-            resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")?;
+        let items_dir_abs = resolve_existing_dir_under_repo(
+            &input.items_dir,
+            &root,
+            &canonical_repo_root,
+            "items_dir",
+        )?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
         let dry_check_json_path = track_dir.join("dry-check.json");
 
         let filter = parse_verdict_filter(&input.filter)?;
 
-        let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root));
+        let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_repo_root));
         let interactor = DryCheckResultsInteractor::new(store);
 
         let results =
@@ -445,228 +505,165 @@ impl CliApp {
         &self,
         input: DryCheckApprovedInput,
     ) -> Result<CommandOutcome, String> {
+        use std::collections::BTreeSet;
+
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+
+        // D5 (T007 / IN-07 / AC-02 / CN-10): GateEval telemetry start.
+        let gate_start = Instant::now();
 
         let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
         let root = git.root().to_path_buf();
-        let canonical_root =
+        let canonical_repo_root =
             root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
         let track_id = parse_dry_track_id(&input.track_id)?;
 
-        let items_dir_abs =
-            resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")?;
+        let items_dir_abs = resolve_existing_dir_under_repo(
+            &input.items_dir,
+            &root,
+            &canonical_repo_root,
+            "items_dir",
+        )?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
         let commit_hash_path = track_dir.join(".commit_hash");
         let dry_check_json_path = track_dir.join("dry-check.json");
+        let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
 
         // Resolve diff base (fail-closed three-branch policy, same as write).
         let base = resolve_dry_diff_base(
             input.base_commit.as_deref(),
             &commit_hash_path,
-            &canonical_root,
+            &canonical_repo_root,
         )?;
 
-        // Resolve threshold: explicit --threshold wins; otherwise load from dry-check config.
-        let threshold = match input.threshold {
-            Some(t) => {
-                SimilarityThreshold::new(t).map_err(|e| format!("invalid --threshold: {e}"))?
-            }
-            None => {
-                let config_path = root.join(".harness/config/dry-check.json");
-                let config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
-                    .map_err(|e| format!("failed to load dry-check config: {e}"))?;
-                config.threshold()
-            }
-        };
+        // D5 / IN-05 (T005): pure-read gate — diff fragments only.
+        // Reuse the workspace root recorded by `dry write` so a scoped run
+        // (`--workspace-root <subdir>`) does not block the gate by deriving
+        // refs from files outside the scope.
+        let (approval_workspace_root, current_corpus_fingerprint) =
+            match resolve_dry_corpus_fingerprint_root(&track_dir, &canonical_repo_root) {
+                Ok(workspace_root) => {
+                    let fingerprint = compute_dry_corpus_fingerprint_from_root(
+                        &workspace_root,
+                        &canonical_repo_root,
+                    );
+                    (workspace_root, fingerprint)
+                }
+                Err(e) => {
+                    eprintln!(
+                        "[warn] dry check-approved: {e}; treating corpus fingerprint as stale"
+                    );
+                    (
+                        canonical_repo_root.clone(),
+                        domain::dry_check::DryCheckCorpusFingerprint::fail_closed(),
+                    )
+                }
+            };
+        let (diff_fragments, _corpus_fragments) =
+            build_diff_and_corpus_fragments(&base, &approval_workspace_root, &canonical_repo_root)?;
 
-        let workspace_root = resolve_existing_dir_under_repo(
-            &input.workspace_root,
-            &root,
-            &canonical_root,
-            "workspace_root",
-        )?;
+        let mut current_fragment_refs: BTreeSet<domain::dry_check::FragmentRef> = BTreeSet::new();
+        for fragment in &diff_fragments {
+            let fragment_ref = fragment_ref_of(fragment)
+                .map_err(|e| format!("dry check-approved: failed to derive fragment ref: {e}"))?;
+            current_fragment_refs.insert(fragment_ref);
+        }
 
-        // Build diff_fragments + corpus_fragments (shared pipeline).
-        let (diff_fragments, corpus_fragments) =
-            build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)?;
+        // Load config to compute the current fingerprint for the gate comparison.
+        let config_path = root.join(".harness/config/dry-check.json");
+        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
+            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+        let current_config_fingerprint = infra_config.fingerprint();
 
-        // Construct adapters.
-        let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
-        let embedding_port = Arc::new(
-            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
+        // Construct adapters: reader + coverage port — no embedding, no index.
+        let store =
+            Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_repo_root.clone()));
+        let coverage =
+            Arc::new(FsDryCheckCoverageAdapter::new(dry_check_coverage_path, canonical_repo_root));
+
+        // D5 read-only interactor.
+        let interactor = DryCheckApprovalInteractor::new(
+            store,
+            coverage,
+            current_config_fingerprint,
+            current_corpus_fingerprint,
         );
 
-        // D7/IN-10: Incremental index update (same path as dry_write).
-        let index_port = open_persistent_index_with_corpus(
-            &input.db_path,
-            corpus_fragments,
-            embedding_port.as_ref(),
-        )?;
-
-        // Construct interactor (reader + index + embedding).
-        let interactor = DryCheckApprovalInteractor::new(store, index_port, embedding_port);
-
-        // Run the gate with empty corpus — index is pre-built above; the interactor's
-        // build_corpus_index call will be a no-op via NullInsertIndexProxy.
         let verdict = interactor
-            .check_approved(vec![], &diff_fragments, threshold)
+            .check_approved(&track_id, &current_fragment_refs)
             .map_err(|e| format!("dry check-approved failed: {e}"))?;
+
+        // D5 (T007 / IN-07 / AC-02 / CN-10): emit GateEval telemetry.
+        let telemetry_writer =
+            resolve_dry_write_telemetry_writer(&input.items_dir, track_id.as_ref());
+        if let Some((ref w, ref tid)) = telemetry_writer {
+            let (verdict_str, reason_summary) = dry_check_approved_gate_eval_fields(&verdict);
+            crate::telemetry_wiring::emit_gate_eval(
+                w,
+                tid,
+                "dry",
+                verdict_str,
+                &reason_summary,
+                gate_start,
+            );
+        }
 
         Ok(dry_check_approved_outcome(verdict))
     }
 }
 
-#[derive(Clone)]
-struct DryAgentRunRecorder {
-    completed: Arc<AtomicBool>,
-    findings_count: Arc<AtomicU64>,
-    started_at: Arc<Mutex<Option<Instant>>>,
+/// Lift infra `DryCheckConfig` fields (max_parallelism + known-bad percents) into the validated
+/// usecase newtypes (D3 / D4 / T011). All values come from `.harness/config/dry-check.json` v3.
+fn build_usecase_dry_check_config(
+    infra_config: &infrastructure::dry_check::DryCheckConfig,
+) -> Result<usecase::dry_check::DryCheckConfig, String> {
+    use usecase::dry_check::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
+    let percent =
+        |v: u8| DryCheckPercent::try_new(v).map_err(|e| format!("invalid known-bad percent: {e}"));
+    Ok(DryCheckConfig::new(
+        percent(infra_config.known_bad_injection_rate_percent())?,
+        percent(infra_config.known_bad_detection_threshold_percent())?,
+        DryCheckParallelism::try_new(infra_config.max_parallelism())
+            .map_err(|e| format!("invalid max_parallelism: {e}"))?,
+    ))
 }
 
-impl DryAgentRunRecorder {
-    fn new() -> Self {
-        Self {
-            completed: Arc::new(AtomicBool::new(false)),
-            findings_count: Arc::new(AtomicU64::new(0)),
-            started_at: Arc::new(Mutex::new(None)),
+/// Resolve `(fast_model, final_model)` for the `dry-checker` capability (D4 / T012).
+/// Explicit `--model` overrides both. Otherwise read `RoundType::Final` and `Fast` from
+/// `agent-profiles.json`, falling back fast → final when no `fast_model` is configured.
+fn resolve_dry_checker_models(
+    root: &std::path::Path,
+    capability_name: &str,
+    explicit_model: Option<String>,
+) -> Result<(String, String), String> {
+    use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
+    if let Some(m) = explicit_model {
+        return Ok((m.clone(), m));
+    }
+    let profiles = AgentProfiles::load(&root.join(AGENT_PROFILES_PATH))
+        .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
+    let resolve = |rt| profiles.resolve_execution(capability_name, rt).and_then(|r| r.model);
+    let final_model = resolve(RoundType::Final).ok_or_else(|| {
+        format!(
+            "[ERROR] no model specified: pass --model or set model in \
+             agent-profiles.json '{capability_name}' capability"
+        )
+    })?;
+    Ok((resolve(RoundType::Fast).unwrap_or_else(|| final_model.clone()), final_model))
+}
+
+/// `GateEval` telemetry fields for the `"dry"` gate (T007 / IN-07 / CN-10):
+/// `Approved` → `("ok", "")`; `Blocked` → `("error", "blocked: N unresolved pair(s)")`.
+fn dry_check_approved_gate_eval_fields(
+    verdict: &domain::dry_check::DryCheckApprovalVerdict,
+) -> (&'static str, String) {
+    match verdict {
+        domain::dry_check::DryCheckApprovalVerdict::Approved => ("ok", String::new()),
+        domain::dry_check::DryCheckApprovalVerdict::Blocked { unresolved_pair_count } => {
+            ("error", format!("blocked: {unresolved_pair_count} unresolved pair(s)"))
         }
     }
-
-    fn record_started(&self) {
-        record_instant_once(&self.started_at);
-    }
-
-    fn record_completed(&self) {
-        self.completed.store(true, Ordering::Relaxed);
-    }
-
-    fn record_violation(&self) {
-        let mut current = self.findings_count.load(Ordering::Relaxed);
-        while current < u64::from(u32::MAX) {
-            match self.findings_count.compare_exchange_weak(
-                current,
-                current + 1,
-                Ordering::Relaxed,
-                Ordering::Relaxed,
-            ) {
-                Ok(_) => return,
-                Err(next) => current = next,
-            }
-        }
-    }
-
-    fn has_completed(&self) -> bool {
-        self.completed.load(Ordering::Relaxed)
-    }
-
-    fn findings_count(&self) -> u32 {
-        self.findings_count.load(Ordering::Relaxed).try_into().unwrap_or(u32::MAX)
-    }
-
-    fn started_at(&self) -> Option<Instant> {
-        self.started_at.lock().ok().and_then(|started_at| *started_at)
-    }
-}
-
-struct RecordingDryAgent<A> {
-    inner: A,
-    recorder: DryAgentRunRecorder,
-}
-
-impl<A> RecordingDryAgent<A> {
-    fn new(inner: A) -> (Self, DryAgentRunRecorder) {
-        let recorder = DryAgentRunRecorder::new();
-        (Self { inner, recorder: recorder.clone() }, recorder)
-    }
-}
-
-impl<A: DryCheckAgentPort> DryCheckAgentPort for RecordingDryAgent<A> {
-    fn judge(
-        &self,
-        changed_fragment: &CodeFragment,
-        candidate_fragment: &CodeFragment,
-    ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
-        self.recorder.record_started();
-        let result = self.inner.judge(changed_fragment, candidate_fragment);
-        if let Ok(judgment) = &result {
-            if matches!(judgment, DryCheckAgentJudgment::Violation { .. }) {
-                self.recorder.record_violation();
-            }
-            self.recorder.record_completed();
-        }
-        result
-    }
-}
-
-struct DryRoundTelemetry {
-    findings_count: u32,
-    verdict_parse_failed: bool,
-    subprocess_started_at: Option<std::time::Instant>,
-}
-
-fn dry_round_telemetry_for_result(
-    dry_result: &Result<Vec<DryCheckFinding>, DryCheckCycleError>,
-    agent_recorder: &DryAgentRunRecorder,
-) -> Option<DryRoundTelemetry> {
-    match dry_result {
-        Ok(findings) => Some(DryRoundTelemetry {
-            findings_count: findings.len().try_into().unwrap_or(u32::MAX),
-            verdict_parse_failed: false,
-            subprocess_started_at: agent_recorder.started_at(),
-        }),
-        // Map only subprocess-involved agent failures to telemetry.
-        // Unexpected(_) is overloaded by the adapter: some messages happen
-        // before spawn, while the prefixes recognized by
-        // dry_agent_error_is_subprocess_failure happen after the child exists.
-        // IllegalOutput is the only parse-failure variant.
-        Err(DryCheckCycleError::Agent(inner)) => {
-            if dry_agent_error_is_subprocess_failure(inner) {
-                let verdict_parse_failed = matches!(inner, DryCheckAgentError::IllegalOutput);
-                Some(DryRoundTelemetry {
-                    findings_count: agent_recorder.findings_count(),
-                    verdict_parse_failed,
-                    subprocess_started_at: agent_recorder.started_at(),
-                })
-            } else {
-                None
-            }
-        }
-        // Entry and Writer errors occur after the agent ran — not parse failures.
-        Err(DryCheckCycleError::Entry(_)) | Err(DryCheckCycleError::Writer(_)) => {
-            Some(DryRoundTelemetry {
-                findings_count: agent_recorder.findings_count(),
-                verdict_parse_failed: false,
-                subprocess_started_at: agent_recorder.started_at(),
-            })
-        }
-        // The interactor can also raise Index after a successful judge() call
-        // while converting the changed path for persistence.
-        Err(DryCheckCycleError::Index(_)) if agent_recorder.has_completed() => {
-            Some(DryRoundTelemetry {
-                findings_count: agent_recorder.findings_count(),
-                verdict_parse_failed: false,
-                subprocess_started_at: agent_recorder.started_at(),
-            })
-        }
-        Err(_) => None,
-    }
-}
-
-fn dry_agent_error_is_subprocess_failure(error: &DryCheckAgentError) -> bool {
-    match error {
-        DryCheckAgentError::UserAbort
-        | DryCheckAgentError::AgentAbort
-        | DryCheckAgentError::Timeout
-        | DryCheckAgentError::IllegalOutput => true,
-        DryCheckAgentError::Unexpected(message) => dry_agent_unexpected_after_spawn(message),
-    }
-}
-
-fn dry_agent_unexpected_after_spawn(message: &str) -> bool {
-    message.starts_with("failed to poll dry-check agent child:")
-        || message.starts_with("failed to reap dry-check agent child:")
-        || message.starts_with("failed to read output-last-message ")
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -682,7 +679,7 @@ mod tests {
         dry_fix_build_smoke_env, dry_fix_smoke_test_codex_version, dry_fix_spawn_and_collect,
         resolve_codex_bin, run_dry_fix_codex,
     };
-    use crate::review_v2::process_guards::{EnvGuard, GitRunner};
+    use crate::review_v2::process_guards::{CwdGuard, EnvGuard, GitRunner};
     #[cfg(unix)]
     use crate::test_support::make_executable;
     use crate::test_support::repo_root_for_tests;
@@ -1033,65 +1030,77 @@ mod tests {
         assert!(!dry_agent_error_is_subprocess_failure(&error));
     }
 
+    fn make_tiered_recorder_fast_only(findings: u32) -> TieredDryAgentRecorder {
+        let fast = DryAgentRunRecorder::new();
+        fast.record_started();
+        for _ in 0..findings {
+            fast.record_violation();
+        }
+        fast.record_completed();
+        TieredDryAgentRecorder { fast, final_: DryAgentRunRecorder::new() }
+    }
+
     #[test]
-    fn test_dry_round_telemetry_for_result_index_after_agent_success_emits_failure() {
-        let recorder = DryAgentRunRecorder::new();
-        recorder.record_started();
-        recorder.record_violation();
-        recorder.record_violation();
-        recorder.record_completed();
+    fn test_dry_tiered_telemetry_for_result_index_after_fast_agent_success_emits_fast() {
+        let tiered = make_tiered_recorder_fast_only(2);
         let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Err(
             DryCheckCycleError::Index(usecase::semantic_dup::SemanticIndexError::SearchFailed {
                 source: "changed_path error: invalid path".to_owned(),
             }),
         );
 
-        let telemetry = dry_round_telemetry_for_result(&result, &recorder).unwrap();
-        assert_eq!(telemetry.findings_count, 2);
-        assert!(!telemetry.verdict_parse_failed);
-        assert!(telemetry.subprocess_started_at.is_some());
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        let fast_t = fast.unwrap();
+        assert_eq!(fast_t.findings_count, 2);
+        assert!(!fast_t.verdict_parse_failed);
+        assert!(fast_t.subprocess_started_at.is_some());
+        assert!(final_.is_none(), "final tier must not emit when only fast was invoked");
     }
 
     #[test]
-    fn test_dry_round_telemetry_for_result_index_before_agent_returns_none() {
-        let recorder = DryAgentRunRecorder::new();
+    fn test_dry_tiered_telemetry_for_result_index_before_agent_returns_none() {
+        let tiered = TieredDryAgentRecorder {
+            fast: DryAgentRunRecorder::new(),
+            final_: DryAgentRunRecorder::new(),
+        };
         let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Err(
             DryCheckCycleError::Index(usecase::semantic_dup::SemanticIndexError::SearchFailed {
                 source: "candidate index failed".to_owned(),
             }),
         );
 
-        assert!(dry_round_telemetry_for_result(&result, &recorder).is_none());
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        assert!(fast.is_none());
+        assert!(final_.is_none());
     }
 
     #[test]
-    fn test_dry_round_telemetry_for_result_writer_error_uses_agent_findings_count() {
-        let recorder = DryAgentRunRecorder::new();
-        recorder.record_started();
-        recorder.record_violation();
-        recorder.record_violation();
-        recorder.record_violation();
+    fn test_dry_tiered_telemetry_for_result_writer_error_uses_fast_findings_count() {
+        let tiered = make_tiered_recorder_fast_only(3);
         let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> =
             Err(DryCheckCycleError::Writer(domain::dry_check::DryCheckWriterError::Codec {
                 detail: "serialize failed".to_owned(),
             }));
 
-        let telemetry = dry_round_telemetry_for_result(&result, &recorder).unwrap();
-        assert_eq!(telemetry.findings_count, 3);
-        assert!(!telemetry.verdict_parse_failed);
-        assert!(telemetry.subprocess_started_at.is_some());
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        let fast_t = fast.unwrap();
+        assert_eq!(fast_t.findings_count, 3);
+        assert!(!fast_t.verdict_parse_failed);
+        assert!(fast_t.subprocess_started_at.is_some());
+        assert!(final_.is_none());
     }
 
     #[test]
-    fn test_dry_round_telemetry_for_result_success_without_agent_start_skips_subprocess() {
-        let recorder = DryAgentRunRecorder::new();
+    fn test_dry_tiered_telemetry_for_result_success_without_agent_start_skips_subprocess() {
+        let tiered = TieredDryAgentRecorder {
+            fast: DryAgentRunRecorder::new(),
+            final_: DryAgentRunRecorder::new(),
+        };
         let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Ok(vec![]);
 
-        let telemetry = dry_round_telemetry_for_result(&result, &recorder).unwrap();
-
-        assert_eq!(telemetry.findings_count, 0);
-        assert!(!telemetry.verdict_parse_failed);
-        assert!(telemetry.subprocess_started_at.is_none());
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        assert!(fast.is_none(), "no fast tier invoked → no fast telemetry");
+        assert!(final_.is_none());
     }
 
     #[test]
@@ -1107,16 +1116,19 @@ mod tests {
         assert_eq!(recorder.started_at(), first_start);
     }
 
-    struct ViolationAgent;
+    struct ViolationAgent {
+        rationale: &'static str,
+    }
 
     impl DryCheckAgentPort for ViolationAgent {
         fn judge(
             &self,
             _changed_fragment: &CodeFragment,
             _candidate_fragment: &CodeFragment,
+            _tier: DryCheckJudgeTier,
         ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
             Ok(DryCheckAgentJudgment::Violation {
-                rationale: domain::Rationale::new("same control flow").unwrap(),
+                rationale: domain::Rationale::new(self.rationale).unwrap(),
                 finding: dry_check_finding_for_tests(),
             })
         }
@@ -1136,17 +1148,128 @@ mod tests {
 
     #[test]
     fn test_recording_dry_agent_counts_violation_judgment_before_persistence() {
-        let (agent, recorder) = RecordingDryAgent::new(ViolationAgent);
+        let (agent, tiered) =
+            RecordingDryAgent::new(ViolationAgent { rationale: "same control flow" });
         let changed =
             CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
         let candidate =
             CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
 
-        let result = agent.judge(&changed, &candidate);
+        let result = agent.judge(&changed, &candidate, DryCheckJudgeTier::Final);
 
         assert!(matches!(result, Ok(DryCheckAgentJudgment::Violation { .. })));
-        assert_eq!(recorder.findings_count(), 1);
-        assert!(recorder.has_completed());
+        // Final tier recorder must capture the violation; fast tier must be idle.
+        assert_eq!(tiered.final_.findings_count(), 1);
+        assert!(tiered.final_.has_completed());
+        assert_eq!(tiered.fast.findings_count(), 0);
+        assert!(!tiered.fast.has_completed());
+    }
+
+    // ── T013: per-tier ReviewRound telemetry (IN-07 / AC-09 / CN-10) ─────────
+
+    struct TieredDryAgent {
+        fast_model: String,
+        final_model: String,
+    }
+
+    impl DryCheckAgentPort for TieredDryAgent {
+        fn judge(
+            &self,
+            _changed_fragment: &CodeFragment,
+            _candidate_fragment: &CodeFragment,
+            tier: DryCheckJudgeTier,
+        ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
+            let _ = match tier {
+                DryCheckJudgeTier::Fast => &self.fast_model,
+                DryCheckJudgeTier::Final => &self.final_model,
+            };
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: domain::Rationale::new("distinct logic").unwrap(),
+            })
+        }
+    }
+
+    /// T013 AC: fast-tier-only run emits a ReviewRound with round_type="fast".
+    ///
+    /// Simulates a run where only the fast tier is invoked (no escalation).
+    /// Verifies that `dry_tiered_telemetry_for_result` returns:
+    /// - `fast` = Some with the correct findings_count and subprocess_started_at.
+    /// - `final_` = None (final tier was never invoked).
+    #[test]
+    fn test_tiered_recording_fast_only_run_emits_fast_round_type() {
+        let (agent, tiered) = RecordingDryAgent::new(TieredDryAgent {
+            fast_model: "fast-model-v1".to_string(),
+            final_model: "final-model-v1".to_string(),
+        });
+        let changed =
+            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
+        let candidate =
+            CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
+
+        // Invoke only fast tier.
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
+
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Ok(vec![]);
+        let (fast_t, final_t) = dry_tiered_telemetry_for_result(&result, &tiered);
+
+        let fast = fast_t.expect("fast tier was invoked → fast telemetry must be Some");
+        assert_eq!(fast.findings_count, 0, "no violations → findings_count=0");
+        assert!(fast.subprocess_started_at.is_some(), "fast tier started_at must be recorded");
+        assert!(final_t.is_none(), "final tier was not invoked → final telemetry must be None");
+    }
+
+    /// T013 AC: run escalated to final tier emits a ReviewRound with round_type="final".
+    ///
+    /// Simulates a run where both fast and final tiers are invoked (escalation path).
+    /// Verifies that `dry_tiered_telemetry_for_result` returns:
+    /// - `fast` = Some (fast tier was invoked).
+    /// - `final_` = Some (final tier was also invoked).
+    #[test]
+    fn test_tiered_recording_escalated_run_emits_both_fast_and_final_round_types() {
+        let (agent, tiered) = RecordingDryAgent::new(TieredDryAgent {
+            fast_model: "fast-model-v1".to_string(),
+            final_model: "final-model-v1".to_string(),
+        });
+        let changed =
+            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
+        let candidate =
+            CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
+
+        // Invoke fast tier first, then final tier (simulating escalation).
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Final).unwrap();
+
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Ok(vec![]);
+        let (fast_t, final_t) = dry_tiered_telemetry_for_result(&result, &tiered);
+
+        assert!(fast_t.is_some(), "fast tier was invoked → fast telemetry must be Some");
+        let final_ = final_t.expect("final tier was invoked → final telemetry must be Some");
+        assert!(final_.subprocess_started_at.is_some(), "final tier started_at must be recorded");
+    }
+
+    /// T013 AC: tier-specific models are correctly routed to per-tier recorders.
+    ///
+    /// `RecordingDryAgent` must route `judge()` calls to the correct per-tier
+    /// recorder. This test verifies that fast-tier calls increment the fast
+    /// recorder and final-tier calls increment the final recorder independently.
+    #[test]
+    fn test_tiered_recording_tier_specific_model_is_recorded_per_tier() {
+        let (agent, tiered) = RecordingDryAgent::new(ViolationAgent { rationale: "duplicated" });
+        let changed =
+            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
+        let candidate =
+            CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
+
+        // Two fast-tier violations.
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
+        // One final-tier violation.
+        agent.judge(&changed, &candidate, DryCheckJudgeTier::Final).unwrap();
+
+        assert_eq!(tiered.fast.findings_count(), 2, "fast recorder must count 2 violations");
+        assert_eq!(tiered.final_.findings_count(), 1, "final recorder must count 1 violation");
+        assert!(tiered.fast.started_at().is_some(), "fast tier must record started_at");
+        assert!(tiered.final_.started_at().is_some(), "final tier must record started_at");
     }
 
     /// Fragments whose path cannot be stripped (not under repo_root) are kept
@@ -1931,9 +2054,6 @@ exit 0
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some("not-a-hash".to_owned()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: Some(0.85),
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
@@ -1950,9 +2070,6 @@ exit 0
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "dry-check-approved-outside-items-dir".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: Some(0.85),
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
@@ -1969,9 +2086,6 @@ exit 0
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "../outside".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: Some(0.85),
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
@@ -1983,22 +2097,27 @@ exit 0
     }
 
     #[test]
-    fn test_dry_check_approved_public_api_missing_track_dir_reaches_threshold_validation() {
+    fn test_dry_check_approved_public_api_missing_track_dir_advances_to_diff_step() {
+        // D5 (T003): dry_check_approved no longer consults `--threshold` /
+        // `db_path` (T005 removes those fields). A missing track dir is
+        // tolerated up to the diff acquisition step, which then fails on
+        // the synthetic base-commit hash.
         let dir = temp_items_dir_under_repo();
 
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
-            track_id: "dry-check-approved-missing-track-invalid-threshold".to_owned(),
+            track_id: "dry-check-approved-missing-track-advances".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: Some(1.5),
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
         let message = result.unwrap_err();
         assert!(
-            message.contains("invalid --threshold"),
-            "missing track dir must not be rejected before threshold validation, got: {message}"
+            !message.contains("invalid --threshold"),
+            "threshold is no longer consulted; got: {message}"
+        );
+        assert!(
+            message.contains("merge-base") || message.contains("dry-check diff failed"),
+            "missing track dir must advance to the diff step; got: {message}"
         );
     }
 
@@ -2054,9 +2173,6 @@ exit 0
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            db_path: dir.path().join("semantic-index"),
-            threshold: None,
-            workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
 
@@ -2198,13 +2314,51 @@ exit 0
         let input = DryCheckApprovedInput {
             track_id: "my-track".to_owned(),
             base_commit: None,
-            db_path: PathBuf::from(".semantic_index"),
-            threshold: Some(0.85),
-            workspace_root: PathBuf::from("."),
             items_dir: PathBuf::from("track/items"),
         };
         assert_eq!(input.track_id, "my-track");
         assert!(input.base_commit.is_none());
+    }
+
+    // ── GateEval telemetry field mapping (T007 / IN-07 / CN-10) ─────────────
+
+    /// Approved verdict maps to gate_name="dry", verdict="ok", empty reason.
+    #[test]
+    fn test_dry_check_approved_gate_eval_fields_approved_maps_to_ok() {
+        let (verdict_str, reason_summary) = dry_check_approved_gate_eval_fields(
+            &domain::dry_check::DryCheckApprovalVerdict::Approved,
+        );
+        assert_eq!(verdict_str, "ok", "Approved must map to verdict_str=\"ok\"");
+        assert!(
+            reason_summary.is_empty(),
+            "Approved must produce an empty reason_summary; got: {reason_summary:?}"
+        );
+    }
+
+    /// Blocked verdict maps to verdict="error" with "blocked: N unresolved pair(s)" summary.
+    #[test]
+    fn test_dry_check_approved_gate_eval_fields_blocked_maps_to_error_with_count() {
+        let (verdict_str, reason_summary) = dry_check_approved_gate_eval_fields(
+            &domain::dry_check::DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 3 },
+        );
+        assert_eq!(verdict_str, "error", "Blocked must map to verdict_str=\"error\"");
+        assert_eq!(
+            reason_summary, "blocked: 3 unresolved pair(s)",
+            "Blocked reason_summary must embed the unresolved pair count"
+        );
+    }
+
+    /// Blocked with zero unresolved pairs still emits "error" (gate is blocked).
+    #[test]
+    fn test_dry_check_approved_gate_eval_fields_blocked_zero_pairs_still_error() {
+        let (verdict_str, reason_summary) = dry_check_approved_gate_eval_fields(
+            &domain::dry_check::DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 0 },
+        );
+        assert_eq!(verdict_str, "error", "Blocked(0) must still map to \"error\"");
+        assert_eq!(
+            reason_summary, "blocked: 0 unresolved pair(s)",
+            "Blocked(0) reason_summary must include the zero count"
+        );
     }
 
     // ── Ephemeral index parent selection ─────────────────────────────────────
@@ -3093,6 +3247,630 @@ exit 0
                 .iter()
                 .map(|r| r.fragment.source_path.display().to_string())
                 .collect::<Vec<_>>()
+        );
+    }
+
+    // ── GateEval telemetry end-to-end: dry_check_approved emits event ────────
+    //
+    // These tests verify that `CliApp::dry_check_approved()` actually reaches the
+    // `emit_gate_eval(...)` call after finalizing the verdict (T007 / IN-07).
+    // The mapping helper (`dry_check_approved_gate_eval_fields`) is tested
+    // separately above; these tests exercise the composition path end-to-end so
+    // a regression that removes or reorders the telemetry call would be caught.
+    //
+    // Setup: a temporary git repo on a `track/<id>` branch with a real initial
+    // commit (so `build_diff_and_corpus_fragments` has a valid base to diff
+    // against), no Rust source files (so the diff is empty → `current_fragment_refs`
+    // is empty), and pre-created dry-check artefacts for the desired verdict.
+    //
+    // Telemetry output is redirected to a tempdir via `SOTP_TELEMETRY_DIR` so the
+    // test can read `telemetry.jsonl` without touching the real repo's track items.
+
+    /// Set up a minimal git repo on a track branch with one commit.
+    ///
+    /// Returns `(repo_tempdir, items_dir, track_id, initial_commit_hash)`.
+    /// Caller must keep `repo_tempdir` alive for the duration of the test.
+    fn setup_gate_eval_repo(track_id: &str) -> (tempfile::TempDir, PathBuf, String) {
+        use std::process::Command;
+
+        let repo = tempfile::tempdir().unwrap();
+        let root = repo.path();
+
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
+
+        let items_dir = root.join("track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+
+        // Create a minimal valid dry-check.json so dry_check_approved can load
+        // the config fingerprint (required since the config-fingerprint fix).
+        let harness_config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 3,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "fast_reasoning_effort": "medium",
+  "final_reasoning_effort": "high",
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
+
+        // Switch to a track branch so `resolve_dry_write_telemetry_writer` returns Some.
+        GitRunner::at(root).assert_success(&["checkout", "-b", &format!("track/{track_id}")]);
+
+        // Capture the initial commit hash (the base we will pass to dry_check_approved).
+        let output =
+            Command::new("git").current_dir(root).args(["rev-parse", "HEAD"]).output().unwrap();
+        let commit_hash = String::from_utf8(output.stdout).unwrap().trim().to_owned();
+
+        (repo, items_dir, commit_hash)
+    }
+
+    /// End-to-end: `dry_check_approved` emits a GateEval event with
+    /// `verdict="ok"` (Approved) when:
+    ///   - coverage manifest present with an empty fragment-ref set,
+    ///   - dry-check.json present with no records,
+    ///   - diff is empty (no Rust source files in the repo).
+    ///
+    /// Verifies that the telemetry call in `CliApp::dry_check_approved` is
+    /// actually reached after the verdict is finalized, not just that the
+    /// mapping helper produces the right strings.
+    #[test]
+    fn test_dry_check_approved_approved_verdict_emits_gate_eval_telemetry_event() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let track_id = "gate-eval-approved-2026-06-14";
+        let (repo, items_dir, commit_hash) = setup_gate_eval_repo(track_id);
+
+        // Pre-create the track directory with an empty coverage manifest and
+        // an empty dry-check store.  No Rust source files → empty diff →
+        // empty current_fragment_refs → Approved.
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Compute the config fingerprint from the config written by setup_gate_eval_repo
+        // so the coverage manifest contains a matching fingerprint.
+        // A mismatch would cause DryCheckApprovalInteractor to return Blocked.
+        let dry_check_config_path = repo.path().join(".harness/config/dry-check.json");
+        let dry_check_config =
+            infrastructure::dry_check::DryCheckConfig::load(&dry_check_config_path)
+                .expect("dry-check.json written by setup_gate_eval_repo must load");
+        let fingerprint_hex = dry_check_config.fingerprint().as_str().to_owned();
+
+        // Compute the corpus fingerprint from the same fragment-snapshot algorithm that
+        // `dry_check_approved` uses for the repo root (no *.rs files → empty corpus).
+        let corpus_fp =
+            compute_dry_corpus_fingerprint_from_root(repo.path(), repo.path()).as_str().to_owned();
+
+        let coverage_json = format!(
+            r#"{{"schema_version":4,"config_fingerprint":"{fingerprint_hex}","corpus_fingerprint":"{corpus_fp}","fragment_refs":[],"processed_pair_keys":[]}}"#
+        );
+        std::fs::write(track_dir.join("dry-check-coverage.json"), coverage_json.as_bytes())
+            .unwrap();
+        std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
+            .unwrap();
+
+        // Use a SOTP_TELEMETRY_DIR tempdir so telemetry.jsonl is written there.
+        let telemetry_dir = tempfile::tempdir().unwrap();
+
+        // Change CWD to the test repo so SystemGitRepo::discover() finds it.
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo.path()).unwrap();
+
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", "1");
+        let _telemetry_dir_guard =
+            EnvGuard::set("SOTP_TELEMETRY_DIR", telemetry_dir.path().as_os_str().to_os_string());
+
+        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+            track_id: track_id.to_owned(),
+            base_commit: Some(commit_hash),
+            items_dir: items_dir.clone(),
+        });
+
+        // The call must succeed with exit_code 0 (Approved).
+        let outcome = result.unwrap();
+        assert_eq!(
+            outcome.exit_code, 0,
+            "Approved verdict must produce exit_code 0; got: {outcome:?}"
+        );
+
+        // The GateEval event must be present in telemetry.jsonl.
+        let telemetry_path = telemetry_dir.path().join("telemetry.jsonl");
+        assert!(
+            telemetry_path.exists(),
+            "telemetry.jsonl must be written when SOTP_TELEMETRY=1 on a track branch"
+        );
+        let content = std::fs::read_to_string(&telemetry_path).unwrap();
+        assert!(
+            content.contains("GateEval"),
+            "GateEval event must be emitted after Approved verdict; got: {content}"
+        );
+        assert!(
+            content.contains("\"verdict\":\"ok\""),
+            "Approved verdict must produce verdict=\"ok\" in GateEval event; got: {content}"
+        );
+        assert!(
+            content.contains("\"gate_name\":\"dry\""),
+            "gate_name must be \"dry\" in GateEval event; got: {content}"
+        );
+    }
+
+    #[test]
+    fn test_dry_check_approved_uses_recorded_workspace_root_for_current_fragment_refs() {
+        use std::collections::BTreeSet;
+        use std::process::Command;
+
+        use domain::dry_check::DryCheckCoverageRecord;
+        use usecase::dry_check::DryCheckCoveragePort as _;
+
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let track_id = "scoped-root-approved-2026-06-16";
+        let (repo, items_dir, _initial_commit_hash) = setup_gate_eval_repo(track_id);
+        let repo_root = repo.path().canonicalize().unwrap();
+        let scoped_root = repo_root.join("scoped");
+        let scoped_src = scoped_root.join("src");
+        let outside_src = repo_root.join("outside/src");
+        std::fs::create_dir_all(&scoped_src).unwrap();
+        std::fs::create_dir_all(&outside_src).unwrap();
+        std::fs::write(scoped_src.join("lib.rs"), "pub fn scoped_value() -> u32 {\n    1\n}\n")
+            .unwrap();
+        std::fs::write(outside_src.join("lib.rs"), "pub fn outside_value() -> u32 {\n    1\n}\n")
+            .unwrap();
+        GitRunner::at(&repo_root).assert_success(&["add", "."]);
+        GitRunner::at(&repo_root).assert_success(&["commit", "--no-gpg-sign", "-m", "add corpus"]);
+
+        let output = Command::new("git")
+            .current_dir(&repo_root)
+            .args(["rev-parse", "HEAD"])
+            .output()
+            .unwrap();
+        let base_commit = String::from_utf8(output.stdout).unwrap().trim().to_owned();
+
+        std::fs::write(scoped_src.join("lib.rs"), "pub fn scoped_value() -> u32 {\n    2\n}\n")
+            .unwrap();
+        std::fs::write(outside_src.join("lib.rs"), "pub fn outside_value() -> u32 {\n    2\n}\n")
+            .unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(&repo_root).unwrap();
+
+        let base = domain::CommitHash::try_new(&base_commit).unwrap();
+        let (scoped_diff_fragments, _) =
+            build_diff_and_corpus_fragments(&base, &scoped_root, &repo_root).unwrap();
+        let mut scoped_fragment_refs = BTreeSet::new();
+        for fragment in &scoped_diff_fragments {
+            scoped_fragment_refs.insert(fragment_ref_of(fragment).unwrap());
+        }
+        assert!(
+            !scoped_fragment_refs.is_empty(),
+            "scoped changed file must produce current fragment refs"
+        );
+
+        let (repo_diff_fragments, _) =
+            build_diff_and_corpus_fragments(&base, &repo_root, &repo_root).unwrap();
+        let mut repo_fragment_refs = BTreeSet::new();
+        for fragment in &repo_diff_fragments {
+            repo_fragment_refs.insert(fragment_ref_of(fragment).unwrap());
+        }
+        assert!(
+            repo_fragment_refs
+                .iter()
+                .any(|fragment_ref| fragment_ref.path().as_str().starts_with("outside/")),
+            "repo-root extraction must see the out-of-scope changed file"
+        );
+        assert!(
+            repo_fragment_refs.len() > scoped_fragment_refs.len(),
+            "repo-root extraction must produce an extra stale ref that scoped extraction excludes"
+        );
+
+        let track_dir = items_dir.join(track_id);
+        write_dry_corpus_root_manifest(&track_dir, &scoped_root, &repo_root).unwrap();
+        std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
+            .unwrap();
+
+        let dry_check_config_path = repo_root.join(".harness/config/dry-check.json");
+        let dry_check_config =
+            infrastructure::dry_check::DryCheckConfig::load(&dry_check_config_path)
+                .expect("dry-check.json written by setup_gate_eval_repo must load");
+        let config_fingerprint = dry_check_config.fingerprint();
+        let corpus_fingerprint = compute_dry_corpus_fingerprint_from_root(&scoped_root, &repo_root);
+        let coverage_record = DryCheckCoverageRecord::new(
+            scoped_fragment_refs,
+            BTreeSet::new(),
+            config_fingerprint,
+            corpus_fingerprint,
+        );
+        let coverage = FsDryCheckCoverageAdapter::new(
+            track_dir.join("dry-check-coverage.json"),
+            repo_root.clone(),
+        );
+        let track_id_value = domain::TrackId::try_new(track_id).unwrap();
+        coverage.write_coverage(&track_id_value, coverage_record).unwrap();
+
+        let _telemetry_guard = EnvGuard::remove("SOTP_TELEMETRY");
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+
+        let outcome = CliApp::new()
+            .dry_check_approved(DryCheckApprovedInput {
+                track_id: track_id.to_owned(),
+                base_commit: Some(base_commit),
+                items_dir,
+            })
+            .unwrap();
+
+        assert_eq!(
+            outcome.exit_code, 0,
+            "scoped approval must ignore changed fragments outside the recorded workspace root"
+        );
+    }
+
+    // ── T016 smoke tests: build_usecase_dry_check_config + resolve_dry_checker_models ──
+
+    /// Builds an infra `DryCheckConfig` from JSON content and a temp file.
+    fn load_infra_dry_check_config_from_json(
+        json: &str,
+    ) -> infrastructure::dry_check::DryCheckConfig {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("dry-check.json");
+        std::fs::write(&path, json).unwrap();
+        let config = infrastructure::dry_check::DryCheckConfig::load(&path).unwrap();
+        // Keep dir alive through the function — config has no reference to the file.
+        drop(dir);
+        config
+    }
+
+    /// Verify that `build_usecase_dry_check_config` propagates `max_parallelism`
+    /// from the infra config to the usecase config newtype.
+    #[test]
+    fn test_dry_write_passes_max_parallelism_to_usecase_config() {
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 7,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        );
+        assert_eq!(infra_config.max_parallelism(), 7, "infra config must expose max_parallelism=7");
+
+        let usecase_config = build_usecase_dry_check_config(&infra_config).unwrap();
+        assert_eq!(
+            usecase_config.max_parallelism.as_usize(),
+            7,
+            "build_usecase_dry_check_config must propagate max_parallelism to the usecase newtype"
+        );
+    }
+
+    /// Verify that `build_usecase_dry_check_config` propagates the known-bad calibration
+    /// percent fields from the infra config to the usecase config newtypes.
+    #[test]
+    fn test_dry_write_passes_known_bad_calibration_to_usecase_config() {
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 20,
+                "known_bad_detection_threshold_percent": 80
+            }"#,
+        );
+        assert_eq!(infra_config.known_bad_injection_rate_percent(), 20);
+        assert_eq!(infra_config.known_bad_detection_threshold_percent(), 80);
+
+        let usecase_config = build_usecase_dry_check_config(&infra_config).unwrap();
+        assert_eq!(
+            usecase_config.known_bad_injection_rate_percent.as_u8(),
+            20,
+            "build_usecase_dry_check_config must propagate known_bad_injection_rate_percent"
+        );
+        assert_eq!(
+            usecase_config.known_bad_detection_threshold_percent.as_u8(),
+            80,
+            "build_usecase_dry_check_config must propagate known_bad_detection_threshold_percent"
+        );
+    }
+
+    /// Verify that `resolve_dry_checker_models` returns fast and final models from a
+    /// test `agent-profiles.json` with both `fast_model` and `model` defined.
+    #[test]
+    fn test_resolve_dry_checker_models_returns_fast_and_final_from_agent_profiles() {
+        let dir = tempfile::tempdir().unwrap();
+
+        // Write a minimal agent-profiles.json with separate fast_model / model for dry-checker.
+        std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
+        std::fs::write(
+            dir.path().join(".harness/config/agent-profiles.json"),
+            r#"{
+  "schema_version": 1,
+  "providers": { "codex": { "label": "Codex" } },
+  "capabilities": {
+    "dry-checker": {
+      "provider": "codex",
+      "model": "final-model-v1",
+      "fast_model": "fast-model-v1"
+    }
+  }
+}"#,
+        )
+        .unwrap();
+
+        let (fast_model, final_model) =
+            resolve_dry_checker_models(dir.path(), "dry-checker", None).unwrap();
+
+        assert_eq!(
+            fast_model, "fast-model-v1",
+            "fast_model must come from the fast_model field in agent-profiles.json"
+        );
+        assert_eq!(
+            final_model, "final-model-v1",
+            "final_model must come from the model field in agent-profiles.json"
+        );
+    }
+
+    /// Verify that `resolve_dry_checker_models` falls back fast_model → final_model
+    /// when no separate `fast_model` field is configured.
+    #[test]
+    fn test_resolve_dry_checker_models_fast_falls_back_to_final_when_not_set() {
+        let dir = tempfile::tempdir().unwrap();
+
+        std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
+        std::fs::write(
+            dir.path().join(".harness/config/agent-profiles.json"),
+            r#"{
+  "schema_version": 1,
+  "providers": { "codex": { "label": "Codex" } },
+  "capabilities": {
+    "dry-checker": {
+      "provider": "codex",
+      "model": "only-final-model-v1"
+    }
+  }
+}"#,
+        )
+        .unwrap();
+
+        let (fast_model, final_model) =
+            resolve_dry_checker_models(dir.path(), "dry-checker", None).unwrap();
+
+        assert_eq!(
+            fast_model, "only-final-model-v1",
+            "fast_model must fall back to final_model when fast_model is not configured"
+        );
+        assert_eq!(final_model, "only-final-model-v1", "final_model must be the model field");
+    }
+
+    /// Verify that `FsDryCheckCoverageAdapter` write/read round-trip works correctly.
+    ///
+    /// Mirrors the round-trip pattern used by the coverage adapter's own unit tests,
+    /// but exercised here at the composition layer to confirm the adapter integrates
+    /// correctly with the types exposed to `dry_check_approved`.
+    #[test]
+    fn test_dry_check_approved_uses_coverage_adapter_for_staleness() {
+        use std::collections::BTreeSet;
+
+        use domain::dry_check::{
+            DryCheckConfigFingerprint, DryCheckCorpusFingerprint, DryCheckCoverageRecord,
+            FragmentContentHash, FragmentRef,
+        };
+        use domain::review_v2::FilePath;
+        use usecase::dry_check::DryCheckCoveragePort as _;
+
+        let dir = tempfile::tempdir().unwrap();
+        let store_path = dir.path().join("dry-check-coverage.json");
+        let adapter = FsDryCheckCoverageAdapter::new(store_path.clone(), dir.path().to_path_buf());
+        let track_id = domain::TrackId::try_new("coverage-smoke-2026-06-15").unwrap();
+
+        // Before any write, read must return None (file absent → Blocked / fail-closed).
+        let before = adapter.read_coverage(&track_id).unwrap();
+        assert!(before.is_none(), "coverage adapter must return None when the manifest is absent");
+
+        // Write a coverage record with one fragment ref.
+        let path = FilePath::new("src/lib.rs").unwrap();
+        let hash = FragmentContentHash::new("a".repeat(64)).unwrap();
+        let fragment_ref = FragmentRef::new(path, hash);
+        let mut refs = BTreeSet::new();
+        refs.insert(fragment_ref.clone());
+        let test_fp = DryCheckConfigFingerprint::new("a".repeat(64)).unwrap();
+        let test_corpus_fp = DryCheckCorpusFingerprint::new("b".repeat(64)).unwrap();
+        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new(), test_fp, test_corpus_fp);
+        adapter.write_coverage(&track_id, record.clone()).unwrap();
+
+        // After write, read must return the same record (write/read round-trip).
+        let after = adapter.read_coverage(&track_id).unwrap();
+        assert_eq!(
+            after,
+            Some(record),
+            "coverage adapter read must return the written record after write_coverage"
+        );
+    }
+
+    /// End-to-end: `dry_check_approved` emits a GateEval event with
+    /// `verdict="error"` (Blocked) when the coverage manifest is absent
+    /// (fail-closed: missing coverage → Blocked { unresolved_pair_count: 1 }).
+    ///
+    /// Verifies the telemetry path is reached for the Blocked flow as well,
+    /// so both branches of `dry_check_approved_gate_eval_fields` are exercised
+    /// through the full composition path.
+    #[test]
+    fn test_dry_check_approved_blocked_verdict_emits_gate_eval_telemetry_event() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let track_id = "gate-eval-blocked-2026-06-14";
+        let (repo, items_dir, commit_hash) = setup_gate_eval_repo(track_id);
+
+        // Pre-create the track directory but intentionally omit the coverage
+        // manifest so `FsDryCheckCoverageAdapter::read_coverage` returns None,
+        // causing `DryCheckApprovalInteractor::check_approved` to return
+        // Blocked { unresolved_pair_count: 1 }.
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
+            .unwrap();
+        // dry-check-coverage.json intentionally absent.
+
+        let telemetry_dir = tempfile::tempdir().unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo.path()).unwrap();
+
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", "1");
+        let _telemetry_dir_guard =
+            EnvGuard::set("SOTP_TELEMETRY_DIR", telemetry_dir.path().as_os_str().to_os_string());
+
+        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+            track_id: track_id.to_owned(),
+            base_commit: Some(commit_hash),
+            items_dir: items_dir.clone(),
+        });
+
+        // The call must succeed (Ok) with exit_code 1 (Blocked — exits non-zero).
+        let outcome = result.unwrap();
+        assert_eq!(
+            outcome.exit_code, 1,
+            "Blocked verdict must produce exit_code 1; got: {outcome:?}"
+        );
+
+        // The GateEval event must be present in telemetry.jsonl.
+        let telemetry_path = telemetry_dir.path().join("telemetry.jsonl");
+        assert!(
+            telemetry_path.exists(),
+            "telemetry.jsonl must be written when SOTP_TELEMETRY=1 on a track branch"
+        );
+        let content = std::fs::read_to_string(&telemetry_path).unwrap();
+        assert!(
+            content.contains("GateEval"),
+            "GateEval event must be emitted after Blocked verdict; got: {content}"
+        );
+        assert!(
+            content.contains("\"verdict\":\"error\""),
+            "Blocked verdict must produce verdict=\"error\" in GateEval event; got: {content}"
+        );
+        assert!(
+            content.contains("\"gate_name\":\"dry\""),
+            "gate_name must be \"dry\" in GateEval event; got: {content}"
+        );
+        assert!(
+            content.contains("blocked:"),
+            "Blocked reason_summary must contain \"blocked:\" in GateEval event; got: {content}"
+        );
+    }
+
+    // ── Round-7/8 P1: threshold-override fingerprint policy ──────────────────
+
+    /// Tests the `resolve_write_config_fingerprint` helper that controls which
+    /// fingerprint `dry write` stores in the coverage manifest.
+    ///
+    /// Policy:
+    /// - Stricter override (`threshold < file_threshold`): use `fingerprint()`
+    ///   (file-config threshold) so `dry check-approved` can match.
+    /// - Looser override (`threshold > file_threshold`): use
+    ///   `fingerprint_with_threshold(override)` so `dry check-approved` sees a
+    ///   mismatch and correctly blocks approval for a manifest built under looser
+    ///   criteria.
+    /// - Equal / no override: use `fingerprint()`.
+    ///
+    /// These tests exercise the production helper directly (not the config API in
+    /// isolation), so they will fail if the production policy is incorrect.
+    #[test]
+    fn test_resolve_write_config_fingerprint_stricter_override_uses_file_config_fingerprint() {
+        // File config threshold = 0.85.
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        );
+
+        // Stricter override: 0.70 < 0.85.
+        let stricter_threshold = domain::semantic_dup::SimilarityThreshold::new(0.70_f32).unwrap();
+        let stored = resolve_write_config_fingerprint(&infra_config, stricter_threshold);
+
+        // Must equal the file-config fingerprint so `dry check-approved` can match.
+        assert_eq!(
+            stored,
+            infra_config.fingerprint(),
+            "stricter override: stored fingerprint must equal infra_config.fingerprint()"
+        );
+    }
+
+    #[test]
+    fn test_resolve_write_config_fingerprint_looser_override_uses_override_fingerprint() {
+        // File config threshold = 0.85.
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        );
+
+        // Looser override: 0.95 > 0.85.
+        let looser_threshold = domain::semantic_dup::SimilarityThreshold::new(0.95_f32).unwrap();
+        let stored = resolve_write_config_fingerprint(&infra_config, looser_threshold);
+
+        // Must equal fingerprint_with_threshold(override) so `dry check-approved` (which
+        // calls fingerprint()) sees a mismatch and correctly blocks approval.
+        let expected = infra_config.fingerprint_with_threshold(looser_threshold);
+        assert_eq!(
+            stored, expected,
+            "looser override: stored fingerprint must equal fingerprint_with_threshold(override)"
+        );
+        assert_ne!(
+            stored,
+            infra_config.fingerprint(),
+            "looser override: stored fingerprint must NOT equal file-config fingerprint"
+        );
+    }
+
+    #[test]
+    fn test_resolve_write_config_fingerprint_equal_threshold_uses_file_config_fingerprint() {
+        // File config threshold = 0.85.
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        );
+
+        // Equal threshold: same as file config.
+        let equal_threshold = domain::semantic_dup::SimilarityThreshold::new(0.85_f32).unwrap();
+        let stored = resolve_write_config_fingerprint(&infra_config, equal_threshold);
+
+        assert_eq!(
+            stored,
+            infra_config.fingerprint(),
+            "equal threshold: stored fingerprint must equal infra_config.fingerprint()"
         );
     }
 }

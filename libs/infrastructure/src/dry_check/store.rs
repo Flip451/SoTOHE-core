@@ -7,9 +7,9 @@ use std::path::PathBuf;
 
 use domain::Timestamp;
 use domain::dry_check::{
-    DryCheckEntry, DryCheckPairKey, DryCheckReader, DryCheckReaderError, DryCheckRecord,
-    DryCheckRecordError, DryCheckVerdict, DryCheckWriter, DryCheckWriterError, FragmentContentHash,
-    FragmentRef, Rationale, RefactorProposal,
+    DryCheckConfigFingerprint, DryCheckEntry, DryCheckPairKey, DryCheckReader, DryCheckReaderError,
+    DryCheckRecord, DryCheckRecordError, DryCheckVerdict, DryCheckWriter, DryCheckWriterError,
+    FragmentContentHash, FragmentRef, Rationale, RefactorProposal,
 };
 use domain::review_v2::FilePath;
 use fs4::fs_std::FileExt;
@@ -22,7 +22,64 @@ use super::codec::{DryCheckJsonV1, DryCheckRecordDto, DryCheckVerdictDto};
 // ── SCHEMA_VERSION ────────────────────────────────────────────────────────────
 
 /// The current schema version written by this implementation.
-const CURRENT_SCHEMA_VERSION: u32 = 1;
+///
+/// Bumped from 1 → 2 to add `config_fingerprint` per record (round-6 P1 fix).
+/// v1 files are still readable: the `config_fingerprint` field uses serde
+/// `default` to supply the all-zeros sentinel for missing fields, causing the
+/// interactor to re-judge those pairs under the current config.
+const CURRENT_SCHEMA_VERSION: u32 = 2;
+
+// ── Shared parse helper ───────────────────────────────────────────────────────
+
+/// Error returned by [`parse_dry_check_content`] before the caller maps it to
+/// the concrete reader or writer error type.
+enum ParseDryCheckError<E> {
+    /// The content was empty or whitespace-only.  Callers should map this to
+    /// `Ok(DryCheckJsonV1::empty())`.
+    Empty,
+    /// JSON codec error (parse or deserialize).  The value is the concrete error
+    /// already produced by `codec_error_mapper`.
+    Codec(E),
+    /// Schema version is newer than [`CURRENT_SCHEMA_VERSION`].
+    IncompatibleSchema(u64),
+}
+
+/// Parse a non-empty dry-check JSON string into a [`DryCheckJsonV1`] envelope.
+///
+/// `codec_error_mapper` converts a human-readable codec detail string into the
+/// caller's concrete error type `E`.
+///
+/// Returns `ParseDryCheckError::Empty` when `content` is blank (callers should
+/// guard against this before calling, but the type makes it explicit).
+/// Returns `ParseDryCheckError::Codec(E)` on JSON parse/deserialize failure.
+/// Returns `ParseDryCheckError::IncompatibleSchema(version)` when the stored
+/// version exceeds [`CURRENT_SCHEMA_VERSION`].
+fn parse_dry_check_content<E>(
+    content: &str,
+    path_str: &str,
+    codec_error_mapper: impl Fn(String) -> E,
+) -> Result<DryCheckJsonV1, ParseDryCheckError<E>> {
+    if content.trim().is_empty() {
+        return Err(ParseDryCheckError::Empty);
+    }
+
+    // Parse envelope to check schema_version first.
+    let envelope: serde_json::Value = serde_json::from_str(content).map_err(|e| {
+        ParseDryCheckError::Codec(codec_error_mapper(format!("parse {path_str}: {e}")))
+    })?;
+
+    let version = envelope.get("schema_version").and_then(serde_json::Value::as_u64).unwrap_or(0);
+
+    if version > u64::from(CURRENT_SCHEMA_VERSION) {
+        return Err(ParseDryCheckError::IncompatibleSchema(version));
+    }
+
+    let doc: DryCheckJsonV1 = serde_json::from_value(envelope).map_err(|e| {
+        ParseDryCheckError::Codec(codec_error_mapper(format!("parse v1/v2 {path_str}: {e}")))
+    })?;
+
+    Ok(doc)
+}
 
 // ── FsDryCheckStore ───────────────────────────────────────────────────────────
 
@@ -49,8 +106,11 @@ impl FsDryCheckStore {
     /// Reads dry-check.json for read-only queries.
     ///
     /// File absent or empty → empty envelope.
-    /// Future schema version (> 1) → returns all records but emits
-    /// `IncompatibleSchema` when a future version field is encountered.
+    /// v1 files (schema_version = 1) → parsed successfully; missing
+    /// `config_fingerprint` fields default to the all-zeros sentinel via serde
+    /// `default = "fail_closed_fingerprint_string"` so the interactor re-judges
+    /// all pairs under the current config.
+    /// Future schema version (> 2) → `IncompatibleSchema` error.
     fn read_doc(&self) -> Result<DryCheckJsonV1, DryCheckReaderError> {
         let path_str = self.path.display().to_string();
 
@@ -69,33 +129,22 @@ impl FsDryCheckStore {
             }
             Err(e) => {
                 return Err(DryCheckReaderError::Io {
-                    path: path_str,
+                    path: path_str.clone(),
                     detail: format!("read: {e}"),
                 });
             }
         };
 
-        if content.trim().is_empty() {
-            return Ok(DryCheckJsonV1::empty());
+        match parse_dry_check_content(&content, &path_str, |codec_detail| {
+            DryCheckReaderError::Codec { path: path_str.clone(), detail: codec_detail }
+        }) {
+            Ok(doc) => Ok(doc),
+            Err(ParseDryCheckError::Empty) => Ok(DryCheckJsonV1::empty()),
+            Err(ParseDryCheckError::Codec(e)) => Err(e),
+            Err(ParseDryCheckError::IncompatibleSchema(version)) => {
+                Err(DryCheckReaderError::IncompatibleSchema { version })
+            }
         }
-
-        // Parse envelope to check schema_version first.
-        let envelope: serde_json::Value = serde_json::from_str(&content).map_err(|e| {
-            DryCheckReaderError::Codec { path: path_str.clone(), detail: format!("parse: {e}") }
-        })?;
-
-        let version =
-            envelope.get("schema_version").and_then(serde_json::Value::as_u64).unwrap_or(0);
-
-        if version > u64::from(CURRENT_SCHEMA_VERSION) {
-            return Err(DryCheckReaderError::IncompatibleSchema { version });
-        }
-
-        let doc: DryCheckJsonV1 = serde_json::from_value(envelope).map_err(|e| {
-            DryCheckReaderError::Codec { path: path_str, detail: format!("parse v1: {e}") }
-        })?;
-
-        Ok(doc)
     }
 
     /// Reads dry-check.json under an exclusive lock for read-modify-write.
@@ -112,30 +161,22 @@ impl FsDryCheckStore {
             }
             Err(e) => {
                 return Err(DryCheckWriterError::Io {
-                    path: path_str,
+                    path: path_str.clone(),
                     detail: format!("read-for-write: {e}"),
                 });
             }
         };
 
-        if content.trim().is_empty() {
-            return Ok(DryCheckJsonV1::empty());
+        match parse_dry_check_content(&content, &path_str, |codec_detail| {
+            DryCheckWriterError::Codec { detail: codec_detail }
+        }) {
+            Ok(doc) => Ok(doc),
+            Err(ParseDryCheckError::Empty) => Ok(DryCheckJsonV1::empty()),
+            Err(ParseDryCheckError::Codec(e)) => Err(e),
+            Err(ParseDryCheckError::IncompatibleSchema(version)) => {
+                Err(DryCheckWriterError::IncompatibleSchema { version })
+            }
         }
-
-        let envelope: serde_json::Value = serde_json::from_str(&content)
-            .map_err(|e| DryCheckWriterError::Codec { detail: format!("parse: {e}") })?;
-
-        let version =
-            envelope.get("schema_version").and_then(serde_json::Value::as_u64).unwrap_or(0);
-
-        if version > u64::from(CURRENT_SCHEMA_VERSION) {
-            return Err(DryCheckWriterError::IncompatibleSchema { version });
-        }
-
-        let doc: DryCheckJsonV1 = serde_json::from_value(envelope)
-            .map_err(|e| DryCheckWriterError::Codec { detail: format!("parse v1: {e}") })?;
-
-        Ok(doc)
     }
 
     /// Acquire an exclusive fs4 lock on `<path>.lock`, ensuring the parent
@@ -207,6 +248,13 @@ impl DryCheckWriter for FsDryCheckStore {
         // Read envelope under lock (init-on-first-write: absent → empty envelope).
         let mut doc = self.read_doc_for_write()?;
 
+        // Schema migration: promote the envelope schema_version on first write
+        // after an upgrade.  The `config_fingerprint` field on historical DTOs is
+        // already normalised to the sentinel string by the serde `default`
+        // attribute when the v1 records were read, so no per-record fixup is
+        // needed here — just bump the version header.
+        doc.schema_version = CURRENT_SCHEMA_VERSION;
+
         // Build the DTO from the entry.
         let verdict_dto = match entry.verdict() {
             DryCheckVerdict::NotAViolation => DryCheckVerdictDto::NotAViolation,
@@ -228,6 +276,7 @@ impl DryCheckWriter for FsDryCheckStore {
             base_commit: entry.base_commit().as_ref().to_owned(),
             rationale: entry.rationale().as_str().to_owned(),
             recorded_at,
+            config_fingerprint: entry.config_fingerprint().as_str().to_owned(),
         };
 
         doc.records.push(dto);
@@ -256,9 +305,14 @@ impl DryCheckReader for FsDryCheckStore {
 
 /// Convert a [`DryCheckRecordDto`] to a [`DryCheckRecord`].
 ///
-/// Any validation failure (invalid hash, self-match, empty proposal/rationale,
-/// invalid timestamp, changed_path outside pair) returns `Err(String)` which
-/// the caller maps to `DryCheckReaderError::InvalidData`.
+/// Missing or malformed `config_fingerprint` values are mapped to
+/// `DryCheckConfigFingerprint::fail_closed()` (all-zeros sentinel) rather than
+/// aborting the call.  The sentinel ensures the interactor re-judges the pair
+/// under the current config instead of treating it as already-verified.
+///
+/// Any other validation failure (invalid hash, self-match, empty
+/// proposal/rationale, invalid timestamp, changed_path outside pair) returns
+/// `Err(String)` which the caller maps to `DryCheckReaderError::InvalidData`.
 fn dto_to_domain(dto: DryCheckRecordDto) -> Result<DryCheckRecord, String> {
     // Reconstruct the two FragmentRefs from the four flat fields.
     let low_content_hash =
@@ -301,6 +355,19 @@ fn dto_to_domain(dto: DryCheckRecordDto) -> Result<DryCheckRecord, String> {
     let threshold = domain::semantic_dup::SimilarityThreshold::new(threshold_value)
         .map_err(|e| format!("threshold: {e}"))?;
 
+    // Reconstruct config_fingerprint.
+    //
+    // v1 records on disk lack the field entirely; the serde `default` attribute
+    // on `DryCheckRecordDto.config_fingerprint` already supplies the all-zeros
+    // sentinel string so `dto.config_fingerprint` is always a `String` here.
+    //
+    // If the persisted string is not a valid 64-char lowercase hex fingerprint
+    // (malformed v2 record), degrade to the fail-closed sentinel rather than
+    // aborting — a single corrupted historical row must not make the entire
+    // dry-check history unreadable.
+    let config_fingerprint = DryCheckConfigFingerprint::new(&dto.config_fingerprint)
+        .unwrap_or_else(|_| DryCheckConfigFingerprint::fail_closed());
+
     // Build entry first to validate changed_path-in-pair invariant.
     let entry = DryCheckEntry::new(
         pair_key,
@@ -310,6 +377,7 @@ fn dto_to_domain(dto: DryCheckRecordDto) -> Result<DryCheckRecord, String> {
         threshold,
         base_commit,
         rationale,
+        config_fingerprint,
     )
     .map_err(|e| format!("entry: {e}"))?;
 
@@ -333,8 +401,9 @@ fn validate_unit_interval_f64(value: f64, field: &str) -> Result<f32, String> {
 mod tests {
     use domain::CommitHash;
     use domain::dry_check::{
-        DryCheckEntry, DryCheckPairKey, DryCheckReader, DryCheckReaderError, DryCheckVerdict,
-        DryCheckWriter, FragmentContentHash, FragmentRef, Rationale,
+        DryCheckConfigFingerprint, DryCheckEntry, DryCheckPairKey, DryCheckReader,
+        DryCheckReaderError, DryCheckVerdict, DryCheckWriter, FragmentContentHash, FragmentRef,
+        Rationale,
     };
     use domain::review_v2::FilePath;
     use domain::semantic_dup::{SimilarityScore, SimilarityThreshold};
@@ -355,6 +424,10 @@ mod tests {
         FragmentRef::new(make_file_path(path), make_hash(hash))
     }
 
+    fn test_fingerprint() -> DryCheckConfigFingerprint {
+        DryCheckConfigFingerprint::new("a".repeat(64)).unwrap()
+    }
+
     fn make_entry(
         low_path: &str,
         low_hash: &str,
@@ -372,8 +445,17 @@ mod tests {
         let commit = CommitHash::try_new("abcdef1234567").unwrap();
         let rationale = Rationale::new("Test rationale.").unwrap();
 
-        DryCheckEntry::new(pair_key, changed_path, verdict, score, threshold, commit, rationale)
-            .unwrap()
+        DryCheckEntry::new(
+            pair_key,
+            changed_path,
+            verdict,
+            score,
+            threshold,
+            commit,
+            rationale,
+            test_fingerprint(),
+        )
+        .unwrap()
     }
 
     fn store_in(dir: &tempfile::TempDir) -> FsDryCheckStore {
@@ -391,16 +473,26 @@ mod tests {
         assert!(records.is_empty());
     }
 
+    /// Any schema_version greater than `CURRENT_SCHEMA_VERSION` (currently 2) must
+    /// return `IncompatibleSchema`.  Covers both the immediate next version (3) and an
+    /// arbitrary far-future version (99) to guard against off-by-one bugs and very
+    /// large version numbers.
     #[test]
     fn test_read_records_future_schema_version_returns_incompatible_schema() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("dry-check.json");
-        std::fs::write(&path, r#"{"schema_version": 2, "records": []}"#).unwrap();
+        for version in [3_u64, 99] {
+            let dir = tempfile::tempdir().unwrap();
+            let path = dir.path().join("dry-check.json");
+            let json = format!(r#"{{"schema_version": {version}, "records": []}}"#);
+            std::fs::write(&path, json).unwrap();
 
-        let store = FsDryCheckStore::new(path, dir.path().to_owned());
-        let result = store.read_records();
+            let store = FsDryCheckStore::new(path, dir.path().to_owned());
+            let result = store.read_records();
 
-        assert!(matches!(result, Err(DryCheckReaderError::IncompatibleSchema { version: 2 })));
+            assert!(
+                matches!(result, Err(DryCheckReaderError::IncompatibleSchema { version: v }) if v == version),
+                "expected IncompatibleSchema({version}), got: {result:?}"
+            );
+        }
     }
 
     #[test]
@@ -497,6 +589,8 @@ mod tests {
         assert_eq!(rec.rationale().as_str(), "Test rationale.");
         // recorded_at must be a non-empty ISO-8601 string
         assert!(!rec.recorded_at().as_str().is_empty());
+        // config_fingerprint must round-trip (v2 schema)
+        assert_eq!(rec.config_fingerprint(), &test_fingerprint());
     }
 
     #[test]
@@ -581,23 +675,6 @@ mod tests {
 
         let records = store.read_records().unwrap();
         assert_eq!(records.len(), 3);
-    }
-
-    #[test]
-    fn test_incompatible_schema_on_future_schema_version() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("dry-check.json");
-
-        // Write a file with schema_version = 99 (future).
-        let json = r#"{"schema_version": 99, "records": []}"#;
-        std::fs::write(&path, json).unwrap();
-
-        let store = FsDryCheckStore::new(path, dir.path().to_owned());
-        let result = store.read_records();
-        assert!(
-            matches!(result, Err(DryCheckReaderError::IncompatibleSchema { version: 99 })),
-            "expected IncompatibleSchema(99), got: {result:?}"
-        );
     }
 
     #[cfg(unix)]
@@ -818,6 +895,177 @@ mod tests {
         assert!(
             matches!(result, Err(DryCheckReaderError::InvalidData(_))),
             "expected InvalidData for empty refactor_proposal, got: {result:?}"
+        );
+    }
+
+    /// v2 round-trip: `config_fingerprint` is serialized to disk and round-trips intact.
+    #[test]
+    fn test_v2_round_trip_config_fingerprint_survives() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = store_in(&dir);
+
+        let entry = make_entry(
+            "src/a.rs",
+            &"a".repeat(64),
+            "src/b.rs",
+            &"b".repeat(64),
+            "src/a.rs",
+            DryCheckVerdict::NotAViolation,
+        );
+
+        store.append_record(&entry).unwrap();
+
+        // Verify the on-disk JSON contains config_fingerprint at schema_version 2.
+        let persisted: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(dir.path().join("dry-check.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(persisted["schema_version"], 2, "written file must be schema_version 2");
+        assert_eq!(
+            persisted["records"][0]["config_fingerprint"].as_str().unwrap(),
+            "a".repeat(64),
+            "config_fingerprint must be persisted to disk"
+        );
+
+        // Read back and verify the fingerprint accessor.
+        let records = store.read_records().unwrap();
+        assert_eq!(records.len(), 1);
+        assert_eq!(
+            records[0].config_fingerprint(),
+            &test_fingerprint(),
+            "config_fingerprint must round-trip through store"
+        );
+    }
+
+    /// v1 migration: a v1 record (no `config_fingerprint` field) is deserialized with
+    /// the all-zeros sentinel fingerprint so the interactor will re-judge it.
+    #[test]
+    fn test_v1_record_without_config_fingerprint_deserializes_with_sentinel() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("dry-check.json");
+
+        let low_hash = "a".repeat(64);
+        let high_hash = "b".repeat(64);
+        // v1 JSON: no `config_fingerprint` field.
+        let json = serde_json::json!({
+            "schema_version": 1,
+            "records": [{
+                "low_path": "src/a.rs",
+                "low_hash": low_hash,
+                "high_path": "src/b.rs",
+                "high_hash": high_hash,
+                "changed_path": "src/a.rs",
+                "verdict": "not-a-violation",
+                "similarity_score": 0.9,
+                "threshold": 0.8,
+                "base_commit": "abcdef1234567",
+                "rationale": "test",
+                "recorded_at": "2026-06-01T00:00:00Z"
+                // NOTE: no config_fingerprint field (v1 format)
+            }]
+        })
+        .to_string();
+        std::fs::write(&path, json).unwrap();
+
+        let store = FsDryCheckStore::new(path, dir.path().to_owned());
+        let records = store.read_records().unwrap();
+
+        assert_eq!(records.len(), 1, "v1 record must parse successfully");
+        // v1 records must carry the all-zeros sentinel so the interactor re-judges them.
+        assert_eq!(
+            records[0].config_fingerprint(),
+            &DryCheckConfigFingerprint::fail_closed(),
+            "v1 record must have the fail-closed sentinel fingerprint"
+        );
+        // Sentinel must differ from any real fingerprint.
+        assert_ne!(
+            records[0].config_fingerprint(),
+            &test_fingerprint(),
+            "sentinel must not match a real test fingerprint"
+        );
+    }
+
+    /// A malformed `config_fingerprint` (not a valid 64-char hex string) in a v2
+    /// record must degrade to the fail-closed sentinel rather than aborting the
+    /// entire `read_records()` call.  One corrupted row must not make the whole
+    /// dry-check history unreadable.
+    #[test]
+    fn test_malformed_config_fingerprint_degrades_to_sentinel() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("dry-check.json");
+
+        let low_hash = "a".repeat(64);
+        let high_hash = "b".repeat(64);
+        // v2 record with an invalid config_fingerprint value.
+        let json = serde_json::json!({
+            "schema_version": 2,
+            "records": [{
+                "low_path": "src/a.rs",
+                "low_hash": low_hash,
+                "high_path": "src/b.rs",
+                "high_hash": high_hash,
+                "changed_path": "src/a.rs",
+                "verdict": "not-a-violation",
+                "similarity_score": 0.9,
+                "threshold": 0.8,
+                "base_commit": "abcdef1234567",
+                "rationale": "test",
+                "recorded_at": "2026-06-01T00:00:00Z",
+                "config_fingerprint": "not-a-valid-hex-fingerprint"
+            }]
+        })
+        .to_string();
+        std::fs::write(&path, json).unwrap();
+
+        let store = FsDryCheckStore::new(path, dir.path().to_owned());
+        let records = store.read_records().unwrap();
+
+        assert_eq!(records.len(), 1, "malformed fingerprint must not abort read_records");
+        assert_eq!(
+            records[0].config_fingerprint(),
+            &DryCheckConfigFingerprint::fail_closed(),
+            "malformed fingerprint must degrade to the fail-closed sentinel"
+        );
+    }
+
+    /// A v2 record with a missing `config_fingerprint` field (field absent in JSON)
+    /// receives the fail-closed sentinel via serde default, matching v1 migration
+    /// semantics.  The interactor will then re-judge the pair under the current config.
+    #[test]
+    fn test_v2_record_without_config_fingerprint_gets_sentinel() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("dry-check.json");
+
+        let low_hash = "a".repeat(64);
+        let high_hash = "b".repeat(64);
+        let json = serde_json::json!({
+            "schema_version": 2,
+            "records": [{
+                "low_path": "src/a.rs",
+                "low_hash": low_hash,
+                "high_path": "src/b.rs",
+                "high_hash": high_hash,
+                "changed_path": "src/a.rs",
+                "verdict": "not-a-violation",
+                "similarity_score": 0.9,
+                "threshold": 0.8,
+                "base_commit": "abcdef1234567",
+                "rationale": "test",
+                "recorded_at": "2026-06-01T00:00:00Z"
+                // config_fingerprint absent → serde default → sentinel
+            }]
+        })
+        .to_string();
+        std::fs::write(&path, json).unwrap();
+
+        let store = FsDryCheckStore::new(path, dir.path().to_owned());
+        let records = store.read_records().unwrap();
+
+        assert_eq!(records.len(), 1, "missing fingerprint field must not abort read_records");
+        assert_eq!(
+            records[0].config_fingerprint(),
+            &DryCheckConfigFingerprint::fail_closed(),
+            "missing config_fingerprint must receive the fail-closed sentinel"
         );
     }
 }

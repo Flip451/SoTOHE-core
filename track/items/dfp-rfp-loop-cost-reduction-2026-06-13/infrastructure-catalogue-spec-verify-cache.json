@@ -1,0 +1,470 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "524d523f543b9a41935763ddaaa9ccdf73d012d85f792ea4d85fea91ab5e9289",
+      "evidence_hash": "a8068960584473da021c44ddfbf309ab2e684add6c7d89129745b9d560404354",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry-checker を較正付き 2 段構成に変える: fast tier（軽量モデル）で全ペアを判定し、既知違反プローブの検出率で信頼性を較正する。較正が健全なら not-a-violation / accepted を確定し、violation および不正出力のみ重量級 tier へ escalation する。較正失敗時は全ペアを重量級 tier で再判定し、重量級でも較正失敗なら fail-closed でエスカレーション。"
+      }
+    },
+    {
+      "claim_hash": "524d523f543b9a41935763ddaaa9ccdf73d012d85f792ea4d85fea91ab5e9289",
+      "evidence_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D4 の較正付き 2 段化において、既知違反プローブの verdict は dry-check.json の production 記録には残さない（プローブと production の記録を分離する）。プローブ injection rate・detection threshold 閾値は `.harness/config/dry-check.json` で調整可能にする。tier 別 model（`fast_model` / 既存 `model`）は `agent-profiles.json` の dry-checker capability に追加する。"
+      }
+    },
+    {
+      "claim_hash": "524d523f543b9a41935763ddaaa9ccdf73d012d85f792ea4d85fea91ab5e9289",
+      "evidence_hash": "d8f319509478fca252fba8754d262fd38f638edac8080d0d74f0a1f15d767a52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D4 の較正失敗時（fast tier のプローブ検出率が閾値未満）は fast 非違反判定を信頼せず、全ペアを重量級 tier で再判定する。重量級 tier でもプローブ検出率が閾値未満なら fail-closed で人間にエスカレーションし、gate を通過させない。"
+      }
+    },
+    {
+      "claim_hash": "524d523f543b9a41935763ddaaa9ccdf73d012d85f792ea4d85fea91ab5e9289",
+      "evidence_hash": "275f37725a7f80679bb3b3c9b2ccff2eae6df51c26e8abcb540ea725038382fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry-checker が fast tier（軽量モデル、`agent-profiles.json` の `fast_model`）と重量級 tier（既存 `model`）の 2 段で動く。fast tier は既知違反プローブをバッチに混ぜてプローブ検出率を較正し、較正が健全なら not-a-violation / accepted を確定し、violation および不正出力のみ重量級 tier へ escalation する。"
+      }
+    },
+    {
+      "claim_hash": "524d523f543b9a41935763ddaaa9ccdf73d012d85f792ea4d85fea91ab5e9289",
+      "evidence_hash": "2e1eb1d8b2015b43f3ec13792d7f0e177b5ffe4c852a3d3fbda5481387e0ebc4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "較正失敗時（fast tier プローブ検出率 < threshold）に全ペアを重量級 tier で再判定し、重量級でも較正失敗なら gate が fail-closed になることを unit または integration test で確認できる。"
+      }
+    },
+    {
+      "claim_hash": "0b9303c873c7dfdb11f46d5301eb2ce05e5e94f15629d5b02bc1bbd2d643aa61",
+      "evidence_hash": "9605c95ba1b22e5e7cb0d44c3a97f405d064e7656f6a4447fca5a8ec5bbd7184",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` の処理を 2 相（照会相: 全 diff fragment の類似照会 → ペア識別子重複排除 → 未検証ペア確定、判定相: 確定ペアへの上限付き並列 fan-out）に分け、並列度上限を `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にする。"
+      }
+    },
+    {
+      "claim_hash": "0b9303c873c7dfdb11f46d5301eb2ce05e5e94f15629d5b02bc1bbd2d643aa61",
+      "evidence_hash": "a8068960584473da021c44ddfbf309ab2e684add6c7d89129745b9d560404354",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast tier の `fast_model` を `agent-profiles.json` に追加し、reasoning effort とプローブ設定を `.harness/config/dry-check.json` に追加する。"
+      }
+    },
+    {
+      "claim_hash": "0b9303c873c7dfdb11f46d5301eb2ce05e5e94f15629d5b02bc1bbd2d643aa61",
+      "evidence_hash": "e7f768da1df7d4960eb35c9ab9d6d7e5a280e4fbbd2e47dd8c80c2ddb2c2bbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の並列度上限は provider の rate limit / アカウント同時実行制限に合わせて運用側が調整できるよう `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にし、無制限並列は行わない。未指定なら nonzero の既定値を使用する。"
+      }
+    },
+    {
+      "claim_hash": "0b9303c873c7dfdb11f46d5301eb2ce05e5e94f15629d5b02bc1bbd2d643aa61",
+      "evidence_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "probe injection rate・detection threshold 閾値は `.harness/config/dry-check.json` で調整可能にする。"
+      }
+    },
+    {
+      "claim_hash": "550d9f0bc3dd357fc899e4f14ba43154eaeb5038936f618b5d73cf91836d8fe1",
+      "evidence_hash": "9605c95ba1b22e5e7cb0d44c3a97f405d064e7656f6a4447fca5a8ec5bbd7184",
+      "verdict": {
+        "kind": "pass",
+        "citation": "並列度上限を `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にする。"
+      }
+    },
+    {
+      "claim_hash": "550d9f0bc3dd357fc899e4f14ba43154eaeb5038936f618b5d73cf91836d8fe1",
+      "evidence_hash": "e7f768da1df7d4960eb35c9ab9d6d7e5a280e4fbbd2e47dd8c80c2ddb2c2bbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の並列度上限は provider の rate limit / アカウント同時実行制限に合わせて運用側が調整できるよう `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にし、無制限並列は行わない。未指定なら nonzero の既定値を使用する。"
+      }
+    },
+    {
+      "claim_hash": "6aff2cab71c5c22a23f0b5250cac7476e4da8ed6a884b49e3220bcd7a6357448",
+      "evidence_hash": "83f40d0e88c80ed4b5dd8bfa7cd0712079afa257877903121bf57eb3172d74b9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`dry write` が記録した diff フラグメントの content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントがカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "6aff2cab71c5c22a23f0b5250cac7476e4da8ed6a884b49e3220bcd7a6357448",
+      "evidence_hash": "2ef364d8e0c1c65e634dae0645e2dba7ea059427863fd29ecb189b0c55fa0d31",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` がカバレッジ記録（処理した diff フラグメントの content_hash 集合）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。"
+      }
+    },
+    {
+      "claim_hash": "6aff2cab71c5c22a23f0b5250cac7476e4da8ed6a884b49e3220bcd7a6357448",
+      "evidence_hash": "8d0e96cb945cb31014c6194ed77a30457fa80f7275380b2fd1335f0987c8b80d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録の欠落・不整合時は fail-closed（Blocked）で安全側に倒す。ゲートは自己完結性を手放し `dry write` が記録したカバレッジ記録の存在に依存することを受け入れる。"
+      }
+    },
+    {
+      "claim_hash": "e347443c5df1d47b62e9e920d02076ec610d1e77541c72312403dda462652831",
+      "evidence_hash": "cf28b3dadc81b1672bbf85f977aa970c5b148f5afeab9dc7acc76a4063546804",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D1 の効果測定のために no-fix completed 識別用 `GateEval` を追加できる。D4 の効果測定のために dry ラウンドに `round_type`（fast / final）+ tier 別 `model` タグを付与する `emit_review_round` 呼び出しを追加する。"
+      }
+    },
+    {
+      "claim_hash": "2c9ff5513e1623c89a599c9693d5b2f9db41dcae0a9e86123c819b0c8c1d432f",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast tier（軽量モデル）で全ペアを判定し、既知違反プローブの検出率で信頼性を較正する。較正が健全なら not-a-violation / accepted を確定し、violation および不正出力のみ重量級 tier へ escalation する。較正失敗時は全ペアを重量級 tier で再判定し、重量級でも較正失敗なら fail-closed でエスカレーション。fast tier の `fast_model` を `agent-profiles.json` に追加し、fast / final tier の reasoning effort とプローブ設定を `.harness/config/dry-check.json` に追加する。"
+      }
+    },
+    {
+      "claim_hash": "2c9ff5513e1623c89a599c9693d5b2f9db41dcae0a9e86123c819b0c8c1d432f",
+      "evidence_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "probe injection rate・detection threshold 閾値は `.harness/config/dry-check.json` で調整可能にする。tier 別 model（`fast_model` / 既存 `model`）は `agent-profiles.json` の dry-checker capability に追加する。"
+      }
+    },
+    {
+      "claim_hash": "2c9ff5513e1623c89a599c9693d5b2f9db41dcae0a9e86123c819b0c8c1d432f",
+      "evidence_hash": "d8f319509478fca252fba8754d262fd38f638edac8080d0d74f0a1f15d767a52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast tier のプローブ検出率が閾値未満）は fast 非違反判定を信頼せず、全ペアを重量級 tier で再判定する。重量級 tier でもプローブ検出率が閾値未満なら fail-closed で人間にエスカレーションし、gate を通過させない。"
+      }
+    },
+    {
+      "claim_hash": "2c9ff5513e1623c89a599c9693d5b2f9db41dcae0a9e86123c819b0c8c1d432f",
+      "evidence_hash": "744b975f9a0835a34357d71992d7575e835e0e2140c695263cbed360b8652a28",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry-checker が fast tier（軽量モデル、`agent-profiles.json` の `fast_model`）と重量級 tier（既存 `model`）の 2 段で動く。fast tier は production ペアとは別の 1 ペア 1 agent 呼び出しで既知違反プローブを判定してプローブ検出率を較正し、較正が健全なら not-a-violation / accepted を確定し、violation および不正出力のみ重量級 tier へ escalation する。"
+      }
+    },
+    {
+      "claim_hash": "2c9ff5513e1623c89a599c9693d5b2f9db41dcae0a9e86123c819b0c8c1d432f",
+      "evidence_hash": "2e1eb1d8b2015b43f3ec13792d7f0e177b5ffe4c852a3d3fbda5481387e0ebc4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「較正失敗時（fast tier プローブ検出率 < threshold）に全ペアを重量級 tier で再判定し、重量級でも較正失敗なら gate が fail-closed になる」"
+      }
+    },
+    {
+      "claim_hash": "b8e8a29d865b8ee075cb717a0cff9950aa8073f1160e1edfb98f2d8b54b3b4a5",
+      "evidence_hash": "9605c95ba1b22e5e7cb0d44c3a97f405d064e7656f6a4447fca5a8ec5bbd7184",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` の処理を 2 相（照会相: 全 diff fragment の類似照会 → ペア識別子重複排除 → 未検証ペア確定、判定相: 確定ペアへの上限付き並列 fan-out）に分け、並列度上限を `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にする。"
+      }
+    },
+    {
+      "claim_hash": "b8e8a29d865b8ee075cb717a0cff9950aa8073f1160e1edfb98f2d8b54b3b4a5",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast / final tier の reasoning effort とプローブ設定を `.harness/config/dry-check.json` に追加する。"
+      }
+    },
+    {
+      "claim_hash": "b8e8a29d865b8ee075cb717a0cff9950aa8073f1160e1edfb98f2d8b54b3b4a5",
+      "evidence_hash": "e7f768da1df7d4960eb35c9ab9d6d7e5a280e4fbbd2e47dd8c80c2ddb2c2bbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の並列度上限は provider の rate limit / アカウント同時実行制限に合わせて運用側が調整できるよう `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にし、無制限並列は行わない。未指定なら nonzero の既定値を使用する。"
+      }
+    },
+    {
+      "claim_hash": "b8e8a29d865b8ee075cb717a0cff9950aa8073f1160e1edfb98f2d8b54b3b4a5",
+      "evidence_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "プローブ injection rate・detection threshold 閾値は `.harness/config/dry-check.json` で調整可能にする。"
+      }
+    },
+    {
+      "claim_hash": "bf5307b6ae67381842fbb080f6f4f62836b3ce627e86d3796441c2849f04e772",
+      "evidence_hash": "9605c95ba1b22e5e7cb0d44c3a97f405d064e7656f6a4447fca5a8ec5bbd7184",
+      "verdict": {
+        "kind": "pass",
+        "citation": "並列度上限を `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にする。"
+      }
+    },
+    {
+      "claim_hash": "bf5307b6ae67381842fbb080f6f4f62836b3ce627e86d3796441c2849f04e772",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast / final tier の reasoning effort とプローブ設定を `.harness/config/dry-check.json` に追加する。"
+      }
+    },
+    {
+      "claim_hash": "bf5307b6ae67381842fbb080f6f4f62836b3ce627e86d3796441c2849f04e772",
+      "evidence_hash": "e7f768da1df7d4960eb35c9ab9d6d7e5a280e4fbbd2e47dd8c80c2ddb2c2bbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の並列度上限は provider の rate limit / アカウント同時実行制限に合わせて運用側が調整できるよう `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にし、無制限並列は行わない。未指定なら nonzero の既定値を使用する。"
+      }
+    },
+    {
+      "claim_hash": "bf5307b6ae67381842fbb080f6f4f62836b3ce627e86d3796441c2849f04e772",
+      "evidence_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "プローブ injection rate・detection threshold 閾値は `.harness/config/dry-check.json` で調整可能にする。"
+      }
+    },
+    {
+      "claim_hash": "6aff2cab71c5c22a23f0b5250cac7476e4da8ed6a884b49e3220bcd7a6357448",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "6aff2cab71c5c22a23f0b5250cac7476e4da8ed6a884b49e3220bcd7a6357448",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。"
+      }
+    },
+    {
+      "claim_hash": "6aff2cab71c5c22a23f0b5250cac7476e4da8ed6a884b49e3220bcd7a6357448",
+      "evidence_hash": "d4b4e31a1a57f735a81956b537a4379bb1d6633bae03a606b0dc384102aeefb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録の欠落・不整合時は fail-closed（Blocked）で安全側に倒す。… ゲートは自己完結性を手放し `dry write` が記録したカバレッジ記録の存在に依存することを受け入れる。"
+      }
+    },
+    {
+      "claim_hash": "e347443c5df1d47b62e9e920d02076ec610d1e77541c72312403dda462652831",
+      "evidence_hash": "f08e26e79ebdb1fd56fe5c9c80da7c50cb9e97ef8efad5e7534e63f9d4c5d57f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存テレメトリ schema の範囲内で対応し、新フィールド・新イベント型は追加しない（既存の `GateEval` / `ReviewRound` と `round_type` / `model` タグを使う）"
+      }
+    },
+    {
+      "claim_hash": "60dae1b05badafa4cb4db67413e35b65a722f87d49382281a11fc71c445f2ce7",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast tier（軽量モデル）で全ペアを判定し、既知違反プローブの検出率で信頼性を較正する。"
+      }
+    },
+    {
+      "claim_hash": "645e0534c642c6bb1422f3082fb9d4b0ec832d49d05f914a4584d92fa0105311",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry write がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、dry-check-approved の staleness 判定の入力として使えるようにする。"
+      }
+    },
+    {
+      "claim_hash": "645e0534c642c6bb1422f3082fb9d4b0ec832d49d05f914a4584d92fa0105311",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "be6fd8b857d12991ac0110838a2b85ac042fcbb77c1d19ac69117119b5afc7e7",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。"
+      }
+    },
+    {
+      "claim_hash": "67f3e2269d93f1cfe3b45e0672a5c3ed297b8e1cecb38916e74d656916f1046e",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast tier の `fast_model` を `agent-profiles.json` に追加し、fast / final tier の reasoning effort とプローブ設定を `.harness/config/dry-check.json` に追加する。"
+      }
+    },
+    {
+      "claim_hash": "67f3e2269d93f1cfe3b45e0672a5c3ed297b8e1cecb38916e74d656916f1046e",
+      "evidence_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "tier 別 model（`fast_model` / 既存 `model`）は `agent-profiles.json` の dry-checker capability に追加する。"
+      }
+    },
+    {
+      "claim_hash": "67f3e2269d93f1cfe3b45e0672a5c3ed297b8e1cecb38916e74d656916f1046e",
+      "evidence_hash": "d8f319509478fca252fba8754d262fd38f638edac8080d0d74f0a1f15d767a52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D4 の較正失敗時（fast tier のプローブ検出率が閾値未満）は fast 非違反判定を信頼せず、全ペアを重量級 tier で再判定する。重量級 tier でもプローブ検出率が閾値未満なら fail-closed で人間にエスカレーションし、gate を通過させない。"
+      }
+    },
+    {
+      "claim_hash": "67f3e2269d93f1cfe3b45e0672a5c3ed297b8e1cecb38916e74d656916f1046e",
+      "evidence_hash": "744b975f9a0835a34357d71992d7575e835e0e2140c695263cbed360b8652a28",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"fast tier は production ペアとは別の 1 ペア 1 agent 呼び出しで既知違反プローブを判定し\""
+      }
+    },
+    {
+      "claim_hash": "67f3e2269d93f1cfe3b45e0672a5c3ed297b8e1cecb38916e74d656916f1046e",
+      "evidence_hash": "2e1eb1d8b2015b43f3ec13792d7f0e177b5ffe4c852a3d3fbda5481387e0ebc4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "較正失敗時（fast tier プローブ検出率 < threshold）に全ペアを重量級 tier で再判定し、重量級でも較正失敗なら gate が fail-closed になることを unit または integration test で確認できる。"
+      }
+    },
+    {
+      "claim_hash": "849d414d964764b24646e316a4a261a1dfbef4631f0a83ac7dde88d1ca027b2e",
+      "evidence_hash": "9605c95ba1b22e5e7cb0d44c3a97f405d064e7656f6a4447fca5a8ec5bbd7184",
+      "verdict": {
+        "kind": "pass",
+        "citation": "並列度上限を `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にする。"
+      }
+    },
+    {
+      "claim_hash": "849d414d964764b24646e316a4a261a1dfbef4631f0a83ac7dde88d1ca027b2e",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast / final tier の reasoning effort とプローブ設定を `.harness/config/dry-check.json` に追加する。"
+      }
+    },
+    {
+      "claim_hash": "849d414d964764b24646e316a4a261a1dfbef4631f0a83ac7dde88d1ca027b2e",
+      "evidence_hash": "e7f768da1df7d4960eb35c9ab9d6d7e5a280e4fbbd2e47dd8c80c2ddb2c2bbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の並列度上限は provider の rate limit / アカウント同時実行制限に合わせて運用側が調整できるよう `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にし、無制限並列は行わない。未指定なら nonzero の既定値を使用する。"
+      }
+    },
+    {
+      "claim_hash": "849d414d964764b24646e316a4a261a1dfbef4631f0a83ac7dde88d1ca027b2e",
+      "evidence_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "プローブ injection rate・detection threshold 閾値は `.harness/config/dry-check.json` で調整可能にする。tier 別 model（`fast_model` / 既存 `model`）は `agent-profiles.json` の dry-checker capability に追加する。"
+      }
+    },
+    {
+      "claim_hash": "c8527bef930088f72cc6322a24db94ad32bba6d571acbb4c4513a3daedc4c20b",
+      "evidence_hash": "9605c95ba1b22e5e7cb0d44c3a97f405d064e7656f6a4447fca5a8ec5bbd7184",
+      "verdict": {
+        "kind": "pass",
+        "citation": "並列度上限を `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にする。"
+      }
+    },
+    {
+      "claim_hash": "c8527bef930088f72cc6322a24db94ad32bba6d571acbb4c4513a3daedc4c20b",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast / final tier の reasoning effort とプローブ設定を `.harness/config/dry-check.json` に追加する"
+      }
+    },
+    {
+      "claim_hash": "c8527bef930088f72cc6322a24db94ad32bba6d571acbb4c4513a3daedc4c20b",
+      "evidence_hash": "e7f768da1df7d4960eb35c9ab9d6d7e5a280e4fbbd2e47dd8c80c2ddb2c2bbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の並列度上限は provider の rate limit / アカウント同時実行制限に合わせて運用側が調整できるよう `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にし、無制限並列は行わない。未指定なら nonzero の既定値を使用する。"
+      }
+    },
+    {
+      "claim_hash": "c8527bef930088f72cc6322a24db94ad32bba6d571acbb4c4513a3daedc4c20b",
+      "evidence_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "プローブ injection rate・detection threshold 閾値は `.harness/config/dry-check.json` で調整可能にする。"
+      }
+    },
+    {
+      "claim_hash": "31ade11b5ccfbc62c71bf6b31dcf179c761a1562a90458801e2176ee550d71ac",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "31ade11b5ccfbc62c71bf6b31dcf179c761a1562a90458801e2176ee550d71ac",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。"
+      }
+    },
+    {
+      "claim_hash": "31ade11b5ccfbc62c71bf6b31dcf179c761a1562a90458801e2176ee550d71ac",
+      "evidence_hash": "d4b4e31a1a57f735a81956b537a4379bb1d6633bae03a606b0dc384102aeefb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「欠落・不整合時は fail-closed（Blocked）で安全側に倒す」"
+      }
+    },
+    {
+      "claim_hash": "31ade11b5ccfbc62c71bf6b31dcf179c761a1562a90458801e2176ee550d71ac",
+      "evidence_hash": "c21398df74f4f2f3c2f8294993e08585a0f2f1b8eb288b5cfef885a1daecbc4d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録を読んで次の条件で Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "645e0534c642c6bb1422f3082fb9d4b0ec832d49d05f914a4584d92fa0105311",
+      "evidence_hash": "3161bf8841d3b2847b280aa202d58c12aa1fa31a99c7ff04786a9f6dfecccfbe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（`DryCheckCoverageRecord`：処理した diff フラグメントの FragmentRef 集合 + 処理済みペアキー集合 + config_fingerprint + corpus_fingerprint）を記録し、その記録を `dry check-approved` が staleness 判定に使う。(c) corpus 変更 → corpus_fingerprint 不一致 → Blocked → `dry write` 強制、(d) `dry write` 失敗時は all-zeros フィンガープリント（`fail_closed()` 値）を書き込み → 次回 `check-approved` で Blocked → `dry write` 再実行強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "31ade11b5ccfbc62c71bf6b31dcf179c761a1562a90458801e2176ee550d71ac",
+      "evidence_hash": "5ab18fac1480c03be38cbffd8c6345bf643a318154871926b06a7ef1ae7aa74b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`DryCheckCoverageRecord`）と dry-check.json の verdict 記録を読んで次の条件で Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "31ade11b5ccfbc62c71bf6b31dcf179c761a1562a90458801e2176ee550d71ac",
+      "evidence_hash": "535235134d20a4091d9ca179c19cd54f3a6ae55ca7972949deb2686787125d8e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` が `DryCheckCoverageRecord`（fragment_refs: 処理した diff フラグメントの FragmentRef 集合、processed_pair_keys: 判定対象として確定したペアキー集合、config_fingerprint: 実行時 dry-check.json 設定のフィンガープリント、corpus_fingerprint: 実行時 workspace corpus のフィンガープリント）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。"
+      }
+    },
+    {
+      "claim_hash": "645e0534c642c6bb1422f3082fb9d4b0ec832d49d05f914a4584d92fa0105311",
+      "evidence_hash": "535235134d20a4091d9ca179c19cd54f3a6ae55ca7972949deb2686787125d8e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` が `DryCheckCoverageRecord`（fragment_refs: 処理した diff フラグメントの FragmentRef 集合、processed_pair_keys: 判定対象として確定したペアキー集合、config_fingerprint: 実行時 dry-check.json 設定のフィンガープリント、corpus_fingerprint: 実行時 workspace corpus のフィンガープリント）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。`dry write` が信頼できるカバレッジを作れない失敗ランでは fail_closed() フィンガープリントを記録し、次回 `dry check-approved` が Blocked へ倒れるようにする。"
+      }
+    },
+    {
+      "claim_hash": "be6fd8b857d12991ac0110838a2b85ac042fcbb77c1d19ac69117119b5afc7e7",
+      "evidence_hash": "535235134d20a4091d9ca179c19cd54f3a6ae55ca7972949deb2686787125d8e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`config_fingerprint: 実行時 dry-check.json 設定のフィンガープリント、corpus_fingerprint: 実行時 workspace corpus のフィンガープリント` ... `fail_closed() フィンガープリントを記録し`"
+      }
+    }
+  ]
+}
