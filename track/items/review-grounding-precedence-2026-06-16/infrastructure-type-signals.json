@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-16T05:31:41Z",
+  "declaration_hash": "ec1e13fea4f364c6c7d22c952b86bf9cf384194a884e383dcd711f980bee4c16",
+  "signals": [
+    {
+      "type_name": "infrastructure::adr_decision::parse::parse_adr_frontmatter",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrFrontMatterCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsAdrFileAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -46,6 +46,65 @@
           "findings": [],
           "hash": "rvw1:sha256:e6a3decf976b0e67d4db79d967451c2cb19f47f5f527fc52fcdfe4f47b3a16cd",
           "at": "2026-06-16T04:25:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OS-02` still says the single-vs-split grounding ref type decision is deferred to Phase 2, but the Phase 2 artifacts have already closed that choice on a shared `DecisionGroundRef` (`domain-types.json` also makes `AdrDecisionCommon` use `Option<DecisionGroundRef>`). The plan set is internally inconsistent about whether this architecture decision is still open.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/review-grounding-precedence-2026-06-16/spec.json",
+              "line": 122,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:07a39b46e5965b92e50c259a6ffae72fe4a4e813ca80bee05001fd841c23f0de",
+          "at": "2026-06-16T05:08:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c337080ada874eaa2c3432f604b13158370eeb5d2b5aa37709198a0a43aa243",
+          "at": "2026-06-16T05:12:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-06 and AC-08 describe the fail-closed empty-placeholder behavior as belonging to `CN-04`, but `CN-04` is the domain/infrastructure placement constraint; the actual fail-closed constraint is `CN-01`. The impl plan and infrastructure catalogue already use `CN-01` for this behavior, so the spec/rendered spec currently contain a broken cross-reference that can send implementation and coverage review to the wrong constraint.",
+              "severity": "P1",
+              "file": "track/items/review-grounding-precedence-2026-06-16/spec.json",
+              "line": 81,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:0c337080ada874eaa2c3432f604b13158370eeb5d2b5aa37709198a0a43aa243",
+          "at": "2026-06-16T05:17:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.md` renders `DecisionGroundRef` with action `—`, but the source catalogue defines `types.DecisionGroundRef.action` as `add` and the spec/plan require adding this new value object. This makes the rendered view contradict the JSON SSoT for the central domain type in the plan artifacts.",
+              "severity": "P1",
+              "file": "track/items/review-grounding-precedence-2026-06-16/domain-types.md",
+              "line": 15,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b90b705e8d14ec1934afddedcb9f8d7ede1aeb316915dec5b55dc05052894edd",
+          "at": "2026-06-16T05:21:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b90b705e8d14ec1934afddedcb9f8d7ede1aeb316915dec5b55dc05052894edd",
+          "at": "2026-06-16T05:29:49Z"
         }
       ]
     }

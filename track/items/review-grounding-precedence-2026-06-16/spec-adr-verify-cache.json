@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "65614b769f30423d7609499beadfd16fc8009b288b021567847700d5511dc858",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review_finding_ref が user_decision_ref より優先される。`review_finding_ref` あり（`user_decision_ref` の有無を問わず） | 🟡 黄"
+      }
+    },
+    {
+      "claim_hash": "b56d4450892f68da416a4a1a1ff78f47a36d588252b27ccae647cf6d147dfb87",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`user_decision_ref` / `review_finding_ref` の grounding 参照文字列に対応する**ドメイン値オブジェクト（newtype）**を domain 層に新設し、その fallible な構築関数（`try_new`）で空文字・空白のみを `Err`"
+      }
+    },
+    {
+      "claim_hash": "1f72bd7d1c5acad4327521561ded7fa456c50eb1d4f4eb3d736823276941a155",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1 | `grandfathered: true` | _(スキップ — 評価対象外)_\n2 | `review_finding_ref` あり（`user_decision_ref` の有無を問わず） | 🟡 黄\n3 | `user_decision_ref` あり かつ `review_finding_ref` なし | 🔵 青\n4 | いずれの根拠もなし | 🔴 赤"
+      }
+    },
+    {
+      "claim_hash": "7bc7a2d662e9ea3d007d9117e1a1126d332ecc9b195d1ccb33c473c8120a4cad",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_finding_ref` が `user_decision_ref` より優先される。"
+      }
+    },
+    {
+      "claim_hash": "48c00238f174ed14c080a65cb529dab09c19e05cb9c7edf878f5e7e8f47851c9",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_finding_ref` が `user_decision_ref` より優先される。"
+      }
+    },
+    {
+      "claim_hash": "3c68cbffd640366fe53e42608d2c9231be46d42d84786aa1b5c843a5365f4853",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`user_decision_ref` / `review_finding_ref` の grounding 参照文字列に対応する**ドメイン値オブジェクト（newtype）を domain 層に新設**し、その fallible な構築関数（`try_new`）で空文字・空白のみを `Err`（`ValidationError`）として弾く。 ... 既存の `InformalGroundSummary::try_new` / `AdrAnchor::try_new` と同じ「空・空白 reject」パターンに揃える。"
+      }
+    },
+    {
+      "claim_hash": "44edeeaacfe56f20f11b290a0f65da655c201e48ca8a911bae185c9f45f11012",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「AdrDecisionCommon は当該フィールドを Option<String> ではなく Option<該当 newtype> で保持する。」"
+      }
+    },
+    {
+      "claim_hash": "ff20ec1ab139868d1043a0661ded7318103b89309a576727674bdf5bf9ae3712",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`decision_dto_to_entry` / `AdrDecisionCommon` 構築」で「値オブジェクトの構築エラーを `AdrFrontMatterCodecError::InvalidDecisionField` として伝播させる」「空・未記入 placeholder の slip-through を防ぐ fail-closed」"
+      }
+    },
+    {
+      "claim_hash": "a5b5a797cca8c6c93ab95647c94cab4dcefb6432b1b009c5995512b7be68253c",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| 2 | `review_finding_ref` あり（`user_decision_ref` の有無を問わず） | 🟡 黄 |\n- 🟡 黄の意味を「review 由来の根拠が残る（正式なユーザー承認への昇格が未完）」とする。両方の ref を持つ decision はこの状態に該当するため 🟡 に畳む。"
+      }
+    },
+    {
+      "claim_hash": "f457badae9bdd70df00a7ece1156a30fdacde8f10457935f8e71fe894985b046",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 D1 の front-matter を `status: superseded` に遷移させ、`superseded_by: 2026-06-16-0042-adr-signal-review-grounding-precedence.md#D1` を付帯する。"
+      }
+    },
+    {
+      "claim_hash": "fb61538e8a8567f45611231cb2e98115c5dae4f5c858f554416c763b681f5d82",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この per-decision 確認・grounding 付与は本 ADR 実装 track の code/artifact 変更には含めず、別途の手動 follow-up として扱う"
+      }
+    },
+    {
+      "claim_hash": "e80f28ba3d2b2880fe1066c109cafbb77cd9d4ca4728732e04eb3e8cb4240c28",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「単一型（例: DecisionGroundRef）にするか、UserDecisionRef / ReviewFindingRef の 2 型に分けるかは Phase 2 type-design で確定する。バリデーション規則は共通（非空・非空白）"
+      }
+    },
+    {
+      "claim_hash": "6f8c686badacfae86f3e5e6bde80bb9b87e756dabe12fb6f83bbc4aa1fb4e268",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`try_new` で空文字・空白のみを `Err`（`ValidationError`）として弾く。 ... 空 → `None` への正規化は**採らない**。 ... 空・空白は fail-closed で**エラー**にする。"
+      }
+    },
+    {
+      "claim_hash": "eb947968354699dfa5fcc9415e7c59f78c3e74564c5398df7717b4c5c1c8ab25",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各 decision の信号は次の順序で評価する。」…「本 D1 は旧 `2026-04-27-1234` D1 の信号表を取り消し、現行の唯一の真とする。」"
+      }
+    },
+    {
+      "claim_hash": "d665e79acd5e830d89a253c089a2a3e4921137f1bcd0135e37fd04ffa3377053",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| 1 | `grandfathered: true` | _(スキップ — 評価対象外)_ |\n- 🔴 赤が CI を block する挙動、`grandfathered: true` が評価対象外となる挙動（最上位スキップ）は**不変**。"
+      }
+    },
+    {
+      "claim_hash": "3775043fdefdd60e9c71ba8639b224c7457ea4b13f80c2b77a715c1bf80bae33",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`user_decision_ref` / `review_finding_ref` の grounding 参照文字列に対応する**ドメイン値オブジェクト（newtype）を domain 層に新設**し、その fallible な構築関数（`try_new`）で空文字・空白のみを `Err`（`ValidationError`）として弾く。... infrastructure の DTO→domain 変換（`decision_dto_to_entry` / `AdrDecisionCommon` 構築）で値オブジェクトの構築エラーを `AdrFrontMatterCodecError::InvalidDecisionField` として伝播させる"
+      }
+    },
+    {
+      "claim_hash": "fef8be3e2278992f5e1c2ac70b2ff784a1284c48c0588f2515af32fe0c058fab",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「旧 ADR の D2.../ D3.../ D4...には触れない。それらは本決定の対象外で有効なまま。」"
+      }
+    },
+    {
+      "claim_hash": "cbc58ec427d47f6352ad6a166ee799bb8cf2d19a32bf7e3de279a2a754f037d2",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_finding_ref` が `user_decision_ref` より優先される。"
+      }
+    },
+    {
+      "claim_hash": "8e5a4241cd31457159b88f9394e27173a156600f511e44e3c122ed0e65bd4b2f",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "3 | `user_decision_ref` あり かつ `review_finding_ref` なし | 🔵 青\n- 🔵 青の意味を「ユーザーが明示承認し、**かつ未解決の review 由来根拠が残っていない**」に限定する。"
+      }
+    },
+    {
+      "claim_hash": "f986aef4988d36771f2c9c4de17ed4bd3da18d946f41c9f46153b44f47039ec4",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| 4 | いずれの根拠もなし | 🔴 赤 |"
+      }
+    },
+    {
+      "claim_hash": "2cbf4ff70c9459a38ad330d824731073d3cb42f2933eafa9a3066ea4e73527a1",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| 1 | `grandfathered: true` | _(スキップ — 評価対象外)_ |\n\n- 🔴 赤が CI を block する挙動、`grandfathered: true` が評価対象外となる挙動（最上位スキップ）は**不変**。"
+      }
+    },
+    {
+      "claim_hash": "e11d5b98e2288388f09a5bf229c2a6ec83ced5339eab911d577ebca3a358c80d",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`user_decision_ref` / `review_finding_ref` の grounding 参照文字列に対応する**ドメイン値オブジェクト（newtype）を domain 層に新設**し、その fallible な構築関数（`try_new`）で空文字・空白のみを `Err`（`ValidationError`）として弾く。"
+      }
+    },
+    {
+      "claim_hash": "de00e578dace856b474347eb058d5f287a683841e334fbdc0e5cdf32c0984734",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "その fallible な構築関数（`try_new`）で空文字・空白のみを `Err`（`ValidationError`）として弾く。"
+      }
+    },
+    {
+      "claim_hash": "9352a90db6bdbc654f3536f96ee8d3b7c742747e0ca17f2f3a7580269ecd3dbc",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`try_new` で空文字・空白のみを `Err`（`ValidationError`）として弾く」"
+      }
+    },
+    {
+      "claim_hash": "7fbd7c0e3d65afe1210ec92172fc8f0e1255a1b73b7d1a45de294b8a7d1173d3",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「空・空白は fail-closed で**エラー**にする」 / 「構築エラーを `AdrFrontMatterCodecError::InvalidDecisionField` として伝播させ、`verify adr-signals` を fail させる」"
+      }
+    },
+    {
+      "claim_hash": "59e331da0849252b0b91e987be199dea2662d38efb433634260e4539f593380b",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 旧 D1 の front-matter を `status: superseded` に遷移させ、`superseded_by: 2026-06-16-0042-adr-signal-review-grounding-precedence.md#D1` を付帯する。"
+      }
+    },
+    {
+      "claim_hash": "c2e715c3f0049e72d760a6d56cc21314e49c99b10bce867fc243f2e02661fc99",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_finding_ref` あり（`user_decision_ref` の有無を問わず） | 🟡 黄"
+      }
+    },
+    {
+      "claim_hash": "030f8569ade53385f5bafc2b53783ccd524b8167345847a950aafb5dfc585450",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の DTO→domain 変換（`decision_dto_to_entry` / `AdrDecisionCommon` 構築）で値オブジェクトの構築エラーを `AdrFrontMatterCodecError::InvalidDecisionField` として伝播させる"
+      }
+    },
+    {
+      "claim_hash": "137ae11feb3cb5732dfca36d55153aeec99319d1676a12e65c865970e7ed7e33",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`infrastructure の DTO→domain 変換（decision_dto_to_entry / AdrDecisionCommon 構築）で値オブジェクトの構築エラーを `AdrFrontMatterCodecError::InvalidDecisionField` として伝播させ、`verify adr-signals` を fail させる（空・未記入 placeholder の slip-through を防ぐ fail-closed、CN-04）。`\n\n`目的: 空の placeholder（Some(\"\")）が is_some() を満たして信号を誤誘発するのを型レベルで排除する。`"
+      }
+    },
+    {
+      "claim_hash": "6ec67002f81e482eed284f9e82bea87213d3f938d517d2877bd5fab459ca11c4",
+      "evidence_hash": "15e78843544b1e5b5549931fc1e1ecddd70910e38b1e43023d4cae5972d765e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "newtype を user / review で共有する単一型（例: `DecisionGroundRef`）にするか、`UserDecisionRef` / `ReviewFindingRef` の 2 型に分けるかは Phase 2 type-design で確定する。バリデーション規則は共通（非空・非空白。必要に応じ single-line 制約も検討）。"
+      }
+    }
+  ]
+}

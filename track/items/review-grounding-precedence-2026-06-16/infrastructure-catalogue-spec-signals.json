@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "ec1e13fea4f364c6c7d22c952b86bf9cf384194a884e383dcd711f980bee4c16",
+  "signals": [
+    {
+      "type_name": "AdrFrontMatterCodecError",
+      "signal": "blue",
+      "entry_hash": "1e8308b8d4274b639b1a0305601455a6ed447de5a9b43679de24ea21e3ec2928"
+    },
+    {
+      "type_name": "FsAdrFileAdapter",
+      "signal": "blue",
+      "entry_hash": "877cc91a93c01d2eea0ff7e8f3372296eef14cff1885ee631acc5e6b947002c4"
+    },
+    {
+      "type_name": "infrastructure::adr_decision::parse::parse_adr_frontmatter",
+      "signal": "blue",
+      "entry_hash": "20dbaf4fb30c43ebf59ca06bf3819b77bc5f5795bbe62137ccb87e4457d5e468"
+    }
+  ]
+}
