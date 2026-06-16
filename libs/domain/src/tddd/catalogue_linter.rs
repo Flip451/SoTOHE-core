@@ -142,6 +142,37 @@ impl RoleKind {
             Self::Repository => "Repository",
         }
     }
+
+    /// Returns `true` when this discriminant carries the named `TypeRef` field.
+    ///
+    /// Used by the `ReferencedRoleConstraint` pre-check to reject
+    /// `target_role × target_field` combinations that cannot produce any role
+    /// reference checks (D19 fail-closed).
+    ///
+    /// `pub(crate)` — internal helper; not part of the public API surface.
+    #[must_use]
+    pub(crate) fn carries_type_ref_field(self, field: &str) -> bool {
+        match field {
+            "exclusive_members" | "shared_value_objects" => matches!(self, Self::AggregateRoot),
+            "emits" => matches!(self, Self::AggregateRoot | Self::DomainService),
+            "handles" => matches!(self, Self::UseCase),
+            "reacts_to" => matches!(self, Self::EventPolicy),
+            "aggregate" => matches!(self, Self::Repository),
+            _ => false,
+        }
+    }
+
+    /// Returns `true` when this discriminant maps to a `DataRole` entry.
+    #[must_use]
+    pub(crate) fn is_data_role(self) -> bool {
+        !matches!(
+            self,
+            Self::SpecificationPort
+                | Self::ApplicationService
+                | Self::SecondaryPort
+                | Self::Repository
+        )
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -1032,6 +1063,38 @@ mod tests {
         assert!(violations[0].message().contains("emits"));
     }
 
+    #[test]
+    fn test_field_empty_rejects_contract_only_target_role() {
+        // FieldEmpty only evaluates TypeEntry/DataRole entries. A ContractRole-only
+        // target would otherwise iterate no entries and return success.
+        let mut doc = make_doc("domain");
+        doc.traits.insert(
+            TraitName::new("OrderRepo").unwrap(),
+            make_trait_entry(ContractRole::Repository {
+                aggregate: TypeRef::new("Order").unwrap(),
+            }),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Repository]),
+            CatalogueLinterRuleKind::FieldEmpty { target_field: "emits".to_owned() },
+        )
+        .unwrap();
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("emits") && msg.contains("Repository")
+            ),
+            "expected InvalidRuleConfig for Repository FieldEmpty target, got: {result:?}"
+        );
+    }
+
     // ===========================================================================
     // T016: Rule 2 — FieldNonEmpty
     // ===========================================================================
@@ -1071,6 +1134,38 @@ mod tests {
         assert_eq!(violations[0].rule_kind(), "FieldNonEmpty");
         assert_eq!(violations[0].entry_name(), "MyUseCase");
         assert!(violations[0].message().contains("handles"));
+    }
+
+    #[test]
+    fn test_field_non_empty_rejects_contract_only_target_role() {
+        // FieldNonEmpty only evaluates TypeEntry/DataRole entries. A ContractRole-only
+        // target would otherwise iterate no entries and return success.
+        let mut doc = make_doc("domain");
+        doc.traits.insert(
+            TraitName::new("OrderRepo").unwrap(),
+            make_trait_entry(ContractRole::Repository {
+                aggregate: TypeRef::new("Order").unwrap(),
+            }),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Repository]),
+            CatalogueLinterRuleKind::FieldNonEmpty { target_field: "emits".to_owned() },
+        )
+        .unwrap();
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("emits") && msg.contains("Repository")
+            ),
+            "expected InvalidRuleConfig for Repository FieldNonEmpty target, got: {result:?}"
+        );
     }
 
     // ===========================================================================
@@ -1194,6 +1289,45 @@ mod tests {
         assert_eq!(violations[0].entry_name(), "OrderAgg");
         assert!(violations[0].message().contains("OrderEntity"));
         assert!(violations[0].message().contains("DomainEvent"));
+    }
+
+    #[test]
+    fn test_referenced_role_constraint_rejects_role_field_mismatch() {
+        // Repository × "emits" must fail-closed with InvalidRuleConfig.
+        //
+        // "emits" is a DataRole-only field (AggregateRoot / DomainService).
+        // Repository is a ContractRole-kind role.  Supplying a DataRole-only
+        // target_field together with an exclusively ContractRole target_roles list
+        // is an incoherent configuration — no catalogue entry can ever carry that
+        // field — so the evaluator must return Err(InvalidRuleConfig) rather than
+        // silently iterating zero entries (D19 fail-closed).
+        let mut doc = make_doc("domain");
+        // Add a Repository trait entry so the rule has at least one candidate entry
+        // to iterate if the pre-check were absent.
+        doc.traits.insert(
+            TraitName::new("OrderRepo").unwrap(),
+            make_trait_entry(ContractRole::Repository {
+                aggregate: TypeRef::new("Order").unwrap(),
+            }),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Repository]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "emits".to_owned(),
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+
+        assert!(
+            matches!(&result, Err(CatalogueLinterError::InvalidRuleConfig(msg)) if msg.contains("emits")),
+            "expected InvalidRuleConfig for Repository × emits mismatch, got: {result:?}"
+        );
     }
 
     // ===========================================================================
@@ -1599,6 +1733,69 @@ mod tests {
         assert!(violations[0].message().contains("EntityA"));
     }
 
+    #[test]
+    fn test_field_element_unique_across_entries_rejects_non_exclusive_members_target_field() {
+        // FieldElementUniqueAcrossEntries is defined only for "exclusive_members" (ADR D6/D11).
+        // Supplying any other DataRole field (e.g. "emits") must return
+        // Err(InvalidRuleConfig) — the evaluator must not silently iterate zero
+        // entries (D19 fail-closed).
+        let doc = make_doc("domain");
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries {
+                target_field: "emits".to_owned(),
+            },
+        )
+        .unwrap();
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+
+        assert!(
+            matches!(&result, Err(CatalogueLinterError::InvalidRuleConfig(msg)) if msg.contains("emits")),
+            "expected InvalidRuleConfig for FieldElementUniqueAcrossEntries with target_field 'emits', \
+             got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_field_element_unique_across_entries_rejects_non_aggregate_target_role() {
+        // FieldElementUniqueAcrossEntries inspects AggregateRoot.exclusive_members only.
+        // Targeting a role that cannot carry that field must fail closed instead of
+        // silently seeing an empty refs slice.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries {
+                target_field: "exclusive_members".to_owned(),
+            },
+        )
+        .unwrap();
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("exclusive_members") && msg.contains("Entity")
+            ),
+            "expected InvalidRuleConfig for Entity target with exclusive_members, got: {result:?}"
+        );
+    }
+
     // Note: AC-16 exclusive_members uniqueness is covered by
     // test_field_element_unique_across_entries_violation_when_overlap above.
 
@@ -1693,6 +1890,42 @@ mod tests {
         assert_eq!(violations[0].entry_name(), "AggA");
         assert!(violations[0].message().contains("EntityA"));
         assert!(violations[0].message().contains("ExternalService"));
+    }
+
+    #[test]
+    fn test_no_external_reference_in_methods_rejects_non_aggregate_target_role() {
+        // NoExternalReferenceInMethods inspects AggregateRoot.exclusive_members only.
+        // Targeting a role that cannot carry that field must fail closed instead of
+        // silently building an empty aggregate boundary set.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::NoExternalReferenceInMethods {
+                target_field: "exclusive_members".to_owned(),
+            },
+        )
+        .unwrap();
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("exclusive_members") && msg.contains("Entity")
+            ),
+            "expected InvalidRuleConfig for Entity target with exclusive_members, got: {result:?}"
+        );
     }
 
     // ===========================================================================
@@ -2648,6 +2881,235 @@ mod tests {
                  got: {violations:?}"
             );
         }
+    }
+
+    // ===========================================================================
+    // D19 fail-closed: unknown target_field rejects with InvalidRuleConfig
+    // ===========================================================================
+
+    #[test]
+    fn test_evaluate_catalogue_lint_unknown_target_field_returns_invalid_rule_config() {
+        // FieldEmpty with target_field "emit" (typo for "emits") must return
+        // Err(InvalidRuleConfig) rather than silently treating the field as empty.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyService").unwrap(),
+            make_type_entry(DataRole::DomainService {
+                emits: vec![TypeRef::new("OrderPlaced").unwrap()],
+            }),
+        );
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::DomainService]),
+            CatalogueLinterRuleKind::FieldEmpty { target_field: "emit".to_owned() }, // typo
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let result = evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone());
+        let is_invalid = matches!(&result, Err(CatalogueLinterError::InvalidRuleConfig(msg)) if msg.contains("emit"));
+        assert!(
+            is_invalid,
+            "expected Err(InvalidRuleConfig) for unknown target_field 'emit', got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_unknown_target_field_for_referenced_role_constraint_returns_error()
+     {
+        // ReferencedRoleConstraint with target_field "handle" (typo for "handles") must
+        // return Err(InvalidRuleConfig) rather than silently reporting zero violations.
+        let mut doc = make_doc("domain");
+        doc.types
+            .insert(TypeName::new("OrderPlaced").unwrap(), make_type_entry(DataRole::DomainEvent));
+        doc.types.insert(
+            TypeName::new("PlaceOrder").unwrap(),
+            make_type_entry(DataRole::UseCase {
+                handles: vec![TypeRef::new("OrderPlaced").unwrap()],
+            }),
+        );
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "handle".to_owned(), // typo — should be "handles"
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let result = evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone());
+        let is_invalid = matches!(&result, Err(CatalogueLinterError::InvalidRuleConfig(msg)) if msg.contains("handle"));
+        assert!(
+            is_invalid,
+            "expected Err(InvalidRuleConfig) for unknown target_field 'handle', got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_referenced_role_constraint_invariants_returns_error() {
+        // "invariants" is a valid DataRole field for FieldEmpty / FieldNonEmpty,
+        // but it contains predicate declarations rather than TypeRef role references.
+        // ReferencedRoleConstraint must reject it instead of silently checking no refs.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("Order").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![invariant_decl("is_valid")],
+            }),
+        );
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "invariants".to_owned(),
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let result = evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone());
+        let is_invalid = matches!(
+            &result,
+            Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                if msg.contains("ReferencedRoleConstraint") && msg.contains("invariants")
+        );
+        assert!(
+            is_invalid,
+            "expected Err(InvalidRuleConfig) for ReferencedRoleConstraint target_field \
+             'invariants', got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_referenced_role_constraint_rejects_field_not_carried_by_data_target_role() {
+        // Entity does not carry "emits"; an explicit Entity target must not silently
+        // evaluate zero refs for ReferencedRoleConstraint.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "emits".to_owned(),
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let result = evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone());
+        let is_invalid = matches!(
+            &result,
+            Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                if msg.contains("emits") && msg.contains("Entity")
+        );
+        assert!(
+            is_invalid,
+            "expected Err(InvalidRuleConfig) for Entity target_field 'emits', got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_referenced_role_constraint_rejects_field_not_carried_by_contract_target_role() {
+        // SpecificationPort does not carry "aggregate"; only Repository does.
+        let mut doc = make_doc("domain");
+        doc.traits.insert(
+            TraitName::new("OrderSpecPort").unwrap(),
+            make_trait_entry(ContractRole::SpecificationPort),
+        );
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::SpecificationPort]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "aggregate".to_owned(),
+                expected_role: RoleKind::AggregateRoot,
+            },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let result = evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone());
+        let is_invalid = matches!(
+            &result,
+            Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                if msg.contains("aggregate") && msg.contains("SpecificationPort")
+        );
+        assert!(
+            is_invalid,
+            "expected Err(InvalidRuleConfig) for SpecificationPort target_field \
+             'aggregate', got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_field_type_refs_aggregate_on_data_role_returns_empty_slice() {
+        // "aggregate" is a ContractRole-only field; DataRole does not carry it.
+        // field_type_refs must return Ok(&[]) (not an error) so that a
+        // ReferencedRoleConstraint rule whose RuleTarget covers both DataRole and
+        // ContractRole entries can still evaluate the ContractRole trait entries.
+        // Only field names that are unrecognised in any role's vocabulary are rejected.
+        use super::helpers::field_type_refs;
+        let role = DataRole::AggregateRoot {
+            identity: identity_accessor("id"),
+            invariants: vec![],
+            exclusive_members: vec![TypeRef::new("OrderLine").unwrap()],
+            shared_value_objects: vec![],
+            emits: vec![],
+        };
+        let result = field_type_refs(&role, "aggregate");
+        assert!(
+            matches!(result, Ok(slice) if slice.is_empty()),
+            "expected Ok(&[]) for ContractRole-only field 'aggregate' on DataRole, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_field_type_refs_truly_unknown_field_returns_error() {
+        // A field name that is not in any role's vocabulary must return Err(InvalidRuleConfig).
+        // (As opposed to cross-role fields like "aggregate" which return Ok(&[]) for DataRole.)
+        use super::helpers::field_type_refs;
+        let role = DataRole::DomainService { emits: vec![] };
+        let result = field_type_refs(&role, "no_such_field_xyz");
+        let is_invalid = matches!(&result, Err(CatalogueLinterError::InvalidRuleConfig(msg)) if msg.contains("no_such_field_xyz"));
+        assert!(
+            is_invalid,
+            "expected Err(InvalidRuleConfig) for truly unknown field 'no_such_field_xyz', got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_unknown_target_field_for_referenced_role_constraint_on_trait_returns_error()
+     {
+        // ReferencedRoleConstraint with an unknown target_field for a trait (ContractRole) target
+        // must return Err(InvalidRuleConfig).  Previously, contract_role_type_ref returned None
+        // for unrecognised field names, causing a silent skip instead of a fail-closed error.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderAgg").unwrap(),
+            make_type_entry(DataRole::aggregate_root().unwrap()),
+        );
+        doc.traits.insert(
+            TraitName::new("OrderRepository").unwrap(),
+            make_trait_entry(ContractRole::Repository {
+                aggregate: TypeRef::new("OrderAgg").unwrap(),
+            }),
+        );
+        // "aggregat" is a typo for "aggregate" — unknown ContractRole field name.
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Repository]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: "aggregat".to_owned(), // typo
+                expected_role: RoleKind::AggregateRoot,
+            },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let result = evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone());
+        let is_invalid = matches!(&result, Err(CatalogueLinterError::InvalidRuleConfig(msg)) if msg.contains("aggregat"));
+        assert!(
+            is_invalid,
+            "expected Err(InvalidRuleConfig) for unknown ContractRole target_field 'aggregat', got: {result:?}"
+        );
     }
 
     #[test]

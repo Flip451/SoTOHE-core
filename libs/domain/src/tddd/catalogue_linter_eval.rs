@@ -13,6 +13,7 @@ use super::helpers::{
     bare_name_in_type_ref, contract_role_type_ref, entry_role_kind, field_type_refs,
     field_vec_is_empty, has_trait_impl, identity_accessor_name, invariants_for_role,
     struct_has_public_fields, trait_entries_for_target, type_entries_for_target,
+    validate_contract_role_field, validate_data_role_field,
 };
 use super::{
     CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
@@ -29,6 +30,44 @@ use crate::tddd::layer_id::LayerId;
 mod eval_helpers;
 
 use eval_helpers::{resolve_type_role, sig_type_contains_entry};
+
+fn ensure_target_can_produce_type_ref_checks(
+    rule_kind: &str,
+    target_roles: &[RoleKind],
+    target_field: &str,
+) -> Result<(), CatalogueLinterError> {
+    if target_roles.is_empty()
+        || target_roles.iter().any(|role| role.carries_type_ref_field(target_field))
+    {
+        return Ok(());
+    }
+
+    let role_names =
+        target_roles.iter().map(|role| role.variant_name()).collect::<Vec<_>>().join(", ");
+    Err(CatalogueLinterError::InvalidRuleConfig(format!(
+        "{}: target_field '{}' is not carried by any target_roles [{}]; \
+         this combination can never produce TypeRef checks",
+        rule_kind, target_field, role_names
+    )))
+}
+
+fn ensure_target_can_produce_data_role_field_checks(
+    rule_kind: &str,
+    target_roles: &[RoleKind],
+    target_field: &str,
+) -> Result<(), CatalogueLinterError> {
+    if target_roles.is_empty() || target_roles.iter().any(|role| role.is_data_role()) {
+        return Ok(());
+    }
+
+    let role_names =
+        target_roles.iter().map(|role| role.variant_name()).collect::<Vec<_>>().join(", ");
+    Err(CatalogueLinterError::InvalidRuleConfig(format!(
+        "{}: target_field '{}' is a DataRole field but target_roles [{}] contain no DataRole \
+         entries; this combination can never produce field checks",
+        rule_kind, target_field, role_names
+    )))
+}
 
 /// Evaluate `rules` against the catalogue identified by `target_layer_id`
 /// within `all_catalogues`.
@@ -69,8 +108,14 @@ pub fn evaluate_catalogue_lint(
     for rule in rules {
         match rule.kind() {
             CatalogueLinterRuleKind::FieldEmpty { target_field } => {
+                validate_data_role_field(target_field.as_str())?;
+                ensure_target_can_produce_data_role_field_checks(
+                    rule.kind().discriminant_name(),
+                    rule.target().target_roles(),
+                    target_field.as_str(),
+                )?;
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    if !field_vec_is_empty(&entry.role, target_field.as_str()) {
+                    if !field_vec_is_empty(&entry.role, target_field.as_str())? {
                         violations.push(CatalogueLintViolation::new(
                             rule.kind().discriminant_name(),
                             name.as_str(),
@@ -81,8 +126,14 @@ pub fn evaluate_catalogue_lint(
             }
 
             CatalogueLinterRuleKind::FieldNonEmpty { target_field } => {
+                validate_data_role_field(target_field.as_str())?;
+                ensure_target_can_produce_data_role_field_checks(
+                    rule.kind().discriminant_name(),
+                    rule.target().target_roles(),
+                    target_field.as_str(),
+                )?;
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    if field_vec_is_empty(&entry.role, target_field.as_str()) {
+                    if field_vec_is_empty(&entry.role, target_field.as_str())? {
                         violations.push(CatalogueLintViolation::new(
                             rule.kind().discriminant_name(),
                             name.as_str(),
@@ -119,8 +170,35 @@ pub fn evaluate_catalogue_lint(
             }
 
             CatalogueLinterRuleKind::ReferencedRoleConstraint { target_field, expected_role } => {
+                // Validate the target_field eagerly so that an unknown field name is
+                // rejected even when the catalogue has no matching entries (D19 fail-closed).
+                // A field may belong to DataRole only (e.g. "emits") or ContractRole only
+                // (e.g. "aggregate").  Reject only names that are unrecognised in BOTH
+                // contexts; role-specific validation happens per entry in the loops below.
+                let field_str = target_field.as_str();
+                if field_str == "invariants" {
+                    return Err(CatalogueLinterError::InvalidRuleConfig(
+                        "ReferencedRoleConstraint: unsupported target_field 'invariants'; \
+                         invariants are predicate declarations, not TypeRef role references; \
+                         valid target_field values are: exclusive_members, shared_value_objects, \
+                         emits, handles, reacts_to, aggregate"
+                            .to_owned(),
+                    ));
+                }
+                if validate_data_role_field(field_str).is_err()
+                    && validate_contract_role_field(field_str).is_err()
+                {
+                    // Propagate the DataRole error as the primary diagnostic.
+                    validate_data_role_field(field_str)?;
+                }
+
+                ensure_target_can_produce_type_ref_checks(
+                    rule.kind().discriminant_name(),
+                    rule.target().target_roles(),
+                    field_str,
+                )?;
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    for type_ref in field_type_refs(&entry.role, target_field.as_str()) {
+                    for type_ref in field_type_refs(&entry.role, target_field.as_str())? {
                         let ref_str = type_ref.as_str();
                         if resolve_type_role(ref_str, all_catalogues, target_layer_id)
                             != Some(*expected_role)
@@ -141,7 +219,7 @@ pub fn evaluate_catalogue_lint(
 
                 for (name, entry) in trait_entries_for_target(catalogue, rule.target()) {
                     if let Some(type_ref) =
-                        contract_role_type_ref(&entry.role, target_field.as_str())
+                        contract_role_type_ref(&entry.role, target_field.as_str())?
                     {
                         let ref_str = type_ref.as_str();
                         if resolve_type_role(ref_str, all_catalogues, target_layer_id)
@@ -342,13 +420,29 @@ pub fn evaluate_catalogue_lint(
             }
 
             CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries { target_field } => {
+                // Per ADR D6/D11, this rule is defined only for `exclusive_members`.
+                // Other DataRole fields (emits, handles, reacts_to, shared_value_objects,
+                // invariants) do not have cross-entry uniqueness semantics in the
+                // minimum-core rule set (D19 fail-closed).
+                if target_field.as_str() != "exclusive_members" {
+                    return Err(CatalogueLinterError::InvalidRuleConfig(format!(
+                        "FieldElementUniqueAcrossEntries: unsupported target_field '{}'; \
+                         only 'exclusive_members' is supported (ADR D6/D11)",
+                        target_field
+                    )));
+                }
+                ensure_target_can_produce_type_ref_checks(
+                    rule.kind().discriminant_name(),
+                    rule.target().target_roles(),
+                    target_field.as_str(),
+                )?;
                 // Key by the tail segment of the TypeRef so that bare `OrderLine` and
                 // path-qualified `domain::OrderLine` are treated as the same type and the
                 // D11 exclusive-member uniqueness check cannot be bypassed by mixing forms.
                 let mut seen: std::collections::HashMap<String, String> =
                     std::collections::HashMap::new();
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    for type_ref in field_type_refs(&entry.role, target_field.as_str()) {
+                    for type_ref in field_type_refs(&entry.role, target_field.as_str())? {
                         let ref_str = type_ref.as_str();
                         let canonical = ref_str.split("::").last().unwrap_or(ref_str).to_owned();
                         if let Some(prev_entry) = seen.get(&canonical) {
@@ -370,16 +464,29 @@ pub fn evaluate_catalogue_lint(
             }
 
             CatalogueLinterRuleKind::NoExternalReferenceInMethods { target_field } => {
-                let agg_exclusive: Vec<(String, Vec<String>)> =
-                    type_entries_for_target(catalogue, rule.target())
-                        .map(|(name, entry)| {
-                            let refs = field_type_refs(&entry.role, target_field.as_str())
-                                .iter()
-                                .map(|r| r.as_str().to_owned())
-                                .collect();
-                            (name.as_str().to_owned(), refs)
-                        })
+                // Per ADR D6/D11, this rule is defined only for `exclusive_members`.
+                // Other DataRole fields do not have external-reference-in-methods
+                // semantics in the minimum-core rule set (D19 fail-closed).
+                if target_field.as_str() != "exclusive_members" {
+                    return Err(CatalogueLinterError::InvalidRuleConfig(format!(
+                        "NoExternalReferenceInMethods: unsupported target_field '{}'; \
+                         only 'exclusive_members' is supported (ADR D6/D11)",
+                        target_field
+                    )));
+                }
+                ensure_target_can_produce_type_ref_checks(
+                    rule.kind().discriminant_name(),
+                    rule.target().target_roles(),
+                    target_field.as_str(),
+                )?;
+                let mut agg_exclusive: Vec<(String, Vec<String>)> = Vec::new();
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    let refs = field_type_refs(&entry.role, target_field.as_str())?
+                        .iter()
+                        .map(|r| r.as_str().to_owned())
                         .collect();
+                    agg_exclusive.push((name.as_str().to_owned(), refs));
+                }
                 for (agg_name, exclusive_refs) in &agg_exclusive {
                     if exclusive_refs.is_empty() {
                         continue;
@@ -402,7 +509,8 @@ pub fn evaluate_catalogue_lint(
                         if let Some((_name, entry)) = catalogue.types.iter().find(|(n, e)| {
                             n.as_str() == agg_name.as_str() && e.action != ItemAction::Delete
                         }) {
-                            for r in field_type_refs(&entry.role, "shared_value_objects") {
+                            // "shared_value_objects" is a recognised field name — always succeeds.
+                            for r in field_type_refs(&entry.role, "shared_value_objects")? {
                                 let tail =
                                     r.as_str().split("::").last().unwrap_or(r.as_str()).to_owned();
                                 set.insert(tail);

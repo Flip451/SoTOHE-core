@@ -4,7 +4,7 @@
 //! a public module. All items are `pub(super)` so they are visible to
 //! `evaluate_catalogue_lint` in `catalogue_linter_eval.rs`.
 
-use super::{RoleKind, RuleTarget};
+use super::{CatalogueLinterError, RoleKind, RuleTarget};
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
 use crate::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
@@ -58,14 +58,37 @@ pub(super) fn trait_entries_for_target<'a>(
 
 /// Returns the `TypeRef` for the named field of a `ContractRole`, if applicable.
 ///
-/// Currently supports `"aggregate"` on `ContractRole::Repository`.
+/// Returns `Ok(Some(...))` when the field is recognised and the role carries it.
+/// Returns `Ok(None)` when the field is recognised but the given role does not
+/// carry it (e.g. `"aggregate"` on `ContractRole::SecondaryPort`).
+/// Returns `Err(InvalidRuleConfig)` when `field` is not a recognised `ContractRole`
+/// field name (D19 fail-closed: unknown field names in lint config are rejected
+/// rather than silently treated as absent).
 pub(super) fn contract_role_type_ref<'a>(
     role: &'a ContractRole,
     field: &str,
-) -> Option<&'a TypeRef> {
-    match (field, role) {
-        ("aggregate", ContractRole::Repository { aggregate }) => Some(aggregate),
-        _ => None,
+) -> Result<Option<&'a TypeRef>, CatalogueLinterError> {
+    match field {
+        "aggregate" => match role {
+            ContractRole::Repository { aggregate } => Ok(Some(aggregate)),
+            _ => Ok(None),
+        },
+        // DataRole-only fields — not carried by any ContractRole variant.
+        // Return Ok(None) so that the entry is skipped without a violation
+        // (the field is in the overall field vocabulary; only names unrecognised
+        // in any role's vocabulary are rejected).
+        "exclusive_members"
+        | "shared_value_objects"
+        | "emits"
+        | "handles"
+        | "reacts_to"
+        | "invariants" => Ok(None),
+        unknown => Err(CatalogueLinterError::InvalidRuleConfig(format!(
+            "unknown target_field '{}': not a recognised field name in any role; \
+             valid names are: exclusive_members, shared_value_objects, emits, handles, \
+             reacts_to, aggregate, invariants",
+            unknown
+        ))),
     }
 }
 
@@ -204,38 +227,142 @@ pub(super) fn invariants_for_role(
     }
 }
 
+/// Validates that `field` is a recognised `DataRole` field name.
+///
+/// This must be called before any loop over type entries so that an unknown
+/// `target_field` is rejected even when the catalogue contains no matching
+/// entries for the rule's `RuleTarget` (D19 fail-closed).
+///
+/// # Errors
+///
+/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is not a
+/// recognised `DataRole` field name.
+pub(super) fn validate_data_role_field(field: &str) -> Result<(), CatalogueLinterError> {
+    match field {
+        "invariants"
+        | "exclusive_members"
+        | "shared_value_objects"
+        | "emits"
+        | "handles"
+        | "reacts_to" => Ok(()),
+        other => Err(CatalogueLinterError::InvalidRuleConfig(format!(
+            "target_field '{}' is not a recognised DataRole field name; \
+             valid DataRole fields are: exclusive_members, shared_value_objects, emits, handles, \
+             reacts_to, invariants",
+            other
+        ))),
+    }
+}
+
+/// Validates that `field` is a recognised `ContractRole` field name.
+///
+/// This must be called before any loop over trait entries so that an unknown
+/// `target_field` is rejected even when the catalogue contains no matching
+/// entries for the rule's `RuleTarget` (D19 fail-closed).
+///
+/// # Errors
+///
+/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is not a
+/// recognised `ContractRole` field name.
+pub(super) fn validate_contract_role_field(field: &str) -> Result<(), CatalogueLinterError> {
+    match field {
+        "aggregate" => Ok(()),
+        unknown => Err(CatalogueLinterError::InvalidRuleConfig(format!(
+            "unknown target_field '{}' for ContractRole: not a recognised ContractRole field name; \
+             valid names are: aggregate",
+            unknown
+        ))),
+    }
+}
+
 /// Returns `true` when the named field Vec for the given role is empty (or the
 /// role does not carry that field).
 ///
 /// For `"invariants"`, delegates to [`invariants_for_role`] because invariants
 /// use `InvariantDecl` rather than `TypeRef` and are not visible through
 /// [`field_type_refs`].
-pub(super) fn field_vec_is_empty(role: &DataRole, field: &str) -> bool {
+///
+/// # Errors
+///
+/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is not a
+/// recognised `DataRole` field name (D19 fail-closed: unknown field names in lint
+/// config are rejected rather than silently treated as empty).
+pub(super) fn field_vec_is_empty(
+    role: &DataRole,
+    field: &str,
+) -> Result<bool, CatalogueLinterError> {
     if field == "invariants" {
-        return invariants_for_role(role).is_empty();
+        return Ok(invariants_for_role(role).is_empty());
     }
-    field_type_refs(role, field).is_empty()
+    Ok(field_type_refs(role, field)?.is_empty())
 }
 
-/// Returns the `Vec<TypeRef>` for a named field on a `DataRole`, or an empty
-/// slice when the role doesn't carry that field.
+/// Returns the `TypeRef` slice for a named field on a `DataRole`.
+///
+/// Returns an empty slice when the field name is valid but the given role does
+/// not carry that field (e.g. `"emits"` on `DataRole::Entity`).
+///
+/// # Errors
+///
+/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is not a
+/// recognised `DataRole` field name (D19 fail-closed: unknown field names in lint
+/// config are rejected rather than silently treated as empty).
 pub(super) fn field_type_refs<'a>(
     role: &'a DataRole,
     field: &str,
-) -> &'a [crate::tddd::catalogue_v2::identifiers::TypeRef] {
-    match (field, role) {
-        ("invariants", _) => &[], // invariants use InvariantDecl, not TypeRef
-        ("exclusive_members", DataRole::AggregateRoot { exclusive_members, .. }) => {
-            exclusive_members.as_slice()
+) -> Result<&'a [crate::tddd::catalogue_v2::identifiers::TypeRef], CatalogueLinterError> {
+    match field {
+        "invariants" => {
+            // invariants use InvariantDecl, not TypeRef; callers that need
+            // invariants should use `invariants_for_role` directly.
+            Ok(&[])
         }
-        ("shared_value_objects", DataRole::AggregateRoot { shared_value_objects, .. }) => {
-            shared_value_objects.as_slice()
+        "exclusive_members" => {
+            if let DataRole::AggregateRoot { exclusive_members, .. } = role {
+                Ok(exclusive_members.as_slice())
+            } else {
+                Ok(&[])
+            }
         }
-        ("emits", DataRole::AggregateRoot { emits, .. }) => emits.as_slice(),
-        ("emits", DataRole::DomainService { emits }) => emits.as_slice(),
-        ("handles", DataRole::UseCase { handles }) => handles.as_slice(),
-        ("reacts_to", DataRole::EventPolicy { reacts_to }) => reacts_to.as_slice(),
-        ("aggregate", _) => &[], // ContractRole field, not DataRole — handled via trait entries
-        _ => &[],
+        "shared_value_objects" => {
+            if let DataRole::AggregateRoot { shared_value_objects, .. } = role {
+                Ok(shared_value_objects.as_slice())
+            } else {
+                Ok(&[])
+            }
+        }
+        "emits" => match role {
+            DataRole::AggregateRoot { emits, .. } | DataRole::DomainService { emits } => {
+                Ok(emits.as_slice())
+            }
+            _ => Ok(&[]),
+        },
+        "handles" => {
+            if let DataRole::UseCase { handles } = role {
+                Ok(handles.as_slice())
+            } else {
+                Ok(&[])
+            }
+        }
+        "reacts_to" => {
+            if let DataRole::EventPolicy { reacts_to } = role {
+                Ok(reacts_to.as_slice())
+            } else {
+                Ok(&[])
+            }
+        }
+        "aggregate" => {
+            // ContractRole-only field — no DataRole variant carries "aggregate".
+            // Return an empty slice so that the entry is skipped without a
+            // violation (the field is in the overall field vocabulary; only
+            // names unrecognised in any role's vocabulary are rejected).
+            Ok(&[])
+        }
+        unknown => Err(CatalogueLinterError::InvalidRuleConfig(format!(
+            "unknown target_field '{}': not a recognised field name in any role; \
+             valid names are: exclusive_members, shared_value_objects, emits, handles, \
+             reacts_to, aggregate, invariants",
+            unknown
+        ))),
     }
 }
