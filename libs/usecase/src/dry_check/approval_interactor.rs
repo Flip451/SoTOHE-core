@@ -194,6 +194,32 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
             });
         }
 
+        // ── Step 4: Missing-verdict scan — every processed pair touching the
+        // current refs must have a corresponding latest verdict.
+        //
+        // Without this scan, a manifest whose fingerprints and FragmentRefs are
+        // consistent but whose companion `dry-check.json` is missing or truncated
+        // (e.g. partial restore, manual edit) would Approve silently — the loop
+        // above only visits pairs that actually have records, so a processed_pair
+        // with no record at all falls through. Treat any such missing verdict as
+        // unresolved.
+        let mut missing_verdict_pairs = 0usize;
+        for pair_key in coverage_record.processed_pair_keys() {
+            let touches_current = current_fragment_refs.contains(pair_key.low())
+                || current_fragment_refs.contains(pair_key.high());
+            if !touches_current {
+                continue;
+            }
+            if !latest_per_pair.contains_key(pair_key) {
+                missing_verdict_pairs += 1;
+            }
+        }
+        if missing_verdict_pairs > 0 {
+            return Ok(DryCheckApprovalVerdict::Blocked {
+                unresolved_pair_count: missing_verdict_pairs,
+            });
+        }
+
         Ok(DryCheckApprovalVerdict::Approved)
     }
 }
@@ -482,6 +508,24 @@ mod tests {
         let interactor = make_interactor(coverage, vec![record]);
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
         assert_eq!(result, DryCheckApprovalVerdict::Approved);
+    }
+
+    // ── processed pair without verdict (history missing / truncated) → Blocked ──
+
+    #[test]
+    fn test_check_approved_processed_pair_missing_verdict_returns_blocked() {
+        // Scenario: coverage manifest survives (FragmentRefs covered, fingerprints
+        // match) but `dry-check.json` is missing / truncated, so the pair_key in
+        // `processed_pair_keys` has no corresponding record. The pair touches a
+        // current FragmentRef, so the gate must Block rather than silently Approve.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let pair_key = DryCheckPairKey::new(a.clone(), b.clone()).unwrap();
+        let coverage = coverage_with_pairs(vec![a.clone(), b.clone()], vec![pair_key]);
+        // No records — dry-check.json was lost / never written for this pair.
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
+        assert_eq!(result, DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
     }
 
     // ── Violation between fragments not in current diff → Approved ───────────

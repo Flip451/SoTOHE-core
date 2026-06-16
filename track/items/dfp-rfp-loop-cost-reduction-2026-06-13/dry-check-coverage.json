@@ -1,7 +1,151 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "e965287f26b5427becfdf7650ca04c2e58e2328575c2314989077683f63264bb",
-  "fragment_refs": [],
-  "processed_pair_keys": []
+  "corpus_fingerprint": "f06159573c2d2d6fa39399dbf3fa10a5a3668fc2b6e44eced263e40521c840ae",
+  "fragment_refs": [
+    {
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
+    },
+    {
+      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+      "content_hash": "779f3603d8ba7670b5355600b5d5c066a1553582173575793b1312f4c77413e8"
+    }
+  ],
+  "processed_pair_keys": [
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "23b451c35687c9162f753fe52780c35f8b4bbe0564e6e351de9f68e7177e6b48"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "445d1b0b53fa1db9111ab0c53e1129861f5dfc2ff2c8955497b43295cc45d06c"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "4f2e4676400742fa7d69bc74daa656450842da0e5f7114e0c460a0d6d029ffdf"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "67d7baa854b722a9d045f20fc270b8defbb10cb5b17b763f0df62f3b9bd52993"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "74b2cb67c0f214a0a15cb3a30943af115989793663df12e3b2423562d7a7520f"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "98efcfcfeecfc7c141b75089c740030b7acecd2afcabf9f6f7690153fcb73503"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "9ea48170e9ea26bfb142e2e744e7af2ac97d481e377e22afdeacd4075dd9e230"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "c492ca16878516cec16a8e753440c3d4a19f3af03793d99a9a86f8481838c557"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "f677a0075ee35d19a69b2fcd9fbcad18deafcb88c545d7d28cc8c5de82cc1ac9"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "23b451c35687c9162f753fe52780c35f8b4bbe0564e6e351de9f68e7177e6b48"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "9ea48170e9ea26bfb142e2e744e7af2ac97d481e377e22afdeacd4075dd9e230"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
+      },
+      "high": {
+        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
+        "content_hash": "f677a0075ee35d19a69b2fcd9fbcad18deafcb88c545d7d28cc8c5de82cc1ac9"
+      }
+    }
+  ]
 }
