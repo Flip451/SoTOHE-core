@@ -196,6 +196,7 @@ const V3_EXTRA_SECTIONS: &[Section] = &[
     Section { heading: "## Use Case Functions", kind_tag: "use_case_function" },
     Section { heading: "## Repositories", kind_tag: "repository" },
     Section { heading: "## Event Policies", kind_tag: "event_policy" },
+    Section { heading: "## Domain Events", kind_tag: "domain_event" },
 ];
 
 /// Maps a section `kind_tag` (a real v3 role tag, as produced by
@@ -887,6 +888,47 @@ mod tests {
         assert!(
             row.contains("\u{1f535}"),
             "the type-signal stored under the v2-compat 'free_function' key must still paint \u{1f535}, row: {row}"
+        );
+    }
+
+    #[test]
+    fn test_render_includes_domain_event_section() {
+        // A DomainEvent role entry must appear under "## Domain Events" in the
+        // rendered view. This is a regression guard for the T012/T013 bug where
+        // `DataRole::DomainEvent` was added without updating SECTIONS /
+        // V3_EXTRA_SECTIONS, causing DomainEvent entries to be silently dropped.
+        use domain::tddd::catalogue_v2::{
+            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
+            StructShape, TypeEntry, TypeKindV2, TypeName,
+        };
+        use domain::tddd::layer_id::LayerId;
+        let layer = LayerId::try_new("domain".to_owned()).unwrap();
+        let crate_name = CrateName::new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        doc.types.insert(
+            TypeName::new("UserRegistered").unwrap(),
+            TypeEntry {
+                action: ItemAction::Add,
+                role: DataRole::DomainEvent,
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
+                methods: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            },
+        );
+        let output = render_type_catalogue_v3(&doc, "domain-types.json", None, None);
+        assert!(
+            output.contains("## Domain Events"),
+            "a DomainEvent entry must render under '## Domain Events', got:\n{output}"
+        );
+        assert!(
+            output.lines().any(|l| l.contains("| UserRegistered | domain_event |")),
+            "UserRegistered row with 'domain_event' Kind must be present, got:\n{output}"
         );
     }
 
