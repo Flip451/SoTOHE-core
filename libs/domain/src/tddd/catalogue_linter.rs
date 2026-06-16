@@ -25,7 +25,7 @@
 //! `knowledge/adr/2026-04-14-1531-…` forbids serde inside `libs/domain`;
 //! codec / serde support lives in the infrastructure codec.
 
-use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, NonEmptyVec};
+use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, NonEmptyVec, SelfReceiver};
 use crate::tddd::layer_id::LayerId;
 
 // ---------------------------------------------------------------------------
@@ -84,6 +84,48 @@ pub enum RoleKind {
 }
 
 impl RoleKind {
+    /// Every role discriminant that a rule target can name.
+    pub(crate) const ALL: [Self; 19] = [
+        Self::ValueObject,
+        Self::Entity,
+        Self::AggregateRoot,
+        Self::DomainService,
+        Self::Specification,
+        Self::Factory,
+        Self::UseCase,
+        Self::Interactor,
+        Self::Command,
+        Self::Query,
+        Self::Dto,
+        Self::ErrorType,
+        Self::SecondaryAdapter,
+        Self::EventPolicy,
+        Self::DomainEvent,
+        Self::SpecificationPort,
+        Self::ApplicationService,
+        Self::SecondaryPort,
+        Self::Repository,
+    ];
+
+    /// All `DataRole` discriminants that a type-entry field rule can scan.
+    pub(crate) const DATA_ROLES: [Self; 15] = [
+        Self::ValueObject,
+        Self::Entity,
+        Self::AggregateRoot,
+        Self::DomainService,
+        Self::Specification,
+        Self::Factory,
+        Self::UseCase,
+        Self::Interactor,
+        Self::Command,
+        Self::Query,
+        Self::Dto,
+        Self::ErrorType,
+        Self::SecondaryAdapter,
+        Self::EventPolicy,
+        Self::DomainEvent,
+    ];
+
     /// Returns the payload-free discriminant for a `DataRole`.
     #[must_use]
     pub fn from_data_role(role: &DataRole) -> Self {
@@ -162,16 +204,27 @@ impl RoleKind {
         }
     }
 
-    /// Returns `true` when this discriminant maps to a `DataRole` entry.
+    /// Returns `true` when this discriminant carries the named `DataRole` field.
+    ///
+    /// Covers both `TypeRef` fields (delegating to [`carries_type_ref_field`])
+    /// and `InvariantDecl` fields (`"invariants"`).
+    ///
+    /// Used by `FieldEmpty` / `FieldNonEmpty` pre-checks to reject
+    /// `target_role × target_field` combinations where any target role does not
+    /// carry the field (D19 fail-closed).  Both rules iterate type entries and
+    /// inspect a field on each entry's `DataRole`; a role that never carries
+    /// the field would silently treat every entry as having an empty vec,
+    /// producing false positives.
+    ///
+    /// `pub(crate)` — internal helper; not part of the public API surface.
     #[must_use]
-    pub(crate) fn is_data_role(self) -> bool {
-        !matches!(
-            self,
-            Self::SpecificationPort
-                | Self::ApplicationService
-                | Self::SecondaryPort
-                | Self::Repository
-        )
+    pub(crate) fn carries_data_role_field(self, field: &str) -> bool {
+        match field {
+            "invariants" => {
+                matches!(self, Self::ValueObject | Self::Entity | Self::AggregateRoot)
+            }
+            other => self.carries_type_ref_field(other),
+        }
     }
 }
 
@@ -373,6 +426,12 @@ pub enum CatalogueLinterRuleError {
     /// codec-layer conversions.
     #[error("forbidden_roles must not be empty for NoRoleInMethodSignature rules")]
     EmptyForbiddenRoles,
+
+    /// The rule configuration is internally inconsistent (e.g. an unsupported
+    /// `forbidden_receiver` string that cannot be parsed as a canonical
+    /// `SelfReceiver` form).
+    #[error("invalid rule configuration: {0}")]
+    InvalidRuleConfig(String),
 }
 
 // ---------------------------------------------------------------------------
@@ -402,6 +461,10 @@ impl CatalogueLinterRule {
     /// `FieldElementUniqueAcrossEntries`, `NoExternalReferenceInMethods`, or
     /// `ForbiddenMethodReceiver` and the associated string payload is empty.
     ///
+    /// Returns [`CatalogueLinterRuleError::InvalidRuleConfig`] when `kind` is
+    /// `ForbiddenMethodReceiver` and `forbidden_receiver` is not a canonical
+    /// `SelfReceiver` form (`"self"`, `"&self"`, `"&mut self"`).
+    ///
     /// For the remaining `kind` variants (`KindLayerConstraint`,
     /// `TraitImplRequired`, `NoRoleInMethodSignature`, `NoPublicField`) this
     /// function always succeeds, because their payloads are either unit or backed
@@ -430,6 +493,16 @@ impl CatalogueLinterRule {
             CatalogueLinterRuleKind::ForbiddenMethodReceiver { forbidden_receiver } => {
                 if forbidden_receiver.is_empty() {
                     return Err(CatalogueLinterRuleError::EmptyTargetField);
+                }
+                // Validate that `forbidden_receiver` is a canonical SelfReceiver
+                // rendered form: "self", "&self", or "&mut self".  Any other value
+                // (e.g. typos like "&mutself", "self mut") would cause the rule to
+                // never fire against any entry — a silent disable (D19 fail-closed).
+                if forbidden_receiver.parse::<SelfReceiver>().is_err() {
+                    return Err(CatalogueLinterRuleError::InvalidRuleConfig(format!(
+                        "unsupported forbidden_receiver '{forbidden_receiver}'; \
+                         expected one of 'self', '&self', '&mut self'"
+                    )));
                 }
             }
             // KindLayerConstraint — permitted_layers is NonEmptyVec, already validated
@@ -766,6 +839,160 @@ mod tests {
     }
 
     #[test]
+    fn test_forbidden_method_receiver_rejects_unsupported_string() {
+        // A typo like "&mutself" is not a canonical SelfReceiver rendered form.
+        // The rule must be rejected at construction time so the evaluator never
+        // runs with a receiver string that can never match any entry (D19
+        // fail-closed).
+        let result = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::DomainEvent]),
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                forbidden_receiver: "&mutself".to_owned(),
+            },
+        );
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterRuleError::InvalidRuleConfig(msg))
+                    if msg.contains("&mutself")
+            ),
+            "expected InvalidRuleConfig for unsupported receiver, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_forbidden_method_receiver_accepts_canonical_forms() {
+        // All three canonical SelfReceiver forms must be accepted.
+        for canonical in &["self", "&self", "&mut self"] {
+            let result = CatalogueLinterRule::new(
+                RuleTarget::new(vec![RoleKind::DomainEvent]),
+                CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                    forbidden_receiver: (*canonical).to_owned(),
+                },
+            );
+            assert!(
+                result.is_ok(),
+                "expected Ok for canonical receiver '{canonical}', got: {result:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_field_non_empty_rejects_target_role_that_does_not_carry_field() {
+        // Entity does not carry "emits"; targeting it with FieldNonEmpty "emits"
+        // would produce a false positive for every Entity entry (the field is
+        // always empty for that role).  The evaluator must return InvalidRuleConfig
+        // rather than silently treating every Entity as a violation (D19 fail-closed).
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyEntity").unwrap(),
+            make_type_entry(DataRole::entity().unwrap()),
+        );
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::FieldNonEmpty { target_field: "emits".to_owned() },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("emits") && msg.contains("Entity")
+            ),
+            "expected InvalidRuleConfig for Entity × emits FieldNonEmpty, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_field_empty_rejects_target_role_that_does_not_carry_field() {
+        // UseCase does not carry "emits"; targeting it with FieldEmpty "emits"
+        // would silently pass for every UseCase entry (the field is always empty
+        // for that role, so the rule trivially fires false negatives).  The
+        // evaluator must return InvalidRuleConfig (D19 fail-closed).
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyUseCase").unwrap(),
+            make_type_entry(DataRole::UseCase { handles: vec![] }),
+        );
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::FieldEmpty { target_field: "emits".to_owned() },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("emits") && msg.contains("UseCase")
+            ),
+            "expected InvalidRuleConfig for UseCase × emits FieldEmpty, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_field_non_empty_rejects_all_roles_target_when_some_roles_do_not_carry_field() {
+        // An empty RuleTarget means all roles. FieldNonEmpty "emits" must not be
+        // accepted because many DataRole variants never carry "emits" and would
+        // be false positives if those entries were present.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyService").unwrap(),
+            make_type_entry(DataRole::DomainService {
+                emits: vec![TypeRef::new("OrderPlaced").unwrap()],
+            }),
+        );
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::FieldNonEmpty { target_field: "emits".to_owned() },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("emits") && msg.contains("all DataRole roles")
+            ),
+            "expected InvalidRuleConfig for all roles × emits FieldNonEmpty, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_field_empty_rejects_all_roles_target_when_some_roles_do_not_carry_field() {
+        // An empty RuleTarget means all roles. FieldEmpty "emits" must not be
+        // accepted because roles that never carry "emits" would silently pass.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("MyService").unwrap(),
+            make_type_entry(DataRole::DomainService { emits: vec![] }),
+        );
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::FieldEmpty { target_field: "emits".to_owned() },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("emits") && msg.contains("all DataRole roles")
+            ),
+            "expected InvalidRuleConfig for all roles × emits FieldEmpty, got: {result:?}"
+        );
+    }
+
+    #[test]
     fn test_linter_rule_new_trait_impl_required_succeeds_with_non_empty_vec() {
         // NonEmptyVec enforces non-emptiness at construction; CatalogueLinterRule::new
         // always succeeds for TraitImplRequired.
@@ -1020,6 +1247,43 @@ mod tests {
         let all = all_catalogues_single(doc);
         let target_layer = doc.layer.clone();
         evaluate_catalogue_lint(&[rule], &all, &target_layer).unwrap()
+    }
+
+    fn assert_mixed_aggregate_entity_target_without_exclusive_members_rejected(
+        kind: CatalogueLinterRuleKind,
+    ) {
+        let rule_kind = kind.discriminant_name();
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderAgg").unwrap(),
+            make_type_entry(DataRole::aggregate_root().unwrap()),
+        );
+        doc.types.insert(
+            TypeName::new("OrderEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::AggregateRoot, RoleKind::Entity]),
+            kind,
+        )
+        .unwrap();
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("exclusive_members") && msg.contains("Entity")
+            ),
+            "expected InvalidRuleConfig for {rule_kind} mixed AggregateRoot/Entity target, got: {result:?}"
+        );
     }
 
     // ===========================================================================
@@ -1796,6 +2060,47 @@ mod tests {
         );
     }
 
+    #[test]
+    fn test_field_element_unique_across_entries_rejects_mixed_target_role_that_does_not_carry_field()
+     {
+        assert_mixed_aggregate_entity_target_without_exclusive_members_rejected(
+            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries {
+                target_field: "exclusive_members".to_owned(),
+            },
+        );
+    }
+
+    #[test]
+    fn test_field_element_unique_across_entries_rejects_all_roles_target() {
+        // RuleTarget::all_roles includes roles that do not carry exclusive_members.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderAgg").unwrap(),
+            make_type_entry(DataRole::aggregate_root().unwrap()),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries {
+                target_field: "exclusive_members".to_owned(),
+            },
+        )
+        .unwrap();
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("exclusive_members") && msg.contains("all roles")
+            ),
+            "expected InvalidRuleConfig for all roles target with exclusive_members, got: {result:?}"
+        );
+    }
+
     // Note: AC-16 exclusive_members uniqueness is covered by
     // test_field_element_unique_across_entries_violation_when_overlap above.
 
@@ -1925,6 +2230,15 @@ mod tests {
                     if msg.contains("exclusive_members") && msg.contains("Entity")
             ),
             "expected InvalidRuleConfig for Entity target with exclusive_members, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_no_external_reference_in_methods_rejects_mixed_target_role_that_does_not_carry_field() {
+        assert_mixed_aggregate_entity_target_without_exclusive_members_rejected(
+            CatalogueLinterRuleKind::NoExternalReferenceInMethods {
+                target_field: "exclusive_members".to_owned(),
+            },
         );
     }
 

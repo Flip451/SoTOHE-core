@@ -36,19 +36,26 @@ fn ensure_target_can_produce_type_ref_checks(
     target_roles: &[RoleKind],
     target_field: &str,
 ) -> Result<(), CatalogueLinterError> {
-    if target_roles.is_empty()
-        || target_roles.iter().any(|role| role.carries_type_ref_field(target_field))
+    let effective_roles =
+        if target_roles.is_empty() { RoleKind::ALL.as_slice() } else { target_roles };
+    if let Some(bad_role) =
+        effective_roles.iter().find(|role| !role.carries_type_ref_field(target_field))
     {
-        return Ok(());
+        let role_names = if target_roles.is_empty() {
+            "all roles".to_owned()
+        } else {
+            effective_roles.iter().map(|role| role.variant_name()).collect::<Vec<_>>().join(", ")
+        };
+        return Err(CatalogueLinterError::InvalidRuleConfig(format!(
+            "{}: target_field '{}' is not carried by role '{}' in target_roles [{}]; \
+             every target role must carry the field to avoid silent skips",
+            rule_kind,
+            target_field,
+            bad_role.variant_name(),
+            role_names
+        )));
     }
-
-    let role_names =
-        target_roles.iter().map(|role| role.variant_name()).collect::<Vec<_>>().join(", ");
-    Err(CatalogueLinterError::InvalidRuleConfig(format!(
-        "{}: target_field '{}' is not carried by any target_roles [{}]; \
-         this combination can never produce TypeRef checks",
-        rule_kind, target_field, role_names
-    )))
+    Ok(())
 }
 
 fn ensure_target_can_produce_data_role_field_checks(
@@ -56,17 +63,30 @@ fn ensure_target_can_produce_data_role_field_checks(
     target_roles: &[RoleKind],
     target_field: &str,
 ) -> Result<(), CatalogueLinterError> {
-    if target_roles.is_empty() || target_roles.iter().any(|role| role.is_data_role()) {
-        return Ok(());
+    let effective_roles =
+        if target_roles.is_empty() { RoleKind::DATA_ROLES.as_slice() } else { target_roles };
+    // Every target role must carry the field.  A role that does not carry the
+    // field will always see an empty vec in `field_vec_is_empty`, causing
+    // FieldNonEmpty to fire as a false positive or FieldEmpty to silently pass
+    // for every entry (D19 fail-closed).
+    if let Some(bad_role) =
+        effective_roles.iter().find(|role| !role.carries_data_role_field(target_field))
+    {
+        let role_names = if target_roles.is_empty() {
+            "all DataRole roles".to_owned()
+        } else {
+            effective_roles.iter().map(|role| role.variant_name()).collect::<Vec<_>>().join(", ")
+        };
+        return Err(CatalogueLinterError::InvalidRuleConfig(format!(
+            "{}: target_field '{}' is not carried by role '{}' in target_roles [{}]; \
+             every target role must carry the field to avoid false positives",
+            rule_kind,
+            target_field,
+            bad_role.variant_name(),
+            role_names
+        )));
     }
-
-    let role_names =
-        target_roles.iter().map(|role| role.variant_name()).collect::<Vec<_>>().join(", ");
-    Err(CatalogueLinterError::InvalidRuleConfig(format!(
-        "{}: target_field '{}' is a DataRole field but target_roles [{}] contain no DataRole \
-         entries; this combination can never produce field checks",
-        rule_kind, target_field, role_names
-    )))
+    Ok(())
 }
 
 /// Evaluate `rules` against the catalogue identified by `target_layer_id`

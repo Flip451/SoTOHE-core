@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f3f79d2be78cadcf383d486f4889c2e3a8443a0f5038ec12611fdec5d594be0c",
+  "catalogue_declaration_hash": "cf8cbe89b0fde7d32fc53392f545f59bab0459d8d7e2d5cf27a27a209621bc7b",
   "signals": [
     {
       "type_name": "CatalogueLintViolation",
@@ -15,12 +15,12 @@
     {
       "type_name": "CatalogueLinterRule",
       "signal": "blue",
-      "entry_hash": "95d165bed7a11020113512c83eada96ef760eed4766f7051b14ab0e6284dc541"
+      "entry_hash": "998dd9406cae328f246148a296e6b83f46ff56f006ec6f2dd72cfa3334a502b7"
     },
     {
       "type_name": "CatalogueLinterRuleError",
       "signal": "blue",
-      "entry_hash": "4a5a1db9efe9953853103ce2ece3381e43bf6f29aca2906f8fb41b895f71633f"
+      "entry_hash": "781d372bc0f546128ab181a8cfc6b781aef8bd0a9e7d34c1ad9a4bd594d0dad4"
     },
     {
       "type_name": "CatalogueLinterRuleKind",

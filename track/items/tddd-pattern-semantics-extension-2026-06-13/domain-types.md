@@ -27,7 +27,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CatalogueLinterError | error_type | modify | InvalidRuleConfig, UnknownLayer | 🔵 | 🔵 |
-| CatalogueLinterRuleError | error_type | modify | EmptyPermittedLayers, EmptyRequiredTraits, EmptyForbiddenRoles, EmptyTargetField | 🔵 | 🔵 |
+| CatalogueLinterRuleError | error_type | modify | EmptyTargetField, EmptyPermittedLayers, EmptyRequiredTraits, EmptyForbiddenRoles, InvalidRuleConfig | 🔵 | 🔵 |
 | CatalogueLoaderError | error_type | reference | CatalogueNotFound, LayerDiscoveryFailed, DecodeFailed, SymlinkRejected, IoError, TopologicalSortFailed | 🔵 | 🔵 |
 | ConstructionError | error_type | — | EmptyCollection | 🔵 | 🔵 |
 

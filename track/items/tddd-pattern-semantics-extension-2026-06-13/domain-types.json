@@ -714,7 +714,7 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Creates and validates a new CatalogueLinterRule with the given target selector and inspection kind. Returns CatalogueLinterRuleError for empty validation inputs such as empty permitted_layers / required_traits / forbidden_roles / target_field."
+          "docs": "Creates and validates a new CatalogueLinterRule with the given target selector and inspection kind. Returns EmptyTargetField when a rule kind carries an empty required string payload (target_field or forbidden_receiver). KindLayerConstraint, TraitImplRequired, and NoRoleInMethodSignature use NonEmptyVec payloads validated before this constructor, so EmptyPermittedLayers, EmptyRequiredTraits, and EmptyForbiddenRoles are reserved for codec-layer conversions rather than returned directly here. Returns InvalidRuleConfig when ForbiddenMethodReceiver carries an unsupported forbidden_receiver string."
         },
         {
           "name": "target",
@@ -756,6 +756,10 @@
         "kind": "enum",
         "variants": [
           {
+            "name": "EmptyTargetField",
+            "payload": { "kind": "unit" }
+          },
+          {
             "name": "EmptyPermittedLayers",
             "payload": { "kind": "unit" }
           },
@@ -768,14 +772,17 @@
             "payload": { "kind": "unit" }
           },
           {
-            "name": "EmptyTargetField",
-            "payload": { "kind": "unit" }
+            "name": "InvalidRuleConfig",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
           }
         ]
       },
       "methods": [],
       "module_path": "tddd::catalogue_linter",
-      "docs": "Errors returned by CatalogueLinterRule::new. Breaking change from baseline: EmptyTargetKind (removed — target_kind: String replaced by RuleTarget with Vec<RoleKind>) and the flat validation errors restructured. New variants: EmptyRequiredTraits (for TraitImplRequired with empty required_traits), EmptyForbiddenRoles (for NoRoleInMethodSignature with empty forbidden_roles), EmptyTargetField (for rule kinds requiring a target_field). EmptyPermittedLayers retained for KindLayerConstraint.",
+      "docs": "Errors returned by CatalogueLinterRule::new. Breaking change from baseline: EmptyTargetKind (removed — target_kind: String replaced by RuleTarget with Vec<RoleKind>) and the flat validation errors restructured. New variants: EmptyRequiredTraits (for TraitImplRequired with empty required_traits), EmptyForbiddenRoles (for NoRoleInMethodSignature with empty forbidden_roles), EmptyTargetField (for rule kinds requiring a target_field), InvalidRuleConfig(String) for codec-layer conversions that detect an inconsistent rule configuration (e.g. ForbiddenMethodReceiver with an unrecognised receiver string). EmptyPermittedLayers retained for KindLayerConstraint. Not returned directly by CatalogueLinterRule::new for EmptyPermittedLayers/EmptyRequiredTraits/EmptyForbiddenRoles — those carry NonEmptyVec payloads validated at variant-construction time; these three variants exist for codec-layer use. InvalidRuleConfig is returned by CatalogueLinterRule::new when ForbiddenMethodReceiver carries an unrecognised forbidden_receiver string.",
       "spec_refs": [
         {
           "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
