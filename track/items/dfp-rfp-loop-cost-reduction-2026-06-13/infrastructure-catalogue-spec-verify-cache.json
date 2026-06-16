@@ -265,6 +265,30 @@
         "kind": "pass",
         "citation": "fast tier（軽量モデル）で全ペアを判定し、既知違反プローブの検出率で信頼性を較正する。"
       }
+    },
+    {
+      "claim_hash": "645e0534c642c6bb1422f3082fb9d4b0ec832d49d05f914a4584d92fa0105311",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry write がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、dry-check-approved の staleness 判定の入力として使えるようにする。"
+      }
+    },
+    {
+      "claim_hash": "645e0534c642c6bb1422f3082fb9d4b0ec832d49d05f914a4584d92fa0105311",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "be6fd8b857d12991ac0110838a2b85ac042fcbb77c1d19ac69117119b5afc7e7",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。"
+      }
     }
   ]
 }

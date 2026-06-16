@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-16T01:08:16Z",
-  "declaration_hash": "de3b68e6f1b6c2fdeeac5454d289f4378c7cdad18f096ba9d341ac5bd45faa2a",
+  "generated_at": "2026-06-16T07:20:29Z",
+  "declaration_hash": "ea00015c84e0910547f670b4e83da1eab537c83438c6e57744dc096b7c93e292",
   "signals": [
     {
       "type_name": "CodexDryChecker",
@@ -45,6 +45,18 @@
     },
     {
       "type_name": "infrastructure::codex_common::build_codex_read_only_invocation",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::dry_check::corpus::compute_corpus_fingerprint",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::dry_check::corpus::sha256_hex",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

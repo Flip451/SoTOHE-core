@@ -30,20 +30,25 @@ use usecase::dry_check::{
 
 use crate::{CliApp, CommandOutcome};
 
+mod corpus_root;
 mod manifest;
 mod persistent_index;
 mod shared;
 mod tier_telemetry;
 
+pub(crate) use corpus_root::compute_current_dry_corpus_fingerprint;
+use corpus_root::{compute_dry_corpus_fingerprint_from_fragments, write_dry_corpus_root_manifest};
 use persistent_index::open_persistent_index_with_corpus;
+#[cfg(test)]
+use shared::git_diff_path_key;
+#[cfg(test)]
+use shared::normalize_fragment_paths;
 pub(crate) use shared::resolve_dry_diff_base_from_store;
 use shared::{
     build_diff_and_corpus_fragments, dry_check_approved_outcome, dry_write_outcome,
     parse_dry_track_id, parse_verdict_filter, resolve_dry_diff_base,
     resolve_existing_dir_under_repo,
 };
-#[cfg(test)]
-use shared::{git_diff_path_key, normalize_fragment_paths};
 #[cfg(test)]
 use tier_telemetry::{
     DryAgentRunRecorder, TieredDryAgentRecorder, dry_agent_error_is_subprocess_failure,
@@ -54,13 +59,15 @@ use tier_telemetry::{
 };
 
 #[cfg(test)]
+use corpus_root::compute_dry_corpus_fingerprint_from_root;
+#[cfg(test)]
 use domain::dry_check::{DryCheckApprovalVerdict, VerdictFilter, fragments_overlapping_hunks};
 #[cfg(test)]
 use domain::semantic_dup::CodeFragment;
 #[cfg(test)]
-use infrastructure::semantic_dup::{
-    extractor::extract_code_fragments, index::LanceDbSemanticIndexAdapter,
-};
+use infrastructure::semantic_dup::extractor::extract_code_fragments;
+#[cfg(test)]
+use infrastructure::semantic_dup::index::LanceDbSemanticIndexAdapter;
 #[cfg(test)]
 use manifest::{
     EMBEDDING_MODEL_ID, IndexManifest, compute_manifest_diff, file_content_hash,
@@ -290,6 +297,7 @@ impl CliApp {
         let (diff_fragments, corpus_fragments) =
             build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)?;
         let diff_fragments_processed = diff_fragments.len();
+        let corpus_fingerprint = compute_dry_corpus_fingerprint_from_fragments(&corpus_fragments);
 
         // Construct adapters.
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
@@ -334,6 +342,10 @@ impl CliApp {
         // See `resolve_write_config_fingerprint` for the full policy.
         let config_fingerprint = resolve_write_config_fingerprint(&infra_config, threshold);
 
+        // D5: persist the corpus root beside coverage so pure-read approval paths
+        // can recompute the same fragment-snapshot fingerprint.
+        write_dry_corpus_root_manifest(&track_dir, &workspace_root, &canonical_root)?;
+
         let interactor = DryCheckInteractor::new(
             embedding_port,
             index_port,
@@ -344,6 +356,7 @@ impl CliApp {
             track_id.clone(),
             usecase_config,
             config_fingerprint,
+            corpus_fingerprint,
         );
 
         let dry_start = std::time::Instant::now();
@@ -419,18 +432,22 @@ impl CliApp {
 
         let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
         let root = git.root().to_path_buf();
-        let canonical_root =
+        let canonical_repo_root =
             root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
         let track_id = parse_dry_track_id(&input.track_id)?;
 
-        let items_dir_abs =
-            resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")?;
+        let items_dir_abs = resolve_existing_dir_under_repo(
+            &input.items_dir,
+            &root,
+            &canonical_repo_root,
+            "items_dir",
+        )?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
         let dry_check_json_path = track_dir.join("dry-check.json");
 
         let filter = parse_verdict_filter(&input.filter)?;
 
-        let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root));
+        let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_repo_root));
         let interactor = DryCheckResultsInteractor::new(store);
 
         let results =
@@ -494,12 +511,16 @@ impl CliApp {
 
         let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
         let root = git.root().to_path_buf();
-        let canonical_root =
+        let canonical_repo_root =
             root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
         let track_id = parse_dry_track_id(&input.track_id)?;
 
-        let items_dir_abs =
-            resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")?;
+        let items_dir_abs = resolve_existing_dir_under_repo(
+            &input.items_dir,
+            &root,
+            &canonical_repo_root,
+            "items_dir",
+        )?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
         let commit_hash_path = track_dir.join(".commit_hash");
@@ -510,12 +531,12 @@ impl CliApp {
         let base = resolve_dry_diff_base(
             input.base_commit.as_deref(),
             &commit_hash_path,
-            &canonical_root,
+            &canonical_repo_root,
         )?;
 
         // D5 / IN-05 (T005): pure-read gate — diff fragments only.
         let (diff_fragments, _corpus_fragments) =
-            build_diff_and_corpus_fragments(&base, &canonical_root, &canonical_root)?;
+            build_diff_and_corpus_fragments(&base, &canonical_repo_root, &canonical_repo_root)?;
 
         let mut current_fragment_refs: BTreeSet<domain::dry_check::FragmentRef> = BTreeSet::new();
         for fragment in &diff_fragments {
@@ -530,14 +551,25 @@ impl CliApp {
             .map_err(|e| format!("failed to load dry-check config: {e}"))?;
         let current_config_fingerprint = infra_config.fingerprint();
 
+        // D5: pure-read gate. Recompute from the workspace root that produced
+        // the coverage manifest, falling back to the repo root for older
+        // manifests that predate the sidecar.
+        let current_corpus_fingerprint =
+            compute_current_dry_corpus_fingerprint(&track_dir, &canonical_repo_root);
+
         // Construct adapters: reader + coverage port — no embedding, no index.
-        let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
+        let store =
+            Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_repo_root.clone()));
         let coverage =
-            Arc::new(FsDryCheckCoverageAdapter::new(dry_check_coverage_path, canonical_root));
+            Arc::new(FsDryCheckCoverageAdapter::new(dry_check_coverage_path, canonical_repo_root));
 
         // D5 read-only interactor.
-        let interactor =
-            DryCheckApprovalInteractor::new(store, coverage, current_config_fingerprint);
+        let interactor = DryCheckApprovalInteractor::new(
+            store,
+            coverage,
+            current_config_fingerprint,
+            current_corpus_fingerprint,
+        );
 
         let verdict = interactor
             .check_approved(&track_id, &current_fragment_refs)
@@ -3288,8 +3320,8 @@ exit 0
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
 
-        // Compute the fingerprint from the config written by setup_gate_eval_repo
-        // so the v3 coverage manifest contains a matching fingerprint.
+        // Compute the config fingerprint from the config written by setup_gate_eval_repo
+        // so the coverage manifest contains a matching fingerprint.
         // A mismatch would cause DryCheckApprovalInteractor to return Blocked.
         let dry_check_config_path = repo.path().join(".harness/config/dry-check.json");
         let dry_check_config =
@@ -3297,8 +3329,13 @@ exit 0
                 .expect("dry-check.json written by setup_gate_eval_repo must load");
         let fingerprint_hex = dry_check_config.fingerprint().as_str().to_owned();
 
+        // Compute the corpus fingerprint from the same fragment-snapshot algorithm that
+        // `dry_check_approved` uses for the repo root (no *.rs files → empty corpus).
+        let corpus_fp =
+            compute_dry_corpus_fingerprint_from_root(repo.path(), repo.path()).as_str().to_owned();
+
         let coverage_json = format!(
-            r#"{{"schema_version":3,"config_fingerprint":"{fingerprint_hex}","fragment_refs":[],"processed_pair_keys":[]}}"#
+            r#"{{"schema_version":4,"config_fingerprint":"{fingerprint_hex}","corpus_fingerprint":"{corpus_fp}","fragment_refs":[],"processed_pair_keys":[]}}"#
         );
         std::fs::write(track_dir.join("dry-check-coverage.json"), coverage_json.as_bytes())
             .unwrap();
@@ -3500,7 +3537,8 @@ exit 0
         use std::collections::BTreeSet;
 
         use domain::dry_check::{
-            DryCheckConfigFingerprint, DryCheckCoverageRecord, FragmentContentHash, FragmentRef,
+            DryCheckConfigFingerprint, DryCheckCorpusFingerprint, DryCheckCoverageRecord,
+            FragmentContentHash, FragmentRef,
         };
         use domain::review_v2::FilePath;
         use usecase::dry_check::DryCheckCoveragePort as _;
@@ -3521,7 +3559,8 @@ exit 0
         let mut refs = BTreeSet::new();
         refs.insert(fragment_ref.clone());
         let test_fp = DryCheckConfigFingerprint::new("a".repeat(64)).unwrap();
-        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new(), test_fp);
+        let test_corpus_fp = DryCheckCorpusFingerprint::new("b".repeat(64)).unwrap();
+        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new(), test_fp, test_corpus_fp);
         adapter.write_coverage(&track_id, record.clone()).unwrap();
 
         // After write, read must return the same record (write/read round-trip).

@@ -5,8 +5,8 @@ use std::path::PathBuf;
 
 use domain::TrackId;
 use domain::dry_check::{
-    DryCheckConfigFingerprint, DryCheckCoverageRecord, DryCheckPairKey, FragmentContentHash,
-    FragmentRef,
+    DryCheckConfigFingerprint, DryCheckCorpusFingerprint, DryCheckCoverageRecord, DryCheckPairKey,
+    FragmentContentHash, FragmentRef,
 };
 use domain::review_v2::FilePath;
 use usecase::dry_check::{DryCheckCoveragePort, DryCheckCycleError};
@@ -18,19 +18,22 @@ use crate::track::symlink_guard::reject_symlinks_below;
 
 /// Schema version written by this implementation.
 ///
-/// Schema v3 adds the `config_fingerprint` field alongside the existing
-/// `fragment_refs` and `processed_pair_keys` arrays. Files written with
-/// schema_version 2 (which lack `config_fingerprint`) are rejected as
-/// unsupported: the gate cannot detect config changes on v2 files, so we
-/// fail-closed and require a fresh `dry write` to regenerate in v3 format.
-/// Schema v1 files (which lack `processed_pair_keys`) are likewise rejected.
-const CURRENT_SCHEMA_VERSION: u32 = 3;
+/// Schema v4 adds the `corpus_fingerprint` field alongside the existing v3 fields
+/// (`config_fingerprint`, `fragment_refs`, `processed_pair_keys`).
+/// v3 files (which lack `corpus_fingerprint`) deserialize with the fail-closed
+/// sentinel via `#[serde(default = "fail_closed_corpus_fingerprint_string")]`,
+/// forcing a re-run so that a corpus fingerprint is written.
+/// Schema v1/v2 files are likewise rejected (missing processed_pair_keys or
+/// config_fingerprint respectively).
+const CURRENT_SCHEMA_VERSION: u32 = 4;
+const MIN_READABLE_SCHEMA_VERSION: u32 = 3;
 
-/// On-disk envelope (schema v3):
+/// On-disk envelope (schema v4):
 /// ```json
 /// {
-///   "schema_version": 3,
+///   "schema_version": 4,
 ///   "config_fingerprint": "<64-char hex>",
+///   "corpus_fingerprint": "<64-char hex>",
 ///   "fragment_refs": [{ "path": "...", "content_hash": "..." }],
 ///   "processed_pair_keys": [{ "low": { "path": "...", "content_hash": "..." }, "high": { ... } }]
 /// }
@@ -39,13 +42,26 @@ const CURRENT_SCHEMA_VERSION: u32 = 3;
 /// Serde lives only here per the hexagonal principle — the domain
 /// `DryCheckCoverageRecord` stays serde-free.
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
-struct CoverageManifestV3 {
+struct CoverageManifestV4 {
     schema_version: u32,
     /// SHA-256 fingerprint of the `dry-check.json` fields that affect `dry write`
     /// semantics (threshold, max_parallelism, reasoning efforts, known-bad percents).
     config_fingerprint: String,
+    /// SHA-256 fingerprint over the sorted `(repo_relative_path, sha256_of_content)`
+    /// pairs of all `*.rs` files scanned by the corpus indexer during the last
+    /// `dry write` run.  Absent in v3 files — deserialized as fail-closed sentinel.
+    #[serde(default = "fail_closed_corpus_fingerprint_string")]
+    corpus_fingerprint: String,
     fragment_refs: Vec<FragmentRefDto>,
     processed_pair_keys: Vec<PairKeyDto>,
+}
+
+/// Serde default for `corpus_fingerprint` on v3 manifests (missing field).
+///
+/// Returns the all-zeros fail-closed sentinel so that v3 records force a
+/// `dry write` re-run when read by v4 `check_approved`.
+fn fail_closed_corpus_fingerprint_string() -> String {
+    DryCheckCorpusFingerprint::fail_closed().as_str().to_owned()
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -142,20 +158,23 @@ impl DryCheckCoveragePort for FsDryCheckCoverageAdapter {
             return Ok(None);
         }
 
-        let manifest: CoverageManifestV3 = serde_json::from_str(&content)
+        let manifest: CoverageManifestV4 = serde_json::from_str(&content)
             .map_err(|e| DryCheckCycleError::CoveragePort(format!("parse {path_str}: {e}")))?;
 
-        if manifest.schema_version != CURRENT_SCHEMA_VERSION {
+        if !(MIN_READABLE_SCHEMA_VERSION..=CURRENT_SCHEMA_VERSION)
+            .contains(&manifest.schema_version)
+        {
             // schema_version 1 files (pre-v2 format) lack processed_pair_keys.
             // schema_version 2 files (pre-v3 format) lack config_fingerprint.
-            // Treating them as having an empty pair-key set or zero fingerprint
-            // would cause the gate to behave incorrectly.
+            // schema_version 3 files (pre-v4 format) are readable: serde fills
+            // missing corpus_fingerprint with the fail-closed sentinel so the
+            // approval interactor returns Blocked and forces a fresh dry write.
             // Fail-closed: reject and require a fresh `dry write` to regenerate
-            // a v3 manifest.
+            // a current manifest.
             return Err(DryCheckCycleError::CoveragePort(format!(
-                "{path_str}: unsupported schema_version {} (expected {}); \
+                "{path_str}: unsupported schema_version {} (readable range {}..={}); \
                  run `dry write` to regenerate the coverage manifest in the current format",
-                manifest.schema_version, CURRENT_SCHEMA_VERSION
+                manifest.schema_version, MIN_READABLE_SCHEMA_VERSION, CURRENT_SCHEMA_VERSION
             )));
         }
 
@@ -163,6 +182,13 @@ impl DryCheckCoveragePort for FsDryCheckCoverageAdapter {
             .map_err(|e| {
                 DryCheckCycleError::CoveragePort(format!(
                     "{path_str}: invalid config_fingerprint: {e}"
+                ))
+            })?;
+
+        let corpus_fingerprint = DryCheckCorpusFingerprint::new(&manifest.corpus_fingerprint)
+            .map_err(|e| {
+                DryCheckCycleError::CoveragePort(format!(
+                    "{path_str}: invalid corpus_fingerprint: {e}"
                 ))
             })?;
 
@@ -188,6 +214,7 @@ impl DryCheckCoveragePort for FsDryCheckCoverageAdapter {
             fragment_refs,
             processed_pair_keys,
             config_fingerprint,
+            corpus_fingerprint,
         )))
     }
 
@@ -200,9 +227,10 @@ impl DryCheckCoveragePort for FsDryCheckCoverageAdapter {
 
         self.reject_symlinks(&path_str)?;
 
-        let manifest = CoverageManifestV3 {
+        let manifest = CoverageManifestV4 {
             schema_version: CURRENT_SCHEMA_VERSION,
             config_fingerprint: record.config_fingerprint().as_str().to_owned(),
+            corpus_fingerprint: record.corpus_fingerprint().as_str().to_owned(),
             fragment_refs: record.fragment_refs().iter().map(fragment_ref_to_dto).collect(),
             processed_pair_keys: record
                 .processed_pair_keys()
@@ -253,8 +281,17 @@ mod tests {
         FragmentRef::new(FilePath::new(path).unwrap(), FragmentContentHash::new(hash).unwrap())
     }
 
-    fn test_fingerprint() -> DryCheckConfigFingerprint {
+    fn test_config_fingerprint() -> DryCheckConfigFingerprint {
         DryCheckConfigFingerprint::new("a".repeat(64)).unwrap()
+    }
+
+    fn test_corpus_fingerprint() -> DryCheckCorpusFingerprint {
+        DryCheckCorpusFingerprint::new("c".repeat(64)).unwrap()
+    }
+
+    // Legacy alias used by tests that do not specifically test the corpus fingerprint.
+    fn test_fingerprint() -> DryCheckConfigFingerprint {
+        test_config_fingerprint()
     }
 
     /// Write `record` and read it back via the adapter.
@@ -293,7 +330,12 @@ mod tests {
         let mut refs = BTreeSet::new();
         refs.insert(a.clone());
         refs.insert(b.clone());
-        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new(), test_fingerprint());
+        let record = DryCheckCoverageRecord::new(
+            refs,
+            BTreeSet::new(),
+            test_fingerprint(),
+            test_corpus_fingerprint(),
+        );
 
         let read = round_trip_coverage(record.clone(), &adapter);
         assert_eq!(read, record);
@@ -301,8 +343,8 @@ mod tests {
 
     #[test]
     fn test_write_then_read_round_trips_record_with_pair_keys() {
-        // Schema v3: fragment_refs, processed_pair_keys, and config_fingerprint
-        // all survive the round-trip.
+        // Schema v4: fragment_refs, processed_pair_keys, config_fingerprint, and
+        // corpus_fingerprint all survive the round-trip.
         let dir = tempfile::tempdir().unwrap();
         let adapter = adapter_in_dir(&dir, "coverage.json");
 
@@ -315,7 +357,8 @@ mod tests {
         refs.insert(b.clone());
         let mut pairs = BTreeSet::new();
         pairs.insert(pair.clone());
-        let record = DryCheckCoverageRecord::new(refs, pairs, test_fingerprint());
+        let record =
+            DryCheckCoverageRecord::new(refs, pairs, test_fingerprint(), test_corpus_fingerprint());
 
         let read = round_trip_coverage(record.clone(), &adapter);
         assert_eq!(read, record);
@@ -323,16 +366,22 @@ mod tests {
         assert!(read.covers(&b));
         assert!(read.contains_pair(&pair));
         assert_eq!(read.config_fingerprint(), &test_fingerprint());
+        assert_eq!(read.corpus_fingerprint(), &test_corpus_fingerprint());
     }
 
     #[test]
     fn test_write_then_read_round_trips_config_fingerprint() {
-        // Schema v3: the config_fingerprint survives the round-trip unchanged.
+        // Schema v4: the config_fingerprint survives the round-trip unchanged.
         let dir = tempfile::tempdir().unwrap();
         let adapter = adapter_in_dir(&dir, "coverage.json");
 
         let fp = DryCheckConfigFingerprint::new("b".repeat(64)).unwrap();
-        let record = DryCheckCoverageRecord::new(BTreeSet::new(), BTreeSet::new(), fp.clone());
+        let record = DryCheckCoverageRecord::new(
+            BTreeSet::new(),
+            BTreeSet::new(),
+            fp.clone(),
+            test_corpus_fingerprint(),
+        );
         adapter.write_coverage(&make_track_id(), record.clone()).unwrap();
 
         let read = adapter.read_coverage(&make_track_id()).unwrap().unwrap();
@@ -340,12 +389,35 @@ mod tests {
     }
 
     #[test]
+    fn test_write_then_read_round_trips_corpus_fingerprint() {
+        // Schema v4: the corpus_fingerprint survives the round-trip unchanged.
+        let dir = tempfile::tempdir().unwrap();
+        let adapter = adapter_in_dir(&dir, "coverage.json");
+
+        let cfp = DryCheckCorpusFingerprint::new("d".repeat(64)).unwrap();
+        let record = DryCheckCoverageRecord::new(
+            BTreeSet::new(),
+            BTreeSet::new(),
+            test_fingerprint(),
+            cfp.clone(),
+        );
+        adapter.write_coverage(&make_track_id(), record.clone()).unwrap();
+
+        let read = adapter.read_coverage(&make_track_id()).unwrap().unwrap();
+        assert_eq!(read.corpus_fingerprint(), &cfp);
+    }
+
+    #[test]
     fn test_write_then_read_round_trips_empty_record() {
         let dir = tempfile::tempdir().unwrap();
         let adapter = adapter_in_dir(&dir, "coverage.json");
 
-        let record =
-            DryCheckCoverageRecord::new(BTreeSet::new(), BTreeSet::new(), test_fingerprint());
+        let record = DryCheckCoverageRecord::new(
+            BTreeSet::new(),
+            BTreeSet::new(),
+            test_fingerprint(),
+            test_corpus_fingerprint(),
+        );
         adapter.write_coverage(&make_track_id(), record.clone()).unwrap();
 
         // A persisted empty-set coverage record serializes to a non-empty
@@ -368,7 +440,12 @@ mod tests {
 
         let result = adapter.write_coverage(
             &make_track_id(),
-            DryCheckCoverageRecord::new(BTreeSet::new(), BTreeSet::new(), test_fingerprint()),
+            DryCheckCoverageRecord::new(
+                BTreeSet::new(),
+                BTreeSet::new(),
+                test_fingerprint(),
+                test_corpus_fingerprint(),
+            ),
         );
         assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
     }
@@ -436,8 +513,9 @@ mod tests {
         std::fs::write(
             &path,
             br#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "config_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "corpus_fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "fragment_refs": [
     { "path": "../src/a.rs", "content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
   ],
@@ -458,8 +536,9 @@ mod tests {
         std::fs::write(
             &path,
             br#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "config_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "corpus_fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "fragment_refs": [
     { "path": "src/a.rs", "content_hash": "not-a-sha256" }
   ],
@@ -481,8 +560,9 @@ mod tests {
         std::fs::write(
             &path,
             br#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "config_fingerprint": "not-a-valid-fingerprint",
+  "corpus_fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "fragment_refs": [],
   "processed_pair_keys": []
 }"#,
@@ -492,6 +572,47 @@ mod tests {
 
         let result = adapter.read_coverage(&make_track_id());
         assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
+    }
+
+    #[test]
+    fn test_read_coverage_with_invalid_corpus_fingerprint_returns_coverage_port_error() {
+        // The corpus_fingerprint field must be a valid 64-char lowercase hex string.
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("coverage.json");
+        std::fs::write(
+            &path,
+            br#"{
+  "schema_version": 4,
+  "config_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "corpus_fingerprint": "not-a-valid-corpus-fingerprint",
+  "fragment_refs": [],
+  "processed_pair_keys": []
+}"#,
+        )
+        .unwrap();
+        let adapter = FsDryCheckCoverageAdapter::new(path, dir.path().to_owned());
+
+        let result = adapter.read_coverage(&make_track_id());
+        assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
+    }
+
+    #[test]
+    fn test_read_coverage_with_schema_version_3_defaults_corpus_fingerprint_to_fail_closed() {
+        // schema_version 3 files lack corpus_fingerprint; serde must default
+        // them to the fail-closed sentinel so check-approved blocks without
+        // turning migration into a hard parse/read error.
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("coverage.json");
+        std::fs::write(
+            &path,
+            br#"{ "schema_version": 3, "config_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "fragment_refs": [], "processed_pair_keys": [] }"#,
+        )
+        .unwrap();
+        let adapter = FsDryCheckCoverageAdapter::new(path, dir.path().to_owned());
+
+        let result = adapter.read_coverage(&make_track_id()).unwrap().unwrap();
+        let fail_closed = DryCheckCorpusFingerprint::fail_closed();
+        assert_eq!(result.corpus_fingerprint().as_str(), fail_closed.as_str());
     }
 
     #[test]
@@ -508,7 +629,12 @@ mod tests {
         refs.insert(a.clone());
         refs.insert(b.clone());
 
-        let record = DryCheckCoverageRecord::new(refs, BTreeSet::new(), test_fingerprint());
+        let record = DryCheckCoverageRecord::new(
+            refs,
+            BTreeSet::new(),
+            test_fingerprint(),
+            test_corpus_fingerprint(),
+        );
         adapter.write_coverage(&make_track_id(), record.clone()).unwrap();
 
         let read = adapter.read_coverage(&make_track_id()).unwrap().unwrap();
@@ -531,7 +657,12 @@ mod tests {
 
         let result = adapter.write_coverage(
             &make_track_id(),
-            DryCheckCoverageRecord::new(BTreeSet::new(), BTreeSet::new(), test_fingerprint()),
+            DryCheckCoverageRecord::new(
+                BTreeSet::new(),
+                BTreeSet::new(),
+                test_fingerprint(),
+                test_corpus_fingerprint(),
+            ),
         );
         assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
     }

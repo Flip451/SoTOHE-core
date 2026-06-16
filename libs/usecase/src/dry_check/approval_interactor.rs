@@ -10,13 +10,20 @@ use std::sync::Arc;
 
 use domain::TrackId;
 use domain::dry_check::{
-    DryCheckApprovalVerdict, DryCheckConfigFingerprint, DryCheckPairKey, DryCheckReader,
-    DryCheckRecord, DryCheckVerdict, FragmentRef,
+    DryCheckApprovalVerdict, DryCheckConfigFingerprint, DryCheckCorpusFingerprint, DryCheckPairKey,
+    DryCheckReader, DryCheckRecord, DryCheckVerdict, FragmentRef,
 };
 
 use super::errors::DryCheckCycleError;
 use super::ports::DryCheckCoveragePort;
 use super::services::DryCheckApprovalService;
+
+const FAIL_CLOSED_CORPUS_FINGERPRINT_HEX: &str =
+    "0000000000000000000000000000000000000000000000000000000000000000";
+
+fn is_fail_closed_corpus_fingerprint(fingerprint: &DryCheckCorpusFingerprint) -> bool {
+    fingerprint.as_str() == FAIL_CLOSED_CORPUS_FINGERPRINT_HEX
+}
 
 // ── DryCheckApprovalInteractor ────────────────────────────────────────────────
 
@@ -35,6 +42,7 @@ pub struct DryCheckApprovalInteractor {
     reader: Arc<dyn DryCheckReader>,
     coverage: Arc<dyn DryCheckCoveragePort>,
     current_config_fingerprint: DryCheckConfigFingerprint,
+    current_corpus_fingerprint: DryCheckCorpusFingerprint,
 }
 
 impl DryCheckApprovalInteractor {
@@ -48,13 +56,24 @@ impl DryCheckApprovalInteractor {
     ///   `dry-check.json` settings. `check_approved` compares this against the
     ///   fingerprint stored in the coverage manifest; a mismatch means the config
     ///   changed since the last `dry write` run → return `Blocked`.
+    /// - `current_corpus_fingerprint`: SHA-256 fingerprint of the current corpus
+    ///   (all `*.rs` files in the workspace). `check_approved` compares this
+    ///   against the fingerprint stored in the coverage manifest; a mismatch means
+    ///   the corpus changed (file added/removed/modified) since the last
+    ///   `dry write` run → return `Blocked`.
     #[must_use]
     pub fn new(
         reader: Arc<dyn DryCheckReader>,
         coverage: Arc<dyn DryCheckCoveragePort>,
         current_config_fingerprint: DryCheckConfigFingerprint,
+        current_corpus_fingerprint: DryCheckCorpusFingerprint,
     ) -> DryCheckApprovalInteractor {
-        DryCheckApprovalInteractor { reader, coverage, current_config_fingerprint }
+        DryCheckApprovalInteractor {
+            reader,
+            coverage,
+            current_config_fingerprint,
+            current_corpus_fingerprint,
+        }
     }
 }
 
@@ -91,6 +110,25 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
         // `unresolved_pair_count: 1` to mirror the missing-manifest fail-closed pattern
         // (count unknown at this stage).
         if coverage_record.config_fingerprint() != &self.current_config_fingerprint {
+            return Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
+        }
+
+        // ── Step 1c: Corpus fingerprint — reject coverage built under a different corpus.
+        //
+        // When the workspace corpus changes (a `*.rs` file is added, removed, or
+        // modified) while the diff fragments keep the same `(path, content_hash)`,
+        // the old coverage manifest looks fragment-ref–fresh but was computed against
+        // a different corpus: new corpus pairs that would be in-scope are silently
+        // absent.
+        //
+        // By comparing the stored corpus fingerprint against the current one we detect
+        // the corpus change and return Blocked immediately, forcing a fresh `dry write`
+        // run.  We report `unresolved_pair_count: 1` to mirror the missing-manifest
+        // fail-closed pattern (count unknown at this stage).
+        if is_fail_closed_corpus_fingerprint(coverage_record.corpus_fingerprint())
+            || is_fail_closed_corpus_fingerprint(&self.current_corpus_fingerprint)
+            || coverage_record.corpus_fingerprint() != &self.current_corpus_fingerprint
+        {
             return Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
         }
 
@@ -167,8 +205,9 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
 mod tests {
     use super::*;
     use domain::dry_check::{
-        DryCheckConfigFingerprint, DryCheckCoverageRecord, DryCheckPairKey, DryCheckReaderError,
-        DryCheckRecord, DryCheckVerdict, FragmentRef, RefactorProposal,
+        DryCheckConfigFingerprint, DryCheckCorpusFingerprint, DryCheckCoverageRecord,
+        DryCheckPairKey, DryCheckReaderError, DryCheckRecord, DryCheckVerdict, FragmentRef,
+        RefactorProposal,
     };
 
     use crate::dry_check::shared::test_mocks::{
@@ -250,6 +289,12 @@ mod tests {
         DryCheckConfigFingerprint::new("a".repeat(64)).unwrap()
     }
 
+    /// The canonical "current corpus fingerprint" used in tests that do not test
+    /// corpus fingerprint mismatch behaviour.
+    fn test_corpus_fingerprint() -> DryCheckCorpusFingerprint {
+        DryCheckCorpusFingerprint::new("c".repeat(64)).unwrap()
+    }
+
     /// Default timestamp used by tests that do not care about the exact
     /// `recorded_at` value. Tests that DO care pass an explicit timestamp to
     /// [`make_dry_check_record_for_tests`] directly.
@@ -259,10 +304,19 @@ mod tests {
         coverage: StubCoverage,
         records: Vec<DryCheckRecord>,
     ) -> DryCheckApprovalInteractor {
+        make_interactor_with_corpus_fingerprint(coverage, records, test_corpus_fingerprint())
+    }
+
+    fn make_interactor_with_corpus_fingerprint(
+        coverage: StubCoverage,
+        records: Vec<DryCheckRecord>,
+        current_corpus_fingerprint: DryCheckCorpusFingerprint,
+    ) -> DryCheckApprovalInteractor {
         DryCheckApprovalInteractor::new(
             Arc::new(StubReader { records }),
             Arc::new(coverage),
             test_fingerprint(),
+            current_corpus_fingerprint,
         )
     }
 
@@ -288,19 +342,36 @@ mod tests {
     }
 
     /// Build a `StubCoverage` covering `refs`, marking `pair_keys` as processed,
-    /// and using the provided `fingerprint`.
-    fn coverage_with_pairs_and_fingerprint(
+    /// and using the provided `config_fingerprint` and `corpus_fingerprint`.
+    fn coverage_with_pairs_and_fingerprints(
         refs: Vec<FragmentRef>,
         pair_keys: Vec<DryCheckPairKey>,
-        fingerprint: DryCheckConfigFingerprint,
+        config_fingerprint: DryCheckConfigFingerprint,
+        corpus_fingerprint: DryCheckCorpusFingerprint,
     ) -> StubCoverage {
         StubCoverage {
             record: Some(DryCheckCoverageRecord::new(
                 refs.into_iter().collect(),
                 pair_keys.into_iter().collect(),
-                fingerprint,
+                config_fingerprint,
+                corpus_fingerprint,
             )),
         }
+    }
+
+    /// Build a `StubCoverage` covering `refs`, marking `pair_keys` as processed,
+    /// and using the provided `config_fingerprint` with the canonical corpus fingerprint.
+    fn coverage_with_pairs_and_fingerprint(
+        refs: Vec<FragmentRef>,
+        pair_keys: Vec<DryCheckPairKey>,
+        config_fingerprint: DryCheckConfigFingerprint,
+    ) -> StubCoverage {
+        coverage_with_pairs_and_fingerprints(
+            refs,
+            pair_keys,
+            config_fingerprint,
+            test_corpus_fingerprint(),
+        )
     }
 
     fn current_refs(refs: Vec<FragmentRef>) -> BTreeSet<FragmentRef> {
@@ -445,6 +516,7 @@ mod tests {
             Arc::new(ErrorReader),
             Arc::new(coverage),
             test_fingerprint(),
+            test_corpus_fingerprint(),
         );
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a]));
         assert!(matches!(result, Err(DryCheckCycleError::Reader(_))));
@@ -459,6 +531,7 @@ mod tests {
             Arc::new(StubReader { records: vec![] }),
             Arc::new(ErrorCoverage),
             test_fingerprint(),
+            test_corpus_fingerprint(),
         );
         let result = interactor.check_approved(&make_track(), &current_refs(vec![a]));
         assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
@@ -493,6 +566,7 @@ mod tests {
                 vec![a.clone()].into_iter().collect(),
                 std::collections::BTreeSet::new(),
                 old_fingerprint,
+                test_corpus_fingerprint(),
             )),
         };
 
@@ -539,6 +613,86 @@ mod tests {
         assert!(
             matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
             "fail-closed fingerprint in coverage must return Blocked, got: {result:?}"
+        );
+    }
+
+    // ── corpus fingerprint mismatch → Blocked ────────────────────────────────
+
+    #[test]
+    fn test_check_approved_skips_when_corpus_fingerprint_drifted() {
+        // Scenario: coverage was written when the corpus had fingerprint X.
+        // The current corpus has fingerprint Y (a file was added, removed, or
+        // modified in the workspace).  The diff fragment and config are unchanged,
+        // so the fragment-ref staleness check and config-fingerprint check would
+        // both pass — but the corpus fingerprint mismatch must cause Blocked.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+
+        // Build coverage with a DIFFERENT corpus fingerprint than the interactor's.
+        let old_corpus_fp = DryCheckCorpusFingerprint::new("d".repeat(64)).unwrap();
+        let coverage = coverage_with_pairs_and_fingerprints(
+            vec![a.clone()],
+            vec![],
+            test_fingerprint(),
+            old_corpus_fp,
+        );
+
+        // The interactor holds test_corpus_fingerprint() ("ccc..."), which differs
+        // from "ddd..." stored in the coverage record.
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "corpus fingerprint mismatch must return Blocked, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_approved_with_fail_closed_corpus_fingerprint_in_coverage_returns_blocked() {
+        // Scenario: the last `dry write` wrote the fail-closed corpus sentinel
+        // (all zeros) because an I/O error occurred during corpus fingerprint
+        // computation. The current corpus has a valid (non-zero) fingerprint.
+        // The gate must return Blocked even if all current FragmentRefs are covered
+        // and the config fingerprint matches.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+
+        let fail_closed_corpus = DryCheckCorpusFingerprint::fail_closed();
+        let coverage = coverage_with_pairs_and_fingerprints(
+            vec![a.clone()],
+            vec![],
+            test_fingerprint(),
+            fail_closed_corpus,
+        );
+
+        // test_corpus_fingerprint() ("ccc...") != fail_closed ("000...") → Blocked.
+        let interactor = make_interactor(coverage, vec![]);
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "fail-closed corpus fingerprint in coverage must return Blocked, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_approved_with_zero_corpus_fingerprint_on_both_sides_returns_blocked() {
+        // Scenario: both the persisted manifest and the current read carry the
+        // serialized fail-closed sentinel. Equality alone would treat them as a
+        // match, but the all-zero fingerprint is never a valid approval basis.
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+
+        let zero_corpus = DryCheckCorpusFingerprint::new("0".repeat(64)).unwrap();
+        let coverage = coverage_with_pairs_and_fingerprints(
+            vec![a.clone()],
+            vec![],
+            test_fingerprint(),
+            zero_corpus.clone(),
+        );
+
+        let interactor =
+            make_interactor_with_corpus_fingerprint(coverage, vec![], zero_corpus.clone());
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "serialized zero corpus fingerprints must return Blocked, got: {result:?}"
         );
     }
 

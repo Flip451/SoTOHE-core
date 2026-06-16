@@ -289,6 +289,158 @@
         "kind": "pass",
         "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
       }
+    },
+    {
+      "claim_hash": "e2e75f3f904d15f77d207f03558b6b684575e8b1e02b63998418a5a5c03366f0",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "e2e75f3f904d15f77d207f03558b6b684575e8b1e02b63998418a5a5c03366f0",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "70cd9c38418f498a51c91d190161cd1390697eec881aebb26ccfb83071483450",
+      "evidence_hash": "d4b4e31a1a57f735a81956b537a4379bb1d6633bae03a606b0dc384102aeefb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録は FragmentRef（path + content_hash）単位で照合し、同一 content_hash の別 path を covered と誤認しない。ゲートは自己完結性を手放し `dry write` が記録したカバレッジ記録の存在に依存することを受け入れる。"
+      }
+    },
+    {
+      "claim_hash": "a79257d1e87e8ee87ee1381e2723d07a83b6be0dfb10636722ddcd6e54f16597",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装を変更し、埋め込み・類似検索を行わず、カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "a79257d1e87e8ee87ee1381e2723d07a83b6be0dfb10636722ddcd6e54f16597",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。"
+      }
+    },
+    {
+      "claim_hash": "a79257d1e87e8ee87ee1381e2723d07a83b6be0dfb10636722ddcd6e54f16597",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "a79257d1e87e8ee87ee1381e2723d07a83b6be0dfb10636722ddcd6e54f16597",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "365ee92b3e3edb9f272b52ee3f9d87617a2b42018029b653232b965670ac522b",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。`"
+      }
+    },
+    {
+      "claim_hash": "365ee92b3e3edb9f272b52ee3f9d87617a2b42018029b653232b965670ac522b",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "ed0de388c05850897d9089ad54ed22f96a2d4b56f2dc936ebbd99148990805e6",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。"
+      }
+    },
+    {
+      "claim_hash": "ed0de388c05850897d9089ad54ed22f96a2d4b56f2dc936ebbd99148990805e6",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "ed0de388c05850897d9089ad54ed22f96a2d4b56f2dc936ebbd99148990805e6",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "ed0de388c05850897d9089ad54ed22f96a2d4b56f2dc936ebbd99148990805e6",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "e1119c7834c68c11e9b4a5619cc84e107d9e07da49061c769d2a71d71323d314",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "d69a9abe08cc7bcd636b9e5d632d8fb77eebeac600ee8062660b34287350f688",
+      "evidence_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を dry-check.json または付随ファイルに記録し、`dry check-approved` の staleness 判定の入力として使えるようにする。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。"
+      }
+    },
+    {
+      "claim_hash": "d69a9abe08cc7bcd636b9e5d632d8fb77eebeac600ee8062660b34287350f688",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "d69a9abe08cc7bcd636b9e5d632d8fb77eebeac600ee8062660b34287350f688",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。フラグメント編集または path 変更 → FragmentRef 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制、という意味論が維持される。"
+      }
+    },
+    {
+      "claim_hash": "e1119c7834c68c11e9b4a5619cc84e107d9e07da49061c769d2a71d71323d314",
+      "evidence_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` がカバレッジ記録（処理した diff フラグメントの FragmentRef 集合）を記録し、その記録を `dry check-approved` が staleness 判定に使う。"
+      }
+    },
+    {
+      "claim_hash": "d69a9abe08cc7bcd636b9e5d632d8fb77eebeac600ee8062660b34287350f688",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する"
+      }
     }
   ]
 }

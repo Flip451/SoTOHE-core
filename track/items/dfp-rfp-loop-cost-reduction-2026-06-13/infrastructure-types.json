@@ -281,6 +281,48 @@
   },
   "traits": {},
   "functions": {
+    "infrastructure::dry_check::corpus::compute_corpus_fingerprint": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "workspace_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "domain::dry_check::DryCheckCorpusFingerprint",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Compute the corpus fingerprint for `workspace_root`. Walks all `*.rs` files reachable from `workspace_root` using the same exclusion rules as `extract_code_fragments` (skip `target/` and dot-prefixed directories), then computes SHA-256 over a deterministic length-prefixed byte encoding of the sorted list of (repo_relative_path_bytes, sha256_of_file_content) pairs. Fail-closed: any I/O error returns DryCheckCorpusFingerprint::fail_closed so that check_approved returns Blocked rather than granting approval with a potentially stale index. D5 coverage staleness gate (CN-08, AC-10, AC-11).",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-06"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::dry_check::corpus::sha256_hex": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "data", "ty": "&[u8]" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Compute SHA-256 of `data` and return a 64-char lowercase hex string. Internal helper shared by `fingerprint_from_entries` and `collect_entries_recursive` within the corpus fingerprint computation. Exposed as `pub` so it is visible in the rustdoc API surface; used as a low-level building block for deterministic content hashing. The returned String has no domain-level constraints (it is a fixed-length 64-char hex output), so the raw String return type is appropriate here rather than a newtype wrapper.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
     "infrastructure::codex_common::build_codex_read_only_invocation": {
       "action": "add",
       "role": "FreeFunction",

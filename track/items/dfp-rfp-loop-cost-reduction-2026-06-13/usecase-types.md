@@ -47,7 +47,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | DryCheckApprovalInteractor | interactor | modify | — | 🔵 | 🔵 |
-| DryCheckInteractor | interactor | modify | — | 🟡 | 🔵 |
+| DryCheckInteractor | interactor | modify | — | 🔵 | 🔵 |
 | FixpointResolveInteractor | interactor | — | — | 🟡 | 🔵 |
 
 ## Commands

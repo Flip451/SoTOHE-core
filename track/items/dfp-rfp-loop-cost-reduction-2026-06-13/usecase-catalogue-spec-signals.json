@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1d09b676bebb06922273f9ea70a25ff5ae6bfd2f163fe4567feb326d49580d2a",
+  "catalogue_declaration_hash": "a1b8977d2b6bc3bd2e31b2fe1eb4c631c07aeecfe441d65448880b6487ee8068",
   "signals": [
     {
       "type_name": "DryCheckAgentError",
@@ -10,7 +10,7 @@
     {
       "type_name": "DryCheckApprovalInteractor",
       "signal": "blue",
-      "entry_hash": "b64e98de06690c61bab54b6cd67c7b169567604b4f4076258a5287faaf9b306c"
+      "entry_hash": "d6e2ab9a994440c9ad1174b0e114cb058b80a7644c8c560b3c1dd22cfe553979"
     },
     {
       "type_name": "DryCheckConfig",
@@ -25,7 +25,7 @@
     {
       "type_name": "DryCheckInteractor",
       "signal": "blue",
-      "entry_hash": "c01d979c09933e0047451b790c7cdf19babc978d11a9064355216f4a24433eff"
+      "entry_hash": "f0647efbe8c6f59a86a5d61cff690ae0baabcd0bca55ee4294c95b8ee46f11e8"
     },
     {
       "type_name": "DryCheckJudgeTier",
@@ -80,7 +80,7 @@
     {
       "type_name": "DryCheckApprovalService",
       "signal": "blue",
-      "entry_hash": "8cf28e229d1d80568ef72fe7c447c402b5b63881e0fa6c6a0b4f032b94038b6b"
+      "entry_hash": "3620e617ab4ce1b7d158081eb25baa1f1f7d135ca633381b62f7af38ae3d740d"
     },
     {
       "type_name": "DryCheckCoveragePort",

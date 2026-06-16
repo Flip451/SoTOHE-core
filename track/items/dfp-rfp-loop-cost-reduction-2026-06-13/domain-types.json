@@ -489,6 +489,93 @@
       "spec_refs": [],
       "informal_grounds": []
     },
+    "DryCheckCorpusFingerprint": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [ "String" ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "s", "ty": "impl Into<String>" } ],
+          "returns": "Result<DryCheckCorpusFingerprint, DryCheckCorpusFingerprintError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fail_closed",
+          "receiver": null,
+          "params": [],
+          "returns": "DryCheckCorpusFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_check",
+      "docs": "SHA-256 fingerprint (64-char lowercase hex string) over the full set of (repo_relative_path, content_hash) pairs scanned by the corpus indexer during a `dry write` run. Written into the coverage manifest by `dry write` so readers can identify which workspace corpus produced the manifest. Comparing the stored value with a separately computed current corpus fingerprint detects corpus changes (added, removed, or modified files) and marks the coverage stale; this domain value does not prescribe the approval-usecase wiring for that comparison. The all-zeros sentinel (fail_closed()) is written on failed runs as fail-closed provenance. Mirrors DryCheckConfigFingerprint in structure and fail-closed convention.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "feedback",
+          "summary": "The corpus fingerprint concept (SHA-256 over sorted (path, content_hash) pairs of all candidate corpus files) is an implementation detail added in Round 9. No spec anchor directly states the corpus fingerprint field; AC-10 and AC-11 capture the coverage-record-based staleness gate that this fingerprint can support when a current corpus fingerprint is available for comparison. CN-08 grounds the fail-closed response when coverage is missing or inconsistent. The format invariant (64-char lowercase hex) mirrors DryCheckConfigFingerprint's constructor invariant."
+        }
+      ]
+    },
+    "DryCheckCorpusFingerprintError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidFormat", "payload": { "kind": "tuple", "fields": [ "String" ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Validation error for DryCheckCorpusFingerprint construction. InvalidFormat means the provided string is not exactly 64 lowercase hexadecimal characters.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-08"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "feedback",
+          "summary": "The 64-char lowercase hex format invariant (SHA-256 encoding) is an implementation detail of DryCheckCorpusFingerprint's constructor: no spec anchor directly states the character-set or length constraint. CN-08 grounds the fail-closed response when the value is invalid; the format rule itself derives from the SHA-256 encoding chosen for the corpus fingerprint. Mirrors DryCheckConfigFingerprintError."
+        }
+      ]
+    },
     "DryCheckCoverageRecord": {
       "action": "add",
       "role": "ValueObject",
@@ -499,7 +586,8 @@
           "fields": [
             { "name": "fragment_refs",       "ty": "std::collections::BTreeSet<FragmentRef>" },
             { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" },
-            { "name": "config_fingerprint",  "ty": "DryCheckConfigFingerprint" }
+            { "name": "config_fingerprint",  "ty": "DryCheckConfigFingerprint" },
+            { "name": "corpus_fingerprint",  "ty": "DryCheckCorpusFingerprint" }
           ],
           "has_stripped_fields": false
         }
@@ -511,9 +599,50 @@
           "params": [
             { "name": "fragment_refs",       "ty": "std::collections::BTreeSet<FragmentRef>" },
             { "name": "processed_pair_keys", "ty": "std::collections::BTreeSet<DryCheckPairKey>" },
-            { "name": "config_fingerprint",  "ty": "DryCheckConfigFingerprint" }
+            { "name": "config_fingerprint",  "ty": "DryCheckConfigFingerprint" },
+            { "name": "corpus_fingerprint",  "ty": "DryCheckCorpusFingerprint" }
           ],
           "returns": "DryCheckCoverageRecord",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fragment_refs",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeSet<FragmentRef>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "processed_pair_keys",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeSet<DryCheckPairKey>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "config_fingerprint",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "corpus_fingerprint",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckCorpusFingerprint",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -538,20 +667,10 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": []
-        },
-        {
-          "name": "config_fingerprint",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&DryCheckConfigFingerprint",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
         }
       ],
       "module_path": "dry_check",
-      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run (fragment_refs), plus the set of DryCheckPairKey values for all pairs that were considered current in that run (processed_pair_keys), plus the config_fingerprint of the dry-check.json settings used by that run. If a current diff fragment's FragmentRef is absent from fragment_refs, `check-approved` returns Blocked (stale coverage). If a historical Violation record's pair_key is absent from processed_pair_keys, that record is treated as stale (candidate side fixed) and skipped by the gate. If the stored config_fingerprint differs from the current config fingerprint, `check-approved` returns Blocked (config changed). BTreeSet preserves deterministic serialization order (CN-05).",
+      "docs": "Coverage manifest written by `dry write` and consumed by `dry check-approved` for staleness checking (D5). Records the set of FragmentRef values (path + content_hash) for all diff fragments processed in the most recent `dry write` run (fragment_refs), plus the set of DryCheckPairKey values for all pairs that were considered current in that run (processed_pair_keys), plus the config_fingerprint of the dry-check.json settings used by that run, plus the corpus_fingerprint of the workspace corpus files scanned by the indexer. If a current diff fragment's FragmentRef is absent from fragment_refs, `check-approved` returns Blocked (stale coverage). If a historical Violation record's pair_key is absent from processed_pair_keys, that record is treated as stale (candidate side fixed) and skipped by the gate. If the stored config_fingerprint differs from the current config fingerprint, `check-approved` returns Blocked (config changed). The stored corpus_fingerprint is provenance for detecting that the manifest was built from a different workspace corpus when compared with a current corpus fingerprint; such a mismatch means coverage is stale and must be regenerated. BTreeSet preserves deterministic serialization order (CN-05).",
       "spec_refs": [
         {
           "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
@@ -616,6 +735,16 @@
     { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckConfigFingerprintError" },
     { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckConfigFingerprintError" },
     { "action": "add", "trait_ref": "core::fmt::Display",     "for_type": "DryCheckConfigFingerprintError" },
-    { "action": "add", "trait_ref": "core::error::Error",     "for_type": "DryCheckConfigFingerprintError" }
+    { "action": "add", "trait_ref": "core::error::Error",     "for_type": "DryCheckConfigFingerprintError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckCorpusFingerprint" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckCorpusFingerprint" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckCorpusFingerprint" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckCorpusFingerprint" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",       "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::clone::Clone",     "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq",   "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::cmp::Eq",          "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::fmt::Display",     "for_type": "DryCheckCorpusFingerprintError" },
+    { "action": "add", "trait_ref": "core::error::Error",     "for_type": "DryCheckCorpusFingerprintError" }
   ]
 }

@@ -817,6 +817,94 @@
         "kind": "pass",
         "citation": "埋め込み・類似検索を行わず、カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。"
       }
+    },
+    {
+      "claim_hash": "d6e2ab9a994440c9ad1174b0e114cb058b80a7644c8c560b3c1dd22cfe553979",
+      "evidence_hash": "d4b4e31a1a57f735a81956b537a4379bb1d6633bae03a606b0dc384102aeefb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録の欠落・不整合時は fail-closed（Blocked）で安全側に倒す。カバレッジ記録は FragmentRef（path + content_hash）単位で照合し、同一 content_hash の別 path を covered と誤認しない。ゲートは自己完結性を手放し `dry write` が記録したカバレッジ記録の存在に依存することを受け入れる。"
+      }
+    },
+    {
+      "claim_hash": "d6e2ab9a994440c9ad1174b0e114cb058b80a7644c8c560b3c1dd22cfe553979",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "f0647efbe8c6f59a86a5d61cff690ae0baabcd0bca55ee4294c95b8ee46f11e8",
+      "evidence_hash": "9605c95ba1b22e5e7cb0d44c3a97f405d064e7656f6a4447fca5a8ec5bbd7184",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` の処理を 2 相（照会相: 全 diff fragment の類似照会 → ペア識別子重複排除 → 未検証ペア確定、判定相: 確定ペアへの上限付き並列 fan-out）に分け、並列度上限を `.harness/config/dry-check.json` の `max_parallelism` フィールドで設定可能にする。"
+      }
+    },
+    {
+      "claim_hash": "f0647efbe8c6f59a86a5d61cff690ae0baabcd0bca55ee4294c95b8ee46f11e8",
+      "evidence_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry-checker を較正付き 2 段構成に変える: fast tier（軽量モデル）で全ペアを判定し、既知違反プローブの検出率で信頼性を較正する。較正が健全なら not-a-violation / accepted を確定し、violation および不正出力のみ重量級 tier へ escalation する。較正失敗時は全ペアを重量級 tier で再判定し、重量級でも較正失敗なら fail-closed でエスカレーション。"
+      }
+    },
+    {
+      "claim_hash": "f0647efbe8c6f59a86a5d61cff690ae0baabcd0bca55ee4294c95b8ee46f11e8",
+      "evidence_hash": "198c6033fdc0bdf49f50dc5a5c85ab99bbab4964bebdc0dcefbaadf8e5e806bf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の判定並列化は、1 ペア 1 agent 呼び出しの粒度を変えない（複数ペアを 1 呼び出しに詰める批量判定はしない）。エラーは収集・報告し、1 件の判定エラーで残りの判定結果を破棄しない。"
+      }
+    },
+    {
+      "claim_hash": "f0647efbe8c6f59a86a5d61cff690ae0baabcd0bca55ee4294c95b8ee46f11e8",
+      "evidence_hash": "d8f319509478fca252fba8754d262fd38f638edac8080d0d74f0a1f15d767a52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast 非違反判定を信頼せず、全ペアを重量級 tier で再判定する"
+      }
+    },
+    {
+      "claim_hash": "3620e617ab4ce1b7d158081eb25baa1f1f7d135ca633381b62f7af38ae3d740d",
+      "evidence_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` の実装が埋め込み・類似検索を行わず、カバレッジ記録（diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録だけを読んで staleness + all-resolved を判定する。"
+      }
+    },
+    {
+      "claim_hash": "3620e617ab4ce1b7d158081eb25baa1f1f7d135ca633381b62f7af38ae3d740d",
+      "evidence_hash": "8ddd668645d1d6e534f84b7eee7368f85239d0cccd0893c8cf8dc481b0471ec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry check-approved` を繰り返し呼んでも安価（埋め込み・検索なし）であり、D1 の dfl ループ先頭 check と D2 の fixpoint 合成が同一の `dry check-approved` を重複実行しても実害がない。"
+      }
+    },
+    {
+      "claim_hash": "3620e617ab4ce1b7d158081eb25baa1f1f7d135ca633381b62f7af38ae3d740d",
+      "evidence_hash": "93292a428db2266f05d5dfb1d4376bee153c6f49d6fb09eb058e988120d7b69e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D5 の `dry check-approved` は staleness 判定を diff フラグメントの FragmentRef（path + content_hash）とカバレッジ記録の FragmentRef 照合で行い、埋め込み・類似検索を呼ばない。"
+      }
+    },
+    {
+      "claim_hash": "d6e2ab9a994440c9ad1174b0e114cb058b80a7644c8c560b3c1dd22cfe553979",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。"
+      }
+    },
+    {
+      "claim_hash": "3620e617ab4ce1b7d158081eb25baa1f1f7d135ca633381b62f7af38ae3d740d",
+      "evidence_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "verdict": {
+        "kind": "pass",
+        "citation": "埋め込み・類似検索を行わず、カバレッジ記録（`dry write` が記録した diff フラグメントの FragmentRef = path + content_hash）と dry-check.json の verdict 記録を読んで staleness（現在の diff フラグメントの FragmentRef がカバレッジ記録に在るか）と all-resolved（触れるペアが全て not-a-violation / accepted か）の 2 条件だけで Approved / Blocked を判定する。"
+      }
     }
   ]
 }

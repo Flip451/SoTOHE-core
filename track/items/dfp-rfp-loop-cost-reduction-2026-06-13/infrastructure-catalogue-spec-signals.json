@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "de3b68e6f1b6c2fdeeac5454d289f4378c7cdad18f096ba9d341ac5bd45faa2a",
+  "catalogue_declaration_hash": "ea00015c84e0910547f670b4e83da1eab537c83438c6e57744dc096b7c93e292",
   "signals": [
     {
       "type_name": "CodexDryChecker",
@@ -31,6 +31,16 @@
       "type_name": "infrastructure::codex_common::build_codex_read_only_invocation",
       "signal": "blue",
       "entry_hash": "60dae1b05badafa4cb4db67413e35b65a722f87d49382281a11fc71c445f2ce7"
+    },
+    {
+      "type_name": "infrastructure::dry_check::corpus::compute_corpus_fingerprint",
+      "signal": "blue",
+      "entry_hash": "645e0534c642c6bb1422f3082fb9d4b0ec832d49d05f914a4584d92fa0105311"
+    },
+    {
+      "type_name": "infrastructure::dry_check::corpus::sha256_hex",
+      "signal": "blue",
+      "entry_hash": "be6fd8b857d12991ac0110838a2b85ac042fcbb77c1d19ac69117119b5afc7e7"
     }
   ]
 }

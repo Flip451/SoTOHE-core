@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-16T01:08:12Z",
-  "declaration_hash": "1d09b676bebb06922273f9ea70a25ff5ae6bfd2f163fe4567feb326d49580d2a",
+  "generated_at": "2026-06-16T07:20:25Z",
+  "declaration_hash": "a1b8977d2b6bc3bd2e31b2fe1eb4c631c07aeecfe441d65448880b6487ee8068",
   "signals": [
     {
       "type_name": "DryCheckAgentError",
@@ -68,7 +68,7 @@
     {
       "type_name": "DryCheckInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "DryCheckService"

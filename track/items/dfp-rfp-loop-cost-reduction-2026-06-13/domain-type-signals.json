@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-16T01:08:12Z",
-  "declaration_hash": "5ae109567b3f36ddddea1a174d12c37b8a37317a1acb16504ea8d9881fd4cc76",
+  "generated_at": "2026-06-16T07:20:24Z",
+  "declaration_hash": "e58bab6d48f8d7a8c986a991209935d29232d03e33fb339e17b615f9765b05d6",
   "signals": [
     {
       "type_name": "DryCheckConfigFingerprint",
@@ -17,6 +17,32 @@
     },
     {
       "type_name": "DryCheckConfigFingerprintError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "DryCheckCorpusFingerprint",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckCorpusFingerprintError",
       "kind_tag": "error_type",
       "signal": "blue",
       "found_type": true,

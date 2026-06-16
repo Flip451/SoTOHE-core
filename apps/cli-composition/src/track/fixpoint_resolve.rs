@@ -429,13 +429,23 @@ impl CliApp {
             .map_err(|e| format!("failed to load dry-check config: {e}"))?;
         let current_config_fingerprint = dry_infra_config.fingerprint();
 
+        // D5: mirror `dry check-approved` by recomputing from the workspace root
+        // recorded by the latest `dry write`, falling back to the repo root for
+        // older manifests that predate the sidecar.
+        let current_corpus_fingerprint =
+            crate::dry::compute_current_dry_corpus_fingerprint(&track_dir, &repo_root);
+
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
         let coverage = Arc::new(FsDryCheckCoverageAdapter::new(
             dry_check_coverage_path,
             canonical_root.clone(),
         ));
-        let dry_approval =
-            Arc::new(DryCheckApprovalInteractor::new(store, coverage, current_config_fingerprint));
+        let dry_approval = Arc::new(DryCheckApprovalInteractor::new(
+            store,
+            coverage,
+            current_config_fingerprint,
+            current_corpus_fingerprint,
+        ));
 
         // ── Build review and ref-verify gate adapters ─────────────────────────
         // Use the canonical (absolute, validated) items_dir so that these adapters
