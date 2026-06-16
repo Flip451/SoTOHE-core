@@ -10,10 +10,10 @@
 use std::collections::BTreeMap;
 
 use super::helpers::{
-    bare_name_in_type_ref, contract_role_type_ref, entry_role_kind, field_type_refs,
-    field_vec_is_empty, has_trait_impl, identity_accessor_name, invariants_for_role,
-    struct_has_public_fields, trait_entries_for_target, type_entries_for_target,
-    validate_contract_role_field, validate_data_role_field,
+    bare_name_in_type_ref, collect_methods_for_type, contract_role_type_ref, entry_role_kind,
+    field_type_refs, field_vec_is_empty, has_trait_impl, identity_accessor_name,
+    invariants_for_role, struct_has_public_fields, trait_entries_for_target,
+    type_entries_for_target, validate_contract_role_field, validate_data_role_field,
 };
 use super::{
     CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
@@ -279,7 +279,8 @@ pub fn evaluate_catalogue_lint(
 
             CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    for method in &entry.methods {
+                    let all_methods = collect_methods_for_type(catalogue, entry, name.as_str())?;
+                    for method in all_methods {
                         let sig_types: Vec<&str> = method
                             .params
                             .iter()
@@ -363,10 +364,11 @@ pub fn evaluate_catalogue_lint(
                     )));
                 }
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    let all_methods = collect_methods_for_type(catalogue, entry, name.as_str())?;
                     for inv in invariants_for_role(&entry.role) {
                         let InvariantPredicate::SelfMethod(method_name) = &inv.predicate;
                         let mname = method_name.as_str();
-                        match entry.methods.iter().find(|m| m.name.as_str() == mname) {
+                        match all_methods.iter().find(|m| m.name.as_str() == mname) {
                             None => {
                                 violations.push(CatalogueLintViolation::new(
                                     rule.kind().discriminant_name(),
@@ -409,7 +411,8 @@ pub fn evaluate_catalogue_lint(
                         Some(g) => g,
                         None => continue,
                     };
-                    match entry.methods.iter().find(|m| m.name.as_str() == getter_name) {
+                    let all_methods = collect_methods_for_type(catalogue, entry, name.as_str())?;
+                    match all_methods.iter().find(|m| m.name.as_str() == getter_name) {
                         None => {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),
@@ -548,6 +551,8 @@ pub fn evaluate_catalogue_lint(
                         if inside_bare.contains(other_bare) {
                             continue;
                         }
+                        let all_methods =
+                            collect_methods_for_type(catalogue, other_entry, other_name.as_str())?;
                         for exclusive_type in exclusive_refs {
                             // Use the bare tail of the exclusive member for delimiter-boundary
                             // matching so that Vec<OrderLine>, Option<OrderLine>, &OrderLine,
@@ -556,7 +561,7 @@ pub fn evaluate_catalogue_lint(
                                 .split("::")
                                 .last()
                                 .unwrap_or(exclusive_type.as_str());
-                            let found_in_methods = other_entry.methods.iter().any(|m| {
+                            let found_in_methods = all_methods.iter().any(|m| {
                                 m.params.iter().any(|p| bare_name_in_type_ref(p.ty.as_str(), bare))
                                     || bare_name_in_type_ref(m.returns.as_str(), bare)
                             });
@@ -592,7 +597,8 @@ pub fn evaluate_catalogue_lint(
 
             CatalogueLinterRuleKind::ForbiddenMethodReceiver { forbidden_receiver } => {
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    for method in &entry.methods {
+                    let all_methods = collect_methods_for_type(catalogue, entry, name.as_str())?;
+                    for method in all_methods {
                         let receiver_str =
                             method.receiver.map(|r| r.to_string()).unwrap_or_default();
                         if receiver_str.as_str() == forbidden_receiver.as_str() {

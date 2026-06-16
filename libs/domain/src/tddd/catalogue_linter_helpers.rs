@@ -9,6 +9,7 @@ use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
 use crate::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
 use crate::tddd::catalogue_v2::identifiers::{TraitName, TypeName, TypeRef};
+use crate::tddd::catalogue_v2::methods::MethodDeclaration;
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
 
 // ---------------------------------------------------------------------------
@@ -54,6 +55,57 @@ pub(super) fn trait_entries_for_target<'a>(
         entry.action != ItemAction::Delete
             && target_matches(target, RoleKind::from_contract_role(&entry.role))
     })
+}
+
+/// Aggregates all `MethodDeclaration` items for `type_name` from both the
+/// `TypeEntry.methods` slice and any matching `CatalogueDocument::inherent_impls`
+/// blocks.
+///
+/// Method names are the logical identity for inherent methods because Rust does
+/// not allow overloads by signature. If both catalogue sources contain the same
+/// method name with identical declarations, later duplicates are ignored. If the
+/// duplicate declarations differ, this fails closed with `InvalidRuleConfig`
+/// instead of letting a stale source hide or fabricate a method-level violation.
+///
+/// The caller is responsible for ensuring the `TypeEntry` itself has not been
+/// filtered out by `action: Delete` before calling this function (e.g. via
+/// `type_entries_for_target`). `InherentImplDeclV2` has no `action` field; all
+/// inherent impl blocks matching `type_name` are included.
+///
+/// Returns a `Vec` so the caller can iterate freely without lifetime entanglement
+/// across two separate slices.
+pub(super) fn collect_methods_for_type<'a>(
+    catalogue: &'a CatalogueDocument,
+    entry: &'a TypeEntry,
+    type_name: &str,
+) -> Result<Vec<&'a MethodDeclaration>, CatalogueLinterError> {
+    let mut methods = Vec::new();
+    let mut seen_names = std::collections::BTreeMap::new();
+
+    for method in entry.methods.iter().chain(
+        catalogue
+            .inherent_impls
+            .iter()
+            .filter(|impl_| impl_.type_name.as_str() == type_name)
+            .flat_map(|impl_| impl_.methods.iter()),
+    ) {
+        if let Some(existing) = seen_names.get(method.name.as_str()) {
+            if *existing != method {
+                return Err(CatalogueLinterError::InvalidRuleConfig(format!(
+                    "method '{}' for type '{}' has inconsistent duplicate declarations \
+                     across TypeEntry.methods and inherent_impls; keep one canonical \
+                     declaration or make duplicate declarations identical",
+                    method.name.as_str(),
+                    type_name
+                )));
+            }
+            continue;
+        }
+        seen_names.insert(method.name.as_str(), method);
+        methods.push(method);
+    }
+
+    Ok(methods)
 }
 
 /// Returns the `TypeRef` for the named field of a `ContractRole`, if applicable.

@@ -1097,7 +1097,7 @@ mod tests {
 
     use crate::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use crate::tddd::catalogue_v2::document::CatalogueDocument;
-    use crate::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+    use crate::tddd::catalogue_v2::entries::{InherentImplDeclV2, TraitEntry, TypeEntry};
     use crate::tddd::catalogue_v2::identifiers::{
         CrateName, FieldName, InvariantName, MethodName, ModulePath, ParamName, TraitName,
         TypeName, TypeRef,
@@ -2198,6 +2198,58 @@ mod tests {
     }
 
     #[test]
+    fn test_no_external_reference_in_methods_detects_external_ref_in_inherent_impl() {
+        // AggA exclusive_member EntityA; ExternalService has no legacy methods, but
+        // its inherent impl references EntityA. The rule must scan both method sources.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("AggA").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![TypeRef::new("EntityA").unwrap()],
+                shared_value_objects: vec![],
+                emits: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("EntityA").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("ExternalService").unwrap(),
+            make_type_entry(DataRole::DomainService { emits: vec![] }),
+        );
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: TypeName::new("ExternalService").unwrap(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![method_shared_ref_no_params("illegal_ref", "EntityA")],
+        });
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::AggregateRoot]),
+            CatalogueLinterRuleKind::NoExternalReferenceInMethods {
+                target_field: "exclusive_members".to_owned(),
+            },
+        );
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation when an inherent impl method references an exclusive member"
+        );
+        assert_eq!(violations[0].rule_kind(), "NoExternalReferenceInMethods");
+        assert_eq!(violations[0].entry_name(), "AggA");
+        assert!(violations[0].message().contains("EntityA"));
+        assert!(violations[0].message().contains("ExternalService"));
+    }
+
+    #[test]
     fn test_no_external_reference_in_methods_rejects_non_aggregate_target_role() {
         // NoExternalReferenceInMethods inspects AggregateRoot.exclusive_members only.
         // Targeting a role that cannot carry that field must fail closed instead of
@@ -2330,6 +2382,175 @@ mod tests {
         assert_eq!(violations[0].entry_name(), "OrderPlaced");
         assert!(violations[0].message().contains("mutate"));
         assert!(violations[0].message().contains("&mut self"));
+    }
+
+    // ===========================================================================
+    // T016: Rule 6/12 — inherent_impls coverage
+    // NoRoleInMethodSignature and ForbiddenMethodReceiver must scan methods
+    // declared in CatalogueDocument::inherent_impls, not only TypeEntry::methods.
+    // ===========================================================================
+
+    #[test]
+    fn test_no_role_in_method_signature_detects_forbidden_role_in_inherent_impl() {
+        // ValueObject `Money` has an empty `TypeEntry::methods`.
+        // An inherent impl block for `Money` declares a method whose param type is
+        // `OrderEntity` — which has role Entity (forbidden).
+        // The rule must detect the violation sourced from the inherent impl.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderEntity").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        doc.types.insert(
+            TypeName::new("Money").unwrap(),
+            make_type_entry(DataRole::value_object()), // methods: vec![]
+        );
+        // The method lives in an inherent impl, not in TypeEntry::methods.
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: TypeName::new("Money").unwrap(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![method_with_params(
+                "from_entity",
+                Some(SelfReceiver::SharedRef),
+                vec![("entity", "OrderEntity")],
+                "String",
+            )],
+        });
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(RoleKind::Entity, vec![RoleKind::AggregateRoot]),
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation: forbidden Entity role found in inherent impl method param"
+        );
+        assert_eq!(violations[0].rule_kind(), "NoRoleInMethodSignature");
+        assert_eq!(violations[0].entry_name(), "Money");
+        assert!(
+            violations[0].message().contains("from_entity"),
+            "violation message should name the method"
+        );
+    }
+
+    #[test]
+    fn test_forbidden_method_receiver_detects_in_inherent_impl() {
+        // DomainEvent `OrderPlaced` has an empty `TypeEntry::methods`.
+        // An inherent impl block for `OrderPlaced` declares a method with `&mut self`.
+        // The ForbiddenMethodReceiver rule must detect the violation from the impl block.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry(DataRole::DomainEvent), // methods: vec![]
+        );
+        // The &mut self method lives in an inherent impl, not in TypeEntry::methods.
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: TypeName::new("OrderPlaced").unwrap(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![method_exclusive_ref_no_params("set_payload", "()")],
+        });
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::DomainEvent]),
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                forbidden_receiver: "&mut self".to_owned(),
+            },
+        );
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected 1 violation: &mut self found in inherent impl method"
+        );
+        assert_eq!(violations[0].rule_kind(), "ForbiddenMethodReceiver");
+        assert_eq!(violations[0].entry_name(), "OrderPlaced");
+        assert!(
+            violations[0].message().contains("set_payload"),
+            "violation message should name the method"
+        );
+        assert!(violations[0].message().contains("&mut self"));
+    }
+
+    #[test]
+    fn test_forbidden_method_receiver_deduplicates_legacy_and_inherent_methods() {
+        // Legacy catalogues can still carry methods in `TypeEntry.methods`, while
+        // newer catalogues can also carry the same logical method in top-level
+        // `inherent_impls`. The linter treats the method name as the identity, so
+        // duplicate source representations must not double-report one Rust method.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::DomainEvent,
+                vec![method_exclusive_ref_no_params("set_payload", "()")],
+            ),
+        );
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: TypeName::new("OrderPlaced").unwrap(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![method_exclusive_ref_no_params("set_payload", "()")],
+        });
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::DomainEvent]),
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                forbidden_receiver: "&mut self".to_owned(),
+            },
+        );
+
+        assert_eq!(violations.len(), 1, "expected one violation for one logical method");
+        assert_eq!(violations[0].rule_kind(), "ForbiddenMethodReceiver");
+        assert_eq!(violations[0].entry_name(), "OrderPlaced");
+        assert!(violations[0].message().contains("set_payload"));
+    }
+
+    #[test]
+    fn test_inconsistent_legacy_and_inherent_method_duplicates_return_invalid_rule_config() {
+        // A stale legacy method declaration must not hide a different declaration
+        // for the same Rust method in `inherent_impls`.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::DomainEvent,
+                vec![method_shared_ref_no_params("set_payload", "()")],
+            ),
+        );
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: TypeName::new("OrderPlaced").unwrap(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![method_exclusive_ref_no_params("set_payload", "()")],
+        });
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::DomainEvent]),
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                forbidden_receiver: "&mut self".to_owned(),
+            },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result = evaluate_catalogue_lint(&[rule], &all, &target_layer);
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterError::InvalidRuleConfig(msg))
+                    if msg.contains("set_payload") && msg.contains("OrderPlaced")
+            ),
+            "expected InvalidRuleConfig for inconsistent duplicate method declarations, got: {result:?}"
+        );
     }
 
     // ===========================================================================
