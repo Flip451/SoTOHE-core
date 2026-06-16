@@ -18,9 +18,10 @@ pub fn execute_lint(
     workspace_root: PathBuf,
     track_id: String,
     layer_id: String,
+    rules_file: Option<PathBuf>,
 ) -> Result<ExitCode, CliError> {
     let outcome = CliApp::new()
-        .track_lint(Some(track_id), layer_id, workspace_root)
+        .track_lint(Some(track_id), layer_id, workspace_root, rules_file)
         .map_err(CliError::Message)?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
@@ -44,7 +45,7 @@ mod tests {
         std::fs::write(dir.path().join("architecture-rules.json"), rules).unwrap();
 
         let result =
-            execute_lint(dir.path().to_path_buf(), "../evil".to_owned(), "domain".to_owned());
+            execute_lint(dir.path().to_path_buf(), "../evil".to_owned(), "domain".to_owned(), None);
         assert!(result.is_err(), "path traversal track id must be rejected");
     }
 }

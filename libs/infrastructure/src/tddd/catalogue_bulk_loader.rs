@@ -425,7 +425,7 @@ mod tests {
     /// with `load_all_catalogues_native`.  The codec validates `crate_name` and
     /// `layer` against the file stem, so each layer needs its own constant.
     const V3_DOMAIN_JSON: &str = r#"{
-      "schema_version": 4,
+      "schema_version": 5,
       "crate_name": "domain",
       "layer": "domain",
       "types": {},
@@ -434,7 +434,7 @@ mod tests {
     }"#;
 
     const V3_USECASE_JSON: &str = r#"{
-      "schema_version": 4,
+      "schema_version": 5,
       "crate_name": "usecase",
       "layer": "usecase",
       "types": {},
@@ -443,7 +443,7 @@ mod tests {
     }"#;
 
     const V3_INFRASTRUCTURE_JSON: &str = r#"{
-      "schema_version": 4,
+      "schema_version": 5,
       "crate_name": "infrastructure",
       "layer": "infrastructure",
       "types": {},
@@ -627,7 +627,7 @@ mod tests {
         // infrastructure-types.json declares `"layer": "domain"` instead of
         // `"layer": "infrastructure"` — binding key mismatch.
         let mismatch_json = r#"{
-          "schema_version": 4,
+          "schema_version": 5,
           "crate_name": "infrastructure",
           "layer": "domain",
           "types": {},

@@ -391,12 +391,18 @@ pub enum TrackCommand {
 
     /// Run catalogue lint rules against a layer catalogue and report violations.
     ///
-    /// Wires `FsCatalogueLoader` + `InMemoryCatalogueLinter` +
-    /// `RunCatalogueLintInteractor` at the composition root and runs a hardcoded
-    /// demo rule set (ADR `tddd-struct-kind-uniformization-and-catalogue-linter`
-    /// §S3 / IN-05 / AC-05).
+    /// Wires `FsCatalogueLoader` + `RunCatalogueLintInteractor` +
+    /// `evaluate_catalogue_lint` at the composition root using lint rules loaded
+    /// from a config file (ADR
+    /// `knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md`
+    /// §D15 / D17 / D19).
     ///
-    /// Exits with code 1 when any violations are found, 0 when none.
+    /// When `--rules-file` is omitted, the default config path
+    /// `.harness/catalogue-lint/config.json` is used. If neither location exists
+    /// the command exits with code 1 and a user-facing message (fail-closed).
+    ///
+    /// Exits with code 1 when any violations are found or the config is missing,
+    /// 0 when the config exists and no violations are found.
     Lint {
         /// Track ID (directory name under `track/items`).
         /// When omitted, resolved from the current git branch (`track/<id>`).
@@ -411,6 +417,12 @@ pub enum TrackCommand {
         /// Defaults to current directory.
         #[arg(long, default_value = ".")]
         workspace_root: PathBuf,
+
+        /// Override the default lint config path
+        /// (`.harness/catalogue-lint/config.json`). When supplied, the file at
+        /// this path is used instead of the default location.
+        #[arg(long)]
+        rules_file: Option<PathBuf>,
     },
 
     /// Diagnose SoT Chain ③ (catalogue ↔ implementation) for a track.

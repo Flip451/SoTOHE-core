@@ -280,13 +280,13 @@ mod tests {
     #[test]
     fn test_v4_catalogue_computes_blue_yellow_red_from_grounding_fields() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "BlueType": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [
         { "file": "track/items/x/spec.json", "anchor": "IN-01" }
@@ -295,7 +295,7 @@ mod tests {
     },
     "YellowType": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [],
       "informal_grounds": [
@@ -304,7 +304,7 @@ mod tests {
     },
     "RedType": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [],
       "informal_grounds": []

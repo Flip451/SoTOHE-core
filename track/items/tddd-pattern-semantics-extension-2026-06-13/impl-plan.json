@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Stage 1 — domain layer: add new value-object types supporting the data-carrying enum migration. Add `InvariantName`, `InvariantPredicate`, `InvariantDecl`, `IdentityAccessor`, and `NonEmptyVec<TypeRef>` in `libs/domain/src/tddd/catalogue_v2/roles.rs`. These are prerequisites for the DataRole / ContractRole rewrite in T002 (T002 references them in variant payloads). No serde derives (domain is serde-free). Wire all new types into the existing pub use chains in `roles.rs` / `mod.rs`.",
+      "status": "done",
+      "commit_hash": "0cedc839"
+    },
+    {
+      "id": "T002",
+      "description": "Stage 1 — domain layer: rewrite `DataRole` and `ContractRole` as data-carrying enums in `libs/domain/src/tddd/catalogue_v2/roles.rs`. Remove `Copy` and `Hash` derives from both (CN-03). Add struct payloads to `ValueObject` (invariants), `Entity` (identity, invariants), `AggregateRoot` (identity, invariants, exclusive_members, shared_value_objects, emits), `DomainService` (emits), `UseCase` (handles). Add `ContractRole::Repository { aggregate: TypeRef }`. Add `DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }`. Do not add `DomainEvent` in Stage 1; it remains a Stage 2 unit variant. Update `Display` / `FromStr` implementations to handle data-carrying variants (strum derives alone no longer cover them). Update `ALL_DATA_ROLES` for the Stage 1 variant set (including EventPolicy, excluding DomainEvent) and update `ALL_CONTRACT_ROLES`. Depends on T001.",
+      "status": "done",
+      "commit_hash": "f1652cf2"
+    },
+    {
+      "id": "T003",
+      "description": "Stage 1 — domain layer: update all callers of `DataRole` / `ContractRole` inside `libs/domain/` that break after T002 (entries.rs, document.rs, catalogue_linter.rs, catalogue_spec_signal.rs, any tests in identifiers_tests.rs, methods.rs pattern matches etc.). Change `Copy`-based usages to `Clone` or references. Update pattern matches from unit variant to struct patterns where role fields are needed. Ensure `cargo make ci` (domain-internal) compiles after this task. Depends on T002.",
+      "status": "done",
+      "commit_hash": "f1652cf2"
+    },
+    {
+      "id": "T004",
+      "description": "Stage 1 — infrastructure layer: update `libs/infrastructure/src/tddd/catalogue_document_codec/` (dto.rs, decode.rs, encode.rs, mod.rs) to handle the new data-carrying `DataRole` and `ContractRole`. Add JSON serde support for all new payload fields (identity, invariants, exclusive_members, shared_value_objects, emits, handles, reacts_to, aggregate) with `#[serde(default, skip_serializing_if)]` for optional Vec fields. Add `NonEmptyVec<TypeRef>` decode logic that rejects empty JSON arrays as `InvalidEntry`. Add `IdentityAccessor`, `InvariantDecl`, `InvariantName`, `InvariantPredicate` serde DTO structs. Update `DataRole` / `ContractRole` JSON codec from string-only to discriminated-object form. Depends on T003.",
+      "status": "done",
+      "commit_hash": "f1652cf2"
+    },
+    {
+      "id": "T005",
+      "description": "Stage 1 — infrastructure layer: update all other infrastructure files that use `DataRole` / `ContractRole` and break after T002-T004. Specifically: existing `in_memory_catalogue_linter.rs` role comparisons required for compilation, `signal_evaluator_v2/structural_eq.rs` (role field pattern matching), `type_signals_evaluator.rs` / `signal_tags.rs` (role-based tag logic), `contract_map_renderer_adapter/mod.rs` (role display), `type_catalogue_render/entry_details.rs` (role display). Change `role ==` unit comparisons to pattern match arms for the data-carrying variants. Do not add the new linter framework or rule evaluation semantics in this task; those remain Stage 3 work. `cargo make ci` must pass after this task. Depends on T004.",
+      "status": "done",
+      "commit_hash": "f1652cf2"
+    },
+    {
+      "id": "T006",
+      "description": "Stage 1 — usecase layer: update `libs/usecase/src/catalogue_lint_workflow.rs` and any other usecase files that use `DataRole` / `ContractRole` and break after the schema migration. Keep the linter-rule boundary changes out of Stage 1: `LintRuleKind` 3→12 expansion and `LintRuleSpec.target_roles` are handled in T007 after Stage 2. Verify `cargo make check-layers` passes. Depends on T003 (domain compiles cleanly).",
+      "status": "done",
+      "commit_hash": "f1652cf2"
+    },
+    {
+      "id": "T007",
+      "description": "Stage 3 — domain/usecase linter framework: rewrite `CatalogueLinterRule`, `CatalogueLinterRuleKind`, `CatalogueLinterRuleError`, and `CatalogueLintViolation` in `libs/domain/src/tddd/catalogue_linter.rs`, and delete the old `CatalogueLinter` evaluation port rather than retaining an empty I/O-only trait. Add `RoleKind` (payload-free discriminant, including DomainEvent from Stage 2) and `RuleTarget` types. Expand `CatalogueLinterRuleKind` from 3 unit variants to 12 variants: 11 data-carrying variants plus unit `NoPublicField` (FieldEmpty, FieldNonEmpty, KindLayerConstraint, ReferencedRoleConstraint, TraitImplRequired, NoRoleInMethodSignature, MethodReferenceSignature, AccessorSignatureRequired, FieldElementUniqueAcrossEntries, NoExternalReferenceInMethods, NoPublicField, ForbiddenMethodReceiver). Rewrite `CatalogueLinterRule` as 2-part struct (`target: RuleTarget`, `kind: CatalogueLinterRuleKind`) with private fields and accessor methods. Update `CatalogueLinterRuleError` (remove EmptyTargetKind, add EmptyRequiredTraits / EmptyForbiddenRoles / EmptyTargetField). Update the usecase `LintRuleKind` enum from 3 unit variants to the corresponding 12-variant boundary shape, with `NoPublicField` remaining unit, and add `LintRuleSpec.target_roles: Vec<String>`. The former `CatalogueLinter::run` evaluation path moves to the `evaluate_catalogue_lint` free function in T008. Depends on T013 (Stage 2 complete).",
+      "status": "done",
+      "commit_hash": "034f193d"
+    },
+    {
+      "id": "T008",
+      "description": "Stage 3 — domain layer: add `evaluate_catalogue_lint(rules: &[CatalogueLinterRule], catalogue: &CatalogueDocument, layer_id: &LayerId) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>` as the pure free-function entry point in `libs/domain/src/tddd/catalogue_linter.rs` (D17). This function replaces the old evaluation API surface that currently lives in `InMemoryCatalogueLinter` (infrastructure), but T008 only establishes the callable domain-layer skeleton/control flow needed for callers to compile. Do not implement the per-rule inspection logic here; the full 12-rule evaluation is deferred to T014. Wire the function into `libs/domain/src/lib.rs` / `libs/domain/src/tddd/mod.rs`. Depends on T007.",
+      "status": "done",
+      "commit_hash": "034f193d"
+    },
+    {
+      "id": "T009",
+      "description": "Stage 3 — infrastructure/usecase cleanup: delete `libs/infrastructure/src/tddd/in_memory_catalogue_linter.rs` as an evaluation adapter, because evaluation moved to `evaluate_catalogue_lint` in T008 and no I/O-only linter adapter remains in this track. Remove the `with_disabled_rules` constructor and make rule filtering caller-side. Update `libs/usecase/src/catalogue_lint_workflow.rs` `RunCatalogueLintInteractor` to call `domain::evaluate_catalogue_lint` directly instead of injecting a `CatalogueLinter` port for evaluation (remove only that linter port injection, per D17). Retain the existing `CatalogueLoader` port injection because loading the requested `CatalogueDocument` / `LayerId` from `RunCatalogueLintCommand.track_id` and `layer_id` is external I/O. Update `RunCatalogueLintInteractor::new` to accept the catalogue loader only, load the requested catalogue, convert `LintRuleSpec` to domain `CatalogueLinterRule`, then pass `rules`, `catalogue`, and `layer_id` to `evaluate_catalogue_lint`. Keep the loader/evaluation error conversions needed by this flow. Depends on T007 and T008.",
+      "status": "done",
+      "commit_hash": "034f193d"
+    },
+    {
+      "id": "T010",
+      "description": "N/A: 旧 active トラック (本トラック以外の active track) の catalogue 移行は本トラックのスコープ外。signal 評価対象 (verify-plan-artifact-refs 等) は current track の catalogue のみを parse するため、他トラックの旧 schema 残置は本トラックの commit gate を阻害しない。本トラックの catalogue (domain/usecase/infrastructure) は T002-T006 で新 schema に移行済み。OS-05 の spec text は将来の reference として保持するが、本トラックでは migration を実施しない (D3 移行対象の限定を踏まえた解釈)。",
+      "status": "skipped"
+    },
+    {
+      "id": "T011",
+      "description": "Stage 1 — unit tests: add TDD-first tests covering the Stage 1 schema-migration behavioral contracts. In domain: tests for `NonEmptyVec` (non-empty construction, `as_slice`), `InvariantName` (non-empty validation via `Identifier`), `IdentityAccessor` (round-trip), `DataRole` / `ContractRole` Clone / PartialEq / Display / FromStr with payload variants. In infrastructure (codec): round-trip tests for DataRole variants with all new payload fields, empty NonEmptyVec decode rejection, Repository decode with mandatory aggregate. Linter framework and linter-rule boundary tests are intentionally deferred to Stage 3 T016. Follows TDD (tests written before / alongside implementation in T001-T006). Depends on T001-T006 for the final Stage 1 compilation gate (T010 is skipped).",
+      "status": "done",
+      "commit_hash": "70494484"
+    },
+    {
+      "id": "T012",
+      "description": "Stage 2 — domain layer: add `DataRole::DomainEvent` unit variant to the data-carrying enum in `roles.rs`. Update `ALL_DATA_ROLES` array to include `DomainEvent`. Update `Display` / `FromStr` for the new unit variant. Update taxonomy display and any fixture / example catalogue files that enumerate available DataRole variants. Update the `signal_evaluator_v2` / `type_signals_evaluator` / `contract_map_renderer` for the new variant (pattern match exhaustiveness). Do not introduce the linter `RoleKind` in Stage 2; T007 adds it in Stage 3 and includes DomainEvent then. Depends on T011 (Stage 1 complete and CI green).",
+      "status": "done",
+      "commit_hash": "8f554c23"
+    },
+    {
+      "id": "T013",
+      "description": "Stage 2 — verify Stage 2 AC acceptance. Update `ALL_CONTRACT_ROLES` array to confirm `Repository` is present (added in T002; verify count is 4). Update `ALL_DATA_ROLES` to confirm both `DomainEvent` and `EventPolicy` are present (variant count is 15). Update any tests that assert variant counts or enumerate `ALL_DATA_ROLES` / `ALL_CONTRACT_ROLES`. Add a round-trip codec test for `DataRole::DomainEvent` (unit variant JSON). Run `cargo make ci`. Depends on T012.",
+      "status": "done",
+      "commit_hash": "8f554c23"
+    },
+    {
+      "id": "T014",
+      "description": "Stage 3 — domain layer: implement evaluation logic for the 12 linter rule kinds in `evaluate_catalogue_lint` (T008 stub → full implementation). Implement each rule's matching logic: `FieldEmpty` / `FieldNonEmpty` (check role-specific Vec field emptiness by field name), `KindLayerConstraint` (entry layer vs permitted_layers), `ReferencedRoleConstraint` (Vec<TypeRef> entries have expected RoleKind), `TraitImplRequired` (trait_impls contains required traits), `NoRoleInMethodSignature` (method params/return contain no forbidden-role types), `MethodReferenceSignature` (method named by target_field exists and satisfies receiver/params/return constraints), `AccessorSignatureRequired` (identity getter exists with &self/no-params/non-unit return), `FieldElementUniqueAcrossEntries` (exclusive_members not duplicated across AggregateRoot entries), `NoExternalReferenceInMethods` (exclusive_members types not in external TypeEntry method signatures), `NoPublicField` (no public fields in Plain/Tuple struct shapes), `ForbiddenMethodReceiver` (no method with forbidden receiver). Depends on T009 (linter framework/API and cleanup complete).",
+      "status": "done",
+      "commit_hash": "30764f05"
+    },
+    {
+      "id": "T015",
+      "description": "Stage 3 — domain layer: implement the `ddd_strict_preset()` Rust function in `libs/domain/src/tddd/catalogue_linter.rs`. This task is done (Rust function committed). Per D15 amend, the authoritative preset delivery mechanism switches to a JSON file; the Rust function will be removed in T018, and the JSON preset file will be created in T019 using the rule set this function encodes. Depends on T014.",
+      "status": "done",
+      "commit_hash": "30764f05"
+    },
+    {
+      "id": "T016",
+      "description": "Stage 3 — unit tests for the linter framework and all linter rules in evaluate_catalogue_lint. Add tests for `CatalogueLinterRule::new` with each new variant including error cases (EmptyPermittedLayers, EmptyRequiredTraits, EmptyForbiddenRoles, EmptyTargetField), and usecase tests for `LintRuleSpec` / `LintRuleKind` 12-variant round-trip. Write tests for each of the 12 rule kinds: happy path (no violation), violation path (returns CatalogueLintViolation with correct rule_kind/entry_name/message). Test `ddd_strict_preset` returns a non-empty rule list and each rule kind appears. Test the invariant SelfMethod signature check (AC-13): method missing → violation, wrong receiver → violation, has params → violation, bool return on &self no-params → pass. Test identity getter check (AC-14). Test equality impl check (AC-15). Test all 5 Aggregate Boundary rules (AC-16). Test DomainEvent mutation rules (AC-17). Test Repository aggregate role check (AC-18). Test all 4 EventPolicy rules (AC-19). Test ValueObject mutation checks (AC-20). Test ddd-strict preset end-to-end with a synthetic catalogue fixture. Follows TDD — tests written before full implementation in T014. Depends on T014 and T015 for final compilation gate.",
+      "status": "done",
+      "commit_hash": "30764f05"
+    },
+    {
+      "id": "T017",
+      "description": "Stage 3 — CI gate: run `cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix all remaining issues. Confirm AC-23 (full CI passes with no regressions). Update any remaining callers that use old `CatalogueLinterRule::try_new` API (now `CatalogueLinterRule::new`) across apps/ and cli-composition layers. Depends on T016.",
+      "status": "done",
+      "commit_hash": "30764f05"
+    },
+    {
+      "id": "T019",
+      "description": "Stage 4 — project resource: create the distributed preset file at `.harness/catalogue-lint/presets/ddd-strict.json`. Format: `{ \"schema_version\": 1, \"rules\": [LintRuleSpec, ...] }` where the rules list mirrors the minimum-core rules of D4-D11 / D16 / D18 in LintRuleSpec JSON form (target_roles as string arrays, kind as the LintRuleKind discriminated JSON). This file is a project resource, not a Rust source file, and does not belong in any type catalogue. Adopters copy this file to `.harness/catalogue-lint/config.json` to enable the full minimum-core rule set. Depends on T017 (transcribes the rule set that `ddd_strict_preset()` implements, which is fully tested and confirmed in T016/T017; the Rust function still exists at this point and serves as the canonical reference for the JSON content).",
+      "status": "done",
+      "commit_hash": "23098c4f"
+    },
+    {
+      "id": "T018",
+      "description": "Stage 4 — domain layer cleanup: delete the `ddd_strict_preset()` Rust function and its sub-module declarations from `libs/domain/src/tddd/catalogue_linter*.rs`. Drop the corresponding catalogue entry from `domain-types.json` (if any function entry was added there). Update any in-repo callers — T016 tests that call `ddd_strict_preset()` must be updated to use a hard-coded rule list or load from `.harness/catalogue-lint/presets/ddd-strict.json` (the JSON file created in T019) instead. Required for D15 amend: the preset is now a JSON file, not a Rust API. Depends on T019 (the JSON preset file must exist before the Rust function is deleted, so implementers can verify the JSON rule list matches before removing the in-code reference).",
+      "status": "done",
+      "commit_hash": "23098c4f"
+    },
+    {
+      "id": "T020",
+      "description": "Stage 4 — usecase layer: implement the `LintConfig { rules }` value object and `LintConfigLoaderError { MissingFile, ParseError, SchemaVersionMismatch }` error type (declared in Phase 2 usecase-types.json catalogue). Add the `LintConfigLoader` port trait (declared in Phase 2 usecase-types.json). These boundary types are serde-free usecase-layer types; the filesystem implementation lives in T021. Depends on T018 (domain cleanup completes the Stage 4 domain baseline before new usecase types are added).",
+      "status": "done",
+      "commit_hash": "f3a7da2d"
+    },
+    {
+      "id": "T021",
+      "description": "Stage 4 — infrastructure layer: implement `FsLintConfigLoader` (declared in Phase 2 infrastructure-types.json catalogue). The adapter stores a fully-resolved path in `self.path` (set at construction via `new(path: PathBuf)`). `load()` reads `self.path` with no additional argument — the adapter does not resolve paths at call time. CLI composition (T023) decides which path to pass to `new()`: the workspace default (`.harness/catalogue-lint/config.json`) or a `--rules-file` CLI override. Reject `schema_version != 1` with `SchemaVersionMismatch`; return `MissingFile` when the file does not exist (no silent fallback per OS-10); return `ParseError` on JSON/structure failure. Depends on T020.",
+      "status": "done",
+      "commit_hash": "f3a7da2d"
+    },
+    {
+      "id": "T022",
+      "description": "Stage 4 — usecase layer: update `RunCatalogueLintInteractor` to accept the new `C: LintConfigLoader` generic (declared in Phase 2 usecase-types.json catalogue). The execute flow priority is: (1) use `command.rules` if non-empty; (2) otherwise call `config_loader.load()` (no path argument — path is baked into the adapter at construction); (3) map `LintConfigLoaderError` to `RunCatalogueLintError` as follows: `MissingFile { path }` → `ConfigMissing { path }` (config has not been set up — fail-closed per OS-10); `ParseError` or `SchemaVersionMismatch` → `ConfigInvalid(err)` (config exists but is broken). Do NOT fall back to any preset. Update `RunCatalogueLintInteractor::new` signature to accept both `loader: L` and `config_loader: C`. Depends on T021.",
+      "status": "done",
+      "commit_hash": "f3a7da2d"
+    },
+    {
+      "id": "T023",
+      "description": "Stage 4 — CLI composition: update `apps/cli-composition/src/track/tddd.rs` `track_lint()` to wire `FsLintConfigLoader`, drop the hard-coded demo rule vec, and resolve the config path before constructing the adapter: if `--rules-file <path>` is given, pass that path to `FsLintConfigLoader::new(path)`; otherwise pass the workspace-default path (`workspace_root.join(\".harness/catalogue-lint/config.json\")`) to `FsLintConfigLoader::new(path)`. Do not pass a path to `load()` — `load()` takes no argument. Update `apps/cli/tests/cli_track_lint.rs` test fixtures: each test must create `.harness/catalogue-lint/config.json` in a temp workspace (or pass `--rules-file` pointing at the preset) as setup; add a fail-closed path test that asserts a non-zero exit code when neither config.json nor `--rules-file` is present. Depends on T022.",
+      "status": "done",
+      "commit_hash": "d3fafa03"
+    },
+    {
+      "id": "T024",
+      "description": "Stage 4 — tests: add unit and integration tests for T020-T023. LintConfigLoader happy path: `FsLintConfigLoader::new(valid_path).load()` succeeds when config.json is present and valid. ParseError path: malformed JSON returns `ParseError`. MissingFile path: absent config file path returns `MissingFile` (path is set at `new()` time, not passed to `load()`). SchemaVersionMismatch path: wrong schema_version returns `SchemaVersionMismatch`. Interactor fail-closed path: `RunCatalogueLintInteractor::execute` returns `ConfigMissing { path }` when no rules in command and config loader returns `MissingFile`. Interactor config-invalid path: execute returns `ConfigInvalid(err)` when loader returns `ParseError` or `SchemaVersionMismatch`. CLI integration end-to-end: `cargo make test` passes with the fixture configs created in T023. Depends on T023.",
+      "status": "done",
+      "commit_hash": "d3fafa03"
+    },
+    {
+      "id": "T025",
+      "description": "Stage 4 — final CI gate: run `cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix all remaining issues. Confirm acceptance against AC-21 (ddd-strict.json exists and domain layer has no `ddd_strict_preset()` Rust API), OS-09 (no per-layer config), OS-10 (fail-closed: absent config causes explicit error), OS-11 (no Rust API preset function). Depends on T024.",
+      "status": "done",
+      "commit_hash": "f87cb85a"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Stage 1: New supporting types in domain layer",
+        "description": [
+          "T001 adds the new value-object types needed as payloads for the data-carrying DataRole / ContractRole variants: InvariantName, InvariantDecl, InvariantPredicate, IdentityAccessor, NonEmptyVec<TypeRef>.",
+          "These types are domain-layer, serde-free, and are prerequisites for T002. No breaking changes in this task alone."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Stage 1: DataRole / ContractRole data-carrying enum migration",
+        "description": [
+          "T002 performs the central breaking migration: rewrites DataRole as data-carrying (struct payloads on 5 existing variants plus new EventPolicy; DomainEvent remains Stage 2) and ContractRole (3→4 with Repository) as data-carrying enums. Copy and Hash derives are removed.",
+          "T003 updates all domain-layer callers that break after T002 (pattern match exhaustiveness, Copy→Clone/ref conversions).",
+          "T004 updates the infrastructure codec (dto.rs, decode.rs, encode.rs) to handle the new payload forms, including NonEmptyVec empty-array decode rejection.",
+          "T005 updates remaining infrastructure files that must compile against the new role enum shapes, without adding new linter semantics.",
+          "T006 updates the usecase layer only for schema-migration fallout. The linter-rule boundary expansion is deferred to Stage 3 T007.",
+          "These tasks form a linear dependency chain (T001→T002→T003→T004→T005, with T006 depending on T003). The entire migration is treated as one logical breaking change (D3 Stage 1)."
+        ],
+        "task_ids": [
+          "T002",
+          "T003",
+          "T004",
+          "T005",
+          "T006"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Stage 1: Active-track catalogue migration and Stage 1 tests",
+        "description": [
+          "T010 was originally planned to migrate active-track catalogue JSON files to the new data-carrying role schema, but is now skipped: migration of other active tracks is out of scope for this track (D3 scope limitation). The current track's catalogue (domain/usecase/infrastructure) was migrated in T002-T006. OS-05 spec text is retained as future reference.",
+          "T011 adds the Stage 1 schema-migration test suite: domain type invariants and codec round-trips for all new payload fields. Linter framework and linter-rule tests are intentionally deferred to Stage 3.",
+          "T011 depends on T001-T006 for the final Stage 1 compilation gate.",
+          "After T011, cargo make ci must pass for Stage 1 schema migration (linter rule evaluation remains Stage 3 T014-T016)."
+        ],
+        "task_ids": [
+          "T010",
+          "T011"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Stage 2: DomainEvent unit variant and taxonomy update",
+        "description": [
+          "T012 adds the DomainEvent unit variant to DataRole (D9), updates ALL_DATA_ROLES (count 14→15), updates Display/FromStr and all exhaustive pattern matches.",
+          "T013 verifies all Stage 2 acceptance criteria: ALL_DATA_ROLES has 15 variants (DomainEvent + EventPolicy), ALL_CONTRACT_ROLES has 4 variants (Repository), codec round-trip for DomainEvent, cargo make ci passes.",
+          "Stage 2 is intentionally small — only a unit variant addition with no new payload schema. The linter RoleKind discriminant is introduced later in Stage 3 T007."
+        ],
+        "task_ids": [
+          "T012",
+          "T013"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "Stage 3: Linter framework rewrite and evaluate_catalogue_lint (D17)",
+        "description": [
+          "T007 rewrites the CatalogueLinterRule / CatalogueLinterRuleKind framework after Stage 2: adds RoleKind, RuleTarget, expands CatalogueLinterRuleKind to 12 variants (11 data-carrying plus unit NoPublicField), updates the usecase LintRuleKind/LintRuleSpec boundary, and deletes the old CatalogueLinter evaluation port.",
+          "T008 adds the domain-layer pure evaluate_catalogue_lint free-function entry point (replaces InMemoryCatalogueLinter's evaluation API surface per D17). T014 supplies the full per-rule implementation.",
+          "T009 deletes InMemoryCatalogueLinter as the old evaluation adapter, wires RunCatalogueLintInteractor to call evaluate_catalogue_lint directly (no CatalogueLinter port injection for evaluation), and retains CatalogueLoader as the external-I/O source for the requested CatalogueDocument / LayerId.",
+          "These three tasks are sequenced T013→T007→T008→T009."
+        ],
+        "task_ids": [
+          "T007",
+          "T008",
+          "T009"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "Stage 3: Linter rule evaluation and ddd_strict_preset() Rust function",
+        "description": [
+          "T014 implements the full evaluation logic for all 12 CatalogueLinterRuleKind variants inside evaluate_catalogue_lint. The T008 skeleton is expanded to real checking logic for each rule kind (ReferencedRoleConstraint, TraitImplRequired, MethodReferenceSignature, AccessorSignatureRequired, FieldElementUniqueAcrossEntries, NoExternalReferenceInMethods, NoPublicField, ForbiddenMethodReceiver, NoRoleInMethodSignature, and the retained FieldEmpty / FieldNonEmpty / KindLayerConstraint).",
+          "T015 implemented the `ddd_strict_preset()` Rust function (done). Per D15 amend, the Rust function will be removed in T018 and the JSON preset file will be created in T019.",
+          "T016 adds the full Stage 3 unit test suite, including CatalogueLinterRule::new validation, LintRuleSpec/LintRuleKind boundary round-trips, one test per rule kind × happy/violation path. AC-11 through AC-20 and AC-22 are verified by these tests.",
+          "T017 is the CI gate run confirming AC-23 (cargo make ci passes end-to-end, no regressions) after the Stage 3 implementation.",
+          "Completion order is T009→T014→T015→T016→T017. T015 stays done (Rust function existed and is now slated for removal in T018)."
+        ],
+        "task_ids": [
+          "T014",
+          "T015",
+          "T016",
+          "T017"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "Stage 4: Preset-as-JSON, LintConfigLoader port, and fail-closed CLI wiring",
+        "description": [
+          "T019 creates `.harness/catalogue-lint/presets/ddd-strict.json` — the JSON LintRuleSpec list covering D4-D11 / D16 / D18 — while the Rust `ddd_strict_preset()` function still exists as a canonical reference. Adopters copy this to `.harness/catalogue-lint/config.json`.",
+          "T018 then removes the `ddd_strict_preset()` Rust function and its sub-module declarations from `libs/domain/src/tddd/`. Per D15 amend, the JSON file created in T019 becomes the new SoT. Callers in T016 tests are updated to load rules from the JSON fixture instead.",
+          "T020 implements the usecase-layer `LintConfig`, `LintConfigLoaderError`, and `LintConfigLoader` port (all declared in Phase 2 usecase-types.json catalogue).",
+          "T021 implements `FsLintConfigLoader` in the infrastructure layer — reads config.json or a `--rules-file` path; fail-closed on missing file per OS-10.",
+          "T022 updates `RunCatalogueLintInteractor` to accept the `C: LintConfigLoader` generic; adds `RunCatalogueLintError::ConfigMissing`; execute priority: command.rules > config loader > fail-closed.",
+          "T023 updates `apps/cli-composition/src/track/tddd.rs` to wire `FsLintConfigLoader`; updates CLI tests to supply config.json or `--rules-file` as setup; adds a fail-closed assertion test.",
+          "T024 adds unit and integration tests for the config loader (happy/error paths), interactor fail-closed, and CLI end-to-end.",
+          "T025 is the final CI gate confirming AC-21 / OS-09 / OS-10 / OS-11 and no regressions.",
+          "Sequential dependency chain: T019 → T018 → T020 → T021 → T022 → T023 → T024 → T025. T019 creates the JSON preset file while the Rust `ddd_strict_preset()` function still exists as a reference; T018 then deletes the Rust function after the JSON file is confirmed."
+        ],
+        "task_ids": [
+          "T019",
+          "T018",
+          "T020",
+          "T021",
+          "T022",
+          "T023",
+          "T024",
+          "T025"
+        ]
+      }
+    ]
+  }
+}

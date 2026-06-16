@@ -125,7 +125,7 @@ fn check_decision_key_presence(raw: &serde_yaml::Value) -> Result<(), AdrFrontMa
         // forgot to fill.
         for key in ["user_decision_ref", "review_finding_ref"] {
             let yaml_key = serde_yaml::Value::String(key.to_owned());
-            if let Some(value) = map.get(yaml_key) {
+            if let Some(value) = map.get(&yaml_key) {
                 if value.is_null() {
                     return Err(AdrFrontMatterCodecError::InvalidDecisionField(format!(
                         "decision '{id}': `{key}` is present but null — \

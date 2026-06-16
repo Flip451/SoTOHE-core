@@ -159,7 +159,7 @@ fn resolve_active_track_dir() -> Option<PathBuf> {
 ///
 /// Validates the track id, delegates I/O to the infrastructure layer,
 /// and maps the result to a `CommandOutcome`.
-pub(crate) fn execute_catalogue_spec_refs(
+pub fn execute_catalogue_spec_refs(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,

@@ -1,0 +1,581 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "LintRuleKind": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FieldEmpty",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "FieldNonEmpty",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "KindLayerConstraint",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "permitted_layers", "ty": "Vec<String>" }
+              ]
+            }
+          },
+          {
+            "name": "ReferencedRoleConstraint",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" },
+                { "name": "expected_role", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "TraitImplRequired",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "required_traits", "ty": "Vec<String>" }
+              ]
+            }
+          },
+          {
+            "name": "NoRoleInMethodSignature",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "forbidden_roles", "ty": "Vec<String>" }
+              ]
+            }
+          },
+          {
+            "name": "MethodReferenceSignature",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "AccessorSignatureRequired",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "FieldElementUniqueAcrossEntries",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "NoExternalReferenceInMethods",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "NoPublicField",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "ForbiddenMethodReceiver",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "forbidden_receiver", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Usecase-layer mirror of domain CatalogueLinterRuleKind. Expanding from 3 unit variants to 12 variants in parallel with the domain type; NoPublicField remains unit while the other 11 variants carry rule parameters. Uses String fields for role / receiver / layer names instead of domain types (FieldName / RoleKind / SelfReceiver / LayerId) because the usecase boundary accepts external input from CLI/config before domain validation. The interactor converts LintRuleKind -> CatalogueLinterRuleKind during rule construction.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "LintRuleSpec": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "target_roles", "ty": "Vec<String>" },
+            { "name": "kind", "ty": "LintRuleKind" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Usecase-layer rule specification input (mirrors domain CatalogueLinterRule). Breaking change from baseline: `kind: LintRuleKind` field remains but now carries the inspection variant; `target_roles: Vec<String>` added to mirror the domain RuleTarget.target_roles concept at the usecase input boundary (role names as strings, converted to RoleKind by the interactor). The `kind` field previously held the entire rule; now it holds only the inspection content.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunCatalogueLintCommand": {
+      "action": "reference",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "layer_id", "ty": "String" },
+            { "name": "rules", "ty": "Vec<LintRuleSpec>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Command to run catalogue lint for a track/layer with the given rules. Struct shape is unchanged from baseline: track_id and layer_id identify the catalogue to load, while LintRuleSpec field type changes are captured in the LintRuleSpec modify entry.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RunCatalogueLintInteractor": {
+      "action": "modify",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Concrete implementation of RunCatalogueLint. Modify from baseline: per D17, the evaluation logic moves from InMemoryCatalogueLinter (infrastructure) to domain::evaluate_catalogue_lint (pure function). Per D19, the interactor now also holds a LintConfigLoader port (generic C: LintConfigLoader) used when command.rules is empty — the execute flow checks rules first, falls back to loading from config via the port, and fails closed if neither is available. The CatalogueLoader port (L: CatalogueLoader) is retained for external I/O. Generic over both L and C to avoid Arc<dyn Trait> boxing at this boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-13"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "LintConfig": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "rules", "ty": "Vec<LintRuleSpec>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructs a LintConfig from a validated rule list. Called by LintConfigLoader implementations after parsing the config file."
+        },
+        {
+          "name": "rules",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[LintRuleSpec]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the lint rules declared in this configuration."
+        }
+      ],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Loaded and validated lint configuration parsed from a config file (e.g. .harness/catalogue-lint/config.json). Holds the rule list as LintRuleSpec boundary objects. Used by RunCatalogueLintInteractor as the fallback rule source when no rules are provided in the command (D19 priority: CLI rules > config file > fail-closed). All fields are private; use the new(rules) constructor and the rules() accessor.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "OS-09"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "LintConfigLoaderError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingFile",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "ParseError",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "SchemaVersionMismatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "expected", "ty": "u32" },
+                { "name": "actual", "ty": "u32" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Errors returned by LintConfigLoader::load. MissingFile: the config file does not exist at the given path (fail-closed per OS-10 — no silent fallback). ParseError: the file exists but cannot be parsed as valid JSON or its structure is invalid. SchemaVersionMismatch: the config file schema_version field does not match the expected version — prevents silently misinterpreting a config written for a different schema.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "OS-10"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunCatalogueLintError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["domain::tddd::catalogue_ports::CatalogueLoaderError"]
+            }
+          },
+          {
+            "name": "LintExecution",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["domain::tddd::catalogue_linter::CatalogueLinterError"]
+            }
+          },
+          {
+            "name": "InvalidLayer",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
+          },
+          {
+            "name": "InvalidRuleSpec",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
+          },
+          {
+            "name": "ConfigMissing",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "ConfigInvalid",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["LintConfigLoaderError"]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Errors from the RunCatalogueLint use case. Modify from baseline: CatalogueLoad continues to wrap CatalogueLoaderError because the interactor still performs external catalogue loading; LintExecution wraps domain CatalogueLinterError from evaluate_catalogue_lint rather than an infrastructure CatalogueLinter port. InvalidLayer(String) carries the unknown layer id; InvalidRuleSpec(String) carries the rejection reason from domain constructor validation. ConfigMissing is returned when command.rules is empty and LintConfigLoader::load returns MissingFile — fail-closed behavior per OS-10 (no silent fallback to any preset). ConfigInvalid wraps LintConfigLoaderError for ParseError and SchemaVersionMismatch cases — the config file exists but cannot be loaded successfully.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-13"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "OS-10"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "LintConfigLoader": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "load",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<LintConfig, LintConfigLoaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Loads and parses a LintConfig from the path baked into the adapter at construction time. Returns LintConfigLoaderError::MissingFile if the file does not exist (fail-closed — no silent fallback). Returns ParseError on JSON/structure failures. Returns SchemaVersionMismatch on version field mismatch. The path is not passed at call time — the adapter implementation (FsLintConfigLoader) receives the fully-resolved path in its constructor (new()), allowing CLI composition to decide whether to use the workspace default path or a --rules-file override path before constructing the adapter."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Secondary port for loading lint configuration from a file. Abstracts the external I/O of reading .harness/catalogue-lint/config.json or a --rules-file path. Implementations live in the infrastructure layer (FsLintConfigLoader). The path is resolved at adapter construction time (not at load() call time), so CLI composition decides which path to use (CLI override or workspace default) before wiring the adapter. Send + Sync bounds allow the port to be held by the generic interactor across thread boundaries.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "OS-09"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunCatalogueLint": {
+      "action": "reference",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            { "name": "command", "ty": "RunCatalogueLintCommand" }
+          ],
+          "returns": "Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Executes the catalogue lint workflow with the given command."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Application service interface for running catalogue lint. Referenced unchanged from baseline — the interface contract is stable even though the underlying interactor implementation changes per D17. The Send + Sync supertrait bounds were already present in the baseline and are not introduced by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "impl_generics": [
+        { "name": "L", "bounds": ["domain::tddd::catalogue_ports::CatalogueLoader"] },
+        { "name": "C", "bounds": ["LintConfigLoader"] }
+      ],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "loader", "ty": "L" },
+            { "name": "config_loader", "ty": "C" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new RunCatalogueLintInteractor with the catalogue loader and lint config loader. Per D17, there is no CatalogueLinter evaluation port injection — the interactor calls domain::evaluate_catalogue_lint directly. Per D19, config_loader provides the fallback rule source when command.rules is empty."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "LintRuleSpec"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RunCatalogueLintCommand"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RunCatalogueLintCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "RunCatalogueLint",
+      "for_type": "RunCatalogueLintInteractor",
+      "impl_generics": [
+        { "name": "L", "bounds": ["domain::tddd::catalogue_ports::CatalogueLoader", "Send", "Sync"] },
+        { "name": "C", "bounds": ["LintConfigLoader", "Send", "Sync"] }
+      ]
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<domain::tddd::catalogue_linter::CatalogueLinterError>",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<domain::tddd::catalogue_ports::CatalogueLoaderError>",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<LintConfigLoaderError>",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "RunCatalogueLintError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LintConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "LintConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LintConfigLoaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "LintConfigLoaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "LintConfigLoaderError"
+    }
+  ]
+}

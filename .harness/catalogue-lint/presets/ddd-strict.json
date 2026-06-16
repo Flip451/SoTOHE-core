@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "rules": [
+    {
+      "target_roles": ["Entity", "AggregateRoot", "ValueObject"],
+      "kind": { "MethodReferenceSignature": { "target_field": "invariants" } }
+    },
+    {
+      "target_roles": ["Entity", "AggregateRoot"],
+      "kind": { "AccessorSignatureRequired": { "target_field": "identity" } }
+    },
+    {
+      "target_roles": ["Entity", "AggregateRoot"],
+      "kind": { "TraitImplRequired": { "required_traits": ["PartialEq", "Eq"] } }
+    },
+    {
+      "target_roles": ["AggregateRoot"],
+      "kind": { "ReferencedRoleConstraint": { "target_field": "exclusive_members", "expected_role": "Entity" } }
+    },
+    {
+      "target_roles": ["AggregateRoot"],
+      "kind": { "ReferencedRoleConstraint": { "target_field": "shared_value_objects", "expected_role": "ValueObject" } }
+    },
+    {
+      "target_roles": ["AggregateRoot", "DomainService"],
+      "kind": { "ReferencedRoleConstraint": { "target_field": "emits", "expected_role": "DomainEvent" } }
+    },
+    {
+      "target_roles": ["UseCase"],
+      "kind": { "ReferencedRoleConstraint": { "target_field": "handles", "expected_role": "DomainEvent" } }
+    },
+    {
+      "target_roles": ["DomainEvent"],
+      "kind": { "ForbiddenMethodReceiver": { "forbidden_receiver": "&mut self" } }
+    },
+    {
+      "target_roles": ["DomainEvent"],
+      "kind": "NoPublicField"
+    },
+    {
+      "target_roles": ["Repository"],
+      "kind": { "ReferencedRoleConstraint": { "target_field": "aggregate", "expected_role": "AggregateRoot" } }
+    },
+    {
+      "target_roles": ["AggregateRoot"],
+      "kind": { "FieldElementUniqueAcrossEntries": { "target_field": "exclusive_members" } }
+    },
+    {
+      "target_roles": ["AggregateRoot"],
+      "kind": { "NoExternalReferenceInMethods": { "target_field": "exclusive_members" } }
+    },
+    {
+      "target_roles": ["ValueObject"],
+      "kind": { "NoRoleInMethodSignature": { "forbidden_roles": ["Entity", "AggregateRoot"] } }
+    },
+    {
+      "target_roles": ["EventPolicy"],
+      "kind": { "ReferencedRoleConstraint": { "target_field": "reacts_to", "expected_role": "DomainEvent" } }
+    },
+    {
+      "target_roles": ["EventPolicy"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain"] } }
+    },
+    {
+      "target_roles": ["EventPolicy"],
+      "kind": { "ForbiddenMethodReceiver": { "forbidden_receiver": "&mut self" } }
+    },
+    {
+      "target_roles": ["EventPolicy"],
+      "kind": { "NoRoleInMethodSignature": { "forbidden_roles": ["Repository", "UseCase"] } }
+    },
+    {
+      "target_roles": ["ValueObject"],
+      "kind": { "TraitImplRequired": { "required_traits": ["PartialEq", "Eq"] } }
+    },
+    {
+      "target_roles": ["ValueObject"],
+      "kind": { "ForbiddenMethodReceiver": { "forbidden_receiver": "&mut self" } }
+    },
+    {
+      "target_roles": ["ValueObject"],
+      "kind": "NoPublicField"
+    }
+  ]
+}

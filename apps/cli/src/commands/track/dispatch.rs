@@ -168,10 +168,10 @@ fn dispatch_track_cmd(cmd: TrackCommand) -> Result<ExitCode, crate::CliError> {
                 )
             })
         }
-        TrackCommand::Lint { track_id, layer_id, workspace_root } => {
+        TrackCommand::Lint { track_id, layer_id, workspace_root, rules_file } => {
             resolve_track_id_from_root(track_id, &workspace_root)
                 .map_err(CliError::Message)
-                .and_then(|tid| tddd::lint::execute_lint(workspace_root, tid, layer_id))
+                .and_then(|tid| tddd::lint::execute_lint(workspace_root, tid, layer_id, rules_file))
         }
         TrackCommand::CatalogueImplSignals { track_id, workspace_root, layer } => {
             let resolved =

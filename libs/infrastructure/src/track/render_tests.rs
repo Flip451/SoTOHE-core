@@ -1410,13 +1410,13 @@ fn sync_rendered_views_propagates_error_on_spec_json_unsupported_schema_version(
 // ---------------------------------------------------------------------------
 
 const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "TrackId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } }
     }
   },
@@ -1914,13 +1914,13 @@ fn sync_rendered_views_single_track_skips_domain_types_md_for_done_track() {
 // already reused by `apps/cli::resolve_layers`).
 
 const USECASE_TYPES_JSON_MINIMAL: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {
     "TrackReader": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } }
     }
   },
@@ -1929,13 +1929,13 @@ const USECASE_TYPES_JSON_MINIMAL: &str = r#"{
 }"#;
 
 const INFRASTRUCTURE_TYPES_JSON_MINIMAL: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "infrastructure",
   "layer": "infrastructure",
   "types": {
     "FsTrackStore": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } }
     }
   },
@@ -2402,16 +2402,16 @@ const ARCH_RULES_DOMAIN_ONLY: &str = r#"{
       ]
     }"#;
 
-/// Catalogue (v4) with two type entries.
+/// Catalogue (v5) with two type entries.
 /// Mirrors the production data that produced the "0 edges" bug in the track.
 const DOMAIN_TYPES_WITH_ENUM_VARIANTS: &str = r#"{
-      "schema_version": 4,
+      "schema_version": 5,
       "crate_name": "domain",
       "layer": "domain",
       "types": {
         "EnumVariantDeclaration": {
           "action": "add",
-          "role": "ValueObject",
+          "role": { "ValueObject": {} },
           "kind": {"kind": "struct", "shape": {"kind": "plain"}},
           "methods": [],
           "module_path": "",
@@ -2420,7 +2420,7 @@ const DOMAIN_TYPES_WITH_ENUM_VARIANTS: &str = r#"{
         },
         "MemberDeclaration": {
           "action": "add",
-          "role": "ValueObject",
+          "role": { "ValueObject": {} },
           "kind": {
             "kind": "enum",
             "variants": [

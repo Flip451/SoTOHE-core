@@ -337,7 +337,7 @@ mod tests {
             TypeName::new("User").unwrap(),
             TypeEntry {
                 action: ItemAction::Add,
-                role: DataRole::Entity,
+                role: DataRole::entity().unwrap(),
                 kind: TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,

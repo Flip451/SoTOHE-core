@@ -1,14 +1,14 @@
-//! JSON codec for [`CatalogueDocument`] (schema_version = 4).
+//! JSON codec for [`CatalogueDocument`] (schema_version = 5).
 //!
 //! `CatalogueDocumentCodec` converts between `CatalogueDocument` domain types
 //! and JSON using serde DTO structs defined here in the infrastructure layer.
 //! The domain layer is serialization-free (ADR `2026-04-14-1531-domain-serde-ripout.md`).
 //!
-//! ## Wire format (schema_version = 4)
+//! ## Wire format (schema_version = 5)
 //!
 //! ```json
 //! {
-//!   "schema_version": 4,
+//!   "schema_version": 5,
 //!   "crate_name": "domain",
 //!   "layer": "domain",
 //!   "types": { "TypeName": { ... } },
@@ -17,15 +17,20 @@
 //! }
 //! ```
 //!
-//! `CatalogueDocument.schema_version` is always `4` (bumped from 3 to 4 in
-//! spec-ref-embedded-hash-removal: `spec_refs[].hash` field removed; schema-version 3
-//! catalogues are rejected fail-closed). Older v1/v2/v3 formats are rejected by this codec.
+//! `CatalogueDocument.schema_version` is always `5` (bumped from 4 to 5 in
+//! tddd-pattern-semantics-extension: `TypeEntry.role` wire format changed from a bare
+//! string to a discriminated-object; schema-version 4 catalogues require migration and
+//! are rejected with `SchemaVersionRequiresMigration`). Older v1/v2/v3 formats are
+//! rejected by this codec as `UnsupportedSchemaVersion`.
 //!
 //! ## Error variants
 //!
 //! - `Json(serde_json::Error)` — serde deserialization failed.
 //! - `Io(std::io::Error)` — file I/O failed.
-//! - `UnsupportedSchemaVersion { actual, expected }` — version mismatch.
+//! - `SchemaVersionRequiresMigration { from, to, reason }` — catalogue uses an older
+//!   schema that has a known breaking format change and must be migrated before use.
+//! - `UnsupportedSchemaVersion { actual, expected }` — version is neither the current
+//!   supported version nor a known migration-gated predecessor.
 //! - `InvalidEntry { entry_name, reason }` — an entry's fields failed validation.
 //! - `CrateNameMismatch { expected, actual }` — `crate_name` field vs filename stem.
 
@@ -37,7 +42,9 @@ use serde::{Deserialize, de};
 use thiserror::Error;
 
 mod decode;
+mod decode_roles;
 mod dto;
+mod dto_roles;
 mod encode;
 mod validate;
 
@@ -51,9 +58,11 @@ use encode::domain_to_dto;
 
 /// The schema version this codec reads and writes.
 ///
-/// Bumped from 3 to 4 in spec-ref-embedded-hash-removal: `spec_refs[].hash` field removed.
-/// Schema-version 3 catalogues are rejected by this codec (fail-closed migration gate).
-pub const SCHEMA_VERSION: u32 = 4;
+/// Bumped from 4 to 5 in tddd-pattern-semantics-extension: `TypeEntry.role` wire format
+/// changed from a bare string to a discriminated-object (ADR D3 Stage 1 breaking change).
+/// Schema-version 4 catalogues are rejected with `SchemaVersionRequiresMigration` (fail-closed).
+/// Schema-version 3 and below are rejected with `UnsupportedSchemaVersion` (no migration path).
+pub const SCHEMA_VERSION: u32 = 5;
 
 // ---------------------------------------------------------------------------
 // StrictMap — duplicate-key-rejecting BTreeMap deserializer
@@ -122,7 +131,23 @@ pub enum CatalogueDocumentCodecError {
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 
-    /// The JSON file's `schema_version` does not match [`SCHEMA_VERSION`].
+    /// The catalogue uses a known older schema version that has a breaking format change.
+    ///
+    /// The file must be migrated (re-generated from source or manually updated) before use.
+    /// This is a distinct variant from [`Self::UnsupportedSchemaVersion`] so callers can
+    /// provide actionable migration guidance rather than a generic version mismatch message.
+    #[error("catalogue schema_version={from} requires migration to schema_version={to}: {reason}")]
+    SchemaVersionRequiresMigration {
+        /// The schema version found in the JSON file.
+        from: u32,
+        /// The schema version this codec expects.
+        to: u32,
+        /// Human-readable description of the breaking change that requires migration.
+        reason: &'static str,
+    },
+
+    /// The JSON file's `schema_version` does not match [`SCHEMA_VERSION`] and there is no
+    /// known migration path (e.g. the version is from the future or a completely unknown format).
     #[error(
         "unsupported catalogue schema_version: file has {actual}, codec expects {expected}. \
          Migrate the catalogue file to schema_version={expected}."
@@ -196,8 +221,13 @@ impl CatalogueDocumentCodec {
     ///
     /// Returns `CatalogueDocumentCodecError::Json` if the JSON is malformed.
     ///
+    /// Returns `CatalogueDocumentCodecError::SchemaVersionRequiresMigration` if
+    /// the `schema_version` field is 4 (the immediately preceding schema, which has a
+    /// known breaking wire-format change for `TypeEntry.role`).
+    ///
     /// Returns `CatalogueDocumentCodecError::UnsupportedSchemaVersion` if
-    /// the `schema_version` field is not [`SCHEMA_VERSION`].
+    /// the `schema_version` field is neither [`SCHEMA_VERSION`] nor a known
+    /// migration-gated predecessor.
     ///
     /// Returns `CatalogueDocumentCodecError::CrateNameMismatch` if the
     /// `crate_name` field does not match `filename_stem`.
@@ -210,11 +240,28 @@ impl CatalogueDocumentCodec {
     ) -> Result<CatalogueDocument, CatalogueDocumentCodecError> {
         // Phase 1: check schema_version before full parse.
         let version_probe: SchemaVersionProbe = serde_json::from_str(json)?;
-        if version_probe.schema_version != SCHEMA_VERSION {
-            return Err(CatalogueDocumentCodecError::UnsupportedSchemaVersion {
-                actual: version_probe.schema_version,
-                expected: SCHEMA_VERSION,
-            });
+        match version_probe.schema_version {
+            v if v == SCHEMA_VERSION => {
+                // Supported version — proceed to full parse below.
+            }
+            4 => {
+                // v4 → v5 is a breaking change: TypeEntry.role wire format changed from a bare
+                // string to a discriminated-object. Attempting a full parse would produce a
+                // JSON type error, which is confusing. Reject with an actionable migration gate.
+                return Err(CatalogueDocumentCodecError::SchemaVersionRequiresMigration {
+                    from: 4,
+                    to: SCHEMA_VERSION,
+                    reason: "role wire format changed from string to discriminated-object in v5; \
+                             re-generate the catalogue via the type-designer agent, \
+                             then run `sotp track type-signals`",
+                });
+            }
+            actual => {
+                return Err(CatalogueDocumentCodecError::UnsupportedSchemaVersion {
+                    actual,
+                    expected: SCHEMA_VERSION,
+                });
+            }
         }
 
         // Phase 2: full parse.
@@ -301,10 +348,10 @@ mod tests {
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
     use domain::tddd::catalogue_v2::{TypeRef, WherePredicateDecl};
 
-    fn minimal_v4_json(crate_name: &str, layer: &str) -> String {
+    fn minimal_v5_json(crate_name: &str, layer: &str) -> String {
         format!(
             r#"{{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "{crate_name}",
   "layer": "{layer}",
   "types": {{}},
@@ -317,14 +364,14 @@ mod tests {
     fn trait_method_catalogue_with_generics(generics_json: &str) -> String {
         format!(
             r#"{{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {{}},
   "traits": {{
     "MyPort": {{
       "action": "add",
-      "role": "SpecificationPort",
+      "role": {{ "SpecificationPort": {{}} }},
       "methods": [
         {{
           "name": "do_it",
@@ -341,14 +388,14 @@ mod tests {
 
     fn mixed_trait_with_default_impl_json() -> &'static str {
         r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
   "traits": {
     "MixedTrait": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         {
           "name": "required",
@@ -378,7 +425,7 @@ mod tests {
     ) -> String {
         format!(
             r#"{{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {{}},
@@ -425,10 +472,10 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_minimal_v4_json_succeeds() {
-        let json = minimal_v4_json("domain", "domain");
+    fn test_decode_minimal_v5_json_succeeds() {
+        let json = minimal_v5_json("domain", "domain");
         let doc = CatalogueDocumentCodec::decode(&json, "domain").unwrap();
-        assert_eq!(doc.schema_version, 4);
+        assert_eq!(doc.schema_version, 5);
         assert_eq!(doc.crate_name.as_str(), "domain");
         assert!(doc.types.is_empty());
     }
@@ -454,7 +501,7 @@ mod tests {
         assert!(
             matches!(
                 err,
-                CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual: 2, expected: 4 }
+                CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual: 2, expected: 5 }
             ),
             "unexpected error: {err:?}"
         );
@@ -469,15 +516,52 @@ mod tests {
         assert!(
             matches!(
                 err,
-                CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual: 3, expected: 4 }
+                CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual: 3, expected: 5 }
             ),
             "schema_version 3 must be rejected: {err:?}"
         );
     }
 
     #[test]
+    fn test_decode_schema_version_4_returns_migration_required_error() {
+        // Schema version 4 → v5 is a known breaking change (TypeEntry.role wire format
+        // changed from bare string to discriminated-object). v4 catalogues must be
+        // rejected with SchemaVersionRequiresMigration, not a confusing JSON type error.
+        let json = r#"{"schema_version": 4, "crate_name": "domain", "layer": "domain"}"#;
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(
+                err,
+                CatalogueDocumentCodecError::SchemaVersionRequiresMigration { from: 4, to: 5, .. }
+            ),
+            "schema_version 4 must be rejected with SchemaVersionRequiresMigration: {err:?}"
+        );
+        // The error message must mention both versions and hint at re-generation.
+        let msg = err.to_string();
+        assert!(
+            msg.contains("4") && msg.contains("5"),
+            "error message must mention both versions, got: {msg}"
+        );
+    }
+
+    #[test]
+    fn test_decode_schema_version_future_returns_unsupported_schema_version() {
+        // A version higher than the current SCHEMA_VERSION has no migration path —
+        // reject with UnsupportedSchemaVersion (the codec is too old to handle it).
+        let json = r#"{"schema_version": 99, "crate_name": "domain", "layer": "domain"}"#;
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(
+                err,
+                CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual: 99, expected: 5 }
+            ),
+            "future schema_version must be rejected with UnsupportedSchemaVersion: {err:?}"
+        );
+    }
+
+    #[test]
     fn test_decode_crate_name_mismatch_returns_error() {
-        let json = minimal_v4_json("domain", "domain");
+        let json = minimal_v5_json("domain", "domain");
         let err = CatalogueDocumentCodec::decode(&json, "usecase").unwrap_err();
         assert!(matches!(err, CatalogueDocumentCodecError::CrateNameMismatch { .. }), "{err:?}");
     }
@@ -491,13 +575,13 @@ mod tests {
     #[test]
     fn test_decode_type_entry_with_plain_struct_kind() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "plain", "fields": [] } }
     }
   },
@@ -508,7 +592,7 @@ mod tests {
         assert_eq!(doc.types.len(), 1);
         let entry = doc.types.values().next().unwrap();
         assert_eq!(entry.action, ItemAction::Add);
-        assert_eq!(entry.role, DataRole::ValueObject);
+        assert_eq!(entry.role, DataRole::value_object());
         assert!(
             matches!(&entry.kind, TypeKindV2::Struct(sk) if matches!(sk.shape, StructShape::Plain { .. }))
         );
@@ -517,13 +601,13 @@ mod tests {
     #[test]
     fn test_decode_type_entry_with_unit_struct_kind() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "Marker": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
@@ -541,13 +625,13 @@ mod tests {
     #[test]
     fn test_decode_type_entry_with_tuple_struct_kind() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } }
     }
   },
@@ -572,13 +656,13 @@ mod tests {
     #[test]
     fn test_decode_type_entry_with_plain_struct_and_typestate_marker() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "IdleState": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "plain", "fields": [] },
@@ -605,14 +689,14 @@ mod tests {
     #[test]
     fn test_decode_trait_entry_with_secondary_port_role() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
     "UserRepository": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": []
     }
   },
@@ -632,14 +716,14 @@ mod tests {
     fn test_decode_trait_entry_with_generics_and_where_predicates() {
         // AC-07: `trait Foo<T> where T: Clone` is expressible in JSON.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
     "Foo": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "generics": [{ "name": "T", "bounds": [] }],
       "where_predicates": [{ "lhs": "T", "rhs": ["Clone"] }]
     }
@@ -660,14 +744,14 @@ mod tests {
         // CN-01 / OS-04 backward compat: catalogues that predate generics/where_predicates
         // on traits must still decode successfully with both fields defaulting to empty.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
     "OldTrait": {
       "action": "add",
-      "role": "SecondaryPort"
+      "role": { "SecondaryPort": {} }
     }
   },
   "functions": {}
@@ -682,14 +766,14 @@ mod tests {
     fn test_encode_decode_round_trip_preserves_trait_generics_and_where_predicates() {
         // Round-trip: encode → JSON → decode preserves generics and where_predicates.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
     "Bar": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "generics": [{ "name": "T", "bounds": ["Clone"] }],
       "where_predicates": [{ "lhs": "T", "rhs": ["Send"] }]
     }
@@ -712,14 +796,14 @@ mod tests {
         // Byte-stable: empty generics/where_predicates must not appear in JSON
         // (skip_serializing_if = "Vec::is_empty").
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
     "Plain": {
       "action": "add",
-      "role": "SecondaryPort"
+      "role": { "SecondaryPort": {} }
     }
   },
   "functions": {}
@@ -740,14 +824,14 @@ mod tests {
     fn test_decode_trait_entry_with_invalid_generics_returns_error() {
         // Codec must reject malformed generic param names at decode time.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
     "BadTrait": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "generics": [{ "name": "", "bounds": [] }]
     }
   },
@@ -763,13 +847,13 @@ mod tests {
     #[test]
     fn test_encode_decode_round_trip_preserves_data() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } },
       "methods": [],
       "module_path": ""
@@ -787,7 +871,7 @@ mod tests {
     #[test]
     fn test_decode_function_entry() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -823,13 +907,13 @@ mod tests {
     fn test_decode_top_level_trait_impls_with_generic_args_in_trait_ref() {
         // ADR `2026-05-20-0048` D1/D2: trait_impls are top-level; trait_ref encodes generic args.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {
     "RenderContractMapError": {
       "action": "modify",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": { "kind": "enum", "variants": [] }
     }
   },
@@ -861,13 +945,13 @@ mod tests {
     fn test_decode_top_level_trait_impl_without_generic_args() {
         // trait_ref without angle brackets (no generic args) decodes correctly.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "MyType": {
       "action": "add",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": { "kind": "enum", "variants": [] }
     }
   },
@@ -886,13 +970,13 @@ mod tests {
     #[test]
     fn test_encode_decode_round_trip_preserves_top_level_trait_impls() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {
     "MyError": {
       "action": "add",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": { "kind": "enum", "variants": [] }
     }
   },
@@ -916,13 +1000,13 @@ mod tests {
         // Old schema (TypeEntry-level trait_impls) must be rejected by deny_unknown_fields.
         // ADR `2026-05-20-0048`: catalogues must be completely rewritten; no backward compat.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "BadError": {
       "action": "add",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": { "kind": "enum", "variants": [] },
       "trait_impls": [
         { "trait_name": "From", "origin_crate": "core", "generic_args": "" }
@@ -943,7 +1027,7 @@ mod tests {
     fn test_decode_top_level_trait_impl_with_empty_trait_ref_returns_error() {
         // An empty trait_ref string must be rejected (TypeRef::new validates non-empty).
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -961,13 +1045,13 @@ mod tests {
     fn test_decode_old_unit_struct_wire_tag_fails() {
         // The old `kind: "unit_struct"` wire tag is no longer supported after CN-02 breaking change.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "Marker": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "unit_struct" }
     }
   },
@@ -986,13 +1070,13 @@ mod tests {
     fn test_unit_struct_with_typestate_round_trips() {
         // AC-03: `kind: "struct"` + `shape: {"kind": "unit"}` + `typestate` decode → domain → encode round-trip.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "Locked": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "unit" },
@@ -1032,13 +1116,13 @@ mod tests {
     fn test_tuple_struct_with_typestate_round_trips() {
         // AC-04: `kind: "struct"` + `shape: {"kind": "tuple", ...}` + `typestate` decode → domain → encode round-trip.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "Pending": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "tuple", "fields": ["Uuid"] },
@@ -1082,6 +1166,11 @@ mod tests {
         for (case, generics_json) in [
             ("empty generic param name", r#"[{ "name": "", "bounds": ["Send"] }]"#),
             ("empty generic bound", r#"[{ "name": "T", "bounds": [""] }]"#),
+            ("hyphenated generic param name", r#"[{ "name": "T-U", "bounds": [] }]"#),
+            ("qualified generic param name", r#"[{ "name": "T::X", "bounds": [] }]"#),
+            ("angle-bracket generic param name", r#"[{ "name": "<T>", "bounds": [] }]"#),
+            ("digit-leading generic param name", r#"[{ "name": "123T", "bounds": [] }]"#),
+            ("space-containing generic param name", r#"[{ "name": "T U", "bounds": [] }]"#),
         ] {
             let json = trait_method_catalogue_with_generics(generics_json);
             let result = CatalogueDocumentCodec::decode(&json, "domain");
@@ -1093,53 +1182,17 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_method_with_invalid_generic_param_name_returns_invalid_entry_error() {
-        // Generic param names like "T-U" or "T::X" must be rejected at the codec boundary.
-        for bad_name in &["T-U", "T::X", "<T>", "123T", "T U", ""] {
-            let json = format!(
-                r#"{{
-  "schema_version": 4,
-  "crate_name": "domain",
-  "layer": "domain",
-  "types": {{
-    "Foo": {{
-      "action": "add",
-      "role": "ValueObject",
-      "kind": {{ "kind": "struct", "shape": {{ "kind": "plain" }} }},
-      "methods": [
-        {{
-          "name": "do_something",
-          "params": [],
-          "returns": "()",
-          "generics": [{{"name": "{bad_name}", "bounds": []}}]
-        }}
-      ]
-    }}
-  }},
-  "traits": {{}},
-  "functions": {{}}
-}}"#
-            );
-            let result = CatalogueDocumentCodec::decode(&json, "domain");
-            assert!(
-                matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
-                "expected InvalidEntry for bad generic name '{bad_name}', got: {result:?}"
-            );
-        }
-    }
-
-    #[test]
     fn test_decode_trait_with_empty_supertrait_bound_returns_invalid_entry_error() {
         // An empty supertrait_bounds entry must be rejected at the codec boundary.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
     "MyPort": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "supertrait_bounds": [""],
       "methods": []
     }
@@ -1158,13 +1211,13 @@ mod tests {
     #[test]
     fn test_type_entry_round_trip_with_spec_refs_and_informal_grounds() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [
         { "file": "track/items/x/spec.json", "anchor": "IN-01" }
@@ -1191,14 +1244,14 @@ mod tests {
     #[test]
     fn test_trait_entry_round_trip_with_spec_refs_and_informal_grounds() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
     "UserRepository": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": [],
       "spec_refs": [
         { "file": "track/items/x/spec.json", "anchor": "AC-02" }
@@ -1224,7 +1277,7 @@ mod tests {
     #[test]
     fn test_function_entry_round_trip_with_spec_refs_and_informal_grounds() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -1258,13 +1311,13 @@ mod tests {
     #[test]
     fn test_type_entry_with_empty_grounding_fields_round_trips_to_empty_arrays() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "Marker": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
@@ -1291,13 +1344,13 @@ mod tests {
         // A v4 catalogue that still carries "hash" in spec_refs must be rejected fail-closed
         // by deny_unknown_fields on SpecRefDto.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "UserId": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [
         { "file": "track/items/x/spec.json", "anchor": "IN-01", "hash": "0000000000000000000000000000000000000000000000000000000000000000" }
@@ -1320,7 +1373,7 @@ mod tests {
     #[test]
     fn test_decode_function_with_own_crate_prefix_succeeds() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -1341,7 +1394,7 @@ mod tests {
     #[test]
     fn test_decode_function_with_cross_crate_prefix_returns_cross_crate_error() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -1369,14 +1422,14 @@ mod tests {
     #[test]
     fn test_decode_trait_method_with_has_default_impl_true_preserves_field() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
   "traits": {
     "Describable": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         {
           "name": "describe",
@@ -1458,7 +1511,7 @@ mod tests {
     #[test]
     fn test_decode_function_with_generics_preserves_field() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
@@ -1489,7 +1542,7 @@ mod tests {
     #[test]
     fn test_decode_function_without_generics_field_defaults_to_empty() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -1514,7 +1567,7 @@ mod tests {
     #[test]
     fn test_encode_decode_round_trip_preserves_function_generics() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
@@ -1546,7 +1599,7 @@ mod tests {
         // Vec::is_empty must skip the generics field on encode so legacy
         // catalogues (no generics) stay byte-stable.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -1571,7 +1624,7 @@ mod tests {
     #[test]
     fn test_decode_function_with_duplicate_generic_param_names_returns_error() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -1603,14 +1656,14 @@ mod tests {
     #[test]
     fn test_decode_trait_method_with_where_predicates_round_trips() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
   "traits": {
     "GenericRepo": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": [
         {
           "name": "save",
@@ -1644,7 +1697,7 @@ mod tests {
     #[test]
     fn test_decode_function_with_where_predicates_round_trips() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
@@ -1683,14 +1736,14 @@ mod tests {
         // must decode correctly via the `#[serde(alias)]` backward-compat path.
         // The decoded domain value must use `lhs` / `rhs` with `BoundOp::Bound` default.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
   "traits": {
     "LegacyRepo": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": [
         {
           "name": "find",
@@ -1724,7 +1777,7 @@ mod tests {
         // After encode, the JSON output for where_predicates must use `"lhs"` / `"rhs"` / `"operator"`
         // field names rather than the legacy `"type"` / `"bounds"` names.
         let json_in = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
@@ -1768,14 +1821,14 @@ mod tests {
         // Legacy catalogues that predate T035 omit where_predicates; it must default to
         // empty for forward-compat (serde default + skip_serializing_if = Vec::is_empty).
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
   "traits": {
     "SimplePort": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         { "name": "do_it", "receiver": "&self", "params": [], "returns": "()" }
       ]
@@ -1796,14 +1849,14 @@ mod tests {
         // `skip_serializing_if = "Vec::is_empty"` must suppress the field
         // so legacy catalogues (no where_predicates) stay byte-stable.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
     "SimplePort": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         { "name": "do_it", "receiver": "&self", "params": [], "returns": "()" }
       ]
@@ -1824,14 +1877,14 @@ mod tests {
         // A where predicate with no bounds (`where T:`) is invalid Rust and
         // must be rejected by the decoder at the codec boundary.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {},
   "traits": {
     "BadPort": {
       "action": "add",
-      "role": "SpecificationPort",
+      "role": { "SpecificationPort": {} },
       "methods": [
         {
           "name": "do_it",
@@ -2010,7 +2063,7 @@ mod tests {
     #[test]
     fn test_decode_inherent_impl_with_minimal_fields_succeeds() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -2037,7 +2090,7 @@ mod tests {
         // Catalogues that predate InherentImplDeclV2 omit the field;
         // serde default must produce an empty Vec.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -2055,7 +2108,7 @@ mod tests {
     fn test_decode_one_struct_multiple_inherent_impl_blocks() {
         // The primary design constraint: 1 struct represented by N entries.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -2087,7 +2140,7 @@ mod tests {
     #[test]
     fn test_decode_inherent_impl_with_generics_and_where_predicates_round_trips() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -2123,7 +2176,7 @@ mod tests {
     #[test]
     fn test_encode_decode_inherent_impls_round_trip_preserves_multiple_blocks() {
         let json_in = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -2156,7 +2209,7 @@ mod tests {
         // When inherent_impls is empty the field must be omitted from the encoded JSON
         // so legacy catalogues stay byte-stable.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -2174,7 +2227,7 @@ mod tests {
     #[test]
     fn test_decode_function_with_no_crate_prefix_returns_cross_crate_error() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -2203,13 +2256,13 @@ mod tests {
     fn test_decode_top_level_trait_impl_with_impl_generics_and_where_predicates_succeeds() {
         // ADR `2026-05-20-0048` D1/D2: top-level trait_impls; `impl<L, R, W> Trait for Foo<L, R, W> where L: Send`.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "Foo": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "plain" } }
     }
   },
@@ -2248,7 +2301,7 @@ mod tests {
     fn test_decode_top_level_trait_impl_without_impl_generics_defaults_to_empty() {
         // Omitting impl_generics/impl_where_predicates must default to empty Vec (serde default).
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -2277,13 +2330,13 @@ mod tests {
         use domain::tddd::catalogue_v2::methods::BoundOp;
 
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "Foo": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "plain" } }
     }
   },
@@ -2335,7 +2388,7 @@ mod tests {
         // `skip_serializing_if = "Vec::is_empty"` must suppress impl_generics and
         // impl_where_predicates from the encoded JSON when they are empty.
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
@@ -2356,6 +2409,500 @@ mod tests {
         assert!(
             !encoded.contains("\"impl_where_predicates\""),
             "impl_where_predicates must be omitted when empty: {encoded}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR 2026-05-25-0000 D16: DataRole::EventPolicy codec tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_event_policy_type_role_with_non_empty_reacts_to_succeeds() {
+        // D16: EventPolicy.reacts_to is a NonEmptyVec<TypeRef>. Happy-path: a valid
+        // list of event type references must decode without error.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "OrderPolicyHandler": {
+      "action": "add",
+      "role": { "EventPolicy": { "reacts_to": ["OrderPlaced", "OrderCancelled"] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            domain::tddd::catalogue_v2::roles::DataRole::EventPolicy { reacts_to } => {
+                let slice = reacts_to.as_slice();
+                assert_eq!(slice.len(), 2);
+                assert_eq!(slice[0].as_str(), "OrderPlaced");
+                assert_eq!(slice[1].as_str(), "OrderCancelled");
+            }
+            other => panic!("expected EventPolicy role, got: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_encode_decode_round_trip_preserves_event_policy_role() {
+        // D16: encode → decode round-trip must preserve EventPolicy.reacts_to exactly.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "PaymentPolicyHandler": {
+      "action": "add",
+      "role": { "EventPolicy": { "reacts_to": ["PaymentReceived"] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "round-trip must preserve EventPolicy role");
+        // Encoded JSON must use discriminated-object form, not bare string.
+        assert!(
+            encoded.contains("\"EventPolicy\""),
+            "encoded JSON must use discriminated-object form for EventPolicy: {encoded}"
+        );
+        assert!(
+            encoded.contains("\"reacts_to\""),
+            "encoded JSON must contain reacts_to field: {encoded}"
+        );
+    }
+
+    #[test]
+    fn test_decode_event_policy_with_empty_reacts_to_returns_invalid_entry_error() {
+        // D16: EventPolicy.reacts_to must be non-empty (NonEmptyVec). An empty array
+        // must be rejected at the codec boundary with InvalidEntry.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "EmptyPolicyHandler": {
+      "action": "add",
+      "role": { "EventPolicy": { "reacts_to": [] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "empty EventPolicy.reacts_to must be rejected with InvalidEntry, got: {result:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR 2026-05-25-0000 D10: ContractRole::Repository codec tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_repository_trait_role_with_aggregate_succeeds() {
+        // D10: ContractRole::Repository requires a non-empty aggregate TypeRef. Happy-path:
+        // a valid aggregate type reference must decode without error.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "OrderRepository": {
+      "action": "add",
+      "role": { "Repository": { "aggregate": "Order" } },
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits.values().next().unwrap();
+        match &entry.role {
+            domain::tddd::catalogue_v2::roles::ContractRole::Repository { aggregate } => {
+                assert_eq!(aggregate.as_str(), "Order");
+            }
+            other => panic!("expected Repository role, got: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_encode_decode_round_trip_preserves_repository_role() {
+        // D10: encode → decode round-trip must preserve Repository.aggregate exactly.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "UserRepository": {
+      "action": "add",
+      "role": { "Repository": { "aggregate": "User" } },
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "round-trip must preserve Repository role");
+        // Encoded JSON must use discriminated-object form, not bare string.
+        assert!(
+            encoded.contains("\"Repository\""),
+            "encoded JSON must use discriminated-object form for Repository: {encoded}"
+        );
+        assert!(
+            encoded.contains("\"aggregate\""),
+            "encoded JSON must contain aggregate field: {encoded}"
+        );
+    }
+
+    #[test]
+    fn test_decode_repository_with_empty_aggregate_returns_invalid_entry_error() {
+        // D10: Repository.aggregate must be a non-empty TypeRef. An empty string must
+        // be rejected at the codec boundary with InvalidEntry.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "BadRepository": {
+      "action": "add",
+      "role": { "Repository": { "aggregate": "" } },
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "empty Repository.aggregate must be rejected with InvalidEntry, got: {result:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR 2026-05-25-0000: DataRole payload variant round-trip tests (T011)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_value_object_with_empty_invariants_round_trips() {
+        // ValueObject with no invariants: invariants field is omitted (skip_serializing_if).
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Money": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "plain", "fields": [] } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        assert_eq!(entry.role, DataRole::value_object());
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_value_object_with_invariant_decl_round_trips() {
+        // ValueObject with one non-empty invariants payload must survive a round-trip.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Email": {
+      "action": "add",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            { "name": "email_is_valid", "predicate": { "SelfMethod": "is_email_valid" } }
+          ]
+        }
+      },
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::ValueObject { invariants } => {
+                assert_eq!(invariants.len(), 1);
+                assert_eq!(invariants[0].name.as_str(), "email_is_valid");
+            }
+            other => panic!("expected ValueObject role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_entity_role_with_identity_and_invariants_round_trips() {
+        // Entity requires identity; invariants are optional.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "User": {
+      "action": "add",
+      "role": {
+        "Entity": {
+          "identity": { "method_name": "id" },
+          "invariants": [
+            { "name": "email_is_valid", "predicate": { "SelfMethod": "validate_email" } }
+          ]
+        }
+      },
+      "kind": { "kind": "struct", "shape": { "kind": "plain", "fields": [] } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::Entity { identity, invariants } => {
+                assert_eq!(identity.method_name().as_str(), "id");
+                assert_eq!(invariants.len(), 1);
+                assert_eq!(invariants[0].name.as_str(), "email_is_valid");
+            }
+            other => panic!("expected Entity role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_aggregate_root_role_with_all_payload_fields_round_trips() {
+        // AggregateRoot with all optional payload fields populated.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Order": {
+      "action": "add",
+      "role": {
+        "AggregateRoot": {
+          "identity": { "method_name": "order_id" },
+          "invariants": [
+            { "name": "total_is_positive", "predicate": { "SelfMethod": "is_total_positive" } }
+          ],
+          "exclusive_members": ["OrderLine"],
+          "shared_value_objects": ["Money"],
+          "emits": ["OrderPlaced"]
+        }
+      },
+      "kind": { "kind": "struct", "shape": { "kind": "plain", "fields": [] } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::AggregateRoot {
+                identity,
+                invariants,
+                exclusive_members,
+                shared_value_objects,
+                emits,
+            } => {
+                assert_eq!(identity.method_name().as_str(), "order_id");
+                assert_eq!(invariants.len(), 1);
+                assert_eq!(exclusive_members.len(), 1);
+                assert_eq!(exclusive_members[0].as_str(), "OrderLine");
+                assert_eq!(shared_value_objects.len(), 1);
+                assert_eq!(shared_value_objects[0].as_str(), "Money");
+                assert_eq!(emits.len(), 1);
+                assert_eq!(emits[0].as_str(), "OrderPlaced");
+            }
+            other => panic!("expected AggregateRoot role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_domain_service_role_with_emits_round_trips() {
+        // DomainService.emits is optional; when provided it must survive round-trip.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "PricingService": {
+      "action": "add",
+      "role": { "DomainService": { "emits": ["PriceCalculated"] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::DomainService { emits } => {
+                assert_eq!(emits.len(), 1);
+                assert_eq!(emits[0].as_str(), "PriceCalculated");
+            }
+            other => panic!("expected DomainService role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_use_case_role_with_handles_round_trips() {
+        // UseCase.handles is optional; when provided it must survive round-trip.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "RegisterUserUseCase": {
+      "action": "add",
+      "role": { "UseCase": { "handles": ["RegisterUserCommand"] } },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        match &entry.role {
+            DataRole::UseCase { handles } => {
+                assert_eq!(handles.len(), 1);
+                assert_eq!(handles[0].as_str(), "RegisterUserCommand");
+            }
+            other => panic!("expected UseCase role, got: {other:?}"),
+        }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    // ADR 2026-05-25-0000 D16 / T013: DataRole::DomainEvent codec round-trip
+    #[test]
+    fn test_decode_domain_event_data_role_round_trips() {
+        // DomainEvent is a unit variant (no payload fields); the JSON form is `{"DomainEvent": {}}`.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "UserRegistered": {
+      "action": "add",
+      "role": { "DomainEvent": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        assert_eq!(
+            entry.role,
+            domain::tddd::catalogue_v2::roles::DataRole::DomainEvent,
+            "decoded role must be DomainEvent"
+        );
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(
+            encoded.contains("\"DomainEvent\""),
+            "encoded JSON must use DomainEvent discriminant key: {encoded}"
+        );
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "round-trip must preserve DomainEvent role");
+    }
+
+    #[test]
+    fn test_decode_repository_trait_role_with_missing_aggregate_field_returns_error() {
+        // D10: Repository requires the `aggregate` field. Omitting it must fail decode.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "MissingAggregateRepo": {
+      "action": "add",
+      "role": { "Repository": {} },
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            result.is_err(),
+            "Repository role with missing aggregate field must fail decode, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_data_role_unknown_variant_returns_error() {
+        // DataRoleDto uses deny_unknown_fields; an unknown role key must be rejected.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Foo": {
+      "action": "add",
+      "role": { "UnknownRole": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            result.is_err(),
+            "unknown DataRole variant must be rejected by deny_unknown_fields, got: {result:?}"
         );
     }
 }

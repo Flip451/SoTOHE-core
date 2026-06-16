@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "6acbc397325790ae7fb96f305b8813a6287401f0673938e30845443eac32ba79",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "03587bb233c3632ec6109640bde3c41901f767aca32673430da7809cf7b004b6",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "df0ad15c82e48ad3c92408b803f30fa37485a7cd504626808211010f6a0ab2ec",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "4a6e8ac84521ebf552d6d41f99b2ac3e6c92d39a0d7d48851075d9edfaea680c",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。"
+      }
+    },
+    {
+      "claim_hash": "2aacd23668199ce43c29da1b4c578eeee93e88181bdba7cd4e34213fb3431100",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし"
+      }
+    },
+    {
+      "claim_hash": "9a2096e8cd6d5a7bb5eee7cdc4860cadd1300e70d324c7df4a90f5b66553e98e",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "76fcf66613facab6f3eb92cff03e594643abb2e58f7e0d4723c9888e27dd898c",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "a062bf627924c76938345b4cf21621450b9716cd6ad603e481b8b4b6bcf8d72c",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "bdab56ce29c0665059d42f7b0b5f2bff007ba3e9b8121add3440918b1fd994c8",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成"
+      }
+    },
+    {
+      "claim_hash": "93e138017773e447e5a9e1b078fbebf3503498947f3dd9829d376a62888b6421",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "3603e814a85e7bec2d8815f6a1321583a3c19ce4c33ae9f211eb555df249eb35",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "28beaa0c3c350754ca837f183c22f882a55b7aa75d0e875324788d826d13fad6",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "8b2f6f78f66c49a06e3633917c06303c3ce3632b8927d586f844dca2533e1b58",
+      "evidence_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "fb7219e4a6906321b30572c2835c6862fb0a4616312b5e7d23262eb9b41461fb",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CatalogueLinterRule を CatalogueDocument に適用して CatalogueLintViolation を生成する評価ロジックを domain/application core に配置する。現行の InMemoryCatalogueLinter（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "ab7d455fa048bbee7504c70d6a6131a9c38886fa744ceab8b570aa4274784ff0",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "7a64057edf666b112eaea34da7ba55469609c1f36db477d0c2faf01987b60224",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。opt-in したルールは厳格に適用し"
+      }
+    },
+    {
+      "claim_hash": "7a64057edf666b112eaea34da7ba55469609c1f36db477d0c2faf01987b60224",
+      "evidence_hash": "2fb0b608d104252e4551d10cd11665d3be76a3c4e5201f1d33b62cd840d9826a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp track lint` が読む `.harness/catalogue-lint/config.json` は workspace 全体に一つ適用されるファイルであり、crate ごと・layer ごとに異なる設定ファイルを指定する機構は設けない。"
+      }
+    },
+    {
+      "claim_hash": "5fa189b8e82e9f4d27bc6adb79b1e170b0ac563ecddb280e1aaf60aae64036fc",
+      "evidence_hash": "0e2819907ad0cc811dca66da2955053cfa0e74f8d24ddd9b8c335507392a8be3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 指定も config.json も見つからない場合は明示エラーで停止する（fail-closed）。このため「config.json がない状態でも lint を実行できるサイレントフォールバック」は実装対象外。"
+      }
+    },
+    {
+      "claim_hash": "5fa189b8e82e9f4d27bc6adb79b1e170b0ac563ecddb280e1aaf60aae64036fc",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ddd-strict プリセットを `.harness/catalogue-lint/presets/ddd-strict.json` として配布する"
+      }
+    },
+    {
+      "claim_hash": "8b2f6f78f66c49a06e3633917c06303c3ce3632b8927d586f844dca2533e1b58",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし"
+      }
+    },
+    {
+      "claim_hash": "93e138017773e447e5a9e1b078fbebf3503498947f3dd9829d376a62888b6421",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。"
+      }
+    },
+    {
+      "claim_hash": "3cc23cee8cd789109a1c95aeea29e6e05fe743271bc7f7273e29d0f19af2d5a2",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行の InMemoryCatalogueLinter（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "3cc23cee8cd789109a1c95aeea29e6e05fe743271bc7f7273e29d0f19af2d5a2",
+      "evidence_hash": "0e2819907ad0cc811dca66da2955053cfa0e74f8d24ddd9b8c335507392a8be3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定不在時の暗黙フォールバック動作（デフォルトプリセットで黙って実行する挙動）は設けない。CLI 指定も config.json も見つからない場合は明示エラーで停止する（fail-closed）。"
+      }
+    },
+    {
+      "claim_hash": "be579bb37c006baa9de61a67b464d6e947af0afce3226eec6b5d1eb9cac619d6",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用して `CatalogueLintViolation` を生成する評価ロジックを domain/application core に配置する。現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "3d4cfe97c91ef4e7f4328beffcb9dd530840c2aca1f9cbfe1daf7ab1dfeb9347",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象ロール指定（`RuleTarget`）」と「検査内容（`CatalogueLinterRuleKind`）」の 2 部構成とし、`DataRole` / `ContractRole` を横断するロール指定のために payload を持たない discriminant 型（`RoleKind`）を設ける。本 ADR が定める最小コアルール群を一括有効化する `ddd-strict` プリセットを `.harness/catalogue-lint/presets/ddd-strict.json` として配布する"
+      }
+    },
+    {
+      "claim_hash": "3d4cfe97c91ef4e7f4328beffcb9dd530840c2aca1f9cbfe1daf7ab1dfeb9347",
+      "evidence_hash": "2fb0b608d104252e4551d10cd11665d3be76a3c4e5201f1d33b62cd840d9826a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp track lint` が読む `.harness/catalogue-lint/config.json` は workspace 全体に一つ適用されるファイルであり、crate ごと・layer ごとに異なる設定ファイルを指定する機構は設けない。"
+      }
+    },
+    {
+      "claim_hash": "be579bb37c006baa9de61a67b464d6e947af0afce3226eec6b5d1eb9cac619d6",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。opt-in したルールは厳格に適用し"
+      }
+    }
+  ]
+}

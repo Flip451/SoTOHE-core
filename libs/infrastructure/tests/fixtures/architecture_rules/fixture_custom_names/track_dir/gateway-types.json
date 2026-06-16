@@ -1,11 +1,11 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "gateway",
   "layer": "gateway",
   "types": {
     "GatewayAdapter": {
       "action": "add",
-      "role": "SecondaryAdapter",
+      "role": { "SecondaryAdapter": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "plain" }

@@ -42,7 +42,7 @@ fn test_encode_returns_ambiguous_identifier_when_type_and_trait_share_name() {
         TypeName::new("Foo").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Enum { variants: vec![] },
             methods: vec![],
 
@@ -90,7 +90,7 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
         TypeName::new("BadType").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![FieldDecl::new(
@@ -142,7 +142,7 @@ fn test_encode_struct_fields_are_promoted_to_struct_field_items() {
         TypeName::new("User").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![
@@ -186,7 +186,7 @@ fn test_encode_enum_variants_are_promoted_to_variant_items() {
         TypeName::new("ItemAction").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Enum {
                 variants: vec![
                     VariantDecl::unit(VariantName::new("Add").unwrap()),
@@ -222,7 +222,7 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
         TypeName::new("Email").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -281,7 +281,7 @@ fn test_encode_paths_includes_module_path_segments() {
         TypeName::new("Draft").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -312,7 +312,7 @@ fn test_encode_paths_crate_root_type_has_two_segment_path() {
         TypeName::new("UserId").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -347,7 +347,7 @@ fn test_encode_field_with_generic_type_ref_creates_resolved_path_with_args() {
         TypeName::new("Cart").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![FieldDecl::new(
@@ -385,7 +385,7 @@ fn test_encode_std_prelude_type_creates_std_external_crate_entry() {
         TypeName::new("Foo").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![FieldDecl::new(
@@ -421,7 +421,7 @@ fn test_encode_undeclared_type_ref_field_gets_unresolved_marker_id() {
         TypeName::new("Foo").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![FieldDecl::new(
@@ -459,7 +459,7 @@ fn test_encode_item_actions_contains_declared_action() {
         TypeName::new("Email").unwrap(),
         TypeEntry {
             action: ItemAction::Modify,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -489,7 +489,7 @@ fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
         TypeName::new("Foo").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -553,7 +553,7 @@ fn test_encode_type_alias_produces_type_alias_item() {
         TypeName::new("UserResult").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::TypeAlias {
                 target: TypeRef::new("Result<User, DomainError>").unwrap(),
             },
@@ -788,7 +788,7 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
         TypeName::new("ValueHolder").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -941,7 +941,7 @@ fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_im
         TypeName::new("Calculator").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -1890,7 +1890,7 @@ fn test_trait_impl_block_generics_encoded_correctly() {
         TypeName::new("Foo").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -1962,7 +1962,7 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
         TypeName::new("Bar").unwrap(),
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,

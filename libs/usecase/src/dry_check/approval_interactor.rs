@@ -171,7 +171,7 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
         // → new pair_key), so the old pair_key is no longer produced by `dry write`
         // and therefore absent from `processed_pair_keys`. Without this filter the
         // gate would stay Blocked forever even though the violation is resolved.
-        let mut unresolved_violation_pairs = 0usize;
+        let mut active_violation_pair_keys = BTreeSet::new();
         for record in latest_per_pair.values() {
             let touches_current = current_fragment_refs.contains(record.pair_key().low())
                 || current_fragment_refs.contains(record.pair_key().high());
@@ -185,39 +185,41 @@ impl DryCheckApprovalService for DryCheckApprovalInteractor {
                 continue;
             }
             if matches!(record.verdict(), DryCheckVerdict::Violation { .. }) {
-                unresolved_violation_pairs += 1;
+                active_violation_pair_keys.insert(record.pair_key().clone());
             }
         }
-        if unresolved_violation_pairs > 0 {
-            return Ok(DryCheckApprovalVerdict::Blocked {
-                unresolved_pair_count: unresolved_violation_pairs,
-            });
-        }
 
-        // ── Step 4: Missing-verdict scan — every processed pair touching the
-        // current refs must have a corresponding latest verdict.
+        // ── Step 4: Processed-pair verdict freshness scan. ─────────────────────
         //
         // Without this scan, a manifest whose fingerprints and FragmentRefs are
         // consistent but whose companion `dry-check.json` is missing or truncated
         // (e.g. partial restore, manual edit) would Approve silently — the loop
         // above only visits pairs that actually have records, so a processed_pair
         // with no record at all falls through. Treat any such missing verdict as
-        // unresolved.
-        let mut missing_verdict_pairs = 0usize;
+        // unresolved. The same applies to records whose verdict was produced under
+        // a different config fingerprint: they are stale for this manifest even if
+        // their pair key is listed in `processed_pair_keys`.
+        let mut stale_or_missing_verdict_pairs = 0usize;
         for pair_key in coverage_record.processed_pair_keys() {
             let touches_current = current_fragment_refs.contains(pair_key.low())
                 || current_fragment_refs.contains(pair_key.high());
             if !touches_current {
                 continue;
             }
-            if !latest_per_pair.contains_key(pair_key) {
-                missing_verdict_pairs += 1;
+            if active_violation_pair_keys.contains(pair_key) {
+                continue;
+            }
+            match latest_per_pair.get(pair_key) {
+                Some(record) if record.config_fingerprint() == &self.current_config_fingerprint => {
+                    continue;
+                }
+                Some(_) | None => stale_or_missing_verdict_pairs += 1,
             }
         }
-        if missing_verdict_pairs > 0 {
-            return Ok(DryCheckApprovalVerdict::Blocked {
-                unresolved_pair_count: missing_verdict_pairs,
-            });
+        let unresolved_pair_count =
+            active_violation_pair_keys.len() + stale_or_missing_verdict_pairs;
+        if unresolved_pair_count > 0 {
+            return Ok(DryCheckApprovalVerdict::Blocked { unresolved_pair_count });
         }
 
         Ok(DryCheckApprovalVerdict::Approved)
@@ -638,6 +640,71 @@ mod tests {
             DryCheckApprovalVerdict::Approved,
             "matching fingerprint + covered refs + no Violation must yield Approved"
         );
+    }
+
+    #[test]
+    fn test_check_approved_processed_pair_with_stale_record_fingerprint_returns_blocked() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let pair_key = DryCheckPairKey::new(a.clone(), b.clone()).unwrap();
+
+        let current_fingerprint = DryCheckConfigFingerprint::new("b".repeat(64)).unwrap();
+        let coverage = coverage_with_pairs_and_fingerprint(
+            vec![a.clone(), b.clone()],
+            vec![pair_key],
+            current_fingerprint.clone(),
+        );
+        // Shared helper records use test_fingerprint() ("aaa..."), so this
+        // Accepted verdict is stale under current_fingerprint ("bbb...").
+        let stale_record = make_dry_check_record_for_tests(
+            a.clone(),
+            b.clone(),
+            DryCheckVerdict::Accepted,
+            DEFAULT_RECORDED_AT,
+        );
+        let interactor = DryCheckApprovalInteractor::new(
+            Arc::new(StubReader { records: vec![stale_record] }),
+            Arc::new(coverage),
+            current_fingerprint,
+            test_corpus_fingerprint(),
+        );
+
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
+        assert_eq!(result, DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 });
+    }
+
+    #[test]
+    fn test_check_approved_violation_and_missing_verdict_counts_distinct_pairs() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let c = make_fragment_ref_for_tests("src/c.rs", 'c');
+        let d = make_fragment_ref_for_tests("src/d.rs", 'd');
+        let violation_pair_key = DryCheckPairKey::new(a.clone(), b.clone()).unwrap();
+        let missing_pair_key = DryCheckPairKey::new(c.clone(), d.clone()).unwrap();
+
+        let current_fingerprint = DryCheckConfigFingerprint::new("b".repeat(64)).unwrap();
+        let coverage = coverage_with_pairs_and_fingerprint(
+            vec![a.clone(), b.clone(), c.clone(), d.clone()],
+            vec![violation_pair_key, missing_pair_key],
+            current_fingerprint.clone(),
+        );
+        let proposal = RefactorProposal::new("Extract helper.").unwrap();
+        let violation_record = make_dry_check_record_for_tests(
+            a.clone(),
+            b.clone(),
+            DryCheckVerdict::Violation { refactor_proposal: proposal },
+            DEFAULT_RECORDED_AT,
+        );
+        let interactor = DryCheckApprovalInteractor::new(
+            Arc::new(StubReader { records: vec![violation_record] }),
+            Arc::new(coverage),
+            current_fingerprint,
+            test_corpus_fingerprint(),
+        );
+
+        let result =
+            interactor.check_approved(&make_track(), &current_refs(vec![a, b, c, d])).unwrap();
+        assert_eq!(result, DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 2 });
     }
 
     #[test]

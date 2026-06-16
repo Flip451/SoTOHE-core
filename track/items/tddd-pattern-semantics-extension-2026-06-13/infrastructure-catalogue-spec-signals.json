@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "3e1376559b0c78495770e85febb4250121842cb13b0932a524025308f5aff7fd",
+  "signals": [
+    {
+      "type_name": "CatalogueDocumentCodec",
+      "signal": "blue",
+      "entry_hash": "185c2d4632246fcf1d038610536143fbd2d512fc2658a56a70db5db98fa73215"
+    },
+    {
+      "type_name": "CatalogueDocumentCodecError",
+      "signal": "blue",
+      "entry_hash": "2ca06e5f536c05a43d1e648891ee090925625e5df7bfb051a23381bf7707d0c1"
+    },
+    {
+      "type_name": "FsLintConfigLoader",
+      "signal": "blue",
+      "entry_hash": "d445a05aaff015985ba35feba64f807fbf111d5c0c73b2640f2023e86bb632e4"
+    },
+    {
+      "type_name": "InMemoryCatalogueLinter",
+      "signal": "blue",
+      "entry_hash": "4625c632f270ef1302bf0d177b40fc9489558571d4782c11336543e72bccca99"
+    }
+  ]
+}

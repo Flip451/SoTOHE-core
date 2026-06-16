@@ -207,7 +207,7 @@ mod tests {
     fn make_simple_type_entry() -> TypeEntry {
         TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,

@@ -506,7 +506,7 @@ mod tests {
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
         let entry = TypeEntry {
             action,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -543,7 +543,7 @@ mod tests {
         for (name, action, spec_refs, informal_grounds) in entries {
             let entry = TypeEntry {
                 action,
-                role: DataRole::ValueObject,
+                role: DataRole::value_object(),
                 kind: TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,

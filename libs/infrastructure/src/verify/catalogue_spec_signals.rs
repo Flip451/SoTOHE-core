@@ -443,13 +443,13 @@ mod tests {
 
     /// Minimal valid v3 domain catalogue with a single type `MyType`.
     const V3_CATALOGUE_ONE_TYPE: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "MyType": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "plain" } },
       "docs": "A simple value object."
     }
@@ -460,7 +460,7 @@ mod tests {
 
     /// Minimal valid v3 domain catalogue with no types.
     const V3_CATALOGUE_EMPTY: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},

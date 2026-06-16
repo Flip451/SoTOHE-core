@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "375b427b2f5622aaa8d2be9a16b2002d741bd2d848bf9cfb0d3f3eb34f07647b",
+  "signals": [
+    {
+      "type_name": "LintConfig",
+      "signal": "blue",
+      "entry_hash": "7a64057edf666b112eaea34da7ba55469609c1f36db477d0c2faf01987b60224"
+    },
+    {
+      "type_name": "LintConfigLoaderError",
+      "signal": "blue",
+      "entry_hash": "5fa189b8e82e9f4d27bc6adb79b1e170b0ac563ecddb280e1aaf60aae64036fc"
+    },
+    {
+      "type_name": "LintRuleKind",
+      "signal": "blue",
+      "entry_hash": "8b2f6f78f66c49a06e3633917c06303c3ce3632b8927d586f844dca2533e1b58"
+    },
+    {
+      "type_name": "LintRuleSpec",
+      "signal": "blue",
+      "entry_hash": "93e138017773e447e5a9e1b078fbebf3503498947f3dd9829d376a62888b6421"
+    },
+    {
+      "type_name": "RunCatalogueLintCommand",
+      "signal": "blue",
+      "entry_hash": "0327bc31c36d85d061344bae894343d85b6870c9aefd0b8c677c97d7477e2fd2"
+    },
+    {
+      "type_name": "RunCatalogueLintError",
+      "signal": "blue",
+      "entry_hash": "3cc23cee8cd789109a1c95aeea29e6e05fe743271bc7f7273e29d0f19af2d5a2"
+    },
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "signal": "blue",
+      "entry_hash": "be579bb37c006baa9de61a67b464d6e947af0afce3226eec6b5d1eb9cac619d6"
+    },
+    {
+      "type_name": "LintConfigLoader",
+      "signal": "blue",
+      "entry_hash": "3d4cfe97c91ef4e7f4328beffcb9dd530840c2aca1f9cbfe1daf7ab1dfeb9347"
+    },
+    {
+      "type_name": "RunCatalogueLint",
+      "signal": "blue",
+      "entry_hash": "8b5301c971250c647ae830b8d786908bf84601c4ff28ccab2fd89323d69d9ba5"
+    }
+  ]
+}

@@ -121,7 +121,7 @@ mod tests {
     fn minimal_v3_json(crate_name: &str) -> String {
         format!(
             r#"{{
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "{crate_name}",
   "layer": "{crate_name}",
   "types": {{}},

@@ -121,6 +121,25 @@ impl DryCheckInteractor {
             corpus_fingerprint,
         }
     }
+
+    fn write_fail_closed_coverage(&self) -> Result<(), DryCheckCycleError> {
+        let record = DryCheckCoverageRecord::new(
+            BTreeSet::new(),
+            BTreeSet::new(),
+            DryCheckConfigFingerprint::fail_closed(),
+            DryCheckCorpusFingerprint::fail_closed(),
+        );
+        self.coverage.write_coverage(&self.track_id, record)
+    }
+
+    fn fail_closed_before_return(&self, err: DryCheckCycleError) -> DryCheckCycleError {
+        match self.write_fail_closed_coverage() {
+            Ok(()) => err,
+            Err(coverage_err) => DryCheckCycleError::CoveragePort(format!(
+                "coverage write failed ({coverage_err}); also: {err}"
+            )),
+        }
+    }
 }
 
 impl DryCheckService for DryCheckInteractor {
@@ -158,10 +177,6 @@ impl DryCheckService for DryCheckInteractor {
         threshold: SimilarityThreshold,
         base_commit: CommitHash,
     ) -> Result<Vec<DryCheckFinding>, DryCheckCycleError> {
-        // ── Phase 1: Inquiry phase ────────────────────────────────────────────
-
-        // Step 1: Build the verified-pair set from history.
-        //
         // CN-07: identifier matching — when content changes, content_hash
         // changes, so FragmentRef changes, so DryCheckPairKey changes → no
         // match → re-verified.  No separate hash-comparison step.
@@ -182,7 +197,11 @@ impl DryCheckService for DryCheckInteractor {
         // fingerprint, so the guard skips it, but the already-inserted A entry
         // is never removed). The pair would then be incorrectly skipped under
         // a reverted-to-A config.
-        let records = self.dry_check_reader.read_records().map_err(DryCheckCycleError::Reader)?;
+        let records = match self.dry_check_reader.read_records().map_err(DryCheckCycleError::Reader)
+        {
+            Ok(records) => records,
+            Err(err) => return Err(self.fail_closed_before_return(err)),
+        };
 
         // Build latest-per-pair: iterate in record order; later records overwrite
         // earlier ones for the same pair_key (last-write-wins).
@@ -199,11 +218,13 @@ impl DryCheckService for DryCheckInteractor {
         }
 
         // Step 2: Build whole-codebase index from corpus_fragments.
-        build_corpus_index(
+        if let Err(err) = build_corpus_index(
             corpus_fragments,
             self.embedding_port.as_ref(),
             self.index_port.as_ref(),
-        )?;
+        ) {
+            return Err(self.fail_closed_before_return(err));
+        }
 
         // Steps 3–4: Per diff_fragment loop — collect unverified pairs.
         //
@@ -387,7 +408,10 @@ impl DryCheckService for DryCheckInteractor {
                     Ok((diff_frag, cand_frag))
                 })
                 .collect();
-        let fragment_pairs = fragment_pairs_result?;
+        let fragment_pairs = match fragment_pairs_result {
+            Ok(pairs) => pairs,
+            Err(err) => return Err(self.fail_closed_before_return(err)),
+        };
 
         // ── STEP B: Fast phase — judge all production pairs with Fast tier ───────
         let fast_judgment_results = if work_items.is_empty() {
@@ -411,11 +435,14 @@ impl DryCheckService for DryCheckInteractor {
         // are NOT re-run if Final calibration also fails (they would be discarded
         // anyway — running them wastes agent calls).
         let (fast_calibration_passed, probe_setup) = {
-            let all_probe_pairs = known_bad_probe_pairs().map_err(|e| {
+            let all_probe_pairs = match known_bad_probe_pairs().map_err(|e| {
                 DryCheckCycleError::Agent(super::errors::DryCheckAgentError::Unexpected(format!(
                     "calibration probe fixture error: {e}"
                 )))
-            })?;
+            }) {
+                Ok(pairs) => pairs,
+                Err(err) => return Err(self.fail_closed_before_return(err)),
+            };
             let total_probes = all_probe_pairs.len();
             let injection_rate = self.config.known_bad_injection_rate_percent.as_u8() as usize;
             // Ceiling division: probe_count = ceil(total_probes * injection_rate / 100)
@@ -608,9 +635,10 @@ impl DryCheckService for DryCheckInteractor {
 
         // Coverage write failure must never be silently dropped — a failed fail-closed
         // write leaves an old manifest in place and may grant approval incorrectly.
-        // When coverage write fails alongside a calibration error, surface both by
-        // combining them into a single CoveragePort error.  When coverage write fails
-        // alongside a pair-level error, the pair-level error takes priority (CN-03).
+        // When coverage write fails alongside another error, surface both by
+        // combining them into a single CoveragePort error. The failed coverage
+        // write means the previous manifest may still approve stale state, so it
+        // must not be hidden behind a pair-level error.
         if let Some(cov_err) = coverage_write_error {
             if let Some(ref cal_err) = calibration_error {
                 // Both calibration and coverage write failed: combine into one error
@@ -619,11 +647,12 @@ impl DryCheckService for DryCheckInteractor {
                     "coverage write failed ({cov_err}); also: {cal_err}"
                 )));
             }
-            // Only coverage write failed (no calibration error); treat it as the
-            // primary error, but prefer an existing pair-level error (CN-03).
-            if first_error.is_none() {
-                first_error = Some(cov_err);
+            if let Some(ref pair_err) = first_error {
+                return Err(DryCheckCycleError::CoveragePort(format!(
+                    "coverage write failed ({cov_err}); also: {pair_err}"
+                )));
             }
+            first_error = Some(cov_err);
         }
 
         // Return first collected error if any occurred (after coverage is written).
@@ -740,6 +769,17 @@ mod tests {
     impl StubReader {
         fn with_records(records: Vec<DryCheckRecord>) -> Self {
             Self { records }
+        }
+    }
+
+    struct FailingReader;
+
+    impl domain::dry_check::DryCheckReader for FailingReader {
+        fn read_records(&self) -> Result<Vec<DryCheckRecord>, DryCheckReaderError> {
+            Err(DryCheckReaderError::Io {
+                path: "dry-check.json".to_owned(),
+                detail: "simulated read error".to_owned(),
+            })
         }
     }
 
@@ -1721,6 +1761,47 @@ mod tests {
     }
 
     #[test]
+    fn test_run_dry_check_reader_error_writes_fail_closed_coverage() {
+        let embed = MockMockEmbeddingPort::new();
+        let index = MockMockSemanticIndexPort::new();
+        let agent = MockMockDryCheckAgentPort::new();
+        let writer = Arc::new(StubWriter::default());
+        let coverage = Arc::new(StubCoverage::new());
+
+        let interactor = DryCheckInteractor::new(
+            Arc::new(embed),
+            Arc::new(index),
+            Arc::new(agent),
+            writer,
+            Arc::new(FailingReader),
+            Arc::clone(&coverage) as Arc<dyn DryCheckCoveragePort>,
+            make_track(),
+            make_config(1),
+            test_fingerprint(),
+            test_corpus_fingerprint(),
+        );
+
+        let result = interactor.run_dry_check(
+            vec![],
+            vec![make_fragment("src/a.rs", "fn a() {}")],
+            make_threshold(0.8),
+            make_commit(),
+        );
+
+        assert!(
+            matches!(result, Err(DryCheckCycleError::Reader(_))),
+            "expected Reader error, got: {result:?}"
+        );
+        assert_eq!(coverage.write_call_count(), 1);
+
+        let recorded = coverage.last_written().expect("coverage written");
+        assert!(recorded.fragment_refs().is_empty());
+        assert!(recorded.processed_pair_keys().is_empty());
+        assert_eq!(recorded.config_fingerprint(), &DryCheckConfigFingerprint::fail_closed());
+        assert_eq!(recorded.corpus_fingerprint().as_str(), "0".repeat(64));
+    }
+
+    #[test]
     fn test_run_dry_check_coverage_port_error_propagated() {
         // write_coverage failure → DryCheckCycleError::CoveragePort.
         let frag = make_fragment("src/a.rs", "fn a() {}");
@@ -1992,6 +2073,43 @@ mod tests {
             coverage.last_written().is_some_and(|r| r.fragment_refs().is_empty()),
             "coverage written on pair-level error must be empty (fail-closed)"
         );
+    }
+
+    #[test]
+    fn test_pair_level_error_with_coverage_write_error_returns_coverage_error() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        index
+            .expect_search()
+            .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
+
+        let agent = make_probe_agent_with_non_probe(|_changed, _candidate| {
+            Err(DryCheckAgentError::Timeout)
+        });
+        let coverage = Arc::new(StubCoverage::failing());
+        let interactor = make_interactor_with_coverage(
+            embed,
+            index,
+            agent,
+            Arc::new(StubWriter::default()),
+            vec![],
+            Arc::clone(&coverage),
+        );
+
+        let result =
+            interactor.run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit());
+
+        let Err(DryCheckCycleError::CoveragePort(message)) = result else {
+            panic!("expected CoveragePort error, got: {result:?}");
+        };
+        assert!(message.contains("coverage write failed"));
+        assert!(message.contains("timed out"));
+        assert_eq!(coverage.write_call_count(), 1);
     }
 
     /// Records are appended in DryCheckPairKey sort order regardless of search

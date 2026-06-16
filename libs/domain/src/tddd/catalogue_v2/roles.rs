@@ -1,21 +1,28 @@
 //! Role enums and action/receiver enums for the catalogue v2 schema.
 //!
-//! Implements 5 enums from the TDDD v2 domain-types.json:
+//! Implements role enums and role payload value objects from the TDDD v2 domain-types.json:
 //! - `DataRole` (13 values) — for `TypeEntry`
 //! - `ContractRole` (3 values) — for `TraitEntry`
 //! - `FunctionRole` (2 values) — for `FunctionEntry`
 //! - `ItemAction` (4 values) — per-entry action
 //! - `SelfReceiver` (3 values) — method self-receiver form
+//! - `InvariantName`, `InvariantPredicate`, `InvariantDecl`, `IdentityAccessor`
+//! - `NonEmptyVec<T>`
 //!
 //! The architectural layer axis is represented by [`crate::tddd::LayerId`] — a
 //! data-driven validated newtype (ADR `2026-05-08-0248` D1). The former
 //! hardcoded `Layer` enum has been removed.
 //!
-//! All enums derive `strum::Display` and `strum::EnumString` for string
-//! round-trips, consistent with the domain serde-free policy
-//! (ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`).
+//! Unit-like enums derive `strum::Display` and `strum::EnumString` for string
+//! round-trips. `DataRole` and `ContractRole` use hand-written string
+//! round-trips because some variants carry schema payload.
 //!
 //! No serde derives — the infrastructure codec layer handles JSON serialization.
+
+use std::fmt;
+use std::str::FromStr;
+
+use crate::tddd::catalogue_v2::identifiers::{IdentifierError, InvariantName, MethodName, TypeRef};
 
 // Re-export strum traits to make them available to callers.
 pub use strum::EnumString;
@@ -31,28 +38,32 @@ pub use strum::IntoStaticStr;
 /// accepts `DataRole`; attaching `ContractRole` or `FunctionRole` to a `TypeEntry`
 /// is a parse-time type error (ADR 1 D2).
 ///
-/// 13 values covering domain layer through infrastructure layer roles:
+/// 15 values covering domain layer through infrastructure layer roles:
 /// `ValueObject`, `Entity`, `AggregateRoot`, `DomainService`, `Specification`,
 /// `Factory`, `UseCase`, `Interactor`, `Command`, `Query`, `Dto`,
-/// `ErrorType`, `SecondaryAdapter`.
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, strum::Display, strum::EnumString, strum::IntoStaticStr,
-)]
+/// `ErrorType`, `SecondaryAdapter`, `EventPolicy`, `DomainEvent`.
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DataRole {
     /// A value object — immutable, equality by value (DDD).
-    ValueObject,
+    ValueObject { invariants: Vec<InvariantDecl> },
     /// An entity — mutable, equality by identity (DDD).
-    Entity,
+    Entity { identity: IdentityAccessor, invariants: Vec<InvariantDecl> },
     /// An aggregate root — consistency boundary (DDD).
-    AggregateRoot,
+    AggregateRoot {
+        identity: IdentityAccessor,
+        invariants: Vec<InvariantDecl>,
+        exclusive_members: Vec<TypeRef>,
+        shared_value_objects: Vec<TypeRef>,
+        emits: Vec<TypeRef>,
+    },
     /// A domain service — stateless domain logic without direct entity ownership (DDD).
-    DomainService,
+    DomainService { emits: Vec<TypeRef> },
     /// A specification / predicate object (DDD Specification pattern).
     Specification,
     /// A factory — responsible for constructing complex domain objects (DDD).
     Factory,
     /// A use case — orchestrates domain entities to fulfil a user story (Clean Architecture).
-    UseCase,
+    UseCase { handles: Vec<TypeRef> },
     /// An interactor — concrete implementation of a use case (Clean Architecture variant).
     Interactor,
     /// A command — represents a write intention (CQRS).
@@ -65,6 +76,125 @@ pub enum DataRole {
     ErrorType,
     /// A secondary adapter — infrastructure implementation of a domain port.
     SecondaryAdapter,
+    /// A declarative domain-layer policy that reacts to one or more events.
+    EventPolicy { reacts_to: NonEmptyVec<TypeRef> },
+    /// A domain event — a record that something significant occurred in the domain.
+    DomainEvent,
+}
+
+impl DataRole {
+    /// Creates the canonical empty-payload `ValueObject` role.
+    #[must_use]
+    pub fn value_object() -> Self {
+        Self::ValueObject { invariants: Vec::new() }
+    }
+
+    /// Creates a minimal `Entity` role with the conventional `identity` accessor.
+    ///
+    /// This is intended for tests and catalogue scaffolding that only need the
+    /// role discriminant. Catalogue JSON decode still requires an explicit
+    /// `identity` payload.
+    pub fn entity() -> Result<Self, IdentifierError> {
+        Ok(Self::Entity { identity: Self::placeholder_identity()?, invariants: Vec::new() })
+    }
+
+    /// Creates a minimal `AggregateRoot` role with the conventional `identity`
+    /// accessor and empty optional vectors.
+    pub fn aggregate_root() -> Result<Self, IdentifierError> {
+        Ok(Self::AggregateRoot {
+            identity: Self::placeholder_identity()?,
+            invariants: Vec::new(),
+            exclusive_members: Vec::new(),
+            shared_value_objects: Vec::new(),
+            emits: Vec::new(),
+        })
+    }
+
+    /// Creates the canonical empty-payload `DomainService` role.
+    #[must_use]
+    pub fn domain_service() -> Self {
+        Self::DomainService { emits: Vec::new() }
+    }
+
+    /// Creates the canonical empty-payload `UseCase` role.
+    #[must_use]
+    pub fn use_case() -> Self {
+        Self::UseCase { handles: Vec::new() }
+    }
+
+    /// Returns the payload-free role name used for display, parsing, and method
+    /// reference signatures.
+    #[must_use]
+    pub fn variant_name(&self) -> &'static str {
+        match self {
+            Self::ValueObject { .. } => "ValueObject",
+            Self::Entity { .. } => "Entity",
+            Self::AggregateRoot { .. } => "AggregateRoot",
+            Self::DomainService { .. } => "DomainService",
+            Self::Specification => "Specification",
+            Self::Factory => "Factory",
+            Self::UseCase { .. } => "UseCase",
+            Self::Interactor => "Interactor",
+            Self::Command => "Command",
+            Self::Query => "Query",
+            Self::Dto => "Dto",
+            Self::ErrorType => "ErrorType",
+            Self::SecondaryAdapter => "SecondaryAdapter",
+            Self::EventPolicy { .. } => "EventPolicy",
+            Self::DomainEvent => "DomainEvent",
+        }
+    }
+
+    fn placeholder_identity() -> Result<IdentityAccessor, IdentifierError> {
+        MethodName::new("identity").map(IdentityAccessor::new)
+    }
+
+    fn placeholder_event_ref() -> Result<TypeRef, IdentifierError> {
+        TypeRef::new("DomainEvent")
+    }
+}
+
+impl fmt::Display for DataRole {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.variant_name())
+    }
+}
+
+impl FromStr for DataRole {
+    type Err = strum::ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parse_error = |_| strum::ParseError::VariantNotFound;
+        match s {
+            "ValueObject" => Ok(Self::value_object()),
+            "Entity" => Self::entity().map_err(parse_error),
+            "AggregateRoot" => Self::aggregate_root().map_err(parse_error),
+            "DomainService" => Ok(Self::domain_service()),
+            "Specification" => Ok(Self::Specification),
+            "Factory" => Ok(Self::Factory),
+            "UseCase" => Ok(Self::use_case()),
+            "Interactor" => Ok(Self::Interactor),
+            "Command" => Ok(Self::Command),
+            "Query" => Ok(Self::Query),
+            "Dto" => Ok(Self::Dto),
+            "ErrorType" => Ok(Self::ErrorType),
+            "SecondaryAdapter" => Ok(Self::SecondaryAdapter),
+            "EventPolicy" => {
+                let event = Self::placeholder_event_ref().map_err(parse_error)?;
+                Ok(Self::EventPolicy { reacts_to: NonEmptyVec::new(event, Vec::new()) })
+            }
+            "DomainEvent" => Ok(Self::DomainEvent),
+            _ => Err(strum::ParseError::VariantNotFound),
+        }
+    }
+}
+
+impl TryFrom<&str> for DataRole {
+    type Error = strum::ParseError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -77,9 +207,7 @@ pub enum DataRole {
 /// `ContractRole` to a `TypeEntry` is a parse-time type error (ADR 1 D2).
 ///
 /// 3 values: `SpecificationPort`, `ApplicationService`, `SecondaryPort`.
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, strum::Display, strum::EnumString, strum::IntoStaticStr,
-)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ContractRole {
     /// A specification port — driven port in hexagonal architecture (domain boundary).
     SpecificationPort,
@@ -87,6 +215,57 @@ pub enum ContractRole {
     ApplicationService,
     /// A secondary port — driving port for infrastructure adapters (domain boundary).
     SecondaryPort,
+    /// A repository port scoped to one aggregate root.
+    Repository { aggregate: TypeRef },
+}
+
+impl ContractRole {
+    /// Returns the payload-free role name used for display and parsing.
+    #[must_use]
+    pub fn variant_name(&self) -> &'static str {
+        match self {
+            Self::SpecificationPort => "SpecificationPort",
+            Self::ApplicationService => "ApplicationService",
+            Self::SecondaryPort => "SecondaryPort",
+            Self::Repository { .. } => "Repository",
+        }
+    }
+
+    fn placeholder_aggregate() -> Result<TypeRef, IdentifierError> {
+        TypeRef::new("AggregateRoot")
+    }
+}
+
+impl fmt::Display for ContractRole {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.variant_name())
+    }
+}
+
+impl FromStr for ContractRole {
+    type Err = strum::ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "SpecificationPort" => Ok(Self::SpecificationPort),
+            "ApplicationService" => Ok(Self::ApplicationService),
+            "SecondaryPort" => Ok(Self::SecondaryPort),
+            "Repository" => {
+                let aggregate = Self::placeholder_aggregate()
+                    .map_err(|_| strum::ParseError::VariantNotFound)?;
+                Ok(Self::Repository { aggregate })
+            }
+            _ => Err(strum::ParseError::VariantNotFound),
+        }
+    }
+}
+
+impl TryFrom<&str> for ContractRole {
+    type Error = strum::ParseError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -181,6 +360,107 @@ pub enum SelfReceiver {
 }
 
 // ---------------------------------------------------------------------------
+// Invariant payload value objects
+// ---------------------------------------------------------------------------
+
+/// The verification mechanism for an [`InvariantDecl`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum InvariantPredicate {
+    /// A predicate method on the declaring type's `self`.
+    SelfMethod(MethodName),
+}
+
+/// Declares a named invariant for a domain type.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InvariantDecl {
+    /// The invariant name. Required because unnamed invariants are unidentifiable.
+    pub name: InvariantName,
+    /// The verification mechanism. Required because predicate-free invariants are
+    /// uncheckable.
+    pub predicate: InvariantPredicate,
+}
+
+impl InvariantDecl {
+    /// Creates a new `InvariantDecl`.
+    #[must_use]
+    pub fn new(name: InvariantName, predicate: InvariantPredicate) -> Self {
+        Self { name, predicate }
+    }
+}
+
+/// References the public getter method that exposes an Entity or AggregateRoot identity.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IdentityAccessor(MethodName);
+
+impl IdentityAccessor {
+    /// Creates a new `IdentityAccessor` from an already-validated method name.
+    #[must_use]
+    pub fn new(method_name: MethodName) -> Self {
+        Self(method_name)
+    }
+
+    /// Returns the referenced getter method name.
+    #[must_use]
+    pub fn method_name(&self) -> &MethodName {
+        &self.0
+    }
+}
+
+// ---------------------------------------------------------------------------
+// NonEmptyVec — schema-level non-empty collection
+// ---------------------------------------------------------------------------
+
+/// Error type for catalogue v2 value-object construction.
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+pub enum ConstructionError {
+    /// A collection required to contain at least one element was empty.
+    #[error("collection must contain at least one element")]
+    EmptyCollection,
+}
+
+/// A vector that is guaranteed to contain at least one element.
+///
+/// Domain-layer type only; infrastructure codecs are responsible for converting
+/// JSON arrays into this value object and rejecting empty arrays.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NonEmptyVec<T>(Vec<T>);
+
+impl<T> NonEmptyVec<T> {
+    /// Creates a `NonEmptyVec` from a first element and the remaining elements.
+    #[must_use]
+    pub fn new(first: T, rest: Vec<T>) -> Self {
+        let mut values = Vec::with_capacity(rest.len() + 1);
+        values.push(first);
+        values.extend(rest);
+        Self(values)
+    }
+
+    /// Creates a `NonEmptyVec` from a vector, rejecting empty input.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ConstructionError::EmptyCollection`] when `values` is empty.
+    pub fn try_new(values: Vec<T>) -> Result<Self, ConstructionError> {
+        if values.is_empty() {
+            return Err(ConstructionError::EmptyCollection);
+        }
+        Ok(Self(values))
+    }
+
+    /// Returns the elements as a slice.
+    #[must_use]
+    pub fn as_slice(&self) -> &[T] {
+        self.0.as_slice()
+    }
+
+    /// Returns the first element.
+    #[must_use]
+    pub fn first(&self) -> Option<&T> {
+        self.0.first()
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -188,31 +468,31 @@ pub enum SelfReceiver {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::tddd::catalogue_v2::identifiers::TypeRef;
 
     // Manual variant arrays replace strum::EnumIter to avoid generating public
     // <EnumName>Iter structs that trigger the catalogue declaration check.
 
-    const ALL_DATA_ROLES: &[DataRole] = &[
-        DataRole::ValueObject,
-        DataRole::Entity,
-        DataRole::AggregateRoot,
-        DataRole::DomainService,
-        DataRole::Specification,
-        DataRole::Factory,
-        DataRole::UseCase,
-        DataRole::Interactor,
-        DataRole::Command,
-        DataRole::Query,
-        DataRole::Dto,
-        DataRole::ErrorType,
-        DataRole::SecondaryAdapter,
+    const ALL_DATA_ROLE_NAMES: &[&str] = &[
+        "ValueObject",
+        "Entity",
+        "AggregateRoot",
+        "DomainService",
+        "Specification",
+        "Factory",
+        "UseCase",
+        "Interactor",
+        "Command",
+        "Query",
+        "Dto",
+        "ErrorType",
+        "SecondaryAdapter",
+        "EventPolicy",
+        "DomainEvent",
     ];
 
-    const ALL_CONTRACT_ROLES: &[ContractRole] = &[
-        ContractRole::SpecificationPort,
-        ContractRole::ApplicationService,
-        ContractRole::SecondaryPort,
-    ];
+    const ALL_CONTRACT_ROLE_NAMES: &[&str] =
+        &["SpecificationPort", "ApplicationService", "SecondaryPort", "Repository"];
 
     const ALL_FUNCTION_ROLES: &[FunctionRole] =
         &[FunctionRole::FreeFunction, FunctionRole::UseCaseFunction];
@@ -224,26 +504,29 @@ mod tests {
         &[SelfReceiver::Owned, SelfReceiver::SharedRef, SelfReceiver::ExclusiveRef];
 
     // -----------------------------------------------------------------------
-    // DataRole — 13 values
+    // DataRole — 15 Stage 2 values
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_data_role_has_13_variants() {
-        assert_eq!(ALL_DATA_ROLES.len(), 13);
+    fn test_data_role_has_15_variants() {
+        assert_eq!(ALL_DATA_ROLE_NAMES.len(), 15);
     }
 
     #[test]
     fn test_data_role_display_fromstr_roundtrip_all_variants() {
-        for role in ALL_DATA_ROLES {
-            let s = role.to_string();
-            let parsed: DataRole = s.parse().unwrap();
-            assert_eq!(*role, parsed, "roundtrip failed for DataRole::{role:?}");
+        for role_name in ALL_DATA_ROLE_NAMES {
+            let parsed: DataRole = role_name.parse().unwrap();
+            assert_eq!(
+                parsed.to_string(),
+                *role_name,
+                "roundtrip failed for DataRole::{role_name}"
+            );
         }
     }
 
     #[test]
     fn test_data_role_value_object_display() {
-        assert_eq!(DataRole::ValueObject.to_string(), "ValueObject");
+        assert_eq!(DataRole::value_object().to_string(), "ValueObject");
     }
 
     #[test]
@@ -258,20 +541,23 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // ContractRole — 3 values
+    // ContractRole — 4 Stage 1 values
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_contract_role_has_3_variants() {
-        assert_eq!(ALL_CONTRACT_ROLES.len(), 3);
+    fn test_contract_role_has_4_variants() {
+        assert_eq!(ALL_CONTRACT_ROLE_NAMES.len(), 4);
     }
 
     #[test]
     fn test_contract_role_display_fromstr_roundtrip_all_variants() {
-        for role in ALL_CONTRACT_ROLES {
-            let s = role.to_string();
-            let parsed: ContractRole = s.parse().unwrap();
-            assert_eq!(*role, parsed, "roundtrip failed for ContractRole::{role:?}");
+        for role_name in ALL_CONTRACT_ROLE_NAMES {
+            let parsed: ContractRole = role_name.parse().unwrap();
+            assert_eq!(
+                parsed.to_string(),
+                *role_name,
+                "roundtrip failed for ContractRole::{role_name}"
+            );
         }
     }
 
@@ -405,6 +691,197 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
+    // Invariant payload value objects
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_invariant_name_new_with_identifier_returns_name() {
+        let name = InvariantName::new("email_is_valid").unwrap();
+
+        assert_eq!(name.as_str(), "email_is_valid");
+    }
+
+    #[test]
+    fn test_invariant_name_new_with_empty_returns_error() {
+        let result = InvariantName::new("");
+
+        assert!(matches!(result, Err(IdentifierError::Empty)));
+    }
+
+    #[test]
+    fn test_invariant_name_new_with_whitespace_returns_error() {
+        let result = InvariantName::new("email is valid");
+
+        assert!(
+            matches!(result, Err(IdentifierError::InvalidCharacters(value)) if value == "email is valid")
+        );
+    }
+
+    #[test]
+    fn test_invariant_decl_new_stores_name_and_predicate() {
+        let name = InvariantName::new("email_is_valid").unwrap();
+        let method_name = MethodName::new("is_email_valid").unwrap();
+        let predicate = InvariantPredicate::SelfMethod(method_name.clone());
+
+        let decl = InvariantDecl::new(name.clone(), predicate);
+
+        assert_eq!(decl.name, name);
+        assert_eq!(decl.predicate, InvariantPredicate::SelfMethod(method_name));
+    }
+
+    #[test]
+    fn test_identity_accessor_new_with_method_name_returns_accessor() {
+        let method_name = MethodName::new("id").unwrap();
+
+        let accessor = IdentityAccessor::new(method_name.clone());
+
+        assert_eq!(accessor.method_name().as_str(), "id");
+        assert_eq!(accessor.method_name(), &method_name);
+    }
+
+    #[test]
+    fn test_identity_accessor_composed_with_empty_method_name_returns_error() {
+        let result = MethodName::new("").map(IdentityAccessor::new);
+
+        assert!(matches!(result, Err(IdentifierError::Empty)));
+    }
+
+    #[test]
+    fn test_identity_accessor_composed_with_whitespace_method_name_returns_error() {
+        let result = MethodName::new("user id").map(IdentityAccessor::new);
+
+        assert!(
+            matches!(result, Err(IdentifierError::InvalidCharacters(value)) if value == "user id")
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // NonEmptyVec
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_non_empty_vec_new_with_first_and_rest_returns_values() {
+        let first = TypeRef::new("UserRegistered").unwrap();
+        let second = TypeRef::new("UserRenamed").unwrap();
+
+        let values = NonEmptyVec::new(first.clone(), vec![second.clone()]);
+
+        assert_eq!(values.as_slice().len(), 2);
+        assert_eq!(values.first(), Some(&first));
+        assert!(values.as_slice().contains(&second));
+    }
+
+    #[test]
+    fn test_non_empty_vec_new_with_empty_rest_returns_single_element_slice() {
+        let first = TypeRef::new("OrderPlaced").unwrap();
+
+        let values = NonEmptyVec::new(first.clone(), vec![]);
+
+        assert_eq!(values.as_slice(), std::slice::from_ref(&first));
+        assert_eq!(values.first(), Some(&first));
+    }
+
+    #[test]
+    fn test_non_empty_vec_new_with_two_rest_elements_returns_three_element_slice() {
+        let first = TypeRef::new("OrderPlaced").unwrap();
+        let second = TypeRef::new("OrderShipped").unwrap();
+        let third = TypeRef::new("OrderDelivered").unwrap();
+
+        let values = NonEmptyVec::new(first.clone(), vec![second.clone(), third.clone()]);
+
+        let slice = values.as_slice();
+        assert_eq!(slice.len(), 3);
+        assert_eq!(slice.first(), Some(&first));
+        assert_eq!(slice.get(1), Some(&second));
+        assert_eq!(slice.get(2), Some(&third));
+    }
+
+    #[test]
+    fn test_non_empty_vec_try_new_with_values_returns_values() {
+        let event = TypeRef::new("UserRegistered").unwrap();
+
+        let values = NonEmptyVec::try_new(vec![event.clone()]).unwrap();
+
+        assert_eq!(values.as_slice(), std::slice::from_ref(&event));
+        assert_eq!(values.first(), Some(&event));
+    }
+
+    #[test]
+    fn test_non_empty_vec_try_new_with_empty_returns_error() {
+        let result = NonEmptyVec::<TypeRef>::try_new(vec![]);
+
+        assert!(matches!(result, Err(ConstructionError::EmptyCollection)));
+    }
+
+    // -----------------------------------------------------------------------
+    // DataRole payload variant Clone and PartialEq
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_data_role_payload_variants_clone_returns_equal_value() {
+        let event_ref = TypeRef::new("OrderPlaced").unwrap();
+        let roles = [
+            DataRole::ValueObject { invariants: vec![] },
+            DataRole::entity().unwrap(),
+            DataRole::aggregate_root().unwrap(),
+            DataRole::DomainService { emits: vec![] },
+            DataRole::UseCase { handles: vec![] },
+            DataRole::EventPolicy { reacts_to: NonEmptyVec::new(event_ref, vec![]) },
+        ];
+        for role in roles {
+            let cloned = role.clone();
+            assert_eq!(cloned, role, "Clone must produce an equal value for {role:?}");
+        }
+    }
+
+    #[test]
+    fn test_data_role_partial_eq_same_payload_variant_returns_true() {
+        let a = DataRole::ValueObject { invariants: vec![] };
+        let b = DataRole::ValueObject { invariants: vec![] };
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn test_data_role_partial_eq_different_payload_variants_returns_false() {
+        let a = DataRole::ValueObject { invariants: vec![] };
+        let b = DataRole::DomainService { emits: vec![] };
+        assert_ne!(a, b);
+    }
+
+    // -----------------------------------------------------------------------
+    // ContractRole payload variant Clone and PartialEq
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_contract_role_payload_variants_clone_returns_equal_value() {
+        let aggregate = TypeRef::new("Order").unwrap();
+        let roles = [
+            ContractRole::SpecificationPort,
+            ContractRole::ApplicationService,
+            ContractRole::SecondaryPort,
+            ContractRole::Repository { aggregate },
+        ];
+        for role in roles {
+            let cloned = role.clone();
+            assert_eq!(cloned, role, "Clone must produce an equal value for {role:?}");
+        }
+    }
+
+    #[test]
+    fn test_contract_role_partial_eq_same_payload_returns_true() {
+        let a = ContractRole::Repository { aggregate: TypeRef::new("User").unwrap() };
+        let b = ContractRole::Repository { aggregate: TypeRef::new("User").unwrap() };
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn test_contract_role_partial_eq_different_aggregates_returns_false() {
+        let a = ContractRole::Repository { aggregate: TypeRef::new("User").unwrap() };
+        let b = ContractRole::Repository { aggregate: TypeRef::new("Order").unwrap() };
+        assert_ne!(a, b);
+    }
+
+    // -----------------------------------------------------------------------
     // Role type separation tests
     // -----------------------------------------------------------------------
 
@@ -412,7 +889,7 @@ mod tests {
     /// Passing a DataRole where a ContractRole is expected causes a compile error.
     #[test]
     fn test_role_types_are_distinct() {
-        let data_role = DataRole::ValueObject;
+        let data_role = DataRole::value_object();
         let contract_role = ContractRole::SpecificationPort;
         let function_role = FunctionRole::FreeFunction;
         // The following would be compile errors:

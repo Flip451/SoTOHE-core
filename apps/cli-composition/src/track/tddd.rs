@@ -429,50 +429,51 @@ impl CliApp {
         track_id: Option<String>,
         layer_id: String,
         workspace_root: PathBuf,
+        rules_file: Option<PathBuf>,
     ) -> Result<CommandOutcome, String> {
         use infrastructure::tddd::contract_map_adapter::FsCatalogueLoader;
-        use infrastructure::tddd::in_memory_catalogue_linter::InMemoryCatalogueLinter;
+        use infrastructure::tddd::fs_lint_config_loader::FsLintConfigLoader;
         use usecase::catalogue_lint_workflow::{
-            LintRuleKind, LintRuleSpec, RunCatalogueLint, RunCatalogueLintCommand,
+            RunCatalogueLint, RunCatalogueLintCommand, RunCatalogueLintError,
             RunCatalogueLintInteractor,
         };
 
         let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)?;
 
-        let rules = vec![
-            LintRuleSpec {
-                kind: LintRuleKind::FieldEmpty,
-                target_kind: "value_object".to_owned(),
-                target_field: Some("expected_methods".to_owned()),
-                permitted_layers: vec![],
-            },
-            LintRuleSpec {
-                kind: LintRuleKind::KindLayerConstraint,
-                target_kind: "domain_service".to_owned(),
-                target_field: None,
-                permitted_layers: vec!["domain".to_owned(), "usecase".to_owned()],
-            },
-        ];
+        // Resolve the config file path: --rules-file overrides the default location.
+        let config_path = rules_file
+            .unwrap_or_else(|| workspace_root.join(".harness/catalogue-lint/config.json"));
 
         let items_dir = workspace_root.join("track/items");
         let rules_path = workspace_root.join("architecture-rules.json");
         let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.clone());
-        let linter = InMemoryCatalogueLinter::new();
-        let interactor = RunCatalogueLintInteractor::new(loader, linter);
+        let config_loader = FsLintConfigLoader::new(config_path);
+        let interactor = RunCatalogueLintInteractor::new(loader, config_loader);
 
         let runner: &dyn RunCatalogueLint = &interactor;
-        let violations = runner
-            .execute(RunCatalogueLintCommand { track_id: resolved_id, layer_id, rules })
-            .map_err(|e| format!("catalogue lint failed: {e}"))?;
+        let result = runner.execute(RunCatalogueLintCommand {
+            track_id: resolved_id,
+            layer_id,
+            rules: vec![],
+        });
+
+        let violations = match result {
+            Ok(v) => v,
+            Err(RunCatalogueLintError::ConfigMissing { path }) => {
+                let msg = format!(
+                    "lint config not found at {}. \
+                     Copy `.harness/catalogue-lint/presets/ddd-strict.json` to that location \
+                     to enable linting.",
+                    path.display()
+                );
+                return Ok(CommandOutcome { stdout: None, stderr: Some(msg), exit_code: 1 });
+            }
+            Err(e) => return Err(format!("catalogue lint failed: {e}")),
+        };
 
         let mut stdout_lines = Vec::new();
         for v in &violations {
-            stdout_lines.push(format!(
-                "{:?} on {}: {}",
-                v.rule_kind(),
-                v.entry_name(),
-                v.message()
-            ));
+            stdout_lines.push(format!("{} on {}: {}", v.rule_kind(), v.entry_name(), v.message()));
         }
         let count = violations.len();
         let stderr_msg = format!("Found {count} violation(s)");
@@ -647,13 +648,7 @@ mod tests {
         r#"{"schema_version":1,"tasks":[],"plan":{"summary":[],"sections":[]}}"#
     }
 
-    /// AC-01/AC-02: `catalogue-spec-signals` gate at Phase 0 (no catalogue file) succeeds.
-    ///
-    /// The gate (`track-active-gate`) calls `sotp track catalogue-spec-signals` after
-    /// `sotp track type-signals`. When no catalogue exists, both commands
-    /// must exit zero so the full gate chain succeeds at Phase 0/1.
-    #[test]
-    fn test_track_catalogue_spec_signals_absent_catalogue_returns_ok() {
+    fn setup_catalogue_spec_signal_track() -> (tempfile::TempDir, PathBuf, PathBuf) {
         let dir = tempfile::tempdir().unwrap();
         init_git_repo_on_track_branch(dir.path(), "test-track");
 
@@ -664,8 +659,6 @@ mod tests {
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
 
-        // Layer with catalogue_spec_signal enabled.
-        // No domain-types.json written — catalogue is absent.
         let rules_json = r#"{
           "layers": [{
             "crate": "domain",
@@ -677,6 +670,18 @@ mod tests {
           }]
         }"#;
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        (dir, items_dir, track_dir)
+    }
+
+    /// AC-01/AC-02: `catalogue-spec-signals` gate at Phase 0 (no catalogue file) succeeds.
+    ///
+    /// The gate (`track-active-gate`) calls `sotp track catalogue-spec-signals` after
+    /// `sotp track type-signals`. When no catalogue exists, both commands
+    /// must exit zero so the full gate chain succeeds at Phase 0/1.
+    #[test]
+    fn test_track_catalogue_spec_signals_absent_catalogue_returns_ok() {
+        let (dir, items_dir, _track_dir) = setup_catalogue_spec_signal_track();
 
         let app = CliApp::new();
         let result = app.track_catalogue_spec_signals(
@@ -731,25 +736,17 @@ mod tests {
     /// file is genuinely absent (no fail-open on present catalogues).
     #[test]
     fn test_track_catalogue_spec_signals_present_catalogue_is_evaluated_not_skipped() {
-        let dir = tempfile::tempdir().unwrap();
-        init_git_repo_on_track_branch(dir.path(), "test-track");
+        let (dir, items_dir, track_dir) = setup_catalogue_spec_signal_track();
 
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
-            .unwrap();
-        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
-
-        // Write a minimal v4 catalogue with a Red-signal entry.
-        let v3_catalogue = r#"{
-  "schema_version": 4,
+        // Write a minimal v5 catalogue with a Red-signal entry.
+        let v5_catalogue = r#"{
+  "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
     "RedType": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [],
       "informal_grounds": []
@@ -758,23 +755,11 @@ mod tests {
   "traits": {},
   "functions": {}
 }"#;
-        std::fs::write(track_dir.join("domain-types.json"), v3_catalogue).unwrap();
-
-        let rules_json = r#"{
-          "layers": [{
-            "crate": "domain",
-            "tddd": {
-              "enabled": true,
-              "catalogue_file": "domain-types.json",
-              "catalogue_spec_signal": { "enabled": true }
-            }
-          }]
-        }"#;
-        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), v5_catalogue).unwrap();
 
         let app = CliApp::new();
         let result = app.track_catalogue_spec_signals(
-            items_dir.clone(),
+            items_dir,
             Some("test-track".to_owned()),
             dir.path().to_path_buf(),
             None,
@@ -804,28 +789,7 @@ mod tests {
     /// a backing catalogue (which would be an error).
     #[test]
     fn test_track_catalogue_spec_signals_absent_catalogue_removes_stale_signals_file() {
-        let dir = tempfile::tempdir().unwrap();
-        init_git_repo_on_track_branch(dir.path(), "test-track");
-
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
-            .unwrap();
-        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
-
-        // Layer with catalogue_spec_signal enabled, but catalogue file is ABSENT.
-        let rules_json = r#"{
-          "layers": [{
-            "crate": "domain",
-            "tddd": {
-              "enabled": true,
-              "catalogue_file": "domain-types.json",
-              "catalogue_spec_signal": { "enabled": true }
-            }
-          }]
-        }"#;
-        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+        let (dir, items_dir, track_dir) = setup_catalogue_spec_signal_track();
 
         // Write a stale signals file (catalogue was removed but signals remained).
         let stale_signals_path = track_dir.join("domain-catalogue-spec-signals.json");

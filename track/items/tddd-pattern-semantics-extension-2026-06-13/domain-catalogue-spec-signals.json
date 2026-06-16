@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "cf8cbe89b0fde7d32fc53392f545f59bab0459d8d7e2d5cf27a27a209621bc7b",
+  "signals": [
+    {
+      "type_name": "CatalogueLintViolation",
+      "signal": "blue",
+      "entry_hash": "f4aac17365f8994e6f528f3fe2a7ed5aa7dbc52bd52526b9ddcf02d809c4e286"
+    },
+    {
+      "type_name": "CatalogueLinterError",
+      "signal": "blue",
+      "entry_hash": "76b290d1649705b1b70859464e2410182b468efd2eb6022947fd4c496647d902"
+    },
+    {
+      "type_name": "CatalogueLinterRule",
+      "signal": "blue",
+      "entry_hash": "998dd9406cae328f246148a296e6b83f46ff56f006ec6f2dd72cfa3334a502b7"
+    },
+    {
+      "type_name": "CatalogueLinterRuleError",
+      "signal": "blue",
+      "entry_hash": "781d372bc0f546128ab181a8cfc6b781aef8bd0a9e7d34c1ad9a4bd594d0dad4"
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "signal": "blue",
+      "entry_hash": "a85d57ad188fe7acd57b8341fad6e4fd22c12c87dcc0ae96d2645830b163f69e"
+    },
+    {
+      "type_name": "CatalogueLoaderError",
+      "signal": "blue",
+      "entry_hash": "c8f4a1e99614ddf90bfae941860d543a5b0f0a8d3a0da05c3cc305a1cc1e4975"
+    },
+    {
+      "type_name": "ConstructionError",
+      "signal": "blue",
+      "entry_hash": "c9229e1212dbcd496912344cd8d241661d1025846acd2e0c8adcb104c1a01558"
+    },
+    {
+      "type_name": "ContractRole",
+      "signal": "blue",
+      "entry_hash": "ed76fbb0fee7588b62f42704778f55f41a9cbd2889e499be6e77646df388ba51"
+    },
+    {
+      "type_name": "DataRole",
+      "signal": "blue",
+      "entry_hash": "54342b02b44e6937e4365f164f19901192d8daa5c767f147558fb5aa086d86ce"
+    },
+    {
+      "type_name": "IdentityAccessor",
+      "signal": "blue",
+      "entry_hash": "4e643aa61c0ace1a3429b7ae37228a3be0e672a6e8e1330d9977a356b2af0c72"
+    },
+    {
+      "type_name": "InvariantDecl",
+      "signal": "blue",
+      "entry_hash": "71148b5debced5d996f84dfc6f5fb76c05a2ac71b91bff4f6ac317e6fdaab6c9"
+    },
+    {
+      "type_name": "InvariantName",
+      "signal": "blue",
+      "entry_hash": "078ac923c212ec3967d9d1335f72af73846f8a7243b6fecd3996d498efb6625d"
+    },
+    {
+      "type_name": "InvariantPredicate",
+      "signal": "blue",
+      "entry_hash": "9fe5c817700e2257d2fa4072af0adf7374f39a511c3c6eb0222e983dbbbb2043"
+    },
+    {
+      "type_name": "NonEmptyVec",
+      "signal": "blue",
+      "entry_hash": "c012c4cd4e9104ca2a6887e43c72ab0c465996616185ae72a6fff5ec44bba002"
+    },
+    {
+      "type_name": "RoleKind",
+      "signal": "blue",
+      "entry_hash": "d7fa82abc5a1d48230ed41e076d24b3e4a8fe157038abce6818454b7f0596ff5"
+    },
+    {
+      "type_name": "RuleTarget",
+      "signal": "blue",
+      "entry_hash": "399ccd9002a38e706031d3aed355d551c12fddb1a0edd7e0d2808c47e95b9521"
+    },
+    {
+      "type_name": "CatalogueLinter",
+      "signal": "blue",
+      "entry_hash": "65efbe3453648946c31a361578e32c4d253ce4c8bab5fc1dda4cbffd16f096eb"
+    },
+    {
+      "type_name": "CatalogueLoader",
+      "signal": "blue",
+      "entry_hash": "9f8a48842ae4cee359211447a3b4275fa6a2bfdae3e2471aa0ff09e7f5b9fc0e"
+    },
+    {
+      "type_name": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint",
+      "signal": "blue",
+      "entry_hash": "5577b350a6e07253c83e644609dbc255fbf0ca68c4a202302de6037062edf673"
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {
     "UsecaseInteractor": {
       "action": "add",
-      "role": "UseCase",
+      "role": { "UseCase": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "plain" }

@@ -1,19 +1,12 @@
 //! `execute_type_signals_for_layer` — wires pre-commit type-signal recomputation
-//! to `SignalEvaluatorV2` (three-way diff evaluator).
-//!
-//! T009: the old evaluator pipeline using `TypeGraph` + `TypeBaseline` is gone.
-//! This module re-implements `execute_type_signals_for_layer` by delegating to
-//! the new `SignalEvaluatorV2` (three-way diff: catalogue A, baseline B, live C).
-//!
-//! The output written to `<layer>-type-signals.json` follows the existing
-//! schema_version 1 format so that the merge-gate reader (`type_signals_codec`)
-//! and the pre-commit classifier in `make.rs` continue to work without changes.
-//!
-//! `EvaluateSignalsError` is kept as the public error type so that the CLI
-//! composition root (`signals.rs`) does not need to be changed.
+//! to `SignalEvaluatorV2` (three-way diff evaluator: catalogue A, baseline B,
+//! live rustdoc C). Output uses the existing schema_version 1 format so the
+//! merge-gate reader (`type_signals_codec`) and the pre-commit classifier in
+//! `make.rs` continue to work unchanged. `EvaluateSignalsError` is the public
+//! error type.
 
 use std::collections::{BTreeMap, HashMap};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 #[path = "type_signals_evaluator/signal_tags.rs"]
@@ -50,6 +43,55 @@ impl std::fmt::Display for EvaluateSignalsError {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum TypeSignalsCataloguePresence {
+    Present,
+    Absent,
+}
+
+pub(crate) fn validate_type_signals_track_id(track_id: &str) -> Result<domain::TrackId, String> {
+    domain::TrackId::try_new(track_id).map_err(|e| format!("invalid track_id '{track_id}': {e}"))
+}
+
+pub(crate) fn type_signals_track_dir(items_dir: &Path, track_id: &domain::TrackId) -> PathBuf {
+    items_dir.join(track_id.as_ref())
+}
+
+pub(crate) fn reject_symlinked_type_signals_anchor(path: &Path, label: &str) -> Result<(), String> {
+    match path.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            Err(format!("symlink guard: refusing to use symlinked {label}: {}", path.display()))
+        }
+        Ok(_) => Ok(()),
+        Err(e) => Err(format!("symlink guard: cannot stat {label} '{}': {e}", path.display())),
+    }
+}
+
+pub(crate) fn require_type_signals_track_dir(track_dir: &Path) -> Result<(), String> {
+    match track_dir.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => Err(format!(
+            "symlink guard: refusing to follow symlinked track directory: {}",
+            track_dir.display()
+        )),
+        Ok(_) => Ok(()),
+        Err(e) => {
+            Err(format!("track directory '{}' is missing or unstattable: {e}", track_dir.display()))
+        }
+    }
+}
+
+pub(crate) fn type_signals_catalogue_presence(
+    catalogue_path: &Path,
+) -> Result<TypeSignalsCataloguePresence, String> {
+    match std::fs::symlink_metadata(catalogue_path) {
+        Ok(_) => Ok(TypeSignalsCataloguePresence::Present),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            Ok(TypeSignalsCataloguePresence::Absent)
+        }
+        Err(e) => Err(format!("cannot stat {}: {e}", catalogue_path.display())),
+    }
+}
+
 /// Evaluates type signals for a single TDDD-enabled layer using `SignalEvaluatorV2`
 /// (three-way diff: catalogue A, baseline B, live rustdoc C) and writes the
 /// result to `<layer>-type-signals.json`.
@@ -82,28 +124,13 @@ pub fn execute_type_signals_for_layer(
     // enforces the lowercase slug format (no uppercase, no spaces, no underscores,
     // no leading/trailing hyphens, no path-traversal components), which is
     // strictly stronger than the Component::Normal check alone.
-    let valid_track_id = domain::TrackId::try_new(track_id)
-        .map_err(|e| EvaluateSignalsError(format!("invalid track_id '{track_id}': {e}")))?;
+    let valid_track_id = validate_type_signals_track_id(track_id).map_err(EvaluateSignalsError)?;
 
-    let track_dir = items_dir.join(valid_track_id.as_ref());
+    let track_dir = type_signals_track_dir(items_dir, &valid_track_id);
 
     // Security: reject symlinked items_dir root before using it as a trusted anchor.
     // Following a symlinked root would allow reading/writing outside the intended workspace.
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(EvaluateSignalsError(format!(
-                "symlink guard: refusing to use symlinked items_dir: {}",
-                items_dir.display()
-            )));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(EvaluateSignalsError(format!(
-                "symlink guard: cannot stat items_dir '{}': {e}",
-                items_dir.display()
-            )));
-        }
-    }
+    reject_symlinked_type_signals_anchor(items_dir, "items_dir").map_err(EvaluateSignalsError)?;
 
     // Security: verify track_dir is contained within items_dir and reject symlinks.
     // `items_dir` is the trusted root; anything outside it is not authorised.
@@ -188,17 +215,29 @@ pub fn execute_type_signals_for_layer(
 
     use crate::tddd::catalogue_document_codec::CatalogueDocumentCodecError;
     let doc = CatalogueDocumentCodec::decode(catalogue_str, &filename_stem).map_err(|e| {
-        // Provide a specific actionable message for schema_version mismatches so
-        // that tracks still using a v2 catalogue get a clear migration prompt
+        // Provide specific actionable messages for schema_version mismatches so
+        // that tracks still using an old catalogue get a clear migration prompt
         // rather than a generic decode failure.
-        if let CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual, .. } = &e {
-            return EvaluateSignalsError(format!(
-                "catalogue '{}' uses schema_version {actual} — \
-                 SignalEvaluatorV2 requires a v3 catalogue (schema_version=3). \
-                 Migrate the catalogue using the type-designer agent before running \
-                 `sotp track type-signals`.",
-                catalogue_path.display()
-            ));
+        match &e {
+            CatalogueDocumentCodecError::SchemaVersionRequiresMigration { from, to, reason } => {
+                return EvaluateSignalsError(format!(
+                    "catalogue '{}' uses schema_version {from} which requires migration to \
+                     schema_version {to}: {reason}. \
+                     Migrate the catalogue using the type-designer agent before running \
+                     `sotp track type-signals`.",
+                    catalogue_path.display()
+                ));
+            }
+            CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual, .. } => {
+                return EvaluateSignalsError(format!(
+                    "catalogue '{}' uses schema_version {actual} — \
+                     SignalEvaluatorV2 requires a v5 catalogue (schema_version=5). \
+                     Migrate the catalogue using the type-designer agent before running \
+                     `sotp track type-signals`.",
+                    catalogue_path.display()
+                ));
+            }
+            _ => {}
         }
         EvaluateSignalsError(format!(
             "failed to decode catalogue '{}': {e}",
@@ -238,10 +277,12 @@ pub fn execute_type_signals_for_layer(
         for (name, entry) in &doc.types {
             m.entry(name.as_str().to_owned())
                 .or_default()
-                .push(data_role_kind_tag(entry.role, &entry.kind));
+                .push(data_role_kind_tag(&entry.role, &entry.kind));
         }
         for (name, entry) in &doc.traits {
-            m.entry(name.as_str().to_owned()).or_default().push(contract_role_kind_tag(entry.role));
+            m.entry(name.as_str().to_owned())
+                .or_default()
+                .push(contract_role_kind_tag(&entry.role));
         }
         for (path, entry) in &doc.functions {
             // T012 ensures that CatalogueDocumentCodec rejects cross-crate function
@@ -310,21 +351,8 @@ pub fn execute_type_signals_for_layer(
     // Security: reject symlinked workspace_root before invoking rustdoc.
     // A symlinked workspace root could redirect the build to an arbitrary
     // directory outside the trusted workspace tree.
-    match workspace_root.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(EvaluateSignalsError(format!(
-                "symlink guard: refusing to use symlinked workspace_root: {}",
-                workspace_root.display()
-            )));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(EvaluateSignalsError(format!(
-                "symlink guard: cannot stat workspace_root '{}': {e}",
-                workspace_root.display()
-            )));
-        }
-    }
+    reject_symlinked_type_signals_anchor(workspace_root, "workspace_root")
+        .map_err(EvaluateSignalsError)?;
 
     let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
     let json_path = exporter.export_rustdoc_json_path(target_crate).map_err(|e| {
@@ -701,7 +729,7 @@ mod tests {
             TypestateTransitions::new(vec![MethodName::new("unlock").unwrap()]),
         );
         let kind = TypeKindV2::Struct(StructKind::new(StructShape::Unit, Some(marker)));
-        assert_eq!(data_role_kind_tag(DataRole::ValueObject, &kind), "typestate");
+        assert_eq!(data_role_kind_tag(&DataRole::value_object(), &kind), "typestate");
     }
 
     // -----------------------------------------------------------------------
@@ -722,7 +750,7 @@ mod tests {
             },
             Some(marker),
         ));
-        assert_eq!(data_role_kind_tag(DataRole::ValueObject, &kind), "typestate");
+        assert_eq!(data_role_kind_tag(&DataRole::value_object(), &kind), "typestate");
     }
 
     // -----------------------------------------------------------------------
@@ -740,13 +768,13 @@ mod tests {
             StructShape::Plain { fields: vec![], has_stripped_fields: false },
             Some(marker),
         ));
-        assert_eq!(data_role_kind_tag(DataRole::ValueObject, &kind), "typestate");
+        assert_eq!(data_role_kind_tag(&DataRole::value_object(), &kind), "typestate");
     }
 
     #[test]
     fn test_data_role_kind_tag_unit_struct_without_typestate_returns_role_tag() {
         // Without typestate, a unit struct falls through to role-based mapping.
         let kind = TypeKindV2::Struct(StructKind::new(StructShape::Unit, None));
-        assert_eq!(data_role_kind_tag(DataRole::ValueObject, &kind), "value_object");
+        assert_eq!(data_role_kind_tag(&DataRole::value_object(), &kind), "value_object");
     }
 }

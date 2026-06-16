@@ -3,7 +3,7 @@
 //! Implements [`DryCheckReader`] and [`DryCheckWriter`] using atomic write and
 //! fs4 exclusive file locking. Mirrors `FsReviewStore` from `review_v2`.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use domain::Timestamp;
 use domain::dry_check::{
@@ -81,6 +81,38 @@ fn parse_dry_check_content<E>(
     Ok(doc)
 }
 
+enum LoadDryCheckDocError {
+    Io { detail: String },
+    Codec { detail: String },
+    IncompatibleSchema { version: u64 },
+}
+
+fn load_dry_check_doc(
+    path: &Path,
+    io_context: &str,
+) -> Result<DryCheckJsonV1, LoadDryCheckDocError> {
+    let path_str = path.display().to_string();
+
+    let content = match std::fs::read_to_string(path) {
+        Ok(c) => c,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(DryCheckJsonV1::empty());
+        }
+        Err(e) => {
+            return Err(LoadDryCheckDocError::Io { detail: format!("{io_context}: {e}") });
+        }
+    };
+
+    match parse_dry_check_content(&content, &path_str, |codec_detail| codec_detail) {
+        Ok(doc) => Ok(doc),
+        Err(ParseDryCheckError::Empty) => Ok(DryCheckJsonV1::empty()),
+        Err(ParseDryCheckError::Codec(detail)) => Err(LoadDryCheckDocError::Codec { detail }),
+        Err(ParseDryCheckError::IncompatibleSchema(version)) => {
+            Err(LoadDryCheckDocError::IncompatibleSchema { version })
+        }
+    }
+}
+
 // ── FsDryCheckStore ───────────────────────────────────────────────────────────
 
 /// Filesystem adapter implementing [`DryCheckReader`] and [`DryCheckWriter`] for
@@ -122,29 +154,17 @@ impl FsDryCheckStore {
             }
         })?;
 
-        let content = match std::fs::read_to_string(&self.path) {
-            Ok(c) => c,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                return Ok(DryCheckJsonV1::empty());
+        load_dry_check_doc(&self.path, "read").map_err(|e| match e {
+            LoadDryCheckDocError::Io { detail } => {
+                DryCheckReaderError::Io { path: path_str.clone(), detail }
             }
-            Err(e) => {
-                return Err(DryCheckReaderError::Io {
-                    path: path_str.clone(),
-                    detail: format!("read: {e}"),
-                });
+            LoadDryCheckDocError::Codec { detail } => {
+                DryCheckReaderError::Codec { path: path_str.clone(), detail }
             }
-        };
-
-        match parse_dry_check_content(&content, &path_str, |codec_detail| {
-            DryCheckReaderError::Codec { path: path_str.clone(), detail: codec_detail }
-        }) {
-            Ok(doc) => Ok(doc),
-            Err(ParseDryCheckError::Empty) => Ok(DryCheckJsonV1::empty()),
-            Err(ParseDryCheckError::Codec(e)) => Err(e),
-            Err(ParseDryCheckError::IncompatibleSchema(version)) => {
-                Err(DryCheckReaderError::IncompatibleSchema { version })
+            LoadDryCheckDocError::IncompatibleSchema { version } => {
+                DryCheckReaderError::IncompatibleSchema { version }
             }
-        }
+        })
     }
 
     /// Reads dry-check.json under an exclusive lock for read-modify-write.
@@ -154,29 +174,15 @@ impl FsDryCheckStore {
     fn read_doc_for_write(&self) -> Result<DryCheckJsonV1, DryCheckWriterError> {
         let path_str = self.path.display().to_string();
 
-        let content = match std::fs::read_to_string(&self.path) {
-            Ok(c) => c,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                return Ok(DryCheckJsonV1::empty());
+        load_dry_check_doc(&self.path, "read-for-write").map_err(|e| match e {
+            LoadDryCheckDocError::Io { detail } => {
+                DryCheckWriterError::Io { path: path_str.clone(), detail }
             }
-            Err(e) => {
-                return Err(DryCheckWriterError::Io {
-                    path: path_str.clone(),
-                    detail: format!("read-for-write: {e}"),
-                });
+            LoadDryCheckDocError::Codec { detail } => DryCheckWriterError::Codec { detail },
+            LoadDryCheckDocError::IncompatibleSchema { version } => {
+                DryCheckWriterError::IncompatibleSchema { version }
             }
-        };
-
-        match parse_dry_check_content(&content, &path_str, |codec_detail| {
-            DryCheckWriterError::Codec { detail: codec_detail }
-        }) {
-            Ok(doc) => Ok(doc),
-            Err(ParseDryCheckError::Empty) => Ok(DryCheckJsonV1::empty()),
-            Err(ParseDryCheckError::Codec(e)) => Err(e),
-            Err(ParseDryCheckError::IncompatibleSchema(version)) => {
-                Err(DryCheckWriterError::IncompatibleSchema { version })
-            }
-        }
+        })
     }
 
     /// Acquire an exclusive fs4 lock on `<path>.lock`, ensuring the parent
@@ -463,6 +469,40 @@ mod tests {
         FsDryCheckStore::new(path, dir.path().to_owned())
     }
 
+    fn valid_v1_record_json() -> serde_json::Value {
+        serde_json::json!({
+            "low_path": "src/a.rs",
+            "low_hash": "a".repeat(64),
+            "high_path": "src/b.rs",
+            "high_hash": "b".repeat(64),
+            "changed_path": "src/a.rs",
+            "verdict": "not-a-violation",
+            "similarity_score": 0.9,
+            "threshold": 0.8,
+            "base_commit": "abcdef1234567",
+            "rationale": "test",
+            "recorded_at": "2026-06-01T00:00:00Z"
+        })
+    }
+
+    fn assert_v1_record_returns_invalid_data(record: serde_json::Value, expected: &str) {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("dry-check.json");
+        let json = serde_json::json!({
+            "schema_version": 1,
+            "records": [record]
+        })
+        .to_string();
+        std::fs::write(&path, json).unwrap();
+
+        let store = FsDryCheckStore::new(path, dir.path().to_owned());
+        let result = store.read_records();
+        assert!(
+            matches!(result, Err(DryCheckReaderError::InvalidData(_))),
+            "expected InvalidData for {expected}, got: {result:?}"
+        );
+    }
+
     // ── Tests ─────────────────────────────────────────────────────────────────
 
     #[test]
@@ -696,206 +736,54 @@ mod tests {
 
     #[test]
     fn test_read_returns_invalid_data_for_self_match() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("dry-check.json");
-
         // Craft a record where low_path==high_path AND low_hash==high_hash (self-match).
         let hash = "a".repeat(64);
-        let json = serde_json::json!({
-            "schema_version": 1,
-            "records": [{
-                "low_path": "src/a.rs",
-                "low_hash": hash,
-                "high_path": "src/a.rs",  // same as low_path
-                "high_hash": hash,          // same as low_hash
-                "changed_path": "src/a.rs",
-                "verdict": "not-a-violation",
-                "similarity_score": 0.9,
-                "threshold": 0.8,
-                "base_commit": "abcdef1234567",
-                "rationale": "test",
-                "recorded_at": "2026-06-01T00:00:00Z"
-            }]
-        })
-        .to_string();
-        std::fs::write(&path, json).unwrap();
+        let mut record = valid_v1_record_json();
+        record["high_path"] = serde_json::json!("src/a.rs");
+        record["low_hash"] = serde_json::json!(hash.clone());
+        record["high_hash"] = serde_json::json!(hash);
 
-        let store = FsDryCheckStore::new(path, dir.path().to_owned());
-        let result = store.read_records();
-        assert!(
-            matches!(result, Err(DryCheckReaderError::InvalidData(_))),
-            "expected InvalidData for self-match, got: {result:?}"
-        );
+        assert_v1_record_returns_invalid_data(record, "self-match");
     }
 
     #[test]
     fn test_read_returns_invalid_data_for_changed_path_outside_pair() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("dry-check.json");
+        let mut record = valid_v1_record_json();
+        record["changed_path"] = serde_json::json!("src/c.rs");
 
-        let low_hash = "a".repeat(64);
-        let high_hash = "b".repeat(64);
-        let json = serde_json::json!({
-            "schema_version": 1,
-            "records": [{
-                "low_path": "src/a.rs",
-                "low_hash": low_hash,
-                "high_path": "src/b.rs",
-                "high_hash": high_hash,
-                "changed_path": "src/c.rs",  // NOT in pair
-                "verdict": "not-a-violation",
-                "similarity_score": 0.9,
-                "threshold": 0.8,
-                "base_commit": "abcdef1234567",
-                "rationale": "test",
-                "recorded_at": "2026-06-01T00:00:00Z"
-            }]
-        })
-        .to_string();
-        std::fs::write(&path, json).unwrap();
-
-        let store = FsDryCheckStore::new(path, dir.path().to_owned());
-        let result = store.read_records();
-        assert!(
-            matches!(result, Err(DryCheckReaderError::InvalidData(_))),
-            "expected InvalidData for changed_path outside pair, got: {result:?}"
-        );
+        assert_v1_record_returns_invalid_data(record, "changed_path outside pair");
     }
 
     #[test]
     fn test_read_returns_invalid_data_for_out_of_range_similarity_score() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("dry-check.json");
+        let mut record = valid_v1_record_json();
+        record["similarity_score"] = serde_json::json!(1.0000000000000002_f64);
 
-        let low_hash = "a".repeat(64);
-        let high_hash = "b".repeat(64);
-        let json = serde_json::json!({
-            "schema_version": 1,
-            "records": [{
-                "low_path": "src/a.rs",
-                "low_hash": low_hash,
-                "high_path": "src/b.rs",
-                "high_hash": high_hash,
-                "changed_path": "src/a.rs",
-                "verdict": "not-a-violation",
-                "similarity_score": 1.0000000000000002_f64,
-                "threshold": 0.8,
-                "base_commit": "abcdef1234567",
-                "rationale": "test",
-                "recorded_at": "2026-06-01T00:00:00Z"
-            }]
-        })
-        .to_string();
-        std::fs::write(&path, json).unwrap();
-
-        let store = FsDryCheckStore::new(path, dir.path().to_owned());
-        let result = store.read_records();
-        assert!(
-            matches!(result, Err(DryCheckReaderError::InvalidData(_))),
-            "expected InvalidData for out-of-range similarity_score, got: {result:?}"
-        );
+        assert_v1_record_returns_invalid_data(record, "out-of-range similarity_score");
     }
 
     #[test]
     fn test_read_returns_invalid_data_for_out_of_range_threshold() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("dry-check.json");
+        let mut record = valid_v1_record_json();
+        record["threshold"] = serde_json::json!(-1e-50_f64);
 
-        let low_hash = "a".repeat(64);
-        let high_hash = "b".repeat(64);
-        let json = serde_json::json!({
-            "schema_version": 1,
-            "records": [{
-                "low_path": "src/a.rs",
-                "low_hash": low_hash,
-                "high_path": "src/b.rs",
-                "high_hash": high_hash,
-                "changed_path": "src/a.rs",
-                "verdict": "not-a-violation",
-                "similarity_score": 0.9,
-                "threshold": -1e-50_f64,
-                "base_commit": "abcdef1234567",
-                "rationale": "test",
-                "recorded_at": "2026-06-01T00:00:00Z"
-            }]
-        })
-        .to_string();
-        std::fs::write(&path, json).unwrap();
-
-        let store = FsDryCheckStore::new(path, dir.path().to_owned());
-        let result = store.read_records();
-        assert!(
-            matches!(result, Err(DryCheckReaderError::InvalidData(_))),
-            "expected InvalidData for out-of-range threshold, got: {result:?}"
-        );
+        assert_v1_record_returns_invalid_data(record, "out-of-range threshold");
     }
 
     #[test]
     fn test_read_returns_invalid_data_for_empty_rationale() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("dry-check.json");
+        let mut record = valid_v1_record_json();
+        record["rationale"] = serde_json::json!("");
 
-        let low_hash = "a".repeat(64);
-        let high_hash = "b".repeat(64);
-        let json = serde_json::json!({
-            "schema_version": 1,
-            "records": [{
-                "low_path": "src/a.rs",
-                "low_hash": low_hash,
-                "high_path": "src/b.rs",
-                "high_hash": high_hash,
-                "changed_path": "src/a.rs",
-                "verdict": "not-a-violation",
-                "similarity_score": 0.9,
-                "threshold": 0.8,
-                "base_commit": "abcdef1234567",
-                "rationale": "",  // empty rationale
-                "recorded_at": "2026-06-01T00:00:00Z"
-            }]
-        })
-        .to_string();
-        std::fs::write(&path, json).unwrap();
-
-        let store = FsDryCheckStore::new(path, dir.path().to_owned());
-        let result = store.read_records();
-        assert!(
-            matches!(result, Err(DryCheckReaderError::InvalidData(_))),
-            "expected InvalidData for empty rationale, got: {result:?}"
-        );
+        assert_v1_record_returns_invalid_data(record, "empty rationale");
     }
 
     #[test]
     fn test_read_returns_invalid_data_for_empty_refactor_proposal_on_violation() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("dry-check.json");
+        let mut record = valid_v1_record_json();
+        record["verdict"] = serde_json::json!({ "violation": { "refactor_proposal": "" } });
 
-        let low_hash = "a".repeat(64);
-        let high_hash = "b".repeat(64);
-        let json = serde_json::json!({
-            "schema_version": 1,
-            "records": [{
-                "low_path": "src/a.rs",
-                "low_hash": low_hash,
-                "high_path": "src/b.rs",
-                "high_hash": high_hash,
-                "changed_path": "src/a.rs",
-                "verdict": { "violation": { "refactor_proposal": "" } },  // empty proposal
-                "similarity_score": 0.9,
-                "threshold": 0.8,
-                "base_commit": "abcdef1234567",
-                "rationale": "test",
-                "recorded_at": "2026-06-01T00:00:00Z"
-            }]
-        })
-        .to_string();
-        std::fs::write(&path, json).unwrap();
-
-        let store = FsDryCheckStore::new(path, dir.path().to_owned());
-        let result = store.read_records();
-        assert!(
-            matches!(result, Err(DryCheckReaderError::InvalidData(_))),
-            "expected InvalidData for empty refactor_proposal, got: {result:?}"
-        );
+        assert_v1_record_returns_invalid_data(record, "empty refactor_proposal");
     }
 
     /// v2 round-trip: `config_fingerprint` is serialized to disk and round-trips intact.

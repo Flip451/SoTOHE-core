@@ -241,7 +241,7 @@ mod tests {
 
     // Minimal v3 catalogue (empty entries — all BTreeMaps empty).
     const EMPTY_CATALOGUE_V3: &str = r#"{
-      "schema_version": 4,
+      "schema_version": 5,
       "crate_name": "domain",
       "layer": "domain",
       "types": {},
@@ -251,13 +251,13 @@ mod tests {
 
     // Minimal v3 catalogue with two types for the E2E test.
     const CATALOGUE_V3_TWO_TYPES: &str = r#"{
-      "schema_version": 4,
+      "schema_version": 5,
       "crate_name": "domain",
       "layer": "domain",
       "types": {
         "UserId": {
           "action": "add",
-          "role": "ValueObject",
+          "role": { "ValueObject": {} },
           "kind": {
             "kind": "struct",
             "shape": { "kind": "tuple", "fields": ["u64"] }
@@ -266,7 +266,7 @@ mod tests {
         },
         "User": {
           "action": "add",
-          "role": "Entity",
+          "role": { "Entity": { "identity": { "method_name": "identity" } } },
           "kind": { "kind": "struct", "shape": { "kind": "plain" } },
           "module_path": "domain::user"
         }

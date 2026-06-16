@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "37ae78bbbb91786f2fb1140aaa10e967a773cf76073ddf21fd092491ed899d1e",
+      "evidence_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` / `ContractRole` を data-carrying enum 化し、すべての payload 付き variant の schema を 1 回の breaking migration で確定する（`Entity`・`AggregateRoot`・`ValueObject`・`DomainService`・`UseCase` への意味論フィールド追加、`ContractRole::Repository { aggregate: TypeRef }` 追加、`DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` 追加を含む）。"
+      }
+    },
+    {
+      "claim_hash": "37ae78bbbb91786f2fb1140aaa10e967a773cf76073ddf21fd092491ed899d1e",
+      "evidence_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。"
+      }
+    },
+    {
+      "claim_hash": "98e65d1baee7a9ec00df7976a9e36596f9cd7e76217b5fe8c2759af7930f00e2",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "45f1dbb945e195668ea67414bdcbe053e55b22b6a04cef6bc2a8057a9a0f568a",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「現行のInMemoryCatalogueLinter（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。」"
+      }
+    },
+    {
+      "claim_hash": "7709ea4fd4622cd71220ed6ee0dad5802c7b53d2d0cce64556407e8732c15ee8",
+      "evidence_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "verdict": {
+        "kind": "pass",
+        "citation": "段 1: `DataRole` / `ContractRole` を data-carrying enum 化し、すべての payload 付き variant の schema を 1 回の breaking migration で確定する（`Entity`・`AggregateRoot`・`ValueObject`・`DomainService`・`UseCase` への意味論フィールド追加、`ContractRole::Repository { aggregate: TypeRef }` 追加、`DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` 追加を含む）。"
+      }
+    },
+    {
+      "claim_hash": "7709ea4fd4622cd71220ed6ee0dad5802c7b53d2d0cce64556407e8732c15ee8",
+      "evidence_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。"
+      }
+    },
+    {
+      "claim_hash": "4625c632f270ef1302bf0d177b40fc9489558571d4782c11336543e72bccca99",
+      "evidence_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行の `InMemoryCatalogueLinter`（infrastructure 層）にある評価ロジックを内側の core に移し、外部 I/O を持たない純粋評価ロジックを infrastructure に依存させない。port（trait）は外部 I/O が実際に必要な操作（設定ファイルからのルールリスト読込・codec・外部ストレージへの報告等）に限定する。"
+      }
+    },
+    {
+      "claim_hash": "185c2d4632246fcf1d038610536143fbd2d512fc2658a56a70db5db98fa73215",
+      "evidence_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装を 3 段階の機構軸で進める。段 1: `DataRole` / `ContractRole` を data-carrying enum 化し、すべての payload 付き variant の schema を 1 回の breaking migration で確定する（`Entity`・`AggregateRoot`・`ValueObject`・`DomainService`・`UseCase` への意味論フィールド追加、`ContractRole::Repository { aggregate: TypeRef }` 追加、`DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` 追加を含む）."
+      }
+    },
+    {
+      "claim_hash": "185c2d4632246fcf1d038610536143fbd2d512fc2658a56a70db5db98fa73215",
+      "evidence_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証（反応するイベントが 0 個の EventPolicy は概念として成立しない）。"
+      }
+    },
+    {
+      "claim_hash": "2ca06e5f536c05a43d1e648891ee090925625e5df7bfb051a23381bf7707d0c1",
+      "evidence_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "verdict": {
+        "kind": "pass",
+        "citation": "段 1: `DataRole` / `ContractRole` を data-carrying enum 化し、すべての payload 付き variant の schema を 1 回の breaking migration で確定する"
+      }
+    },
+    {
+      "claim_hash": "e795920d2954d576e7f070a65e992586e047073c70c8f20cc80c8f3d77d47ab8",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。opt-in したルールは厳格に適用し（違反を容認する「advisory」という中間状態は設けない）。"
+      }
+    },
+    {
+      "claim_hash": "e795920d2954d576e7f070a65e992586e047073c70c8f20cc80c8f3d77d47ab8",
+      "evidence_hash": "2fb0b608d104252e4551d10cd11665d3be76a3c4e5201f1d33b62cd840d9826a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp track lint` が読む `.harness/catalogue-lint/config.json` は workspace 全体に一つ適用されるファイルであり、crate ごと・layer ごとに異なる設定ファイルを指定する機構は設けない。"
+      }
+    },
+    {
+      "claim_hash": "e795920d2954d576e7f070a65e992586e047073c70c8f20cc80c8f3d77d47ab8",
+      "evidence_hash": "0e2819907ad0cc811dca66da2955053cfa0e74f8d24ddd9b8c335507392a8be3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定不在時の暗黙フォールバック動作（デフォルトプリセットで黙って実行する挙動）は設けない。CLI 指定も config.json も見つからない場合は明示エラーで停止する（fail-closed）。"
+      }
+    },
+    {
+      "claim_hash": "d445a05aaff015985ba35feba64f807fbf111d5c0c73b2640f2023e86bb632e4",
+      "evidence_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DDD パターンの機械検査ルール（D4–D11 / D16 / D18 が定める各ルール）を、呼び出し側から外部供給するルールリスト（`&[CatalogueLinterRule]`）として提供する opt-in linter 機構を実装する。"
+      }
+    },
+    {
+      "claim_hash": "d445a05aaff015985ba35feba64f807fbf111d5c0c73b2640f2023e86bb632e4",
+      "evidence_hash": "2fb0b608d104252e4551d10cd11665d3be76a3c4e5201f1d33b62cd840d9826a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp track lint` が読む `.harness/catalogue-lint/config.json` は workspace 全体に一つ適用されるファイルであり、crate ごと・layer ごとに異なる設定ファイルを指定する機構は設けない。"
+      }
+    },
+    {
+      "claim_hash": "d445a05aaff015985ba35feba64f807fbf111d5c0c73b2640f2023e86bb632e4",
+      "evidence_hash": "0e2819907ad0cc811dca66da2955053cfa0e74f8d24ddd9b8c335507392a8be3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 指定も config.json も見つからない場合は明示エラーで停止する（fail-closed）。このため「config.json がない状態でも lint を実行できるサイレントフォールバック」は実装対象外。"
+      }
+    }
+  ]
+}

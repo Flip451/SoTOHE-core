@@ -1,0 +1,1389 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "c1179bd4037fcc0a70aea49b7ae9b2c4c024aa8ca3dab2da85e8830362499241",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「DDD / Clean Architecture のパターンを、機械処理可能な形で SoTOHE カタログ上で包括的に扱えるようにする。」「独自の機械検査ルールを持つパターンのみを追加する」"
+      }
+    },
+    {
+      "claim_hash": "b5766f327b6a5b64b52dc7d79afcad6bf60156d57b01ca7799379dffbf2c22a7",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「カタログ taxonomy の意味論基盤を整備する。」「テスト生成（gen-tests）が有意義な検査コードを生成するには、ロール + 意味論フィールドの組み合わせが揃っている必要がある。」「本 ADR の Layer ① + Layer ② を先に実装・安定化してから gen-tests の実装に移行する。」"
+      }
+    },
+    {
+      "claim_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「実装フェーズは『型定義による schema 強制の意味論 → 新ロール追加 → linter』の機構軸で分ける。ロールの種類（既存／新規）では分けない。... 1. **schema 強制の意味論**: `DataRole` / `ContractRole` を data-carrying enum 化し、payload を持つすべての variant の schema を 1 回の breaking migration で確定する。... 2. **新ロール追加**: `DomainEvent`（D9）を unit variant として追加し、段 1 で schema を確定した ... 新ロール群を taxonomy / 表示 / fixture に反映する。... 3. **linter**: D4–D11 および D16 / D18 の機械検査ルール ... を、確定した schema の上に opt-in ルール（D15）として実装する。」"
+      }
+    },
+    {
+      "claim_hash": "f9578e73f678535916b0ce19274191c9da605e5c85d1a0b45957b9cce3272415",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::ValueObject` / `DataRole::Entity` / `DataRole::AggregateRoot` の各 variant が `invariants: Vec<InvariantDecl>` フィールドを持つ。`InvariantDecl` は名前付きのドメインルールを宣言する struct である。`InvariantPredicate` を `SelfMethod` のみの enum として維持する理由は、将来 Specification 等の検査手段を追加する拡張軸を確保するためである。"
+      }
+    },
+    {
+      "claim_hash": "1602a7119c81597f2a1db17567e4e7fe15660988c8e5f344fd58358281f088b5",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::Entity` と `DataRole::AggregateRoot` の variant が `identity: IdentityAccessor` フィールドを持つ（`Option` 不可）。`IdentityAccessor` は getter メソッド名を保持する ... public field identity は禁止 ... getter 統一は 2026-06-14 のユーザー決定 ... による。"
+      }
+    },
+    {
+      "claim_hash": "7d7ae2cfc50b0809ff87f2223365c2f850cb54e8f1b851efacec4b437c9e37b7",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::AggregateRoot` variant が `exclusive_members: Vec<TypeRef>` と `shared_value_objects: Vec<TypeRef>` の 2 フィールドを持つ。Value Object（Money / Email / Address 等）は複数集約で共有されるのが自然であるため、集約専属 Entity（`exclusive_members`）と共有可能 VO（`shared_value_objects`）を型レベルで分離する。"
+      }
+    },
+    {
+      "claim_hash": "bb0d674e6c2708445f038609946f3c0faee12de9e7dd5356e44db5813896d2af",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::AggregateRoot` と `DataRole::DomainService` の各 variant が `emits: Vec<TypeRef>` フィールドを持つ。- **任意（D14）**: 空 Vec も正当な状態 … DomainService は `reacts_to` / `handles` を持たない"
+      }
+    },
+    {
+      "claim_hash": "04c515501e34b7e51951d1a49d35a1940eddeb59997bf7115454cb5b4814d7a9",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::UseCase` は `handles: Vec<TypeRef>` フィールドを持つ。 / - **任意（D14）**: コマンド駆動の UseCase は Domain Event をハンドルしない場合がある（空 Vec 正当）。"
+      }
+    },
+    {
+      "claim_hash": "6e4ed9b7d0e03eaccca74f3bba77f7e3e1f92b20dd8f4762f22b81bc6d62fb90",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DomainEvent` variant を追加する。... `payload` なし — `unit variant` のまま。... `専用 variant が必要。`"
+      }
+    },
+    {
+      "claim_hash": "0135b52bf6b981be6d09f582d24d87282ab25bc891be958a2d14662ff6d7f58e",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ContractRole::Repository { aggregate: TypeRef }` variant を追加する。既存の `ContractRole::SecondaryPort` は aggregate を持たない非 Repository の secondary port を表す。\n- **`aggregate` フィールドの必須化（D14 適用）**: Repository は必ず 1 つの aggregate を持つ。`aggregate: Option<TypeRef>` は「aggregate なしの Repository」という不正な状態を表現可能にしてしまうため `Option` 不可。\n- **なぜ独立 variant か**: Repository は必ず 1 つの aggregate を持ち、非 Repository の SecondaryPort は持たない。独立 variant にすることで「aggregate なし Repository」「aggregate あり 非Repository」の両方の不正状態が構造的に排除される"
+      }
+    },
+    {
+      "claim_hash": "fcb9e669a4773f01e459fbf0c0bd06b92550bdee8d4d3b56b87d0a906400aaa1",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "exclusive_members / shared_value_objects フィールドを基盤として、Aggregate Boundary lint を linter の独立した検査ルールとして実装する"
+      }
+    },
+    {
+      "claim_hash": "8a23ee5a74dab2ea11ddd428038e040df26268ec6ebbf50fb0dab194c1c27bb8",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Option` や空 `Vec` が許容されるかは「空または `None` が不正な状態と 1:1 対応するか」で判断する。対応するなら必須（`Option` 不可）とし、ロールと構造的に結合する（enum-first）。空が正当な状態なら `Vec` / `Option` でよい。"
+      }
+    },
+    {
+      "claim_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「opt-in したルールは厳格に適用し（違反を許さない）、advisory ... 設けない。」"
+      }
+    },
+    {
+      "claim_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。… `reacts_to` は `NonEmptyVec<TypeRef>` で**型による非空保証**とする。… `UseCase.handles` は `Vec`（空可能）であり、この型レベルの差が EventPolicy を UseCase と区別する構造的独自性となる。"
+      }
+    },
+    {
+      "claim_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用し `CatalogueLintViolation` を生成する処理は、外部 I/O を伴わない純粋ロジックであり、検査対象はドメイン語彙の意味論そのものである。よってこの評価ロジックは domain/application core に置く。… port（trait）は外部 I/O が実際に必要な操作——設定ファイルからのルールリスト読込・codec・外部ストレージへの報告など——に限定する。"
+      }
+    },
+    {
+      "claim_hash": "a40c2ac404b7c6cf5e12cb2565525a378ff1251e0eb61a2d0333e24bb9e3c814",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ValueObject ロールの本質は『値による等価性』と『値として扱える（内部状態が変わらない）』の 2 点である。」"
+      }
+    },
+    {
+      "claim_hash": "4343aed074dee6fb29764a57ecfc34242b77e8bc571726b91f3ec34ad0974a8d",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「追加しない。SoTOHE の TDDD は **内側の六角形**（Domain / UseCase 層）を主な対象とする。Primary Adapters（CLI / HTTP handler 等）は SoTOHE の `apps/` 層に相当し、ハーネスが提供する型レベルの検査の主対象ではない。Presenter / Controller に固有の機械検査ルールを定義しにくいことも理由… `informal_grounds` に rationale を記録した上で独自カタログエントリとして扱うことができる。」"
+      }
+    },
+    {
+      "claim_hash": "ffed8747830d2057467f4d2c5ee5503e9bd7bcb8ab363f34f9e8a21461b94227",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「現時点では保留とする。`Eventual`（Saga / バックグラウンド補償）を lint するには Saga 対応が先に必要。`Atomic` の lint ... 困難。Saga 設計が固まったタイミングで再評価する。」"
+      }
+    },
+    {
+      "claim_hash": "457131364c0e5196af21cba7fc7eb299c106961569fc1d13c5ae884c8b875452",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "テスト生成（gen-tests）が有意義な検査コードを生成するには、ロール + 意味論フィールドの組み合わせが揃っている必要がある。カタログ側の基盤なしに gen-tests を実装しても、生成されるテストは「型が存在する」程度の shallow な確認にとどまる。本 ADR の Layer ① + Layer ② を先に実装・安定化してから gen-tests の実装に移行する。"
+      }
+    },
+    {
+      "claim_hash": "6296758f988b34c91346fca8ac72f6cca75a9e98c944a2106a0a8e731a95ecb5",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "linter: 直接参照チェック（shallow）（opt-in 時に厳格適用）: ... `TypeEntry::methods` に限定するのは D6 と同じ理由（AggregateRoot / Entity ロール意味論に最も直接対応する surface; 拡大対象はプロジェクト構造に依存するためカスタムに委ねる）。"
+      }
+    },
+    {
+      "claim_hash": "b31c81d21b59094699d288bc23872d580c3c6c7d27eee840eb4ff5aa8b8f93ca",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reacts_to` は surface 宣言である。 / `method-level` 拡張は今後の判断ポイントで扱う。"
+      }
+    },
+    {
+      "claim_hash": "89facc5b265f2b73cdee464cdb84d7f676d487454a29a341972692fed478192a",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ユーザー決定（2026-05-26）: 意味論フィールドは `TypeEntry` に平置きするのでなく、有効ロールに対応する `DataRole` variant に結合する（per-variant enum-first）。」および「他の variant には `invariants` フィールドが存在しないため、不正な組み合わせは構造的に表現不可能になる。」"
+      }
+    },
+    {
+      "claim_hash": "bcf8c658bfa5eafde47a53c01417996dbb058cdc19b892320deae8a98e12b2d2",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「独自の機械検査ルールを持つパターンのみを追加する」という絞り込み原則のもとで具体化したものである。"
+      }
+    },
+    {
+      "claim_hash": "54ade4ab1d5bb4b091504afed9ab4e2fe5266b0734354599bbbf05a3864df716",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "payload を持つすべての variant の schema を 1 回の breaking migration で確定する。... 1 variant でも data を持つと `Copy` が外れ、strum・codec・signal evaluator・renderer・すべての `role ==` 比較を一斉に更新する必要がある"
+      }
+    },
+    {
+      "claim_hash": "bcbd2326d511b53d445f932d353bd4960db87452d6430fabfba0ef77d6bfb9c9",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::Entity` と `DataRole::AggregateRoot` の variant が `identity: IdentityAccessor` フィールドを持つ（`Option` 不可）。 ... identity は public getter メソッド（`&self -> &Id`、private field を読み取り専用で公開）で参照することを標準とする。 ... Rust の public field は外部から直接書き換え可能（`entity.id = new_id`）であり、Entity の identity 安定性（identity-based equality の前提）に反するため禁止。"
+      }
+    },
+    {
+      "claim_hash": "fc398726592bc612ae6f31888f975e4ccfb63e3bbb1e55f4cb8ffa29c7d10b1a",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "opt-in されたルールは厳格に適用し（違反を許さない）、advisory ... は設けない。違反があれば linter はそれを `CatalogueLintViolation` として報告し"
+      }
+    },
+    {
+      "claim_hash": "af42b30c600936647bdec55a2a3c065fb239f875bf8ebbf0d201af7ef274e521",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用し `CatalogueLintViolation` を生成する処理は、外部 I/O を伴わない純粋ロジックであり... よってこの評価ロジックは domain/application core に置く。... port（trait）は外部 I/O が実際に必要な操作——設定ファイルからのルールリスト読込・codec・外部ストレージへの報告など——に限定する。"
+      }
+    },
+    {
+      "claim_hash": "553096f02e763887cffbe5d74e28dcfe64d039b3c939cabf822d668cc8db25e4",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reacts_to は `NonEmptyVec<TypeRef>` で**型による非空保証**とする。`NonEmptyVec<TypeRef>` は domain 層の新型（serde-free）。infrastructure の codec で JSON 配列 ⇄ `NonEmptyVec` を変換し、空配列は decode エラーとして弾く"
+      }
+    },
+    {
+      "claim_hash": "604b1cb328fb91ca7c1caddf82e792b897de6605f26bef47d2192be28dd52f16",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が定める拡張は、このユーザー方針を踏まえ、「独自の機械検査ルールを持つパターンのみを追加する」という絞り込み原則のもとで具体化したものである。"
+      }
+    },
+    {
+      "claim_hash": "2d6a7fa8479def19564653faa15989c92351ff07c1d8a655fea9f24fc0be8176",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各 **opt-in linter ルール**は、`CatalogueLinter` に対して外部から供給するルールリストとして実現する。」"
+      }
+    },
+    {
+      "claim_hash": "fbf196be1fefac80d87eee5d5bd39008e678ec705043face64fb7342ec2dae3f",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::ValueObject` / `DataRole::Entity` / `DataRole::AggregateRoot` の各 variant が `invariants: Vec<InvariantDecl>` フィールドを持つ。`InvariantPredicate::SelfMethod(MethodName)`"
+      }
+    },
+    {
+      "claim_hash": "42c6e3ef7a119650d07238ff4d4d52ef05293c10b06a1326eda3cb1ae77553f1",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::Entity` と `DataRole::AggregateRoot` の variant が `identity: IdentityAccessor` フィールドを持つ（`Option` 不可）。`IdentityAccessor` は getter メソッド名を保持する"
+      }
+    },
+    {
+      "claim_hash": "3e57c61a26ccf823adbd7f07ad03d82a251c2ddf43b1fcd1b34e6c978b99e1c6",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::AggregateRoot` variant が `exclusive_members: Vec<TypeRef>` と `shared_value_objects: Vec<TypeRef>` の 2 フィールドを持つ。... - **任意（D14）**: 空 Vec 正当。 ... - **有効ロール**: `AggregateRoot` variant のみ。他の variant にはこれらのフィールドが存在しないため不正な組み合わせは構造的に排除される。"
+      }
+    },
+    {
+      "claim_hash": "8c20c6b83421bed22cf0a7f4782e2a0ca040650114d63ec71997b691896cefe3",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「AggregateRoot / DomainService。両 variant が `emits` フィールドを持つ。他の variant にはこのフィールドが存在しない。」"
+      }
+    },
+    {
+      "claim_hash": "4cefc767712aca4362041522fbfdaf966a9e731f7abe256905fdd5894109d185",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::UseCase` は `handles: Vec<TypeRef>` フィールドを持つ。`Vec<TypeRef>`（空可能）。"
+      }
+    },
+    {
+      "claim_hash": "da0fe36dcb3d2eb368df95412ae7c3e82eb0a806db791dc0b9f8d0deff0af721",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Repository は必ず 1 つの aggregate を持つ。既存の `ContractRole::SecondaryPort` は aggregate を持たない非 Repository の secondary port を表す。」"
+      }
+    },
+    {
+      "claim_hash": "84657bbacbf37a40d5d42030d6536cee6f0536556307745b704ab61db5f0e5b0",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。 / `infrastructure` の codec で JSON 配列 ⇄ `NonEmptyVec` を変換し、空配列は decode エラーとして弾く"
+      }
+    },
+    {
+      "claim_hash": "8a6c116a72a2aee507f3d4b94a418d36bbaf59bf7154f2eafe825e034370f443",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` / `ContractRole` の data-carrying enum 化は不可分な変更である。`1 variant でも data を持つと `Copy` が外れ、strum・codec・signal evaluator・renderer・すべての `role ==` 比較を一斉に更新する必要がある`"
+      }
+    },
+    {
+      "claim_hash": "649a984b5f413c3d155d6ff7ffd279bdad1bbc3c6bdb2ced9f878cb6a36ceb5e",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ContractRole::Repository { aggregate: TypeRef }` variant を追加する。"
+      }
+    },
+    {
+      "claim_hash": "ee75203d39af6d6eb3502b9f6ac9e3564a3873782a357e2383e8cb273624fe79",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象」と「検査内容」を分けて指定できる構造とする。payload を持たないロール種別 discriminant（参考スケッチでは `RoleKind`）を設ける方向"
+      }
+    },
+    {
+      "claim_hash": "2f7a31ee41f676980fee04f9d8a701dcf20505b5fdbedd625d2c2a5994eb995b",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D4〜D11 および D16 / D18 で定める各 **opt-in linter ルール**は、`CatalogueLinter` に対して外部から供給するルールリスト（`&[CatalogueLinterRule]`）として実現する。... *以下は non-canonical な参考スケッチである。型シグネチャ・フィールド名・variant 名は実装フェーズで確定する。*"
+      }
+    },
+    {
+      "claim_hash": "bcc3a13f8b7b5be01d05fd03aef413d8ac0b7c655c5bda068663382e510aa987",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`InvariantPredicate::SelfMethod(method)`: 対象メソッド名が親エントリ型の public method 宣言集合に存在し、かつ対象 `MethodDeclaration` が `receiver: Some(SelfReceiver::SharedRef)`（`&self`）/ `params` が空 / `returns` が `bool` 型であることを確認する"
+      }
+    },
+    {
+      "claim_hash": "848a7e80f89daccbb0b30d4bf613160715c65686771ac469a17941ecfcbf1c4c",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`identity` で指定した getter メソッド名が、対象型のカタログ上の public method 宣言集合に存在するかを確認する。さらに対象 `MethodDeclaration` が `receiver: Some(SelfReceiver::SharedRef)`（`&self`）/ `params` が空 / `returns` が `()` 以外であることを確認する。」"
+      }
+    },
+    {
+      "claim_hash": "7c1421cca443f5f5cb5f8ac3b0e53415646556a46514d063362ff3c9347cf285",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ValueObject` ロールを持つ型に対し、`PartialEq` / `Eq` の impl が catalogue の `trait_impls` に宣言されているかを確認する。... いずれかが欠ければ linter が違反を報告する。"
+      }
+    },
+    {
+      "claim_hash": "1841364ca70b0b8a4416015a875d010a757aa21344788d58ec5f010eaeb1723e",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Aggregate Boundary 最小コア lint — exclusive_members を基盤とする」「Aggregate Boundary lint を linter の独立した検査ルールとして実装する」"
+      }
+    },
+    {
+      "claim_hash": "160c29fc47c6c1ade3313e4cb5633379e9d8b3898a604182fd8d7baa0f9957ff",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`DomainEvent` ロールを持つ型に `&mut self`（`SelfReceiver::ExclusiveRef`）を受け取るメソッドが宣言されていれば linter が違反を報告する。」 / 「`DomainEvent` ロールの型について、struct 形状の public field がカタログ上に存在すれば linter が違反を報告する——`StructShape::Plain` の `fields: Vec<FieldDecl>` / `StructShape::Tuple` の tuple 要素」 / 「**enum の variant payload ...は禁止しない**」"
+      }
+    },
+    {
+      "claim_hash": "a403a8a07fae6a5de811692cc3ef52965456fa317a20c1cfc282a7fde2e6e945",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「aggregate フィールドで参照された型が、カタログ上で `AggregateRoot` ロールで宣言されているかを確認する。未宣言であれば linter が違反を報告する。」"
+      }
+    },
+    {
+      "claim_hash": "b85011505858fca3657d8ef267f842640d47d1cddf09ba96751ab7283d644d3a",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"**機械検査ルール（linter / opt-in 時に厳格適用）**:\n  - **reacts_to 参照先 DomainEvent チェック**: `reacts_to` の各型がカタログ上で `DomainEvent` ロールで宣言されているかを確認する...\n  - **domain 層配置チェック（linter / opt-in 時に厳格適用）**: EventPolicy エントリが domain 層以外で宣言されていれば linter が違反を報告する...\n  - **`&mut self` 禁止（linter / opt-in 時に厳格適用）**: EventPolicy ロールの型のメソッドに `&mut self` ...\n  - **副作用ロール禁止（linter / opt-in 時に厳格適用）**: EventPolicy のメソッドシグネチャ（引数型・戻り値型）に Repository / UseCase ロールの型が出現する場合に linter が違反を報告する...\""
+      }
+    },
+    {
+      "claim_hash": "8ada1302a80e1a719701afa1f801be343d0c5a4d244f0c8fe89e5fc84b4717f3",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "VO に値等価性と public mutation surface削減チェック（不変性の近似）の最小コアを与える。"
+      }
+    },
+    {
+      "claim_hash": "7ebd992189c3b8e04f8d2d3aacc41c0947cc6d5e4b722d48721416b2ce3ac205",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR は「opt-in/厳格/advisory なし」という原則を定める。ADR は最小コアルールを定義し、利用者は最小コア + カスタムルールを `&[CatalogueLinterRule]` として組み上げる。検査範囲の網羅（全型スロット・全 entry 種別・method body 等）はカスタムに委ねる。\n\n本 ADR の最小コアルール（D4〜D11 / D16 / D18 で定めた全最小コアルール）を一括で有効化するルールセットプリセットを `ddd-strict` として提供する。"
+      }
+    },
+    {
+      "claim_hash": "546ac9dd5fa6c358598f7a914498f2335f0e88aeb41a62ae4fa8e89498f35a2a",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「評価ロジックを domain/application core に移す。…これにより、linter ルールの評価は infrastructure に依存せずユニットテストできる。」「既存 `CatalogueLinter` trait と `InMemoryCatalogueLinter` の扱い: … 廃止または再定義することを意味する。」"
+      }
+    },
+    {
+      "claim_hash": "4d413169f8258bd9a4d250dacbffd5313b7e96661892e4ee9c3d078e8249b881",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「1. **schema 強制の意味論** ... 型で守れる制約 ... はこの段で確定する。 2. **新ロール追加** ... 3. **linter**: D4–D11 および D16 / D18 の機械検査ルール ... を、確定した schema の上に opt-in ルールとして実装する。」"
+      }
+    },
+    {
+      "claim_hash": "7103823c5c07989634028519956e91ce5f356b0c4a574d12816aa3e0d9129cb8",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint / wrong reference: the claim excludes Saga / Process Manager variants and Saga-specific state-transition schema extensions, but the evidence only decides not to add Presenter / Controller and gives rationale for Primary Adapters; it does not back the Saga / Process Manager exclusion."
+      }
+    },
+    {
+      "claim_hash": "69594b8467b94f5767ef959d9090e4864d432398d0cc59086aa9691d3ce0047c",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "The evidence is about excluding Presenter / Controller primary adapters because SoTOHE targets the inner hexagon and cannot define useful machine checks for presentation types. It does not back the claim's exclusion of the Read Model (CQRS) variant, its Dto ambiguity rationale, source_events linting, Domain Event delivery requirements, or waiting for Event Sourcing project demand; the reference is unrelated to the claim's core intent."
+      }
+    },
+    {
+      "claim_hash": "05f6d26047a82479854afaf87b5061ec2019fdcf83657241b96de5d7f3cb219b",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the claim restricts migration to active track catalogs and write-protects inactive/archive/completed tracks, but the ADR only defines the implementation order and states schema changes are handled as one breaking migration; it does not exclude inactive catalog files or derive a write-protection rule."
+      }
+    },
+    {
+      "claim_hash": "a66d4310055b1b114c7d10b13ea9ecf6699dab650b121736b47589335f1e5c7c",
+      "evidence_hash": "948d07f243c41a2afd08440cd6d99e099314e073719c2d54472c0b740584445a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` enum に `DomainEvent` variant を追加する。"
+      }
+    },
+    {
+      "claim_hash": "c1179bd4037fcc0a70aea49b7ae9b2c4c024aa8ca3dab2da85e8830362499241",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ユーザー指示: DDD / Clean Architecture のパターンを、機械処理可能な形で SoTOHE カタログ上で包括的に扱えるようにする。」\n「本 ADR が定める拡張は、このユーザー方針を踏まえ、『独自の機械検査ルールを持つパターンのみを追加する』という絞り込み原則のもとで具体化したものである。」"
+      }
+    },
+    {
+      "claim_hash": "b5766f327b6a5b64b52dc7d79afcad6bf60156d57b01ca7799379dffbf2c22a7",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「テスト生成（gen-tests）が有意義な検査コードを生成するには、ロール + 意味論フィールドの組み合わせが揃っている必要がある。カタログ側の基盤なしに gen-tests を実装しても、生成されるテストは『型が存在する』程度の shallow な確認にとどまる。本 ADR の Layer ① + Layer ② を先に実装・安定化してから gen-tests の実装に移行する。」"
+      }
+    },
+    {
+      "claim_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1. **schema 強制の意味論**: `DataRole` / `ContractRole` を data-carrying enum 化し、payload を持つすべての variant の schema を 1 回の breaking migration で確定する。対象は既存ロールへの意味論フィールド（D4–D8）に加え、`ContractRole::Repository { aggregate: TypeRef }`（D10）と `DataRole::EventPolicy { reacts_to: NonEmptyVec<TypeRef> }`（D16）を含む。2. **新ロール追加**: `DomainEvent`（D9）を unit variant として追加し、段 1 で schema を確定した `ContractRole::Repository`（D10）および `DataRole::EventPolicy`（D16）を含む新ロール群を taxonomy / 表示 / fixture に反映する。3. **linter**: D4–D11 および D16 / D18 の機械検査ルール（A-side 静的チェック）を、確定した schema の上に opt-in ルール（D15）として実装する。"
+      }
+    },
+    {
+      "claim_hash": "f9578e73f678535916b0ce19274191c9da605e5c85d1a0b45957b9cce3272415",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各 variant が `invariants: Vec<InvariantDecl>` フィールドを持つ」「`InvariantDecl` は名前付きのドメインルールを宣言する struct」「`SelfMethod(MethodName)`」"
+      }
+    },
+    {
+      "claim_hash": "1602a7119c81597f2a1db17567e4e7fe15660988c8e5f344fd58358281f088b5",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::Entity` と `DataRole::AggregateRoot` の variant が `identity: IdentityAccessor` フィールドを持つ（`Option` 不可）。… public field identity は禁止"
+      }
+    },
+    {
+      "claim_hash": "7d7ae2cfc50b0809ff87f2223365c2f850cb54e8f1b851efacec4b437c9e37b7",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「DataRole::AggregateRoot variant が `exclusive_members: Vec<TypeRef>` と `shared_value_objects: Vec<TypeRef>` の 2 フィールドを持つ。Value Object（Money / Email / Address 等）は複数集約で共有されるのが自然であるため、集約専属 Entity（`exclusive_members`）と共有可能 VO（`shared_value_objects`）を型レベルで分離する。」"
+      }
+    },
+    {
+      "claim_hash": "bb0d674e6c2708445f038609946f3c0faee12de9e7dd5356e44db5813896d2af",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::AggregateRoot` と `DataRole::DomainService` の各 variant が `emits: Vec<TypeRef>` フィールドを持つ。 ... DomainService は `reacts_to` / `handles` を持たない（D8 参照）。"
+      }
+    },
+    {
+      "claim_hash": "04c515501e34b7e51951d1a49d35a1940eddeb59997bf7115454cb5b4814d7a9",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`DataRole::UseCase` は `handles: Vec<TypeRef>` フィールドを持つ。」 / 「コマンド駆動の UseCase は Domain Event をハンドルしない場合がある（空 Vec 正当）。」"
+      }
+    },
+    {
+      "claim_hash": "6e4ed9b7d0e03eaccca74f3bba77f7e3e1f92b20dd8f4762f22b81bc6d62fb90",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` enum に `DomainEvent` variant を追加する。 / ドメイン内で起きた事実を表す**不変であるべきデータ**。 / `ValueObject` は不変性を持つが「ドメインで起きた事実」という時間的文脈を持たない。`Command` は「これからやること」を表し `DomainEvent` とは逆方向。`Dto` は層を越えるデータ容器であり...専用 variant が必要。"
+      }
+    },
+    {
+      "claim_hash": "0135b52bf6b981be6d09f582d24d87282ab25bc891be958a2d14662ff6d7f58e",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ContractRole::Repository { aggregate: TypeRef }` variant を追加する。既存の `ContractRole::SecondaryPort` は aggregate を持たない非 Repository の secondary port を表す。 ... `aggregate` フィールドの必須化 ... `aggregate: Option<TypeRef>` は「aggregate なしの Repository」という不正な状態を表現可能にしてしまうため `Option` 不可。 ... 独立 variant にすることで「aggregate なし Repository」「aggregate あり 非Repository」の両方の不正状態が構造的に排除される（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "fcb9e669a4773f01e459fbf0c0bd06b92550bdee8d4d3b56b87d0a906400aaa1",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D6 で `DataRole::AggregateRoot` variant に結合した `exclusive_members` / `shared_value_objects` フィールドを基盤として、Aggregate Boundary lint を linter の独立した検査ルールとして実装する。このルールは新しい `DataRole` variant ではなく、`AggregateRoot` variant のフィールドが宣言されたときに opt-in 設定で有効になる（D15）。"
+      }
+    },
+    {
+      "claim_hash": "8a23ee5a74dab2ea11ddd428038e040df26268ec6ebbf50fb0dab194c1c27bb8",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Option や空 Vec が許容されるかは「空または `None` が不正な状態と 1:1 対応するか」で判断する。対応するなら必須（`Option` 不可）とし、ロールと構造的に結合する（enum-first）。空が正当な状態なら `Vec` / `Option` でよい。"
+      }
+    },
+    {
+      "claim_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「外部から供給するルールリスト（`&[CatalogueLinterRule]`）として実現する。opt-in したルールに違反があれば linter はそれを `CatalogueLintViolation` として報告し、違反を容認する「advisory」という扱いは設けない。」"
+      }
+    },
+    {
+      "claim_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。... `reacts_to` は `NonEmptyVec<TypeRef>` で**型による非空保証**とする。空の `reacts_to` は型レベルで表現不可能（make-illegal-states-unrepresentable）。`UseCase.handles` は `Vec`（空可能）であり、この型レベルの差が EventPolicy を UseCase と区別する構造的独自性となる。"
+      }
+    },
+    {
+      "claim_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "評価ロジックを domain/application core に置く。"
+      }
+    },
+    {
+      "claim_hash": "a40c2ac404b7c6cf5e12cb2565525a378ff1251e0eb61a2d0333e24bb9e3c814",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「D18 では VO に値等価性と public mutation surface削減チェック（不変性の近似）の最小コアを与える。」「schema フィールドの追加は行わない」"
+      }
+    },
+    {
+      "claim_hash": "4343aed074dee6fb29764a57ecfc34242b77e8bc571726b91f3ec34ad0974a8d",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「追加しない。SoTOHE の TDDD は 内側の六角形（Domain / UseCase 層）を主な対象とする。Primary Adapters（CLI / HTTP handler 等）は SoTOHE の `apps/` 層に相当し、ハーネスが提供する型レベルの検査の主対象ではない。Presenter / Controller に固有の機械検査ルールを定義しにくいことも理由。」「`informal_grounds` に rationale を記録した上で独自カタログエントリとして扱うことができる。」"
+      }
+    },
+    {
+      "claim_hash": "e86b740facd7bc1f0080990a02c551924651181463f857147f4d0b51edba9e37",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「追加しない。状態機械のステップ遷移を機械検査するには、`typestate` フィールド ... を拡張した Saga 固有の状態遷移スキーマが必要であり、設計コストが高い。また採用先での具体的なユースケースが不明確であるため、今回は追加しない。... 採用プロジェクトから『Saga を TDDD で管理したい』という具体的要求が来た場合は、別 ADR で設計する。」"
+      }
+    },
+    {
+      "claim_hash": "9b0e00e5440329a632bcf42db706471d7dfaba50ab3d82ac2381721c4a78da70",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Read Model（CQRS）: 追加しない。「ドメインロジックを持たない読み取り専用ビュー」という定義は `Dto` との区別が曖昧であり、`source_events: [EventRef]` を lint するためには Domain Event の配信機構が必要である。Event Sourcing を採用するプロジェクトからの具体的な要求が来た時点で、別 ADR で判断する。」"
+      }
+    },
+    {
+      "claim_hash": "ffed8747830d2057467f4d2c5ee5503e9bd7bcb8ab363f34f9e8a21461b94227",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「研究レポートは UseCase 向けに `consistency: Atomic | Eventual` の宣言を提案しているが、現時点では保留とする。`Eventual`（Saga / バックグラウンド補償）を lint するには Saga 対応が先に必要。`Atomic` の lint（「単一 UseCase 内で複数 AggregateRoot を変更していないか」）は rustdoc 静的情報からの確認が困難。Saga 設計が固まったタイミングで再評価する。」"
+      }
+    },
+    {
+      "claim_hash": "05f6d26047a82479854afaf87b5061ec2019fdcf83657241b96de5d7f3cb219b",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「非アクティブ（archive 済み・completed）なトラックのカタログはライトプロテクトして移行対象外とする」"
+      }
+    },
+    {
+      "claim_hash": "457131364c0e5196af21cba7fc7eb299c106961569fc1d13c5ae884c8b875452",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR の Layer ① + Layer ② を先に実装・安定化してから gen-tests の実装に移行する。"
+      }
+    },
+    {
+      "claim_hash": "6296758f988b34c91346fca8ac72f6cca75a9e98c944a2106a0a8e731a95ecb5",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「検査対象の拡大はカスタム拡張例参照」」「TypeEntry::methods に限定する」"
+      }
+    },
+    {
+      "claim_hash": "b31c81d21b59094699d288bc23872d580c3c6c7d27eee840eb4ff5aa8b8f93ca",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reacts_to` は EventPolicy が反応する Domain Event の型名リスト（surface）を宣言する。どのメソッドが入力イベントを受け取り、何を判断・決定として返すか（handler method / input event / decision output の契約）は method-level の拡張であり、本 ADR の最小コアには含めない。"
+      }
+    },
+    {
+      "claim_hash": "89facc5b265f2b73cdee464cdb84d7f676d487454a29a341972692fed478192a",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ユーザー決定（2026-05-26）: 意味論フィールドは `TypeEntry` に平置きするのでなく、有効ロールに対応する `DataRole` variant に結合する（per-variant enum-first）。\n- `ValueObject` / `Entity` / `AggregateRoot`。他の variant には `invariants` フィールドが存在しないため、不正な組み合わせは構造的に表現不可能になる。"
+      }
+    },
+    {
+      "claim_hash": "bcf8c658bfa5eafde47a53c01417996dbb058cdc19b892320deae8a98e12b2d2",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が定める拡張は、このユーザー方針を踏まえ、「独自の機械検査ルールを持つパターンのみを追加する」という絞り込み原則のもとで具体化したものである。"
+      }
+    },
+    {
+      "claim_hash": "54ade4ab1d5bb4b091504afed9ab4e2fe5266b0734354599bbbf05a3864df716",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「スキーマ変更は breaking change であり、既存カタログとの後方互換性は保証しない。」 / 「1 variant でも data を持つと Copy が外れ、strum・codec・signal evaluator・renderer・すべての `role ==` 比較を一斉に更新する必要がある」"
+      }
+    },
+    {
+      "claim_hash": "bcbd2326d511b53d445f932d353bd4960db87452d6430fabfba0ef77d6bfb9c9",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「public field identity（`IdentityAccessor::Field`）は最小コアで禁止した。Rust の public field は `entity.id = ...` で外部から変更可能 ... identity は public getter メソッド（`&self -> &Id`、private field を読み取り専用で公開）で参照することを標準とする。」"
+      }
+    },
+    {
+      "claim_hash": "fc398726592bc612ae6f31888f975e4ccfb63e3bbb1e55f4cb8ffa29c7d10b1a",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "opt-in されたルールは厳格に適用し（違反を許さない）、advisory（無視可能な警告）という中間の重み付けは設けない。"
+      }
+    },
+    {
+      "claim_hash": "af42b30c600936647bdec55a2a3c065fb239f875bf8ebbf0d201af7ef274e521",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この評価ロジックは domain/application core に置く。」「port（trait）は外部 I/O が実際に必要な操作——設定ファイルからのルールリスト読込・codec・外部ストレージへの報告など——に限定する。」"
+      }
+    },
+    {
+      "claim_hash": "553096f02e763887cffbe5d74e28dcfe64d039b3c939cabf822d668cc8db25e4",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reacts_to` は `NonEmptyVec<TypeRef>` で型による非空保証とする。`NonEmptyVec<TypeRef>` は domain 層の新型（serde-free）。"
+      }
+    },
+    {
+      "claim_hash": "604b1cb328fb91ca7c1caddf82e792b897de6605f26bef47d2192be28dd52f16",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が定める拡張は、このユーザー方針を踏まえ、「独自の機械検査ルールを持つパターンのみを追加する」という絞り込み原則のもとで具体化したものである。"
+      }
+    },
+    {
+      "claim_hash": "2d6a7fa8479def19564653faa15989c92351ff07c1d8a655fea9f24fc0be8176",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「機械検査ルールは設定ファイルで opt-in / opt-out できる linter ルールとして提供する。既存 `CatalogueLinter` trait は D17 で core 評価関数へ移行する対象であり、評価ロジックの層配置は D17 が定める。」"
+      }
+    },
+    {
+      "claim_hash": "fbf196be1fefac80d87eee5d5bd39008e678ec705043face64fb7342ec2dae3f",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::ValueObject` / `DataRole::Entity` / `DataRole::AggregateRoot` の各 variant が `invariants: Vec<InvariantDecl>` フィールドを持つ。"
+      }
+    },
+    {
+      "claim_hash": "42c6e3ef7a119650d07238ff4d4d52ef05293c10b06a1326eda3cb1ae77553f1",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::Entity` と `DataRole::AggregateRoot` の variant が `identity: IdentityAccessor` フィールドを持つ（`Option` 不可）。`IdentityAccessor` は getter メソッド名を保持する。public field identity は禁止。"
+      }
+    },
+    {
+      "claim_hash": "3e57c61a26ccf823adbd7f07ad03d82a251c2ddf43b1fcd1b34e6c978b99e1c6",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::AggregateRoot` variant が `exclusive_members: Vec<TypeRef>` と `shared_value_objects: Vec<TypeRef>` の 2 フィールドを持つ。Value Object（Money / Email / Address 等）は複数集約で共有されるのが自然であるため、集約専属 Entity（`exclusive_members`）と共有可能 VO（`shared_value_objects`）を型レベルで分離する。"
+      }
+    },
+    {
+      "claim_hash": "8c20c6b83421bed22cf0a7f4782e2a0ca040650114d63ec71997b691896cefe3",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「DataRole::AggregateRoot と DataRole::DomainService の各 variant が emits: Vec<TypeRef> フィールドを持つ。」 / 「空 Vec も正当な状態（イベントを発行しない集約は存在する）なので宣言省略可。」 / 「他の variant にはこのフィールドが存在しない。」"
+      }
+    },
+    {
+      "claim_hash": "4cefc767712aca4362041522fbfdaf966a9e731f7abe256905fdd5894109d185",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DataRole::UseCase は `handles: Vec<TypeRef>` フィールドを持つ。DomainService は `handles` を持たない。"
+      }
+    },
+    {
+      "claim_hash": "da0fe36dcb3d2eb368df95412ae7c3e82eb0a806db791dc0b9f8d0deff0af721",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ContractRole::Repository { aggregate: TypeRef }` variant を追加する。`Repository は必ず 1 つの aggregate を持つ。`"
+      }
+    },
+    {
+      "claim_hash": "84657bbacbf37a40d5d42030d6536cee6f0536556307745b704ab61db5f0e5b0",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「infrastructure の codec で JSON 配列 ⇄ `NonEmptyVec` を変換し、空配列は decode エラーとして弾く」"
+      }
+    },
+    {
+      "claim_hash": "8a6c116a72a2aee507f3d4b94a418d36bbaf59bf7154f2eafe825e034370f443",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` / `ContractRole` を data-carrying enum 化し、payload を持つすべての variant の schema を 1 回の breaking migration で確定する。"
+      }
+    },
+    {
+      "claim_hash": "a66d4310055b1b114c7d10b13ea9ecf6699dab650b121736b47589335f1e5c7c",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` enum に `DomainEvent` variant を追加する。\n\n```rust\n// <!-- illustrative, non-canonical -->\npub enum DataRole {\n    // ...既存 13 variant...\n    DomainEvent,  // payload なし — unit variant のまま\n}\n```"
+      }
+    },
+    {
+      "claim_hash": "649a984b5f413c3d155d6ff7ffd279bdad1bbc3c6bdb2ced9f878cb6a36ceb5e",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ユーザー決定（2026-05-26）: Repository を独立した `ContractRole` variant として追加する。`SecondaryPort` + `Option<aggregate>` での表現は「aggregate なし Repository」「aggregate あり 非Repository」の不正状態を許容するため採用しない。\n\n`ContractRole::Repository { aggregate: TypeRef }` variant を追加する。"
+      }
+    },
+    {
+      "claim_hash": "ee75203d39af6d6eb3502b9f6ac9e3564a3873782a357e2383e8cb273624fe79",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールは「検査対象」と「検査内容」を分けて指定できる構造とする。... payload を持たないロール種別 discriminant（参考スケッチでは `RoleKind`）を設ける方向で実装する。"
+      }
+    },
+    {
+      "claim_hash": "2f7a31ee41f676980fee04f9d8a701dcf20505b5fdbedd625d2c2a5994eb995b",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「参考スケッチ: `CatalogueLinterRuleKind` の variant 候補（正確な型シグネチャは実装フェーズで確定する）: - `KindLayerConstraint` ... - `FieldEmpty` ... - `FieldNonEmpty` ... - `ReferencedRoleConstraint` ... - `TraitImplRequired` ... - `NoRoleInMethodSignature` ... - `MethodReferenceSignature` ... - `AccessorSignatureRequired` ... - `FieldElementUniqueAcrossEntries` ... - `NoExternalReferenceInMethods` ... - `NoPublicField` ... - `ForbiddenMethodReceiver` ...」"
+      }
+    },
+    {
+      "claim_hash": "bcc3a13f8b7b5be01d05fd03aef413d8ac0b7c655c5bda068663382e510aa987",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`InvariantPredicate::SelfMethod(method)`: 対象メソッド名が親エントリ型の public method 宣言集合に存在し、かつ対象 `MethodDeclaration` が `receiver: Some(SelfReceiver::SharedRef)` / `params` が空 / `returns` が `bool` 型"
+      }
+    },
+    {
+      "claim_hash": "848a7e80f89daccbb0b30d4bf613160715c65686771ac469a17941ecfcbf1c4c",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **getter 存在 + signature チェック（linter / opt-in 時に厳格適用）**: `identity` で指定した getter メソッド名が、対象型のカタログ上の public method 宣言集合（`TypeEntry::methods: Vec<MethodDeclaration>`）に存在するかを確認する。存在しなければ linter が違反を報告する。さらに対象 `MethodDeclaration` が `receiver: Some(SelfReceiver::SharedRef)`（`&self`）/ `params` が空 / `returns` が `()` 以外であることを確認する。"
+      }
+    },
+    {
+      "claim_hash": "7c1421cca443f5f5cb5f8ac3b0e53415646556a46514d063362ff3c9347cf285",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「PartialEq / Eq の impl が catalogue の `trait_impls` に宣言されているかを確認する」"
+      }
+    },
+    {
+      "claim_hash": "1841364ca70b0b8a4416015a875d010a757aa21344788d58ec5f010eaeb1723e",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "linter の独立した検査ルールとして実装する"
+      }
+    },
+    {
+      "claim_hash": "160c29fc47c6c1ade3313e4cb5633379e9d8b3898a604182fd8d7baa0f9957ff",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **public mutation surface削減チェック（linter / opt-in 時に厳格適用）**: `DomainEvent` ロールを持つ型に `&mut self`（`SelfReceiver::ExclusiveRef`）を受け取るメソッドが宣言されていれば linter が違反を報告する。DomainEvent は不変であるべきデータであり、public な mutation surface を持つべきでない。`ForbiddenMethodReceiver` として実装する（D15 参照）。\n- **struct public field 禁止チェック（linter / opt-in 時に厳格適用）**: `DomainEvent` ロールの型について、struct 形状の public field がカタログ上に存在すれば linter が違反を報告する——`StructShape::Plain` の `fields: Vec<FieldDecl>`（plain struct の public field）/ `StructShape::Tuple` の tuple 要素（tuple struct の public 要素）。**enum の variant payload（`VariantPayload::Struct` / `VariantPayload::Tuple`）は禁止しない**: `OrderEvent::Placed { order_id }` のように enum バリアントに payload を持つ DomainEvent は妥当な表現である。"
+      }
+    },
+    {
+      "claim_hash": "a403a8a07fae6a5de811692cc3ef52965456fa317a20c1cfc282a7fde2e6e945",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「aggregate フィールドで参照された型が、カタログ上で `AggregateRoot` ロールで宣言されているかを確認する。未宣言であれば linter が違反を報告する。」"
+      }
+    },
+    {
+      "claim_hash": "b85011505858fca3657d8ef267f842640d47d1cddf09ba96751ab7283d644d3a",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **reacts_to 参照先 DomainEvent チェック**: `reacts_to` の各型がカタログ上で `DomainEvent` ロールで宣言されているかを確認する\n- **domain 層配置チェック**: EventPolicy エントリが domain 層以外で宣言されていれば linter が違反を報告する\n- **`&mut self` 禁止**: EventPolicy ロールの型のメソッドに `&mut self`（`SelfReceiver::ExclusiveRef`）が宣言されていれば linter が違反を報告する\n- **副作用ロール禁止**: EventPolicy のメソッドシグネチャ（引数型・戻り値型）に Repository / UseCase ロールの型が出現する場合に linter が違反を報告する"
+      }
+    },
+    {
+      "claim_hash": "8ada1302a80e1a719701afa1f801be343d0c5a4d244f0c8fe89e5fc84b4717f3",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`&mut self` 禁止 ... `StructShape::Plain` の public field / `StructShape::Tuple` の public 要素"
+      }
+    },
+    {
+      "claim_hash": "7ebd992189c3b8e04f8d2d3aacc41c0947cc6d5e4b722d48721416b2ce3ac205",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D4〜D11 および D16 / D18 で定める各 opt-in linter ルールは、`CatalogueLinter` に対して外部から供給するルールリスト（`&[CatalogueLinterRule]`）として実現する。`ddd-strict` として提供する。"
+      }
+    },
+    {
+      "claim_hash": "546ac9dd5fa6c358598f7a914498f2335f0e88aeb41a62ae4fa8e89498f35a2a",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "評価ロジックを domain/application core に移す。これにより、linter ルールの評価は infrastructure に依存せずユニットテストできる。"
+      }
+    },
+    {
+      "claim_hash": "4d413169f8258bd9a4d250dacbffd5313b7e96661892e4ee9c3d078e8249b881",
+      "evidence_hash": "2660fed8891708eed609b452971fd4c5009ac360f759dbec74e6a080cdbc41b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装フェーズは「型定義による schema 強制の意味論 → 新ロール追加 → linter」の機構軸で分ける。ロールの種類（既存／新規）では分けない。"
+      }
+    },
+    {
+      "claim_hash": "c1179bd4037fcc0a70aea49b7ae9b2c4c024aa8ca3dab2da85e8830362499241",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ユーザー指示: DDD / Clean Architecture のパターンを、機械処理可能な形で SoTOHE カタログ上で包括的に扱えるようにする。」および「『独自の機械検査ルールを持つパターンのみを追加する』という絞り込み原則」"
+      }
+    },
+    {
+      "claim_hash": "b5766f327b6a5b64b52dc7d79afcad6bf60156d57b01ca7799379dffbf2c22a7",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「カタログ駆動テスト生成（gen-tests）の設計を進める前に、カタログ taxonomy の意味論基盤を整備する。」"
+      }
+    },
+    {
+      "claim_hash": "b324e2922888e6cf1ed66880295e09920c66a498142957072cd76b49d5552680",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装フェーズは「型定義による schema 強制の意味論 → 新ロール追加 → linter」の機構軸で分ける。ロールの種類（既存／新規）では分けない。"
+      }
+    },
+    {
+      "claim_hash": "f9578e73f678535916b0ce19274191c9da605e5c85d1a0b45957b9cce3272415",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::ValueObject` / `DataRole::Entity` / `DataRole::AggregateRoot` の各 variant が `invariants: Vec<InvariantDecl>` フィールドを持つ。`InvariantDecl` は名前付きのドメインルールを宣言する struct である。`InvariantPredicate` を `SelfMethod` のみの enum として維持する。`空 Vec` も正当な状態（...）なので宣言省略可。"
+      }
+    },
+    {
+      "claim_hash": "1602a7119c81597f2a1db17567e4e7fe15660988c8e5f344fd58358281f088b5",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::Entity` と `DataRole::AggregateRoot` の variant が `identity: IdentityAccessor` フィールドを持つ（`Option` 不可）。`IdentityAccessor` は getter メソッド名を保持する"
+      }
+    },
+    {
+      "claim_hash": "7d7ae2cfc50b0809ff87f2223365c2f850cb54e8f1b851efacec4b437c9e37b7",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::AggregateRoot` variant が `exclusive_members: Vec<TypeRef>` と `shared_value_objects: Vec<TypeRef>` の 2 フィールドを持つ。Value Object（Money / Email / Address 等）は複数集約で共有されるのが自然であるため、集約専属 Entity（`exclusive_members`）と共有可能 VO（`shared_value_objects`）を型レベルで分離する。- **任意（D14）**: 空 Vec 正当。"
+      }
+    },
+    {
+      "claim_hash": "bb0d674e6c2708445f038609946f3c0faee12de9e7dd5356e44db5813896d2af",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::AggregateRoot` と `DataRole::DomainService` の各 variant が `emits: Vec<TypeRef>` フィールドを持つ。- **任意（D14）**: 空 Vec も正当な状態（イベントを発行しない集約は存在する）なので宣言省略可。- DomainService は `reacts_to` / `handles` を持たない（D8 参照）。"
+      }
+    },
+    {
+      "claim_hash": "04c515501e34b7e51951d1a49d35a1940eddeb59997bf7115454cb5b4814d7a9",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DataRole::UseCase は `handles: Vec<TypeRef>` フィールドを持つ。 ... コマンド駆動の UseCase は Domain Event をハンドルしない場合がある（空 Vec 正当）。"
+      }
+    },
+    {
+      "claim_hash": "6e4ed9b7d0e03eaccca74f3bba77f7e3e1f92b20dd8f4762f22b81bc6d62fb90",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` enum に `DomainEvent` variant を追加する。`payload なし — unit variant のまま`"
+      }
+    },
+    {
+      "claim_hash": "0135b52bf6b981be6d09f582d24d87282ab25bc891be958a2d14662ff6d7f58e",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ContractRole::Repository { aggregate: TypeRef }` variant を追加する。既存の `ContractRole::SecondaryPort` は aggregate を持たない非 Repository の secondary port を表す。"
+      }
+    },
+    {
+      "claim_hash": "fcb9e669a4773f01e459fbf0c0bd06b92550bdee8d4d3b56b87d0a906400aaa1",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D6 で `DataRole::AggregateRoot` variant に結合した `exclusive_members` / `shared_value_objects` フィールドを基盤として、Aggregate Boundary lint を linter の独立した検査ルールとして実装する。... - **linter: exclusive_members → Entity ロール整合チェック（opt-in 時に厳格適用）** ... - **linter: shared_value_objects → ValueObject ロール整合チェック（opt-in 時に厳格適用）** ... - **linter: 重複所属チェック（opt-in 時に厳格適用）** ... - **linter: 直接参照チェック（shallow）（opt-in 時に厳格適用）** ... - **linter: ValueObject 独立性チェック（opt-in 時に厳格適用）**"
+      }
+    },
+    {
+      "claim_hash": "8a23ee5a74dab2ea11ddd428038e040df26268ec6ebbf50fb0dab194c1c27bb8",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Option` や空 `Vec` が許容されるかは「空または `None` が不正な状態と 1:1 対応するか」で判断する。対応するなら必須（`Option` 不可）とし、ロールと構造的に結合する（enum-first）。空が正当な状態なら `Vec` / `Option` でよい。"
+      }
+    },
+    {
+      "claim_hash": "171fe2125739d9466da0e0532474aef9602061f5cef8b79af6a2cbee23117510",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR は「opt-in/厳格/advisory なし」という原則を定める。D4〜D11 および D16 / D18 で定める各 opt-in linter ルールは、`CatalogueLinter` に対して外部から供給するルールリスト（`&[CatalogueLinterRule]`）として実現する。ルールは「検査対象」と「検査内容」を分けて指定できる構造とする。payload を持たないロール種別 discriminant（参考スケッチでは `RoleKind`）を設ける方向で実装する。"
+      }
+    },
+    {
+      "claim_hash": "fbe5c705759621e95a36133f962b59212218a64bd4e688881627fc677a12a93f",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `EventPolicy { reacts_to: NonEmptyVec<TypeRef> }` variant を追加する。`reacts_to` は `NonEmptyVec<TypeRef>` で**型による非空保証**とする。`UseCase.handles` は `Vec`（空可能）であり、この型レベルの差が EventPolicy を UseCase と区別する構造的独自性となる。`EventPolicy` の設計意図は宣言型リアクター（Domain Event に反応して判断を返す domain 層のロールであるべき）。"
+      }
+    },
+    {
+      "claim_hash": "2ac4c451e63adda83bd52e6f277412e53a48ff0918e8a65abcc9b8d3ce91e07a",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "評価ロジックを domain/application core に移す。port（trait）は外部 I/O が実際に必要な操作——設定ファイルからのルールリスト読込・codec・外部ストレージへの報告など——に限定する。"
+      }
+    },
+    {
+      "claim_hash": "a40c2ac404b7c6cf5e12cb2565525a378ff1251e0eb61a2d0333e24bb9e3c814",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ValueObject` ロールを持つ型に対し、`PartialEq` / `Eq` の impl が catalogue の `trait_impls` に宣言されているかを確認する。... `&mut self`（`SelfReceiver::ExclusiveRef`）が宣言されていれば linter が違反を報告する。... `StructShape::Plain` の public field / `StructShape::Tuple` の public 要素がカタログ上に存在すれば linter が違反を報告する。... D9 の DomainEvent `ForbiddenMethodReceiver` と同じ rule kind。... schema フィールドの追加（D3 段1）は行わない——`ValueObject` は D4 で `invariants` フィールドを持つが"
+      }
+    },
+    {
+      "claim_hash": "4343aed074dee6fb29764a57ecfc34242b77e8bc571726b91f3ec34ad0974a8d",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "追加しない。SoTOHE の TDDD は **内側の六角形**（Domain / UseCase 層）を主な対象とする。Primary Adapters（CLI / HTTP handler 等）は SoTOHE の `apps/` 層に相当し、ハーネスが提供する型レベルの検査の主対象ではない。... Presenter / Controller を追加したい採用プロジェクトは、`informal_grounds` に rationale を記録した上で独自カタログエントリとして扱うことができる。"
+      }
+    },
+    {
+      "claim_hash": "e86b740facd7bc1f0080990a02c551924651181463f857147f4d0b51edba9e37",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "追加しない。状態機械のステップ遷移を機械検査するには、`typestate` フィールド...設計コストが高い。また採用先での具体的なユースケースが不明確であるため、今回は追加しない。"
+      }
+    },
+    {
+      "claim_hash": "9b0e00e5440329a632bcf42db706471d7dfaba50ab3d82ac2381721c4a78da70",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Read Model（CQRS）は今回の拡張対象に含めない。」"
+      }
+    },
+    {
+      "claim_hash": "ffed8747830d2057467f4d2c5ee5503e9bd7bcb8ab363f34f9e8a21461b94227",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「consistency」フィールドについて（今回は保留）: 研究レポートは UseCase 向けに `consistency: Atomic | Eventual` の宣言を提案しているが、現時点では保留とする。`Eventual`（Saga / バックグラウンド補償）を lint するには Saga 対応が先に必要。`Atomic` の lint（「単一 UseCase 内で複数 AggregateRoot を変更していないか」）は rustdoc 静的情報からの確認が困難。Saga 設計が固まったタイミングで再評価する。"
+      }
+    },
+    {
+      "claim_hash": "05f6d26047a82479854afaf87b5061ec2019fdcf83657241b96de5d7f3cb219b",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「移行はアクティブなトラックのカタログのみを対象とする。非アクティブ（archive 済み・completed）なトラックのカタログはライトプロテクトして移行対象外とする——遡及移行は行わない。」"
+      }
+    },
+    {
+      "claim_hash": "457131364c0e5196af21cba7fc7eb299c106961569fc1d13c5ae884c8b875452",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「カタログ側の基盤なしに gen-tests を実装しても、生成されるテストは『型が存在する』程度の shallow な確認にとどまる。本 ADR の Layer ① + Layer ② を先に実装・安定化してから gen-tests の実装に移行する。」"
+      }
+    },
+    {
+      "claim_hash": "6296758f988b34c91346fca8ac72f6cca75a9e98c944a2106a0a8e731a95ecb5",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「検査対象の拡大はカスタム拡張例参照」および「TypeEntry::methods に限定するのは D6 と同じ理由 ... 拡大対象はプロジェクト構造に依存するためカスタムに委ねる」"
+      }
+    },
+    {
+      "claim_hash": "b31c81d21b59094699d288bc23872d580c3c6c7d27eee840eb4ff5aa8b8f93ca",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「handler method / input event / decision output の契約）は method-level の拡張であり、本 ADR の最小コアには含めない」 「reacts_to に列挙された型が DomainEvent ロールで宣言されているか」という宣言整合"
+      }
+    },
+    {
+      "claim_hash": "89facc5b265f2b73cdee464cdb84d7f676d487454a29a341972692fed478192a",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効ロールに対応する `DataRole` variant に結合する（per-variant enum-first）"
+      }
+    },
+    {
+      "claim_hash": "bcf8c658bfa5eafde47a53c01417996dbb058cdc19b892320deae8a98e12b2d2",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「独自の機械検査ルールを持つパターンのみを追加する」という絞り込み原則"
+      }
+    },
+    {
+      "claim_hash": "54ade4ab1d5bb4b091504afed9ab4e2fe5266b0734354599bbbf05a3864df716",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`1 variant でも data を持つと `Copy` が外れ、strum・codec・signal evaluator・renderer・すべての `role ==` 比較を一斉に更新する必要がある`"
+      }
+    },
+    {
+      "claim_hash": "bcbd2326d511b53d445f932d353bd4960db87452d6430fabfba0ef77d6bfb9c9",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "public field identity は禁止 ... identity は public getter メソッドで参照することを標準とする"
+      }
+    },
+    {
+      "claim_hash": "fc398726592bc612ae6f31888f975e4ccfb63e3bbb1e55f4cb8ffa29c7d10b1a",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「機械検査ルールは設定ファイルで opt-in / opt-out できる linter ルールとして提供する。opt-in されたルールは厳格に適用し（違反を許さない）、advisory（無視可能な警告）という中間の重み付けは設けない」"
+      }
+    },
+    {
+      "claim_hash": "af42b30c600936647bdec55a2a3c065fb239f875bf8ebbf0d201af7ef274e521",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CatalogueLinterRule` を `CatalogueDocument` に適用し `CatalogueLintViolation` を生成する処理は、外部 I/O を伴わない純粋ロジックであり、検査対象はドメイン語彙の意味論そのものである。よってこの評価ロジックは domain/application core に置く。... port（trait）は外部 I/O が実際に必要な操作——設定ファイルからのルールリスト読込・codec・外部ストレージへの報告など——に限定する。"
+      }
+    },
+    {
+      "claim_hash": "553096f02e763887cffbe5d74e28dcfe64d039b3c939cabf822d668cc8db25e4",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reacts_to` を `NonEmptyVec<TypeRef>` で**型による非空保証**とする。`NonEmptyVec<TypeRef>` は domain 層の新型（serde-free）。infrastructure の codec で JSON 配列 ⇄ `NonEmptyVec` を変換し、空配列は decode エラーとして弾く。"
+      }
+    },
+    {
+      "claim_hash": "604b1cb328fb91ca7c1caddf82e792b897de6605f26bef47d2192be28dd52f16",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が定める拡張は、このユーザー方針を踏まえ、「独自の機械検査ルールを持つパターンのみを追加する」という絞り込み原則のもとで具体化したものである。"
+      }
+    },
+    {
+      "claim_hash": "2d6a7fa8479def19564653faa15989c92351ff07c1d8a655fea9f24fc0be8176",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械検査ルールは設定ファイルで opt-in / opt-out できる linter ルールとして提供する。"
+      }
+    },
+    {
+      "claim_hash": "fbf196be1fefac80d87eee5d5bd39008e678ec705043face64fb7342ec2dae3f",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::ValueObject` / `DataRole::Entity` / `DataRole::AggregateRoot` の各 variant が `invariants: Vec<InvariantDecl>` フィールドを持つ。`InvariantPredicate` を `SelfMethod` のみの enum として維持する"
+      }
+    },
+    {
+      "claim_hash": "42c6e3ef7a119650d07238ff4d4d52ef05293c10b06a1326eda3cb1ae77553f1",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole::Entity` と `DataRole::AggregateRoot` の variant が `identity: IdentityAccessor` フィールドを持つ（`Option` 不可）。`IdentityAccessor` は getter メソッド名を保持する"
+      }
+    },
+    {
+      "claim_hash": "3e57c61a26ccf823adbd7f07ad03d82a251c2ddf43b1fcd1b34e6c978b99e1c6",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「DataRole::AggregateRoot variant が `exclusive_members: Vec<TypeRef>` と `shared_value_objects: Vec<TypeRef>` の 2 フィールドを持つ。」「任意（D14）: 空 Vec 正当。」「他の variant にはこれらのフィールドが存在しない」"
+      }
+    },
+    {
+      "claim_hash": "8c20c6b83421bed22cf0a7f4782e2a0ca040650114d63ec71997b691896cefe3",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **型**: `Vec<TypeRef>`\n- **有効ロール**: `AggregateRoot` / `DomainService`。両 variant が `emits` フィールドを持つ。他の variant にはこのフィールドが存在しない。\n- **任意（D14）**: 空 Vec も正当な状態（イベントを発行しない集約は存在する）なので宣言省略可。"
+      }
+    },
+    {
+      "claim_hash": "4cefc767712aca4362041522fbfdaf966a9e731f7abe256905fdd5894109d185",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「DataRole::UseCase は `handles: Vec<TypeRef>` フィールドを持つ」「DomainService は `handles` を持たない」"
+      }
+    },
+    {
+      "claim_hash": "da0fe36dcb3d2eb368df95412ae7c3e82eb0a806db791dc0b9f8d0deff0af721",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ContractRole::Repository { aggregate: TypeRef }` variant を追加する。既存の `ContractRole::SecondaryPort` は aggregate を持たない非 Repository の secondary port を表す。- **`aggregate` フィールドの必須化（D14 適用）**: Repository は必ず 1 つの aggregate を持つ。"
+      }
+    },
+    {
+      "claim_hash": "84657bbacbf37a40d5d42030d6536cee6f0536556307745b704ab61db5f0e5b0",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reacts_to` は `NonEmptyVec<TypeRef>` で**型による非空保証**とする。空の `reacts_to` は型レベルで表現不可能... 空配列は decode エラーとして弾く"
+      }
+    },
+    {
+      "claim_hash": "8a6c116a72a2aee507f3d4b94a418d36bbaf59bf7154f2eafe825e034370f443",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` / `ContractRole` の data-carrying enum 化は不可分な変更である。1 variant でも data を持つと `Copy` が外れ、strum・codec・signal evaluator・renderer・すべての `role ==` 比較を一斉に更新する必要がある"
+      }
+    },
+    {
+      "claim_hash": "a66d4310055b1b114c7d10b13ea9ecf6699dab650b121736b47589335f1e5c7c",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` enum に `DomainEvent` variant を追加する。\n\n```rust\npub enum DataRole {\n    // ...既存 13 variant...\n    DomainEvent,  // payload なし — unit variant のまま\n}\n```"
+      }
+    },
+    {
+      "claim_hash": "649a984b5f413c3d155d6ff7ffd279bdad1bbc3c6bdb2ced9f878cb6a36ceb5e",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Repository を独立した `ContractRole::Repository` variant として追加する。`ContractRole::Repository { aggregate: TypeRef }` variant を追加する。"
+      }
+    },
+    {
+      "claim_hash": "ee75203d39af6d6eb3502b9f6ac9e3564a3873782a357e2383e8cb273624fe79",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「検査対象」と「検査内容」を分けて指定できる構造とする。検査対象ロールの指定は DataRole / ContractRole を横断して行える必要がある。"
+      }
+    },
+    {
+      "claim_hash": "2f7a31ee41f676980fee04f9d8a701dcf20505b5fdbedd625d2c2a5994eb995b",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "参考スケッチ: `CatalogueLinterRuleKind` の variant 候補: `KindLayerConstraint` / `FieldEmpty` / `FieldNonEmpty` / `ReferencedRoleConstraint` / `TraitImplRequired` / `NoRoleInMethodSignature` / `MethodReferenceSignature` / `AccessorSignatureRequired` / `FieldElementUniqueAcrossEntries` / `NoExternalReferenceInMethods` / `NoPublicField` / `ForbiddenMethodReceiver`"
+      }
+    },
+    {
+      "claim_hash": "bcc3a13f8b7b5be01d05fd03aef413d8ac0b7c655c5bda068663382e510aa987",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`InvariantPredicate::SelfMethod(method)`: 対象メソッド名が親エントリ型の public method 宣言集合に存在し、かつ対象 `MethodDeclaration` が `receiver: Some(SelfReceiver::SharedRef)`（`&self`）/ `params` が空 / `returns` が `bool` 型であることを確認する"
+      }
+    },
+    {
+      "claim_hash": "848a7e80f89daccbb0b30d4bf613160715c65686771ac469a17941ecfcbf1c4c",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`identity` で指定した getter メソッド名が、対象型のカタログ上の public method 宣言集合に存在するかを確認する。存在しなければ linter が違反を報告する。`receiver: Some(SelfReceiver::SharedRef)` / `params` が空 / `returns` が `()` 以外"
+      }
+    },
+    {
+      "claim_hash": "7c1421cca443f5f5cb5f8ac3b0e53415646556a46514d063362ff3c9347cf285",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PartialEq` / `Eq` の impl が catalogue の `trait_impls` に宣言されているかを確認する。"
+      }
+    },
+    {
+      "claim_hash": "1841364ca70b0b8a4416015a875d010a757aa21344788d58ec5f010eaeb1723e",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **linter: exclusive_members → Entity ロール整合チェック（opt-in 時に厳格適用）**: D6 と同じ（`ReferencedRoleConstraint`、`target_field: \"exclusive_members\"`）。\n- **linter: shared_value_objects → ValueObject ロール整合チェック（opt-in 時に厳格適用）**: D6 と同じ（`ReferencedRoleConstraint`、`target_field: \"shared_value_objects\"`）。\n- **linter: 重複所属チェック（opt-in 時に厳格適用）**: 同一の型が複数の `AggregateRoot` の `exclusive_members` に列挙されていないか。違反があれば linter が報告する。\n- **linter: 直接参照チェック（shallow）（opt-in 時に厳格適用）**: `exclusive_members` の型が、その集約ルートおよび同一集約の `exclusive_members` / `shared_value_objects` に列挙された型以外の `TypeEntry` のメソッド（`TypeEntry::methods`）の引数型・戻り値型として直接受け取られていないか確認する\n- **linter: ValueObject 独立性チェック（opt-in 時に厳格適用）**: `ValueObject` ロールを持つ型のメソッド（`TypeEntry::methods`）の引数型・戻り値型に `Entity` / `AggregateRoot` ロールの型が現れないかを確認する。"
+      }
+    },
+    {
+      "claim_hash": "160c29fc47c6c1ade3313e4cb5633379e9d8b3898a604182fd8d7baa0f9957ff",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「DomainEvent をロールに持つ型に `&mut self`（`SelfReceiver::ExclusiveRef`）を受け取るメソッドが宣言されていれば linter が違反を報告する。DomainEvent は不変であるべきデータであり、public な mutation surface を持つべきでない。`ForbiddenMethodReceiver` として実装する」および「`DomainEvent` ロールの型について、struct 形状の public field がカタログ上に存在すれば linter が違反を報告する… `StructShape::Plain` … / `StructShape::Tuple` … `NoPublicField` として実装する」"
+      }
+    },
+    {
+      "claim_hash": "a403a8a07fae6a5de811692cc3ef52965456fa317a20c1cfc282a7fde2e6e945",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **機械検査ルール（linter / opt-in 時に厳格適用）**:\n  - `aggregate` フィールドで参照された型が、カタログ上で `AggregateRoot` ロールで宣言されているかを確認する。未宣言であれば linter が違反を報告する。"
+      }
+    },
+    {
+      "claim_hash": "b85011505858fca3657d8ef267f842640d47d1cddf09ba96751ab7283d644d3a",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「機械検査ルール（linter / opt-in 時に厳格適用）: ReferencedRoleConstraint { expected_role: RoleKind::DomainEvent } … KindLayerConstraint { permitted_layers: [\"domain\"] } … ForbiddenMethodReceiver { forbidden_receiver: ExclusiveRef } … NoRoleInMethodSignature { forbidden_roles: [RoleKind::Repository, RoleKind::UseCase] }」"
+      }
+    },
+    {
+      "claim_hash": "8ada1302a80e1a719701afa1f801be343d0c5a4d244f0c8fe89e5fc84b4717f3",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「public mutation surface削減チェック（最小コア・不変性の近似）: `ValueObject` ロールを持つ型について、以下の 2 つを確認する。 - **`&mut self` 禁止（linter / opt-in 時に厳格適用）**: メソッドに `&mut self`（`SelfReceiver::ExclusiveRef`）が宣言されていれば linter が違反を報告する。 - **struct public field 禁止（linter / opt-in 時に厳格適用）**: `StructShape::Plain` の public field / `StructShape::Tuple` の public 要素がカタログ上に存在すれば linter が違反を報告する。 ... D9 の DomainEvent `ForbiddenMethodReceiver` と同じ rule kind。 ... D9 の DomainEvent `NoPublicField` と同じ rule kind。」"
+      }
+    },
+    {
+      "claim_hash": "7ebd992189c3b8e04f8d2d3aacc41c0947cc6d5e4b722d48721416b2ce3ac205",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールセットプリセットを `ddd-strict` として提供する。外部から供給するルールリスト（`&[CatalogueLinterRule]`）として実現する。"
+      }
+    },
+    {
+      "claim_hash": "546ac9dd5fa6c358598f7a914498f2335f0e88aeb41a62ae4fa8e89498f35a2a",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「評価ロジックを domain/application core に移す」かつ「infrastructure に依存せずユニットテストできる」。また「CatalogueLinter trait … を廃止または再定義することを意味する」。"
+      }
+    },
+    {
+      "claim_hash": "4d413169f8258bd9a4d250dacbffd5313b7e96661892e4ee9c3d078e8249b881",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装フェーズは「型定義による schema 強制の意味論 → 新ロール追加 → linter」の機構軸で分ける。"
+      }
+    },
+    {
+      "claim_hash": "2e8791d0dc080207dd04a6f7fc7115089ce37b9175f829a2162728e321511df6",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「D4〜D11 および D16 / D18 で定める各 **opt-in linter ルール**は、`CatalogueLinter` に対して外部から供給するルールリスト（`&[CatalogueLinterRule]`）として実現する。... opt-in したルールに違反があれば linter はそれを `CatalogueLintViolation` として報告し、違反を容認する『advisory』という扱いは設けない」「ルールは『**検査対象**』と『**検査内容**』を分けて指定できる構造とする。... payload を持たないロール種別 discriminant（参考スケッチでは `RoleKind`）を設ける方向で実装する」「本 ADR が定める最小コアルールを一括で有効化するルールセットプリセットを `ddd-strict` として提供する。... **配布 config ファイル**（`.harness/catalogue-lint/presets/ddd-strict.json`）として提供する。... domain layer に `ddd_strict_preset()` 関数は設けない」"
+      }
+    },
+    {
+      "claim_hash": "2fb0b608d104252e4551d10cd11665d3be76a3c4e5201f1d33b62cd840d9826a",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「対象は workspace 全体（per-layer config は対象外）」"
+      }
+    },
+    {
+      "claim_hash": "0e2819907ad0cc811dca66da2955053cfa0e74f8d24ddd9b8c335507392a8be3",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "3. **(else) fail-closed**: いずれも見つからなければ「設定が無い」旨の明示エラーで停止する。設定なしで黙って動くフォールバックは設けない。"
+      }
+    },
+    {
+      "claim_hash": "7f944bafb3567d48e0ce70f8556ea7483288c7273a3d87db70a168b2bc9dfd98",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ddd-strict` プリセットは Rust source にハードコードされた API 関数ではなく、**配布 config ファイル**（`.harness/catalogue-lint/presets/ddd-strict.json`）として提供する。 ... 採用者はこのファイルを**コピーして `.harness/catalogue-lint/config.json` に置き、必要に応じて編集して使う**。config.json から preset を参照する機構は設けない"
+      }
+    },
+    {
+      "claim_hash": "1f6509fe7de204544d0f76082072db8316e30ebfb45d23e3800aaa20eb3b001a",
+      "evidence_hash": "1cdb63ae87c249e0b03e9fa535af21095d6db7c1ef11f377bfce69902d63d445",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「配布 config ファイル（`.harness/catalogue-lint/presets/ddd-strict.json`）として提供する。採用者はこのファイルをコピーして `.harness/catalogue-lint/config.json` に置き」"
+      }
+    }
+  ]
+}

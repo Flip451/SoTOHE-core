@@ -1,0 +1,290 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "CatalogueDocumentCodec": {
+      "action": "modify",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new CatalogueDocumentCodec."
+        },
+        {
+          "name": "decode",
+          "receiver": null,
+          "params": [
+            { "name": "json", "ty": "&str" },
+            { "name": "filename_stem", "ty": "&str" }
+          ],
+          "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Decodes a JSON string into a CatalogueDocument. filename_stem is the portion of the filename before '-types.json' (e.g. 'domain' for domain-types.json) — used to validate the crate_name field. Associated function (no self)."
+        },
+        {
+          "name": "load",
+          "receiver": null,
+          "params": [
+            { "name": "path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Loads and decodes a catalogue from the given filesystem path. Derives filename_stem from the file's stem portion before '-types.json'. Associated function (no self)."
+        },
+        {
+          "name": "encode",
+          "receiver": null,
+          "params": [
+            { "name": "doc", "ty": "&domain::tddd::catalogue_v2::CatalogueDocument" }
+          ],
+          "returns": "Result<String, CatalogueDocumentCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Encodes a CatalogueDocument to a pretty-printed JSON string. Associated function (no self)."
+        }
+      ],
+      "module_path": "tddd::catalogue_document_codec",
+      "docs": "Infrastructure codec for CatalogueDocument JSON serialization / deserialization. Stateless unit struct; decode, load, encode are all associated functions (no self receiver). Modify from baseline: handles the new data-carrying DataRole (15 variants with struct/unit payloads) and ContractRole (4 variants, Repository with aggregate field). NonEmptyVec<TypeRef> codec for EventPolicy.reacts_to — empty JSON array is a decode error. decode() takes (json: &str, filename_stem: &str) — filename_stem is the file name part before '-types.json', used for crate_name validation. load() takes &Path (borrows, does not consume). All payload fields (identity, invariants, exclusive_members, shared_value_objects, emits, handles, reacts_to, aggregate) managed here with appropriate serde default / skip_serializing_if annotations.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-01"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueDocumentCodecError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": { "kind": "tuple", "fields": ["serde_json::Error"] }
+          },
+          {
+            "name": "Io",
+            "payload": { "kind": "tuple", "fields": ["std::io::Error"] }
+          },
+          {
+            "name": "SchemaVersionRequiresMigration",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "from", "ty": "u32" },
+                { "name": "to", "ty": "u32" },
+                { "name": "reason", "ty": "&str" }
+              ]
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "actual", "ty": "u32" },
+                { "name": "expected", "ty": "u32" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidEntry",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "entry_name", "ty": "String" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "CrateNameMismatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "expected", "ty": "String" },
+                { "name": "actual", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "CrossCrateFunctionPath",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "key", "ty": "String" },
+                { "name": "expected_crate", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_document_codec",
+      "docs": "Errors from CatalogueDocumentCodec. Modified: SchemaVersionRequiresMigration variant added (v4 catalogue schema requires migration to v5; fail-closed gate added per D3 Stage 1 breaking change). Variant set now has 7 members.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-01"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FsLintConfigLoader": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::fs_lint_config_loader",
+      "docs": "Filesystem implementation of LintConfigLoader. Holds a fully-resolved path to the lint config file (either the workspace default .harness/catalogue-lint/config.json or a --rules-file CLI override). CLI composition resolves which path to use before constructing FsLintConfigLoader::new(path). load() reads from self.path with no additional argument. Fail-closed: returns LintConfigLoaderError::MissingFile if the file does not exist — no silent fallback to default rules (per OS-10).",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "OS-09"
+        },
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "OS-10"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "InMemoryCatalogueLinter": {
+      "action": "delete",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::in_memory_catalogue_linter",
+      "docs": "Deleted with the old CatalogueLinter evaluation adapter. Per D17, applying rules to CatalogueDocument moves to the pure domain::evaluate_catalogue_lint function, and this track does not retain a separate I/O-only linter adapter. Rule filtering is caller-side before passing the rule list to evaluate_catalogue_lint.",
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/spec.json",
+          "anchor": "IN-13"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "FsLintConfigLoader",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new FsLintConfigLoader with a fully-resolved path to the config file. The path is either the workspace default (.harness/catalogue-lint/config.json) or a --rules-file CLI override; CLI composition decides which before calling new()."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsLintConfigLoader"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::catalogue_lint_workflow::LintConfigLoader",
+      "for_type": "FsLintConfigLoader"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogueDocumentCodec"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CatalogueDocumentCodec"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::default::Default",
+      "for_type": "CatalogueDocumentCodec"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogueDocumentCodecError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "CatalogueDocumentCodecError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "CatalogueDocumentCodecError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<serde_json::Error>",
+      "for_type": "CatalogueDocumentCodecError"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "core::default::Default",
+      "for_type": "InMemoryCatalogueLinter"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "domain::tddd::catalogue_linter::CatalogueLinter",
+      "for_type": "InMemoryCatalogueLinter"
+    }
+  ]
+}

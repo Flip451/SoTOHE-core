@@ -3788,8 +3788,7 @@ exit 0
     ///
     /// These tests exercise the production helper directly (not the config API in
     /// isolation), so they will fail if the production policy is incorrect.
-    #[test]
-    fn test_resolve_write_config_fingerprint_stricter_override_uses_file_config_fingerprint() {
+    fn assert_write_config_fingerprint_uses_file_config(threshold: f32, case_label: &str) {
         // File config threshold = 0.85.
         let infra_config = load_infra_dry_check_config_from_json(
             r#"{
@@ -3803,16 +3802,23 @@ exit 0
             }"#,
         );
 
-        // Stricter override: 0.70 < 0.85.
-        let stricter_threshold = domain::semantic_dup::SimilarityThreshold::new(0.70_f32).unwrap();
-        let stored = resolve_write_config_fingerprint(&infra_config, stricter_threshold);
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(threshold).unwrap();
+        let stored = resolve_write_config_fingerprint(&infra_config, threshold);
 
-        // Must equal the file-config fingerprint so `dry check-approved` can match.
         assert_eq!(
             stored,
             infra_config.fingerprint(),
-            "stricter override: stored fingerprint must equal infra_config.fingerprint()"
+            "{case_label}: stored fingerprint must equal infra_config.fingerprint()"
         );
+    }
+
+    #[test]
+    fn test_resolve_write_config_fingerprint_non_looser_threshold_uses_file_config_fingerprint() {
+        for (case_label, threshold) in
+            [("stricter override", 0.70_f32), ("equal threshold", 0.85_f32)]
+        {
+            assert_write_config_fingerprint_uses_file_config(threshold, case_label);
+        }
     }
 
     #[test]
@@ -3845,32 +3851,6 @@ exit 0
             stored,
             infra_config.fingerprint(),
             "looser override: stored fingerprint must NOT equal file-config fingerprint"
-        );
-    }
-
-    #[test]
-    fn test_resolve_write_config_fingerprint_equal_threshold_uses_file_config_fingerprint() {
-        // File config threshold = 0.85.
-        let infra_config = load_infra_dry_check_config_from_json(
-            r#"{
-                "schema_version": 3,
-                "threshold": 0.85,
-                "max_parallelism": 4,
-                "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high",
-                "known_bad_injection_rate_percent": 10,
-                "known_bad_detection_threshold_percent": 90
-            }"#,
-        );
-
-        // Equal threshold: same as file config.
-        let equal_threshold = domain::semantic_dup::SimilarityThreshold::new(0.85_f32).unwrap();
-        let stored = resolve_write_config_fingerprint(&infra_config, equal_threshold);
-
-        assert_eq!(
-            stored,
-            infra_config.fingerprint(),
-            "equal threshold: stored fingerprint must equal infra_config.fingerprint()"
         );
     }
 }

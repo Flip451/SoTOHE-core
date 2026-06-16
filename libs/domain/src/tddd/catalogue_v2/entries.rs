@@ -217,7 +217,7 @@ mod tests {
     use crate::tddd::catalogue_v2::identifiers::{
         CrateName, FieldName, MethodName, ModulePath, ParamName, TypeName, TypeRef,
     };
-    use crate::tddd::catalogue_v2::roles::SelfReceiver;
+    use crate::tddd::catalogue_v2::roles::{NonEmptyVec, SelfReceiver};
     use crate::tddd::catalogue_v2::variants::FieldDecl;
 
     // -----------------------------------------------------------------------
@@ -229,7 +229,7 @@ mod tests {
         // TypeEntry.role: DataRole — assigning ContractRole is a compile-time error.
         let entry = TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -240,7 +240,7 @@ mod tests {
             spec_refs: vec![],
             informal_grounds: vec![],
         };
-        assert_eq!(entry.role, DataRole::ValueObject);
+        assert_eq!(entry.role, DataRole::value_object());
         assert_eq!(entry.action, ItemAction::Add);
     }
 
@@ -251,7 +251,7 @@ mod tests {
         let fields = vec![FieldDecl::new(field_name, field_ty)];
         let entry = TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::Entity,
+            role: DataRole::entity().unwrap(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: fields.clone(), has_stripped_fields: false },
                 None,
@@ -289,7 +289,7 @@ mod tests {
         let field_ty = TypeRef::new("String").unwrap();
         let entry = TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Tuple { fields: vec![field_ty], has_stripped_fields: false },
                 None,
@@ -310,7 +310,7 @@ mod tests {
             ModulePath::from_segments(vec!["user".to_string(), "domain".to_string()]).unwrap();
         let entry = TypeEntry {
             action: ItemAction::Modify,
-            role: DataRole::AggregateRoot,
+            role: DataRole::aggregate_root().unwrap(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -329,24 +329,28 @@ mod tests {
     fn test_type_entry_all_data_roles_are_accepted() {
         // Verify that all DataRole values can be used — no runtime rejection.
         let roles = [
-            DataRole::ValueObject,
-            DataRole::Entity,
-            DataRole::AggregateRoot,
-            DataRole::DomainService,
+            DataRole::value_object(),
+            DataRole::entity().unwrap(),
+            DataRole::aggregate_root().unwrap(),
+            DataRole::domain_service(),
             DataRole::Specification,
             DataRole::Factory,
-            DataRole::UseCase,
+            DataRole::use_case(),
             DataRole::Interactor,
             DataRole::Command,
             DataRole::Query,
             DataRole::Dto,
             DataRole::ErrorType,
             DataRole::SecondaryAdapter,
+            DataRole::EventPolicy {
+                reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
+            }, // (kept multi-line for readability — line exceeds small-heuristics threshold)
+            DataRole::DomainEvent,
         ];
         for role in roles {
             let entry = TypeEntry {
                 action: ItemAction::Add,
-                role,
+                role: role.clone(),
                 kind: TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
@@ -440,11 +444,12 @@ mod tests {
             ContractRole::SpecificationPort,
             ContractRole::ApplicationService,
             ContractRole::SecondaryPort,
+            ContractRole::Repository { aggregate: TypeRef::new("Order").unwrap() },
         ];
         for role in roles {
             let entry = TraitEntry {
                 action: ItemAction::Add,
-                role,
+                role: role.clone(),
                 methods: vec![],
                 supertrait_bounds: vec![],
                 generics: vec![],
@@ -763,7 +768,7 @@ mod tests {
 
         let entry = TypeEntry {
             action: ItemAction::Add,
-            role: DataRole::ValueObject,
+            role: DataRole::value_object(),
             kind: TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
@@ -997,10 +1002,10 @@ mod tests {
         // TypeEntry.role is DataRole, TraitEntry.role is ContractRole,
         // FunctionEntry.role is FunctionRole. The following would be compile errors:
         //   let _: TypeEntry = TypeEntry { role: ContractRole::SecondaryPort, .. }; // ERROR
-        //   let _: TraitEntry = TraitEntry { role: DataRole::ValueObject, .. };     // ERROR
+        //   let _: TraitEntry = TraitEntry { role: DataRole::value_object(), .. };     // ERROR
         //
         // We verify at runtime that the types are distinct (they have different Display output).
-        let type_role = DataRole::ValueObject;
+        let type_role = DataRole::value_object();
         let trait_role = ContractRole::SpecificationPort;
         let fn_role = FunctionRole::FreeFunction;
         assert_ne!(type_role.to_string(), trait_role.to_string());

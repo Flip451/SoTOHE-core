@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize, de};
 use crate::tddd::spec_ground_codec::{InformalGroundRefDto, SpecRefDto};
 
 use super::StrictMap;
+use super::dto_roles::{ContractRoleDto, DataRoleDto};
 
 // ---------------------------------------------------------------------------
 // Minimal version probe DTO
@@ -209,7 +210,7 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
 pub(super) struct TypeEntryDto {
     #[serde(default = "default_action")]
     pub(super) action: String,
-    pub(super) role: String,
+    pub(super) role: DataRoleDto,
     pub(super) kind: TypeKindDto,
     #[serde(default)]
     pub(super) methods: Vec<MethodDeclarationDto>,
@@ -348,7 +349,7 @@ pub(super) enum VariantPayloadDto {
 pub(super) struct TraitEntryDto {
     #[serde(default = "default_action")]
     pub(super) action: String,
-    pub(super) role: String,
+    pub(super) role: ContractRoleDto,
     #[serde(default)]
     pub(super) methods: Vec<MethodDeclarationDto>,
     /// Supertrait bounds (e.g. `["Send", "Sync"]` for `trait Foo: Send + Sync`).
