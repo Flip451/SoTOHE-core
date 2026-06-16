@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-16T05:31:35Z",
-  "declaration_hash": "59184377ac4f1c48712c193d87259ea622f8867847a02c7fc821fcdb70e2530a",
+  "generated_at": "2026-06-16T07:30:44Z",
+  "declaration_hash": "e49ebf1ae01aa74d67493dcadb71482b58573fd3d01421b34fcaa1c62c6c2215",
   "signals": [
     {
       "type_name": "AdrDecisionCommon",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -18,9 +18,9 @@
     {
       "type_name": "DecisionGroundRef",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -42,7 +42,7 @@
     {
       "type_name": "ValidationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

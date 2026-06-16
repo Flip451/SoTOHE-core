@@ -95,6 +95,8 @@ pub enum ValidationError {
     EmptyInformalGroundSummary,
     #[error("informal ground summary must be a single line (no line breaks)")]
     MultiLineInformalGroundSummary,
+    #[error("decision ground reference must not be empty or whitespace-only")]
+    EmptyDecisionGroundRef,
 }
 
 /// Errors from invalid task state transitions.

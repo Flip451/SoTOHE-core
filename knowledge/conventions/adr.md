@@ -36,8 +36,8 @@ top-level key は以下 2 つのみ (`deny_unknown_fields`):
 | field | type | 必須条件 | 意味 |
 |---|---|---|---|
 | `id` | non-empty string | 必須 | decision 識別子 (`D1`, `D2`, ...; grandfathered legacy では `<file-stem>_grandfathered` 等)。同一 ADR 内で unique であれば良い。 |
-| `user_decision_ref` | string | optional | ユーザー明示承認の参照 (chat segment ref, approval marker 等)。値が non-null なら 🔵 Blue。 |
-| `review_finding_ref` | string | optional | review process で発見された根拠の参照。値が non-null かつ `user_decision_ref` 未設定なら 🟡 Yellow。 |
+| `user_decision_ref` | string | optional | ユーザー明示承認の参照 (chat segment ref, approval marker 等)。値が non-null **かつ `review_finding_ref` 未設定**のとき 🔵 Blue。空文字 / 空白のみは domain newtype 構築時に reject される (fail-closed)。 |
+| `review_finding_ref` | string | optional | review process で発見された根拠の参照。値が non-null なら **`user_decision_ref` の有無に関わらず** 🟡 Yellow。review 由来の未昇格根拠が残る状態は注意色に留め、`user_decision_ref` で silently 🔵 に格上げされない。空文字 / 空白のみは domain newtype 構築時に reject される (fail-closed)。 |
 | `candidate_selection` | string | optional | `## Rejected Alternatives` で評価した候補からの選択 (例: `"from:[A,B,C,D,E] chose:A"`)。 |
 | `status` | string | 必須 | `proposed` / `accepted` / `implemented` / `superseded` / `deprecated` のいずれか。それ以外は parse 時に reject。 |
 | `superseded_by` | string | `status: superseded` のとき必須、他では禁止 | 後継 decision への参照 (`<adr-slug>.md#<id>` 形式)。`null` も禁止 (raw key-presence check)。 |
@@ -74,11 +74,15 @@ dispatch の実体は `parse_adr_frontmatter`(`libs/infrastructure/src/adr_decis
 
 各 `decisions[]` entry は次のいずれかを満たさなければならない:
 
-1. `user_decision_ref` が non-null (Blue), または
-2. `review_finding_ref` が non-null (Yellow), または
-3. `grandfathered: true` (exempt)
+1. `grandfathered: true` (exempt — 最上位スキップ)
+2. `review_finding_ref` が non-null (Yellow — `user_decision_ref` の有無を問わない), または
+3. `user_decision_ref` のみ non-null かつ `review_finding_ref` 未設定 (Blue)
 
-3 つすべてに該当しない decision は 🔴 Red と評価され、`cargo make verify-adr-signals` が non-zero exit して CI を block する。
+いずれにも該当しない decision は 🔴 Red と評価され、`cargo make verify-adr-signals` が non-zero exit して CI を block する。
+
+`user_decision_ref` と `review_finding_ref` を両方持つ decision は 🟡 Yellow になる。review 由来の未昇格根拠が残るため、`user_decision_ref` の存在だけで 🔵 に昇格させない設計（review-priority rule, `knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md` §D1, supersedes `knowledge/adr/2026-04-27-1234-adr-decision-traceability-lifecycle.md` §D1）。
+
+`user_decision_ref` / `review_finding_ref` の値文字列は domain `DecisionGroundRef` newtype として保持され、構築時に空文字 / 空白のみは `ValidationError::EmptyDecisionGroundRef` で reject される。infrastructure の YAML codec はその構築エラーを `AdrFrontMatterCodecError::InvalidDecisionField` として伝播させ、`verify-adr-signals` を fail させる (fail-closed, ADR 2026-06-16-0042 §D2)。
 
 ### grandfathered 用途
 

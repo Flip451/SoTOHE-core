@@ -17,8 +17,8 @@
 //! [`AdrFrontMatterCodecError::MissingAdrId`] rather than a silent default.
 
 use domain::{
-    AcceptedDecision, AdrDecisionCommon, AdrDecisionEntry, AdrFrontMatter, DeprecatedDecision,
-    ImplementedDecision, ProposedDecision, SupersededDecision,
+    AcceptedDecision, AdrDecisionCommon, AdrDecisionEntry, AdrFrontMatter, DecisionGroundRef,
+    DeprecatedDecision, ImplementedDecision, ProposedDecision, SupersededDecision,
 };
 
 use super::dto::{AdrDecisionDto, AdrFrontMatterDto};
@@ -121,6 +121,28 @@ fn check_decision_key_presence(raw: &serde_yaml::Value) -> Result<(), AdrFrontMa
     Ok(())
 }
 
+/// Validate a YAML `user_decision_ref` / `review_finding_ref` string as a
+/// [`DecisionGroundRef`] domain newtype.
+///
+/// Empty and whitespace-only values are rejected as
+/// [`AdrFrontMatterCodecError::InvalidDecisionField`] — `Some("")` placeholders
+/// must not slip through and silently drive the ADR-decision grounds signal
+/// (fail-closed per ADR 2026-06-16-0042 §D2 / spec CN-01).
+fn convert_ground_ref(
+    decision_id: &str,
+    field_name: &str,
+    raw: Option<String>,
+) -> Result<Option<DecisionGroundRef>, AdrFrontMatterCodecError> {
+    match raw {
+        None => Ok(None),
+        Some(value) => DecisionGroundRef::try_new(value).map(Some).map_err(|e| {
+            AdrFrontMatterCodecError::InvalidDecisionField(format!(
+                "decision '{decision_id}': `{field_name}` must not be empty or whitespace-only ({e})"
+            ))
+        }),
+    }
+}
+
 /// Convert a typed [`AdrDecisionDto`] into the domain
 /// [`AdrDecisionEntry`] variant that matches its `status` string.
 ///
@@ -140,6 +162,9 @@ fn decision_dto_to_entry(
         implemented_in,
         grandfathered,
     } = dto;
+
+    let user_decision_ref = convert_ground_ref(&id, "user_decision_ref", user_decision_ref)?;
+    let review_finding_ref = convert_ground_ref(&id, "review_finding_ref", review_finding_ref)?;
 
     let common = AdrDecisionCommon::new(
         id.clone(),
@@ -210,7 +235,10 @@ decisions:
         match &fm.decisions()[0] {
             AdrDecisionEntry::ProposedDecision(d) => {
                 assert_eq!(d.common.id(), "D1");
-                assert_eq!(d.common.user_decision_ref(), Some("chat:2026-04-25"));
+                assert_eq!(
+                    d.common.user_decision_ref().map(DecisionGroundRef::as_str),
+                    Some("chat:2026-04-25")
+                );
             }
             other => panic!("expected ProposedDecision, got {other:?}"),
         }
@@ -229,7 +257,10 @@ decisions:
         match &fm.decisions()[0] {
             AdrDecisionEntry::AcceptedDecision(d) => {
                 assert_eq!(d.common.id(), "D2");
-                assert_eq!(d.common.review_finding_ref(), Some("RF-12"));
+                assert_eq!(
+                    d.common.review_finding_ref().map(DecisionGroundRef::as_str),
+                    Some("RF-12")
+                );
             }
             other => panic!("expected AcceptedDecision, got {other:?}"),
         }
@@ -487,6 +518,48 @@ decisions:
         );
         let err = parse_adr_frontmatter(&content).unwrap_err();
         assert!(matches!(err, AdrFrontMatterCodecError::InvalidDecisionField(_)));
+    }
+
+    #[test]
+    fn test_parse_adr_frontmatter_empty_user_decision_ref_returns_invalid_decision_field() {
+        // AC-08: empty placeholder ("") in user_decision_ref must fail-closed at the
+        // DTO→domain boundary so it cannot satisfy is_some() and falsely drive the
+        // signal (ADR 2026-06-16-0042 §D2).
+        let content = wrap(
+            r#"adr_id: foo
+decisions:
+  - id: D1
+    status: proposed
+    user_decision_ref: """#,
+        );
+        let err = parse_adr_frontmatter(&content).unwrap_err();
+        match err {
+            AdrFrontMatterCodecError::InvalidDecisionField(msg) => {
+                assert!(msg.contains("user_decision_ref"), "got: {msg}");
+                assert!(msg.contains("D1"), "got: {msg}");
+            }
+            other => panic!("expected InvalidDecisionField, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_parse_adr_frontmatter_whitespace_review_finding_ref_returns_invalid_decision_field() {
+        // AC-08 (whitespace variant): whitespace-only placeholder is equally rejected.
+        let content = wrap(
+            r#"adr_id: foo
+decisions:
+  - id: D1
+    status: accepted
+    review_finding_ref: "   ""#,
+        );
+        let err = parse_adr_frontmatter(&content).unwrap_err();
+        match err {
+            AdrFrontMatterCodecError::InvalidDecisionField(msg) => {
+                assert!(msg.contains("review_finding_ref"), "got: {msg}");
+                assert!(msg.contains("D1"), "got: {msg}");
+            }
+            other => panic!("expected InvalidDecisionField, got {other:?}"),
+        }
     }
 
     #[test]

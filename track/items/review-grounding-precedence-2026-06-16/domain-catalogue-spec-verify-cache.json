@@ -201,6 +201,62 @@
         "kind": "pass",
         "citation": "bin/sotp verify adr-signals が空 placeholder（Some(\"\") 相当）を user_decision_ref / review_finding_ref に持つ ADR ファイルを InvalidDecisionField エラーとして fail する（fail-closed, CN-01）。"
       }
+    },
+    {
+      "claim_hash": "8fa4ca43ee52f2b51e604fa1a44e5c76570a89fb3c6ba105103cb4bd26c7b430",
+      "evidence_hash": "3c68cbffd640366fe53e42608d2c9231be46d42d84786aa1b5c843a5365f4853",
+      "verdict": {
+        "kind": "pass",
+        "citation": "grounding 参照用ドメイン値オブジェクト（newtype）を domain 層に新設する。try_new で空文字列・空白のみを Err（ValidationError）として拒否し、正常値は Ok で返す。既存の InformalGroundSummary::try_new / AdrAnchor::try_new と同じ「空・空白 reject」パターンに揃える。"
+      }
+    },
+    {
+      "claim_hash": "8fa4ca43ee52f2b51e604fa1a44e5c76570a89fb3c6ba105103cb4bd26c7b430",
+      "evidence_hash": "44edeeaacfe56f20f11b290a0f65da655c201e48ca8a911bae185c9f45f11012",
+      "verdict": {
+        "kind": "pass",
+        "citation": "AdrDecisionCommon の user_decision_ref / review_finding_ref フィールドを Option<String> から Option<grounding 参照 newtype> に変更する。"
+      }
+    },
+    {
+      "claim_hash": "8fa4ca43ee52f2b51e604fa1a44e5c76570a89fb3c6ba105103cb4bd26c7b430",
+      "evidence_hash": "e11d5b98e2288388f09a5bf229c2a6ec83ced5339eab911d577ebca3a358c80d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "空文字列（\"\"）を渡して grounding 参照 newtype を構築しようとすると Err（ValidationError）が返る。"
+      }
+    },
+    {
+      "claim_hash": "8fa4ca43ee52f2b51e604fa1a44e5c76570a89fb3c6ba105103cb4bd26c7b430",
+      "evidence_hash": "de00e578dace856b474347eb058d5f287a683841e334fbdc0e5cdf32c0984734",
+      "verdict": {
+        "kind": "pass",
+        "citation": "空白のみの文字列（\"  \" 等）を渡して grounding 参照 newtype を構築しようとすると Err（ValidationError）が返る。"
+      }
+    },
+    {
+      "claim_hash": "8fa4ca43ee52f2b51e604fa1a44e5c76570a89fb3c6ba105103cb4bd26c7b430",
+      "evidence_hash": "9352a90db6bdbc654f3536f96ee8d3b7c742747e0ca17f2f3a7580269ecd3dbc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "正常な非空・非空白の grounding 参照文字列（例: \"chat_segment:2026-06-16\"）を渡して grounding 参照 newtype を構築すると Ok が返る。"
+      }
+    },
+    {
+      "claim_hash": "8fa4ca43ee52f2b51e604fa1a44e5c76570a89fb3c6ba105103cb4bd26c7b430",
+      "evidence_hash": "6f8c686badacfae86f3e5e6bde80bb9b87e756dabe12fb6f83bbc4aa1fb4e268",
+      "verdict": {
+        "kind": "pass",
+        "citation": "空文字列・空白のみの grounding 参照は None への silent normalization を行わず、fail-closed の構築時エラー（Err）として報告しなければならない。"
+      }
+    },
+    {
+      "claim_hash": "8fa4ca43ee52f2b51e604fa1a44e5c76570a89fb3c6ba105103cb4bd26c7b430",
+      "evidence_hash": "3775043fdefdd60e9c71ba8639b224c7457ea4b13f80c2b77a715c1bf80bae33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "grounding 参照 newtype は domain 層に配置し、DTO との変換（YAML→domain）は infrastructure 層で行う。domain 型に YAML/serde の知識を持ち込まない（ヘキサゴナルアーキテクチャ原則）。"
+      }
     }
   ]
 }

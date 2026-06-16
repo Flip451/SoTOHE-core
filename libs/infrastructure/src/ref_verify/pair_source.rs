@@ -259,10 +259,10 @@ fn render_adr_decision_entry(decision: &AdrDecisionEntry) -> String {
     ];
 
     if let Some(user_decision_ref) = common.user_decision_ref() {
-        lines.push(format!("user_decision_ref: {user_decision_ref}"));
+        lines.push(format!("user_decision_ref: {}", user_decision_ref.as_str()));
     }
     if let Some(review_finding_ref) = common.review_finding_ref() {
-        lines.push(format!("review_finding_ref: {review_finding_ref}"));
+        lines.push(format!("review_finding_ref: {}", review_finding_ref.as_str()));
     }
     if let Some(candidate_selection) = common.candidate_selection() {
         lines.push(format!("candidate_selection: {candidate_selection}"));

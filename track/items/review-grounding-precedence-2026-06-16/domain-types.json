@@ -10,8 +10,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["String"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -298,7 +298,7 @@
           "params": [
             { "name": "value", "ty": "impl Into<String>" }
           ],
-          "returns": "Result<DecisionGroundRef, ValidationError>",
+          "returns": "Result<Self, ValidationError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -329,7 +329,7 @@
             { "name": "candidate_selection","ty": "Option<String>" },
             { "name": "grandfathered",      "ty": "bool" }
           ],
-          "returns": "Result<AdrDecisionCommon, AdrDecisionCommonError>",
+          "returns": "Result<Self, AdrDecisionCommonError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,

@@ -1,6 +1,42 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7a10dc6eff278c9a271f9a085394c4c857cb50c7cba277bdba4614ebd692468",
+          "at": "2026-06-16T07:12:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7a10dc6eff278c9a271f9a085394c4c857cb50c7cba277bdba4614ebd692468",
+          "at": "2026-06-16T07:15:11Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:955a7ae925922a7e1e557d3bceb43550bf2a2ce9dbc6d7f604ec2ffef33ea218",
+          "at": "2026-06-16T07:13:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:955a7ae925922a7e1e557d3bceb43550bf2a2ce9dbc6d7f604ec2ffef33ea218",
+          "at": "2026-06-16T07:17:05Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -105,6 +141,86 @@
           "findings": [],
           "hash": "rvw1:sha256:b90b705e8d14ec1934afddedcb9f8d7ede1aeb316915dec5b55dc05052894edd",
           "at": "2026-06-16T05:29:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:879a39c5c20ee8f9958921ee6d14fd8f98d9e9923cf0e8e0c3c380c1ae06c4e0",
+          "at": "2026-06-16T07:13:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.md` renders `DecisionGroundRef` with action `—`, while the scoped JSON SSoT declares `DecisionGroundRef.action` as `add`. That is a cross-artifact contradiction in the planning view and can mislead readers about whether the new value object is actually part of the planned domain changes.",
+              "severity": "P1",
+              "file": "track/items/review-grounding-precedence-2026-06-16/domain-types.md",
+              "line": 15,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:879a39c5c20ee8f9958921ee6d14fd8f98d9e9923cf0e8e0c3c380c1ae06c4e0",
+          "at": "2026-06-16T07:17:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DecisionGroundRef is rendered with no action (`—`) in the domain type catalogue, but the implementation plan describes T001 as adding the DecisionGroundRef newtype and the catalogue also lists new trait impls for DecisionGroundRef. That leaves the plan artifacts contradictory about whether this is a new domain type or an unchanged/reference type; the catalogue should keep the value object action aligned with the add task.",
+              "severity": "P1",
+              "file": "track/items/review-grounding-precedence-2026-06-16/domain-types.md",
+              "line": 15,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:60dc903a0be511786235051ec865b9ac069a2229818ecc54b9df4699d222663d",
+          "at": "2026-06-16T07:22:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:879a39c5c20ee8f9958921ee6d14fd8f98d9e9923cf0e8e0c3c380c1ae06c4e0",
+          "at": "2026-06-16T07:28:04Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3de2cc5f636c8986cc59cbeb169f33b043cd23899e3e8410c9064b5d5d66e43a",
+          "at": "2026-06-16T07:14:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3de2cc5f636c8986cc59cbeb169f33b043cd23899e3e8410c9064b5d5d66e43a",
+          "at": "2026-06-16T07:16:51Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23b32d63b521fcce316c62036bfd9100202bdfcd5521df42e02028149eca4b97",
+          "at": "2026-06-16T07:12:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23b32d63b521fcce316c62036bfd9100202bdfcd5521df42e02028149eca4b97",
+          "at": "2026-06-16T07:16:16Z"
         }
       ]
     }

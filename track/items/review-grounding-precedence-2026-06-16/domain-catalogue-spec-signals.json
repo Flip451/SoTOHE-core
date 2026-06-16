@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "59184377ac4f1c48712c193d87259ea622f8867847a02c7fc821fcdb70e2530a",
+  "catalogue_declaration_hash": "e49ebf1ae01aa74d67493dcadb71482b58573fd3d01421b34fcaa1c62c6c2215",
   "signals": [
     {
       "type_name": "AdrDecisionCommon",
@@ -20,7 +20,7 @@
     {
       "type_name": "DecisionGroundRef",
       "signal": "blue",
-      "entry_hash": "2ed49047275191bf6770f0779db3b74187898a4a96ab280ff344c8c2a9d9ba14"
+      "entry_hash": "8fa4ca43ee52f2b51e604fa1a44e5c76570a89fb3c6ba105103cb4bd26c7b430"
     },
     {
       "type_name": "DecisionGrounds",

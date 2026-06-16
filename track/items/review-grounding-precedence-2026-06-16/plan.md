@@ -9,7 +9,7 @@
 > Placing the type in domain and exporting it from adr_decision satisfies CN-04 (no serde in domain).
 > EmptyDecisionGroundRef variant is added to ValidationError so the existing DomainError::from(ValidationError) propagation chain carries the new error kind without changes to DomainError.
 
-- [ ] **T001**: Add DecisionGroundRef newtype to domain: new struct in grounds.rs, try_new/as_str impls, trait impls (Debug/Clone/PartialEq/Eq), and EmptyDecisionGroundRef variant in ValidationError; export via adr_decision::mod.rs.
+- [~] **T001**: Add DecisionGroundRef newtype to domain: new struct in grounds.rs, try_new/as_str impls, trait impls (Debug/Clone/PartialEq/Eq), and EmptyDecisionGroundRef variant in ValidationError; export via adr_decision::mod.rs.
 
 ### S2 — Domain layer: AdrDecisionCommon field type migration
 
@@ -17,7 +17,7 @@
 > Updating the test helper common_with in evaluator.rs is mandatory because it constructs AdrDecisionCommon directly; it must use DecisionGroundRef::try_new to compile after the signature change.
 > Depends on T001 (DecisionGroundRef must exist before AdrDecisionCommon can reference it).
 
-- [ ] **T002**: Update AdrDecisionCommon to use Option<DecisionGroundRef>: change user_decision_ref/review_finding_ref field types, update new() signature, update accessor return types to Option<&DecisionGroundRef>; update evaluator.rs test helper common_with to construct via DecisionGroundRef::try_new.
+- [~] **T002**: Update AdrDecisionCommon to use Option<DecisionGroundRef>: change user_decision_ref/review_finding_ref field types, update new() signature, update accessor return types to Option<&DecisionGroundRef>; update evaluator.rs test helper common_with to construct via DecisionGroundRef::try_new.
 
 ### S3 — Domain layer: classify_grounds priority inversion
 
@@ -26,7 +26,7 @@
 > Rename and update the test that previously asserted user_ref wins, so it now asserts both-ref yields ReviewFindingRef (IN-03, AC-01).
 > Depends on T002 because common.user_decision_ref() and common.review_finding_ref() now return Option<&DecisionGroundRef>; classify_grounds checks .is_some() which works on that type without further change, but the compilation of the updated test helper requires T002.
 
-- [ ] **T003**: Invert classify_grounds priority in evaluator.rs (review_finding_ref checked before user_decision_ref); update grounds.rs doc comment to describe review-priority rule; rename and invert test_evaluate_adr_decision_user_ref_takes_priority_over_review_ref to assert both-ref yields ReviewFindingRef.
+- [~] **T003**: Invert classify_grounds priority in evaluator.rs (review_finding_ref checked before user_decision_ref); update grounds.rs doc comment to describe review-priority rule; rename and invert test_evaluate_adr_decision_user_ref_takes_priority_over_review_ref to assert both-ref yields ReviewFindingRef.
 
 ### S4 — Infrastructure layer: DTO-to-domain conversion hardening
 
@@ -34,7 +34,7 @@
 > Add parse test verifying that an empty string for user_decision_ref or review_finding_ref is rejected (AC-08).
 > Depends on T002 (AdrDecisionCommon::new signature now takes Option<DecisionGroundRef>).
 
-- [ ] **T004**: Update decision_dto_to_entry in infrastructure parse.rs: convert Option<String> DTO fields to Option<DecisionGroundRef> via DecisionGroundRef::try_new, propagating Err as AdrFrontMatterCodecError::InvalidDecisionField; add parse test for empty placeholder rejection.
+- [~] **T004**: Update decision_dto_to_entry in infrastructure parse.rs: convert Option<String> DTO fields to Option<DecisionGroundRef> via DecisionGroundRef::try_new, propagating Err as AdrFrontMatterCodecError::InvalidDecisionField; add parse test for empty placeholder rejection.
 
 ### S5 — Convention update: adr.md grounds table
 
