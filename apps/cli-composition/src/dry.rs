@@ -37,7 +37,10 @@ mod shared;
 mod tier_telemetry;
 
 pub(crate) use corpus_root::compute_current_dry_corpus_fingerprint;
-use corpus_root::{compute_dry_corpus_fingerprint_from_fragments, write_dry_corpus_root_manifest};
+use corpus_root::{
+    compute_dry_corpus_fingerprint_from_fragments, compute_dry_corpus_fingerprint_from_root,
+    resolve_dry_corpus_fingerprint_root, write_dry_corpus_root_manifest,
+};
 use persistent_index::open_persistent_index_with_corpus;
 #[cfg(test)]
 use shared::git_diff_path_key;
@@ -58,8 +61,6 @@ use tier_telemetry::{
     emit_dry_tier_review_round,
 };
 
-#[cfg(test)]
-use corpus_root::compute_dry_corpus_fingerprint_from_root;
 #[cfg(test)]
 use domain::dry_check::{DryCheckApprovalVerdict, VerdictFilter, fragments_overlapping_hunks};
 #[cfg(test)]
@@ -535,8 +536,30 @@ impl CliApp {
         )?;
 
         // D5 / IN-05 (T005): pure-read gate — diff fragments only.
+        // Reuse the workspace root recorded by `dry write` so a scoped run
+        // (`--workspace-root <subdir>`) does not block the gate by deriving
+        // refs from files outside the scope.
+        let (approval_workspace_root, current_corpus_fingerprint) =
+            match resolve_dry_corpus_fingerprint_root(&track_dir, &canonical_repo_root) {
+                Ok(workspace_root) => {
+                    let fingerprint = compute_dry_corpus_fingerprint_from_root(
+                        &workspace_root,
+                        &canonical_repo_root,
+                    );
+                    (workspace_root, fingerprint)
+                }
+                Err(e) => {
+                    eprintln!(
+                        "[warn] dry check-approved: {e}; treating corpus fingerprint as stale"
+                    );
+                    (
+                        canonical_repo_root.clone(),
+                        domain::dry_check::DryCheckCorpusFingerprint::fail_closed(),
+                    )
+                }
+            };
         let (diff_fragments, _corpus_fragments) =
-            build_diff_and_corpus_fragments(&base, &canonical_repo_root, &canonical_repo_root)?;
+            build_diff_and_corpus_fragments(&base, &approval_workspace_root, &canonical_repo_root)?;
 
         let mut current_fragment_refs: BTreeSet<domain::dry_check::FragmentRef> = BTreeSet::new();
         for fragment in &diff_fragments {
@@ -550,12 +573,6 @@ impl CliApp {
         let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
             .map_err(|e| format!("failed to load dry-check config: {e}"))?;
         let current_config_fingerprint = infra_config.fingerprint();
-
-        // D5: pure-read gate. Recompute from the workspace root that produced
-        // the coverage manifest, falling back to the repo root for older
-        // manifests that predate the sidecar.
-        let current_corpus_fingerprint =
-            compute_current_dry_corpus_fingerprint(&track_dir, &canonical_repo_root);
 
         // Construct adapters: reader + coverage port — no embedding, no index.
         let store =
@@ -3384,6 +3401,116 @@ exit 0
         assert!(
             content.contains("\"gate_name\":\"dry\""),
             "gate_name must be \"dry\" in GateEval event; got: {content}"
+        );
+    }
+
+    #[test]
+    fn test_dry_check_approved_uses_recorded_workspace_root_for_current_fragment_refs() {
+        use std::collections::BTreeSet;
+        use std::process::Command;
+
+        use domain::dry_check::DryCheckCoverageRecord;
+        use usecase::dry_check::DryCheckCoveragePort as _;
+
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let track_id = "scoped-root-approved-2026-06-16";
+        let (repo, items_dir, _initial_commit_hash) = setup_gate_eval_repo(track_id);
+        let repo_root = repo.path().canonicalize().unwrap();
+        let scoped_root = repo_root.join("scoped");
+        let scoped_src = scoped_root.join("src");
+        let outside_src = repo_root.join("outside/src");
+        std::fs::create_dir_all(&scoped_src).unwrap();
+        std::fs::create_dir_all(&outside_src).unwrap();
+        std::fs::write(scoped_src.join("lib.rs"), "pub fn scoped_value() -> u32 {\n    1\n}\n")
+            .unwrap();
+        std::fs::write(outside_src.join("lib.rs"), "pub fn outside_value() -> u32 {\n    1\n}\n")
+            .unwrap();
+        GitRunner::at(&repo_root).assert_success(&["add", "."]);
+        GitRunner::at(&repo_root).assert_success(&["commit", "--no-gpg-sign", "-m", "add corpus"]);
+
+        let output = Command::new("git")
+            .current_dir(&repo_root)
+            .args(["rev-parse", "HEAD"])
+            .output()
+            .unwrap();
+        let base_commit = String::from_utf8(output.stdout).unwrap().trim().to_owned();
+
+        std::fs::write(scoped_src.join("lib.rs"), "pub fn scoped_value() -> u32 {\n    2\n}\n")
+            .unwrap();
+        std::fs::write(outside_src.join("lib.rs"), "pub fn outside_value() -> u32 {\n    2\n}\n")
+            .unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(&repo_root).unwrap();
+
+        let base = domain::CommitHash::try_new(&base_commit).unwrap();
+        let (scoped_diff_fragments, _) =
+            build_diff_and_corpus_fragments(&base, &scoped_root, &repo_root).unwrap();
+        let mut scoped_fragment_refs = BTreeSet::new();
+        for fragment in &scoped_diff_fragments {
+            scoped_fragment_refs.insert(fragment_ref_of(fragment).unwrap());
+        }
+        assert!(
+            !scoped_fragment_refs.is_empty(),
+            "scoped changed file must produce current fragment refs"
+        );
+
+        let (repo_diff_fragments, _) =
+            build_diff_and_corpus_fragments(&base, &repo_root, &repo_root).unwrap();
+        let mut repo_fragment_refs = BTreeSet::new();
+        for fragment in &repo_diff_fragments {
+            repo_fragment_refs.insert(fragment_ref_of(fragment).unwrap());
+        }
+        assert!(
+            repo_fragment_refs
+                .iter()
+                .any(|fragment_ref| fragment_ref.path().as_str().starts_with("outside/")),
+            "repo-root extraction must see the out-of-scope changed file"
+        );
+        assert!(
+            repo_fragment_refs.len() > scoped_fragment_refs.len(),
+            "repo-root extraction must produce an extra stale ref that scoped extraction excludes"
+        );
+
+        let track_dir = items_dir.join(track_id);
+        write_dry_corpus_root_manifest(&track_dir, &scoped_root, &repo_root).unwrap();
+        std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
+            .unwrap();
+
+        let dry_check_config_path = repo_root.join(".harness/config/dry-check.json");
+        let dry_check_config =
+            infrastructure::dry_check::DryCheckConfig::load(&dry_check_config_path)
+                .expect("dry-check.json written by setup_gate_eval_repo must load");
+        let config_fingerprint = dry_check_config.fingerprint();
+        let corpus_fingerprint = compute_dry_corpus_fingerprint_from_root(&scoped_root, &repo_root);
+        let coverage_record = DryCheckCoverageRecord::new(
+            scoped_fragment_refs,
+            BTreeSet::new(),
+            config_fingerprint,
+            corpus_fingerprint,
+        );
+        let coverage = FsDryCheckCoverageAdapter::new(
+            track_dir.join("dry-check-coverage.json"),
+            repo_root.clone(),
+        );
+        let track_id_value = domain::TrackId::try_new(track_id).unwrap();
+        coverage.write_coverage(&track_id_value, coverage_record).unwrap();
+
+        let _telemetry_guard = EnvGuard::remove("SOTP_TELEMETRY");
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+
+        let outcome = CliApp::new()
+            .dry_check_approved(DryCheckApprovedInput {
+                track_id: track_id.to_owned(),
+                base_commit: Some(base_commit),
+                items_dir,
+            })
+            .unwrap();
+
+        assert_eq!(
+            outcome.exit_code, 0,
+            "scoped approval must ignore changed fragments outside the recorded workspace root"
         );
     }
 
