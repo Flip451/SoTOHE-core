@@ -1,6 +1,42 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23b32d63b521fcce316c62036bfd9100202bdfcd5521df42e02028149eca4b97",
+          "at": "2026-06-16T07:12:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23b32d63b521fcce316c62036bfd9100202bdfcd5521df42e02028149eca4b97",
+          "at": "2026-06-16T07:16:16Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3de2cc5f636c8986cc59cbeb169f33b043cd23899e3e8410c9064b5d5d66e43a",
+          "at": "2026-06-16T07:14:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3de2cc5f636c8986cc59cbeb169f33b043cd23899e3e8410c9064b5d5d66e43a",
+          "at": "2026-06-16T07:16:51Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -16,24 +52,6 @@
           "findings": [],
           "hash": "rvw1:sha256:c7a10dc6eff278c9a271f9a085394c4c857cb50c7cba277bdba4614ebd692468",
           "at": "2026-06-16T07:15:11Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:955a7ae925922a7e1e557d3bceb43550bf2a2ce9dbc6d7f604ec2ffef33ea218",
-          "at": "2026-06-16T07:13:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:955a7ae925922a7e1e557d3bceb43550bf2a2ce9dbc6d7f604ec2ffef33ea218",
-          "at": "2026-06-16T07:17:05Z"
         }
       ]
     },
@@ -185,42 +203,45 @@
           "findings": [],
           "hash": "rvw1:sha256:879a39c5c20ee8f9958921ee6d14fd8f98d9e9923cf0e8e0c3c380c1ae06c4e0",
           "at": "2026-06-16T07:28:04Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3de2cc5f636c8986cc59cbeb169f33b043cd23899e3e8410c9064b5d5d66e43a",
-          "at": "2026-06-16T07:14:34Z"
+          "hash": "rvw1:sha256:30347516369de0e19f5baf823a8a5baaae22145dc853619d048c7e88e0aa729c",
+          "at": "2026-06-16T07:40:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a23afc93ce8f9f1087ebde3d2fd5fa3d01d0670aac775f2237a7f52fd7165cb",
+          "at": "2026-06-16T09:21:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3de2cc5f636c8986cc59cbeb169f33b043cd23899e3e8410c9064b5d5d66e43a",
-          "at": "2026-06-16T07:16:51Z"
+          "hash": "rvw1:sha256:9a23afc93ce8f9f1087ebde3d2fd5fa3d01d0670aac775f2237a7f52fd7165cb",
+          "at": "2026-06-16T09:25:04Z"
         }
       ]
     },
-    "harness-policy": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:23b32d63b521fcce316c62036bfd9100202bdfcd5521df42e02028149eca4b97",
-          "at": "2026-06-16T07:12:53Z"
+          "hash": "rvw1:sha256:955a7ae925922a7e1e557d3bceb43550bf2a2ce9dbc6d7f604ec2ffef33ea218",
+          "at": "2026-06-16T07:13:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:23b32d63b521fcce316c62036bfd9100202bdfcd5521df42e02028149eca4b97",
-          "at": "2026-06-16T07:16:16Z"
+          "hash": "rvw1:sha256:955a7ae925922a7e1e557d3bceb43550bf2a2ce9dbc6d7f604ec2ffef33ea218",
+          "at": "2026-06-16T07:17:05Z"
         }
       ]
     }

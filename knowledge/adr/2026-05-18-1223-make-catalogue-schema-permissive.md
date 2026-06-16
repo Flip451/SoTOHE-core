@@ -11,7 +11,6 @@ decisions:
     status: accepted
   - id: D3
     user_decision_ref: "chat_segment:make-catalogue-schema-permissive:2026-05-18"
-    review_finding_ref: "contract-map-v3-2026-05-15:workaround-4-entries"
     status: accepted
   - id: D4
     user_decision_ref: "chat_segment:make-catalogue-schema-permissive:2026-05-19"
