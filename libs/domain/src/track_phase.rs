@@ -3,10 +3,99 @@
 //! The phase is a user-facing concept derived from `TrackStatus`, branch state,
 //! and schema version. It drives the recommended next command in status displays
 //! and registry rendering.
+//!
+//! This module also hosts the fixpoint-resolution domain types (`FixpointStep`,
+//! `ReviewScopeSet`, `ReviewScopeSetError`) used by the usecase layer's mechanized
+//! convergence driver (D2 / IN-02 / AC-03).
 
+use std::collections::BTreeSet;
 use std::fmt;
 
+use thiserror::Error;
+
 use crate::{ImplPlanDocument, TrackMetadata, TrackStatus, derive_track_status};
+
+// ── ReviewScopeSet ────────────────────────────────────────────────────────────
+
+/// Non-empty deterministic set of review scopes required by the RFP gate.
+///
+/// Scope labels are opaque `String` values owned by the orchestrator or review
+/// infrastructure; this value object only rejects the empty set so
+/// [`FixpointStep::RunRfp`] cannot represent "run RFP for no scopes".
+/// [`BTreeSet`] keeps CLI output deterministic.
+///
+/// # Errors
+///
+/// [`try_new`](ReviewScopeSet::try_new) returns [`ReviewScopeSetError::Empty`] when
+/// the supplied set is empty.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewScopeSet {
+    scopes: BTreeSet<String>,
+}
+
+impl ReviewScopeSet {
+    /// Construct a [`ReviewScopeSet`] from a non-empty [`BTreeSet<String>`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ReviewScopeSetError::Empty`] when `scopes` is empty.
+    pub fn try_new(scopes: BTreeSet<String>) -> Result<Self, ReviewScopeSetError> {
+        if scopes.is_empty() {
+            return Err(ReviewScopeSetError::Empty);
+        }
+        Ok(Self { scopes })
+    }
+
+    /// Returns a reference to the underlying set of scope labels.
+    #[must_use]
+    pub fn as_set(&self) -> &BTreeSet<String> {
+        &self.scopes
+    }
+}
+
+// ── ReviewScopeSetError ───────────────────────────────────────────────────────
+
+/// Validation error for [`ReviewScopeSet`] construction.
+///
+/// [`Empty`](ReviewScopeSetError::Empty) means the review gate attempted to
+/// request RFP with no target scopes, which is not a valid
+/// [`FixpointStep::RunRfp`] payload.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum ReviewScopeSetError {
+    /// The supplied scope set was empty.
+    #[error("review scope set must be non-empty")]
+    Empty,
+}
+
+// ── FixpointStep ──────────────────────────────────────────────────────────────
+
+/// Output of the mechanized fixpoint resolver (D2).
+///
+/// Each variant names the one phase the orchestrator must execute next to move
+/// toward convergence:
+///
+/// - [`RunDfp`](FixpointStep::RunDfp) — dry gate is open; run DFP.
+/// - [`RunRfp`](FixpointStep::RunRfp) — one or more review scopes are open;
+///   run RFP for all named scopes.
+/// - [`RunRefVerify`](FixpointStep::RunRefVerify) — ref-verify gate is open.
+/// - [`Commit`](FixpointStep::Commit) — all gates are green; safe to commit.
+///
+/// `scopes` is a non-empty [`ReviewScopeSet`] of opaque orchestrator-assigned
+/// review-group labels; the domain validates only non-emptiness, not naming.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum FixpointStep {
+    /// Dry gate open — run the DRY fix phase (DFP).
+    RunDfp,
+    /// One or more review scopes are open — run the review fix phase (RFP).
+    RunRfp {
+        /// Non-empty set of opaque review-group scope labels that must run RFP.
+        scopes: ReviewScopeSet,
+    },
+    /// Ref-verify gate open — run `ref-verify`.
+    RunRefVerify,
+    /// All gates green — safe to commit.
+    Commit,
+}
 
 /// User-facing workflow phase.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -197,6 +286,8 @@ pub fn next_command(track: &TrackMetadata, impl_plan: Option<&ImplPlanDocument>)
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use std::collections::BTreeSet;
+
     use rstest::rstest;
 
     use super::*;
@@ -346,5 +437,35 @@ mod tests {
         let track = planned_track("demo", Some("track/demo"));
         let cmd = next_command(&track, None);
         assert_eq!(cmd, NextCommand::Implement);
+    }
+
+    // --- ReviewScopeSet ---
+
+    #[test]
+    fn review_scope_set_try_new_with_empty_set_returns_empty_error() {
+        let result = ReviewScopeSet::try_new(BTreeSet::new());
+        assert!(matches!(result, Err(ReviewScopeSetError::Empty)));
+    }
+
+    #[test]
+    fn review_scope_set_try_new_with_single_scope_preserves_it() {
+        let mut scopes = BTreeSet::new();
+        scopes.insert("plan-artifacts".to_owned());
+        let result = ReviewScopeSet::try_new(scopes.clone());
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().as_set(), &scopes);
+    }
+
+    #[test]
+    fn review_scope_set_try_new_with_multiple_scopes_preserves_deterministic_order() {
+        let mut scopes = BTreeSet::new();
+        scopes.insert("code".to_owned());
+        scopes.insert("plan-artifacts".to_owned());
+        let result = ReviewScopeSet::try_new(scopes.clone());
+        assert!(result.is_ok());
+        let set = result.unwrap();
+        // BTreeSet iteration order is deterministic (ascending lexicographic).
+        let ordered: Vec<&str> = set.as_set().iter().map(String::as_str).collect();
+        assert_eq!(ordered, vec!["code", "plan-artifacts"]);
     }
 }

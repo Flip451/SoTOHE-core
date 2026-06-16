@@ -1,0 +1,893 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "6e79ca620f6891a4063babeccedd4263337924737649464c9cff3beedc6a2f1b",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「実際に修正を適用したときだけ ci-rust と再 dry write を走らせる」および「violation ゼロ → `sotp dry check-approved`（Approved）→ `completed`。**`cargo make ci-rust` と再 `dry write` はスキップ**する（検証すべき修正が無い）。」"
+      }
+    },
+    {
+      "claim_hash": "e2b5036bcc194813962eacaf37e000bb3fe209b03aaffa0bd91c8b1fbb77cd31",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「全ゲートが同時に green」という commit 前提条件の判定を、orchestrator の prompt 運用から単一の決定的コマンドに移す。"
+      }
+    },
+    {
+      "claim_hash": "c9d0617aa02ed6671f7cd7e1d6b62b1544cdbf5be2b42cc2edb901e147a8594b",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` の判定実行を、ペアごとの直列呼び出しから上限付きの並列 fan-out に変える。 ... 未検証ペアが残る run の wall-clock を並列度に応じて削る。"
+      }
+    },
+    {
+      "claim_hash": "e8a022c41b83e0359071fd6e60b2653e363a8aaa1095b9c02ab0fd804d660d0f",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「較正付き 2 段構成」/「fast tier（1 次判定）: 軽量モデルで全ペアを判定する」"
+      }
+    },
+    {
+      "claim_hash": "aa9d83ee923aafc1c800e00830d97f2c4cc1a4b3d62603ce7fa0963609eb466d",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry check-approved` は読み取り + hash 照合のみで判定する"
+      }
+    },
+    {
+      "claim_hash": "2fd9b05aea834c1b6ee15269c0b087f0c01d4526d382851091dcef4e0f5a07e9",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "3. `sotp dry check-approved`（Approved）→ `completed`。**`cargo make ci-rust` と再 `dry write` はスキップ**する（検証すべき修正が無い）。"
+      }
+    },
+    {
+      "claim_hash": "a7e52f86e3eca539c5231d1d984cd55b537757d5cfc9c208754e4bc36f3b0993",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "コマンドは DRY gate の状態（`sotp dry check-approved` 相当）、review の per-scope 状態（hash 失効・verdict）、および ref-verify gate の状態（`sotp ref-verify check-approved` 相当）を公開 API 経由で合成し、「次に必要なフェーズ（DFP / RFP の対象 scope / ref-verify 再実行 / なし = commit 可）」を出力する。"
+      }
+    },
+    {
+      "claim_hash": "9605c95ba1b22e5e7cb0d44c3a97f405d064e7656f6a4447fca5a8ec5bbd7184",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` の判定実行を、ペアごとの直列呼び出しから上限付きの並列 fan-out に変える。処理を 2 相に分ける: 1. **照会相**: 全 diff fragment の類似照会を先に行い、ペア識別子で重複排除した未検証ペアの一覧を確定する。2. **判定相**: 確定した一覧に対し、設定可能な上限付き並列度で判定 agent を同時に呼び出す。"
+      }
+    },
+    {
+      "claim_hash": "a8068960584473da021c44ddfbf309ab2e684add6c7d89129745b9d560404354",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry-checker の verdict 判定を、ref-verifier ゲートと同型の**較正付き 2 段構成**」; 「fast_model」; 「violation と判定不成立（出力不正・タイムアウト等）のみ、重量級モデル…に escalation」"
+      }
+    },
+    {
+      "claim_hash": "83f40d0e88c80ed4b5dd8bfa7cd0712079afa257877903121bf57eb3172d74b9",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「類似検索は `dry write`（resolver）にのみ置く。`dry check-approved` は読み取り + hash 照合のみで判定する」「カバレッジ記録 + ペア記録（dry-check.json）を読む」「staleness」「all-resolved」"
+      }
+    },
+    {
+      "claim_hash": "2ef364d8e0c1c65e634dae0645e2dba7ea059427863fd29ecb189b0c55fa0d31",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`dry write` は処理した diff フラグメントの content_hash（カバレッジ記録）と発見ペア + verdict を記録する。」 / 「`dry check-approved` は読み取り + hash 照合のみ`...` 2. カバレッジ記録 + ペア記録（dry-check.json）を読む。 3. **staleness**: 各 diff フラグメントの現 content_hash がカバレッジ記録に在るか。無ければ（編集されて未 `dry write`）→ Blocked。"
+      }
+    },
+    {
+      "claim_hash": "cf28b3dadc81b1672bbf85f977aa970c5b148f5afeab9dc7acc76a4063546804",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "no-fix completed を識別する `dry check-approved` の `GateEval`"
+      }
+    },
+    {
+      "claim_hash": "cf28b3dadc81b1672bbf85f977aa970c5b148f5afeab9dc7acc76a4063546804",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry ラウンドを tier タグ付きで発火する（`round_type ∈ {fast, final}` + tier 別 `model`。reviewer が既に用いる `emit_review_round` と同じ経路で、テレメトリ schema 変更は不要）"
+      }
+    },
+    {
+      "claim_hash": "ca2c5f925e0815efe714a79969734a6a0fe80b22d8517e11e5f82d4c808c0386",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「D1 は dfl が呼ばれた後の中身を安くする — D2 が呼ぶ前に振り分け、D1 が呼ばれた後を効率化する。」「成功指標（テレメトリ実測）」"
+      }
+    },
+    {
+      "claim_hash": "235a6b5b0b852df6ae7cce828b4e0535b76311a2d3c23d0727bede0fb7aa1160",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dfl の起動そのものは高くない — 高かったのは、起動後に修正ゼロでも払っていた `cargo make ci-rust` ... と冗長な 2 度目の `dry write`。ループを効率化すれば、違反ゼロの dfl 起動は「安価な check-approved（+ 必要なら判定 1 回の `dry write`）→ completed」で終わり、**dfl 起動を外部で gate する必要が消える**"
+      }
+    },
+    {
+      "claim_hash": "1e94a6518edb3ab876f118274d0cbd1d3b4308de5322ef2cadbf8e4fd5bb8a70",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「D1 は dfl が呼ばれた後の中身を安くする — D2 が呼ぶ前に振り分け」"
+      }
+    },
+    {
+      "claim_hash": "81864c506d90a576bf54cbd7b2932581ed8bcdeac376c6c7054d22886359ca82",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本決定はゲートの評価コストを下げるもので、1042 D6/D7 が扱う索引 BUILD の最適化とは別軸（索引の作り方は変えず、ゲートが索引検索に依存すること自体をやめる）"
+      }
+    },
+    {
+      "claim_hash": "87184e57c43e9f6ab57016e8573764ae426a1d1bd544cda9eae1c4156945b65a",
+      "evidence_hash": "db1751d0d8ced033142e94d789848047fb8bbc2ba35f7a7ce740709d2bd606f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "修正役を一つの fix-lead に統合すると、DFP と RFP が単一 agent の内部ループに溶け込み、phase 境界が消えて密結合になる。各 phase に単一責務の専用 fix-lead を置いて分離する"
+      }
+    },
+    {
+      "claim_hash": "09cf8a32aa1c9ddb8c029a400f8fa093bed8fdaa746257c0feb07e76a80ea7b0",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本コマンド = 安価な読み取りの合成ルータ、各フェーズ = 自分のゲートの単一 resolver"
+      }
+    },
+    {
+      "claim_hash": "614e170f0da000354933bd8226072e82b347f0b3129476264013148f08c66c75",
+      "evidence_hash": "db1751d0d8ced033142e94d789848047fb8bbc2ba35f7a7ce740709d2bd606f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「DRY 検証は、現在の変更フラグメントの全 above-threshold ペアの agent verdict が `not-a-violation`（偽陽性として却下）または `accepted`（真の重複だが許容として承認）のいずれかになるまで先に進めない blocking gate とする。未解決の重複（`violation` のままのペア）が残ったまま次工程（レビュー等）へ進めない。」「この acceptance 判断は agent が担う。別の人間/dfl 向け ack コマンドや flat な ack-file は設けない（D9 に統合）」。"
+      }
+    },
+    {
+      "claim_hash": "614e170f0da000354933bd8226072e82b347f0b3129476264013148f08c66c75",
+      "evidence_hash": "db1751d0d8ced033142e94d789848047fb8bbc2ba35f7a7ce740709d2bd606f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **dry-fix-lead（dfl）**: DFP で DRY 違反のみを修正する（whole-codebase, D13）。\n- **review-fix-lead（rfl）**: RFP で review 指摘のみを修正する（per-scope 並列, D13）。既存の rfl をそのまま使い、DRY 修正ロジックを混ぜない。\n- **rfl は DRY を修正しない**: RFP 中に DRY check が違反を捉えたら、rfl は即座に RFP を停止して DFP へ移行する（D2 の back-edge）。DRY の修正は dfl が担う。phase 間の遷移は agent 内部のモード切替ではなく明示的なハンドオフとする。\n- どちらの fix-lead も verdict（dry-check.json / review.json）を直接書かない（D11）。"
+      }
+    },
+    {
+      "claim_hash": "614e170f0da000354933bd8226072e82b347f0b3129476264013148f08c66c75",
+      "evidence_hash": "db1751d0d8ced033142e94d789848047fb8bbc2ba35f7a7ce740709d2bd606f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「DRY は単一（全コードベース）スコープの dfl、review は per-scope 並列の rfl」"
+      }
+    },
+    {
+      "claim_hash": "fa5bda0a93e9b15e86a7ec79a90e6327a0dffab104e2fe27f70e69a3aaef89e3",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "gate の fail-closed 性（`2026-06-02-0716-dry-checker.md` D7）は変わらない（check-approved が Blocked のときは必ず judge され、未解決 violation は通過できない）"
+      }
+    },
+    {
+      "claim_hash": "fa5bda0a93e9b15e86a7ec79a90e6327a0dffab104e2fe27f70e69a3aaef89e3",
+      "evidence_hash": "db1751d0d8ced033142e94d789848047fb8bbc2ba35f7a7ce740709d2bd606f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DRY 検証は、現在の変更フラグメントの全 above-threshold ペアの agent verdict が `not-a-violation`（偽陽性として却下）または `accepted`（真の重複だが許容として承認）のいずれかになるまで先に進めない blocking gate とする。未解決の重複（`violation` のままのペア）が残ったまま次工程（レビュー等）へ進めない。"
+      }
+    },
+    {
+      "claim_hash": "47a973c35061aa1c3388a887a91ec85db08759653a4695760dc2d055f49461a6",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各ゲートの公開インターフェース（gate 判定の exit code / 読み出し API）だけを合成し、dry-check.json / review.json / ref-verify cache の内部構造には依存しない"
+      }
+    },
+    {
+      "claim_hash": "47a973c35061aa1c3388a887a91ec85db08759653a4695760dc2d055f49461a6",
+      "evidence_hash": "db1751d0d8ced033142e94d789848047fb8bbc2ba35f7a7ce740709d2bd606f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「インターフェースを疎結合に保って相互に依存させない」"
+      }
+    },
+    {
+      "claim_hash": "198c6033fdc0bdf49f50dc5a5c85ab99bbab4964bebdc0dcefbaadf8e5e806bf",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定の単位は 1 ペア 1 呼び出しのまま変えない（Rejected Alternatives D）。... 判定エラーは収集して報告し、1 件のエラーで残りの判定結果を破棄しない。"
+      }
+    },
+    {
+      "claim_hash": "e7f768da1df7d4960eb35c9ab9d6d7e5a280e4fbbd2e47dd8c80c2ddb2c2bbb2",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「並列度の上限は `.harness/config/dry-check.json` から注入する」"
+      }
+    },
+    {
+      "claim_hash": "0a07ae4a1a7b810b38945865ee056f55590f01a4cd7680f99d5e836c7829d55d",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "永続化は完了順ではなくペア識別子順で append し、dry-check.json の記録順を決定的に保つ。"
+      }
+    },
+    {
+      "claim_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「プローブの verdict は dry-check.json の production 記録には残さない（プローブと production の記録は分離する）」「agent-profiles.json の dry-checker capability に `fast_model` を追加する」「`.harness/config/dry-check.json` で調整可能」"
+      }
+    },
+    {
+      "claim_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**段1**: 対象 Chain に対応する `ref-verifier-chain1` / `ref-verifier-chain2` capability の fast 解決 (`fast_provider` / `fast_model`) で全ペアを並列レビュー (D7/D11)。\n**段2**: 不合格または判定保留のペア、あるいは既知の誤り例検査 (後述) での劣化検出時に同じ Chain 専用 capability の final 解決 (`provider` / `model`) へ引き上げ。\n**並列の振り分け粒度**: Chain① は (spec element × ADR file) のペア単位、Chain② は layer 単位バッチ (domain / usecase / infrastructure / cli ごと)。バッチ上限とスロットリングの具体数値は設定ファイルで指定可能とする。"
+      }
+    },
+    {
+      "claim_hash": "d8f319509478fca252fba8754d262fd38f638edac8080d0d74f0a1f15d767a52",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「fast tier の判定を信頼せず、fast の非違反判定を含む全ペアを重量級 tier で再判定する」「gate を fail-closed にし、人間へエスカレーションする」"
+      }
+    },
+    {
+      "claim_hash": "8d0e96cb945cb31014c6194ed77a30457fa80f7275380b2fd1335f0987c8b80d",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry write は処理した diff フラグメントの content_hash（カバレッジ記録）と発見ペア + verdict を記録する。」「無ければ（編集されて未 `dry write`）→ Blocked。」"
+      }
+    },
+    {
+      "claim_hash": "ee10a3f4fe91378fb973ced35479c30bc9f6c29f2808cc054353d85fafa68ed7",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry check-approved` は読み取り + hash 照合のみで判定する: ... 2. カバレッジ記録 + ペア記録（dry-check.json）を読む。 3. staleness: 各 diff フラグメントの現 content_hash がカバレッジ記録に在るか。無ければ ... → Blocked。 ... 類似検索は `dry write`（resolver）にのみ置く。"
+      }
+    },
+    {
+      "claim_hash": "f5cbe83dc0d29247abab8f14c2cfe95a5d0a56b51c9d6c7d2b6235fb2f483cad",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "成功指標（テレメトリ実測）: (i) 違反ゼロ dfl run の wall-clock span が、`cargo make ci-rust`（フル CI、分単位）を含まない floor（`dry write` ≤ 1 回 + check のみ）に収束する。ci-rust は cargo make 呼び出しでテレメトリに出ないため、dfl run の総 wall-clock（dfl の dry ReviewRound 群とその終端までの span）で代理測定する — ci-rust スキップで span が大きく縮む。 (ii) ゼロ違反率 = `count(dry ReviewRound, findings_count=0) / count(all dry ReviewRound)`"
+      }
+    },
+    {
+      "claim_hash": "4db4516a5bbe22422ecb69d212e8ae8637500a10fcd7479110f9c99a4540bb7d",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「violation あり → 修正適用 → cargo make ci-rust → s otp dry write → s otp dry check-approved → loop（4 へ）または completed / blocked」「violation ゼロ → s otp dry check-approved（Approved）→ completed。**cargo make ci-rust と再 dry write はスキップ**する」"
+      }
+    },
+    {
+      "claim_hash": "ee73320e4a35b705de28d1571d97b4562c2ab06037aae8bd3966599395eef58e",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「violation ゼロで終わる dfl run の wall-clock span が、`cargo make ci-rust`（フル CI、分単位）を含まない floor（`dry write` ≤ 1 回 + check のみ）に収束する。... 直接計測したい場合は、no-fix completed を識別する `dry check-approved` の `GateEval`（gate_name=`dry`、verdict Approved→`ok` / Blocked→`error`）か、ci-rust 実行点を示す `GateEval` を 1 つ足す」"
+      }
+    },
+    {
+      "claim_hash": "724f4d7e19eda6a6428c346c661670730b0a941b6cf48eafc6718a685b7813be",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "コマンドは DRY gate の状態（`sotp dry check-approved` 相当）、review の per-scope 状態（hash 失効・verdict）、および ref-verify gate の状態（`sotp ref-verify check-approved` 相当）を公開 API 経由で合成し、「次に必要なフェーズ（DFP / RFP の対象 scope / ref-verify 再実行 / なし = commit 可）」を出力する。orchestrator はこの出力に従うだけで、収束判定ロジックを持たない。"
+      }
+    },
+    {
+      "claim_hash": "8a3624b93eec748333096b13a3dc82d58ed98309d8f378749d746a7bc62563c0",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "このコマンドは各ゲートの公開インターフェース（gate 判定の exit code / 読み出し API）だけを合成し、dry-check.json / review.json / ref-verify cache の内部構造には依存しない。"
+      }
+    },
+    {
+      "claim_hash": "28d97ee373cb2bd3b7174248e11c00f0c8849b994ecb9276242d1cbd30e2d8da",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「処理を 2 相に分ける」「設定可能な上限付き並列度で判定 agent を同時に呼び出す」「ペア識別子順で append」"
+      }
+    },
+    {
+      "claim_hash": "d10a3fdfd3d8e980b9205b4190e897a85324657a98577fcdaccd36f42a29451c",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "未検証ペアが残る run の wall-clock を並列度に応じて削る"
+      }
+    },
+    {
+      "claim_hash": "275f37725a7f80679bb3b3c9b2ccff2eae6df51c26e8abcb540ea725038382fb",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既知違反プローブをバッチに混ぜて判定させる」「violation と判定不成立のみ、重量級モデル...に escalation」"
+      }
+    },
+    {
+      "claim_hash": "2e1eb1d8b2015b43f3ec13792d7f0e177b5ffe4c852a3d3fbda5481387e0ebc4",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **較正失敗時**: プローブ検出率が閾値未満なら fast tier の判定を信頼せず、fast の非違反判定を含む全ペアを重量級 tier で再判定する。重量級 tier でもプローブ検出率が閾値未満なら、判定系自体の劣化として gate を fail-closed にし、人間へエスカレーションする。"
+      }
+    },
+    {
+      "claim_hash": "8136ebe05b58b51dd821822ed8e549536626eda0750cf203081f1c2db8c0808f",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "success指標（テレメトリ実測）: dry ラウンドを **tier タグ付きで発火**する（`round_type ∈ {fast, final}` + tier 別 `model`。reviewer が既に用いる `emit_review_round` と同じ経路で、テレメトリ schema 変更は不要）ことを前提に、(i) **fast 完結率** = `count(fast round で同 scope の final 後続なし) / count(fast round)` を高く、(ii) **昇格率** = `count(final round) / count(fast round)` を低く保つ。"
+      }
+    },
+    {
+      "claim_hash": "bac859066c2573521c7073c1051906fdede7ed92b400a94b6cd9fbbfc3c383a0",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry check-approved` は読み取り + hash 照合のみで判定する: 2. カバレッジ記録 + ペア記録（dry-check.json）を読む。 3. staleness ... 4. all-resolved ... 5. それ以外 → Approved."
+      }
+    },
+    {
+      "claim_hash": "368320ec3e67e65540a27aa8019419af6c54cf6443c52162c2f4a2e10f83555c",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`dry write` は処理した diff フラグメントの content_hash（カバレッジ記録）と発見ペア + verdict を記録する。」「`dry check-approved` は読み取り + hash 照合のみで判定する: ... 3. **staleness**: 各 diff フラグメントの現 content_hash がカバレッジ記録に在るか。無ければ（編集されて未 `dry write`）→ Blocked。」「blocking gate ... フラグメント編集 → content_hash 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制」"
+      }
+    },
+    {
+      "claim_hash": "8ddd668645d1d6e534f84b7eee7368f85239d0cccd0893c8cf8dc481b0471ec9",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`sotp dry check-approved` を、ref-verify / review の check-approved と同型の**安価な純読み取りゲート**にする。」…「これにより dfl ループの先頭 check（D1）・D2 の fixpoint 合成・commit ゲートの反復評価がすべて安価になり（埋め込み・検索なし）、check-approved を何度読んでも実害がなくなる」"
+      }
+    },
+    {
+      "claim_hash": "81864c506d90a576bf54cbd7b2932581ed8bcdeac376c6c7054d22886359ca82",
+      "evidence_hash": "2ca3dc82585d91fc6b9ee2d663e3fc67bb5363ccc073ef79e7a8f70a1b7d20b9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "決定: セマンティックインデックスを `--db-path`(既定 `.semantic_index`、D3 で gitignore 済み)に**永続化**し、**コーパスのフィンガープリント**(全コーパスフラグメントの (path, 内容ハッシュ) 集合 + 埋め込みモデル識別子から導出する単一ハッシュ)をインデックスと併せて記録する。実行時:\n\n- 永続インデックスが存在し、記録済みフィンガープリントが現在のコーパスのものと一致 → インデックスを再構築せず再利用(埋め込み + 投入をスキップ)。\n- 不一致(または不在)→ 全再構築(コーパスを埋め込み直し insert_batch し、新しいフィンガープリントを記録)。"
+      }
+    },
+    {
+      "claim_hash": "81864c506d90a576bf54cbd7b2932581ed8bcdeac376c6c7054d22886359ca82",
+      "evidence_hash": "2ca3dc82585d91fc6b9ee2d663e3fc67bb5363ccc073ef79e7a8f70a1b7d20b9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D6 との関係: 本決定は D6 の「単一フィンガープリント + 不一致時の全再構築」という再利用機構を「ファイル単位マニフェスト + 増分更新」に置き換える。D6 のインデックス永続化(`--db-path` への保存)とキャッシュ安全機構(マーカー / ロック)はそのまま維持する。"
+      }
+    },
+    {
+      "claim_hash": "3b92bb677222eeedceb53e07e9107c80a7288473f7da03aa509644e267015e05",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "violation あり → 修正適用 → `cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved` → loop（4 へ）または completed / blocked。"
+      }
+    },
+    {
+      "claim_hash": "658694f0620c2f80f9cea420851ca147d908416b8eb56f29afbbe182a411537c",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` を、ref-verify / review の check-approved と同型の**安価な純読み取りゲート**にする。... `dry check-approved` は読み取り + hash 照合のみ`"
+      }
+    },
+    {
+      "claim_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「較正付き 2 段構成」, 「fast tier（1 次判定）: 軽量モデルで全ペアを判定する」, 「較正失敗時: ... 全ペアを重量級 tier で再判定する」"
+      }
+    },
+    {
+      "claim_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry check-approved` は読み取り + hash 照合のみで判定する: 1. 現在の diff フラグメントと content_hash を git diff から得る（埋め込み・検索不要）。 2. カバレッジ記録 + ペア記録（dry-check.json）を読む。 3. staleness: 各 diff フラグメントの現 content_hash がカバレッジ記録に在るか。無ければ（編集されて未 `dry write`）→ Blocked。 4. all-resolved: 変更フラグメントに触れる記録ペアが全て not-a-violation / accepted か。 violation あれば → Blocked。 5. それ以外 → Approved。"
+      }
+    },
+    {
+      "claim_hash": "f08e26e79ebdb1fd56fe5c9c80da7c50cb9e97ef8efad5e7534e63f9d4c5d57f",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "iii. 直接計測したい場合は、no-fix completed を識別する `dry check-approved` の `GateEval`（gate_name=`dry`、verdict Approved→`ok` / Blocked→`error`）か、ci-rust 実行点を示す `GateEval` を 1 つ足す（既存 `emit_gate_eval`、テレメトリ schema 変更は不要）."
+      }
+    },
+    {
+      "claim_hash": "f08e26e79ebdb1fd56fe5c9c80da7c50cb9e97ef8efad5e7534e63f9d4c5d57f",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry ラウンドを **tier タグ付きで発火**する（`round_type ∈ {fast, final}` + tier 別 `model`。reviewer が既に用いる `emit_review_round` と同じ経路で、テレメトリ schema 変更は不要）"
+      }
+    },
+    {
+      "claim_hash": "d4b4e31a1a57f735a81956b537a4379bb1d6633bae03a606b0dc384102aeefb2",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry check-approved` は読み取り + hash 照合のみで判定する / `staleness`: 各 diff フラグメントの現 content_hash がカバレッジ記録に在るか。無ければ（編集されて未 `dry write`）→ Blocked。"
+      }
+    },
+    {
+      "claim_hash": "93292a428db2266f05d5dfb1d4376bee153c6f49d6fb09eb058e988120d7b69e",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry check-approved は読み取り + hash 照合のみで判定する」「現在の diff フラグメントと content_hash を git diff から得る（埋め込み・検索不要）」"
+      }
+    },
+    {
+      "claim_hash": "a820dd3f46bef0d917cd87b08bd1d9e1efa2f7128a0ade3943b7133ff4c912fd",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「コマンドは DRY gate の状態、review の per-scope 状態、および ref-verify gate の状態を公開 API 経由で合成し」"
+      }
+    },
+    {
+      "claim_hash": "744b975f9a0835a34357d71992d7575e835e0e2140c695263cbed360b8652a28",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「fast tier のプローブ検出率（既知違反を violation と判定できた割合）が閾値以上なら fast tier を信頼し、not-a-violation / accepted をそのまま最終 verdict として確定する。violation と判定不成立（出力不正・タイムアウト等）のみ、重量級モデル（既存の `model`）+ 高 reasoning effort に escalation」"
+      }
+    },
+    {
+      "claim_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「類似検索は `dry write`（resolver）にのみ置く。`dry check-approved` は読み取り + hash 照合のみで判定する」"
+      }
+    },
+    {
+      "claim_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **dry check-approved** は読み取り + hash 照合のみで判定する: 1. 現在の diff フラグメントと content_hash を git diff から得る（埋め込み・検索不要）。 2. カバレッジ記録 + ペア記録（dry-check.json）を読む。 3. **staleness**: 各 diff フラグメントの現 content_hash がカバレッジ記録に在るか。無ければ（編集されて未 `dry write`）→ Blocked。 ... blocking gate（`2026-06-02-0716-dry-checker.md` D7/D8）の意味論は保たれる: フラグメント編集 → content_hash 変化 → カバレッジ記録に不在 → Blocked → `dry write` 強制（検索・判定・記録更新）→ 通過。"
+      }
+    },
+    {
+      "claim_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "evidence_hash": "29b6fe346bf3699463486cebe2d566c37cbadb0ccc8ec6f3fc7cfa27a90e0457",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim says fragments with the same content_hash but different paths must be treated as separate FragmentRefs and that hash alone must not count as covered, while the ADR defines `dry check-approved` as a read + hash matching gate and its staleness check asks whether each current diff fragment's content_hash is present in the coverage record."
+      }
+    },
+    {
+      "claim_hash": "6e79ca620f6891a4063babeccedd4263337924737649464c9cff3beedc6a2f1b",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "violation ゼロ → `cargo make ci-rust` と再 `dry write` はスキップする（検証すべき修正が無い）."
+      }
+    },
+    {
+      "claim_hash": "e2b5036bcc194813962eacaf37e000bb3fe209b03aaffa0bd91c8b1fbb77cd31",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「全ゲートが同時に green」という commit 前提条件の判定を、orchestrator の prompt 運用から単一の決定的コマンドに移す。… orchestrator はこの出力に従うだけで、収束判定ロジックを持たない。"
+      }
+    },
+    {
+      "claim_hash": "c9d0617aa02ed6671f7cd7e1d6b62b1544cdbf5be2b42cc2edb901e147a8594b",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` の判定実行を、ペアごとの直列呼び出しから上限付きの並列 fan-out に変える。"
+      }
+    },
+    {
+      "claim_hash": "e8a022c41b83e0359071fd6e60b2653e363a8aaa1095b9c02ab0fd804d660d0f",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry-checker の verdict 判定を、ref-verifier ゲートと同型の較正付き 2 段構成にする"
+      }
+    },
+    {
+      "claim_hash": "658694f0620c2f80f9cea420851ca147d908416b8eb56f29afbbe182a411537c",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「sotp dry check-approved を、ref-verify / review の check-approved と同型の安価な純読み取りゲートにする。」"
+      }
+    },
+    {
+      "claim_hash": "2fd9b05aea834c1b6ee15269c0b087f0c01d4526d382851091dcef4e0f5a07e9",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved`（Approved）→ `completed`。`cargo make ci-rust` と再 `dry write` はスキップ"
+      }
+    },
+    {
+      "claim_hash": "a7e52f86e3eca539c5231d1d984cd55b537757d5cfc9c208754e4bc36f3b0993",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「全ゲートが同時に green」という commit 前提条件（`2026-06-02-0716-dry-checker.md` D2 の fixpoint）の判定を、orchestrator の prompt 運用から単一の決定的コマンドに移す。コマンドは DRY gate の状態（`sotp dry check-approved` 相当）、review の per-scope 状態（hash 失効・verdict）、および ref-verify gate の状態（`sotp ref-verify check-approved` 相当）を公開 API 経由で合成し、「次に必要なフェーズ（DFP / RFP の対象 scope / ref-verify 再実行 / なし = commit 可）」を出力する。"
+      }
+    },
+    {
+      "claim_hash": "9605c95ba1b22e5e7cb0d44c3a97f405d064e7656f6a4447fca5a8ec5bbd7184",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry write` の判定実行を、ペアごとの直列呼び出しから上限付きの並列 fan-out に変える。処理を 2 相に分ける:\n\n1. **照会相**: 全 diff fragment の類似照会を先に行い、ペア識別子で重複排除した未検証ペアの一覧を確定する\n2. **判定相**: 確定した一覧に対し、設定可能な上限付き並列度で判定 agent を同時に呼び出す\n\n並列度の上限は **`.harness/config/dry-check.json` から注入する**"
+      }
+    },
+    {
+      "claim_hash": "52a87a35b88a31b20af2d04d852176f02f32d3c8345ec1e1c4e651d89d3fe460",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry check-approved は読み取り + FragmentRef 照合のみで判定する」「類似検索は `dry write`（resolver）にのみ置く。」"
+      }
+    },
+    {
+      "claim_hash": "3878981338c9feffb4e843612259cb129510783a90eba31685868dd134f282b5",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`dry write` は処理した diff フラグメントの FragmentRef（= path + content_hash の組。カバレッジ記録）と発見ペア + verdict を記録する。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。」「カバレッジ記録 + ペア記録（dry-check.json）を読む。」「staleness: 各 diff フラグメントの現 FragmentRef（path + content_hash）がカバレッジ記録に在るか。無ければ…→ Blocked。」"
+      }
+    },
+    {
+      "claim_hash": "f08e26e79ebdb1fd56fe5c9c80da7c50cb9e97ef8efad5e7534e63f9d4c5d57f",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "直接計測したい場合は、no-fix completed を識別する `dry check-approved` の `GateEval`（gate_name=`dry`、verdict Approved→`ok` / Blocked→`error`）か、ci-rust 実行点を示す `GateEval` を 1 つ足す（既存 `emit_gate_eval`、テレメトリ schema 変更は不要）。"
+      }
+    },
+    {
+      "claim_hash": "f08e26e79ebdb1fd56fe5c9c80da7c50cb9e97ef8efad5e7534e63f9d4c5d57f",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`round_type ∈ {fast, final}` + tier 別 `model`。`emit_review_round` と同じ経路で、テレメトリ schema 変更は不要"
+      }
+    },
+    {
+      "claim_hash": "ca2c5f925e0815efe714a79969734a6a0fe80b22d8517e11e5f82d4c808c0386",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「D1 は dfl が呼ばれた後の中身を安くする」"
+      }
+    },
+    {
+      "claim_hash": "235a6b5b0b852df6ae7cce828b4e0535b76311a2d3c23d0727bede0fb7aa1160",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dfl の起動そのものは高くない"
+      }
+    },
+    {
+      "claim_hash": "81864c506d90a576bf54cbd7b2932581ed8bcdeac376c6c7054d22886359ca82",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本決定はゲートの評価コストを下げるもので、1042 D6/D7 が扱う索引 BUILD の最適化とは別軸（索引の作り方は変えず、ゲートが索引検索に依存すること自体をやめる）。"
+      }
+    },
+    {
+      "claim_hash": "09cf8a32aa1c9ddb8c029a400f8fa093bed8fdaa746257c0feb07e76a80ea7b0",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本コマンド = 安価な読み取りの合成ルータ、各フェーズ = 自分のゲートの単一 resolver。"
+      }
+    },
+    {
+      "claim_hash": "fa5bda0a93e9b15e86a7ec79a90e6327a0dffab104e2fe27f70e69a3aaef89e3",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "gate の fail-closed 性（`2026-06-02-0716-dry-checker.md` D7）は変わらない（check-approved が Blocked のときは必ず judge され、未解決 violation は通過できない）。"
+      }
+    },
+    {
+      "claim_hash": "47a973c35061aa1c3388a887a91ec85db08759653a4695760dc2d055f49461a6",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各ゲートの公開インターフェース（gate 判定の exit code / 読み出し API）だけを合成し、dry-check.json / review.json / ref-verify cache の内部構造には依存しない」"
+      }
+    },
+    {
+      "claim_hash": "198c6033fdc0bdf49f50dc5a5c85ab99bbab4964bebdc0dcefbaadf8e5e806bf",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「判定の単位は 1 ペア 1 呼び出しのまま変えない（Rejected Alternatives D）。…判定エラーは収集して報告し、1 件のエラーで残りの判定結果を破棄しない。」"
+      }
+    },
+    {
+      "claim_hash": "e7f768da1df7d4960eb35c9ab9d6d7e5a280e4fbbd2e47dd8c80c2ddb2c2bbb2",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry-check.json` から注入する。これは ref-verify が `max_parallelism` を `.harness/config/ref-verify.json` から読む実装の踏襲である。"
+      }
+    },
+    {
+      "claim_hash": "0a07ae4a1a7b810b38945865ee056f55590f01a4cd7680f99d5e836c7829d55d",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "永続化は完了順ではなくペア識別子順で append し、dry-check.json の記録順を決定的に保つ。"
+      }
+    },
+    {
+      "claim_hash": "298fc018c1668a458b254699278828bb539f9570d2a5bff32b521c41bbdb6c15",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「プローブの verdict は dry-check.json の production 記録には残さない」「プローブの注入率と検出率閾値は `.harness/config/dry-check.json` で調整可能とする」「agent-profiles.json の dry-checker capability に `fast_model` を追加する」"
+      }
+    },
+    {
+      "claim_hash": "d8f319509478fca252fba8754d262fd38f638edac8080d0d74f0a1f15d767a52",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「fast tier の判定を信頼せず、fast の非違反判定を含む全ペアを重量級 tier で再判定する。重量級 tier でもプローブ検出率が閾値未満なら、判定系自体の劣化として gate を fail-closed にし、人間へエスカレーションする。」"
+      }
+    },
+    {
+      "claim_hash": "d4b4e31a1a57f735a81956b537a4379bb1d6633bae03a606b0dc384102aeefb2",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry write は処理した diff フラグメントの FragmentRef（= path + content_hash の組。カバレッジ記録）と発見ペア + verdict を記録する。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。」「無ければ（編集または path 変更により未 `dry write`）→ Blocked。」"
+      }
+    },
+    {
+      "claim_hash": "93292a428db2266f05d5dfb1d4376bee153c6f49d6fb09eb058e988120d7b69e",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry check-approved は読み取り + FragmentRef 照合のみで判定する」「埋め込み・検索不要」"
+      }
+    },
+    {
+      "claim_hash": "f5cbe83dc0d29247abab8f14c2cfe95a5d0a56b51c9d6c7d2b6235fb2f483cad",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ci-rust は cargo make 呼び出しでテレメトリにも出ない隠れコスト」および「dfl run の総 wall-clock ... で代理測定する」"
+      }
+    },
+    {
+      "claim_hash": "4db4516a5bbe22422ecb69d212e8ae8637500a10fcd7479110f9c99a4540bb7d",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "violation ゼロ → `sotp dry check-approved`（Approved）→ `completed`。**`cargo make ci-rust` と再 `dry write` はスキップ**する"
+      }
+    },
+    {
+      "claim_hash": "ee73320e4a35b705de28d1571d97b4562c2ab06037aae8bd3966599395eef58e",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "violation ゼロで終わる dfl run の wall-clock span が ... floor（`dry write` ≤ 1 回 + check のみ）に収束する。"
+      }
+    },
+    {
+      "claim_hash": "a820dd3f46bef0d917cd87b08bd1d9e1efa2f7128a0ade3943b7133ff4c912fd",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「次に必要なフェーズ（DFP / RFP の対象 scope / ref-verify 再実行 / なし = commit 可）」を出力する。orchestrator はこの出力に従うだけで、収束判定ロジックを持たない。"
+      }
+    },
+    {
+      "claim_hash": "8a3624b93eec748333096b13a3dc82d58ed98309d8f378749d746a7bc62563c0",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "このコマンドは各ゲートの公開インターフェース（gate 判定の exit code / 読み出し API）だけを合成し、dry-check.json / review.json / ref-verify cache の内部構造には依存しない。"
+      }
+    },
+    {
+      "claim_hash": "28d97ee373cb2bd3b7174248e11c00f0c8849b994ecb9276242d1cbd30e2d8da",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "処理を 2 相に分ける: 1. **照会相**: 全 diff fragment の類似照会を先に行い、ペア識別子で重複排除した未検証ペアの一覧を確定する ... 2. **判定相**: 確定した一覧に対し、設定可能な上限付き並列度で判定 agent を同時に呼び出す ... 永続化は完了順ではなくペア識別子順で append し、dry-check.json の記録順を決定的に保つ。"
+      }
+    },
+    {
+      "claim_hash": "d10a3fdfd3d8e980b9205b4190e897a85324657a98577fcdaccd36f42a29451c",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「設定可能な上限付き並列度で判定 agent を同時に呼び出す」「未検証ペアが残る run の wall-clock を並列度に応じて削る」"
+      }
+    },
+    {
+      "claim_hash": "744b975f9a0835a34357d71992d7575e835e0e2140c695263cbed360b8652a28",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast tier のプローブ検出率（既知違反を violation と判定できた割合）が閾値以上なら fast tier を信頼し、not-a-violation / accepted をそのまま最終 verdict として確定する。violation と判定不成立（出力不正・タイムアウト等）のみ、重量級モデル（既存の `model`）+ 高 reasoning effort に escalation して再判定する。"
+      }
+    },
+    {
+      "claim_hash": "2e1eb1d8b2015b43f3ec13792d7f0e177b5ffe4c852a3d3fbda5481387e0ebc4",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「較正失敗時: プローブ検出率が閾値未満なら fast tier の判定を信頼せず、fast の非違反判定を含む全ペアを重量級 tier で再判定する。重量級 tier でもプローブ検出率が閾値未満なら、判定系自体の劣化として gate を fail-closed にし、人間へエスカレーションする。」"
+      }
+    },
+    {
+      "claim_hash": "8136ebe05b58b51dd821822ed8e549536626eda0750cf203081f1c2db8c0808f",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry ラウンドを **tier タグ付きで発火**する（`round_type ∈ {fast, final}` + tier 別 `model`。reviewer が既に用いる `emit_review_round` と同じ経路で、テレメトリ schema 変更は不要）ことを前提に、(i) **fast 完結率** = `count(fast round で同 scope の final 後続なし) / count(fast round)` を高く、(ii) **昇格率** = `count(final round) / count(fast round)` を低く保つ。"
+      }
+    },
+    {
+      "claim_hash": "98170160a838902e875345d115540a9b2f3604731aa0885b35d397b6becdcfb6",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「類似検索は `dry write`（resolver）にのみ置く。 ... `dry check-approved` は読み取り + FragmentRef 照合のみで判定する: 1. 現在の diff フラグメントと各フラグメントの FragmentRef（path + content_hash）を git diff から得る（埋め込み・検索不要）。 2. カバレッジ記録 + ペア記録（dry-check.json）を読む。」"
+      }
+    },
+    {
+      "claim_hash": "cc3191ec2d64767a1e0ea39372c4062a9e622de4a1eb125ab8c35700a59542e2",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` は処理した diff フラグメントの FragmentRef を記録する。`dry check-approved` は読み取り + FragmentRef 照合のみで判定する。"
+      }
+    },
+    {
+      "claim_hash": "8ddd668645d1d6e534f84b7eee7368f85239d0cccd0893c8cf8dc481b0471ec9",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry check-approved` は読み取り + FragmentRef 照合のみで判定する"
+      }
+    },
+    {
+      "claim_hash": "3b92bb677222eeedceb53e07e9107c80a7288473f7da03aa509644e267015e05",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1. `sotp dry check-approved`（D5 で安価）。Approved → `completed`（無変更 back-edge 再入を素通り。`dry write` も走らない）。\n2. Blocked → `sotp dry write` で未判定ペアを判定（既判定は cache-hit で no-op）。\n3. judge 後に violation ゼロ → `sotp dry check-approved`（Approved）→ `completed`。**`cargo make ci-rust` と再 `dry write` はスキップ**する（検証すべき修正が無い）。"
+      }
+    },
+    {
+      "claim_hash": "14290b38612124464414a38f6513abbf9358d6ed94a1fc3c8a37710781cbdc80",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dry-checker の verdict 判定を、ref-verifier ゲートと同型の**較正付き 2 段構成**（既知の誤り例の注入と検出率較正。`2026-05-27-1601-sot-chain-semantic-review-gate.md`）にする:\n\n- **fast tier（1 次判定）**: 軽量モデルで全ペアを判定する。モデルは `agent-profiles.json` の dry-checker capability に `fast_model` を追加して解決する。このとき**既知違反プローブ**（真の DRY 違反と確定済みのペア集合。過去に violation と判定された実例や合成例から整備し、具体的な整備方法は実装時に確定する）をバッチに混ぜて判定させる。\n- **較正判定**: fast tier のプローブ検出率（既知違反を violation と判定できた割合）が閾値以上なら fast tier を信頼し、not-a-violation / accepted をそのまま最終 verdict として確定する。violation と判定不成立（出力不正・タイムアウト等）のみ、重量級モデル（既存の `model`）+ 高 reasoning effort に escalation して再判定する。\n- **較正失敗時**: プローブ検出率が閾値未満なら fast tier の判定を信頼せず、fast の非違反判定を含む全ペアを重量級 tier で再判定する。重量級 tier でもプローブ検出率が閾値未満なら、判定系自体の劣化として gate を fail-closed にし、人間へエスカレーションする。"
+      }
+    },
+    {
+      "claim_hash": "1e94a6518edb3ab876f118274d0cbd1d3b4308de5322ef2cadbf8e4fd5bb8a70",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装は dfl 定義（`.md`）に分岐を 1 つ足すだけで、Rust 変更は不要。"
+      }
+    },
+    {
+      "claim_hash": "c21398df74f4f2f3c2f8294993e08585a0f2f1b8eb288b5cfef885a1daecbc4d",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「類似検索は `dry write`（resolver）にのみ置く。`dry check-approved` は読み取り + FragmentRef 照合のみで判定する」"
+      }
+    },
+    {
+      "claim_hash": "37f4efb8c4d1d02ef3359436fe205a5820efa21fba5e09989f74c607d3dd47ed",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry check-approved は読み取り + FragmentRef 照合のみ」"
+      }
+    },
+    {
+      "claim_hash": "3161bf8841d3b2847b280aa202d58c12aa1fa31a99c7ff04786a9f6dfecccfbe",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry check-approved は読み取り + FragmentRef 照合のみで判定する」"
+      }
+    },
+    {
+      "claim_hash": "b182564641a58e6c4920e009460741ce15ed60fad5f06557d1240881a63e10b3",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「sotp dry check-approved を、ref-verify / review の check-approved と同型の安価な純読み取りゲートにする。」「類似検索は dry write（resolver）にのみ置く。」「dry check-approved は読み取り + FragmentRef 照合のみで判定する。」「all-resolved: 変更フラグメントに触れる記録ペアが全て not-a-violation / accepted か。violation あれば → Blocked。」"
+      }
+    },
+    {
+      "claim_hash": "535235134d20a4091d9ca179c19cd54f3a6ae55ca7972949deb2686787125d8e",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「dry write は処理した diff フラグメントの FragmentRef（= path + content_hash の組。カバレッジ記録）と発見ペア + verdict を記録する。同じ content_hash でも path が異なるフラグメントは別 FragmentRef として扱い、hash だけでは covered と見なさない。」「dry check-approved は読み取り + FragmentRef 照合のみで判定する」"
+      }
+    },
+    {
+      "claim_hash": "f5b67489bad5d712b83eba04a8330185556e55c1c0f8e6c380f545866ea722f3",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「類似検索は `dry write`（resolver）にのみ置く。」「`dry check-approved` は読み取り + FragmentRef 照合のみで判定する」「5. それ以外 → Approved。」"
+      }
+    },
+    {
+      "claim_hash": "5ab18fac1480c03be38cbffd8c6345bf643a318154871926b06a7ef1ae7aa74b",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**`dry check-approved` は読み取り + FragmentRef 照合のみ**で判定する:\n  1. 現在の diff フラグメントと各フラグメントの FragmentRef（path + content_hash）を git diff から得る（埋め込み・検索不要）。\n  2. カバレッジ記録 + ペア記録（dry-check.json）を読む。\n  3. **staleness**: 各 diff フラグメントの現 FragmentRef（path + content_hash）がカバレッジ記録に在るか。無ければ（編集または path 変更により未 `dry write`）→ Blocked。content_hash が一致しても path が異なる FragmentRef は covered と見なさない。\n  4. **all-resolved**: 変更フラグメントに触れる記録ペアが全て not-a-violation / accepted か。violation あれば → Blocked。\n  5. それ以外 → Approved。"
+      }
+    },
+    {
+      "claim_hash": "dac78768c20acab739f9359be6e941a4193233e6ccdcfca5cf1b271e90983f41",
+      "evidence_hash": "380673cf16bce72ac77953924470c9875cb8fcf14061696a6b4321a5a6bb4aef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp dry check-approved` を、ref-verify / review の check-approved と同型の**安価な純読み取りゲート**にする。現在は呼び出しごとに `corpus_fragments` からインデックスを再構築し埋め込み + 類似検索して現在の above-threshold ペアを導出している（`libs/usecase/src/dry_check/approval_interactor.rs`）が、これをやめる:\n\n- **類似検索は `dry write`（resolver）にのみ置く。** `dry write` は処理した diff フラグメントの FragmentRef（= path + content_hash の組。カバレッジ記録）と発見ペア + verdict を記録する。\n- **`dry check-approved` は読み取り + FragmentRef 照合のみ**で判定する:"
+      }
+    }
+  ]
+}

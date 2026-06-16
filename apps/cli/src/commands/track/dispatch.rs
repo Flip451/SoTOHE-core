@@ -7,8 +7,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use super::{
-    TrackCommand, archive, branch_ops, resolve, set_commit_hash, signals, state_ops, tddd,
-    transition, views,
+    TrackCommand, archive, branch_ops, fixpoint_resolve, resolve, set_commit_hash, signals,
+    state_ops, tddd, transition, views,
 };
 use crate::commands::track::{
     resolve_track_id, resolve_track_id_for_write, resolve_track_id_from_root,
@@ -184,6 +184,7 @@ fn dispatch_track_cmd(cmd: TrackCommand) -> Result<ExitCode, crate::CliError> {
                 )
             })
         }
+        TrackCommand::FixpointResolve(args) => fixpoint_resolve::execute_fixpoint_resolve(args),
         TrackCommand::SetCommitHash(args) => {
             resolve_track_id_from_root_for_write(args.track_id, &PathBuf::from("."))
                 .map_err(CliError::Message)

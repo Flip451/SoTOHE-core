@@ -3,7 +3,8 @@ adr_id: 2026-04-27-1234-adr-decision-traceability-lifecycle
 decisions:
   - id: D1
     user_decision_ref: "chat_segment:session-8223577e-33f7-4ba0-9539-6e9e287e9676:2026-04-25"
-    status: accepted
+    status: superseded
+    superseded_by: "2026-06-16-0042-adr-signal-review-grounding-precedence.md#D1"
   - id: D2
     user_decision_ref: "chat_segment:session-8223577e-33f7-4ba0-9539-6e9e287e9676:2026-04-25"
     status: accepted

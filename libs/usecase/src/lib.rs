@@ -19,6 +19,7 @@ pub mod commit_hash_persistence;
 pub mod contract_map_workflow;
 pub mod dry_check;
 pub mod export_schema;
+pub mod fixpoint_resolve;
 pub mod git_workflow;
 pub mod guard;
 pub mod hook;

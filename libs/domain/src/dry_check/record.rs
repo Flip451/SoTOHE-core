@@ -7,6 +7,7 @@ use crate::review_v2::types::FilePath;
 use crate::semantic_dup::{SimilarityScore, SimilarityThreshold};
 use crate::timestamp::Timestamp;
 
+use super::coverage::DryCheckConfigFingerprint;
 use super::fragment::DryCheckPairKey;
 use super::value_objects::Rationale;
 use super::verdict::DryCheckVerdict;
@@ -15,9 +16,15 @@ use super::verdict::DryCheckVerdict;
 
 /// Write-input type for the dry-check persistence path (write-read separation).
 ///
-/// Carries the 7 fields the interactor knows at verdict time. Does NOT carry
+/// Carries the 8 fields the interactor knows at verdict time. Does NOT carry
 /// `recorded_at` — the infra adapter (`FsDryCheckStore`) stamps `Timestamp`
 /// internally.
+///
+/// `config_fingerprint` identifies which `.harness/config/dry-check.json`
+/// configuration was active when this entry was judged. On read, the interactor
+/// uses it to decide whether to seed the `verified_set` with this record: records
+/// whose fingerprint differs from the current config are NOT added to
+/// `verified_set` and will be re-judged under the new config.
 ///
 /// `Eq` is not derived because `SimilarityScore` and `SimilarityThreshold` wrap
 /// `f32`, which does not implement `Eq`.
@@ -30,6 +37,7 @@ pub struct DryCheckEntry {
     threshold: SimilarityThreshold,
     base_commit: CommitHash,
     rationale: Rationale,
+    config_fingerprint: DryCheckConfigFingerprint,
 }
 
 impl DryCheckEntry {
@@ -39,6 +47,7 @@ impl DryCheckEntry {
     ///
     /// Returns [`DryCheckEntryError::ChangedPathOutsidePair`] when `changed_path`
     /// is neither `pair_key.low().path()` nor `pair_key.high().path()`.
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         pair_key: DryCheckPairKey,
         changed_path: FilePath,
@@ -47,6 +56,7 @@ impl DryCheckEntry {
         threshold: SimilarityThreshold,
         base_commit: CommitHash,
         rationale: Rationale,
+        config_fingerprint: DryCheckConfigFingerprint,
     ) -> Result<DryCheckEntry, DryCheckEntryError> {
         if &changed_path != pair_key.low().path() && &changed_path != pair_key.high().path() {
             return Err(DryCheckEntryError::ChangedPathOutsidePair);
@@ -59,6 +69,7 @@ impl DryCheckEntry {
             threshold,
             base_commit,
             rationale,
+            config_fingerprint,
         })
     }
 
@@ -96,6 +107,15 @@ impl DryCheckEntry {
     pub fn rationale(&self) -> &Rationale {
         &self.rationale
     }
+
+    /// Return the config fingerprint that was active when this entry was judged.
+    ///
+    /// Used by the interactor to filter the `verified_set` seed: only records
+    /// whose fingerprint matches the current config are added to `verified_set`.
+    /// Records under a different fingerprint (stale config) will be re-judged.
+    pub fn config_fingerprint(&self) -> &DryCheckConfigFingerprint {
+        &self.config_fingerprint
+    }
 }
 
 /// Error from [`DryCheckEntry::new`].
@@ -111,7 +131,7 @@ pub enum DryCheckEntryError {
 /// A single entry in the dry-check history (read/persistent form).
 ///
 /// Constructed exclusively by `FsDryCheckStore::append_record` which stamps
-/// `Timestamp`. The interactor constructs [`DryCheckEntry`] (7 fields, no
+/// `Timestamp`. The interactor constructs [`DryCheckEntry`] (8 fields, no
 /// `recorded_at`) and passes it to `DryCheckWriter::append_record`; the infra
 /// adapter builds this record.
 ///
@@ -120,6 +140,10 @@ pub enum DryCheckEntryError {
 /// - Self-match is impossible (`DryCheckPairKey::new` rejects equal refs).
 /// - `changed_path` outside the pair is impossible (`DryCheckEntry::new` validates it).
 /// - `recorded_at`, `rationale`, and `refactor_proposal` (in `Violation`) are always valid.
+///
+/// `config_fingerprint` is the fingerprint of the `.harness/config/dry-check.json`
+/// settings that were active when this record was written. The interactor uses it
+/// during `verified_set` seeding to skip records written under a different config.
 ///
 /// `Eq` is not derived because `SimilarityScore` and `SimilarityThreshold` wrap
 /// `f32`, which does not implement `Eq`.
@@ -133,6 +157,7 @@ pub struct DryCheckRecord {
     base_commit: CommitHash,
     rationale: Rationale,
     recorded_at: Timestamp,
+    config_fingerprint: DryCheckConfigFingerprint,
 }
 
 impl DryCheckRecord {
@@ -163,6 +188,7 @@ impl DryCheckRecord {
             base_commit: entry.base_commit,
             rationale: entry.rationale,
             recorded_at,
+            config_fingerprint: entry.config_fingerprint,
         })
     }
 
@@ -204,6 +230,15 @@ impl DryCheckRecord {
     /// Return the record timestamp (stamped by the infra adapter at write time).
     pub fn recorded_at(&self) -> &Timestamp {
         &self.recorded_at
+    }
+
+    /// Return the config fingerprint embedded when this record was written.
+    ///
+    /// The interactor seeds `verified_set` only from records whose fingerprint
+    /// matches the current config. Records with a different fingerprint are
+    /// excluded, forcing re-judgment under the updated config.
+    pub fn config_fingerprint(&self) -> &DryCheckConfigFingerprint {
+        &self.config_fingerprint
     }
 }
 

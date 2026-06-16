@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e49ebf1ae01aa74d67493dcadb71482b58573fd3d01421b34fcaa1c62c6c2215",
+  "signals": [
+    {
+      "type_name": "AdrDecisionCommon",
+      "signal": "blue",
+      "entry_hash": "e189da21977cc0d705553b4263b001bb00f9a530a2e40ba974eeae70a2badbcc"
+    },
+    {
+      "type_name": "AdrDecisionCommonError",
+      "signal": "blue",
+      "entry_hash": "42f09c26989186c8f4557c28b0d9aefdef381d4280dd91334650178c2702d4b8"
+    },
+    {
+      "type_name": "AdrDecisionEntry",
+      "signal": "blue",
+      "entry_hash": "5d8783d7e9e55a801db34bdaf90299403ef164c8336a995d3dc0a836e17822c0"
+    },
+    {
+      "type_name": "DecisionGroundRef",
+      "signal": "blue",
+      "entry_hash": "8fa4ca43ee52f2b51e604fa1a44e5c76570a89fb3c6ba105103cb4bd26c7b430"
+    },
+    {
+      "type_name": "DecisionGrounds",
+      "signal": "blue",
+      "entry_hash": "f61ffcef3faf25c1c02a0e22189b9c8429a5cdd2ef5610cd9fc88b9365f75afa"
+    },
+    {
+      "type_name": "DomainError",
+      "signal": "blue",
+      "entry_hash": "2cac2512df814c979101e19036ce3d78dc2893cd66bb0cc6cec7d590952dc086"
+    },
+    {
+      "type_name": "ValidationError",
+      "signal": "blue",
+      "entry_hash": "fde17574d16aca01e753c5df1ed668186fe639435cb09042df6ce36aeef1da50"
+    },
+    {
+      "type_name": "AdrFilePort",
+      "signal": "blue",
+      "entry_hash": "23e7d4ccf3b00c638b26d72cb9b51c301958de7a4fccbafa9d8e549388b1d269"
+    },
+    {
+      "type_name": "domain::adr_decision::evaluator::evaluate_adr_decision",
+      "signal": "blue",
+      "entry_hash": "3ea5d6a60bd91965a6466d82a48170715ab3f3e87b34361b70ef333a27a6a7c4"
+    }
+  ]
+}

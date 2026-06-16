@@ -1,0 +1,237 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_adr_decision["domain::adr_decision"]
+    direction TB
+  subgraph T31_domain_domain_AdrDecisionCommon["adr_decision::common::AdrDecisionCommon"]
+    direction TB
+    T31_domain_domain_AdrDecisionCommon__self[AdrDecisionCommon]
+    T31_domain_domain_AdrDecisionCommon_id([id])
+    T31_domain_domain_AdrDecisionCommon_user_decision_ref([user_decision_ref])
+    T31_domain_domain_AdrDecisionCommon_review_finding_ref([review_finding_ref])
+    T31_domain_domain_AdrDecisionCommon_candidate_selection([candidate_selection])
+    T31_domain_domain_AdrDecisionCommon_grandfathered([grandfathered])
+    T31_domain_domain_AdrDecisionCommon_new([new])
+  end
+  subgraph T36_domain_domain_AdrDecisionCommonError["adr_decision::common::AdrDecisionCommonError"]
+    direction TB
+    T36_domain_domain_AdrDecisionCommonError__self[AdrDecisionCommonError]
+    T36_domain_domain_AdrDecisionCommonError_EmptyId[EmptyId]
+    T36_domain_domain_AdrDecisionCommonError_EmptyImplementedIn[EmptyImplementedIn]
+    T36_domain_domain_AdrDecisionCommonError_EmptySupersededBy[EmptySupersededBy]
+  end
+  subgraph T30_domain_domain_AdrDecisionEntry["adr_decision::entry::AdrDecisionEntry"]
+    direction TB
+    T30_domain_domain_AdrDecisionEntry__self[AdrDecisionEntry]
+    T30_domain_domain_AdrDecisionEntry_ProposedDecision[ProposedDecision]
+    T30_domain_domain_AdrDecisionEntry_AcceptedDecision[AcceptedDecision]
+    T30_domain_domain_AdrDecisionEntry_ImplementedDecision[ImplementedDecision]
+    T30_domain_domain_AdrDecisionEntry_SupersededDecision[SupersededDecision]
+    T30_domain_domain_AdrDecisionEntry_DeprecatedDecision[DeprecatedDecision]
+  end
+  subgraph T31_domain_domain_DecisionGroundRef["adr_decision::grounds::DecisionGroundRef"]
+    direction TB
+    T31_domain_domain_DecisionGroundRef__self[DecisionGroundRef]
+    T31_domain_domain_DecisionGroundRef_try_new([try_new])
+    T31_domain_domain_DecisionGroundRef_as_str([as_str])
+  end
+  subgraph T29_domain_domain_DecisionGrounds["adr_decision::grounds::DecisionGrounds"]
+    direction TB
+    T29_domain_domain_DecisionGrounds__self[DecisionGrounds]
+    T29_domain_domain_DecisionGrounds_UserDecisionRef[UserDecisionRef]
+    T29_domain_domain_DecisionGrounds_ReviewFindingRef[ReviewFindingRef]
+    T29_domain_domain_DecisionGrounds_Grandfathered[Grandfathered]
+    T29_domain_domain_DecisionGrounds_NoGrounds[NoGrounds]
+  end
+  subgraph R25_domain_domain_AdrFilePort["adr_decision::file_port::AdrFilePort"]
+    direction TB
+    R25_domain_domain_AdrFilePort__self[AdrFilePort]
+    R25_domain_domain_AdrFilePort_list_adr_paths([list_adr_paths])
+    R25_domain_domain_AdrFilePort_read_adr_frontmatter([read_adr_frontmatter])
+  end
+  F68_domain_domain_domain__adr_decision__evaluator__evaluate_adr_decision[[evaluate_adr_decision]]
+  end
+  subgraph domain_domain_module_error["domain::error"]
+    direction TB
+  subgraph T25_domain_domain_DomainError["error::DomainError"]
+    direction TB
+    T25_domain_domain_DomainError__self[DomainError]
+    T25_domain_domain_DomainError_Validation[Validation]
+    T25_domain_domain_DomainError_Transition[Transition]
+  end
+  subgraph T29_domain_domain_ValidationError["error::ValidationError"]
+    direction TB
+    T29_domain_domain_ValidationError__self[ValidationError]
+    T29_domain_domain_ValidationError_EmptyString[EmptyString]
+    T29_domain_domain_ValidationError_InvalidTrackId[InvalidTrackId]
+    T29_domain_domain_ValidationError_InvalidTaskId[InvalidTaskId]
+    T29_domain_domain_ValidationError_InvalidCommitHash[InvalidCommitHash]
+    T29_domain_domain_ValidationError_InvalidTimestamp[InvalidTimestamp]
+    T29_domain_domain_ValidationError_InvalidTrackBranch[InvalidTrackBranch]
+    T29_domain_domain_ValidationError_BranchIdMismatch[BranchIdMismatch]
+    T29_domain_domain_ValidationError_StatusOverrideMismatch[StatusOverrideMismatch]
+    T29_domain_domain_ValidationError_EmptyTrackTitle[EmptyTrackTitle]
+    T29_domain_domain_ValidationError_EmptyTaskDescription[EmptyTaskDescription]
+    T29_domain_domain_ValidationError_EmptyPlanSectionId[EmptyPlanSectionId]
+    T29_domain_domain_ValidationError_EmptyPlanSectionTitle[EmptyPlanSectionTitle]
+    T29_domain_domain_ValidationError_DuplicateTaskId[DuplicateTaskId]
+    T29_domain_domain_ValidationError_DuplicatePlanSectionId[DuplicatePlanSectionId]
+    T29_domain_domain_ValidationError_UnknownTaskReference[UnknownTaskReference]
+    T29_domain_domain_ValidationError_DuplicateTaskReference[DuplicateTaskReference]
+    T29_domain_domain_ValidationError_UnreferencedTask[UnreferencedTask]
+    T29_domain_domain_ValidationError_OverrideIncompatibleWithResolvedTasks[OverrideIncompatibleWithResolvedTasks]
+    T29_domain_domain_ValidationError_TrackActivationRequiresPlanningOnly[TrackActivationRequiresPlanningOnly]
+    T29_domain_domain_ValidationError_TrackActivationRequiresSchemaV3[TrackActivationRequiresSchemaV3]
+    T29_domain_domain_ValidationError_TrackAlreadyMaterialized[TrackAlreadyMaterialized]
+    T29_domain_domain_ValidationError_UnsupportedTargetStatus[UnsupportedTargetStatus]
+    T29_domain_domain_ValidationError_SectionNotFound[SectionNotFound]
+    T29_domain_domain_ValidationError_NoSectionsAvailable[NoSectionsAvailable]
+    T29_domain_domain_ValidationError_TaskDescriptionMutated[TaskDescriptionMutated]
+    T29_domain_domain_ValidationError_TaskRemoved[TaskRemoved]
+    T29_domain_domain_ValidationError_DuplicateElementId[DuplicateElementId]
+    T29_domain_domain_ValidationError_InvalidLayerId[InvalidLayerId]
+    T29_domain_domain_ValidationError_InvalidSpecElementId[InvalidSpecElementId]
+    T29_domain_domain_ValidationError_EmptyAdrAnchor[EmptyAdrAnchor]
+    T29_domain_domain_ValidationError_EmptyConventionAnchor[EmptyConventionAnchor]
+    T29_domain_domain_ValidationError_InvalidContentHash[InvalidContentHash]
+    T29_domain_domain_ValidationError_EmptyInformalGroundSummary[EmptyInformalGroundSummary]
+    T29_domain_domain_ValidationError_MultiLineInformalGroundSummary[MultiLineInformalGroundSummary]
+    T29_domain_domain_ValidationError_EmptyDecisionGroundRef[EmptyDecisionGroundRef]
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_adr_decision["infrastructure::adr_decision"]
+    direction TB
+  subgraph T54_infrastructure_infrastructure_AdrFrontMatterCodecError["adr_decision::error::AdrFrontMatterCodecError"]
+    direction TB
+    T54_infrastructure_infrastructure_AdrFrontMatterCodecError__self[AdrFrontMatterCodecError]
+    T54_infrastructure_infrastructure_AdrFrontMatterCodecError_YamlParse[YamlParse]
+    T54_infrastructure_infrastructure_AdrFrontMatterCodecError_MissingAdrId[MissingAdrId]
+    T54_infrastructure_infrastructure_AdrFrontMatterCodecError_InvalidDecisionField[InvalidDecisionField]
+  end
+  subgraph T46_infrastructure_infrastructure_FsAdrFileAdapter["adr_decision::adapter::FsAdrFileAdapter"]
+    direction TB
+    T46_infrastructure_infrastructure_FsAdrFileAdapter__self[FsAdrFileAdapter]
+  end
+  F88_infrastructure_infrastructure_infrastructure__adr_decision__parse__parse_adr_frontmatter[[parse_adr_frontmatter]]
+  end
+end
+T31_domain_domain_AdrDecisionCommon_user_decision_ref --> T31_domain_domain_DecisionGroundRef__self
+T31_domain_domain_AdrDecisionCommon_review_finding_ref --> T31_domain_domain_DecisionGroundRef__self
+T31_domain_domain_AdrDecisionCommon_new --o T31_domain_domain_DecisionGroundRef__self
+T31_domain_domain_AdrDecisionCommon_new --o T31_domain_domain_DecisionGroundRef__self
+T31_domain_domain_AdrDecisionCommon_new --> T36_domain_domain_AdrDecisionCommonError__self
+T31_domain_domain_AdrDecisionCommon_new --> T31_domain_domain_AdrDecisionCommon__self
+T31_domain_domain_DecisionGroundRef_try_new --> T31_domain_domain_DecisionGroundRef__self
+T31_domain_domain_DecisionGroundRef_try_new --> T29_domain_domain_ValidationError__self
+F68_domain_domain_domain__adr_decision__evaluator__evaluate_adr_decision --o T30_domain_domain_AdrDecisionEntry__self
+F68_domain_domain_domain__adr_decision__evaluator__evaluate_adr_decision --> T29_domain_domain_DecisionGrounds__self
+T25_domain_domain_DomainError_Validation --o T29_domain_domain_ValidationError__self
+F88_infrastructure_infrastructure_infrastructure__adr_decision__parse__parse_adr_frontmatter --> T54_infrastructure_infrastructure_AdrFrontMatterCodecError__self
+T46_infrastructure_infrastructure_FsAdrFileAdapter__self -.impl.-> R25_domain_domain_AdrFilePort__self
+class T31_domain_domain_AdrDecisionCommon_id method_node
+class T31_domain_domain_AdrDecisionCommon_user_decision_ref method_node
+class T31_domain_domain_AdrDecisionCommon_review_finding_ref method_node
+class T31_domain_domain_AdrDecisionCommon_candidate_selection method_node
+class T31_domain_domain_AdrDecisionCommon_grandfathered method_node
+class T31_domain_domain_AdrDecisionCommon_new method_node
+class T31_domain_domain_AdrDecisionCommon__self value_object
+class T36_domain_domain_AdrDecisionCommonError_EmptyId variant_node
+class T36_domain_domain_AdrDecisionCommonError_EmptyImplementedIn variant_node
+class T36_domain_domain_AdrDecisionCommonError_EmptySupersededBy variant_node
+class T36_domain_domain_AdrDecisionCommonError__self error_type
+class T30_domain_domain_AdrDecisionEntry_ProposedDecision variant_node
+class T30_domain_domain_AdrDecisionEntry_AcceptedDecision variant_node
+class T30_domain_domain_AdrDecisionEntry_ImplementedDecision variant_node
+class T30_domain_domain_AdrDecisionEntry_SupersededDecision variant_node
+class T30_domain_domain_AdrDecisionEntry_DeprecatedDecision variant_node
+class T30_domain_domain_AdrDecisionEntry__self value_object
+class T31_domain_domain_DecisionGroundRef_try_new method_node
+class T31_domain_domain_DecisionGroundRef_as_str method_node
+class T31_domain_domain_DecisionGroundRef__self value_object
+class T29_domain_domain_DecisionGrounds_UserDecisionRef variant_node
+class T29_domain_domain_DecisionGrounds_ReviewFindingRef variant_node
+class T29_domain_domain_DecisionGrounds_Grandfathered variant_node
+class T29_domain_domain_DecisionGrounds_NoGrounds variant_node
+class T29_domain_domain_DecisionGrounds__self value_object
+class R25_domain_domain_AdrFilePort_list_adr_paths method_node
+class R25_domain_domain_AdrFilePort_read_adr_frontmatter method_node
+class R25_domain_domain_AdrFilePort__self secondary_port
+class F68_domain_domain_domain__adr_decision__evaluator__evaluate_adr_decision free_function
+class F68_domain_domain_domain__adr_decision__evaluator__evaluate_adr_decision function_node
+class T25_domain_domain_DomainError_Validation variant_node
+class T25_domain_domain_DomainError_Transition variant_node
+class T25_domain_domain_DomainError__self error_type
+class T29_domain_domain_ValidationError_EmptyString variant_node
+class T29_domain_domain_ValidationError_InvalidTrackId variant_node
+class T29_domain_domain_ValidationError_InvalidTaskId variant_node
+class T29_domain_domain_ValidationError_InvalidCommitHash variant_node
+class T29_domain_domain_ValidationError_InvalidTimestamp variant_node
+class T29_domain_domain_ValidationError_InvalidTrackBranch variant_node
+class T29_domain_domain_ValidationError_BranchIdMismatch variant_node
+class T29_domain_domain_ValidationError_StatusOverrideMismatch variant_node
+class T29_domain_domain_ValidationError_EmptyTrackTitle variant_node
+class T29_domain_domain_ValidationError_EmptyTaskDescription variant_node
+class T29_domain_domain_ValidationError_EmptyPlanSectionId variant_node
+class T29_domain_domain_ValidationError_EmptyPlanSectionTitle variant_node
+class T29_domain_domain_ValidationError_DuplicateTaskId variant_node
+class T29_domain_domain_ValidationError_DuplicatePlanSectionId variant_node
+class T29_domain_domain_ValidationError_UnknownTaskReference variant_node
+class T29_domain_domain_ValidationError_DuplicateTaskReference variant_node
+class T29_domain_domain_ValidationError_UnreferencedTask variant_node
+class T29_domain_domain_ValidationError_OverrideIncompatibleWithResolvedTasks variant_node
+class T29_domain_domain_ValidationError_TrackActivationRequiresPlanningOnly variant_node
+class T29_domain_domain_ValidationError_TrackActivationRequiresSchemaV3 variant_node
+class T29_domain_domain_ValidationError_TrackAlreadyMaterialized variant_node
+class T29_domain_domain_ValidationError_UnsupportedTargetStatus variant_node
+class T29_domain_domain_ValidationError_SectionNotFound variant_node
+class T29_domain_domain_ValidationError_NoSectionsAvailable variant_node
+class T29_domain_domain_ValidationError_TaskDescriptionMutated variant_node
+class T29_domain_domain_ValidationError_TaskRemoved variant_node
+class T29_domain_domain_ValidationError_DuplicateElementId variant_node
+class T29_domain_domain_ValidationError_InvalidLayerId variant_node
+class T29_domain_domain_ValidationError_InvalidSpecElementId variant_node
+class T29_domain_domain_ValidationError_EmptyAdrAnchor variant_node
+class T29_domain_domain_ValidationError_EmptyConventionAnchor variant_node
+class T29_domain_domain_ValidationError_InvalidContentHash variant_node
+class T29_domain_domain_ValidationError_EmptyInformalGroundSummary variant_node
+class T29_domain_domain_ValidationError_MultiLineInformalGroundSummary variant_node
+class T29_domain_domain_ValidationError_EmptyDecisionGroundRef variant_node
+class T29_domain_domain_ValidationError__self error_type
+class T54_infrastructure_infrastructure_AdrFrontMatterCodecError_YamlParse variant_node
+class T54_infrastructure_infrastructure_AdrFrontMatterCodecError_MissingAdrId variant_node
+class T54_infrastructure_infrastructure_AdrFrontMatterCodecError_InvalidDecisionField variant_node
+class T54_infrastructure_infrastructure_AdrFrontMatterCodecError__self error_type
+class T46_infrastructure_infrastructure_FsAdrFileAdapter__self secondary_adapter
+class F88_infrastructure_infrastructure_infrastructure__adr_decision__parse__parse_adr_frontmatter free_function
+class F88_infrastructure_infrastructure_infrastructure__adr_decision__parse__parse_adr_frontmatter function_node
+```

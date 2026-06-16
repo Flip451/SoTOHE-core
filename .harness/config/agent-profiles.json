@@ -50,7 +50,8 @@
     },
     "dry-checker": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "fast_model": "gpt-5.4-mini"
     },
     "dry-fix-lead": {
       "provider": "codex",

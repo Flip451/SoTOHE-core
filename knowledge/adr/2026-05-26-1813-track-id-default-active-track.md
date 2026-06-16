@@ -21,7 +21,6 @@ decisions:
     status: proposed
   - id: D6
     user_decision_ref: "chat_segment:make-wrapper-uniform-flag-passthrough:2026-05-28"
-    review_finding_ref: "pr:142:codex-review:make-wrapper-track-id-self-resolve"
     status: proposed
   - id: D7
     user_decision_ref: "chat_segment:track-id-read-write-split:2026-05-28"

@@ -23,7 +23,7 @@ mod ref_verify;
 pub mod review_v2;
 mod semantic_dup;
 mod telemetry;
-mod track;
+pub mod track;
 pub mod verify;
 
 mod dry_fix_runner;
@@ -76,6 +76,35 @@ pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
 };
 pub use telemetry::TelemetryReportInput;
+pub use track::fixpoint_resolve::FixpointResolveInput;
+
+/// Build the argument vector for a `codex exec --sandbox read-only` invocation.
+///
+/// Re-exports [`infrastructure::codex_common::build_codex_read_only_invocation`]
+/// so that `apps/cli` test helpers can reuse it without importing
+/// `infrastructure` directly (which the architecture disallows for `cli`).
+///
+/// # Arguments
+/// - `model`: Codex model name.
+/// - `reasoning_effort`: `model_reasoning_effort` value (e.g. `"high"`).
+/// - `prompt`: Full prompt string.
+/// - `output_last_message`: Path where Codex writes the last message JSON.
+/// - `output_schema`: Path to the JSON schema file for structured output.
+pub fn build_codex_read_only_invocation(
+    model: &str,
+    reasoning_effort: &str,
+    prompt: &str,
+    output_last_message: &std::path::Path,
+    output_schema: &std::path::Path,
+) -> Vec<std::ffi::OsString> {
+    infrastructure::codex_common::build_codex_read_only_invocation(
+        model,
+        reasoning_effort,
+        prompt,
+        output_last_message,
+        output_schema,
+    )
+}
 
 // ---------------------------------------------------------------------------
 // Public API types

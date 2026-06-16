@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "41cb6080e3c1e240601e6885bac9bbc1cb856340e509a1d7a23186d6df40eee6",
+  "signals": [
+    {
+      "type_name": "DryCheckAgentError",
+      "signal": "blue",
+      "entry_hash": "8ee8fd96448f9454e35a2c6386b01242271bf337347d4e5e1abeef576fd1cd00"
+    },
+    {
+      "type_name": "DryCheckApprovalInteractor",
+      "signal": "blue",
+      "entry_hash": "527f7e2b37ed6d565de60b0680bcb8ae6e5867420797507e25e023e19ddf95ec"
+    },
+    {
+      "type_name": "DryCheckConfig",
+      "signal": "blue",
+      "entry_hash": "337a062fff15ff891cb4393c83c3d6fc14b0f46b55f57e15adc5c997c4b00934"
+    },
+    {
+      "type_name": "DryCheckCycleError",
+      "signal": "blue",
+      "entry_hash": "217a2c57be0fc85c91667a37d6e07d47a220e37c18afd8b18f3911a7d230a148"
+    },
+    {
+      "type_name": "DryCheckInteractor",
+      "signal": "blue",
+      "entry_hash": "f0647efbe8c6f59a86a5d61cff690ae0baabcd0bca55ee4294c95b8ee46f11e8"
+    },
+    {
+      "type_name": "DryCheckJudgeTier",
+      "signal": "blue",
+      "entry_hash": "11420f53381ab3f57dbc9c777746c5662832eee15584b04aa85f2a991def5da2"
+    },
+    {
+      "type_name": "DryCheckParallelism",
+      "signal": "blue",
+      "entry_hash": "ed36569e453996918259038e1b6136b72fbf6703cd444b061a23f0cb4b356919"
+    },
+    {
+      "type_name": "DryCheckPercent",
+      "signal": "blue",
+      "entry_hash": "913732caef0d43c43a8aa08a1b70478707963a605475a20dbdc47699e56349d9"
+    },
+    {
+      "type_name": "FixpointCurrentBranch",
+      "signal": "blue",
+      "entry_hash": "f3a3755436f73a43629631990d5d13eaa753c6b205fb76fbc7d96c3cb40e524b"
+    },
+    {
+      "type_name": "FixpointResolveCommand",
+      "signal": "blue",
+      "entry_hash": "f6c5d1e21ac940c7271c0284e299ed8a341d14c7ce19ccbc34de6d5d66be8a16"
+    },
+    {
+      "type_name": "FixpointResolveError",
+      "signal": "blue",
+      "entry_hash": "cdb1ad87a49fc044bfeb0ef2d82f2e81fa4c27fde27ee199957a9f9cb88dddc3"
+    },
+    {
+      "type_name": "FixpointResolveInteractor",
+      "signal": "blue",
+      "entry_hash": "1a914d135c6489b846d2a45e8cea3dd486d4266041c2f75189a48999db1d9b26"
+    },
+    {
+      "type_name": "RefVerifyGateStatus",
+      "signal": "blue",
+      "entry_hash": "18a834f00b5151dd09d98f045047364f2ad1130048bf3a5f6a26adf6cd7cabb6"
+    },
+    {
+      "type_name": "ReviewGateStatus",
+      "signal": "blue",
+      "entry_hash": "851f383dc5551cd5385a6368af9aa8e5344cc58172855d834dcef71b68dc7e3d"
+    },
+    {
+      "type_name": "DryCheckAgentPort",
+      "signal": "blue",
+      "entry_hash": "f9491e2d681f901f0c9bc74f24e4b8ce4fffb56938fd4ca05219518ece8b43da"
+    },
+    {
+      "type_name": "DryCheckApprovalService",
+      "signal": "blue",
+      "entry_hash": "b650ad04281ffdb15e06bfa558ccb05750977819616e1e3aa144aab00395826a"
+    },
+    {
+      "type_name": "DryCheckCoveragePort",
+      "signal": "blue",
+      "entry_hash": "b047df8a1be53f32e1d44d40b2531fc10f67599a0adb38317af22a6bfccabffb"
+    },
+    {
+      "type_name": "DryCheckService",
+      "signal": "blue",
+      "entry_hash": "26ce84e930c92ac952495ea6a08dcebcc21815d527a61fd2c70741d2b6dc6388"
+    },
+    {
+      "type_name": "FixpointResolveService",
+      "signal": "blue",
+      "entry_hash": "1151c9448cb77463f88820112e9ef5ff66fee22e5c4e76952745ec8a69aa708a"
+    },
+    {
+      "type_name": "RefVerifyGateStatePort",
+      "signal": "blue",
+      "entry_hash": "7b6490bc43072aafc4b32cb4fc9ac1334f9a042819ff19cf1185a8d2d8372b65"
+    },
+    {
+      "type_name": "ReviewGateStatePort",
+      "signal": "blue",
+      "entry_hash": "3657d727c3dc43dfb808674c89dbc12e2a6bdba40581b0477aa6c1d125fa04b2"
+    },
+    {
+      "type_name": "usecase::dry_check::shared::fragment_ref_of",
+      "signal": "blue",
+      "entry_hash": "05241eb8cb35dd2ff43e38e50f61706b8283da7dfb576cc98894fb4dc9acd245"
+    }
+  ]
+}

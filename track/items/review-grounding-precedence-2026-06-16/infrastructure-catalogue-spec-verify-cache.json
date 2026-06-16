@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "1e8308b8d4274b639b1a0305601455a6ed447de5a9b43679de24ea21e3ec2928",
+      "evidence_hash": "ff20ec1ab139868d1043a0661ded7318103b89309a576727674bdf5bf9ae3712",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の DTO→domain 変換（decision_dto_to_entry / AdrDecisionCommon 構築）で値オブジェクトの構築エラーを AdrFrontMatterCodecError::InvalidDecisionField として伝播させる。空・未記入 placeholder が slip-through するのを防ぐ fail-closed 設計（CN-04）。"
+      }
+    },
+    {
+      "claim_hash": "1e8308b8d4274b639b1a0305601455a6ed447de5a9b43679de24ea21e3ec2928",
+      "evidence_hash": "7fbd7c0e3d65afe1210ec92172fc8f0e1255a1b73b7d1a45de294b8a7d1173d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin/sotp verify adr-signals が空 placeholder（Some(\"\") 相当）を user_decision_ref / review_finding_ref に持つ ADR ファイルを InvalidDecisionField エラーとして fail する（fail-closed, CN-04）。"
+      }
+    },
+    {
+      "claim_hash": "20dbaf4fb30c43ebf59ca06bf3819b77bc5f5795bbe62137ccb87e4457d5e468",
+      "evidence_hash": "ff20ec1ab139868d1043a0661ded7318103b89309a576727674bdf5bf9ae3712",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の DTO→domain 変換（decision_dto_to_entry / AdrDecisionCommon 構築）で値オブジェクトの構築エラーを AdrFrontMatterCodecError::InvalidDecisionField として伝播させる。空・未記入 placeholder が slip-through するのを防ぐ fail-closed 設計（CN-04）。"
+      }
+    },
+    {
+      "claim_hash": "20dbaf4fb30c43ebf59ca06bf3819b77bc5f5795bbe62137ccb87e4457d5e468",
+      "evidence_hash": "7fbd7c0e3d65afe1210ec92172fc8f0e1255a1b73b7d1a45de294b8a7d1173d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin/sotp verify adr-signals が空 placeholder（Some(\"\") 相当）を user_decision_ref / review_finding_ref に持つ ADR ファイルを InvalidDecisionField エラーとして fail する（fail-closed, CN-04）。"
+      }
+    },
+    {
+      "claim_hash": "20dbaf4fb30c43ebf59ca06bf3819b77bc5f5795bbe62137ccb87e4457d5e468",
+      "evidence_hash": "6f8c686badacfae86f3e5e6bde80bb9b87e756dabe12fb6f83bbc4aa1fb4e268",
+      "verdict": {
+        "kind": "pass",
+        "citation": "空文字列・空白のみの grounding 参照は None への silent normalization を行わず、fail-closed の構築時エラー（Err）として報告しなければならない。"
+      }
+    },
+    {
+      "claim_hash": "20dbaf4fb30c43ebf59ca06bf3819b77bc5f5795bbe62137ccb87e4457d5e468",
+      "evidence_hash": "3775043fdefdd60e9c71ba8639b224c7457ea4b13f80c2b77a715c1bf80bae33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "grounding 参照 newtype は domain 層に配置し、DTO との変換（YAML→domain）は infrastructure 層で行う。domain 型に YAML/serde の知識を持ち込まない（ヘキサゴナルアーキテクチャ原則）。"
+      }
+    },
+    {
+      "claim_hash": "1e8308b8d4274b639b1a0305601455a6ed447de5a9b43679de24ea21e3ec2928",
+      "evidence_hash": "030f8569ade53385f5bafc2b53783ccd524b8167345847a950aafb5dfc585450",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の DTO→domain 変換（decision_dto_to_entry / AdrDecisionCommon 構築）で値オブジェクトの構築エラーを AdrFrontMatterCodecError::InvalidDecisionField として伝播させる。空・未記入 placeholder が slip-through するのを防ぐ fail-closed 設計（CN-01）。"
+      }
+    },
+    {
+      "claim_hash": "1e8308b8d4274b639b1a0305601455a6ed447de5a9b43679de24ea21e3ec2928",
+      "evidence_hash": "137ae11feb3cb5732dfca36d55153aeec99319d1676a12e65c865970e7ed7e33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin/sotp verify adr-signals が空 placeholder（Some(\"\") 相当）を user_decision_ref / review_finding_ref に持つ ADR ファイルを InvalidDecisionField エラーとして fail する（fail-closed, CN-01）。"
+      }
+    },
+    {
+      "claim_hash": "20dbaf4fb30c43ebf59ca06bf3819b77bc5f5795bbe62137ccb87e4457d5e468",
+      "evidence_hash": "030f8569ade53385f5bafc2b53783ccd524b8167345847a950aafb5dfc585450",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の DTO→domain 変換（decision_dto_to_entry / AdrDecisionCommon 構築）で値オブジェクトの構築エラーを AdrFrontMatterCodecError::InvalidDecisionField として伝播させる。空・未記入 placeholder が slip-through するのを防ぐ fail-closed 設計（CN-01）。"
+      }
+    },
+    {
+      "claim_hash": "20dbaf4fb30c43ebf59ca06bf3819b77bc5f5795bbe62137ccb87e4457d5e468",
+      "evidence_hash": "137ae11feb3cb5732dfca36d55153aeec99319d1676a12e65c865970e7ed7e33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「空 placeholder（Some(\"\") 相当）を user_decision_ref / review_finding_ref に持つ ADR ファイルを InvalidDecisionField エラーとして fail する（fail-closed, CN-01）。」"
+      }
+    }
+  ]
+}

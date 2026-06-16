@@ -682,6 +682,46 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
+    // T011 tests: dry-checker capability with fast_model (D4 / IN-04).
+    // -----------------------------------------------------------------------
+
+    const DRY_CHECKER_CONFIG: &str = r#"{
+        "schema_version": 1,
+        "providers": {
+            "codex": { "label": "Codex CLI" }
+        },
+        "capabilities": {
+            "dry-checker": {
+                "provider": "codex",
+                "model": "gpt-5.5",
+                "fast_model": "gpt-5.4-mini"
+            }
+        }
+    }"#;
+
+    #[test]
+    fn test_dry_checker_fast_round_returns_fast_model() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), DRY_CHECKER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let fast = profiles.resolve_execution("dry-checker", RoundType::Fast).unwrap();
+        assert_eq!(fast.provider, "codex");
+        assert_eq!(fast.model.as_deref(), Some("gpt-5.4-mini"));
+    }
+
+    #[test]
+    fn test_dry_checker_final_round_returns_primary_model() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), DRY_CHECKER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let final_exec = profiles.resolve_execution("dry-checker", RoundType::Final).unwrap();
+        assert_eq!(final_exec.provider, "codex");
+        assert_eq!(final_exec.model.as_deref(), Some("gpt-5.5"));
+    }
+
+    // -----------------------------------------------------------------------
     // RoundType::from_str tests
     // -----------------------------------------------------------------------
 

@@ -1,0 +1,954 @@
+{
+  "schema_version": 4,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "FixpointResolveCommand": {
+      "action": "add",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",                "ty": "domain::TrackId" },
+            { "name": "current_branch",          "ty": "FixpointCurrentBranch" },
+            { "name": "current_fragment_refs", "ty": "std::collections::BTreeSet<domain::dry_check::FragmentRef>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "fixpoint_resolve",
+      "docs": "Command input for `FixpointResolveService::resolve`. Identifies the active track, the caller's current git branch, and the current diff FragmentRef set needed by the dry gate public API. current_branch is a validated opaque FixpointCurrentBranch value, so empty branch labels cannot enter the interactor. current_fragment_refs is computed by the composition layer from the current diff and passed through so the interactor does not acquire diff fragments itself.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FixpointCurrentBranch": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [ { "name": "value", "ty": "String" } ],
+          "returns": "Result<Self, FixpointResolveError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "fixpoint_resolve",
+      "docs": "Validated opaque current git branch label for fixpoint resolution. `try_new` rejects empty or whitespace-only strings with FixpointResolveError::InvalidCurrentBranch; branch naming remains an infrastructure/orchestrator concern, so the usecase validates only non-emptiness.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FixpointResolveError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidTrackId",   "payload": { "kind": "struct", "fields": [ { "name": "message", "ty": "String" } ] } },
+          { "name": "InvalidCurrentBranch", "payload": { "kind": "struct", "fields": [ { "name": "message", "ty": "String" } ] } },
+          { "name": "TrackNotActive",   "payload": { "kind": "struct", "fields": [ { "name": "branch",  "ty": "String" } ] } },
+          { "name": "GateQueryFailed",  "payload": { "kind": "struct", "fields": [ { "name": "gate",    "ty": "String" }, { "name": "message", "ty": "String" } ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "fixpoint_resolve",
+      "docs": "Error variants for `FixpointResolveService::resolve`. InvalidCurrentBranch covers FixpointCurrentBranch::try_new rejecting empty input. GateQueryFailed carries an opaque gate name string (e.g. 'dry', 'review', 'ref-verify') and a message; both are opaque labels with no domain-level constraints, used only for human-readable diagnostics.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewGateStatus": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Approved",    "payload": { "kind": "unit" } },
+          { "name": "NeedsReview", "payload": { "kind": "struct", "fields": [ { "name": "scopes", "ty": "domain::track_phase::ReviewScopeSet" } ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "fixpoint_resolve",
+      "docs": "Review gate status consumed by the fixpoint resolver (D2). Approved means no review scope is currently stale or findings_remain; NeedsReview carries the non-empty deterministic set of opaque review scope labels that must run through RFP. This keeps the review gate result enum-first instead of encoding it as Option<bool> and preserves IN-02's RFP target scope list.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyGateStatus": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Approved", "payload": { "kind": "unit" } },
+          { "name": "Blocked",  "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "fixpoint_resolve",
+      "docs": "Ref-verify gate status consumed by the fixpoint resolver (D2). Approved allows progression after dry and review gates are green; Blocked selects FixpointStep::RunRefVerify. This avoids representing gate state as an unlabelled boolean.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FixpointResolveInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "fixpoint_resolve",
+      "docs": "Implements `FixpointResolveService`. Holds injected port dependencies (dry approval port, review state port, ref-verify result port) as private Arc<dyn Port> fields. Queries each gate's public API only — no direct access to dry-check.json / review.json / ref-verify cache internals (CN-02).",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckParallelism": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [ { "name": "value", "ty": "usize" } ],
+          "returns": "Result<DryCheckParallelism, DryCheckCycleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_usize",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_check",
+      "docs": "Validated nonzero parallelism limit for dry-check fan-out. `try_new` rejects 0 so the interactor cannot be configured with a nonsensical worker limit. Mirrors `RefVerifyParallelism` pattern (D3 / CN-04).",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckPercent": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [ { "name": "value", "ty": "u8" } ],
+          "returns": "Result<DryCheckPercent, DryCheckCycleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_u8",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_check",
+      "docs": "Validated nonzero percentage (1..=100) for dry-checker calibration settings (D4). Used for known-bad injection rate and detection threshold, making invalid percentages unrepresentable. Mirrors `RefVerifyPercent` pattern (CN-06).",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckJudgeTier": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Fast",  "payload": { "kind": "unit" } },
+          { "name": "Final", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Explicit D4 tier selector passed to DryCheckAgentPort for one-pair judgments. This keeps fast/final selection enum-first instead of hidden adapter state or a bool flag, and lets DryCheckInteractor own the run-level calibration barrier and all-pair final retry required by CN-07.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-08"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckConfig": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "known_bad_injection_rate_percent",    "ty": "DryCheckPercent" },
+            { "name": "known_bad_detection_threshold_percent", "ty": "DryCheckPercent" },
+            { "name": "max_parallelism",                     "ty": "DryCheckParallelism" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Usecase configuration for the dry-checker injected by the composition layer. Keeps known-bad injection rate (D4), detection threshold (D4), and parallelism limit (D3) out of filesystem I/O inside the interactor while making invalid settings unrepresentable through `DryCheckPercent` and `DryCheckParallelism`. Mirrors `RefVerifyConfig` pattern (CN-06 / CN-04).",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckAgentError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "UserAbort",     "payload": { "kind": "unit" } },
+          { "name": "AgentAbort",    "payload": { "kind": "unit" } },
+          { "name": "Timeout",       "payload": { "kind": "unit" } },
+          { "name": "IllegalOutput", "payload": { "kind": "unit" } },
+          { "name": "Unexpected",    "payload": { "kind": "tuple", "fields": [ "String" ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check::errors",
+      "docs": "Errors from DryCheckAgentPort (mirrors ReviewerError). T012 (D4 / IN-04 escalation flow) added #[derive(Clone)] so that fast-tier agent errors can be cloned when escalating to the final tier in the two-tier calibration barrier (CN-07). Clone is required because DryCheckInteractor may need to propagate the same error through the parallel fan-out join before returning the final-tier result.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckCycleError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Embedding",    "payload": { "kind": "tuple", "fields": [ "EmbeddingError" ] } },
+          { "name": "Index",        "payload": { "kind": "tuple", "fields": [ "SemanticIndexError" ] } },
+          { "name": "Agent",        "payload": { "kind": "tuple", "fields": [ "DryCheckAgentError" ] } },
+          { "name": "Reader",       "payload": { "kind": "tuple", "fields": [ "domain::dry_check::DryCheckReaderError" ] } },
+          { "name": "Writer",       "payload": { "kind": "tuple", "fields": [ "domain::dry_check::DryCheckWriterError" ] } },
+          { "name": "Diff",         "payload": { "kind": "tuple", "fields": [ "DryCheckDiffError" ] } },
+          { "name": "Entry",        "payload": { "kind": "tuple", "fields": [ "domain::dry_check::DryCheckEntryError" ] } },
+          { "name": "CoveragePort",       "payload": { "kind": "tuple", "fields": [ "String" ] } },
+          { "name": "InvalidParallelism", "payload": { "kind": "unit" } },
+          { "name": "InvalidPercent",     "payload": { "kind": "tuple", "fields": [ "u8" ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check::errors",
+      "docs": "Error variants for dry-check cycle operations. CoveragePort (new in this track) covers failures reading or writing the DryCheckCoverageRecord via DryCheckCoveragePort (D5 / CN-08). InvalidParallelism covers DryCheckParallelism::try_new(0), and InvalidPercent covers DryCheckPercent::try_new values outside 1..=100, keeping config validation distinct from coverage-store failures.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-08"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::interactor",
+      "docs": "Implements `DryCheckService`. Updated for D3 (parallel fan-out with DryCheckParallelism limit from DryCheckConfig), D4 (run-level two-tier calibration barrier: fast-tier production results stay provisional until known-bad probes pass; fast calibration failure discards provisional results and rejudges every production pair on the final tier before appending records), and D5 (writes DryCheckCoverageRecord including corpus_fingerprint after completing all judgments, so DryCheckApprovalInteractor can detect corpus changes). Holds injected port dependencies, track_id, config, config_fingerprint, and corpus_fingerprint as private fields.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovalInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::approval_interactor",
+      "docs": "Implements `DryCheckApprovalService`. Updated for D5: now reads DryCheckCoverageRecord via DryCheckCoveragePort for staleness checking instead of performing embedding/similarity-search. Staleness check includes four conditions: (1) all current FragmentRefs must be present in the stored coverage, (2) the stored config_fingerprint must match the current_config_fingerprint injected at construction (config change → Blocked), (3) the stored corpus_fingerprint must match the current_corpus_fingerprint injected at construction (corpus change → Blocked), and (4) either stored coverage fingerprint being the fail-closed sentinel (all-zero) blocks. For all-resolved checking it reads DryCheckReader history, derives the same latest-per-pair last-write-wins view as DryCheckResultsInteractor, and evaluates only latest records whose pair_key is present in coverage.processed_pair_keys and that touch current FragmentRef values. Holds DryCheckReader + DryCheckCoveragePort + current_config_fingerprint + current_corpus_fingerprint as private fields.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-08"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "FixpointResolveService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&FixpointResolveCommand" }
+          ],
+          "returns": "Result<domain::track_phase::FixpointStep, FixpointResolveError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "fixpoint_resolve",
+      "docs": "Application service for mechanized fixpoint resolution (D2). Queries the three gate states (dry / review / ref-verify) via their public APIs and returns the next required phase as a domain::track_phase::FixpointStep. CN-02: no direct access to internal gate file formats.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewGateStatePort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "review_status",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<ReviewGateStatus, FixpointResolveError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "fixpoint_resolve",
+      "docs": "Secondary port used by FixpointResolveInteractor to query the review gate through its public API/read API. It returns an enum status rather than exposing review.json internals, preserving CN-02.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyGateStatePort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "ref_verify_status",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<RefVerifyGateStatus, FixpointResolveError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "fixpoint_resolve",
+      "docs": "Secondary port used by FixpointResolveInteractor to query the ref-verify gate through its public API/read API. It returns only gate status and never exposes ref-verify cache internals, preserving CN-02.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-02"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckAgentPort": {
+      "action": "modify",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "judge",
+          "receiver": "&self",
+          "params": [
+            { "name": "changed_fragment",   "ty": "&domain::semantic_dup::CodeFragment" },
+            { "name": "candidate_fragment", "ty": "&domain::semantic_dup::CodeFragment" },
+            { "name": "tier",               "ty": "DryCheckJudgeTier" }
+          ],
+          "returns": "Result<DryCheckAgentJudgment, DryCheckAgentError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_check::ports",
+      "docs": "Existing dry-checker secondary port modified for D4 so DryCheckInteractor can choose Fast or Final for each one-pair production/probe judgment. The port remains one pair per call and owns no run-level calibration state; the interactor owns probe detection, provisional result acceptance, and all-pair final retry.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-08"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-03"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckCoveragePort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "read_coverage",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<Option<domain::dry_check::DryCheckCoverageRecord>, DryCheckCycleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "write_coverage",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" },
+            { "name": "record",   "ty": "domain::dry_check::DryCheckCoverageRecord" }
+          ],
+          "returns": "Result<(), DryCheckCycleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_check::ports",
+      "docs": "Secondary port for reading and writing the DryCheckCoverageRecord (D5). Implemented by FsDryCheckCoverageAdapter in infrastructure. `dry write` calls write_coverage after completing all judgments; `dry check-approved` (via DryCheckApprovalInteractor) calls read_coverage for staleness checking. CN-08: coverage absence returns Ok(None) which the interactor treats as Blocked.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-06"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-08"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovalService": {
+      "action": "modify",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "check_approved",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" },
+            { "name": "current_fragment_refs", "ty": "&std::collections::BTreeSet<domain::dry_check::FragmentRef>" }
+          ],
+          "returns": "Result<domain::dry_check::DryCheckApprovalVerdict, DryCheckCycleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "dry_check::services",
+      "docs": "Application service for the cheap dry gate approval check after D5. The caller supplies the active track_id and current diff FragmentRef set. Decides Approved/Blocked using DryCheckCoveragePort (staleness check: (1) are all current FragmentRefs present in coverage, (2) does the stored config_fingerprint match the current config fingerprint — a mismatch means the config changed and coverage is stale, (3) does the stored corpus_fingerprint match the current corpus fingerprint — a mismatch means the corpus changed (file added/removed/modified) and coverage is stale, and (4) either stored coverage fingerprint being the fail-closed sentinel blocks) + DryCheckReader (all-resolved check scoped to latest records whose pair_key is in coverage.processed_pair_keys and that touch the current diff), with no embedding or semantic-index lookup. DryCheckReader history is interpreted as latest-per-pair with last-write-wins, so a later Accepted/NotAViolation can resolve an older Violation for the same pair.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-10"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "AC-12"
+        },
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "CN-09"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "run_dry_check",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), DryCheckCycleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_check::services",
+      "docs": null,
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "usecase::dry_check::shared::fragment_ref_of": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "fragment", "ty": "&domain::semantic_dup::CodeFragment" }
+      ],
+      "returns": "Result<domain::dry_check::FragmentRef, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Build a FragmentRef (path + SHA-256 content_hash) from a CodeFragment. Promoted from pub(crate) to pub in T003 so the cli_composition layer can compute the current diff FragmentRef set passed to the new pure-read DryCheckApprovalInteractor (D5 / IN-05). Visibility change only — algorithm unchanged.",
+      "spec_refs": [
+        {
+          "file": "track/items/dfp-rfp-loop-cost-reduction-2026-06-13/spec.json",
+          "anchor": "IN-05"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "FixpointResolveInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "dry_approval",       "ty": "std::sync::Arc<dyn DryCheckApprovalService + Send + Sync>" },
+            { "name": "review_state",       "ty": "std::sync::Arc<dyn ReviewGateStatePort>" },
+            { "name": "ref_verify_results", "ty": "std::sync::Arc<dyn RefVerifyGateStatePort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckConfig",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "known_bad_injection_rate_percent",      "ty": "DryCheckPercent" },
+            { "name": "known_bad_detection_threshold_percent", "ty": "DryCheckPercent" },
+            { "name": "max_parallelism",                       "ty": "DryCheckParallelism" }
+          ],
+          "returns": "DryCheckConfig",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "embedding_port",   "ty": "std::sync::Arc<dyn crate::semantic_dup::EmbeddingPort>" },
+            { "name": "index_port",       "ty": "std::sync::Arc<dyn crate::semantic_dup::SemanticIndexPort>" },
+            { "name": "agent_port",       "ty": "std::sync::Arc<dyn DryCheckAgentPort>" },
+            { "name": "dry_check_writer", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckWriter>" },
+            { "name": "dry_check_reader", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" },
+            { "name": "coverage",         "ty": "std::sync::Arc<dyn DryCheckCoveragePort>" },
+            { "name": "track_id",         "ty": "domain::TrackId" },
+            { "name": "config",           "ty": "DryCheckConfig" },
+            { "name": "config_fingerprint", "ty": "domain::dry_check::DryCheckConfigFingerprint" },
+            { "name": "corpus_fingerprint", "ty": "domain::dry_check::DryCheckCorpusFingerprint" }
+          ],
+          "returns": "DryCheckInteractor",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckApprovalInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "reader",   "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" },
+            { "name": "coverage", "ty": "std::sync::Arc<dyn DryCheckCoveragePort>" },
+            { "name": "current_config_fingerprint", "ty": "domain::dry_check::DryCheckConfigFingerprint" },
+            { "name": "current_corpus_fingerprint", "ty": "domain::dry_check::DryCheckCorpusFingerprint" }
+          ],
+          "returns": "DryCheckApprovalInteractor",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add",       "trait_ref": "FixpointResolveService",  "for_type": "FixpointResolveInteractor" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",        "for_type": "FixpointResolveCommand" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "FixpointResolveCommand" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",        "for_type": "FixpointCurrentBranch" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "FixpointCurrentBranch" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "FixpointCurrentBranch" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "FixpointCurrentBranch" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",        "for_type": "FixpointResolveError" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "FixpointResolveError" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "FixpointResolveError" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "FixpointResolveError" },
+    { "action": "add",       "trait_ref": "core::fmt::Display",      "for_type": "FixpointResolveError" },
+    { "action": "add",       "trait_ref": "core::error::Error",      "for_type": "FixpointResolveError" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",        "for_type": "ReviewGateStatus" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "ReviewGateStatus" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "ReviewGateStatus" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "ReviewGateStatus" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",        "for_type": "RefVerifyGateStatus" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "RefVerifyGateStatus" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "RefVerifyGateStatus" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "RefVerifyGateStatus" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",        "for_type": "DryCheckParallelism" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "DryCheckParallelism" },
+    { "action": "add",       "trait_ref": "core::marker::Copy",      "for_type": "DryCheckParallelism" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "DryCheckParallelism" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "DryCheckParallelism" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",        "for_type": "DryCheckPercent" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "DryCheckPercent" },
+    { "action": "add",       "trait_ref": "core::marker::Copy",      "for_type": "DryCheckPercent" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "DryCheckPercent" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "DryCheckPercent" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",        "for_type": "DryCheckJudgeTier" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "DryCheckJudgeTier" },
+    { "action": "add",       "trait_ref": "core::marker::Copy",      "for_type": "DryCheckJudgeTier" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "DryCheckJudgeTier" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "DryCheckJudgeTier" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",        "for_type": "DryCheckConfig" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "DryCheckConfig" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",    "for_type": "DryCheckConfig" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",           "for_type": "DryCheckConfig" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",        "for_type": "DryCheckAgentError" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",      "for_type": "DryCheckAgentError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display",      "for_type": "DryCheckAgentError" },
+    { "action": "reference", "trait_ref": "core::error::Error",      "for_type": "DryCheckAgentError" },
+    { "action": "modify",    "trait_ref": "core::fmt::Debug",        "for_type": "DryCheckCycleError" },
+    { "action": "modify",    "trait_ref": "core::fmt::Display",      "for_type": "DryCheckCycleError" },
+    { "action": "modify",    "trait_ref": "core::error::Error",      "for_type": "DryCheckCycleError" },
+    { "action": "modify",    "trait_ref": "DryCheckService",         "for_type": "DryCheckInteractor" },
+    { "action": "modify",    "trait_ref": "DryCheckApprovalService", "for_type": "DryCheckApprovalInteractor" }
+  ]
+}

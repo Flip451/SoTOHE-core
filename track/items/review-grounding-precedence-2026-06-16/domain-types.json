@@ -1,0 +1,453 @@
+{
+  "schema_version": 4,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "DecisionGroundRef": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "adr_decision::grounds",
+      "docs": "Validated newtype for a grounding-reference string in an ADR decision. Used for both user_decision_ref and review_finding_ref in AdrDecisionCommon. try_new rejects empty strings and whitespace-only strings with ValidationError::EmptyDecisionGroundRef, following the same pattern as AdrAnchor::try_new and InformalGroundSummary::try_new. A single shared type is used for both user and review refs because validation rules are identical (D2 OS-02 resolution: shared single type).",
+      "spec_refs": [
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-05" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-06" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-07" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "CN-01" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "CN-04" }
+      ],
+      "informal_grounds": []
+    },
+    "ValidationError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "EmptyString",                          "payload": { "kind": "unit" } },
+          { "name": "InvalidTrackId",                       "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidTaskId",                        "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidCommitHash",                    "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidTimestamp",                     "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidTrackBranch",                   "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "BranchIdMismatch",                     "payload": { "kind": "struct", "fields": [{ "name": "id", "ty": "String" }, { "name": "branch", "ty": "String" }] } },
+          { "name": "StatusOverrideMismatch",               "payload": { "kind": "struct", "fields": [{ "name": "override_kind", "ty": "String" }, { "name": "required", "ty": "String" }, { "name": "actual", "ty": "String" }] } },
+          { "name": "EmptyTrackTitle",                      "payload": { "kind": "unit" } },
+          { "name": "EmptyTaskDescription",                 "payload": { "kind": "unit" } },
+          { "name": "EmptyPlanSectionId",                   "payload": { "kind": "unit" } },
+          { "name": "EmptyPlanSectionTitle",                "payload": { "kind": "unit" } },
+          { "name": "DuplicateTaskId",                      "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "DuplicatePlanSectionId",               "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "UnknownTaskReference",                 "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "DuplicateTaskReference",               "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "UnreferencedTask",                     "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "OverrideIncompatibleWithResolvedTasks","payload": { "kind": "tuple", "fields": ["TrackStatus"] } },
+          { "name": "TrackActivationRequiresPlanningOnly",  "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }, { "name": "status", "ty": "TrackStatus" }] } },
+          { "name": "TrackActivationRequiresSchemaV3",      "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }, { "name": "schema_version", "ty": "u32" }] } },
+          { "name": "TrackAlreadyMaterialized",             "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }, { "name": "branch", "ty": "String" }] } },
+          { "name": "UnsupportedTargetStatus",              "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "SectionNotFound",                      "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "NoSectionsAvailable",                  "payload": { "kind": "unit" } },
+          { "name": "TaskDescriptionMutated",               "payload": { "kind": "struct", "fields": [{ "name": "task_id", "ty": "String" }] } },
+          { "name": "TaskRemoved",                          "payload": { "kind": "struct", "fields": [{ "name": "task_id", "ty": "String" }] } },
+          { "name": "DuplicateElementId",                   "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidLayerId",                       "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidSpecElementId",                 "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "EmptyAdrAnchor",                       "payload": { "kind": "unit" } },
+          { "name": "EmptyConventionAnchor",                "payload": { "kind": "unit" } },
+          { "name": "InvalidContentHash",                   "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "EmptyInformalGroundSummary",           "payload": { "kind": "unit" } },
+          { "name": "MultiLineInformalGroundSummary",       "payload": { "kind": "unit" } },
+          { "name": "EmptyDecisionGroundRef",               "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "error",
+      "docs": "Validation errors for domain invariants. This track adds EmptyDecisionGroundRef to support the validated DecisionGroundRef newtype constructor (IN-04 / D2).",
+      "spec_refs": [
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-05" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-06" }
+      ],
+      "informal_grounds": []
+    },
+    "AdrDecisionCommon": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "user_decision_ref",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&DecisionGroundRef>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "review_finding_ref",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&DecisionGroundRef>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "candidate_selection",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "grandfathered",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "adr_decision::common",
+      "docs": "Common grounds and identity fields shared by every ADR decision lifecycle state. This track changes user_decision_ref and review_finding_ref from Option<String> to Option<DecisionGroundRef>, ensuring empty/whitespace strings are rejected at construction (IN-05 / D2). No serde derives — deserialization lives in the infrastructure adapter per CN-04.",
+      "spec_refs": [
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "DecisionGrounds": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "UserDecisionRef",  "payload": { "kind": "unit" } },
+          { "name": "ReviewFindingRef", "payload": { "kind": "unit" } },
+          { "name": "Grandfathered",    "payload": { "kind": "unit" } },
+          { "name": "NoGrounds",        "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_decision::grounds",
+      "docs": "Orthogonal classification of the grounds for a single ADR decision. This track updates the doc comment to reflect the new review-priority precedence (D1 / IN-02): review_finding_ref present yields ReviewFindingRef (yellow) regardless of user_decision_ref.",
+      "spec_refs": [
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "AdrDecisionCommonError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "EmptyId",             "payload": { "kind": "unit" } },
+          { "name": "EmptyImplementedIn",  "payload": { "kind": "unit" } },
+          { "name": "EmptySupersededBy",   "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_decision::common",
+      "docs": "Carried for edge exposure. Not changed by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "AdrDecisionEntry": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ProposedDecision",    "payload": { "kind": "tuple", "fields": ["ProposedDecision"] } },
+          { "name": "AcceptedDecision",    "payload": { "kind": "tuple", "fields": ["AcceptedDecision"] } },
+          { "name": "ImplementedDecision", "payload": { "kind": "tuple", "fields": ["ImplementedDecision"] } },
+          { "name": "SupersededDecision",  "payload": { "kind": "tuple", "fields": ["SupersededDecision"] } },
+          { "name": "DeprecatedDecision",  "payload": { "kind": "tuple", "fields": ["DeprecatedDecision"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_decision::entry",
+      "docs": "Carried for edge exposure from evaluate_adr_decision. Not changed by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DomainError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Validation", "payload": { "kind": "tuple", "fields": ["ValidationError"] } },
+          { "name": "Transition", "payload": { "kind": "tuple", "fields": ["TransitionError"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "error",
+      "docs": "Carried for edge exposure: DomainError has From<ValidationError> generated by #[from] which creates a visible edge when ValidationError is modified. Not changed by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "AdrFilePort": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "list_adr_paths",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Vec<std::path::PathBuf>, AdrFilePortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_adr_frontmatter",
+          "receiver": "&self",
+          "params": [
+            { "name": "path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<AdrFrontMatter, AdrFilePortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "adr_decision::file_port",
+      "docs": "Carried per R7: FsAdrFileAdapter in infrastructure implements AdrFilePort. Not changed by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "domain::adr_decision::evaluator::evaluate_adr_decision": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "entry", "ty": "AdrDecisionEntry" }
+      ],
+      "returns": "DecisionGrounds",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Classify a single AdrDecisionEntry into a DecisionGrounds signal. This track inverts classify_grounds priority: review_finding_ref is checked before user_decision_ref so both-ref decisions yield ReviewFindingRef (yellow) instead of UserDecisionRef (blue), per D1 (IN-01 / AC-01).",
+      "spec_refs": [
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/review-grounding-precedence-2026-06-16/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "DecisionGroundRef",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "value", "ty": "impl Into<String>" }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "AdrDecisionCommon",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "id",                 "ty": "impl Into<String>" },
+            { "name": "user_decision_ref",  "ty": "Option<DecisionGroundRef>" },
+            { "name": "review_finding_ref", "ty": "Option<DecisionGroundRef>" },
+            { "name": "candidate_selection","ty": "Option<String>" },
+            { "name": "grandfathered",      "ty": "bool" }
+          ],
+          "returns": "Result<Self, AdrDecisionCommonError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DecisionGroundRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DecisionGroundRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DecisionGroundRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DecisionGroundRef"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ValidationError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ValidationError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ValidationError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ValidationError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "ValidationError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ValidationError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AdrDecisionCommon"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "AdrDecisionCommon"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "AdrDecisionCommon"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "AdrDecisionCommon"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<ValidationError>",
+      "for_type": "DomainError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DomainError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "DomainError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DomainError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DecisionGrounds"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DecisionGrounds"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DecisionGrounds"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DecisionGrounds"
+    }
+  ]
+}

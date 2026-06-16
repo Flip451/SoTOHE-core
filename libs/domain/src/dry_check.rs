@@ -4,6 +4,7 @@
 //! (DRY violations) using semantic similarity search and agent-based judgment.
 //! See ADR 2026-06-02-0716-dry-checker for the design decisions.
 
+mod coverage;
 mod diff;
 mod finding;
 mod fragment;
@@ -12,6 +13,7 @@ mod record;
 mod value_objects;
 mod verdict;
 
+pub use self::coverage::*;
 pub use self::diff::*;
 pub use self::finding::*;
 pub use self::fragment::*;
@@ -259,8 +261,12 @@ mod tests {
 
     // ── DryCheckEntry ─────────────────────────────────────────────────────────
 
+    fn make_test_fingerprint() -> DryCheckConfigFingerprint {
+        DryCheckConfigFingerprint::new("a".repeat(64)).unwrap()
+    }
+
     #[test]
-    fn test_dry_check_entry_new_round_trips_all_7_fields() {
+    fn test_dry_check_entry_new_round_trips_all_8_fields() {
         let low = make_fragment_ref("src/a.rs", &"a".repeat(64));
         let high = make_fragment_ref("src/b.rs", &"b".repeat(64));
         let pair_key = DryCheckPairKey::new(low, high).unwrap();
@@ -270,6 +276,7 @@ mod tests {
         let threshold = make_threshold();
         let commit = make_commit();
         let rationale = Rationale::new("Rejected — self-similar.").unwrap();
+        let fingerprint = make_test_fingerprint();
 
         let entry = DryCheckEntry::new(
             pair_key.clone(),
@@ -279,6 +286,7 @@ mod tests {
             threshold,
             commit.clone(),
             rationale.clone(),
+            fingerprint.clone(),
         )
         .unwrap();
 
@@ -289,6 +297,7 @@ mod tests {
         assert_eq!(entry.threshold().value(), threshold.value());
         assert_eq!(entry.base_commit().as_ref(), commit.as_ref());
         assert_eq!(entry.rationale(), &rationale);
+        assert_eq!(entry.config_fingerprint(), &fingerprint);
     }
 
     #[test]
@@ -308,6 +317,7 @@ mod tests {
             make_threshold(),
             make_commit(),
             rationale,
+            make_test_fingerprint(),
         );
 
         assert!(matches!(result, Err(DryCheckEntryError::ChangedPathOutsidePair)));
@@ -322,6 +332,7 @@ mod tests {
         let pair_key = DryCheckPairKey::new(low, high).unwrap();
         let changed_path = make_file_path("src/a.rs");
         let rationale = Rationale::new("acceptable").unwrap();
+        let fingerprint = make_test_fingerprint();
 
         let entry = DryCheckEntry::new(
             pair_key,
@@ -331,6 +342,7 @@ mod tests {
             make_threshold(),
             make_commit(),
             rationale.clone(),
+            fingerprint.clone(),
         )
         .unwrap();
 
@@ -340,6 +352,7 @@ mod tests {
         assert_eq!(record.recorded_at(), &ts);
         assert_eq!(record.rationale(), &rationale);
         assert_eq!(record.verdict(), &DryCheckVerdict::Accepted);
+        assert_eq!(record.config_fingerprint(), &fingerprint);
     }
 
     // ── DryCheckVerdict::Violation ─────────────────────────────────────────────

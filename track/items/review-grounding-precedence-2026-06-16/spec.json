@@ -1,0 +1,310 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "ADR decision 根拠信号機: review 優先化 + grounding 値オブジェクト検証",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "ADR decision 根拠信号機の優先規則を「review grounding が一件でもあれば 🟡」に修正し、user_decision_ref と review_finding_ref の両方を持つ decision が誤って 🔵 に評価される現行バグを解消する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "grounding 参照文字列（user_decision_ref / review_finding_ref）をドメイン値オブジェクト（newtype）で保護し、空文字列・空白のみの placeholder が Some(_) を満たして信号を誤誘発するのを型レベルで排除する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "classify_grounds 関数の判定順反転: review_finding_ref が user_decision_ref より優先される（両方あれば 🟡、user のみなら 🔵、いずれもなければ 🔴、grandfathered はスキップ）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "grounds.rs の doc コメントにある「user 優先」記述を新しい優先規則（review 優先）に更新する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "テスト test_evaluate_adr_decision_user_ref_takes_priority_over_review_ref の期待値を反転し、両方の ref を持つ decision が 🟡 を返すことを検証するテストに更新する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "grounding 参照用ドメイン値オブジェクト（newtype）を domain 層に新設する。try_new で空文字列・空白のみを Err（ValidationError）として拒否し、正常値は Ok で返す。既存の InformalGroundSummary::try_new / AdrAnchor::try_new と同じ「空・空白 reject」パターンに揃える。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "AdrDecisionCommon の user_decision_ref / review_finding_ref フィールドを Option<String> から Option<grounding 参照 newtype> に変更する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "infrastructure の DTO→domain 変換（decision_dto_to_entry / AdrDecisionCommon 構築）で値オブジェクトの構築エラーを AdrFrontMatterCodecError::InvalidDecisionField として伝播させる。空・未記入 placeholder が slip-through するのを防ぐ fail-closed 設計（CN-01）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "knowledge/conventions/adr.md の YAML front-matter grounds 表の review_finding_ref 行を「review あり → 🟡（user_decision_ref の有無を問わず）」に更新する（D1 の Consequences に明記された convention 更新義務）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "旧 ADR 2026-04-27-1234-adr-decision-traceability-lifecycle.md の D1 front-matter を status: superseded に遷移させ、superseded_by: 2026-06-16-0042-adr-signal-review-grounding-precedence.md#D1 を付帯する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "D4 の対象である 6 件の既存 both-ref decision（2026-05-29-1118: D1/D2/D3/D4、2026-05-18-1223: D3、2026-05-26-1813: D6）に対する per-decision ユーザー確認・grounding 付与は、このトラックの code/artifact 変更に含めない。D1 の優先規則反転により当該 decision は信号上 🔵→🟡 に変わるが、🟡 は CI を block しないため実装上の問題にはならない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "grounding 参照 newtype を user / review で共有する単一型にするか、UserDecisionRef / ReviewFindingRef の 2 型に分けるかの比較検討は Phase 2 type-designer で解決済みであり、本 spec では追加の分割型設計タスクを扱わない。Phase 2 の型カタログでは、共通の非空・非空白バリデーション規則に基づき単一の DecisionGroundRef を採用する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "空文字列・空白のみの grounding 参照は None への silent normalization を行わず、fail-closed の構築時エラー（Err）として報告しなければならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "信号機の 3 値モデル（🔵🟡🔴）は不変であり、新たな色・バリアントを追加しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "grandfathered: true の decision は引き続き評価スキップ（最上位スキップ）とし、D1 の優先規則反転後もこの挙動を変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "grounding 参照 newtype は domain 層に配置し、DTO との変換（YAML→domain）は infrastructure 層で行う。domain 型に YAML/serde の知識を持ち込まない（ヘキサゴナルアーキテクチャ原則）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "旧 ADR 2026-04-27-1234 の D2 / D3 / D4 は本トラックの supersede 対象外であり、これらの decision は有効のまま変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "user_decision_ref と review_finding_ref の両方を持つ decision が classify_grounds により 🟡 を返す（旧挙動は 🔵、D1 反転の核心）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "user_decision_ref のみを持ち review_finding_ref を持たない decision が classify_grounds により 🔵 を返す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "いずれの grounding ref も持たない decision が classify_grounds により 🔴 を返す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "grandfathered: true の decision が classify_grounds の評価をスキップされる（信号色を返さず除外される）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "空文字列（\"\"）を渡して grounding 参照 newtype を構築しようとすると Err（ValidationError）が返る。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "空白のみの文字列（\"  \" 等）を渡して grounding 参照 newtype を構築しようとすると Err（ValidationError）が返る。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "正常な非空・非空白の grounding 参照文字列（例: \"chat_segment:2026-06-16\"）を渡して grounding 参照 newtype を構築すると Ok が返る。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "bin/sotp verify adr-signals が空 placeholder（Some(\"\") 相当）を user_decision_ref / review_finding_ref に持つ ADR ファイルを InvalidDecisionField エラーとして fail する（fail-closed, CN-01）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "旧 ADR 2026-04-27-1234-adr-decision-traceability-lifecycle.md の D1 front-matter の status フィールドが superseded であり、superseded_by が 2026-06-16-0042-adr-signal-review-grounding-precedence.md#D1 を指している。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "knowledge/conventions/adr.md の grounds 表の review_finding_ref 行が「review あり → 🟡（user_decision_ref の有無を問わず）」を記述しており、旧「user_decision_ref 未設定なら 🟡」という文言が残っていない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "YAML front-matter"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/source-attribution.md",
+      "anchor": "Source Tag Types"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 27,
+    "yellow": 0,
+    "red": 0
+  }
+}

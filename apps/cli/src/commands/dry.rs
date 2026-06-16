@@ -160,6 +160,9 @@ pub fn execute_dry_results(args: DryResultsArgs) -> ExitCode {
 // ── sotp dry check-approved ───────────────────────────────────────────────────
 
 /// Arguments for `sotp dry check-approved`.
+///
+/// D5 / T005: pure-read gate — no `--db-path`, `--threshold`, or
+/// `--workspace-root` flags (those inputs are no longer consulted).
 #[derive(Debug, Args)]
 pub struct DryCheckApprovedArgs {
     /// Track ID used to locate the per-track dry-check.json and .commit_hash.
@@ -174,18 +177,6 @@ pub struct DryCheckApprovedArgs {
     /// fallback; malformed → warn + main fallback).
     #[arg(long)]
     pub base_commit: Option<String>,
-
-    /// Path to the local LanceDB semantic index database.
-    #[arg(long, default_value = ".semantic_index")]
-    pub db_path: PathBuf,
-
-    /// Cosine similarity threshold (0.0–1.0).
-    #[arg(long)]
-    pub threshold: Option<f32>,
-
-    /// Workspace root to scan for Rust sources (corpus + diff fragment extraction).
-    #[arg(long, default_value = ".")]
-    pub workspace_root: PathBuf,
 
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
@@ -206,9 +197,6 @@ pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
     outcome_to_exit(CliApp::new().dry_check_approved(DryCheckApprovedInput {
         track_id,
         base_commit: args.base_commit,
-        db_path: args.db_path,
-        threshold: args.threshold,
-        workspace_root: args.workspace_root,
         items_dir: args.items_dir,
     }))
 }
@@ -299,13 +287,25 @@ mod tests {
         TestCli::parse_from(args).cmd
     }
 
+    /// Parse a `dry write ...` argv and run an assertion closure against the
+    /// resulting [`DryWriteArgs`]. Consolidates the parse-and-match boilerplate
+    /// shared by every `dry write` argument test (required defaults + each
+    /// optional flag).
+    fn with_dry_write_args(argv: &[&str], context: &str, assert: impl FnOnce(&DryWriteArgs)) {
+        match parse_dry(argv) {
+            DryCommand::Write(args) => assert(&args),
+            other => panic!("expected Write for {context}, got {other:?}"),
+        }
+    }
+
     // ── sotp dry write: arg parsing ───────────────────────────────────────────
 
     #[test]
     fn test_dry_write_required_args_parse_correctly() {
-        let cmd = parse_dry(&["dry", "write", "--track-id", "my-track"]);
-        match cmd {
-            DryCommand::Write(args) => {
+        with_dry_write_args(
+            &["dry", "write", "--track-id", "my-track"],
+            "required defaults",
+            |args| {
                 assert_eq!(args.track_id, "my-track");
                 assert!(args.base_commit.is_none(), "base_commit must be absent by default");
                 assert_eq!(args.db_path, PathBuf::from(".semantic_index"));
@@ -314,58 +314,36 @@ mod tests {
                     args.model.is_none(),
                     "model must be absent by default (resolved from agent-profiles)"
                 );
-            }
-            other => panic!("expected Write, got {other:?}"),
-        }
+            },
+        );
     }
 
+    /// Verify each optional `dry write` flag round-trips into the parsed
+    /// `Write` args. Consolidates the per-flag tests so the parse-and-match
+    /// pattern is captured once (includes `--model`, `--base-commit`,
+    /// `--threshold`, and `--db-path`).
     #[test]
-    fn test_dry_write_explicit_model_parses_when_given() {
-        let cmd = parse_dry(&["dry", "write", "--track-id", "my-track", "--model", "gpt-5.5"]);
-        match cmd {
-            DryCommand::Write(args) => {
-                assert_eq!(
-                    args.model.as_deref(),
-                    Some("gpt-5.5"),
-                    "explicit --model must be captured as Some(\"gpt-5.5\")"
-                );
-            }
-            other => panic!("expected Write, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn test_dry_write_optional_base_commit_parses_when_given() {
-        let cmd =
-            parse_dry(&["dry", "write", "--track-id", "my-track", "--base-commit", "abc1234"]);
-        match cmd {
-            DryCommand::Write(args) => {
-                assert_eq!(args.base_commit.as_deref(), Some("abc1234"));
-            }
-            other => panic!("expected Write, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn test_dry_write_custom_threshold_parses() {
-        let cmd = parse_dry(&["dry", "write", "--track-id", "my-track", "--threshold", "0.9"]);
-        match cmd {
-            DryCommand::Write(args) => {
-                assert!((args.threshold.unwrap() - 0.9).abs() < 1e-5);
-            }
-            other => panic!("expected Write, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn test_dry_write_custom_db_path_parses() {
-        let cmd = parse_dry(&["dry", "write", "--track-id", "my-track", "--db-path", "/tmp/my.db"]);
-        match cmd {
-            DryCommand::Write(args) => {
-                assert_eq!(args.db_path, PathBuf::from("/tmp/my.db"));
-            }
-            other => panic!("expected Write, got {other:?}"),
-        }
+    fn test_dry_write_optional_flags_parse_into_args() {
+        with_dry_write_args(
+            &["dry", "write", "--track-id", "my-track", "--model", "gpt-5.5"],
+            "--model",
+            |args| assert_eq!(args.model.as_deref(), Some("gpt-5.5")),
+        );
+        with_dry_write_args(
+            &["dry", "write", "--track-id", "my-track", "--base-commit", "abc1234"],
+            "--base-commit",
+            |args| assert_eq!(args.base_commit.as_deref(), Some("abc1234")),
+        );
+        with_dry_write_args(
+            &["dry", "write", "--track-id", "my-track", "--threshold", "0.9"],
+            "--threshold",
+            |args| assert!((args.threshold.unwrap() - 0.9).abs() < 1e-5),
+        );
+        with_dry_write_args(
+            &["dry", "write", "--track-id", "my-track", "--db-path", "/tmp/my.db"],
+            "--db-path",
+            |args| assert_eq!(args.db_path, PathBuf::from("/tmp/my.db")),
+        );
     }
 
     // ── sotp dry results: arg parsing ─────────────────────────────────────────
@@ -425,22 +403,30 @@ mod tests {
             DryCommand::CheckApproved(args) => {
                 assert_eq!(args.track_id.as_deref(), Some("my-track"));
                 assert!(args.base_commit.is_none(), "base_commit must be absent by default");
-                assert_eq!(args.db_path, PathBuf::from(".semantic_index"));
-                assert!(args.threshold.is_none(), "threshold must be absent by default");
+                assert_eq!(args.items_dir, PathBuf::from("track/items"));
             }
             other => panic!("expected CheckApproved, got {other:?}"),
         }
     }
 
+    /// D5 / T005: `dry check-approved` is now a pure-read gate and rejects
+    /// removed write-only inputs at parse time.
     #[test]
-    fn test_dry_check_approved_custom_threshold_parses() {
-        let cmd =
-            parse_dry(&["dry", "check-approved", "--track-id", "my-track", "--threshold", "0.9"]);
-        match cmd {
-            DryCommand::CheckApproved(args) => {
-                assert!((args.threshold.unwrap() - 0.9).abs() < 1e-5);
-            }
-            other => panic!("expected CheckApproved, got {other:?}"),
+    fn test_dry_check_approved_rejects_removed_flags() {
+        for (flag, value, message) in [
+            ("--threshold", "0.9", "--threshold must be rejected after T005 removal"),
+            ("--db-path", "/tmp/my.db", "--db-path must be rejected after T005 removal"),
+            ("--workspace-root", ".", "--workspace-root must be rejected after T005 removal"),
+        ] {
+            let result = TestCli::try_parse_from([
+                "dry",
+                "check-approved",
+                "--track-id",
+                "my-track",
+                flag,
+                value,
+            ]);
+            assert!(result.is_err(), "{message}");
         }
     }
 

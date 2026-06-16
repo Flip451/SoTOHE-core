@@ -505,6 +505,7 @@ fn track_command_label(cmd: &commands::track::TrackCommand) -> &'static str {
         TrackCommand::BaselineCapture { .. } => "track baseline-capture",
         TrackCommand::CatalogueImplSignals { .. } => "track catalogue-impl-signals",
         TrackCommand::Lint { .. } => "track lint",
+        TrackCommand::FixpointResolve(_) => "track fixpoint-resolve",
         TrackCommand::SetCommitHash(_) => "track set-commit-hash",
     }
 }
@@ -517,6 +518,7 @@ fn track_command_label(cmd: &commands::track::TrackCommand) -> &'static str {
 ///   effects; emitting on these would pollute the log with noise.
 /// - `Views { Validate }`: read-only metadata validation.
 /// - `SpecElementHash`: read-only hash output helper.
+/// - `FixpointResolve`: read-only gate selector that only prints the next step.
 /// - `CatalogueImplSignals` / `TypeGraph` / `ContractMap`: diagnostic/display
 ///   commands; run on demand for viewing purposes, not part of the workflow
 ///   execution path that telemetry is meant to track.
@@ -530,6 +532,7 @@ fn is_display_only_track_command(cmd: &commands::track::TrackCommand) -> bool {
             | TrackCommand::TaskCounts { .. }
             | TrackCommand::Views { action: ViewAction::Validate { .. } }
             | TrackCommand::SpecElementHash { .. }
+            | TrackCommand::FixpointResolve(_)
             | TrackCommand::CatalogueImplSignals { .. }
             | TrackCommand::TypeGraph { .. }
             | TrackCommand::ContractMap { .. }
@@ -842,6 +845,19 @@ mod tests {
         assert_eq!(value["track_id"], track_id);
         assert_eq!(value["command"], "track archive");
         assert_eq!(value["exit_code"], 0);
+    }
+
+    #[test]
+    fn test_is_display_only_track_command_fixpoint_resolve_returns_true() {
+        let cmd = crate::commands::track::TrackCommand::FixpointResolve(
+            crate::commands::track::fixpoint_resolve::FixpointResolveArgs {
+                items_dir: std::path::PathBuf::from("track/items"),
+                track_id: "my-track".to_owned(),
+                current_branch: "track/my-track".to_owned(),
+            },
+        );
+
+        assert!(super::is_display_only_track_command(&cmd));
     }
 
     // ── CliCommand::Conventions entrypoint dispatch routing ──────────────────

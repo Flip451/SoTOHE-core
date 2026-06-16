@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "db80917149cfa32a9098e035c160c821826ae8e9d1a4a2b473d0c2d5c8ca6b8b",
+  "signals": [
+    {
+      "type_name": "DryCheckConfigFingerprint",
+      "signal": "blue",
+      "entry_hash": "6f6996dbfc000354102d8fcc748b1df1378bc22f3417620be34281b63f379e56"
+    },
+    {
+      "type_name": "DryCheckConfigFingerprintError",
+      "signal": "blue",
+      "entry_hash": "610ef62aa14e12f41d4d771487dd8625d67caf67a53cd34fd8a0b8016169b659"
+    },
+    {
+      "type_name": "DryCheckCorpusFingerprint",
+      "signal": "blue",
+      "entry_hash": "00dcff91e1b54511324b90b7d9fb82a315116d67438911dae14da7763ba93893"
+    },
+    {
+      "type_name": "DryCheckCorpusFingerprintError",
+      "signal": "blue",
+      "entry_hash": "c1b0955f3c260c0f3506f3fcb3544a402b98d0d5ad2fea5cb9184597edd8c471"
+    },
+    {
+      "type_name": "DryCheckCoverageRecord",
+      "signal": "blue",
+      "entry_hash": "bc307376e66545ef026fb104dcc6992f7a4ad3a130e4c7cefdde58f65a7e18a4"
+    },
+    {
+      "type_name": "DryCheckEntry",
+      "signal": "blue",
+      "entry_hash": "865d85db1aa6fc2a0c7822000b352f39d6b97ad7c8a38d139f9a44750e9e06d1"
+    },
+    {
+      "type_name": "DryCheckEntryError",
+      "signal": "blue",
+      "entry_hash": "e8fbf3d7343093f35bc8dfc578c8f36df676ab042b0a72af70c1088891e53813"
+    },
+    {
+      "type_name": "DryCheckRecord",
+      "signal": "blue",
+      "entry_hash": "c3ac257a2286f9197d93c521cd259fa4b97c76dba91fa391d32ec270880fbfe7"
+    },
+    {
+      "type_name": "DryCheckRecordError",
+      "signal": "blue",
+      "entry_hash": "4b69d3410b16e6cfd9a300fa02835d56ecab93c524a1eede8f9e65d9cdd0ac09"
+    },
+    {
+      "type_name": "FixpointStep",
+      "signal": "blue",
+      "entry_hash": "ae363f3164b0441414754494daa865167964a5f1252aa9ef231506cff2014b17"
+    },
+    {
+      "type_name": "ReviewScopeSet",
+      "signal": "blue",
+      "entry_hash": "eba2ceaf24d7025f2fc1bccda6f877690f369171176cfba76c1fc81598c245de"
+    },
+    {
+      "type_name": "ReviewScopeSetError",
+      "signal": "blue",
+      "entry_hash": "9248196dcb3d90a252dbdfc7a1b46228c254c2cb5c962f4764b8434b34ae1246"
+    }
+  ]
+}

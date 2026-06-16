@@ -2,6 +2,8 @@
 
 use thiserror::Error;
 
+use super::grounds::DecisionGroundRef;
+
 /// Validation errors for [`AdrDecisionCommon`] fields and lifecycle typestate fields.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum AdrDecisionCommonError {
@@ -25,17 +27,24 @@ pub enum AdrDecisionCommonError {
 /// `AdrDecisionCommon` as its shared payload, so grounds trace fields are accessed
 /// uniformly regardless of lifecycle state.
 ///
+/// The `user_decision_ref` and `review_finding_ref` fields use the
+/// [`DecisionGroundRef`] validated newtype rather than raw `String` so the
+/// non-empty-and-non-whitespace invariant is enforced by the type — empty
+/// placeholders cannot satisfy `is_some()` and silently drive the signal.
+///
 /// No serde derives — deserialization lives in the infrastructure adapter per CN-05.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AdrDecisionCommon {
     /// Short identifier for this decision (e.g. `"D1"`, `"D2"`). Must not be empty.
     id: String,
     /// Reference to the user's explicit approval (e.g. a chat segment timestamp or
-    /// approval marker). `Some` → blue signal.
-    user_decision_ref: Option<String>,
+    /// approval marker). `Some` → blue signal (when no `review_finding_ref` remains).
+    user_decision_ref: Option<DecisionGroundRef>,
     /// Reference to the review-process finding that produced this decision.
-    /// `Some` → yellow signal (if `user_decision_ref` is `None`).
-    review_finding_ref: Option<String>,
+    /// `Some` → yellow signal (regardless of whether `user_decision_ref` is also set,
+    /// per the review-priority rule of
+    /// `knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md` §D1).
+    review_finding_ref: Option<DecisionGroundRef>,
     /// Candidate selection note (e.g. `"chose option A over B and C"`).
     candidate_selection: Option<String>,
     /// When `true`, the `verify-adr-signals` check skips this decision (D4 exemption).
@@ -50,8 +59,8 @@ impl AdrDecisionCommon {
     /// Returns [`AdrDecisionCommonError::EmptyId`] when `id` is empty.
     pub fn new(
         id: impl Into<String>,
-        user_decision_ref: Option<String>,
-        review_finding_ref: Option<String>,
+        user_decision_ref: Option<DecisionGroundRef>,
+        review_finding_ref: Option<DecisionGroundRef>,
         candidate_selection: Option<String>,
         grandfathered: bool,
     ) -> Result<Self, AdrDecisionCommonError> {
@@ -68,13 +77,13 @@ impl AdrDecisionCommon {
     }
 
     /// Reference to the user's explicit approval of this decision, if any.
-    pub fn user_decision_ref(&self) -> Option<&str> {
-        self.user_decision_ref.as_deref()
+    pub fn user_decision_ref(&self) -> Option<&DecisionGroundRef> {
+        self.user_decision_ref.as_ref()
     }
 
     /// Reference to the review-process finding that produced this decision, if any.
-    pub fn review_finding_ref(&self) -> Option<&str> {
-        self.review_finding_ref.as_deref()
+    pub fn review_finding_ref(&self) -> Option<&DecisionGroundRef> {
+        self.review_finding_ref.as_ref()
     }
 
     /// Candidate selection note, if any.
@@ -113,15 +122,21 @@ mod tests {
     fn test_adr_decision_common_with_all_fields_populated_succeeds() {
         let common = AdrDecisionCommon::new(
             "D2",
-            Some("chat_segment:2026-04-25T03:50:00Z".to_string()),
-            Some("review_finding:RF-42".to_string()),
+            Some(DecisionGroundRef::try_new("chat_segment:2026-04-25T03:50:00Z").unwrap()),
+            Some(DecisionGroundRef::try_new("review_finding:RF-42").unwrap()),
             Some("chose option A".to_string()),
             true,
         )
         .unwrap();
         assert_eq!(common.id(), "D2");
-        assert_eq!(common.user_decision_ref(), Some("chat_segment:2026-04-25T03:50:00Z"));
-        assert_eq!(common.review_finding_ref(), Some("review_finding:RF-42"));
+        assert_eq!(
+            common.user_decision_ref().map(DecisionGroundRef::as_str),
+            Some("chat_segment:2026-04-25T03:50:00Z")
+        );
+        assert_eq!(
+            common.review_finding_ref().map(DecisionGroundRef::as_str),
+            Some("review_finding:RF-42")
+        );
         assert_eq!(common.candidate_selection(), Some("chose option A"));
         assert!(common.grandfathered());
     }
