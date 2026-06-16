@@ -23,11 +23,13 @@ use usecase::fixpoint_resolve::{
 };
 use usecase::review_v2::ReviewApprovalDecision;
 
-// ── Public re-exports for CLI test layer ──────────────────────────────────────
-// These allow `apps/cli` tests to access types needed for format_fixpoint_step
-// tests without importing `domain` or `usecase` directly (CN-02).
-pub use domain::track_phase::{FixpointStep, ReviewScopeSet};
-pub use usecase::fixpoint_resolve::{FixpointCurrentBranch, FixpointResolveError};
+// Domain / usecase types used internally by this composition module and
+// its in-crate unit tests. They are intentionally NOT re-exported through
+// the `cli_composition` public surface — `apps/cli` consumes only DTOs and
+// primitives across the CN-02 boundary, so the format-shape contract and
+// the domain-validation contract are tested here, not in `apps/cli`.
+use domain::track_phase::{FixpointStep, ReviewScopeSet};
+use usecase::fixpoint_resolve::{FixpointCurrentBranch, FixpointResolveError};
 
 use crate::{CliApp, CommandOutcome};
 
@@ -274,7 +276,7 @@ fn build_current_fragment_refs(
 /// - `RunRfp { scopes }` → `"run-rfp scopes=<s1>,<s2>..."` (BTreeSet iteration order)
 /// - `RunRefVerify` → `"run-ref-verify"`
 /// - `Commit` → `"commit"`
-pub fn format_fixpoint_step(step: FixpointStep) -> String {
+pub(crate) fn format_fixpoint_step(step: FixpointStep) -> String {
     match step {
         FixpointStep::RunDfp => "run-dfp".to_owned(),
         FixpointStep::RunRfp { scopes } => {
@@ -494,10 +496,64 @@ impl CliApp {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
+    use std::collections::BTreeSet;
     use std::path::{Path, PathBuf};
     use std::process::Command;
 
     use super::*;
+
+    // ── format_fixpoint_step tests ────────────────────────────────────────────
+    //
+    // These live in `cli-composition` (not in `apps/cli`) so that
+    // `format_fixpoint_step` callers do not need to import `domain` /
+    // `usecase` types across the CN-02 boundary. `apps/cli` tests only
+    // exercise the clap argument-parsing surface and the dispatch shim;
+    // the output-shape contract is owned here.
+
+    #[test]
+    fn test_format_fixpoint_step_run_dfp() {
+        assert_eq!(format_fixpoint_step(FixpointStep::RunDfp), "run-dfp");
+    }
+
+    #[test]
+    fn test_format_fixpoint_step_run_rfp_single_scope() {
+        let mut set = BTreeSet::new();
+        set.insert("plan-artifacts".to_owned());
+        let scopes = ReviewScopeSet::try_new(set).unwrap();
+        assert_eq!(
+            format_fixpoint_step(FixpointStep::RunRfp { scopes }),
+            "run-rfp scopes=plan-artifacts"
+        );
+    }
+
+    #[test]
+    fn test_format_fixpoint_step_run_rfp_multiple_scopes_in_btreeset_order() {
+        let mut set = BTreeSet::new();
+        set.insert("code".to_owned());
+        set.insert("plan-artifacts".to_owned());
+        let scopes = ReviewScopeSet::try_new(set).unwrap();
+        // "code" < "plan-artifacts" in BTreeSet order.
+        assert_eq!(
+            format_fixpoint_step(FixpointStep::RunRfp { scopes }),
+            "run-rfp scopes=code,plan-artifacts"
+        );
+    }
+
+    #[test]
+    fn test_format_fixpoint_step_run_ref_verify() {
+        assert_eq!(format_fixpoint_step(FixpointStep::RunRefVerify), "run-ref-verify");
+    }
+
+    #[test]
+    fn test_format_fixpoint_step_commit() {
+        assert_eq!(format_fixpoint_step(FixpointStep::Commit), "commit");
+    }
+
+    // FixpointCurrentBranch validation (empty-string rejection, etc.) is
+    // tested in the usecase layer where the type is defined
+    // (`libs/usecase/src/fixpoint_resolve.rs`). Re-asserting it here would
+    // duplicate that contract; the composition layer only owns the
+    // formatting-shape contract above.
 
     // ── Test helpers ──────────────────────────────────────────────────────────
 

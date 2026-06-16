@@ -76,10 +76,7 @@ pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
 };
 pub use telemetry::TelemetryReportInput;
-pub use track::fixpoint_resolve::{
-    FixpointCurrentBranch, FixpointResolveError, FixpointResolveInput, FixpointStep,
-    ReviewScopeSet, format_fixpoint_step,
-};
+pub use track::fixpoint_resolve::FixpointResolveInput;
 
 /// Build the argument vector for a `codex exec --sandbox read-only` invocation.
 ///

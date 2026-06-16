@@ -1,150 +1,68 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "f06159573c2d2d6fa39399dbf3fa10a5a3668fc2b6e44eced263e40521c840ae",
+  "corpus_fingerprint": "693b8880bfd1bd1cf683b744c0098554158993eda915bf9281aa822471b11d08",
   "fragment_refs": [
     {
-      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-      "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+      "path": "apps/cli-composition/src/lib.rs",
+      "content_hash": "9971fe10f5a865c412509c2800aeb2c1fc458ac2e24745890fe67a0bae500c88"
     },
     {
-      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-      "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
+      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "content_hash": "0dcebd92453194cb15d3fc3d649483c829760ee3d11fd6b2d5bbfa6fc3c16c88"
     },
     {
-      "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-      "content_hash": "779f3603d8ba7670b5355600b5d5c066a1553582173575793b1312f4c77413e8"
+      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "content_hash": "1920f617fd2b7108779d24743e3ec5c8633f59f72685c73e6cd1c61e37131241"
+    },
+    {
+      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "content_hash": "3b7b385c1afc7357cf076a11aa97482bd95395fcfc755fadbe4966106e7301dd"
+    },
+    {
+      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "content_hash": "8a3dc20c6dc5b38b4fe0050527f70bf3562d3866c7b145ac6b8c73f643099092"
+    },
+    {
+      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "content_hash": "98fc3bd29d31b65d615275c6bce1e3cfff2f2732f04607fa087a3d3b33507682"
+    },
+    {
+      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "content_hash": "a838acef637cc4a27bda54dfa925edbaf1083ef51aca2eedee161ca3fa954340"
+    },
+    {
+      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "content_hash": "b1a1934f073aca44a38e011a87ef46ab0313a4efa68329d72716d6d110b90e98"
+    },
+    {
+      "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "content_hash": "f8dd8f5cae90967af94a3ff0018d00bce2f587e52b5e45b5a1de2ca7d1b2e96a"
+    },
+    {
+      "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+      "content_hash": "674a7785640df578ae22ae06730c0bfb0616b49e969c36ac6273ba7b7d4bce1d"
     }
   ],
   "processed_pair_keys": [
     {
       "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+        "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+        "content_hash": "0dcebd92453194cb15d3fc3d649483c829760ee3d11fd6b2d5bbfa6fc3c16c88"
       },
       "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
+        "path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+        "content_hash": "a838acef637cc4a27bda54dfa925edbaf1083ef51aca2eedee161ca3fa954340"
       }
     },
     {
       "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
+        "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+        "content_hash": "674a7785640df578ae22ae06730c0bfb0616b49e969c36ac6273ba7b7d4bce1d"
       },
       "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "23b451c35687c9162f753fe52780c35f8b4bbe0564e6e351de9f68e7177e6b48"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "445d1b0b53fa1db9111ab0c53e1129861f5dfc2ff2c8955497b43295cc45d06c"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "4f2e4676400742fa7d69bc74daa656450842da0e5f7114e0c460a0d6d029ffdf"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "67d7baa854b722a9d045f20fc270b8defbb10cb5b17b763f0df62f3b9bd52993"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "74b2cb67c0f214a0a15cb3a30943af115989793663df12e3b2423562d7a7520f"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "98efcfcfeecfc7c141b75089c740030b7acecd2afcabf9f6f7690153fcb73503"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "9ea48170e9ea26bfb142e2e744e7af2ac97d481e377e22afdeacd4075dd9e230"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "c492ca16878516cec16a8e753440c3d4a19f3af03793d99a9a86f8481838c557"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "0e572323a826e7f325bdd22cc509dbeeffc6727e9f2f2c1686c743a463a7e8b0"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "f677a0075ee35d19a69b2fcd9fbcad18deafcb88c545d7d28cc8c5de82cc1ac9"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "23b451c35687c9162f753fe52780c35f8b4bbe0564e6e351de9f68e7177e6b48"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "9ea48170e9ea26bfb142e2e744e7af2ac97d481e377e22afdeacd4075dd9e230"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "17977cdc189321bab3e332f764e6450fbc3982b04a70f8f6a3345f9bcad63045"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/approval_interactor.rs",
-        "content_hash": "f677a0075ee35d19a69b2fcd9fbcad18deafcb88c545d7d28cc8c5de82cc1ac9"
+        "path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+        "content_hash": "d64a3408dd95f7eed57a7d31ba68d02927954ae4a241e36acaa92803e5757922"
       }
     }
   ]

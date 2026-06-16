@@ -11768,6 +11768,52 @@
       "rationale": "These are two distinct test cases that share a small amount of setup boilerplate, but they exercise different behavior: one covers a missing/truncated verdict record and the other covers an active latest Violation record. The overlap is limited to the standard arrange-act-assert pattern for the same API, which is normal in tests and not a meaningful DRY violation.",
       "recorded_at": "2026-06-16T12:40:22Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "low_hash": "0dcebd92453194cb15d3fc3d649483c829760ee3d11fd6b2d5bbfa6fc3c16c88",
+      "high_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "high_hash": "a838acef637cc4a27bda54dfa925edbaf1083ef51aca2eedee161ca3fa954340",
+      "changed_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8728609681129456,
+      "threshold": 0.8500000238418579,
+      "base_commit": "9e9e9eaa1bd3e15dcd0442626dfb65056e6225b5",
+      "rationale": "These fragments are similar test scaffolding, but they exercise different behaviors: one covers a single-scope rendering case and the other verifies multi-scope ordering in a BTreeSet. The overlap is normal test setup reuse, not harmful duplication.",
+      "recorded_at": "2026-06-16T13:15:08Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "low_hash": "75b34a91278023d2219c8107a85a0063ab3577338ceed94dc23b0cfb1a32f25f",
+      "high_path": "libs/usecase/src/fixpoint_resolve.rs",
+      "high_hash": "a05a3696218b969818decb26e5c98872d3d09c7e3944827cc5a9801839dad96c",
+      "changed_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Keep the validation test in `libs/usecase/src/fixpoint_resolve.rs` and remove the duplicate CLI-composition test, or replace it with a higher-level CLI/composition test that proves an empty current-branch input is rejected through that layer’s public boundary without directly retesting `FixpointCurrentBranch::try_new`."
+        }
+      },
+      "similarity_score": 0.9161301255226136,
+      "threshold": 0.8500000238418579,
+      "base_commit": "9e9e9eaa1bd3e15dcd0442626dfb65056e6225b5",
+      "rationale": "Both fragments exercise the same domain invariant on the same constructor: `FixpointCurrentBranch::try_new(String::new())` must return `FixpointResolveError::InvalidCurrentBranch`. The changed CLI-composition test does not add a CLI/composition-specific behavior; it duplicates the existing usecase-level validation test.",
+      "recorded_at": "2026-06-16T13:15:08Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+      "low_hash": "674a7785640df578ae22ae06730c0bfb0616b49e969c36ac6273ba7b7d4bce1d",
+      "high_path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+      "high_hash": "d64a3408dd95f7eed57a7d31ba68d02927954ae4a241e36acaa92803e5757922",
+      "changed_path": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.870928168296814,
+      "threshold": 0.8500000238418579,
+      "base_commit": "9e9e9eaa1bd3e15dcd0442626dfb65056e6225b5",
+      "rationale": "The two fragments cover different behaviors rather than duplicating the same logic: the existing test checks the failure case when `--track-id` is missing, while the changed test checks the success case when both required flags are present and verifies the default `items_dir`. That is complementary test coverage, not a DRY violation.",
+      "recorded_at": "2026-06-16T13:15:08Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }

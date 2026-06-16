@@ -50,10 +50,7 @@ pub fn execute_fixpoint_resolve(args: FixpointResolveArgs) -> Result<ExitCode, C
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
-    use std::collections::BTreeSet;
-
     use clap::Parser as _;
-    use cli_composition::{FixpointStep, ReviewScopeSet, format_fixpoint_step};
 
     // ── Clap argument parsing tests ───────────────────────────────────────────
 
@@ -104,73 +101,11 @@ mod tests {
         assert_eq!(args.items_dir.as_os_str(), "track/items");
     }
 
-    /// Clap accepts `--current-branch ""` (empty string), but the domain layer
-    /// `FixpointCurrentBranch::try_new` rejects it.  This test documents that
-    /// the clap-level validation is permissive and the domain-level validation
-    /// is the actual gate.
-    #[test]
-    fn test_fixpoint_resolve_args_empty_current_branch_is_accepted_by_clap_but_rejected_by_domain()
-    {
-        use cli_composition::{FixpointCurrentBranch, FixpointResolveError};
-
-        // Clap parse succeeds (empty string is a valid clap string value).
-        let args = try_parse(&["test", "--track-id", "foo", "--current-branch", ""])
-            .expect("clap must accept an empty --current-branch string");
-        assert_eq!(args.current_branch, "");
-
-        // Domain validation rejects it.
-        let err = FixpointCurrentBranch::try_new(args.current_branch).unwrap_err();
-        assert!(
-            matches!(err, FixpointResolveError::InvalidCurrentBranch { .. }),
-            "domain must reject empty branch: {err:?}"
-        );
-    }
-
-    // ── format_fixpoint_step tests ────────────────────────────────────────────
-
-    /// `RunDfp` must format as `"run-dfp"`.
-    #[test]
-    fn test_format_fixpoint_step_run_dfp() {
-        assert_eq!(format_fixpoint_step(FixpointStep::RunDfp), "run-dfp");
-    }
-
-    /// `RunRfp` with a single scope must format as `"run-rfp scopes=<scope>"`.
-    #[test]
-    fn test_format_fixpoint_step_run_rfp_single_scope() {
-        let mut set = BTreeSet::new();
-        set.insert("plan-artifacts".to_owned());
-        let scopes = ReviewScopeSet::try_new(set).unwrap();
-        assert_eq!(
-            format_fixpoint_step(FixpointStep::RunRfp { scopes }),
-            "run-rfp scopes=plan-artifacts"
-        );
-    }
-
-    /// `RunRfp` with multiple scopes must format in BTreeSet (sorted) order.
-    #[test]
-    fn test_format_fixpoint_step_run_rfp_multiple_scopes_in_btreeset_order() {
-        let mut set = BTreeSet::new();
-        set.insert("code".to_owned());
-        set.insert("plan-artifacts".to_owned());
-        let scopes = ReviewScopeSet::try_new(set).unwrap();
-        // "code" < "plan-artifacts" in BTreeSet order.
-        assert_eq!(
-            format_fixpoint_step(FixpointStep::RunRfp { scopes }),
-            "run-rfp scopes=code,plan-artifacts"
-        );
-    }
-
-    /// `RunRefVerify` must format as `"run-ref-verify"`.
-    #[test]
-    fn test_format_fixpoint_step_run_ref_verify() {
-        assert_eq!(format_fixpoint_step(FixpointStep::RunRefVerify), "run-ref-verify");
-    }
-
-    /// `Commit` must format as `"commit"`.
-    #[test]
-    fn test_format_fixpoint_step_commit() {
-        assert_eq!(format_fixpoint_step(FixpointStep::Commit), "commit");
-    }
+    // Domain-level validation tests for `FixpointCurrentBranch::try_new` and
+    // output-shape tests for `format_fixpoint_step` live in
+    // `apps/cli-composition/src/track/fixpoint_resolve.rs` so the
+    // `cli_composition` public surface does not have to re-export `domain` /
+    // `usecase` types across the CN-02 boundary.
 
     // ── execute_fixpoint_resolve dispatch tests ───────────────────────────────
 
