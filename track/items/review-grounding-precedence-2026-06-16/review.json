@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:568fdd42cbebf8579b126a935a345d888c1b5f2773cde56a88cbfa36d51a7b50",
+          "at": "2026-06-16T04:11:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Line 24 names the ADR front-matter convention as `knowledge/adr/adr.md`, but the same ADR later identifies the same convention/update target as `knowledge/conventions/adr.md` in Consequences/Related. This is an internal cross-document reference contradiction that makes the implementation target ambiguous; align the Context reference with the convention path used elsewhere.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+              "line": 24,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:568fdd42cbebf8579b126a935a345d888c1b5f2773cde56a88cbfa36d51a7b50",
+          "at": "2026-06-16T04:14:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 makes the per-decision grounding adjudication a work item of the track implementing this ADR, but the briefing defines that adjudication of the six flipped decisions as a manual follow-up that is out of scope for this track's code. As written, downstream planning can treat those unrelated ADR front-matter edits as required implementation work for this track, contradicting the intended scope. Clarify D4 so the current track only changes the precedence/value-object behavior and leaves the six-decision adjudication to the separate manual follow-up.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md",
+              "line": 86,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8eead052ade55c63cbd95061fcf3d62b9c126bab094fc5939d2f962c8e22204e",
+          "at": "2026-06-16T04:23:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6a3decf976b0e67d4db79d967451c2cb19f47f5f527fc52fcdfe4f47b3a16cd",
+          "at": "2026-06-16T04:25:30Z"
+        }
+      ]
+    }
+  }
+}
