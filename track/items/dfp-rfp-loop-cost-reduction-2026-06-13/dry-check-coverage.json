@@ -1,123 +1,33 @@
 {
   "schema_version": 3,
-  "config_fingerprint": "793a901aeb02032a0a424ef068b381e7f7afb65edebf89023fa32729a9c92aba",
+  "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
   "fragment_refs": [
     {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "006cfae62f8cccd7a3f61ac150185be105a916f5a4d72927896d340036b32e68"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "08903759a085cea2ba751f85ecd4bef04733b52ecb9220bbf94e8d10664692ad"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "0ead4142a4a9eb25300a033e04ee1ed6779bc768a67c9c302a6d8a84d7f56246"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "120d81ad68d8e28ac48a29d7d54e116f42ffd31e2ecfdae9909580dc925585d3"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "4911ef328552825249aaf7366da079d82e4172fac87d86ce65e63304878364e2"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "83479aef564baf9d22616840e395233ab1aed586aadd3ff135d450a63cc80461"
-    },
-    {
-      "path": "apps/cli-composition/src/dry.rs",
-      "content_hash": "d65a0482d5c81579ed07b0e8b2271a0c6e6fa323b2471af5d1091e401cb6fe7d"
+      "path": "libs/usecase/src/dry_check/interactor.rs",
+      "content_hash": "326e004b9ab2b0cd42fbedc36272933973990f0528815073263640fff403114d"
     },
     {
       "path": "libs/usecase/src/dry_check/interactor.rs",
-      "content_hash": "0a6909aeb4792927f059707a0a51a7cdb8f2dfbc1437560aacc7e075aa19a95e"
+      "content_hash": "9232768dc64fe7c90ae5158aa8ac6a63d0b9228233cf271cd840802628a88ce9"
     },
     {
       "path": "libs/usecase/src/dry_check/interactor.rs",
-      "content_hash": "2b23148022ffd9b69aeb2b07a354e53d0453f1c6497c4a0d74f3df3f9d9d6fd5"
+      "content_hash": "a8a9f2d188b79b0364d7c7acbe7a280edd4c52ff163eb3219ac72cc00ba480cc"
     },
     {
       "path": "libs/usecase/src/dry_check/interactor.rs",
-      "content_hash": "75364f57b0836a5aff96beeb30ed0894963029c36283604ead1e980d0aa1c4ad"
+      "content_hash": "b9620016eeb1431090222422cfecd8386577072a80b0ee16f369bb97fa03a01e"
     },
     {
       "path": "libs/usecase/src/dry_check/interactor.rs",
-      "content_hash": "93da9761b18fe93ef8602f7ce5e61dd62c34f4852337a5452630b887a4b6779d"
+      "content_hash": "d9546ea24ea580cb4983000493bdfecdab95a59b79e771391a9339b1783df30b"
     },
     {
       "path": "libs/usecase/src/dry_check/interactor.rs",
-      "content_hash": "a155cb8891aaf7bb9d43fef6a7d387eab6a84ef9734496bb9a3cca2575ddf391"
-    },
-    {
-      "path": "libs/usecase/src/dry_check/interactor.rs",
-      "content_hash": "b14bc3d8d988f8def6000afdf7cb80013285df87bc11c3b36ac676ec4882cff8"
-    },
-    {
-      "path": "libs/usecase/src/dry_check/interactor.rs",
-      "content_hash": "bc221c91d6e64b37607c3684a8588a445caf03d5b2b041f98dbd73dfcd23442b"
-    },
-    {
-      "path": "libs/usecase/src/dry_check/interactor.rs",
-      "content_hash": "c29b9c2790be9fb1c1e348f1b428e49ce5828725828d0a78b32e9a1f6fd8d960"
-    },
-    {
-      "path": "libs/usecase/src/dry_check/interactor.rs",
-      "content_hash": "c69697d79540985e6e5598f9413b9bf29b74b2d25c8f64bd3bd706d07116cbb3"
+      "content_hash": "e48105e70677195f9423b3c28786c6747c23e9388016588e2405462d4f0435a1"
     }
   ],
   "processed_pair_keys": [
-    {
-      "low": {
-        "path": "apps/cli-composition/src/dry.rs",
-        "content_hash": "08903759a085cea2ba751f85ecd4bef04733b52ecb9220bbf94e8d10664692ad"
-      },
-      "high": {
-        "path": "apps/cli-composition/src/dry.rs",
-        "content_hash": "73b95147a49242b655b62ecfd73dd724e38b917f8961691ec2e695dae952c39e"
-      }
-    },
-    {
-      "low": {
-        "path": "apps/cli-composition/src/dry.rs",
-        "content_hash": "120d81ad68d8e28ac48a29d7d54e116f42ffd31e2ecfdae9909580dc925585d3"
-      },
-      "high": {
-        "path": "apps/cli-composition/src/dry.rs",
-        "content_hash": "83479aef564baf9d22616840e395233ab1aed586aadd3ff135d450a63cc80461"
-      }
-    },
-    {
-      "low": {
-        "path": "apps/cli-composition/src/dry.rs",
-        "content_hash": "120d81ad68d8e28ac48a29d7d54e116f42ffd31e2ecfdae9909580dc925585d3"
-      },
-      "high": {
-        "path": "apps/cli-composition/src/dry.rs",
-        "content_hash": "d65a0482d5c81579ed07b0e8b2271a0c6e6fa323b2471af5d1091e401cb6fe7d"
-      }
-    },
-    {
-      "low": {
-        "path": "apps/cli-composition/src/dry.rs",
-        "content_hash": "83479aef564baf9d22616840e395233ab1aed586aadd3ff135d450a63cc80461"
-      },
-      "high": {
-        "path": "apps/cli-composition/src/dry.rs",
-        "content_hash": "d65a0482d5c81579ed07b0e8b2271a0c6e6fa323b2471af5d1091e401cb6fe7d"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "0a6909aeb4792927f059707a0a51a7cdb8f2dfbc1437560aacc7e075aa19a95e"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "6403d6e2ba2bd1988ba23556ef8e9a39a8fb4bdf51292cc0043dbc87a2112502"
-      }
-    },
     {
       "low": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
@@ -125,87 +35,57 @@
       },
       "high": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "75364f57b0836a5aff96beeb30ed0894963029c36283604ead1e980d0aa1c4ad"
+        "content_hash": "9232768dc64fe7c90ae5158aa8ac6a63d0b9228233cf271cd840802628a88ce9"
       }
     },
     {
       "low": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "2b23148022ffd9b69aeb2b07a354e53d0453f1c6497c4a0d74f3df3f9d9d6fd5"
+        "content_hash": "2d87aec4a82027155e8f7d417f9f55b230cc8d4cb8ef37508aabbf24d4d80d4e"
       },
       "high": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "6403d6e2ba2bd1988ba23556ef8e9a39a8fb4bdf51292cc0043dbc87a2112502"
+        "content_hash": "326e004b9ab2b0cd42fbedc36272933973990f0528815073263640fff403114d"
       }
     },
     {
       "low": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "2b23148022ffd9b69aeb2b07a354e53d0453f1c6497c4a0d74f3df3f9d9d6fd5"
+        "content_hash": "2d87aec4a82027155e8f7d417f9f55b230cc8d4cb8ef37508aabbf24d4d80d4e"
       },
       "high": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "803d035c0b357ea3b1857bf51dd09d5145a6a60660bde70a3e60a3b34f308f75"
+        "content_hash": "9232768dc64fe7c90ae5158aa8ac6a63d0b9228233cf271cd840802628a88ce9"
       }
     },
     {
       "low": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "3a1dd9291ffeccd57c4de1885c455260b6708d21d0acfd35d56adcdd0c90e8ce"
+        "content_hash": "326e004b9ab2b0cd42fbedc36272933973990f0528815073263640fff403114d"
       },
       "high": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "a155cb8891aaf7bb9d43fef6a7d387eab6a84ef9734496bb9a3cca2575ddf391"
+        "content_hash": "9232768dc64fe7c90ae5158aa8ac6a63d0b9228233cf271cd840802628a88ce9"
       }
     },
     {
       "low": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "75364f57b0836a5aff96beeb30ed0894963029c36283604ead1e980d0aa1c4ad"
+        "content_hash": "326e004b9ab2b0cd42fbedc36272933973990f0528815073263640fff403114d"
       },
       "high": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "d3087598073c4e6ce3e6efffe0d0df48a627eaa4b5288810158b239717129c93"
+        "content_hash": "b9620016eeb1431090222422cfecd8386577072a80b0ee16f369bb97fa03a01e"
       }
     },
     {
       "low": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "89d8b48429836f81b050fbf82d194dbaa517438dae49ea3e3cc3ad3b63f18c0b"
+        "content_hash": "9232768dc64fe7c90ae5158aa8ac6a63d0b9228233cf271cd840802628a88ce9"
       },
       "high": {
         "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "c29b9c2790be9fb1c1e348f1b428e49ce5828725828d0a78b32e9a1f6fd8d960"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "a155cb8891aaf7bb9d43fef6a7d387eab6a84ef9734496bb9a3cca2575ddf391"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "d3087598073c4e6ce3e6efffe0d0df48a627eaa4b5288810158b239717129c93"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "bc221c91d6e64b37607c3684a8588a445caf03d5b2b041f98dbd73dfcd23442b"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "c29b9c2790be9fb1c1e348f1b428e49ce5828725828d0a78b32e9a1f6fd8d960"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "c29b9c2790be9fb1c1e348f1b428e49ce5828725828d0a78b32e9a1f6fd8d960"
-      },
-      "high": {
-        "path": "libs/usecase/src/dry_check/interactor.rs",
-        "content_hash": "f1793f857e39995adb973409354b383ed8a09553c873ba1344241fe0546448ee"
+        "content_hash": "b9620016eeb1431090222422cfecd8386577072a80b0ee16f369bb97fa03a01e"
       }
     }
   ]

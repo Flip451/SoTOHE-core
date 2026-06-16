@@ -385,7 +385,7 @@ impl DryCheckService for DryCheckInteractor {
             run_parallel_judgments(&fragment_pairs, agent, max_parallelism, DryCheckJudgeTier::Fast)
         };
 
-        // ── STEP C: Calibration — run known-bad probes with Fast tier ────────────
+        // ── STEP C: Fast calibration — run known-bad probes with Fast tier ──────
         //
         // Calibration always runs, even when `work_items` is empty (fully cached or
         // no-candidate run).  A broken or regressed agent can invalidate previously
@@ -394,7 +394,12 @@ impl DryCheckService for DryCheckInteractor {
         //
         // Known-bad probe pairs are fixed in-memory fixtures (see `known_bad.rs`),
         // so probe construction cannot fail due to file-system unavailability.
-        let (fast_calibration_passed, calibration_error) = {
+        //
+        // Only the Fast-tier probe run happens here.  When fast calibration fails,
+        // the Final-tier probe run is deferred to STEP D/E so that production pairs
+        // are NOT re-run if Final calibration also fails (they would be discarded
+        // anyway — running them wastes agent calls).
+        let (fast_calibration_passed, probe_setup) = {
             let all_probe_pairs = known_bad_probe_pairs().map_err(|e| {
                 DryCheckCycleError::Agent(super::errors::DryCheckAgentError::Unexpected(format!(
                     "calibration probe fixture error: {e}"
@@ -412,56 +417,62 @@ impl DryCheckService for DryCheckInteractor {
             let threshold_percent =
                 self.config.known_bad_detection_threshold_percent.as_u8() as usize;
 
-            let probes_to_run =
-                all_probe_pairs.get(..run_count).unwrap_or(all_probe_pairs.as_slice());
-
             let fast_passed = run_calibration_probes(
                 agent,
-                probes_to_run,
+                all_probe_pairs.get(..run_count).unwrap_or(all_probe_pairs.as_slice()),
                 DryCheckJudgeTier::Fast,
                 threshold_percent,
             );
 
-            let cal_err: Option<DryCheckCycleError> = if !fast_passed {
-                let final_passed = run_calibration_probes(
-                    agent,
-                    probes_to_run,
-                    DryCheckJudgeTier::Final,
-                    threshold_percent,
-                );
-                if !final_passed && probe_count > 0 {
-                    Some(DryCheckCycleError::Agent(super::errors::DryCheckAgentError::Unexpected(
-                        "calibration failed".to_owned(),
-                    )))
-                } else {
-                    None
-                }
-            } else {
-                None
-            };
-
-            (fast_passed, cal_err)
+            (fast_passed, (all_probe_pairs, run_count, probe_count, threshold_percent))
         };
 
         // ── STEP D/E: Choose final production judgment results ───────────────────
-        let final_judgment_results: Vec<
-            Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>,
-        > = if fast_calibration_passed {
-            // Promote fast results, escalating Violation/Err to Final tier.
-            escalate_violations_to_final(
+        //
+        // When fast calibration failed, run the Final-tier probe calibration FIRST
+        // before spending agent calls on production pairs.  If Final calibration also
+        // fails the production pairs are discarded anyway, so skipping them avoids
+        // unnecessary agent invocations (PR-160 round-8 P1 fix).
+        let (final_judgment_results, calibration_error): (
+            Vec<Result<DryCheckAgentJudgment, super::errors::DryCheckAgentError>>,
+            Option<DryCheckCycleError>,
+        ) = if fast_calibration_passed {
+            // Fast calibration passed: promote fast results, escalating
+            // Violation/Err to Final tier.
+            let results = escalate_violations_to_final(
                 &fragment_pairs,
                 fast_judgment_results,
                 agent,
                 max_parallelism,
-            )
+            );
+            (results, None)
         } else {
-            // Discard fast results, re-run all with Final tier.
-            run_parallel_judgments(
-                &fragment_pairs,
+            // Fast calibration failed: probe with Final tier first.
+            let (all_probe_pairs, run_count, probe_count, threshold_percent) = probe_setup;
+            let final_cal_passed = run_calibration_probes(
                 agent,
-                max_parallelism,
+                all_probe_pairs.get(..run_count).unwrap_or(all_probe_pairs.as_slice()),
                 DryCheckJudgeTier::Final,
-            )
+                threshold_percent,
+            );
+            if !final_cal_passed && probe_count > 0 {
+                // Both tiers failed: agent quality is untrusted.  Skip production
+                // reruns — their verdicts will not be trusted regardless.
+                let cal_err = DryCheckCycleError::Agent(
+                    super::errors::DryCheckAgentError::Unexpected("calibration failed".to_owned()),
+                );
+                (Vec::new(), Some(cal_err))
+            } else {
+                // Final calibration passed: discard fast results, re-run all
+                // production pairs with Final tier.
+                let results = run_parallel_judgments(
+                    &fragment_pairs,
+                    agent,
+                    max_parallelism,
+                    DryCheckJudgeTier::Final,
+                );
+                (results, None)
+            }
         };
 
         // ── STEP F: Append results and collect findings ──────────────────────────
@@ -2111,6 +2122,72 @@ mod tests {
         )
     }
 
+    fn run_final_calibration_failure_scenario(
+        agent: MockMockDryCheckAgentPort,
+    ) -> (Result<Vec<DryCheckFinding>, DryCheckCycleError>, Arc<StubWriter>, Arc<StubCoverage>)
+    {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().returning(|_| Ok(()));
+        index
+            .expect_search()
+            .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
+
+        let config = DryCheckConfig::new(
+            DryCheckPercent::try_new(100).unwrap(),
+            DryCheckPercent::try_new(90).unwrap(),
+            DryCheckParallelism::try_new(1).unwrap(),
+        );
+
+        let writer = Arc::new(StubWriter::default());
+        let coverage = Arc::new(StubCoverage::new());
+        let interactor = make_interactor_with_config_and_coverage(
+            embed,
+            index,
+            agent,
+            Arc::clone(&writer),
+            config,
+            Arc::clone(&coverage),
+        );
+
+        let result =
+            interactor.run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit());
+
+        (result, writer, coverage)
+    }
+
+    fn assert_final_calibration_failure_fail_closed(
+        result: Result<Vec<DryCheckFinding>, DryCheckCycleError>,
+        writer: &StubWriter,
+        coverage: &StubCoverage,
+    ) {
+        assert!(
+            matches!(
+                &result,
+                Err(DryCheckCycleError::Agent(DryCheckAgentError::Unexpected(msg)))
+                    if msg.as_str() == "calibration failed"
+            ),
+            "expected calibration-failed error, got: {result:?}"
+        );
+        assert!(
+            writer.entries.lock().unwrap().is_empty(),
+            "pair-entry writer must not be called when calibration fails"
+        );
+        assert_eq!(
+            coverage.write_call_count(),
+            1,
+            "coverage must be written exactly once even when calibration fails"
+        );
+        assert!(
+            coverage.last_written().is_some_and(|r| r.fragment_refs().is_empty()),
+            "coverage written on calibration failure must be empty (fail-closed)"
+        );
+    }
+
     /// T012-1: Fast tier is used for production pairs when agent path is NOT a probe.
     ///
     /// With calibration passing (probe returns Violation) and a production
@@ -2132,81 +2209,81 @@ mod tests {
         );
     }
 
-    /// T012-2: Fast calibration failure causes all production pairs to be re-run
-    /// with Final tier. When Final calibration also fails, the error is returned
-    /// fail-closed — but coverage IS written first (T011 preservation) so the
-    /// current diff fragments do not remain permanently stale.
+    /// T012-2: When fast calibration fails and Final calibration also fails, the
+    /// error is returned fail-closed — but coverage IS written first (T011
+    /// preservation) so the current diff fragments do not remain permanently stale.
     ///
     /// With injection_rate=100 and 3 probes, probe_count = 3 (all probes run).
     /// All probes return NotAViolation → detection rate = 0% < threshold 90% →
-    /// fast calibration fails. Then Final tier runs all production pairs.
-    /// Final probes also return NotAViolation → final calibration also fails →
-    /// fail-closed error returned after coverage write.
+    /// fast calibration fails.  Final probes also return NotAViolation → final
+    /// calibration also fails → fail-closed error returned after coverage write.
+    ///
+    /// Crucially, production pairs are NOT re-run at Final tier: their verdicts
+    /// would be discarded anyway, so skipping them avoids unnecessary agent calls
+    /// (PR-160 round-8 P1 fix).  See T012-2b for the strict no-production-call
+    /// assertion.
     #[test]
     fn test_fast_calibration_failure_final_also_fails_returns_calibration_error() {
-        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
-
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert_batch().returning(|_| Ok(()));
-        index
-            .expect_search()
-            .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
-
         // All judge calls return NotAViolation — probes not detected.
-        let agent = make_always_not_violation_agent();
-
-        // Use injection_rate=100 so all 3 probes are run; threshold=90.
-        let config = DryCheckConfig::new(
-            DryCheckPercent::try_new(100).unwrap(),
-            DryCheckPercent::try_new(90).unwrap(),
-            DryCheckParallelism::try_new(1).unwrap(),
-        );
-
-        let writer = Arc::new(StubWriter::default());
-        let coverage = Arc::new(StubCoverage::new());
-        let interactor = make_interactor_with_config_and_coverage(
-            embed,
-            index,
-            agent,
-            Arc::clone(&writer),
-            config,
-            Arc::clone(&coverage),
-        );
-
-        let result =
-            interactor.run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit());
-
-        assert!(
-            matches!(
-                result,
-                Err(DryCheckCycleError::Agent(DryCheckAgentError::Unexpected(ref msg)))
-                    if msg == "calibration failed"
-            ),
-            "expected calibration-failed error, got: {result:?}"
-        );
+        let (result, writer, coverage) =
+            run_final_calibration_failure_scenario(make_always_not_violation_agent());
         // Pair-level writer must NOT be called: agent quality is untrusted, so no
         // production verdicts are persisted when calibration fails.
-        assert!(
-            writer.entries.lock().unwrap().is_empty(),
-            "pair-entry writer must not be called when calibration fails"
-        );
         // Coverage manifest MUST be written on calibration failure — but with an
         // EMPTY set of refs (AC-08 fail-closed).  An empty coverage record means
         // all current diff fragments are "uncovered" → `check_approved` returns
         // Blocked rather than Approved.  Writing the (empty) manifest ensures the
         // gate does not remain blocked due to a missing manifest from an older run.
-        assert_eq!(
-            coverage.write_call_count(),
-            1,
-            "coverage must be written exactly once even when calibration fails"
-        );
-        assert!(
-            coverage.last_written().is_some_and(|r| r.fragment_refs().is_empty()),
-            "coverage written on calibration failure must be empty (fail-closed)"
-        );
+        assert_final_calibration_failure_fail_closed(result, writer.as_ref(), coverage.as_ref());
+    }
+
+    /// T012-2b: When fast calibration fails AND Final calibration also fails,
+    /// `agent.judge` is NOT called for any production pair at Final tier.
+    ///
+    /// This is the strict non-call assertion for the PR-160 round-8 P1 fix:
+    /// production pairs must be skipped when Final calibration has already shown the
+    /// agent is unreliable, since their verdicts will be discarded anyway.
+    ///
+    /// Note: production pairs ARE called at Fast tier (STEP B runs before calibration
+    /// — this is by design and cannot be avoided).  The fix only skips the production
+    /// re-run at Final tier after both calibration tiers have failed.
+    ///
+    /// Setup: injection_rate=100 (all 3 probes run), threshold=90.
+    /// Fast probes → NotAViolation (fails, 0% detection < 90%).
+    /// Final probes → NotAViolation (fails, 0% detection < 90%).
+    /// Agent panics if called for a non-probe path at Final tier, proving production
+    /// re-run was skipped.
+    #[test]
+    fn test_fast_calibration_failure_final_also_fails_production_pairs_not_called() {
+        // Probe calls return NotAViolation (both tiers fail calibration: 0% < 90%).
+        // Production pairs may be called at Fast tier (STEP B runs before calibration),
+        // but must NOT be called at Final tier once both calibration tiers have failed.
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().returning(|changed, _, tier| {
+            if changed.source_path.to_string_lossy().starts_with("probes/") {
+                // Probe path: always return NotAViolation so calibration fails.
+                Ok(DryCheckAgentJudgment::NotAViolation {
+                    rationale: Rationale::new("probe: not detected").unwrap(),
+                })
+            } else if tier == DryCheckJudgeTier::Final {
+                // Production pair at Final tier must NOT happen after both tiers fail.
+                panic!(
+                    "production pair must NOT be judged at Final tier when both calibration tiers fail"
+                )
+            } else {
+                // Production pair at Fast tier (STEP B, before calibration) is expected.
+                Ok(DryCheckAgentJudgment::NotAViolation {
+                    rationale: Rationale::new("production fast: not a violation").unwrap(),
+                })
+            }
+        });
+
+        let (result, writer, coverage) = run_final_calibration_failure_scenario(agent);
+
+        // Calibration error must still be returned fail-closed.
+        // No production entries written.
+        // Coverage still written (fail-closed empty manifest).
+        assert_final_calibration_failure_fail_closed(result, writer.as_ref(), coverage.as_ref());
     }
 
     /// T012-3: When fast calibration passes but a production pair returns Violation,
