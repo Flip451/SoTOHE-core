@@ -386,29 +386,62 @@ impl DryCheckService for DryCheckInteractor {
         };
 
         // ── STEP C: Calibration — run known-bad probes with Fast tier ────────────
-        let all_probe_pairs = known_bad_probe_pairs().map_err(|e| {
-            DryCheckCycleError::Agent(super::errors::DryCheckAgentError::Unexpected(format!(
-                "calibration probe fixture error: {e}"
-            )))
-        })?;
-        let total_probes = all_probe_pairs.len();
-        let injection_rate = self.config.known_bad_injection_rate_percent.as_u8() as usize;
-        // Ceiling division: probe_count = ceil(total_probes * injection_rate / 100)
-        let probe_count =
-            if total_probes == 0 { 0 } else { (total_probes * injection_rate).div_ceil(100) };
-        // Always run at least 1 probe when probes exist.
-        let probe_count = probe_count.max(if total_probes > 0 { 1 } else { 0 });
-        let run_count = probe_count.min(all_probe_pairs.len());
+        //
+        // Calibration always runs, even when `work_items` is empty (fully cached or
+        // no-candidate run).  A broken or regressed agent can invalidate previously
+        // cached verdicts; skipping calibration on no-work runs would leave stale
+        // cache entries trusted without any agent-quality check on that run.
+        //
+        // Known-bad probe pairs are fixed in-memory fixtures (see `known_bad.rs`),
+        // so probe construction cannot fail due to file-system unavailability.
+        let (fast_calibration_passed, calibration_error) = {
+            let all_probe_pairs = known_bad_probe_pairs().map_err(|e| {
+                DryCheckCycleError::Agent(super::errors::DryCheckAgentError::Unexpected(format!(
+                    "calibration probe fixture error: {e}"
+                )))
+            })?;
+            let total_probes = all_probe_pairs.len();
+            let injection_rate = self.config.known_bad_injection_rate_percent.as_u8() as usize;
+            // Ceiling division: probe_count = ceil(total_probes * injection_rate / 100)
+            let probe_count =
+                if total_probes == 0 { 0 } else { (total_probes * injection_rate).div_ceil(100) };
+            // Always run at least 1 probe when probes exist.
+            let probe_count = probe_count.max(if total_probes > 0 { 1 } else { 0 });
+            let run_count = probe_count.min(all_probe_pairs.len());
 
-        let probes_to_run = all_probe_pairs.get(..run_count).unwrap_or(all_probe_pairs.as_slice());
-        let threshold_percent = self.config.known_bad_detection_threshold_percent.as_u8() as usize;
+            let threshold_percent =
+                self.config.known_bad_detection_threshold_percent.as_u8() as usize;
 
-        let fast_calibration_passed = run_calibration_probes(
-            agent,
-            probes_to_run,
-            DryCheckJudgeTier::Fast,
-            threshold_percent,
-        );
+            let probes_to_run =
+                all_probe_pairs.get(..run_count).unwrap_or(all_probe_pairs.as_slice());
+
+            let fast_passed = run_calibration_probes(
+                agent,
+                probes_to_run,
+                DryCheckJudgeTier::Fast,
+                threshold_percent,
+            );
+
+            let cal_err: Option<DryCheckCycleError> = if !fast_passed {
+                let final_passed = run_calibration_probes(
+                    agent,
+                    probes_to_run,
+                    DryCheckJudgeTier::Final,
+                    threshold_percent,
+                );
+                if !final_passed && probe_count > 0 {
+                    Some(DryCheckCycleError::Agent(super::errors::DryCheckAgentError::Unexpected(
+                        "calibration failed".to_owned(),
+                    )))
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
+            (fast_passed, cal_err)
+        };
 
         // ── STEP D/E: Choose final production judgment results ───────────────────
         let final_judgment_results: Vec<
@@ -429,25 +462,6 @@ impl DryCheckService for DryCheckInteractor {
                 max_parallelism,
                 DryCheckJudgeTier::Final,
             )
-        };
-
-        // ── STEP E (continued): if fast calibration failed, check Final calibration
-        let calibration_error: Option<DryCheckCycleError> = if !fast_calibration_passed {
-            let final_calibration_passed = run_calibration_probes(
-                agent,
-                probes_to_run,
-                DryCheckJudgeTier::Final,
-                threshold_percent,
-            );
-            if !final_calibration_passed && probe_count > 0 {
-                Some(DryCheckCycleError::Agent(super::errors::DryCheckAgentError::Unexpected(
-                    "calibration failed".to_owned(),
-                )))
-            } else {
-                None
-            }
-        } else {
-            None
         };
 
         // ── STEP F: Append results and collect findings ──────────────────────────
@@ -881,7 +895,7 @@ mod tests {
         index.expect_search().returning(move |_, _| Ok(results.clone()));
 
         // Agent must NOT be called for production pairs — pair is already verified.
-        // Calibration probes (path starts with "probes/") still fire exactly once.
+        // Calibration probes still run (probes always run regardless of work_items).
         let agent =
             make_probe_only_agent("non-probe agent call not expected for already-verified pair");
 
@@ -967,7 +981,7 @@ mod tests {
         index.expect_search().returning(move |_, _| Ok(results.clone()));
 
         // Agent must NOT be called for self-match production pairs.
-        // Calibration probes (path starts with "probes/") still fire exactly once.
+        // Calibration probes still run (probes always run regardless of work_items count).
         let agent = make_probe_only_agent("non-probe agent call not expected for self-match");
 
         let writer = Arc::new(StubWriter::default());
@@ -1448,8 +1462,8 @@ mod tests {
         // Search returns empty (no candidates above threshold) so no agent calls.
         index.expect_search().returning(|_, _| Ok(vec![]));
 
-        // No production agent calls (no above-threshold candidates).
-        // Calibration probes (path starts with "probes/") still fire exactly once.
+        // No production agent calls (no above-threshold candidates). Calibration
+        // probes still run (probes always run regardless of work_items count).
         let agent = make_probe_only_agent(
             "non-probe agent call not expected (no above-threshold candidates)",
         );
@@ -1487,8 +1501,8 @@ mod tests {
         // No candidates above threshold for either diff fragment.
         index.expect_search().times(2).returning(|_, _| Ok(vec![]));
 
-        // No production agent calls (no above-threshold candidates).
-        // Calibration probes (path starts with "probes/") still fire exactly once.
+        // No production agent calls (no above-threshold candidates). Calibration
+        // probes still run (probes always run regardless of work_items count).
         let agent = make_probe_only_agent(
             "non-probe agent call not expected (no above-threshold candidates)",
         );
@@ -1570,8 +1584,8 @@ mod tests {
         let embed = MockMockEmbeddingPort::new();
         let mut index = MockMockSemanticIndexPort::new();
         index.expect_insert_batch().times(1).withf(|items| items.is_empty()).returning(|_| Ok(()));
-        // No production agent calls (empty diff → no candidates).
-        // Calibration probes (path starts with "probes/") still fire exactly once.
+        // No production agent calls (empty diff → no candidates). Calibration
+        // probes still run (probes always run regardless of work_items count).
         let agent = make_probe_only_agent("non-probe agent call not expected (empty diff)");
 
         let writer = Arc::new(StubWriter::default());
@@ -1657,8 +1671,8 @@ mod tests {
         let mut index = MockMockSemanticIndexPort::new();
         index.expect_insert_batch().times(1).withf(|items| items.is_empty()).returning(|_| Ok(()));
         index.expect_search().times(1).returning(|_, _| Ok(vec![]));
-        // No production agent calls (no above-threshold candidates).
-        // Calibration probes (path starts with "probes/") still fire exactly once.
+        // No production agent calls (no above-threshold candidates). Calibration
+        // probes still run (probes always run regardless of work_items count).
         let agent = make_probe_only_agent(
             "non-probe agent call not expected (no above-threshold candidates)",
         );
@@ -2636,6 +2650,93 @@ mod tests {
             matches!(entries[0].verdict(), DryCheckVerdict::NotAViolation),
             "persisted verdict must be NotAViolation (from Final tier, not provisional Fast \
              Violation)"
+        );
+    }
+
+    // ── Round-7 P1 fix: calibration always runs even with no production pairs ──
+
+    /// When `dry_write` is called and no diff fragment produces an above-threshold
+    /// candidate (`work_items` is empty), calibration probes must still be invoked.
+    ///
+    /// Calibration guards agent quality on every run.  A regressed or broken agent
+    /// could invalidate previously cached verdicts; skipping calibration on no-work
+    /// runs would leave stale entries trusted without any quality check on that run.
+    ///
+    /// The default config (injection_rate=10, threshold=90) with 3 known-bad fixtures
+    /// yields exactly 1 probe call: `ceil(3 * 10 / 100) = 1`.  The mock asserts
+    /// `.times(1)` so a regression that skips calibration would cause the test to fail
+    /// at mock-drop time with "expected 1 call, got 0".
+    #[test]
+    fn test_no_above_threshold_candidates_still_runs_calibration_probes() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().times(1).returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert_batch().times(1).withf(|items| items.is_empty()).returning(|_| Ok(()));
+        // No candidates above threshold — work_items will be empty.
+        index.expect_search().times(1).returning(|_, _| Ok(vec![]));
+
+        // Agent must be called exactly once for the calibration probe (injection_rate=10,
+        // 3 known-bad fixtures → ceil(3*10/100)=1 probe).  No production calls expected.
+        // The `.times(1)` expectation is verified at mock-drop: if calibration is skipped,
+        // the mock panics with "expected 1 call, got 0", catching the regression.
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(1).returning(|changed, candidate, _tier| {
+            assert!(
+                changed.source_path.to_string_lossy().starts_with("probes/"),
+                "only probe paths expected in this no-work test; got: {:?}",
+                changed.source_path
+            );
+            let changed_ref = fragment_ref_of(changed).unwrap();
+            let cand_ref = fragment_ref_of(candidate).unwrap();
+            Ok(DryCheckAgentJudgment::Violation {
+                rationale: Rationale::new("probe: known bad").unwrap(),
+                finding: DryCheckFinding::new(changed_ref, cand_ref, "probe violation").unwrap(),
+            })
+        });
+
+        let coverage = Arc::new(StubCoverage::new());
+        let interactor = make_interactor_with_coverage(
+            embed,
+            index,
+            agent,
+            Arc::new(StubWriter::default()),
+            vec![],
+            Arc::clone(&coverage),
+        );
+
+        let result = interactor.run_dry_check(
+            vec![],
+            vec![diff_frag.clone()],
+            make_threshold(0.8),
+            make_commit(),
+        );
+
+        // Must succeed — calibration passes (probe returns Violation), no pair-level error.
+        assert!(result.is_ok(), "no-work run must succeed; got: {result:?}");
+        let findings = result.unwrap();
+        assert!(findings.is_empty(), "no findings expected when no candidates are above threshold");
+
+        // Coverage must be written exactly once with the current (non-fail-closed) fingerprint
+        // and empty pair_keys — there is nothing to fail-close on.
+        assert_eq!(
+            coverage.write_call_count(),
+            1,
+            "coverage must be written exactly once on a no-work run"
+        );
+        let recorded = coverage.last_written().expect("coverage must have been written");
+        assert!(
+            recorded.fragment_refs().len() == 1,
+            "coverage must include the single diff fragment ref"
+        );
+        let expected_ref = fragment_ref_of(&diff_frag).unwrap();
+        assert!(recorded.covers(&expected_ref), "coverage must cover the diff fragment ref");
+        assert_eq!(
+            recorded.config_fingerprint(),
+            &test_fingerprint(),
+            "no-work run must write the real config fingerprint, not the fail-closed sentinel"
         );
     }
 }

@@ -195,6 +195,32 @@ fn resolve_dry_write_telemetry_writer(
         .filter(|(_, telemetry_track_id)| telemetry_track_id.as_str() == dry_track_id)
 }
 
+/// Resolve the config fingerprint to store in the coverage manifest for `dry write`.
+///
+/// The fingerprint controls whether `dry check-approved` can match this manifest.
+/// `dry check-approved` always calls `infra_config.fingerprint()` (file-config threshold),
+/// so the stored fingerprint must be chosen accordingly:
+///
+/// - If `effective_threshold <= file_threshold` (stricter or equal): use `fingerprint()`
+///   (file-config threshold). The manifest covers at least as many pairs as the file config
+///   requires, so approval is safe.
+/// - If `effective_threshold > file_threshold` (more permissive override): use
+///   `fingerprint_with_threshold(effective_threshold)`. The manifest was built under a looser
+///   threshold and may be missing pairs in the `[file_threshold, effective_threshold)` range.
+///   `dry check-approved` will see a fingerprint mismatch and correctly block approval.
+fn resolve_write_config_fingerprint(
+    infra_config: &infrastructure::dry_check::DryCheckConfig,
+    effective_threshold: domain::semantic_dup::SimilarityThreshold,
+) -> domain::dry_check::DryCheckConfigFingerprint {
+    // Higher threshold value = more permissive (fewer pairs detected).
+    // Only use the override fingerprint when the override is MORE permissive than the file config.
+    if effective_threshold.value() > infra_config.threshold().value() {
+        infra_config.fingerprint_with_threshold(effective_threshold)
+    } else {
+        infra_config.fingerprint()
+    }
+}
+
 // ── CliApp impl — dry write ───────────────────────────────────────────────────
 
 impl CliApp {
@@ -299,13 +325,14 @@ impl CliApp {
             embedding_port.as_ref(),
         )?;
 
-        // Compute the fingerprint using the *effective* threshold (which may have
-        // been overridden by `--threshold`).  `infra_config.fingerprint()` always
-        // uses the file-config threshold, so a `dry write --threshold X` run
-        // would store the file-config fingerprint (not X), causing `check-approved`
-        // to accept stale coverage as fresh (P1 correctness fix).
-        // `fingerprint_with_threshold` uses the supplied threshold instead.
-        let config_fingerprint = infra_config.fingerprint_with_threshold(threshold);
+        // Resolve the stored fingerprint using the safe-approval rule:
+        // - If the effective threshold is stricter or equal to the file config threshold,
+        //   use `infra_config.fingerprint()` so `dry check-approved` can match.
+        // - If the effective threshold is MORE permissive (higher value), use
+        //   `fingerprint_with_threshold(threshold)` so `dry check-approved` sees a
+        //   mismatch and correctly blocks approval for a manifest built under looser criteria.
+        // See `resolve_write_config_fingerprint` for the full policy.
+        let config_fingerprint = resolve_write_config_fingerprint(&infra_config, threshold);
 
         let interactor = DryCheckInteractor::new(
             embedding_port,
@@ -3574,6 +3601,108 @@ exit 0
         assert!(
             content.contains("blocked:"),
             "Blocked reason_summary must contain \"blocked:\" in GateEval event; got: {content}"
+        );
+    }
+
+    // ── Round-7/8 P1: threshold-override fingerprint policy ──────────────────
+
+    /// Tests the `resolve_write_config_fingerprint` helper that controls which
+    /// fingerprint `dry write` stores in the coverage manifest.
+    ///
+    /// Policy:
+    /// - Stricter override (`threshold < file_threshold`): use `fingerprint()`
+    ///   (file-config threshold) so `dry check-approved` can match.
+    /// - Looser override (`threshold > file_threshold`): use
+    ///   `fingerprint_with_threshold(override)` so `dry check-approved` sees a
+    ///   mismatch and correctly blocks approval for a manifest built under looser
+    ///   criteria.
+    /// - Equal / no override: use `fingerprint()`.
+    ///
+    /// These tests exercise the production helper directly (not the config API in
+    /// isolation), so they will fail if the production policy is incorrect.
+    #[test]
+    fn test_resolve_write_config_fingerprint_stricter_override_uses_file_config_fingerprint() {
+        // File config threshold = 0.85.
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        );
+
+        // Stricter override: 0.70 < 0.85.
+        let stricter_threshold = domain::semantic_dup::SimilarityThreshold::new(0.70_f32).unwrap();
+        let stored = resolve_write_config_fingerprint(&infra_config, stricter_threshold);
+
+        // Must equal the file-config fingerprint so `dry check-approved` can match.
+        assert_eq!(
+            stored,
+            infra_config.fingerprint(),
+            "stricter override: stored fingerprint must equal infra_config.fingerprint()"
+        );
+    }
+
+    #[test]
+    fn test_resolve_write_config_fingerprint_looser_override_uses_override_fingerprint() {
+        // File config threshold = 0.85.
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        );
+
+        // Looser override: 0.95 > 0.85.
+        let looser_threshold = domain::semantic_dup::SimilarityThreshold::new(0.95_f32).unwrap();
+        let stored = resolve_write_config_fingerprint(&infra_config, looser_threshold);
+
+        // Must equal fingerprint_with_threshold(override) so `dry check-approved` (which
+        // calls fingerprint()) sees a mismatch and correctly blocks approval.
+        let expected = infra_config.fingerprint_with_threshold(looser_threshold);
+        assert_eq!(
+            stored, expected,
+            "looser override: stored fingerprint must equal fingerprint_with_threshold(override)"
+        );
+        assert_ne!(
+            stored,
+            infra_config.fingerprint(),
+            "looser override: stored fingerprint must NOT equal file-config fingerprint"
+        );
+    }
+
+    #[test]
+    fn test_resolve_write_config_fingerprint_equal_threshold_uses_file_config_fingerprint() {
+        // File config threshold = 0.85.
+        let infra_config = load_infra_dry_check_config_from_json(
+            r#"{
+                "schema_version": 3,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        );
+
+        // Equal threshold: same as file config.
+        let equal_threshold = domain::semantic_dup::SimilarityThreshold::new(0.85_f32).unwrap();
+        let stored = resolve_write_config_fingerprint(&infra_config, equal_threshold);
+
+        assert_eq!(
+            stored,
+            infra_config.fingerprint(),
+            "equal threshold: stored fingerprint must equal infra_config.fingerprint()"
         );
     }
 }

@@ -45,8 +45,8 @@
       "provider": "gemini"
     },
     "review-fix-lead": {
-      "provider": "claude",
-      "model": "claude-opus-4-8"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "dry-checker": {
       "provider": "codex",
@@ -54,8 +54,8 @@
       "fast_model": "gpt-5.4-mini"
     },
     "dry-fix-lead": {
-      "provider": "claude",
-      "model": "claude-opus-4-8"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "pr-reviewer": {
       "provider": "codex"
