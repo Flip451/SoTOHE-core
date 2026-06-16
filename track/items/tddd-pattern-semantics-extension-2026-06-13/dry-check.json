@@ -5734,6 +5734,97 @@
       "base_commit": "13fd7cd42ead850699933ad1f94dd53cd5eb3a99",
       "rationale": "The changed fragment only declares the sibling helper module and imports the specific helper functions it uses. The candidate fragment is the implementation of that helper module. The overlapping comments and imports describe the parent-child module relationship and shared dependencies, but they do not duplicate behavior, validation logic, or maintain two copies of the same knowledge in executable code.",
       "recorded_at": "2026-06-16T00:35:59Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "5ddc790e9a2f984ee6a1a3f88a43bfbc41c30d8e850a81765d28caa14ff04d41",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "65d43d5e2b163fd10d8026bc437609c0fb7b904343611206427a92af9b471007",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8751370310783386,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4a7751bcfa61a803a02fe141c99b41d79f778ba5",
+      "rationale": "The fragments implement role-to-kind_tag mappings for different enum domains: DataRole plus TypeKindV2 shape in the changed code, and ContractRole in the candidate code. Although both functions belong to the same kind_tag scheme and have similar documentation wording, they encode distinct mappings and decision inputs, so there is no duplicated behavioral logic that should be unified.",
+      "recorded_at": "2026-06-16T01:22:28Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "5ddc790e9a2f984ee6a1a3f88a43bfbc41c30d8e850a81765d28caa14ff04d41",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "a8d91b5e3c0003294eccd7b10620643c589a7a1c8f631988ead46d043f632427",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.850987434387207,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4a7751bcfa61a803a02fe141c99b41d79f778ba5",
+      "rationale": "The fragments repeat descriptive documentation about the same kind_tag output scheme, but they do not duplicate implementation logic or create competing sources of truth. The actual DataRole mapping is implemented once in data_role_kind_tag; the candidate fragment only contains module/function docs and imports that contextualize the helper. The repeated ADR/context wording is acceptable documentation overlap, not a maintainability DRY violation.",
+      "recorded_at": "2026-06-16T01:22:50Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "b510ae5ff0585121f9c8702710cde2ca9dc475612808daa2a5eed7089460bfb4",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "d2c66aad53e202b56c75298d8d06d68732b1d8aa1e0974d41811d408edbe6975",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9270508885383606,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4a7751bcfa61a803a02fe141c99b41d79f778ba5",
+      "rationale": "The fragments have similar test structure, but they cover distinct data-role branches and expected tags: DomainEvent with a populated enum payload versus ErrorType with an empty enum. The repeated arrange/act/assert pattern is small and improves test readability without duplicating production logic or creating meaningful maintenance risk.",
+      "recorded_at": "2026-06-16T01:23:07Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "b510ae5ff0585121f9c8702710cde2ca9dc475612808daa2a5eed7089460bfb4",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "ebf08ec729b993cf7035640b000b6e871f871faaf83c5d168e5731c820e72b6e",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8540508151054382,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4a7751bcfa61a803a02fe141c99b41d79f778ba5",
+      "rationale": "The fragments share a small Arrange-Act-Assert test shape, but they cover distinct behavior: DomainEvent enum should return \"domain_event\" while Command enum should return the generic \"enum\" tag. The repeated setup is minimal and keeps each regression case explicit; extracting it would add indirection without removing meaningful duplicated knowledge.",
+      "recorded_at": "2026-06-16T01:23:20Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "d2c66aad53e202b56c75298d8d06d68732b1d8aa1e0974d41811d408edbe6975",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "ebf08ec729b993cf7035640b000b6e871f871faaf83c5d168e5731c820e72b6e",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9201908111572266,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4a7751bcfa61a803a02fe141c99b41d79f778ba5",
+      "rationale": "The fragments share a tiny Arrange/Act/Assert shape, but they validate different behavioral cases: ErrorType enums get the specialized \"error_type\" tag, while Command enums remain the generic \"enum\" baseline. The repetition is minimal and makes the distinct expected behavior explicit in tests.",
+      "recorded_at": "2026-06-16T01:23:33Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "cc77344ee8cb1488c4db49530be53254b556f1382d49efd5709f7792d2798616",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "d2c66aad53e202b56c75298d8d06d68732b1d8aa1e0974d41811d408edbe6975",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9536831974983216,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4a7751bcfa61a803a02fe141c99b41d79f778ba5",
+      "rationale": "The fragments are structurally similar tests, but they assert distinct behavior for different DataRole inputs: DomainEvent enum maps to the generic \"enum\" tag, while ErrorType enum maps to the special \"error_type\" tag. The duplicated setup is minimal and keeps each baseline case explicit, so this is not a meaningful DRY violation.",
+      "recorded_at": "2026-06-16T01:39:48Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "low_hash": "cc77344ee8cb1488c4db49530be53254b556f1382d49efd5709f7792d2798616",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "high_hash": "ebf08ec729b993cf7035640b000b6e871f871faaf83c5d168e5731c820e72b6e",
+      "changed_path": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.896164059638977,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4a7751bcfa61a803a02fe141c99b41d79f778ba5",
+      "rationale": "The fragments are small test cases with the same arrange/assert shape but different behavioral inputs: `DataRole::DomainEvent` versus `DataRole::Command`. This is acceptable test duplication because each test documents a distinct role-specific expectation, and the repeated code is minimal.",
+      "recorded_at": "2026-06-16T01:40:07Z"
     }
   ]
 }

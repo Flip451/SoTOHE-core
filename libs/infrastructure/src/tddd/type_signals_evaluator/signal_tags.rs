@@ -69,3 +69,40 @@ pub(crate) const fn contract_role_kind_tag(role: &ContractRole) -> &'static str 
 pub(crate) const fn function_role_kind_tag(_role: FunctionRole) -> &'static str {
     "free_function"
 }
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::roles::DataRole;
+
+    /// Regression test: enum-shaped DomainEvent must keep the generic "enum"
+    /// signal tag because the renderer groups non-error enum entries under the
+    /// "## Enums" section.
+    #[test]
+    fn test_data_role_kind_tag_domain_event_enum_returns_enum_tag() {
+        let enum_kind = TypeKindV2::Enum { variants: vec![] };
+        let tag = data_role_kind_tag(&DataRole::DomainEvent, &enum_kind);
+        assert_eq!(tag, "enum");
+    }
+
+    /// Baseline: error_type enum still produces "error_type" after the refactor.
+    #[test]
+    fn test_data_role_kind_tag_error_type_enum_returns_error_type_tag() {
+        let enum_kind = TypeKindV2::Enum { variants: vec![] };
+        let tag = data_role_kind_tag(&DataRole::ErrorType, &enum_kind);
+        assert_eq!(tag, "error_type");
+    }
+
+    /// Baseline: unrelated enum role (e.g. Command) still produces generic "enum".
+    #[test]
+    fn test_data_role_kind_tag_command_enum_returns_enum_tag() {
+        let enum_kind = TypeKindV2::Enum { variants: vec![] };
+        let tag = data_role_kind_tag(&DataRole::Command, &enum_kind);
+        assert_eq!(tag, "enum");
+    }
+}
