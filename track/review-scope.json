@@ -32,7 +32,7 @@
         ".claude/permission-extensions.json",
         "knowledge/conventions/**",
         "AGENTS.md", "CLAUDE.md",
-        "DEVELOPER_AI_WORKFLOW.md", "README.md", "START_HERE_HUMAN.md",
+        "README.md",
         "track/review-scope.json",
         "Makefile.toml"
       ]
