@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
-          "at": "2026-06-17T02:16:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
-          "at": "2026-06-17T02:18:59Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -255,6 +237,20 @@
           "findings": [],
           "hash": "rvw1:sha256:78e74c6df1150f06c4acdd4de2f7c362b53e3a3681840740a57a00c5e7c9272a",
           "at": "2026-06-17T02:15:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcfb6c474bdac2b9cb66324f5838c235346726ea36898c7bc5492b5d0476663a",
+          "at": "2026-06-17T02:26:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcfb6c474bdac2b9cb66324f5838c235346726ea36898c7bc5492b5d0476663a",
+          "at": "2026-06-17T02:28:40Z"
         }
       ]
     },
@@ -302,6 +298,38 @@
           "findings": [],
           "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
           "at": "2026-06-17T02:18:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b145ef110b7af2851b522a2ff07b1c14ad023e5f9954bbf2a8beb7f19b059a2e",
+          "at": "2026-06-17T02:26:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b145ef110b7af2851b522a2ff07b1c14ad023e5f9954bbf2a8beb7f19b059a2e",
+          "at": "2026-06-17T02:28:19Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
+          "at": "2026-06-17T02:16:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
+          "at": "2026-06-17T02:18:59Z"
         }
       ]
     }
