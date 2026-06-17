@@ -70,7 +70,7 @@ Do NOT emit Rust code, trait signatures, module trees, or `TypeDefinitionKind` s
 
 ## Design Principles (cite, don't enumerate)
 
-Apply `.claude/rules/04-coding-principles.md` at the **plan level**:
+Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-first / Typestate) and `knowledge/conventions/coding-principles.md` (error handling / no panics / module size / documentation) at the **plan level**:
 
 - Respect hexagonal layer placement when deciding task batching (tasks modifying one layer often group together)
 - Respect enum-first / typestate / newtype decisions already made by the type-designer — task descriptions should not propose different type shapes

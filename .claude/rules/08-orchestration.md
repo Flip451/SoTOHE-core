@@ -55,10 +55,6 @@ Operational split:
 
 Always invoke `/track:plan` before implementation, regardless of task difficulty. `/track:plan` orchestrates Phase 0-3 (init → spec → design → impl-plan) and back-and-forth escalation when downstream signals fail. Skipping design entirely causes expensive downstream review loops (historical lesson: 15+ review rounds from skipped design).
 
-## Briefing Requirements (Provider-Agnostic)
-
-All capability briefings (regardless of provider — Codex, Claude, or future providers) must reference `.claude/rules/04-coding-principles.md` for type design patterns. The enum-first / typestate / hybrid decision table in that file is the source of truth.
-
 ## Delegation Rules
 
 Use the minimum capable capability first, then resolve it via `.harness/config/agent-profiles.json`.

@@ -15,9 +15,12 @@ Priority references:
 - `knowledge/adr/README.md`
 - `knowledge/strategy/TODO-PLAN.md`
 - `.harness/config/agent-profiles.json`
-- `.claude/rules/`
+- `.claude/rules/`  # Claude Code-specific operating rules only; engineering conventions live under knowledge/conventions/
 - `knowledge/conventions/README.md`
 - `knowledge/conventions/`
+- `knowledge/conventions/coding-principles.md`           # error handling / naming / module size / no-panics / unsafe
+- `knowledge/conventions/prefer-type-safe-abstractions.md`  # Newtype / Enum-first / Typestate patterns
+- `knowledge/conventions/hexagonal-architecture.md`        # Trait-Based Abstraction / port placement / adapter rules
 - `knowledge/conventions/pre-track-adr-authoring.md`  # ADR authored before /track:plan runs
 - `knowledge/conventions/workflow-ceremony-minimization.md`  # post-hoc review + approved-state removal
 - `architecture-rules.json`
@@ -43,6 +46,7 @@ Operating notes:
 
 Details:
 
+- Language policy: `.claude/rules/01-language.md`
 - Orchestration / delegation: `.claude/rules/08-orchestration.md`
 - Maintainer checklist: `.claude/rules/09-maintainer-checklist.md`
 - Guardrails: `.claude/rules/10-guardrails.md`

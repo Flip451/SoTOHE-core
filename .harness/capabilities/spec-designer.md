@@ -75,7 +75,7 @@ Do NOT emit Rust code, trait signatures, module trees, or `TypeDefinitionKind` s
 
 ## Design Principles (cite, don't enumerate)
 
-Apply `.claude/rules/04-coding-principles.md` at the **contract level only**:
+Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-first / Typestate) and `knowledge/conventions/coding-principles.md` (error handling / no panics) at the **contract level only**:
 
 - Enum-first / typestate / newtype principles are the type-designer's concern; the spec can cite them by name when writing constraints (e.g., the constraint "use newtype for boundary primitives") but does not enumerate concrete type choices
 - Hexagonal layer placement is the ADR's concern; the spec can cite the layer assignment as a constraint

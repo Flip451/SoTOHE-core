@@ -16,12 +16,13 @@
     {
       "id": "T003",
       "description": "Create three new convention files by extracting the unique content from track/workflow.md: (1) knowledge/conventions/branch-strategy.md — Branch Strategy section + Guard Policy section; (2) knowledge/conventions/track-lifecycle.md — plan.md and metadata.json SSoT section + observations.md section + registry.md update rules section; (3) knowledge/conventions/git-notes.md — Git Notes section. While extracting, scan for dead-refs (old cargo make task names, deleted doc paths) per CN-05 and fix any found. Run 'bin/sotp conventions update-index' in this same task and include the resulting knowledge/conventions/README.md update so verify-arch-docs remains green at this commit boundary. Do NOT delete track/workflow.md in this task (deletion is T007). CI passes independently: new convention files and the synced index are committed together. (IN-05 / IN-06 / IN-07 / IN-19 partial / CN-05 / AC-04 / AC-13 / AC-16 partial)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "713e786b1d9bf6b283758b48997aac6393b01b80"
     },
     {
       "id": "T004",
       "description": "Migrate .claude/rules/04-coding-principles.md into knowledge/conventions/ using the existing focused-convention structure instead of copying the whole rule into one file. Split or merge the rule's provider-independent sections by topic: type-safety material should land with the existing type-safe/deserialization conventions where applicable, trait/port guidance with the architecture convention, and remaining coding-principles material in appropriately named convention file(s) only where no existing convention fits. Before deleting the old path, remove known references to it: delete the .claude/rules/08-orchestration.md Briefing Requirements section (D7) and replace the CLAUDE.md Details entry for .claude/rules/04-coding-principles.md with the migrated convention references. Run 'bin/sotp conventions update-index' in this same task and include the README update for any new or retitled convention files created by the split migration. Then delete .claude/rules/04-coding-principles.md (no pointer stub per CN-02). CI passes: no surviving in-scope reference points at .claude/rules/04-coding-principles.md after this task, and verify-arch-docs sees a synced convention index. (IN-09 / IN-14 / IN-17 partial / IN-19 partial / CN-01 / CN-02 / CN-04 / AC-06 partial / AC-09 / AC-15 partial / AC-16 partial)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",

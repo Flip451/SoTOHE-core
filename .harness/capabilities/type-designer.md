@@ -81,7 +81,7 @@ The type-designer operates on decisions already made at the ADR + spec level —
 - Relevant ADR(s) under `knowledge/adr/` — design decisions, rejected alternatives, layer placement constraints. Per `knowledge/conventions/pre-track-adr-authoring.md`, an ADR must exist before design starts
 - Existing catalogue file (if incremental update) — `track/items/<id>/<catalogue_file>`
 - Existing baseline file (if any) — `track/items/<id>/<catalogue-stem>-baseline.json`
-- `.claude/rules/04-coding-principles.md` for type design patterns (enum-first / typestate / newtype)
+- `knowledge/conventions/prefer-type-safe-abstractions.md` for type design patterns (enum-first / typestate / newtype)
 
 ### Internal pipeline (all executed by this capability, per layer in scope)
 
@@ -472,7 +472,7 @@ rustdoc **omits private fields** from the public API JSON and sets `has_stripped
 
 ## Design Principles (MUST follow)
 
-Apply `.claude/rules/04-coding-principles.md` via **role + kind** selection. **Read § Make Illegal States Unrepresentable / § Enum-first / § Typestate before drafting any catalogue entry whose subject involves status / state / phase / lifecycle / step / variant-specific data.** The decision below is binding — it is not a wording preference.
+Apply `knowledge/conventions/prefer-type-safe-abstractions.md` via **role + kind** selection. **Read § Make Illegal States Unrepresentable / § Newtype / § Enum-first / § Typestate before drafting any catalogue entry whose subject involves status / state / phase / lifecycle / step / variant-specific data.** The decision below is binding — it is not a wording preference.
 
 ### Role + kind selection decision tree
 
@@ -825,7 +825,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
 }
 ```
 
-Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a plain-shape struct `{ status: DecisionStatus, implemented_in: Option<String>, superseded_by: Option<String> }`. That shape permits `Proposed { superseded_by: Some(...) }` — runtime invariants only. Per `.claude/rules/04-coding-principles.md` § Enum-first / § Typestate, use a typestate cluster instead.
+Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a plain-shape struct `{ status: DecisionStatus, implemented_in: Option<String>, superseded_by: Option<String> }`. That shape permits `Proposed { superseded_by: Some(...) }` — runtime invariants only. Per `knowledge/conventions/prefer-type-safe-abstractions.md` § Enum-first / § Typestate, use a typestate cluster instead.
 
 ### Pattern 2: Pure enum with variant payloads (finite values, no transitions)
 
