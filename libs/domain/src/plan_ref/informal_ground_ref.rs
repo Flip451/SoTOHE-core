@@ -11,7 +11,7 @@ use crate::ValidationError;
 /// `informal_grounds[]` on a spec element or catalogue entry drives a 🟡
 /// signal per ADR 2026-04-19-1242 §D3.1 / §D3.2.
 ///
-/// Enum-first per `.claude/rules/04-coding-principles.md` § Enum-first:
+/// Enum-first per `knowledge/conventions/prefer-type-safe-abstractions.md` § Enum-first:
 /// there are no state transitions, just a closed set of variants.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum InformalGroundKind {

@@ -493,7 +493,7 @@ mod tests {
     {
       "id": "CO-01",
       "text": "Constraint 1",
-      "convention_refs": [{"file": ".claude/rules/04-coding-principles.md", "anchor": "newtype-pattern"}]
+      "convention_refs": [{"file": "knowledge/conventions/prefer-type-safe-abstractions.md", "anchor": "newtype-pattern"}]
     }
   ],
   "acceptance_criteria": [

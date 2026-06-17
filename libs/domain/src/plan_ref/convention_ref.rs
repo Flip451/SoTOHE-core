@@ -82,8 +82,9 @@ mod tests {
     #[test]
     fn convention_ref_constructs_with_path_and_anchor() {
         let a = ConventionAnchor::try_new("newtype").unwrap();
-        let r = ConventionRef::new(".claude/rules/04-coding-principles.md", a.clone());
-        assert_eq!(r.file, PathBuf::from(".claude/rules/04-coding-principles.md"));
+        let r =
+            ConventionRef::new("knowledge/conventions/prefer-type-safe-abstractions.md", a.clone());
+        assert_eq!(r.file, PathBuf::from("knowledge/conventions/prefer-type-safe-abstractions.md"));
         assert_eq!(r.anchor, a);
     }
 }

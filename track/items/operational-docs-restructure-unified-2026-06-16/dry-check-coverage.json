@@ -1,7 +1,93 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "77b0c9459c04db32e3d2a859b97fb06347ad78890d74f64ce6386e503f0ea08b",
-  "fragment_refs": [],
-  "processed_pair_keys": []
+  "corpus_fingerprint": "05cfd84b60900c4520e7450dbb0c6234eee94500143a92cbb48f75517dfb12d5",
+  "fragment_refs": [
+    {
+      "path": "libs/domain/src/plan_ref/convention_ref.rs",
+      "content_hash": "0e689d271658ac80c55aa7ca8036b7d976cdb74b64039a3a6ab5bba24fad29fe"
+    },
+    {
+      "path": "libs/domain/src/plan_ref/informal_ground_ref.rs",
+      "content_hash": "541b94c1b56959d3f1a7d7c3e657e28c9bd7b36d051c2422cc6882148b3a0c0c"
+    },
+    {
+      "path": "libs/domain/src/review_v2/types.rs",
+      "content_hash": "eb2c949f255b3c73e7b49f57cd2004ad445560341e3f5138a7c700bf561640f5"
+    },
+    {
+      "path": "libs/domain/src/spec.rs",
+      "content_hash": "77172b0f9467b61cbf00b2e4053a0d21602b174631923e2c69a64f085085676e"
+    },
+    {
+      "path": "libs/domain/src/tddd/catalogue.rs",
+      "content_hash": "33f5b41fc4333e372b632692d50b6897ac78818781cdccc4a1242c6af776522a"
+    },
+    {
+      "path": "libs/domain/src/tddd/type_signals_doc.rs",
+      "content_hash": "91660e3ee8d7b0793867a22ad792054bd16f6ca876b0c1a5f4cd78d60444d6b5"
+    },
+    {
+      "path": "libs/infrastructure/src/review_v2/review_fix_runner/session_log.rs",
+      "content_hash": "930edb040b275bec387c3fa9a0103db1c05feb6c79a1000413ade88083edcd10"
+    },
+    {
+      "path": "libs/infrastructure/src/spec/codec.rs",
+      "content_hash": "22333ddd57d98e40d23abb890aaebc88fac3d8f4026db571bea42d8c4a176727"
+    },
+    {
+      "path": "libs/infrastructure/src/spec/render.rs",
+      "content_hash": "337532c7c961cd2e993e00164d229810836c88ebf8d85854e211f4608e978adf"
+    },
+    {
+      "path": "libs/infrastructure/src/spec/render.rs",
+      "content_hash": "4b155f65e91004eec320ad916406e0b59505ad115ed2097b4dba7e3abf7e4ec9"
+    },
+    {
+      "path": "libs/infrastructure/src/spec/render.rs",
+      "content_hash": "ba18b2b2cd3c252a888a3e1daae2183d0c5d030612acd55d26ea1767612ee703"
+    }
+  ],
+  "processed_pair_keys": [
+    {
+      "low": {
+        "path": "libs/domain/src/tddd/type_signals_doc.rs",
+        "content_hash": "91660e3ee8d7b0793867a22ad792054bd16f6ca876b0c1a5f4cd78d60444d6b5"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+        "content_hash": "178abe0eb5213ee606e687c5b0cf17e08cf481e7d55af29446e2117a0b7abd90"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/spec/render.rs",
+        "content_hash": "337532c7c961cd2e993e00164d229810836c88ebf8d85854e211f4608e978adf"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/spec/render.rs",
+        "content_hash": "e716bb42b1feb982caf6a897d02d59da4ec927c011e9bcafdedca5400669c433"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/spec/render.rs",
+        "content_hash": "337532c7c961cd2e993e00164d229810836c88ebf8d85854e211f4608e978adf"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/spec/render.rs",
+        "content_hash": "f6cd1f8dcc32c8055f2e2774ec92fd189ddda83770c63b98df50bce7432a9359"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/spec/render.rs",
+        "content_hash": "ba18b2b2cd3c252a888a3e1daae2183d0c5d030612acd55d26ea1767612ee703"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/spec/render.rs",
+        "content_hash": "ca00a3636cf85ffaa26c6c8119685ae5bb4d6868e141350812b30f71f934ef39"
+      }
+    }
+  ]
 }
