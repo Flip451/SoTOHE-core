@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # 運用ドキュメント再編（統合版）— ルート文書一本化・track/workflow.md 分散・工学規約の conventions 移管
 
-## Tasks (9/10 resolved)
+## Tasks (10/10 resolved)
 
 ### S1 — Immediate deletions with no ordering dependency
 
@@ -34,4 +34,4 @@
 > T009 depends on T003-T008 completing so that all referenced files are in their final state. T010 depends on T003-T006 so the final index check sees all migrated/new conventions. Both tasks pass CI independently.
 
 - [x] **T009**: Sweep .claude/rules/08, /09, /10 and CLAUDE.md for remaining dead-refs and reference updates after the old-path and deleted-doc rewiring in T004-T008. Specific changes: (a) .claude/rules/08-orchestration.md Operational split — replace the 'scripts/check_layers.py' reference with current 'sotp verify layers' guidance (D8 / IN-15); (b) .claude/rules/09-maintainer-checklist.md — remove the 'python3 is required inside Docker for scripts/' prerequisite bullet (Python runtime is fully removed) (D8 / IN-15); (c) .claude/rules/10-guardrails.md — remove any 'scripts/verify_orchestra_guardrails.py' / 'verify-orchestra' references (D8 / IN-15 / CN-03); (d) CLAUDE.md — preserve the T004-T008 updated old-path and deleted-doc references, add migrated conventions if still missing, and keep .claude/rules references limited to 01/07/08/09/10 (D10 / IN-17); (e) review remaining content of .claude/rules/01/07/08/09/10 for duplicate explanation or current-command mismatches and trim/fix where needed (IN-18). Depends on T003-T008. CI passes: the changes are all doc/config only. (IN-15 / IN-17 / IN-18 / AC-10 / AC-15) (`69aedee408163d2f0cdc19622c6c55fa2e665518`)
-- [~] **T010**: Run a final 'bin/sotp conventions update-index' after T003-T006 and commit knowledge/conventions/README.md only if this final pass still changes it. This is a consistency guard, not the first index update for newly created convention files: T003-T006 each keep the index synced at their own commit boundary so verify-arch-docs remains green throughout the sequence. Depends on T003, T004, T005, T006. CI passes: verify-arch-docs confirms the final index is consistent with the files on disk. (IN-19 / AC-16)
+- [x] **T010**: Run a final 'bin/sotp conventions update-index' after T003-T006 and commit knowledge/conventions/README.md only if this final pass still changes it. This is a consistency guard, not the first index update for newly created convention files: T003-T006 each keep the index synced at their own commit boundary so verify-arch-docs remains green throughout the sequence. Depends on T003, T004, T005, T006. CI passes: verify-arch-docs confirms the final index is consistent with the files on disk. (IN-19 / AC-16) (`1f001dba72213df057f47ac1a917e531ecaf9f90`)

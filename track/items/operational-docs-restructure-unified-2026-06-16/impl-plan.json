@@ -58,7 +58,8 @@
     {
       "id": "T010",
       "description": "Run a final 'bin/sotp conventions update-index' after T003-T006 and commit knowledge/conventions/README.md only if this final pass still changes it. This is a consistency guard, not the first index update for newly created convention files: T003-T006 each keep the index synced at their own commit boundary so verify-arch-docs remains green throughout the sequence. Depends on T003, T004, T005, T006. CI passes: verify-arch-docs confirms the final index is consistent with the files on disk. (IN-19 / AC-16)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "1f001dba72213df057f47ac1a917e531ecaf9f90"
     }
   ],
   "plan": {
