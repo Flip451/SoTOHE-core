@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f9821dbbc9b529b29d1dcc778112d2185e4b450b9ff798eaa83affedef0852",
+          "at": "2026-06-17T04:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f9821dbbc9b529b29d1dcc778112d2185e4b450b9ff798eaa83affedef0852",
+          "at": "2026-06-17T04:51:14Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -16,6 +34,20 @@
           "findings": [],
           "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
           "at": "2026-06-17T02:18:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:640d65f8cb0d4b21c70e19955c8dbc2e94cb578e899f46d764bde9282be9d7ce",
+          "at": "2026-06-17T04:48:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:640d65f8cb0d4b21c70e19955c8dbc2e94cb578e899f46d764bde9282be9d7ce",
+          "at": "2026-06-17T04:51:33Z"
         }
       ]
     },
@@ -377,6 +409,20 @@
           "findings": [],
           "hash": "rvw1:sha256:b146d2e4d8f4f806d64c1ca571a886f2d1ff15e94a5b787b2ea1a3e93ee5880b",
           "at": "2026-06-17T04:32:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e57b9812e87e8b142402f4907f2d639468f635b94b4d181a56a7704eecdf2f63",
+          "at": "2026-06-17T04:48:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e57b9812e87e8b142402f4907f2d639468f635b94b4d181a56a7704eecdf2f63",
+          "at": "2026-06-17T04:50:37Z"
         }
       ]
     },
@@ -634,6 +680,35 @@
           "findings": [],
           "hash": "rvw1:sha256:0cdb477e0aeda75065d5f25e57704fd21b216bb38eebc0b008914b3bac46773e",
           "at": "2026-06-17T04:28:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:420c0adb6bf422d3283fd0a669a089579a4aabdcbfb1cb25aeb502b6547d98f2",
+          "at": "2026-06-17T04:49:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The replacement leaves two of the three convention references as bare filenames (`track-lifecycle.md` and `git-notes.md`). This command section is a list of architecture-facing document paths to update, and those bare paths do not exist at the repo root or relative to this command file, so agents following the command can miss the required convention docs after `track/workflow.md` is deleted. Use the full `knowledge/conventions/track-lifecycle.md` and `knowledge/conventions/git-notes.md` paths here.",
+              "severity": "P1",
+              "file": ".claude/commands/architecture-customizer.md",
+              "line": 25,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:420c0adb6bf422d3283fd0a669a089579a4aabdcbfb1cb25aeb502b6547d98f2",
+          "at": "2026-06-17T04:52:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67c50155be67e85040910f58ac06eae46c7e330570b3269533d1f2eb3ec0f201",
+          "at": "2026-06-17T04:54:33Z"
         }
       ]
     }

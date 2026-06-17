@@ -31,6 +31,9 @@ cargo make clippy       # clippy で静的解析（-D warnings）
 cargo make test         # cargo nextest でテスト
 cargo make ci-rust      # Rust専用CI（fmt-check + clippy + test + deny + check-layers）アプリ開発内側ループ用
 cargo make ci           # 全体CI（ci-rust + verify-* すべて）コミット前ゲート
+# Quality Gates の SSoT は Makefile.toml の `ci-local` / `ci-container` task の
+# `dependencies` 配列（機械可読）。doc 化した checklist は維持しない。
+# 内訳の discovery surface は `cargo make help` のカテゴリ表示を使う。
 cargo make check-layers     # レイヤー依存関係チェック（標準CIに含む）
 cargo make verify-arch-docs # ドキュメント乖離チェック（標準CIに含む）
 bin/sotp arch tree          # crate のみの workspace tree を表示

@@ -34,7 +34,7 @@
         "AGENTS.md", "CLAUDE.md",
         "DEVELOPER_AI_WORKFLOW.md", "README.md", "START_HERE_HUMAN.md",
         "track/review-scope.json",
-        "track/workflow.md", "Makefile.toml"
+        "Makefile.toml"
       ]
     }
   },

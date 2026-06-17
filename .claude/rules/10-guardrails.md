@@ -13,6 +13,8 @@ Core guardrails:
   reports zero findings. The reviewer provider is resolved via `.harness/config/agent-profiles.json`.
 - **Small task commits**: Prefer small, focused task commits (<500 lines). Review cost
   grows super-linearly with diff size. Split large tasks into sub-tasks during planning.
+  Review cost scales roughly O(N^2) with diff size (O(N) comprehension x O(N) findings);
+  splitting M tasks reduces cost to O(N^2/M).
 
 ## Permission Guardrails
 
@@ -141,7 +143,9 @@ Inline review within Claude Code's main context (self-review) is not a substitut
 
 Operational details live in:
 
-- `track/workflow.md`
+- `knowledge/conventions/branch-strategy.md`
+- `knowledge/conventions/track-lifecycle.md`
+- `knowledge/conventions/git-notes.md`
 - `DEVELOPER_AI_WORKFLOW.md`
 - `.claude/settings.json`
 - `.claude/hooks/`

@@ -5,8 +5,10 @@ Minimal maintainer index for this repository. First-time user onboarding lives i
 Priority references:
 
 - `track/tech-stack.md`
-- `track/workflow.md`
 - `track/registry.md`
+- `knowledge/conventions/branch-strategy.md`   # branch-per-track model, PR/merge workflow, guard policy
+- `knowledge/conventions/track-lifecycle.md`   # task state transitions, plan.md SSoT, registry update rules, observations
+- `knowledge/conventions/git-notes.md`         # git note format, commit traceability
 - `track/items/<id>/metadata.json`
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
