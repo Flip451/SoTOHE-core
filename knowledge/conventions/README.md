@@ -55,6 +55,7 @@
 この一覧は `bin/sotp conventions add ...` / `bin/sotp conventions update-index` により自動更新される。既知の主要カテゴリは推奨読順で並び、それ以外はファイル名順で並ぶ。
 
 <!-- convention-docs:start -->
+- `testing.md`: Testing Convention
 - `adr.md`: Convention: Architecture Decision Records (ADR)
 - `bash-write-guard.md`: Bash File-Write Guard (CON-07)
 - `branch-strategy.md`: Branch Strategy Convention
