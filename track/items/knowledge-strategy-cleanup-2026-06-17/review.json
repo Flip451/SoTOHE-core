@@ -16,6 +16,13 @@
           "findings": [],
           "hash": "rvw1:sha256:7a44f063cd308bfb0bbc6ce99ccd0de8c61901da41ac6824e3ee359c4bbceab0",
           "at": "2026-06-17T13:48:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42982bce450b71a079da0f6ce399a45b9f0087ca92f08e0fb1956bab44a78e42",
+          "at": "2026-06-17T14:04:07Z"
         }
       ]
     }
