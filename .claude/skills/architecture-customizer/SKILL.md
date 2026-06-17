@@ -46,8 +46,8 @@ Define which crates may depend on which crates.
 ## Step 4: Update Documentation
 
 1. Update `track/tech-stack.md` workspace structure and rule text.
-2. Update `track/workflow.md` quality gates and layer check steps.
-3. Update `track/code_styleguides/rust.md` module layout example.
+2. Update `Makefile.toml` `ci-local` / `ci-container` dependencies if quality gates change, and ensure `sotp verify layers` still reflects the new architecture rules.
+3. Update `knowledge/conventions/coding-principles.md` module layout example if module conventions change.
 4. Update `CLAUDE.md` file tree if crate map changed.
 
 ## Step 5: Validation Gates
