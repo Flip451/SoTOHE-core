@@ -7,7 +7,7 @@
 
 > Delete START_HERE_HUMAN.md and LOCAL_DEVELOPMENT.md (T001) and strengthen AGENTS.md as a standalone PR briefing (T002). These two tasks are purely additive or subtractive with no cross-dependency on other tasks in this plan. Both can be committed independently and both pass cargo make ci on their own.
 
-- [ ] **T001**: Delete START_HERE_HUMAN.md and LOCAL_DEVELOPMENT.md from the repository root. These are the two redundant root-level human-facing docs identified in D1. No CI gate checks for the presence of these files, so the commit passes independently. (IN-02 / AC-01 partial)
+- [~] **T001**: Delete START_HERE_HUMAN.md and LOCAL_DEVELOPMENT.md from the repository root. These are the two redundant root-level human-facing docs identified in D1. No CI gate checks for the presence of these files, so the commit passes independently. (IN-02 / AC-01 partial)
 - [ ] **T002**: Strengthen AGENTS.md as a self-contained PR review briefing. Keep the existing severity policy (P0/P1 only). Add a new section covering PR-level review angles that local reviewers miss: branch-wide consistency (do deletions, creations, and reference updates form a coherent final state?), cross-commit consistency (do changes that span multiple commits remain mutually consistent across the PR diff?), and dead-reference check (do any surviving files still reference files deleted in this PR?). Do not pointerize to conventions — the briefing must remain self-contained. (IN-13 / AC-08)
 
 ### S2 — Convention files and rule migrations

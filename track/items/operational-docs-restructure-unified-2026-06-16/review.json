@@ -1,21 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
-          "at": "2026-06-17T00:24:51Z"
+          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
+          "at": "2026-06-17T02:16:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
-          "at": "2026-06-17T00:27:22Z"
+          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
+          "at": "2026-06-17T02:18:59Z"
         }
       ]
     },
@@ -241,6 +241,67 @@
           "findings": [],
           "hash": "rvw1:sha256:aaa2ce27cbc408b8ac4d828ca1f3fda55220f39d6206a16d1bcc2c03112220e4",
           "at": "2026-06-17T02:00:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78e74c6df1150f06c4acdd4de2f7c362b53e3a3681840740a57a00c5e7c9272a",
+          "at": "2026-06-17T02:12:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78e74c6df1150f06c4acdd4de2f7c362b53e3a3681840740a57a00c5e7c9272a",
+          "at": "2026-06-17T02:15:35Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
+          "at": "2026-06-17T00:24:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
+          "at": "2026-06-17T00:27:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/workflow.md` still says `START_HERE_HUMAN.md` is the first human entry point, but this diff deletes that file. The onboarding path is now broken until this reference is retargeted to `README.md` or removed.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 5,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
+          "at": "2026-06-17T02:12:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
+          "at": "2026-06-17T02:15:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
+          "at": "2026-06-17T02:18:19Z"
         }
       ]
     }
