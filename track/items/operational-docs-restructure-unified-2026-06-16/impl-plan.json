@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Delete START_HERE_HUMAN.md and LOCAL_DEVELOPMENT.md from the repository root. These are the two redundant root-level human-facing docs identified in D1. No CI gate checks for the presence of these files, so the commit passes independently. (IN-02 / AC-01 partial)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Strengthen AGENTS.md as a self-contained PR review briefing. Keep the existing severity policy (P0/P1 only). Add a new section covering PR-level review angles that local reviewers miss: branch-wide consistency (do deletions, creations, and reference updates form a coherent final state?), cross-commit consistency (do changes that span multiple commits remain mutually consistent across the PR diff?), and dead-reference check (do any surviving files still reference files deleted in this PR?). Do not pointerize to conventions — the briefing must remain self-contained. (IN-13 / AC-08)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Create three new convention files by extracting the unique content from track/workflow.md: (1) knowledge/conventions/branch-strategy.md — Branch Strategy section + Guard Policy section; (2) knowledge/conventions/track-lifecycle.md — plan.md and metadata.json SSoT section + observations.md section + registry.md update rules section; (3) knowledge/conventions/git-notes.md — Git Notes section. While extracting, scan for dead-refs (old cargo make task names, deleted doc paths) per CN-05 and fix any found. Run 'bin/sotp conventions update-index' in this same task and include the resulting knowledge/conventions/README.md update so verify-arch-docs remains green at this commit boundary. Do NOT delete track/workflow.md in this task (deletion is T007). CI passes independently: new convention files and the synced index are committed together. (IN-05 / IN-06 / IN-07 / IN-19 partial / CN-05 / AC-04 / AC-13 / AC-16 partial)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "Migrate .claude/rules/04-coding-principles.md into knowledge/conventions/ using the existing focused-convention structure instead of copying the whole rule into one file. Split or merge the rule's provider-independent sections by topic: type-safety material should land with the existing type-safe/deserialization conventions where applicable, trait/port guidance with the architecture convention, and remaining coding-principles material in appropriately named convention file(s) only where no existing convention fits. Before deleting the old path, remove known references to it: delete the .claude/rules/08-orchestration.md Briefing Requirements section (D7) and replace the CLAUDE.md Details entry for .claude/rules/04-coding-principles.md with the migrated convention references. Run 'bin/sotp conventions update-index' in this same task and include the README update for any new or retitled convention files created by the split migration. Then delete .claude/rules/04-coding-principles.md (no pointer stub per CN-02). CI passes: no surviving in-scope reference points at .claude/rules/04-coding-principles.md after this task, and verify-arch-docs sees a synced convention index. (IN-09 / IN-14 / IN-17 partial / IN-19 partial / CN-01 / CN-02 / CN-04 / AC-06 partial / AC-09 / AC-15 partial / AC-16 partial)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "Migrate .claude/rules/05-testing.md to knowledge/conventions/testing.md as a new convention file. While copying, apply the D8 dead-ref fix: replace the reference to 'cargo make test-one-exec' (a task name absent from the current Makefile.toml) with the correct invocation 'cargo make test-nocapture' or inline cargo-nextest filter syntax that actually exists. Before deleting the old path, replace the CLAUDE.md Details entry for .claude/rules/05-testing.md with the new testing convention reference. Run 'bin/sotp conventions update-index' in this same task and include the README update for testing.md. Then delete .claude/rules/05-testing.md (no pointer stub per CN-02). CI passes: no surviving in-scope reference points at .claude/rules/05-testing.md after this task, and verify-arch-docs sees a synced convention index. (IN-10 / IN-15 partial / IN-17 partial / IN-19 partial / CN-01 / CN-02 / AC-06 partial / AC-11 partial / AC-15 partial / AC-16 partial)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "Integrate .claude/rules/06-security.md code-implementation patterns (Secrets Management, Input Validation, SQL Injection Prevention, Error Messages, Dependencies sections, and the Code Review Checklist) into knowledge/conventions/security.md. The Sensitive Directories and Symlink Rejection sections already in security.md stay unchanged. While integrating, apply the D8 dead-ref fix: replace the Enforcement steps that reference scripts/verify_orchestra_guardrails.py / EXPECTED_DENY / verify-orchestra (all abolished) with a note that CI enforcement of sensitive-directory deny rules is the consumer's responsibility (per responsibility-boundary.md). Before deleting the old path, replace the CLAUDE.md Details entry for .claude/rules/06-security.md with the existing security convention reference. Run 'bin/sotp conventions update-index' in this same task if the security convention title or index metadata changes, and include the README update when it does. Then delete .claude/rules/06-security.md (no pointer stub per CN-02). CI passes: no surviving in-scope reference points at .claude/rules/06-security.md after this task, and verify-arch-docs remains green. (IN-11 / IN-15 partial / IN-17 partial / IN-19 partial / CN-01 / CN-02 / AC-06 / AC-11 partial / AC-15 partial / AC-16 partial)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "Delete track/workflow.md and update all files that reference it. Reference updates: (a) .claude/commands/track/setup.md — replace 'Read track/workflow.md' with reading the 3 new conventions (branch-strategy.md, track-lifecycle.md, git-notes.md); (b) .claude/rules/08-orchestration.md Source Of Truth list — replace track/workflow.md entry with the 3 new conventions; (c) .claude/rules/08-orchestration.md Operational split — remove 'track/workflow.md: day-to-day workflow rules' line and add a line stating that knowledge/conventions/ holds day-to-day workflow rules; (d) .claude/rules/08-orchestration.md If unsure section — append 1 line at the end: 'If stuck for 3+ iterations, use researcher to diagnose the root cause before escalating.' (D5 principle-10); (e) .claude/rules/10-guardrails.md Small task commits bullet — append the O(N^2) cost rationale as 1 line: 'Review cost scales roughly O(N^2) with diff size (O(N) comprehension x O(N) findings); splitting M tasks reduces cost to O(N^2/M).' (D5 principle-11); (f) .claude/rules/09-maintainer-checklist.md — replace track/workflow.md entry under 'track docs:' with the 3 new conventions; (g) .claude/rules/10-guardrails.md Operational details subsection — replace the track/workflow.md line with the 3 new conventions; (h) CLAUDE.md — remove the track/workflow.md priority-reference line and add the 3 new conventions; (i) .claude/rules/07-dev-environment.md — add or update a Quality Gates note stating that Makefile.toml ci-local / ci-container dependencies are the machine-readable source of truth and cargo make help is the discovery surface. Depends on T003 (the 3 conventions must exist before track/workflow.md is deleted). Deletion of track/workflow.md also eliminates the old Quality Gates checklist without creating a replacement checklist document (IN-16 / AC-14). CI passes: no surviving in-scope reference points at track/workflow.md after this task. (IN-04 / IN-08 / IN-12 / IN-16 / AC-03 / AC-05 partial / AC-07 / AC-14)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "Enhance README.md to serve as the sole human-facing entry point, remove all known DEVELOPER_AI_WORKFLOW.md references, then delete DEVELOPER_AI_WORKFLOW.md. README additions: (1) a 'Value proposition' or introductory section explaining SoT Chain, signal traffic-light semantics, and the track model at a level a new user can grasp; (2) a 'Prerequisites' section (Docker + docker compose required; Claude Code required; Codex CLI and Gemini CLI required for the default profile); (3) a 'Getting started' section with the canonical flow /adr:add -> /track:adr2pr and the minimal command sequence; (4) a 'Free-form request examples' section (absorbing DEVELOPER_AI_WORKFLOW.md §8 AI request examples). Reference cleanup before deletion: remove the existing 'Details: DEVELOPER_AI_WORKFLOW.md' pointer from README; replace DEVELOPER_AI_WORKFLOW.md references in .claude/rules/08/09/10 with README.md or the new workflow conventions as appropriate; remove the DEVELOPER_AI_WORKFLOW.md opening-paragraph and priority-reference lines from CLAUDE.md. CI passes: no surviving in-scope reference points at DEVELOPER_AI_WORKFLOW.md after this task. (IN-01 / IN-03 / IN-15 partial / IN-17 partial / AC-01 partial / AC-02 / AC-12 / AC-15 partial)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "Sweep .claude/rules/08, /09, /10 and CLAUDE.md for remaining dead-refs and reference updates after the old-path and deleted-doc rewiring in T004-T008. Specific changes: (a) .claude/rules/08-orchestration.md Operational split — replace the 'scripts/check_layers.py' reference with current 'sotp verify layers' guidance (D8 / IN-15); (b) .claude/rules/09-maintainer-checklist.md — remove the 'python3 is required inside Docker for scripts/' prerequisite bullet (Python runtime is fully removed) (D8 / IN-15); (c) .claude/rules/10-guardrails.md — remove any 'scripts/verify_orchestra_guardrails.py' / 'verify-orchestra' references (D8 / IN-15 / CN-03); (d) CLAUDE.md — preserve the T004-T008 updated old-path and deleted-doc references, add migrated conventions if still missing, and keep .claude/rules references limited to 01/07/08/09/10 (D10 / IN-17); (e) review remaining content of .claude/rules/01/07/08/09/10 for duplicate explanation or current-command mismatches and trim/fix where needed (IN-18). Depends on T003-T008. CI passes: the changes are all doc/config only. (IN-15 / IN-17 / IN-18 / AC-10 / AC-15)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T010",
+      "description": "Run a final 'bin/sotp conventions update-index' after T003-T006 and commit knowledge/conventions/README.md only if this final pass still changes it. This is a consistency guard, not the first index update for newly created convention files: T003-T006 each keep the index synced at their own commit boundary so verify-arch-docs remains green throughout the sequence. Depends on T003, T004, T005, T006. CI passes: verify-arch-docs confirms the final index is consistent with the files on disk. (IN-19 / AC-16)",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Immediate deletions with no ordering dependency",
+        "description": [
+          "Delete START_HERE_HUMAN.md and LOCAL_DEVELOPMENT.md (T001) and strengthen AGENTS.md as a standalone PR briefing (T002). These two tasks are purely additive or subtractive with no cross-dependency on other tasks in this plan. Both can be committed independently and both pass cargo make ci on their own."
+        ],
+        "task_ids": ["T001", "T002"]
+      },
+      {
+        "id": "S2",
+        "title": "Convention files and rule migrations",
+        "description": [
+          "Create the new convention replacements before deleting shared workflow entry points. T003 extracts the unique content of track/workflow.md into 3 new conventions and syncs the convention index in the same commit. T004 migrates .claude/rules/04 into the existing focused convention structure, creating new convention file(s) only where needed, syncs the index for those files, and removes the old rule file. T005 migrates .claude/rules/05 to knowledge/conventions/testing.md (with dead-ref fix), syncs the index, and removes the old rule file. T006 integrates .claude/rules/06 patterns into the existing security.md (with dead-ref fix), refreshing the index if metadata changes, and removes the old rule file.",
+          "Each task can be committed and pass CI independently because convention file changes and their knowledge/conventions/README.md index updates are kept together. This ordering ensures that the convention replacements exist before S3 removes track/workflow.md or DEVELOPER_AI_WORKFLOW.md and rewires their downstream references."
+        ],
+        "task_ids": ["T003", "T004", "T005", "T006"]
+      },
+      {
+        "id": "S3",
+        "title": "Source file deletions with reference rewiring",
+        "description": [
+          "Delete source files now that their convention replacements exist, and update all downstream references. T007 deletes track/workflow.md, rewires all callers to the 3 new conventions, applies D5 Guiding Principles distribution (principle-10 to rules/08 If-unsure, principle-11 to rules/10 Small-task-commits), and preserves D9 by documenting Makefile.toml ci-local / ci-container dependencies as the Quality Gates source of truth. T008 enhances README.md with the unique content from DEVELOPER_AI_WORKFLOW.md, then deletes DEVELOPER_AI_WORKFLOW.md.",
+          "T007 depends on T003 (the 3 conventions must exist). T008 is independent of T007 but both belong to this deletion phase. Each can be committed independently and passes CI."
+        ],
+        "task_ids": ["T007", "T008"]
+      },
+      {
+        "id": "S4",
+        "title": "Rules and index cleanup",
+        "description": [
+          "T009 performs the final sweep across .claude/rules/08/09/10 and CLAUDE.md after T004-T008 old-path and deleted-doc rewiring: updates the scripts/check_layers.py reference to current layer-verifier guidance, removes verify-orchestra dead-refs (D8), and right-sizes the autoloaded docs (D10). T010 runs a final bin/sotp conventions update-index pass as an index consistency guard after the convention migrations have already kept the index current at each commit boundary.",
+          "T009 depends on T003-T008 completing so that all referenced files are in their final state. T010 depends on T003-T006 so the final index check sees all migrated/new conventions. Both tasks pass CI independently."
+        ],
+        "task_ids": ["T009", "T010"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,397 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "2999c0940afd80b1cd36962d68696e49df1d5fcbb6ccc4760ba4b6ceb47d92db",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「README.md を GitHub ランディングページ兼唯一の人間向け入口に位置づけ」; 「正規フローがコマンド定義側に自己完結しており」"
+      }
+    },
+    {
+      "claim_hash": "cf19920ae578482f73b02a8f16f7de2ed99ea907342bd5836d2b9571fcc475dd",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CLAUDE.md` は自動ロードされる索引として残し、本再編（削除・移管・新設）に合わせて参照一覧を更新する"
+      }
+    },
+    {
+      "claim_hash": "83a8c54534978827284d501f01d2ac90a592a553257baa2ceecab669e43d6573",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`README.md` を GitHub ランディングページ兼唯一の人間向け入口に位置づけ、SoTOHE の価値説明（SoT Chain・信号機・track モデル）と最小の使い方（前提条件、`/adr:add` で ADR を作り `/track:adr2pr` で PR まで進める）を載せる方向で増強する。"
+      }
+    },
+    {
+      "claim_hash": "84db6aa70b767d673f851265dab64c9bc1032de9923799e2a6f2359289e11743",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`START_HERE_HUMAN.md` と `LOCAL_DEVELOPMENT.md` は削除する。"
+      }
+    },
+    {
+      "claim_hash": "f0b727a5ef7771a68b509ddfc299e22470548845f1d7a8d9a508b1e4b8640504",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md` を削除し、Branch Strategy / SSoT lifecycle / Git Notes の固有内容を以下の 3 ファイルに分散する。Guiding Principles 由来の固有 guidance 2 件は D5 のとおり `.claude/rules/08-orchestration.md` / `.claude/rules/10-guardrails.md` に追記する。重複内容は移送せず削除する。\n\n削除する重複内容（集約先は本再編後の最終状態）:\n\n- phase 構成表 → `README.md`（D1/D2）+ 各コマンド定義\n- Task Workflow / Standard Task Process → `README.md` + 各 `/track:*` コマンド定義\n- Track Commands リスト → `README.md` + 各コマンド定義\n- Mermaid Diagram Convention → 1 例のみで convention 化に足りないため削除"
+      }
+    },
+    {
+      "claim_hash": "ece4ff3f09eb86bcbfecdabb05ffff14a11feb59a257b1d06b100d3a243f7194",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md` を削除し、Branch Strategy / SSoT lifecycle / Git Notes の固有内容を以下の 3 ファイルに分散する。| `knowledge/conventions/branch-strategy.md` | Branch Strategy + ガードポリシー |"
+      }
+    },
+    {
+      "claim_hash": "ce216664a1ace4f4fff6c2a3ae84be1d2a48a43f6869d1114074d970deda579b",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/conventions/track-lifecycle.md` | plan.md と metadata.json SSoT + observations.md + registry.md 更新ルール"
+      }
+    },
+    {
+      "claim_hash": "2e1aa9e81ee2e0168acd4fa0ee6927e302282ad6752922cfcd1ffe90fc8d442b",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track/workflow.md を削除し、Branch Strategy / SSoT lifecycle / Git Notes の固有内容を以下の 3 ファイルに分散する。"
+      }
+    },
+    {
+      "claim_hash": "08995e38be8796a9438e300464900f254c2406cbda1cd19f02f86dc9c1a065e7",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\".claude/commands/track/setup.md（Read 操作） | 新 3 convention を Read 対象に列挙\"; \".claude/rules/08-orchestration.md（Operational split） | track/workflow.md 行を削除し、conventions が「day-to-day workflow rules」を持つことを明記\""
+      }
+    },
+    {
+      "claim_hash": "0acafa99732c58f9336674a540f2e0a5ac8a937c86ae821d2c3e9328be87c021",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`04-coding-principles.md` / `05-testing.md` / `06-security.md` の内容を `knowledge/conventions/` 配下の正式 convention に移管し、旧ファイルは削除する（ポインタ stub も残さない）。`04` / `05` の移管先 convention の分割は既存の conventions 構成に合わせて決める。"
+      }
+    },
+    {
+      "claim_hash": "20c51f78eecff5001f18a170efa5d791eaa84b24d63e458c815139c10a18351f",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.claude/rules/04-coding-principles.md` / `05-testing.md` / `06-security.md` の内容を `knowledge/conventions/` 配下の正式 convention に移管し、旧ファイルは削除する（ポインタ stub も残さない）。"
+      }
+    },
+    {
+      "claim_hash": "9324e60601e0c677f2ea2e7f196c5a84c364bf8757503024cf779daca13bcb67",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`06-security.md` のコード実装パターンは既存の `knowledge/conventions/security.md` に統合する。... 旧ファイルは削除する（ポインタ stub も残さない）"
+      }
+    },
+    {
+      "claim_hash": "4faa5d8ef95e06736377af9aae37c1faad43c86b2ef0e25757747c4e51d135a0",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`9 項目は他箇所で既に enforce 済みの restatement なので削除し、残り 2 項目を既存 rules に 1 行ずつ追記する。`\n`10 | 自己修復優先（3 回詰まったら researcher で原因切り分け） | .claude/rules/08-orchestration.md の \"If unsure\" 末尾に 1 行追記`\n`11 | レビューサーフェース最小化（タスク単位レビュー、O(N²) 根拠） | .claude/rules/10-guardrails.md の \"Small task commits\" 項目に O(N²) 根拠を 1 行追記`"
+      }
+    },
+    {
+      "claim_hash": "79f9d63ebfc853bb7e2ce8ffba331454b2eeeec45ab24f6772e170d03a9b16d6",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AGENTS.md` はリポジトリルートに残し、conventions へのポインタ化はしない。severity policy（P0/P1 のみ報告する方針）を維持したうえで、ローカルレビュワーが取りこぼしうるレビュー観点（ブランチ全体を通した整合性、複数コミットにまたがる変更の一貫性など、PR 単位でしか見えない観点）をすべて盛り込む方向で内容を強化する。"
+      }
+    },
+    {
+      "claim_hash": "4c3cd9f82a6aac2324517bca2b4895453a63449eaff797dc7b55a5479a6879ef",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.claude/rules/08-orchestration.md` の Briefing Requirements 節を削除する。"
+      }
+    },
+    {
+      "claim_hash": "07f376e2a92cf950200c7a55dd40ea3e586a8df55ff87328ee33e58f75fef772",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "運用文書から、削除済み機構への参照と実行すると失敗する手順案内を排除する。確認済みの対象に加え、本再編で新たに生じる張替えを含める。"
+      }
+    },
+    {
+      "claim_hash": "a7f2bf99d60f8551709ced5502b4b286d782f19e1c1fea6de001ae9dd87b601b",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md` の Quality Gates チェックリストは（D3 の workflow.md 廃止に伴い）削除し、doc 化しない。代替として: - `Makefile.toml` の `ci-local` / `ci-container` task の `dependencies` を機械可読な真実の源泉とする"
+      }
+    },
+    {
+      "claim_hash": "20ff42c6cfc6d7042a68a96e09a2f5605463aed3b342dc6940fd4de9272b760c",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CLAUDE.md` は自動ロードされる索引として残し、本再編（削除・移管・新設）に合わせて参照一覧を更新する（`DEVELOPER_AI_WORKFLOW.md` / `track/workflow.md` 行の削除、移管後の conventions と新設 3 convention の反映、`.claude/rules` を 01 / 07 / 08 / 09 / 10 に限定）。"
+      }
+    },
+    {
+      "claim_hash": "0619fdd25de9e6f18e8cab41ae109fdce97568e7e3320ddeb44639cd0dd6609c",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "残置する `.claude/rules`（01 / 07 / 08 / 09 / 10）も同じ基準で精査し、索引・運用規則として必要十分な情報量に直す（重複説明の削減、現行コマンドとの突合）。"
+      }
+    },
+    {
+      "claim_hash": "82e1f15dfc56e3e707fd2371f691c4e8ba108ae26d78a88678095517bb9f0774",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/conventions/README.md` の convention 索引は `bin/sotp conventions update-index` で再生成する。"
+      }
+    },
+    {
+      "claim_hash": "425adc45caaf119cfee9ea26fa9cefd5396d209ff01db1d0fb42ab967d2ccab9",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "参照整合の検証は現行 track のみが対象でゲートに影響せず"
+      }
+    },
+    {
+      "claim_hash": "639f936b0a94702c66bfd14caca14969c426bc2b4bbe73432173062bffbf06dd",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AGENTS.md` はリポジトリルートに残し、conventions へのポインタ化はしない。... conventions との重複は読み手が異なる意図的なコピーとして許容し、規約変更時に手動で同期する。"
+      }
+    },
+    {
+      "claim_hash": "0c39dd06d5abf3e325b8d50ce726039721825f9f6923ef5f790adec5cdd731d6",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧パスへの後方互換は不要とする"
+      }
+    },
+    {
+      "claim_hash": "2f14dfcfa2c2510096acb05dc9c4e541287b333c8b65e43f681dac2f71915a5e",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Quality Gates チェックリストは doc 化せず、Makefile.toml の ci-local / ci-container task dependencies を真実の源泉とする"
+      }
+    },
+    {
+      "claim_hash": "78d78546ea14d56109686ca2c0a275ace513290d4835b7841f73f9ce7ce46d42",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必要なら `Makefile.toml` のタスクに `category` メタを整備して `cargo make help` の出力を読みやすくする"
+      }
+    },
+    {
+      "claim_hash": "5935c9927b40b9bb83b26e5f01c394f55aafcf37d015a55cbc0fbd6ebb34296c",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「後続の Branch Strategy 可変化 ADR の編集対象が `branch-strategy.md` 1 ファイルに絞れる」"
+      }
+    },
+    {
+      "claim_hash": "04c3435654ebdd83bb13289edb1c1c960ebe3e1101a63194714a77cc3dac50a6",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.claude/rules/` は以後、Claude Code 固有の運用規則...だけを置く場所とする。`04` / `05` / `06` の内容を `knowledge/conventions/` 配下の正式 convention に移管し、旧ファイルは削除する"
+      }
+    },
+    {
+      "claim_hash": "2c1869964a4e32d5bd738160b829f205b6a2c8227dcaf9aa827a54d5b928400d",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「旧パスへの後方互換は不要とする — 過去 track の参照は歴史的記録であり、参照整合の検証は現行 track のみが対象でゲートに影響せず」および「ポインタ stub も残さない」"
+      }
+    },
+    {
+      "claim_hash": "118a9ccd4bededee81d7d85877fb0fafc5fef9c3a8418b37c57e4b77026d1d34",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「verify-orchestra は全廃済みなので verifier 参照を削除し、危険な permission 設定は docs の警告として残す」"
+      }
+    },
+    {
+      "claim_hash": "48c42a81a68ac2d31e5980d923d40e3974c834ef96ad9f5159becaca525e7a2e",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.claude/rules/08-orchestration.md` の Briefing Requirements 節を削除する。`writer agent 定義の必読指定とレビューゲートで担保`"
+      }
+    },
+    {
+      "claim_hash": "c16a414ee799af258d289cb7fae1a96620b0104395274ce11094c71a7ab4a4bf",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本再編で新設する 3 convention（`branch-strategy.md` / `track-lifecycle.md` / `git-notes.md`）も、`track/workflow.md` から引き継いだ dead-ref（旧 `cargo make` タスク名等）がないかスキャン対象に含める"
+      }
+    },
+    {
+      "claim_hash": "828d6b8d75da66100683b2fd8ba3ad89e42e7092a2b36c404884e5bf285502c7",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「README.md を GitHub ランディングページ兼唯一の人間向け入口に位置づけ」「`START_HERE_HUMAN.md` と `LOCAL_DEVELOPMENT.md` は削除する」"
+      }
+    },
+    {
+      "claim_hash": "2b44bdd4845fc1329bf07194dab198652c79e06a88eaaac3d8c3629c7641a6b7",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DEVELOPER_AI_WORKFLOW.md` を削除する。固有価値が残る部分（前提条件、自由文での依頼例）は README.md の使い方の節に吸収する。"
+      }
+    },
+    {
+      "claim_hash": "2a9fd8daf4996c9feb616a2b088ff37edfee5ad6c8e4bb594e6281a11ed7dad1",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md` を削除し、Branch Strategy / SSoT lifecycle / Git Notes の固有内容を以下の 3 ファイルに分散する。"
+      }
+    },
+    {
+      "claim_hash": "b0746b5c22afba331a3693b31df52871998bb3e7601d53b19b1999289dfd56a1",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| `knowledge/conventions/branch-strategy.md` | Branch Strategy + ガードポリシー |\n| `knowledge/conventions/track-lifecycle.md` | plan.md と metadata.json SSoT + observations.md + registry.md 更新ルール |\n| `knowledge/conventions/git-notes.md` | Git Notes |"
+      }
+    },
+    {
+      "claim_hash": "8919d52c68c0e009405a2fbd3bb8957d11522d6e33ccb5d7a5d55c2b4d2ee6d5",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.claude/commands/track/setup.md`（Read 操作） | 新 3 convention を Read 対象に列挙"
+      }
+    },
+    {
+      "claim_hash": "6a59155082aa9f3cc054675b935d9dbda5804dc10750617198ea78f34a8dc7bb",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.claude/rules/04-coding-principles.md` / `05-testing.md` / `06-security.md` の内容を `knowledge/conventions/` 配下の正式 convention に移管し、旧ファイルは削除する（ポインタ stub も残さない）。`06-security.md` のコード実装パターンは既存の `knowledge/conventions/security.md` に統合する。"
+      }
+    },
+    {
+      "claim_hash": "62be6504f3d5bacb7d1e4363124e60bb315cf45b83465150f0ccf32a73f4779f",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`10 | 自己修復優先（3 回詰まったら researcher で原因切り分け） | `.claude/rules/08-orchestration.md` の \"If unsure\" 末尾に 1 行追記`\n`11 | レビューサーフェース最小化（タスク単位レビュー、O(N²) 根拠） | `.claude/rules/10-guardrails.md` の \"Small task commits\" 項目に O(N²) 根拠を 1 行追記`\n`1-9 を残すと正本が二重化する`"
+      }
+    },
+    {
+      "claim_hash": "8f0e94b73c6538597554c0a9343fd171b135517fe5ba6178deadf00c6369e93f",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AGENTS.md` はリポジトリルートに残し、conventions へのポインタ化はしない。severity policy（P0/P1 のみ報告する方針）を維持したうえで、ローカルレビュワーが取りこぼしうるレビュー観点（ブランチ全体を通した整合性、複数コミットにまたがる変更の一貫性など、PR 単位でしか見えない観点）をすべて盛り込む方向で内容を強化する。"
+      }
+    },
+    {
+      "claim_hash": "603d8178d0e3a93a9ab0f7fe759ac7e24ad79fc4d260faf1c79535cc89158600",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "` .claude/rules/08-orchestration.md` の Briefing Requirements 節を削除する。"
+      }
+    },
+    {
+      "claim_hash": "720b5a8b0da9756f53afb25df42b818613825d9e77e2baf4a18b847b8c52e250",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "運用文書から、削除済み機構への参照と実行すると失敗する手順案内を排除する。"
+      }
+    },
+    {
+      "claim_hash": "e0e3b063ac27d754f3b0a67f5400392fb0c5939f8245de8d37a5d89dceedbf38",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`EXPECTED_DENY` の追加先・回帰テストの追加先が削除済みスクリプト / `verify-orchestra` を指す保守手順」"
+      }
+    },
+    {
+      "claim_hash": "9fe42bc0725fa73a22c2fde477d1af0f09785c5f576d73a0d6acaf10bdf8cf6a",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本再編で削除する `DEVELOPER_AI_WORKFLOW.md` への参照（`.claude/rules/08/09/10` ほか）→ `README.md` / 新 3 convention に張替え"
+      }
+    },
+    {
+      "claim_hash": "19d47d2c205769e957f6abba30adc48ddff07ea94b1454672995a15fad503912",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 本再編で新設する 3 convention（`branch-strategy.md` / `track-lifecycle.md` / `git-notes.md`）も、`track/workflow.md` から引き継いだ dead-ref（旧 `cargo make` タスク名等）がないかスキャン対象に含める"
+      }
+    },
+    {
+      "claim_hash": "fe19d53a751130d2d474d8fb863188c25663d2cd189c0780a40be9f75ec851b4",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md` の Quality Gates チェックリストは（D3 の workflow.md 廃止に伴い）削除し、doc 化しない。"
+      }
+    },
+    {
+      "claim_hash": "b7114ff5b355f30ffcf1206ef3520ab277268cff26403fdf68a47330dcd5993b",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「CLAUDE.md は自動ロードされる索引として残し、本再編（削除・移管・新設）に合わせて参照一覧を更新する（`DEVELOPER_AI_WORKFLOW.md` / `track/workflow.md` 行の削除、移管後の conventions と新設 3 convention の反映、`.claude/rules` を 01 / 07 / 08 / 09 / 10 に限定）。」"
+      }
+    },
+    {
+      "claim_hash": "ab361b0dd54f5c4f272e3e275d575a38b06aa24de46014f059b81979565d1a2e",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/conventions/README.md` の convention 索引は `bin/sotp conventions update-index` で再生成する。 / `knowledge/conventions/branch-strategy.md` / `knowledge/conventions/track-lifecycle.md` / `knowledge/conventions/git-notes.md`"
+      }
+    },
+    {
+      "claim_hash": "45612090d9e2317c08906a56b34a398a74b66d3cacedde46b7e2ddecf7d5a43d",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DEVELOPER_AI_WORKFLOW.md` を削除する。固有価値が残る部分（前提条件、自由文での依頼例）は README.md の使い方の節に吸収する。重複していた phase 構成・コマンド一覧・標準フローは README.md と各 `/track:*` コマンド定義に集約され、ブランチ運用の節は D3 で新設する `knowledge/conventions/branch-strategy.md` に集約される。"
+      }
+    },
+    {
+      "claim_hash": "d5f9d706b43d2c9c57ca8037fea1f10e20c547e2ae193c9b37fc606d8f5f48bd",
+      "evidence_hash": "7a754e96f4ceace663cd4cbfeb4c49a13dbded8b569b23667cc1776a1a9cbc2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/workflow.md` の Quality Gates チェックリストは ... 削除し、doc 化しない。代替として: `Makefile.toml` の `ci-local` / `ci-container` task の `dependencies` を機械可読な真実の源泉とする"
+      }
+    }
+  ]
+}

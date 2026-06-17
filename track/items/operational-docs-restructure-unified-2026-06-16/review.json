@@ -108,6 +108,139 @@
           "findings": [],
           "hash": "rvw1:sha256:3b9d004ee42c2ec62fadfb5af0e9c216f5770b81a9e49d724c32782d2ed938c0",
           "at": "2026-06-17T00:37:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 is labeled an additive phase, but the task bodies in the same section immediately delete `.claude/rules/04-coding-principles.md`, `.claude/rules/05-testing.md`, and `.claude/rules/06-security.md`. That contradicts the phase promise that sources are not deleted until S3, so the sequencing described here is internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 15,
+              "category": "contradiction"
+            },
+            {
+              "message": "T009 rewrites the removed `scripts/check_layers.py` reference to `sotp verify layers`, but CN-03 in the spec says the D8 response must be reduced to docs warning or deletion rather than another verifier call. As written, this reintroduces the verifier pattern the plan says to eliminate.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f00b4486a719d2cc4e9b9f67533dc2460651aef08f9d5f848be2aadaa8f4e003",
+          "at": "2026-06-17T01:20:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba887c1cd8a1dc248eb564249de66d1556d72a8a10404f810355613323902eae",
+          "at": "2026-06-17T01:24:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 claims it deletes `track/workflow.md` and updates all files that reference it, and task coverage maps IN-08 only to T007, but T009 later still has to remove `track/workflow.md` references from `.claude/rules/10-guardrails.md` and `CLAUDE.md`. This is a plan contradiction: either T007 owns all `track/workflow.md` rewiring, including those files, or the coverage/order needs to say T009 also completes IN-08. As written, the implementation can leave a deleted-doc reference between T007 and T009 while T007 is described as independently complete.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 42,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ba887c1cd8a1dc248eb564249de66d1556d72a8a10404f810355613323902eae",
+          "at": "2026-06-17T01:29:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 deletes `DEVELOPER_AI_WORKFLOW.md` after only removing the README pointer, but T009, which runs later and depends on T008, is the task that removes the remaining `.claude/rules/10` and `CLAUDE.md` references to that file. That contradicts the plan's claim that tasks are independently committable/coherent: the T008 boundary intentionally leaves surviving docs pointing at a deleted document. Move all `DEVELOPER_AI_WORKFLOW.md` reference cleanup into T008, or combine/reorder these tasks so deletion happens after the known references are removed.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 48,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:241bad69e37e0e67c2fc53f2b00808accdff0bfff3d4d425abca6e0c2ebaaa56",
+          "at": "2026-06-17T01:34:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004-T006 delete `.claude/rules/04/05/06` while T009 later removes the remaining references to those old rule files from `.claude/rules/08` and `CLAUDE.md`. Since the plan also claims each task can be committed and pass CI independently, this ordering knowingly creates intermediate commits with dead references to deleted files. Move the reference cleanup into T004-T006 or run it before deleting the old paths.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T009 says to remove the `scripts/check_layers.py` reference “without replacing it with another verifier command,” citing D8/CN-03. D8’s `check_layers.py` item is supposed to be updated to the current layer verifier (`sotp verify layers`); CN-03’s no-verifier-replacement rule applies to abolished `verify-orchestra`, not to layer verification. As written, the task drops valid verification guidance instead of updating it.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d14f0195af4d35dc46aaae7bfc933911d44ee1f6d07cf55e474311b653786c8e",
+          "at": "2026-06-17T01:40:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 does not satisfy the scope it is mapped to: IN-09 requires the 04-coding-principles migration target to use a split layout aligned with the existing conventions structure, but T004 instead instructs implementers to copy the whole rule verbatim into a single new `knowledge/conventions/coding-principles.md`. Following this task would mark IN-09/AC-06 covered while skipping the specified decomposition of the engineering-rule content, so the plan is internally inconsistent and can produce the wrong final documentation structure.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 19,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f168b66d0755674c82fd33521313c907aa2a7895fa9cc0e3dbda608850d7300f",
+          "at": "2026-06-17T01:45:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is defined as an independently CI-green commit because the new convention files are “additive”, but T010 later states that those same files must be registered by `bin/sotp conventions update-index` and that `verify-arch-docs` checks the index against files on disk. With T010 deferred until after T003-T006, convention-creating tasks can leave `knowledge/conventions/README.md` inconsistent at their own CI boundary, contradicting the plan's independent-CI guarantee. Either include the index update with each convention-creating task or move T010 before those commits are expected to pass independently.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 18,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:ff1666edb05f1810809be952565a04b619cb5ca711f32eaebcf9efd7b36cc9b5",
+          "at": "2026-06-17T01:50:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-16 requires not only deleting the Quality Gates checklist, but also making clear that Makefile.toml ci-local / ci-container dependencies are the machine-readable source of truth. T007 only deletes track/workflow.md and says that deletion eliminates the checklist, while AC-14 only checks that no Quality Gates document exists. As written, the plan can complete with no task preserving or adding the D9 source-of-truth guidance, leaving that part of the spec unimplemented.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 28,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:98292a71ba2bde16bba16dcd1f3de3aca27d6d5c9746cc77ed71537fb9a4f23a",
+          "at": "2026-06-17T01:55:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaa2ce27cbc408b8ac4d828ca1f3fda55220f39d6206a16d1bcc2c03112220e4",
+          "at": "2026-06-17T02:00:49Z"
         }
       ]
     }
