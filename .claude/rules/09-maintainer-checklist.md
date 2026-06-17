@@ -2,10 +2,6 @@
 
 When changing workflow or architecture, update all affected layers together.
 
-Host prerequisite:
-
-- `python3` is required inside Docker for the `scripts/` Python helpers (architecture rules, convention docs, make wrappers); not directly required on the host because the workflow is invoked through Docker compose wrappers
-
 Always consider:
 
 - user-facing docs:

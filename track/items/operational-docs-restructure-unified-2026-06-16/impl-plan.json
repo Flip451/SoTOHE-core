@@ -46,12 +46,13 @@
     {
       "id": "T008",
       "description": "Enhance README.md to serve as the sole human-facing entry point, remove all known DEVELOPER_AI_WORKFLOW.md references, then delete DEVELOPER_AI_WORKFLOW.md. README additions: (1) a 'Value proposition' or introductory section explaining SoT Chain, signal traffic-light semantics, and the track model at a level a new user can grasp; (2) a 'Prerequisites' section (Docker + docker compose required; Claude Code required; Codex CLI and Gemini CLI required for the default profile); (3) a 'Getting started' section with the canonical flow /adr:add -> /track:adr2pr and the minimal command sequence; (4) a 'Free-form request examples' section (absorbing DEVELOPER_AI_WORKFLOW.md §8 AI request examples). Reference cleanup before deletion: remove the existing 'Details: DEVELOPER_AI_WORKFLOW.md' pointer from README; replace DEVELOPER_AI_WORKFLOW.md references in .claude/rules/08/09/10 with README.md or the new workflow conventions as appropriate; remove the DEVELOPER_AI_WORKFLOW.md opening-paragraph and priority-reference lines from CLAUDE.md. CI passes: no surviving in-scope reference points at DEVELOPER_AI_WORKFLOW.md after this task. (IN-01 / IN-03 / IN-15 partial / IN-17 partial / AC-01 partial / AC-02 / AC-12 / AC-15 partial)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0efc3c3d61ec104042dd4e8964d56163b6140ba1"
     },
     {
       "id": "T009",
       "description": "Sweep .claude/rules/08, /09, /10 and CLAUDE.md for remaining dead-refs and reference updates after the old-path and deleted-doc rewiring in T004-T008. Specific changes: (a) .claude/rules/08-orchestration.md Operational split — replace the 'scripts/check_layers.py' reference with current 'sotp verify layers' guidance (D8 / IN-15); (b) .claude/rules/09-maintainer-checklist.md — remove the 'python3 is required inside Docker for scripts/' prerequisite bullet (Python runtime is fully removed) (D8 / IN-15); (c) .claude/rules/10-guardrails.md — remove any 'scripts/verify_orchestra_guardrails.py' / 'verify-orchestra' references (D8 / IN-15 / CN-03); (d) CLAUDE.md — preserve the T004-T008 updated old-path and deleted-doc references, add migrated conventions if still missing, and keep .claude/rules references limited to 01/07/08/09/10 (D10 / IN-17); (e) review remaining content of .claude/rules/01/07/08/09/10 for duplicate explanation or current-command mismatches and trim/fix where needed (IN-18). Depends on T003-T008. CI passes: the changes are all doc/config only. (IN-15 / IN-17 / IN-18 / AC-10 / AC-15)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T010",
