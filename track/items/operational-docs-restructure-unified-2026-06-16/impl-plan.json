@@ -10,7 +10,8 @@
     {
       "id": "T002",
       "description": "Strengthen AGENTS.md as a self-contained PR review briefing. Keep the existing severity policy (P0/P1 only). Add a new section covering PR-level review angles that local reviewers miss: branch-wide consistency (do deletions, creations, and reference updates form a coherent final state?), cross-commit consistency (do changes that span multiple commits remain mutually consistent across the PR diff?), and dead-reference check (do any surviving files still reference files deleted in this PR?). Do not pointerize to conventions — the briefing must remain self-contained. (IN-13 / AC-08)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "c31bccfbad8970b0ed207890e8899064022bb117"
     },
     {
       "id": "T003",
