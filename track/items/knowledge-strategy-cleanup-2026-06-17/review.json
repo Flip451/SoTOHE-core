@@ -23,6 +23,65 @@
           "findings": [],
           "hash": "rvw1:sha256:42982bce450b71a079da0f6ce399a45b9f0087ca92f08e0fb1956bab44a78e42",
           "at": "2026-06-17T14:04:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 narrows active-doc cleanup to `knowledge/DESIGN.md`, while T001 deletes the whole `knowledge/strategy/` directory. Active docs named by the plan, including `CLAUDE.md` and `README.md`, still reference `knowledge/strategy/TODO-PLAN.md`; no task or AC covers those refs, so executing this plan leaves dead references despite the summary promising updates to all deleted paths.",
+              "severity": "P1",
+              "file": "track/items/knowledge-strategy-cleanup-2026-06-17/impl-plan.json",
+              "line": 21,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-03 describes both `knowledge/schemas/` files as `(auto-mode-*)`, but the plan's own T002 names `auto-state-schema.md` as one of the two targets. That pattern excludes one target file and makes the schema-deletion scope internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/knowledge-strategy-cleanup-2026-06-17/spec.json",
+              "line": 73,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:12417f4cccac4ac7d8fa78cee3cbf212bc72a53284410ede24bc2691180129b7",
+          "at": "2026-06-17T14:44:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-07 combines two separate requirements, but its ADR grounding only cites D4. D4 covers updating active docs such as knowledge/README.md after removing strategy/designs/schemas references, while the knowledge/DESIGN.md removal/update rationale is introduced by D5. AC-10 has the inverse problem later by citing only D5 for the same combined README requirement. As written, the spec can appear fully blue while each element is only partially grounded in the relevant decisions; cite both D4 and D5 for this combined README task.",
+              "severity": "P1",
+              "file": "track/items/knowledge-strategy-cleanup-2026-06-17/spec.json",
+              "line": 120,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:93b8fb5948b488c820c29f09e45c0a1cd80f6340950e8ca4e44fa6dea146fd45",
+          "at": "2026-06-17T14:50:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 3 plan is directly citing ADR decisions from task descriptions (`ADR D1 / D1.1`, and similarly in every task). `knowledge/conventions/pre-track-adr-authoring.md` says impl-plan artifacts must reference spec/type catalogues rather than ADRs directly, because direct `impl-plan -> ADR` citation skips the SoT chain. This leaves the plan artifact with the wrong layer placement; remove the ADR citations from task descriptions and rely on the IN/CN/AC spec refs instead.",
+              "severity": "P1",
+              "file": "track/items/knowledge-strategy-cleanup-2026-06-17/impl-plan.json",
+              "line": 6,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:0276ab2ac15d6643f4d808a6174232ad4aec893967404aa27cefb76cb90b2d08",
+          "at": "2026-06-17T14:54:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:175f976492935e94f82bbb1c72fcdb4a619ee3fca2828aba200617d0f1249198",
+          "at": "2026-06-17T14:59:30Z"
         }
       ]
     }

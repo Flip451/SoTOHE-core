@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "df00c21f98ec5c90316e2f65125184db046155f36fe3614c53a7a467bab3dffe",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/strategy/` ディレクトリを撤去する\n\n`knowledge/strategy/` 配下の全 15 ファイルとディレクトリ自体を削除する。戦略文書という概念をプロジェクトのワーキングディレクトリから取り除き、SoTOHE は今後「track / ADR / convention」の 3 つで設計判断と運用ルールを完結させる。"
+      }
+    },
+    {
+      "claim_hash": "df00c21f98ec5c90316e2f65125184db046155f36fe3614c53a7a467bab3dffe",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/designs/` 配下の 3 ファイル (`auto-mode-*`) も `knowledge/strategy/` と同じ方針で扱う。設計メモが track artifact (`track/items/<id>/spec.md` / `plan.md`) と重複しており、独立して管理する意義が失われている。"
+      }
+    },
+    {
+      "claim_hash": "df00c21f98ec5c90316e2f65125184db046155f36fe3614c53a7a467bab3dffe",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/schemas/` 配下の 2 ファイル (`auto-mode-config-schema.md`, `auto-state-schema.md`) も同方針。最終更新は 2026-04-01 で約 2.5 ヶ月触れられていない。D1.1 と同様 salvage 後に撤去する。"
+      }
+    },
+    {
+      "claim_hash": "df00c21f98ec5c90316e2f65125184db046155f36fe3614c53a7a467bab3dffe",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/DESIGN.md` も同様に撤去する。本 doc の内容は次の SSoT への pointer ばかりで独自情報が薄い"
+      }
+    },
+    {
+      "claim_hash": "ba72e2edb3b4dfc0756a178cb600bc30c0bbe7920aee39f1f962d47965cc28b2",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-17:salvage-before-removal"
+      }
+    },
+    {
+      "claim_hash": "7134e6181407d654c0843047e85f3121c2cda7df4ed24e0b1e988ead6595b78a",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「knowledge/DESIGN.md を cite している 10+ の現役 doc (`CLAUDE.md` / `README.md` / `.claude/rules/` / `.claude/commands/` / `.claude/settings.json` 等) は D4 の対象外 (現役 doc) であり、撤去に追従して通常通り参照を更新する。」"
+      }
+    },
+    {
+      "claim_hash": "46d809272da60d5b68e5e9d7ed1d3c53087b17b3e49f26a7e83e98e30e788ced",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/strategy/` 配下の全 15 ファイルとディレクトリ自体を削除する。"
+      }
+    },
+    {
+      "claim_hash": "4eaad4f9ea8ad71c433377a77af39351e4ec0fe892aabf962ac2029762d53f01",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/designs/` も同様に撤去する\n\n`knowledge/designs/` 配下の 3 ファイル (`auto-mode-*`) も `knowledge/strategy/` と同じ方針で扱う。"
+      }
+    },
+    {
+      "claim_hash": "82d52b6e17f7671293f7d574ae52f44f6e5e00b02643098e73c278fc4a8e8236",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/schemas/` 配下の 2 ファイル (`auto-mode-config-schema.md`, `auto-state-schema.md`) も同方針。... D1.1 と同様 salvage 後に撤去する。"
+      }
+    },
+    {
+      "claim_hash": "032ec11a32172db2ff1b8bc99bb0f62684ea25fe7265e0a249bd46bd2b44efcb",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/DESIGN.md` も同様に撤去する"
+      }
+    },
+    {
+      "claim_hash": "cccbb02fd0755ab634500b233903f76ed9acb380a1a2f4cebb1011385152edc9",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「knowledge/DESIGN.md を cite している 10+ の現役 doc ... は ... 撤去に追従して通常通り参照を更新する」"
+      }
+    },
+    {
+      "claim_hash": "503b413d8d8e577779d95e523da3dd1034769057d9e71724c0b23018799b99d9",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/README.md` … は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "11e3921223c31f73734892ab976f939e003eeeef62f1569e44f99da37888fcd0",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現役 doc (`knowledge/conventions/adr.md` Decision Reference、`knowledge/README.md`、CLAUDE.md など SoT として運用中の文書) は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "1a7608e9f83e3a59ee40018fdfc75635819d489dd0e557e784b481f3ab9a6b28",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「過去 ADR ... に残る `knowledge/strategy/` / `knowledge/designs/` / `knowledge/schemas/` への参照は撤去後 dead link となるが、追従して書き換えない。」"
+      }
+    },
+    {
+      "claim_hash": "f5af4fa192d9722206dcb123e570578c2fef1086d913c07376c467d8a9ba65e8",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "main にマージ済みの過去 ADR (`2026-03-30-0546-knowledge-directory-consolidation.md` など) に残る `knowledge/strategy/` / `knowledge/designs/` / `knowledge/schemas/` への参照は撤去後 dead link となるが、追従して書き換えない。... 過去 ADR は当時の文脈の記録として残す。現役 doc (`knowledge/conventions/adr.md` Decision Reference、`knowledge/README.md`、CLAUDE.md など SoT として運用中の文書) は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "5226cb5aa4e9e76bb55f06fb69130965afd1619ad812746bba3fad2afb5b7917",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/strategy/` 配下の全 15 ファイルとディレクトリ自体を削除する"
+      }
+    },
+    {
+      "claim_hash": "c0c685e9d6f6b83fafb9ebebf1dbe2059eb20edebfba9724532d89e81535cecd",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "main にマージ済みの過去 ADR (`2026-03-30-0546-knowledge-directory-consolidation.md` など) に残る `knowledge/strategy/` / `knowledge/designs/` / `knowledge/schemas/` への参照は撤去後 dead link となるが、追従して書き換えない。ADR Lifecycle の post-merge 不変原則 (`knowledge/conventions/adr.md` §Lifecycle) に従い、過去 ADR は当時の文脈の記録として残す。"
+      }
+    },
+    {
+      "claim_hash": "67b9d556912b99ffc98262b04aa3531b3c5a6ab76fe6468645ddf6d48a395f72",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現役 doc (`knowledge/conventions/adr.md` Decision Reference、`knowledge/README.md`、CLAUDE.md など SoT として運用中の文書) は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "fc38651aa79ecbfecba40b198682e5f5e58cf66a0a7dfa1d6c9928d9f090910a",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-17:salvage-before-removal"
+      }
+    },
+    {
+      "claim_hash": "d1df31162abca63dc7ca1cfb1a6b7ba290d20322c060840fb90949f0c12790cb",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/strategy/` 配下の全 15 ファイルとディレクトリ自体を削除する。"
+      }
+    },
+    {
+      "claim_hash": "567531f0cbfb384482315e36669b9db84a207f6a3abfb13011fd731b3babe691",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/designs/` も同様に撤去する"
+      }
+    },
+    {
+      "claim_hash": "677b838510755dd69d44efd1b0c763aea35593c21c749fee7cac29060d6ea446",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/schemas/` も同様に撤去する"
+      }
+    },
+    {
+      "claim_hash": "4b3f2d25c71ca22ddcf81268cae9eddde2e5758123a4d92247cc3296819a2a8e",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/DESIGN.md` も同様に撤去する"
+      }
+    },
+    {
+      "claim_hash": "2cfbca5a77e3380be993c8c5d07f4330b19ad8e7ce45f0232bd5f851d8196810",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/DESIGN.md` を cite している 10+ の現役 doc (`CLAUDE.md` / `README.md` / `.claude/rules/` / `.claude/commands/` / `.claude/settings.json` 等) は D4 の対象外 (現役 doc) であり、撤去に追従して通常通り参照を更新する。"
+      }
+    },
+    {
+      "claim_hash": "b78066ba26738225d7f550900eca17867c74e81da389eaf1ad23953b1a9fe80c",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/DESIGN.md` を cite している 10+ の現役 doc (`CLAUDE.md` / `README.md` / `.claude/rules/` / `.claude/commands/` / `.claude/settings.json` 等) は D4 の対象外 (現役 doc) であり、撤去に追従して通常通り参照を更新する。"
+      }
+    },
+    {
+      "claim_hash": "be1789baa4c58cbf2a8e5543a4195c749d34709e12f60677ab8ff9ff11fb93e4",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/DESIGN.md` を cite している 10+ の現役 doc (`CLAUDE.md` / `README.md` / `.claude/rules/` / `.claude/commands/` / `.claude/settings.json` 等) は D4 の対象外 (現役 doc) であり、撤去に追従して通常通り参照を更新する。"
+      }
+    },
+    {
+      "claim_hash": "2eaf88064438f84a3ce8f00ae17a1d97601a48c8364880ab45567af8b64d1836",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「knowledge/DESIGN.md も同様に撤去する」; 「撤去に追従して通常通り参照を更新する」"
+      }
+    },
+    {
+      "claim_hash": "fd97a18aa17a4f6a345a32a50710ea89a998898712434251767ed4fd6cae9d7b",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現役 doc (`knowledge/conventions/adr.md` Decision Reference) は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "6beefede7b3de922a3355b92786339bfc1880249762887da8674964bf2b4d424",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-17:salvage-before-removal"
+      }
+    },
+    {
+      "claim_hash": "58a0999d341f0bc17a476cb57ce45fb8ae3fbf9c085f783fbfe2f7c5fdeedee9",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/strategy/` 配下の全 15 ファイルとディレクトリ自体を削除する。戦略文書という概念をプロジェクトのワーキングディレクトリから取り除き、SoTOHE は今後「track / ADR / convention」の 3 つで設計判断と運用ルールを完結させる。"
+      }
+    },
+    {
+      "claim_hash": "2ed2f88729aaaf509844eaff669754a1446403b157b53b7b2477ee17b7192223",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-17:salvage-before-removal"
+      }
+    },
+    {
+      "claim_hash": "fb8465a401e26dcf0dbf2f4bbf028f0abee2572eeb65a48bf2a14ff47a7c5f62",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-17:salvage-before-removal"
+      }
+    },
+    {
+      "claim_hash": "8d69e39257c72bf9138e8557a66feae770ff371553a24a8cdc0cf25032c35b68",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-17:salvage-before-removal"
+      }
+    },
+    {
+      "claim_hash": "2028d8263f0a268a490f9e3e564964adbc75efd41b1784976850a8bb71bbb11e",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現役 doc (`knowledge/conventions/adr.md` Decision Reference、`knowledge/README.md`、CLAUDE.md など SoT として運用中の文書) は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "2028d8263f0a268a490f9e3e564964adbc75efd41b1784976850a8bb71bbb11e",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/DESIGN.md` を cite している 10+ の現役 doc (`CLAUDE.md` / `README.md` / `.claude/rules/` / `.claude/commands/` / `.claude/settings.json` 等) は D4 の対象外 (現役 doc) であり、撤去に追従して通常通り参照を更新する。"
+      }
+    },
+    {
+      "claim_hash": "7325d80be5472442adbc6adaa53916809e78a33f7554c71a4bc0199710340676",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/schemas/` 配下の 2 ファイル (`auto-mode-config-schema.md`, `auto-state-schema.md`) も同方針。... D1.1 と同様 salvage 後に撤去する。"
+      }
+    },
+    {
+      "claim_hash": "3e489f966daab443ac1a9529bdd0241212dd39246db9de7a67301399d3ebcdd4",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現役 doc（`knowledge/conventions/adr.md` Decision Reference、`knowledge/README.md`、CLAUDE.md など SoT として運用中の文書) は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "3e489f966daab443ac1a9529bdd0241212dd39246db9de7a67301399d3ebcdd4",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「knowledge/DESIGN.md を cite している 10+ の現役 doc ... は D4 の対象外 (現役 doc) であり、撤去に追従して通常通り参照を更新する。」"
+      }
+    },
+    {
+      "claim_hash": "a182fd5cfdccc51c6c9dcf41521620e90f4c90ac33c7dd30119b006dc2c84204",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現役 doc (`knowledge/conventions/adr.md` Decision Reference、`knowledge/README.md`、CLAUDE.md など SoT として運用中の文書) は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "a182fd5cfdccc51c6c9dcf41521620e90f4c90ac33c7dd30119b006dc2c84204",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/DESIGN.md` も同様に撤去する。 ... `knowledge/DESIGN.md` を cite している 10+ の現役 doc (`CLAUDE.md` / `README.md` / `.claude/rules/` / `.claude/commands/` / `.claude/settings.json` 等) は D4 の対象外 (現役 doc) であり、撤去に追従して通常通り参照を更新する。"
+      }
+    },
+    {
+      "claim_hash": "dfdd02a0c0cce4ab6e7bd2b0d6ec0fa6498806aa912d478dca1427acdc329475",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLAUDE.md など SoT として運用中の文書 は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "dfdd02a0c0cce4ab6e7bd2b0d6ec0fa6498806aa912d478dca1427acdc329475",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CLAUDE.md` / ... `knowledge/DESIGN.md` を cite している ... 撤去に追従して通常通り参照を更新する"
+      }
+    },
+    {
+      "claim_hash": "4cb3899776a7fa39faa3fcffc26df2885dfe9b7fef4892d6108489e766860a73",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「現役 doc ... は本決定の対象外であり、撤去に追従して通常通り更新する。」"
+      }
+    },
+    {
+      "claim_hash": "4cb3899776a7fa39faa3fcffc26df2885dfe9b7fef4892d6108489e766860a73",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "撤去に追従して通常通り参照を更新する。"
+      }
+    },
+    {
+      "claim_hash": "798f724f3894e917aaf22f0bd102f1885dee56a7d026ae4f0238262f2aad5faf",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現役 doc (`knowledge/conventions/adr.md` Decision Reference、`knowledge/README.md`、CLAUDE.md など SoT として運用中の文書) は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "798f724f3894e917aaf22f0bd102f1885dee56a7d026ae4f0238262f2aad5faf",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「撤去に追従して通常通り参照を更新する」"
+      }
+    },
+    {
+      "claim_hash": "c46a37251be10be4d162444af374b74c02719d64c1a884b0dc02a38ce59aa3ad",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現役 doc (`knowledge/conventions/adr.md` Decision Reference、`knowledge/README.md`、CLAUDE.md など SoT として運用中の文書) は本決定の対象外であり、撤去に追従して通常通り更新する。"
+      }
+    },
+    {
+      "claim_hash": "c46a37251be10be4d162444af374b74c02719d64c1a884b0dc02a38ce59aa3ad",
+      "evidence_hash": "30ef50392b3bf0e248a70d02c1312a616d8114e8149001ecc0d47ec65402f7bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`knowledge/DESIGN.md` も同様に撤去する ... `knowledge/DESIGN.md` を cite している 10+ の現役 doc (`CLAUDE.md` / `README.md` / `.claude/rules/` / `.claude/commands/` / `.claude/settings.json` 等) は D4 の対象外 (現役 doc) であり、撤去に追従して通常通り参照を更新する。"
+      }
+    }
+  ]
+}

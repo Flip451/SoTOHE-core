@@ -1,0 +1,376 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "knowledge/strategy ディレクトリの整理方針",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "knowledge/strategy/ (15 ファイル)、knowledge/designs/ (3 ファイル)、knowledge/schemas/ (2 ファイル)、knowledge/DESIGN.md の計 21 ファイルを working tree から撤去し、knowledge/ 配下の認知負荷を下げる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "撤去前に各ファイルを精査し、現在の SoTOHE にとって役立つ情報を knowledge/research/ の独立 file に salvage することで、情報損失リスクを低減しながら削除を完遂する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D1.1"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "knowledge/DESIGN.md および削除対象ディレクトリ配下の文書 (例: knowledge/strategy/TODO-PLAN.md / TODO.md) を cite している現役 doc (CLAUDE.md / README.md / .claude/rules/ 等) を撤去に追従して更新し、dead link を残さない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D5"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "knowledge/strategy/ 配下の全 15 ファイルとディレクトリ自体を削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "knowledge/designs/ 配下の全 3 ファイル (auto-mode-*) とディレクトリ自体を削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "knowledge/schemas/ 配下の全 2 ファイル (auto-mode-config-schema.md / auto-state-schema.md) とディレクトリ自体を削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "knowledge/DESIGN.md を削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "各削除対象ファイルを読み込み、現在の SoTOHE にとって役立つ情報を抽出して knowledge/research/YYYY-MM-DD-HHMM-<topic>.md 形式の独立 file に encode してから削除する (salvage フェーズ)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D1.1"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "knowledge/DESIGN.md および削除対象ディレクトリ (knowledge/strategy/ / knowledge/designs/ / knowledge/schemas/) 配下の文書を cite している現役 doc (CLAUDE.md / README.md / .claude/rules/ / .claude/commands/ / .claude/settings.json / .codex/instructions.md / knowledge/conventions/ 等) から該当参照を削除または代替 SSoT への参照に更新する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "knowledge/README.md の Directory Structure 表から strategy/ / designs/ / schemas/ の行と knowledge/DESIGN.md の参照を削除し、実態と一致させる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "knowledge/conventions/adr.md の Decision Reference セクションにある knowledge-restructure-design-2026-03-20.md (strategy/ 配下) への参照を削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D4"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "main にマージ済みの過去 ADR (2026-03-30-0546-knowledge-directory-consolidation.md 等) に残る knowledge/strategy/ / knowledge/designs/ / knowledge/schemas/ / knowledge/DESIGN.md への参照は撤去後 dead link となるが更新しない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "完了済み track (done 状態) の spec.json / impl-plan.json 等に埋め込まれた knowledge/strategy/ / knowledge/designs/ / knowledge/schemas/ / knowledge/DESIGN.md への参照は更新しない。過去 track の artifact は歴史的記録であり参照整合の検証は現行 track のみが対象",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "Rust ソースコード (libs/ / apps/) の変更は行わない。本 track は doc 操作のみ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "knowledge/adr/2026-03-24-0930-adr-auto-derivation-design.md (sotp adr suggest 設計 ADR) の deprecate / supersede 判断は本 track のスコープ外。撤去で前提が変わることは Consequences に記載されているが、対応 ADR の作成は別 track で扱う",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "既存 SoT (ADR / convention / CLAUDE.md / track/tech-stack.md 等) への inline 追記による salvage は重要文書を汚染するため禁止する。encode 先は knowledge/research/YYYY-MM-DD-HHMM-<topic>.md 形式の独立 file に限定する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D1.1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "撤去後に dead link となる過去 ADR の参照は追従して更新しない。ADR の post-merge 不変原則に従い過去 ADR は当時の文脈の記録として残す",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "現役 doc (knowledge/conventions/ / CLAUDE.md / README.md / .claude/rules/ 等、SoT として運用中の文書) は D4 の対象外であり、撤去に追従して参照を更新する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "salvage 判定 (どの情報を残すか) の判断基準: 現在の SoTOHE の ADR / convention / track artifact にまだ encode されていない固有情報があれば salvage 候補とし、重複または陳腐化した情報は salvage しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D1.1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "knowledge/strategy/ ディレクトリが存在しない (git status で削除として記録される)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "knowledge/designs/ ディレクトリが存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "knowledge/schemas/ ディレクトリが存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "knowledge/DESIGN.md が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "各削除対象ファイルを読み込んで salvage 判定 (役立つ情報あり / なし) を実施した上で削除している。salvage ありと判定したファイルについては削除前に knowledge/research/ 配下の独立 file への encode が完了している",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D1.1"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "knowledge/research/ 配下に salvage として encode した各 file の名前が YYYY-MM-DD-HHMM-<topic>.md 形式であり、ADR / convention / CLAUDE.md / track/tech-stack.md 等の既存 SoT ファイルへの inline 追記が行われていない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D1.1"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "CLAUDE.md に knowledge/DESIGN.md および削除対象ディレクトリ (knowledge/strategy/ / knowledge/designs/ / knowledge/schemas/) 配下への参照が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "README.md に knowledge/DESIGN.md および削除対象ディレクトリ (knowledge/strategy/ / knowledge/designs/ / knowledge/schemas/) 配下への参照が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "T004 対象の現役 doc (.claude/rules/ / .claude/commands/ / .claude/settings.json / .codex/instructions.md / .claude/skills/ / knowledge/conventions/ 等) に knowledge/DESIGN.md または削除対象ディレクトリ (knowledge/strategy/ / knowledge/designs/ / knowledge/schemas/) 配下への参照が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "knowledge/README.md の Directory Structure 表に strategy/ / designs/ / schemas/ の行が存在せず、Related Top-Level Files に knowledge/DESIGN.md への参照が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "knowledge/conventions/adr.md の Decision Reference セクションに knowledge-restructure-design-2026-03-20.md (strategy/ 配下) への参照が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-17-1321-knowledge-strategy-cleanup.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "Lifecycle"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/track-lifecycle.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 30,
+    "yellow": 0,
+    "red": 0
+  }
+}
