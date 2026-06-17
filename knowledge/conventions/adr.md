@@ -141,4 +141,3 @@ ADR が `main` にマージされているかで扱いが変わる:
 ## Decision Reference
 
 - [knowledge/adr/README.md](../../knowledge/adr/README.md) — ADR テンプレート・索引
-- [knowledge-restructure-design-2026-03-20.md](../strategy/knowledge-restructure-design-2026-03-20.md) — 元の設計メモ

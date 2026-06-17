@@ -4,7 +4,7 @@
     {
       "id": "T001",
       "description": "knowledge/strategy/ — salvage then delete. Read all 15 files in knowledge/strategy/. For each file, judge whether it contains information not yet encoded elsewhere in ADR / convention / track artifacts. Encode salvage-worthy information to knowledge/research/YYYY-MM-DD-HHMM-<topic>.md independent files (no inline SoT edits). Then delete the entire knowledge/strategy/ directory. (IN-01 / IN-05 / AC-01 / AC-05 / AC-06)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T002",
@@ -43,7 +43,11 @@
         "description": [
           "Read each target file, judge salvage-worthiness, encode novel information to knowledge/research/, then delete the directory or file."
         ],
-        "task_ids": ["T001", "T002", "T003"]
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003"
+        ]
       },
       {
         "id": "S2",
@@ -51,7 +55,11 @@
         "description": [
           "Remove or redirect references to the deleted paths in all surviving active docs."
         ],
-        "task_ids": ["T004", "T005", "T006"]
+        "task_ids": [
+          "T004",
+          "T005",
+          "T006"
+        ]
       }
     ]
   }

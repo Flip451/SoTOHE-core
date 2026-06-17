@@ -15,7 +15,6 @@ Priority references:
 - `track/items/<id>/observations.md` (optional — manual observation log)
 - `knowledge/DESIGN.md`
 - `knowledge/adr/README.md`
-- `knowledge/strategy/TODO-PLAN.md`
 - `.harness/config/agent-profiles.json`
 - `.claude/rules/`  # Claude Code-specific operating rules only; engineering conventions live under knowledge/conventions/
 - `knowledge/conventions/README.md`
