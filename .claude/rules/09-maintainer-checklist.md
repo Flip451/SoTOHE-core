@@ -9,7 +9,7 @@ Host prerequisite:
 Always consider:
 
 - user-facing docs:
-  - `DEVELOPER_AI_WORKFLOW.md`
+  - `README.md`
 - track docs:
   - `knowledge/conventions/branch-strategy.md`
   - `knowledge/conventions/track-lifecycle.md`

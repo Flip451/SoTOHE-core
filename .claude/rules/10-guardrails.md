@@ -146,6 +146,6 @@ Operational details live in:
 - `knowledge/conventions/branch-strategy.md`
 - `knowledge/conventions/track-lifecycle.md`
 - `knowledge/conventions/git-notes.md`
-- `DEVELOPER_AI_WORKFLOW.md`
+- `README.md`
 - `.claude/settings.json`
 - `.claude/hooks/`

@@ -1,21 +1,363 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f3f9821dbbc9b529b29d1dcc778112d2185e4b450b9ff798eaa83affedef0852",
-          "at": "2026-06-17T04:48:38Z"
+          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
+          "at": "2026-06-17T00:24:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f3f9821dbbc9b529b29d1dcc778112d2185e4b450b9ff798eaa83affedef0852",
-          "at": "2026-06-17T04:51:14Z"
+          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
+          "at": "2026-06-17T00:27:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/workflow.md` still says `START_HERE_HUMAN.md` is the first human entry point, but this diff deletes that file. The onboarding path is now broken until this reference is retargeted to `README.md` or removed.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 5,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
+          "at": "2026-06-17T02:12:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
+          "at": "2026-06-17T02:15:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
+          "at": "2026-06-17T02:18:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b145ef110b7af2851b522a2ff07b1c14ad023e5f9954bbf2a8beb7f19b059a2e",
+          "at": "2026-06-17T02:26:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b145ef110b7af2851b522a2ff07b1c14ad023e5f9954bbf2a8beb7f19b059a2e",
+          "at": "2026-06-17T02:28:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This purpose statement overstates the branch model: the repo also supports `plan/<id>` branches for planning-only flows, and those branches are still first-class in the workflow (`.claude/commands/track/pr.md:4-17`, `.claude/commands/track/plan.md:228`). As written, the convention reads as if every track must work on `track/<track-id>` only, which is not true for the planning branch path.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 5,
+              "category": "correctness"
+            },
+            {
+              "message": "This states that `metadata.json` is the SSoT for progress, but the current implementation keeps task state in `impl-plan.json` and derives status from that file: `TransitionTaskUseCase` writes only `impl-plan.json` and leaves `metadata.json` untouched (`libs/usecase/src/lib.rs:90-99`), and `ImplPlanDocument` is explicitly the Phase 3 SSoT (`libs/domain/src/impl_plan.rs:1-5`). The lifecycle convention should name `impl-plan.json` as part of the source of truth, otherwise it points editors at the wrong file.",
+              "severity": "P1",
+              "file": "knowledge/conventions/track-lifecycle.md",
+              "line": 5,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:94cdaafc0b9e126148fb1273222b14e3d457a73f93d60e69fd85cef007982d9a",
+          "at": "2026-06-17T02:43:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`branch-strategy.md` still treats `plan/<id>` as a live branch class (`Purpose`, `Scope`, and `現在のトラック解決`), but the current resolver only accepts `track/<id>` and explicitly rejects `plan/*`, and the active-track ADR says the plan-only lane was removed. This makes the new convention internally inconsistent with the repo’s actual branch model and will mislead workflow decisions. Remove `plan/<id>` from this convention or mark it as historical only.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 5,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3906fe53d9ba9f9400d32244e2d6deb73a3b347ca233a16cd14baa388238f000",
+          "at": "2026-06-17T02:49:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30f9aeee313ba04c6c6d6946de364bf9eaedbd545cc313e65d60673971bc1a3d",
+          "at": "2026-06-17T02:55:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make track-pr-merge` is documented as a live merge-path command, but this wrapper no longer exists in `Makefile.toml`; the current CLI exposes the merge path as `bin/sotp pr wait-and-merge` and `/track:merge` still has command docs. Leaving the removed wrapper in the new convention reintroduces a dead command reference for readers following the branch policy.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 96,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:30f9aeee313ba04c6c6d6946de364bf9eaedbd545cc313e65d60673971bc1a3d",
+          "at": "2026-06-17T02:59:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This convention says `main` resolves the latest track via the `updated_at` legacy fallback, but the current resolver it points readers to accepts only `track/<id>` branches and returns `NotTrackBranch` for `main`. Keeping this stale rule will send users and automation down a non-existent path for current-track resolution on `main`; update the convention to match the strict resolver or point to the actual fallback path if one still exists elsewhere.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 18,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:56ed8b791f57d53ad5a06423b99190f93370955d589dc747d6ac93d08ae5d1f5",
+          "at": "2026-06-17T03:03:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54b2643652dc44311d3f7f1f3b0984f786ad950450d81df01c37cd6b7db15ac0",
+          "at": "2026-06-17T03:08:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d05892c2d7f6240b46b64d0cfd660986a86dd9a9844115b25a8c359c13b9c595",
+          "at": "2026-06-17T03:20:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migrated typestate guidance now says any state transition should prefer typestate, but the surviving Decision Flow above still tells readers to use an enum to limit state transitions. That leaves two conflicting rules in the same convention and can steer later type-design work toward the wrong abstraction. Update the Decision Flow to distinguish finite state/data variants from transition modeling, or point it at the typestate section.",
+              "severity": "P1",
+              "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+              "line": 25,
+              "category": "consistency"
+            },
+            {
+              "message": "The updated priority reference says `.claude/rules/` is limited to 08/09/10/07, but `.claude/rules/01-language.md` still exists and is part of the planned final operating-rule set. Agents following this narrowed comment can skip the language policy rules, so the reference should include 01 or avoid enumerating an incomplete subset.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 18,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d05892c2d7f6240b46b64d0cfd660986a86dd9a9844115b25a8c359c13b9c595",
+          "at": "2026-06-17T03:26:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a871c9b43b6926a136220a1be53162adb6e90669412def55397a7f45bcd0728",
+          "at": "2026-06-17T03:35:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d99e0960a1ba6f7cba971ddf8f4de2ec3b637587da2627691e80f24651d9c0d2",
+          "at": "2026-06-17T03:40:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting this rule leaves live harness-policy references pointing at a file that no longer exists. The accepted deviations only cover historical track/spec records and follow-up-deleted docs, but current operational docs still cite `.claude/rules/04-coding-principles.md`, including `.harness/capabilities/type-designer.md:84`, `.harness/capabilities/spec-designer.md:78`, `.harness/capabilities/impl-planner.md:73`, `.claude/commands/track/plan.md:260`, `knowledge/conventions/type-designer-kind-selection.md:233`/`:320`, and `knowledge/conventions/impl-delegation-arch-guard.md:116`. Agents following those instructions will chase a deleted source instead of the new `knowledge/conventions/*` documents.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": null,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d99e0960a1ba6f7cba971ddf8f4de2ec3b637587da2627691e80f24651d9c0d2",
+          "at": "2026-06-17T03:45:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36af1d57b18f67b911bcf5bab0ca3082c31d06858728d646c03cf85c497da7d1",
+          "at": "2026-06-17T03:53:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new convention is supposed to follow the standard convention format, but it jumps from `## Scope` directly into topical rule sections and never defines the required `## Rules` or `## Examples` sections. This leaves the document structurally inconsistent with the convention format called out for this migration.",
+              "severity": "P1",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 12,
+              "category": "documentation-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:36af1d57b18f67b911bcf5bab0ca3082c31d06858728d646c03cf85c497da7d1",
+          "at": "2026-06-17T03:58:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:813db9cc3d80df569cc7c78649c27e9de6cf0b58b9dbf6c8b894a83a79d7776c",
+          "at": "2026-06-17T04:02:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2503fd5e4e0b64c5b82db7151363c29e4e7bf21354be2d6f8940050669d366aa",
+          "at": "2026-06-17T04:13:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2503fd5e4e0b64c5b82db7151363c29e4e7bf21354be2d6f8940050669d366aa",
+          "at": "2026-06-17T04:17:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cdb477e0aeda75065d5f25e57704fd21b216bb38eebc0b008914b3bac46773e",
+          "at": "2026-06-17T04:26:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cdb477e0aeda75065d5f25e57704fd21b216bb38eebc0b008914b3bac46773e",
+          "at": "2026-06-17T04:28:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:420c0adb6bf422d3283fd0a669a089579a4aabdcbfb1cb25aeb502b6547d98f2",
+          "at": "2026-06-17T04:49:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The replacement leaves two of the three convention references as bare filenames (`track-lifecycle.md` and `git-notes.md`). This command section is a list of architecture-facing document paths to update, and those bare paths do not exist at the repo root or relative to this command file, so agents following the command can miss the required convention docs after `track/workflow.md` is deleted. Use the full `knowledge/conventions/track-lifecycle.md` and `knowledge/conventions/git-notes.md` paths here.",
+              "severity": "P1",
+              "file": ".claude/commands/architecture-customizer.md",
+              "line": 25,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:420c0adb6bf422d3283fd0a669a089579a4aabdcbfb1cb25aeb502b6547d98f2",
+          "at": "2026-06-17T04:52:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67c50155be67e85040910f58ac06eae46c7e330570b3269533d1f2eb3ec0f201",
+          "at": "2026-06-17T04:54:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [README.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md#L90) and [README.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md#L96) misstate the canonical `/track:adr2pr` flow. The README says the command runs `/track:plan` and then implements/reviews/commits/creates the PR, but the actual orchestrator explicitly says not to invoke `/track:plan`, requires an initial ADR review+commit, and ends at `/track:pr-review` with no merge ([.claude/commands/track/adr2pr.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md#L19), [.claude/commands/track/adr2pr.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md#L39)). A newcomer following the README will execute the wrong sequence and miss required steps.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md",
+              "line": 90,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:45bb0b0351d47ddf222b7d4e66c3f7563c0108094f5b9c17ac8af17777f26a85",
+          "at": "2026-06-17T05:05:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `DEVELOPER_AI_WORKFLOW.md` leaves the doc-pattern verifier still hard-coded to that file. `REQUIRED_LINES` and `CONVENTIONS_REQUIRED_LINES` still require `cargo make verify-track-metadata`, `cargo make verify-tech-stack`, `cargo make verify-latest-track`, `/track:revert`, and the conventions-reference line from `DEVELOPER_AI_WORKFLOW.md`, so `cargo make ci` will now fail once `verify_architecture_docs` runs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/doc_patterns.rs",
+              "line": 103,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:4a0a5be3cd96aa00f9559d756f84f7be079883b7cb8a0ebe58af8b61aff628fe",
+          "at": "2026-06-17T05:10:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new prerequisites section still omits the host Rust/Cargo toolchain even though the first documented setup step is `cargo make bootstrap`, and that bootstrap task hard-fails when `cargo` is missing. As written, a fresh machine with Docker but without Rust will hit a setup failure immediately.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md",
+              "line": 56,
+              "category": "onboarding"
+            }
+          ],
+          "hash": "rvw1:sha256:4a0a5be3cd96aa00f9559d756f84f7be079883b7cb8a0ebe58af8b61aff628fe",
+          "at": "2026-06-17T05:17:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:524b42ffe9d43f609219efea6fadf934ad3e06dbcba3f01195b0db2bdaa47107",
+          "at": "2026-06-17T05:21:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "README now instructs first-time users to run `/track:adr2pr <feature>`, but the actual `.claude/commands/track/adr2pr.md` command does not declare or consume an argument and describes a prepared-ADR flow that auto-decides the track slug. Since README is becoming the sole human-facing entry point, this non-canonical command shape can mislead users into passing a feature argument that is ignored. Drop `<feature>` here or update the command definition to explicitly accept and use it.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 94,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:524b42ffe9d43f609219efea6fadf934ad3e06dbcba3f01195b0db2bdaa47107",
+          "at": "2026-06-17T05:26:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99f03d14ecebce0c1fa21c0c81eed0564cf74e770077dcd85a3faec1b278b10b",
+          "at": "2026-06-17T05:29:30Z"
         }
       ]
     },
@@ -48,6 +390,38 @@
           "findings": [],
           "hash": "rvw1:sha256:640d65f8cb0d4b21c70e19955c8dbc2e94cb578e899f46d764bde9282be9d7ce",
           "at": "2026-06-17T04:51:33Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f9821dbbc9b529b29d1dcc778112d2185e4b450b9ff798eaa83affedef0852",
+          "at": "2026-06-17T04:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f9821dbbc9b529b29d1dcc778112d2185e4b450b9ff798eaa83affedef0852",
+          "at": "2026-06-17T04:51:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:997231ac5d80726e04095beb0268a7262030310976ec06fa140c3aeb0ccbb473",
+          "at": "2026-06-17T05:14:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:997231ac5d80726e04095beb0268a7262030310976ec06fa140c3aeb0ccbb473",
+          "at": "2026-06-17T05:16:50Z"
         }
       ]
     },
@@ -423,292 +797,20 @@
           "findings": [],
           "hash": "rvw1:sha256:e57b9812e87e8b142402f4907f2d639468f635b94b4d181a56a7704eecdf2f63",
           "at": "2026-06-17T04:50:37Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
-          "at": "2026-06-17T00:24:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
-          "at": "2026-06-17T00:27:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track/workflow.md` still says `START_HERE_HUMAN.md` is the first human entry point, but this diff deletes that file. The onboarding path is now broken until this reference is retargeted to `README.md` or removed.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 5,
-              "category": "broken-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
-          "at": "2026-06-17T02:12:49Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
-          "at": "2026-06-17T02:15:37Z"
+          "hash": "rvw1:sha256:026c0934f70c01254eedcaae72f405423a01b10bfb80a854cc115c90d0f524be",
+          "at": "2026-06-17T05:03:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
-          "at": "2026-06-17T02:18:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b145ef110b7af2851b522a2ff07b1c14ad023e5f9954bbf2a8beb7f19b059a2e",
-          "at": "2026-06-17T02:26:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b145ef110b7af2851b522a2ff07b1c14ad023e5f9954bbf2a8beb7f19b059a2e",
-          "at": "2026-06-17T02:28:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This purpose statement overstates the branch model: the repo also supports `plan/<id>` branches for planning-only flows, and those branches are still first-class in the workflow (`.claude/commands/track/pr.md:4-17`, `.claude/commands/track/plan.md:228`). As written, the convention reads as if every track must work on `track/<track-id>` only, which is not true for the planning branch path.",
-              "severity": "P1",
-              "file": "knowledge/conventions/branch-strategy.md",
-              "line": 5,
-              "category": "correctness"
-            },
-            {
-              "message": "This states that `metadata.json` is the SSoT for progress, but the current implementation keeps task state in `impl-plan.json` and derives status from that file: `TransitionTaskUseCase` writes only `impl-plan.json` and leaves `metadata.json` untouched (`libs/usecase/src/lib.rs:90-99`), and `ImplPlanDocument` is explicitly the Phase 3 SSoT (`libs/domain/src/impl_plan.rs:1-5`). The lifecycle convention should name `impl-plan.json` as part of the source of truth, otherwise it points editors at the wrong file.",
-              "severity": "P1",
-              "file": "knowledge/conventions/track-lifecycle.md",
-              "line": 5,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:94cdaafc0b9e126148fb1273222b14e3d457a73f93d60e69fd85cef007982d9a",
-          "at": "2026-06-17T02:43:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`branch-strategy.md` still treats `plan/<id>` as a live branch class (`Purpose`, `Scope`, and `現在のトラック解決`), but the current resolver only accepts `track/<id>` and explicitly rejects `plan/*`, and the active-track ADR says the plan-only lane was removed. This makes the new convention internally inconsistent with the repo’s actual branch model and will mislead workflow decisions. Remove `plan/<id>` from this convention or mark it as historical only.",
-              "severity": "P1",
-              "file": "knowledge/conventions/branch-strategy.md",
-              "line": 5,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3906fe53d9ba9f9400d32244e2d6deb73a3b347ca233a16cd14baa388238f000",
-          "at": "2026-06-17T02:49:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30f9aeee313ba04c6c6d6946de364bf9eaedbd545cc313e65d60673971bc1a3d",
-          "at": "2026-06-17T02:55:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cargo make track-pr-merge` is documented as a live merge-path command, but this wrapper no longer exists in `Makefile.toml`; the current CLI exposes the merge path as `bin/sotp pr wait-and-merge` and `/track:merge` still has command docs. Leaving the removed wrapper in the new convention reintroduces a dead command reference for readers following the branch policy.",
-              "severity": "P1",
-              "file": "knowledge/conventions/branch-strategy.md",
-              "line": 96,
-              "category": "dead-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:30f9aeee313ba04c6c6d6946de364bf9eaedbd545cc313e65d60673971bc1a3d",
-          "at": "2026-06-17T02:59:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This convention says `main` resolves the latest track via the `updated_at` legacy fallback, but the current resolver it points readers to accepts only `track/<id>` branches and returns `NotTrackBranch` for `main`. Keeping this stale rule will send users and automation down a non-existent path for current-track resolution on `main`; update the convention to match the strict resolver or point to the actual fallback path if one still exists elsewhere.",
-              "severity": "P1",
-              "file": "knowledge/conventions/branch-strategy.md",
-              "line": 18,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:56ed8b791f57d53ad5a06423b99190f93370955d589dc747d6ac93d08ae5d1f5",
-          "at": "2026-06-17T03:03:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54b2643652dc44311d3f7f1f3b0984f786ad950450d81df01c37cd6b7db15ac0",
-          "at": "2026-06-17T03:08:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d05892c2d7f6240b46b64d0cfd660986a86dd9a9844115b25a8c359c13b9c595",
-          "at": "2026-06-17T03:20:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The migrated typestate guidance now says any state transition should prefer typestate, but the surviving Decision Flow above still tells readers to use an enum to limit state transitions. That leaves two conflicting rules in the same convention and can steer later type-design work toward the wrong abstraction. Update the Decision Flow to distinguish finite state/data variants from transition modeling, or point it at the typestate section.",
-              "severity": "P1",
-              "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
-              "line": 25,
-              "category": "consistency"
-            },
-            {
-              "message": "The updated priority reference says `.claude/rules/` is limited to 08/09/10/07, but `.claude/rules/01-language.md` still exists and is part of the planned final operating-rule set. Agents following this narrowed comment can skip the language policy rules, so the reference should include 01 or avoid enumerating an incomplete subset.",
-              "severity": "P1",
-              "file": "CLAUDE.md",
-              "line": 18,
-              "category": "dead-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:d05892c2d7f6240b46b64d0cfd660986a86dd9a9844115b25a8c359c13b9c595",
-          "at": "2026-06-17T03:26:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a871c9b43b6926a136220a1be53162adb6e90669412def55397a7f45bcd0728",
-          "at": "2026-06-17T03:35:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d99e0960a1ba6f7cba971ddf8f4de2ec3b637587da2627691e80f24651d9c0d2",
-          "at": "2026-06-17T03:40:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting this rule leaves live harness-policy references pointing at a file that no longer exists. The accepted deviations only cover historical track/spec records and follow-up-deleted docs, but current operational docs still cite `.claude/rules/04-coding-principles.md`, including `.harness/capabilities/type-designer.md:84`, `.harness/capabilities/spec-designer.md:78`, `.harness/capabilities/impl-planner.md:73`, `.claude/commands/track/plan.md:260`, `knowledge/conventions/type-designer-kind-selection.md:233`/`:320`, and `knowledge/conventions/impl-delegation-arch-guard.md:116`. Agents following those instructions will chase a deleted source instead of the new `knowledge/conventions/*` documents.",
-              "severity": "P1",
-              "file": ".claude/rules/04-coding-principles.md",
-              "line": null,
-              "category": "dead-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:d99e0960a1ba6f7cba971ddf8f4de2ec3b637587da2627691e80f24651d9c0d2",
-          "at": "2026-06-17T03:45:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:36af1d57b18f67b911bcf5bab0ca3082c31d06858728d646c03cf85c497da7d1",
-          "at": "2026-06-17T03:53:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new convention is supposed to follow the standard convention format, but it jumps from `## Scope` directly into topical rule sections and never defines the required `## Rules` or `## Examples` sections. This leaves the document structurally inconsistent with the convention format called out for this migration.",
-              "severity": "P1",
-              "file": "knowledge/conventions/coding-principles.md",
-              "line": 12,
-              "category": "documentation-contract"
-            }
-          ],
-          "hash": "rvw1:sha256:36af1d57b18f67b911bcf5bab0ca3082c31d06858728d646c03cf85c497da7d1",
-          "at": "2026-06-17T03:58:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:813db9cc3d80df569cc7c78649c27e9de6cf0b58b9dbf6c8b894a83a79d7776c",
-          "at": "2026-06-17T04:02:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2503fd5e4e0b64c5b82db7151363c29e4e7bf21354be2d6f8940050669d366aa",
-          "at": "2026-06-17T04:13:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2503fd5e4e0b64c5b82db7151363c29e4e7bf21354be2d6f8940050669d366aa",
-          "at": "2026-06-17T04:17:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0cdb477e0aeda75065d5f25e57704fd21b216bb38eebc0b008914b3bac46773e",
-          "at": "2026-06-17T04:26:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0cdb477e0aeda75065d5f25e57704fd21b216bb38eebc0b008914b3bac46773e",
-          "at": "2026-06-17T04:28:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:420c0adb6bf422d3283fd0a669a089579a4aabdcbfb1cb25aeb502b6547d98f2",
-          "at": "2026-06-17T04:49:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The replacement leaves two of the three convention references as bare filenames (`track-lifecycle.md` and `git-notes.md`). This command section is a list of architecture-facing document paths to update, and those bare paths do not exist at the repo root or relative to this command file, so agents following the command can miss the required convention docs after `track/workflow.md` is deleted. Use the full `knowledge/conventions/track-lifecycle.md` and `knowledge/conventions/git-notes.md` paths here.",
-              "severity": "P1",
-              "file": ".claude/commands/architecture-customizer.md",
-              "line": 25,
-              "category": "broken-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:420c0adb6bf422d3283fd0a669a089579a4aabdcbfb1cb25aeb502b6547d98f2",
-          "at": "2026-06-17T04:52:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67c50155be67e85040910f58ac06eae46c7e330570b3269533d1f2eb3ec0f201",
-          "at": "2026-06-17T04:54:33Z"
+          "hash": "rvw1:sha256:026c0934f70c01254eedcaae72f405423a01b10bfb80a854cc115c90d0f524be",
+          "at": "2026-06-17T05:06:04Z"
         }
       ]
     }

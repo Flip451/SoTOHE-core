@@ -46,7 +46,7 @@ Read these first before planning or implementation:
 
 Operational split:
 
-- `DEVELOPER_AI_WORKFLOW.md`: user-facing operating guide
+- `README.md`: user-facing entry point (value proposition / prerequisites / getting started / free-form request examples)
 - `CLAUDE.md`: maintainer/reference guide
 - `knowledge/conventions/`: project-specific engineering rules, day-to-day workflow rules, and implementation policies
 - `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `sotp verify layers`

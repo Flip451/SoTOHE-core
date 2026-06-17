@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Minimal maintainer index for this repository. First-time user onboarding lives in `DEVELOPER_AI_WORKFLOW.md`.
+Minimal maintainer index for this repository. First-time user onboarding lives in `README.md`.
 
 Priority references:
 
