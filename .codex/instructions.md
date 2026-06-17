@@ -12,7 +12,9 @@ assigned to Codex, act only within that specialist boundary.
 Read these first:
 
 - `AGENTS.md`
-- `track/workflow.md`
+- `knowledge/conventions/branch-strategy.md`
+- `knowledge/conventions/track-lifecycle.md`
+- `knowledge/conventions/git-notes.md`
 - `track/tech-stack.md`
 - `track/registry.md`
 - `knowledge/conventions/README.md`

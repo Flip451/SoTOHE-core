@@ -122,9 +122,31 @@ pub fn check_approved(input: CheckApprovedInput) -> Result<(), String> {
 - [ ] `cargo make check-layers` が pass するか
 - [ ] `cargo make deny` が pass するか
 
+## Trait-Based Abstraction
+
+インフラ依存を Trait で分離する。Port trait は対象層に定義し、Adapter は infrastructure 層に実装する。
+
+```rust
+// Port (domain layer) — sync baseline
+pub trait UserRepository: Send + Sync {
+    fn save(&self, user: &User) -> Result<(), DomainError>;
+}
+
+// Adapter (infrastructure layer)
+pub struct PostgresUserRepository { pool: PgPool }
+impl UserRepository for PostgresUserRepository {
+    fn save(&self, user: &User) -> Result<(), DomainError> { ... }
+}
+```
+
+> **Note**: async runtime（tokio 等）を `track/tech-stack.md` で採用した場合は、
+> native `async fn in trait`（Rust 1.75+）を優先する。`async-trait` クレートは
+> dyn dispatch（object safety）や明示的な future auto-trait bounds が必要な場合に使用する。
+
 ## Related Documents
 
 - `architecture-rules.json`: レイヤー依存ルールの SSoT
 - `deny.toml`: Cargo レベルのレイヤー強制
-- `.claude/rules/04-coding-principles.md`: Trait-Based Abstraction
+- `knowledge/conventions/prefer-type-safe-abstractions.md`: 型安全パターン（Newtype / Enum-first / Typestate）
+- `knowledge/conventions/coding-principles.md`: Error handling / naming / module size / no-panics
 - `track/tech-stack.md`: アーキテクチャパターンの決定

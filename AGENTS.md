@@ -34,6 +34,45 @@ When reviewing pull requests, focus on the following areas:
 - Error messages must not leak internal details (host, port, stack traces).
 - Logs must not contain sensitive information.
 
+### PR-Specific Review Angles
+
+These angles only become visible when reviewing the whole PR branch against the base. Local
+reviewers that scope to a single file or commit cannot catch them; surface findings here when
+the PR-level view shows a problem the per-commit view missed.
+
+- **Branch-wide consistency** — Read the full set of file deletions, creations, edits, and
+  reference updates across the PR as a single change set. Ask: does the final state of the
+  branch (HEAD vs. base) form a coherent whole? Examples to flag:
+  - A new file is created and referenced from elsewhere, but a different commit moved or
+    deleted the referencing file.
+  - A function is renamed in one commit and a different commit adds a new caller using the
+    old name.
+  - A configuration key is removed in one commit and another commit still reads it.
+  - A documentation file says "see X" where X is created or renamed elsewhere in the PR
+    inconsistently.
+- **Cross-commit consistency** — Walk the PR commit by commit. Ask: do changes introduced in
+  earlier commits remain consistent with the assumptions of later commits? Examples to flag:
+  - An early commit changes a public API signature; a later commit's code still passes the
+    old shape (compiles only because the later commit also adjusts something accidentally
+    masking the mismatch).
+  - An early commit's test asserts behavior X; a later commit changes the implementation to
+    behavior Y without updating the test (the test happens to still pass because of an
+    unrelated condition).
+  - An early commit introduces a constraint or invariant that a later commit silently
+    violates.
+- **Dead-reference check** — After the PR's deletions and renames are applied, scan the
+  surviving files (those still present at HEAD) for references to files that no longer
+  exist. Includes: source file paths in docs, import paths in code, command invocations in
+  scripts, anchor links in markdown. Examples to flag:
+  - A markdown file says "see `path/to/old.md`" but `old.md` is deleted in this PR.
+  - A `cargo make` task references a script that this PR removed.
+  - A test fixture path points at a file the PR moved without updating the test.
+  - The PR description or commit message says "as documented in X" where X was deleted.
+
+  Exclusion: references to deleted files inside ADR / convention / commit-message / git-note
+  text that describe *what this PR did* (e.g., "this PR deletes `old.md` because ...") are
+  intentional historical records, not dead references.
+
 ### Severity Policy
 
 Only report findings at these severity levels:

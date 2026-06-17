@@ -257,4 +257,4 @@ On completion, present:
 - `knowledge/conventions/workflow-ceremony-minimization.md` — post-hoc review, pre-approval limited to irreversible actions
 - `knowledge/conventions/source-attribution.md` — source attribution for spec.json elements
 - `knowledge/conventions/adr.md` — ADR format rules
-- `.claude/rules/04-coding-principles.md` — enum-first / typestate / newtype principles
+- `knowledge/conventions/prefer-type-safe-abstractions.md` — enum-first / typestate / newtype principles

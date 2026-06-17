@@ -1,12 +1,14 @@
 # CLAUDE.md
 
-Minimal maintainer index for this repository. First-time user onboarding lives in `DEVELOPER_AI_WORKFLOW.md`.
+Minimal maintainer index for this repository. First-time user onboarding lives in `README.md`.
 
 Priority references:
 
 - `track/tech-stack.md`
-- `track/workflow.md`
 - `track/registry.md`
+- `knowledge/conventions/branch-strategy.md`   # branch-per-track model, PR/merge workflow, guard policy
+- `knowledge/conventions/track-lifecycle.md`   # task state transitions, plan.md SSoT, registry update rules, observations
+- `knowledge/conventions/git-notes.md`         # git note format, commit traceability
 - `track/items/<id>/metadata.json`
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
@@ -15,9 +17,12 @@ Priority references:
 - `knowledge/adr/README.md`
 - `knowledge/strategy/TODO-PLAN.md`
 - `.harness/config/agent-profiles.json`
-- `.claude/rules/`
+- `.claude/rules/`  # Claude Code-specific operating rules only; engineering conventions live under knowledge/conventions/
 - `knowledge/conventions/README.md`
 - `knowledge/conventions/`
+- `knowledge/conventions/coding-principles.md`           # error handling / naming / module size / no-panics / unsafe
+- `knowledge/conventions/prefer-type-safe-abstractions.md`  # Newtype / Enum-first / Typestate patterns
+- `knowledge/conventions/hexagonal-architecture.md`        # Trait-Based Abstraction / port placement / adapter rules
 - `knowledge/conventions/pre-track-adr-authoring.md`  # ADR authored before /track:plan runs
 - `knowledge/conventions/workflow-ceremony-minimization.md`  # post-hoc review + approved-state removal
 - `architecture-rules.json`
@@ -43,6 +48,7 @@ Operating notes:
 
 Details:
 
+- Language policy: `.claude/rules/01-language.md`
 - Orchestration / delegation: `.claude/rules/08-orchestration.md`
 - Maintainer checklist: `.claude/rules/09-maintainer-checklist.md`
 - Guardrails: `.claude/rules/10-guardrails.md`

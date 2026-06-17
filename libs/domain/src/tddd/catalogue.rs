@@ -174,7 +174,7 @@ impl EnumVariantDeclaration {
 /// A member of a composite type: either an enum variant (name + payload types)
 /// or a struct field (name + type string).
 ///
-/// **Enum-first design** (see `.claude/rules/04-coding-principles.md` § Enum-first):
+/// **Enum-first design** (see `knowledge/conventions/prefer-type-safe-abstractions.md` § Enum-first):
 /// the two states carry structurally distinct data — a variant has a name and
 /// payload types while a field has a name and a type string. A
 /// `struct { name, ty: Option<String> }` shape would allow the illegal

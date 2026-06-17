@@ -8,7 +8,7 @@
 //!
 //! `TypeSignalsDocument` is a pure value type: it has no state transitions and
 //! no variant-dependent data, so it is modelled as a struct with private fields
-//! and accessor methods (see `.claude/rules/04-coding-principles.md`).
+//! and accessor methods (see `knowledge/conventions/prefer-type-safe-abstractions.md`).
 //!
 //! `TypeSignalsLoadResult` captures the outcome of loading a signal document
 //! relative to the current declaration file: `Current` / `Stale { .. }` /

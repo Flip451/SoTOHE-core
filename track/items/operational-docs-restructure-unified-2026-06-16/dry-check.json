@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "records": [
+    {
+      "low_path": "libs/domain/src/spec.rs",
+      "low_hash": "920d8c463521269abd9e65784ffa2bf2d49008f4c69322c5a39b05c249ab6d73",
+      "high_path": "libs/domain/src/spec.rs",
+      "high_hash": "aa78963595e2a154d9a9819697ccead3cafcfb6505e57690bfb68369e5c1ef4e",
+      "changed_path": "libs/domain/src/spec.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8510181903839111,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1f001dba72213df057f47ac1a917e531ecaf9f90",
+      "rationale": "These helpers are intentionally similar but not redundant: one encodes a blue requirement tied to an ADR reference, while the new fragment encodes a blue requirement tied to a convention reference. The shared `SpecRequirement::new(...)` call is a small, localized construction pattern, and the differing reference sets are the meaningful part. This does not look like harmful copy-paste duplication.",
+      "recorded_at": "2026-06-17T06:07:01Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/type_signals_doc.rs",
+      "low_hash": "91660e3ee8d7b0793867a22ad792054bd16f6ca876b0c1a5f4cd78d60444d6b5",
+      "high_path": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+      "high_hash": "178abe0eb5213ee606e687c5b0cf17e08cf481e7d55af29446e2117a0b7abd90",
+      "changed_path": "libs/domain/src/tddd/type_signals_doc.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8589286804199219,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1f001dba72213df057f47ac1a917e531ecaf9f90",
+      "rationale": "These fragments overlap in describing the same TDDD signal-file schema, but they serve different layers and purposes: the domain file defines the in-memory value type, while the infrastructure file documents the Serde codec behavior and error handling. Repeating the schema context in both places is justified for local clarity and does not indicate duplicated logic or an avoidable single source of truth problem.",
+      "recorded_at": "2026-06-17T06:07:01Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/spec/render.rs",
+      "low_hash": "337532c7c961cd2e993e00164d229810836c88ebf8d85854e211f4608e978adf",
+      "high_path": "libs/infrastructure/src/spec/render.rs",
+      "high_hash": "e716bb42b1feb982caf6a897d02d59da4ec927c011e9bcafdedca5400669c433",
+      "changed_path": "libs/infrastructure/src/spec/render.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8809745907783508,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1f001dba72213df057f47ac1a917e531ecaf9f90",
+      "rationale": "The changed fragment is a thin compatibility wrapper that delegates to `render_spec_with_coverage(doc, None)` rather than duplicating rendering logic. That preserves a single implementation path for spec rendering, so there is no meaningful DRY violation here.",
+      "recorded_at": "2026-06-17T06:07:01Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/spec/render.rs",
+      "low_hash": "337532c7c961cd2e993e00164d229810836c88ebf8d85854e211f4608e978adf",
+      "high_path": "libs/infrastructure/src/spec/render.rs",
+      "high_hash": "f6cd1f8dcc32c8055f2e2774ec92fd189ddda83770c63b98df50bce7432a9359",
+      "changed_path": "libs/infrastructure/src/spec/render.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8692257404327393,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1f001dba72213df057f47ac1a917e531ecaf9f90",
+      "rationale": "The new `render_spec` wrapper does not duplicate the rendering logic; it delegates to `render_spec_with_coverage(doc, None)`. The only overlap is a small amount of documentation, which is intentional and does not create a DRY problem in the implementation.",
+      "recorded_at": "2026-06-17T06:07:01Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/spec/render.rs",
+      "low_hash": "ba18b2b2cd3c252a888a3e1daae2183d0c5d030612acd55d26ea1767612ee703",
+      "high_path": "libs/infrastructure/src/spec/render.rs",
+      "high_hash": "ca00a3636cf85ffaa26c6c8119685ae5bb4d6868e141350812b30f71f934ef39",
+      "changed_path": "libs/infrastructure/src/spec/render.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8993207216262817,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1f001dba72213df057f47ac1a917e531ecaf9f90",
+      "rationale": "The two fragments are complementary tests for different behaviors of `render_spec`: one verifies constraints are omitted when empty, the other verifies they are rendered when present. The small shared setup (`doc` creation and `render_spec` call) is idiomatic test code, not a meaningful DRY violation.",
+      "recorded_at": "2026-06-17T06:07:01Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    }
+  ]
+}

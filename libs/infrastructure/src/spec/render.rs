@@ -62,7 +62,7 @@ pub fn render_spec(doc: &SpecDocument) -> String {
 /// - [OO-01] Excluded item [informal: discussion — agreed out of scope]
 ///
 /// ## Constraints
-/// - [CN-01] Constraint 1 [conv: .claude/rules/04-coding-principles.md#newtype-pattern]
+/// - [CN-01] Constraint 1 [conv: knowledge/conventions/prefer-type-safe-abstractions.md#newtype-pattern]
 ///
 /// ## Acceptance Criteria
 /// - [ ] [AC-01] AC text [adr: knowledge/adr/x.md#D3.1] [tasks: T003]
@@ -398,7 +398,7 @@ mod tests {
             vec![req_with_conv(
                 "CO-01",
                 "Constraint 1",
-                ".claude/rules/04-coding-principles.md",
+                "knowledge/conventions/prefer-type-safe-abstractions.md",
                 "newtype-pattern",
             )],
             vec![req_with_adr("AC-01", "AC text", "knowledge/adr/x.md", "D3.1")],
@@ -576,7 +576,7 @@ mod tests {
         let output = render_spec(&doc);
         assert!(output.contains("## Constraints\n"));
         assert!(output.contains(
-            "- [CO-01] Constraint 1 [conv: .claude/rules/04-coding-principles.md#newtype-pattern]\n"
+            "- [CO-01] Constraint 1 [conv: knowledge/conventions/prefer-type-safe-abstractions.md#newtype-pattern]\n"
         ));
     }
 

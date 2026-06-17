@@ -450,7 +450,7 @@ pub struct ScopeRound {
 /// Domain verdict expressing the outcome of the approval/bypass check for the
 /// entire track's review cycle.
 ///
-/// Enum-first design (per `04-coding-principles.md`): each variant carries
+/// Enum-first design (per `knowledge/conventions/prefer-type-safe-abstractions.md` § Enum-first): each variant carries
 /// exactly the data it needs, eliminating boolean flags and cross-field
 /// invariants.
 ///

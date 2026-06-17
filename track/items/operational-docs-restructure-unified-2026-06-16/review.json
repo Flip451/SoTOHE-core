@@ -1,0 +1,984 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
+          "at": "2026-06-17T02:16:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
+          "at": "2026-06-17T02:18:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:640d65f8cb0d4b21c70e19955c8dbc2e94cb578e899f46d764bde9282be9d7ce",
+          "at": "2026-06-17T04:48:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:640d65f8cb0d4b21c70e19955c8dbc2e94cb578e899f46d764bde9282be9d7ce",
+          "at": "2026-06-17T04:51:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:212f399722d38f829324cee1f602b66dabdb8570e10e15d034d772e7dafa36d6",
+          "at": "2026-06-17T06:45:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:212f399722d38f829324cee1f602b66dabdb8570e10e15d034d772e7dafa36d6",
+          "at": "2026-06-17T06:48:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b8918755bd9168b7870eb39bbf44af0db022e78af291d0b6e434d3302e3aee6",
+          "at": "2026-06-17T07:27:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b8918755bd9168b7870eb39bbf44af0db022e78af291d0b6e434d3302e3aee6",
+          "at": "2026-06-17T07:30:25Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
+          "at": "2026-06-17T00:24:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
+          "at": "2026-06-17T00:27:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/workflow.md` still says `START_HERE_HUMAN.md` is the first human entry point, but this diff deletes that file. The onboarding path is now broken until this reference is retargeted to `README.md` or removed.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 5,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
+          "at": "2026-06-17T02:12:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
+          "at": "2026-06-17T02:15:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f226d38cdc5c328b4e87a1e1fc0dfb979a7571417e85b6589aa2f050b6edf500",
+          "at": "2026-06-17T02:18:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b145ef110b7af2851b522a2ff07b1c14ad023e5f9954bbf2a8beb7f19b059a2e",
+          "at": "2026-06-17T02:26:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b145ef110b7af2851b522a2ff07b1c14ad023e5f9954bbf2a8beb7f19b059a2e",
+          "at": "2026-06-17T02:28:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This purpose statement overstates the branch model: the repo also supports `plan/<id>` branches for planning-only flows, and those branches are still first-class in the workflow (`.claude/commands/track/pr.md:4-17`, `.claude/commands/track/plan.md:228`). As written, the convention reads as if every track must work on `track/<track-id>` only, which is not true for the planning branch path.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 5,
+              "category": "correctness"
+            },
+            {
+              "message": "This states that `metadata.json` is the SSoT for progress, but the current implementation keeps task state in `impl-plan.json` and derives status from that file: `TransitionTaskUseCase` writes only `impl-plan.json` and leaves `metadata.json` untouched (`libs/usecase/src/lib.rs:90-99`), and `ImplPlanDocument` is explicitly the Phase 3 SSoT (`libs/domain/src/impl_plan.rs:1-5`). The lifecycle convention should name `impl-plan.json` as part of the source of truth, otherwise it points editors at the wrong file.",
+              "severity": "P1",
+              "file": "knowledge/conventions/track-lifecycle.md",
+              "line": 5,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:94cdaafc0b9e126148fb1273222b14e3d457a73f93d60e69fd85cef007982d9a",
+          "at": "2026-06-17T02:43:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`branch-strategy.md` still treats `plan/<id>` as a live branch class (`Purpose`, `Scope`, and `現在のトラック解決`), but the current resolver only accepts `track/<id>` and explicitly rejects `plan/*`, and the active-track ADR says the plan-only lane was removed. This makes the new convention internally inconsistent with the repo’s actual branch model and will mislead workflow decisions. Remove `plan/<id>` from this convention or mark it as historical only.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 5,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3906fe53d9ba9f9400d32244e2d6deb73a3b347ca233a16cd14baa388238f000",
+          "at": "2026-06-17T02:49:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30f9aeee313ba04c6c6d6946de364bf9eaedbd545cc313e65d60673971bc1a3d",
+          "at": "2026-06-17T02:55:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make track-pr-merge` is documented as a live merge-path command, but this wrapper no longer exists in `Makefile.toml`; the current CLI exposes the merge path as `bin/sotp pr wait-and-merge` and `/track:merge` still has command docs. Leaving the removed wrapper in the new convention reintroduces a dead command reference for readers following the branch policy.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 96,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:30f9aeee313ba04c6c6d6946de364bf9eaedbd545cc313e65d60673971bc1a3d",
+          "at": "2026-06-17T02:59:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This convention says `main` resolves the latest track via the `updated_at` legacy fallback, but the current resolver it points readers to accepts only `track/<id>` branches and returns `NotTrackBranch` for `main`. Keeping this stale rule will send users and automation down a non-existent path for current-track resolution on `main`; update the convention to match the strict resolver or point to the actual fallback path if one still exists elsewhere.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 18,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:56ed8b791f57d53ad5a06423b99190f93370955d589dc747d6ac93d08ae5d1f5",
+          "at": "2026-06-17T03:03:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54b2643652dc44311d3f7f1f3b0984f786ad950450d81df01c37cd6b7db15ac0",
+          "at": "2026-06-17T03:08:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d05892c2d7f6240b46b64d0cfd660986a86dd9a9844115b25a8c359c13b9c595",
+          "at": "2026-06-17T03:20:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migrated typestate guidance now says any state transition should prefer typestate, but the surviving Decision Flow above still tells readers to use an enum to limit state transitions. That leaves two conflicting rules in the same convention and can steer later type-design work toward the wrong abstraction. Update the Decision Flow to distinguish finite state/data variants from transition modeling, or point it at the typestate section.",
+              "severity": "P1",
+              "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+              "line": 25,
+              "category": "consistency"
+            },
+            {
+              "message": "The updated priority reference says `.claude/rules/` is limited to 08/09/10/07, but `.claude/rules/01-language.md` still exists and is part of the planned final operating-rule set. Agents following this narrowed comment can skip the language policy rules, so the reference should include 01 or avoid enumerating an incomplete subset.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 18,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d05892c2d7f6240b46b64d0cfd660986a86dd9a9844115b25a8c359c13b9c595",
+          "at": "2026-06-17T03:26:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a871c9b43b6926a136220a1be53162adb6e90669412def55397a7f45bcd0728",
+          "at": "2026-06-17T03:35:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d99e0960a1ba6f7cba971ddf8f4de2ec3b637587da2627691e80f24651d9c0d2",
+          "at": "2026-06-17T03:40:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting this rule leaves live harness-policy references pointing at a file that no longer exists. The accepted deviations only cover historical track/spec records and follow-up-deleted docs, but current operational docs still cite `.claude/rules/04-coding-principles.md`, including `.harness/capabilities/type-designer.md:84`, `.harness/capabilities/spec-designer.md:78`, `.harness/capabilities/impl-planner.md:73`, `.claude/commands/track/plan.md:260`, `knowledge/conventions/type-designer-kind-selection.md:233`/`:320`, and `knowledge/conventions/impl-delegation-arch-guard.md:116`. Agents following those instructions will chase a deleted source instead of the new `knowledge/conventions/*` documents.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": null,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d99e0960a1ba6f7cba971ddf8f4de2ec3b637587da2627691e80f24651d9c0d2",
+          "at": "2026-06-17T03:45:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36af1d57b18f67b911bcf5bab0ca3082c31d06858728d646c03cf85c497da7d1",
+          "at": "2026-06-17T03:53:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new convention is supposed to follow the standard convention format, but it jumps from `## Scope` directly into topical rule sections and never defines the required `## Rules` or `## Examples` sections. This leaves the document structurally inconsistent with the convention format called out for this migration.",
+              "severity": "P1",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 12,
+              "category": "documentation-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:36af1d57b18f67b911bcf5bab0ca3082c31d06858728d646c03cf85c497da7d1",
+          "at": "2026-06-17T03:58:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:813db9cc3d80df569cc7c78649c27e9de6cf0b58b9dbf6c8b894a83a79d7776c",
+          "at": "2026-06-17T04:02:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2503fd5e4e0b64c5b82db7151363c29e4e7bf21354be2d6f8940050669d366aa",
+          "at": "2026-06-17T04:13:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2503fd5e4e0b64c5b82db7151363c29e4e7bf21354be2d6f8940050669d366aa",
+          "at": "2026-06-17T04:17:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cdb477e0aeda75065d5f25e57704fd21b216bb38eebc0b008914b3bac46773e",
+          "at": "2026-06-17T04:26:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cdb477e0aeda75065d5f25e57704fd21b216bb38eebc0b008914b3bac46773e",
+          "at": "2026-06-17T04:28:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:420c0adb6bf422d3283fd0a669a089579a4aabdcbfb1cb25aeb502b6547d98f2",
+          "at": "2026-06-17T04:49:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The replacement leaves two of the three convention references as bare filenames (`track-lifecycle.md` and `git-notes.md`). This command section is a list of architecture-facing document paths to update, and those bare paths do not exist at the repo root or relative to this command file, so agents following the command can miss the required convention docs after `track/workflow.md` is deleted. Use the full `knowledge/conventions/track-lifecycle.md` and `knowledge/conventions/git-notes.md` paths here.",
+              "severity": "P1",
+              "file": ".claude/commands/architecture-customizer.md",
+              "line": 25,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:420c0adb6bf422d3283fd0a669a089579a4aabdcbfb1cb25aeb502b6547d98f2",
+          "at": "2026-06-17T04:52:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67c50155be67e85040910f58ac06eae46c7e330570b3269533d1f2eb3ec0f201",
+          "at": "2026-06-17T04:54:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [README.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md#L90) and [README.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md#L96) misstate the canonical `/track:adr2pr` flow. The README says the command runs `/track:plan` and then implements/reviews/commits/creates the PR, but the actual orchestrator explicitly says not to invoke `/track:plan`, requires an initial ADR review+commit, and ends at `/track:pr-review` with no merge ([.claude/commands/track/adr2pr.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md#L19), [.claude/commands/track/adr2pr.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md#L39)). A newcomer following the README will execute the wrong sequence and miss required steps.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md",
+              "line": 90,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:45bb0b0351d47ddf222b7d4e66c3f7563c0108094f5b9c17ac8af17777f26a85",
+          "at": "2026-06-17T05:05:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `DEVELOPER_AI_WORKFLOW.md` leaves the doc-pattern verifier still hard-coded to that file. `REQUIRED_LINES` and `CONVENTIONS_REQUIRED_LINES` still require `cargo make verify-track-metadata`, `cargo make verify-tech-stack`, `cargo make verify-latest-track`, `/track:revert`, and the conventions-reference line from `DEVELOPER_AI_WORKFLOW.md`, so `cargo make ci` will now fail once `verify_architecture_docs` runs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/doc_patterns.rs",
+              "line": 103,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:4a0a5be3cd96aa00f9559d756f84f7be079883b7cb8a0ebe58af8b61aff628fe",
+          "at": "2026-06-17T05:10:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new prerequisites section still omits the host Rust/Cargo toolchain even though the first documented setup step is `cargo make bootstrap`, and that bootstrap task hard-fails when `cargo` is missing. As written, a fresh machine with Docker but without Rust will hit a setup failure immediately.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md",
+              "line": 56,
+              "category": "onboarding"
+            }
+          ],
+          "hash": "rvw1:sha256:4a0a5be3cd96aa00f9559d756f84f7be079883b7cb8a0ebe58af8b61aff628fe",
+          "at": "2026-06-17T05:17:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:524b42ffe9d43f609219efea6fadf934ad3e06dbcba3f01195b0db2bdaa47107",
+          "at": "2026-06-17T05:21:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "README now instructs first-time users to run `/track:adr2pr <feature>`, but the actual `.claude/commands/track/adr2pr.md` command does not declare or consume an argument and describes a prepared-ADR flow that auto-decides the track slug. Since README is becoming the sole human-facing entry point, this non-canonical command shape can mislead users into passing a feature argument that is ignored. Drop `<feature>` here or update the command definition to explicitly accept and use it.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 94,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:524b42ffe9d43f609219efea6fadf934ad3e06dbcba3f01195b0db2bdaa47107",
+          "at": "2026-06-17T05:26:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99f03d14ecebce0c1fa21c0c81eed0564cf74e770077dcd85a3faec1b278b10b",
+          "at": "2026-06-17T05:29:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2942c9768e7e8dcb7894cea62f8d2218dc099cc2a3c7b853d53f645d74714e3e",
+          "at": "2026-06-17T05:39:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2942c9768e7e8dcb7894cea62f8d2218dc099cc2a3c7b853d53f645d74714e3e",
+          "at": "2026-06-17T05:41:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5172fccd6ba6c33daf2bac29eb9ca934f189258ff84032bf61cd28bf2848f4a",
+          "at": "2026-06-17T06:26:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5172fccd6ba6c33daf2bac29eb9ca934f189258ff84032bf61cd28bf2848f4a",
+          "at": "2026-06-17T06:29:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:595878dae833939c23e33c42097738db9014b0c7944727528181071b85ed9ccf",
+          "at": "2026-06-17T07:47:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:595878dae833939c23e33c42097738db9014b0c7944727528181071b85ed9ccf",
+          "at": "2026-06-17T07:48:56Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:653d5dcbf9efcb2924ab0a043958db0f6a74a2a722087a82b289483a43044849",
+          "at": "2026-06-17T06:13:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:653d5dcbf9efcb2924ab0a043958db0f6a74a2a722087a82b289483a43044849",
+          "at": "2026-06-17T06:15:59Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f9821dbbc9b529b29d1dcc778112d2185e4b450b9ff798eaa83affedef0852",
+          "at": "2026-06-17T04:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f9821dbbc9b529b29d1dcc778112d2185e4b450b9ff798eaa83affedef0852",
+          "at": "2026-06-17T04:51:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:997231ac5d80726e04095beb0268a7262030310976ec06fa140c3aeb0ccbb473",
+          "at": "2026-06-17T05:14:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:997231ac5d80726e04095beb0268a7262030310976ec06fa140c3aeb0ccbb473",
+          "at": "2026-06-17T05:16:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9e17663ff2939b74f7eb7fc3d99ceffed224af95fd9428b3eb3f2d747db5ed9",
+          "at": "2026-06-17T06:15:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9e17663ff2939b74f7eb7fc3d99ceffed224af95fd9428b3eb3f2d747db5ed9",
+          "at": "2026-06-17T06:21:33Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61f6385c8b91a003f936ea93b93a10c763b7205023e40157e51b699f3c76a4b",
+          "at": "2026-06-17T00:03:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61f6385c8b91a003f936ea93b93a10c763b7205023e40157e51b699f3c76a4b",
+          "at": "2026-06-17T00:06:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 で `track/workflow.md` の Quality Gates を「17 項目」と述べていますが、同文書の該当チェックリストは現状 20 項目あります。削除理由の前提が古く、採否の根拠としては不正確です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md",
+              "line": 171,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:7354ad096580a0b58c9bcf9729e22953c4758cd79d57fa54b4e6217b5b91af04",
+          "at": "2026-06-17T00:19:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fbe7129c09aa897ef477b871c0584dd03a29b1493f7a1700ffa6116b6279014b",
+          "at": "2026-06-17T00:25:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 states that `track/workflow.md`'s unique content will be distributed into the three new convention files, but D5 later says two unique Guiding Principles are preserved by appending them to `.claude/rules/08-orchestration.md` and `.claude/rules/10-guardrails.md`, outside those three convention targets. This gives conflicting aggregation targets for unique `track/workflow.md` content and can cause the implementation to either drop those principles or place them in the wrong destination. Clarify D3 as covering only branch/lifecycle/git-notes content, or include the D5 rule updates in its migration target list.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md",
+              "line": 87,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fbe7129c09aa897ef477b871c0584dd03a29b1493f7a1700ffa6116b6279014b",
+          "at": "2026-06-17T00:28:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 makes `Makefile.toml`'s `ci` task `dependencies` the source of truth for Quality Gates, but the actual `ci` task only depends on `prepare-local-cache-dirs` and delegates to `ci-local`; the real gate list is on `ci-local`/`ci-container`. As written, an implementer following this ADR would inspect or maintain the wrong dependency list and could miss the actual Quality Gates source of truth. Update the ADR to name the `ci-local`/`ci-container` dependency lists, or otherwise describe the `ci` wrapper delegation explicitly.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md",
+              "line": 173,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:fec9b9a8a1fd295a4591a77e6f762a580c38c2ca00f96e91fefdf7059ef93be1",
+          "at": "2026-06-17T00:31:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D8 still directs the rewrite to `sotp verify orchestra`, but the repository's later responsibility-boundary decision explicitly removed `verify-orchestra`, including the CLI `verify orchestra` subcommand. That makes the proposed target mechanism semantically wrong: implementers following this ADR would replace a dead Python script reference with another non-existent verifier instead of removing or rewording that guardrail path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md",
+              "line": 161,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:89812639cbaffecce39fada4f6c5258ab597d2abcd55f214932b10c2b8a225f3",
+          "at": "2026-06-17T00:35:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b9d004ee42c2ec62fadfb5af0e9c216f5770b81a9e49d724c32782d2ed938c0",
+          "at": "2026-06-17T00:37:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 is labeled an additive phase, but the task bodies in the same section immediately delete `.claude/rules/04-coding-principles.md`, `.claude/rules/05-testing.md`, and `.claude/rules/06-security.md`. That contradicts the phase promise that sources are not deleted until S3, so the sequencing described here is internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 15,
+              "category": "contradiction"
+            },
+            {
+              "message": "T009 rewrites the removed `scripts/check_layers.py` reference to `sotp verify layers`, but CN-03 in the spec says the D8 response must be reduced to docs warning or deletion rather than another verifier call. As written, this reintroduces the verifier pattern the plan says to eliminate.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f00b4486a719d2cc4e9b9f67533dc2460651aef08f9d5f848be2aadaa8f4e003",
+          "at": "2026-06-17T01:20:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba887c1cd8a1dc248eb564249de66d1556d72a8a10404f810355613323902eae",
+          "at": "2026-06-17T01:24:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 claims it deletes `track/workflow.md` and updates all files that reference it, and task coverage maps IN-08 only to T007, but T009 later still has to remove `track/workflow.md` references from `.claude/rules/10-guardrails.md` and `CLAUDE.md`. This is a plan contradiction: either T007 owns all `track/workflow.md` rewiring, including those files, or the coverage/order needs to say T009 also completes IN-08. As written, the implementation can leave a deleted-doc reference between T007 and T009 while T007 is described as independently complete.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 42,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ba887c1cd8a1dc248eb564249de66d1556d72a8a10404f810355613323902eae",
+          "at": "2026-06-17T01:29:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 deletes `DEVELOPER_AI_WORKFLOW.md` after only removing the README pointer, but T009, which runs later and depends on T008, is the task that removes the remaining `.claude/rules/10` and `CLAUDE.md` references to that file. That contradicts the plan's claim that tasks are independently committable/coherent: the T008 boundary intentionally leaves surviving docs pointing at a deleted document. Move all `DEVELOPER_AI_WORKFLOW.md` reference cleanup into T008, or combine/reorder these tasks so deletion happens after the known references are removed.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 48,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:241bad69e37e0e67c2fc53f2b00808accdff0bfff3d4d425abca6e0c2ebaaa56",
+          "at": "2026-06-17T01:34:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004-T006 delete `.claude/rules/04/05/06` while T009 later removes the remaining references to those old rule files from `.claude/rules/08` and `CLAUDE.md`. Since the plan also claims each task can be committed and pass CI independently, this ordering knowingly creates intermediate commits with dead references to deleted files. Move the reference cleanup into T004-T006 or run it before deleting the old paths.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T009 says to remove the `scripts/check_layers.py` reference “without replacing it with another verifier command,” citing D8/CN-03. D8’s `check_layers.py` item is supposed to be updated to the current layer verifier (`sotp verify layers`); CN-03’s no-verifier-replacement rule applies to abolished `verify-orchestra`, not to layer verification. As written, the task drops valid verification guidance instead of updating it.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d14f0195af4d35dc46aaae7bfc933911d44ee1f6d07cf55e474311b653786c8e",
+          "at": "2026-06-17T01:40:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 does not satisfy the scope it is mapped to: IN-09 requires the 04-coding-principles migration target to use a split layout aligned with the existing conventions structure, but T004 instead instructs implementers to copy the whole rule verbatim into a single new `knowledge/conventions/coding-principles.md`. Following this task would mark IN-09/AC-06 covered while skipping the specified decomposition of the engineering-rule content, so the plan is internally inconsistent and can produce the wrong final documentation structure.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 19,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f168b66d0755674c82fd33521313c907aa2a7895fa9cc0e3dbda608850d7300f",
+          "at": "2026-06-17T01:45:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is defined as an independently CI-green commit because the new convention files are “additive”, but T010 later states that those same files must be registered by `bin/sotp conventions update-index` and that `verify-arch-docs` checks the index against files on disk. With T010 deferred until after T003-T006, convention-creating tasks can leave `knowledge/conventions/README.md` inconsistent at their own CI boundary, contradicting the plan's independent-CI guarantee. Either include the index update with each convention-creating task or move T010 before those commits are expected to pass independently.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 18,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:ff1666edb05f1810809be952565a04b619cb5ca711f32eaebcf9efd7b36cc9b5",
+          "at": "2026-06-17T01:50:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-16 requires not only deleting the Quality Gates checklist, but also making clear that Makefile.toml ci-local / ci-container dependencies are the machine-readable source of truth. T007 only deletes track/workflow.md and says that deletion eliminates the checklist, while AC-14 only checks that no Quality Gates document exists. As written, the plan can complete with no task preserving or adding the D9 source-of-truth guidance, leaving that part of the spec unimplemented.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/plan.md",
+              "line": 28,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:98292a71ba2bde16bba16dcd1f3de3aca27d6d5c9746cc77ed71537fb9a4f23a",
+          "at": "2026-06-17T01:55:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaa2ce27cbc408b8ac4d828ca1f3fda55220f39d6206a16d1bcc2c03112220e4",
+          "at": "2026-06-17T02:00:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78e74c6df1150f06c4acdd4de2f7c362b53e3a3681840740a57a00c5e7c9272a",
+          "at": "2026-06-17T02:12:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78e74c6df1150f06c4acdd4de2f7c362b53e3a3681840740a57a00c5e7c9272a",
+          "at": "2026-06-17T02:15:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcfb6c474bdac2b9cb66324f5838c235346726ea36898c7bc5492b5d0476663a",
+          "at": "2026-06-17T02:26:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcfb6c474bdac2b9cb66324f5838c235346726ea36898c7bc5492b5d0476663a",
+          "at": "2026-06-17T02:28:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T003` was advanced from `todo` to `in_progress` in the same artifact update, so this snapshot is no longer limited to the T002 transition described in the briefing. That contradicts the stated intent that the only delta from the previous round should be T002's status change.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 19,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2654407d6031a91bf628e7eb23d6530795064eea1a9f5edb1058515536160d85",
+          "at": "2026-06-17T02:39:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b348e75191d51c79580ac9bd59cd5a9f6862bdfe6523fa70874f6db37733f46",
+          "at": "2026-06-17T02:40:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b348e75191d51c79580ac9bd59cd5a9f6862bdfe6523fa70874f6db37733f46",
+          "at": "2026-06-17T02:42:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce9573806674076962e2b56c5e137891042cbb9d162632b858da97eccf1668ae",
+          "at": "2026-06-17T03:20:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The scoped artifacts do not reflect the described T002-only transition: T002 was already marked done, while this change marks T003 as done and advances T004 to in_progress. For this round, the plan SSoT is now recording progress for the wrong tasks rather than only the T002 status update described in the briefing, so downstream reviewers/readers will see a different task state than the round claims to have produced.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ce9573806674076962e2b56c5e137891042cbb9d162632b858da97eccf1668ae",
+          "at": "2026-06-17T03:22:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce9573806674076962e2b56c5e137891042cbb9d162632b858da97eccf1668ae",
+          "at": "2026-06-17T03:38:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce9573806674076962e2b56c5e137891042cbb9d162632b858da97eccf1668ae",
+          "at": "2026-06-17T03:40:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29b36b5baa42399f4c0ebbe4e76e99d263fdca78edd581354f8cbe632653f6a4",
+          "at": "2026-06-17T04:13:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29b36b5baa42399f4c0ebbe4e76e99d263fdca78edd581354f8cbe632653f6a4",
+          "at": "2026-06-17T04:16:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b146d2e4d8f4f806d64c1ca571a886f2d1ff15e94a5b787b2ea1a3e93ee5880b",
+          "at": "2026-06-17T04:27:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The reviewed plan artifacts record a T005/T006 transition even though the briefing for this round says the only intended plan-artifact change is the T002 entry. Here T005 is marked done with a commit hash and T006 is moved to in_progress, so the artifact now advances the wrong tasks and the generated plan.md repeats that state. This is a semantic contradiction in the plan state, not a mechanical hash/path check.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b146d2e4d8f4f806d64c1ca571a886f2d1ff15e94a5b787b2ea1a3e93ee5880b",
+          "at": "2026-06-17T04:29:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b146d2e4d8f4f806d64c1ca571a886f2d1ff15e94a5b787b2ea1a3e93ee5880b",
+          "at": "2026-06-17T04:32:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e57b9812e87e8b142402f4907f2d639468f635b94b4d181a56a7704eecdf2f63",
+          "at": "2026-06-17T04:48:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e57b9812e87e8b142402f4907f2d639468f635b94b4d181a56a7704eecdf2f63",
+          "at": "2026-06-17T04:50:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:026c0934f70c01254eedcaae72f405423a01b10bfb80a854cc115c90d0f524be",
+          "at": "2026-06-17T05:03:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:026c0934f70c01254eedcaae72f405423a01b10bfb80a854cc115c90d0f524be",
+          "at": "2026-06-17T05:06:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce81076cb12a9ff9b17630440316ac8a140ca7dbdc7ceb4105dc1f7776a06fa3",
+          "at": "2026-06-17T05:39:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce81076cb12a9ff9b17630440316ac8a140ca7dbdc7ceb4105dc1f7776a06fa3",
+          "at": "2026-06-17T05:42:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3e2ec0cb401350ebd967d73f76bd15ce1b82ba44323150e3b3523f415593d2d",
+          "at": "2026-06-17T05:48:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3e2ec0cb401350ebd967d73f76bd15ce1b82ba44323150e3b3523f415593d2d",
+          "at": "2026-06-17T05:50:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59038e9256a1b926339269df2fbc4930f31706903a7ff44178ee79a955349710",
+          "at": "2026-06-17T06:13:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This review round explicitly says the plan artifacts should not change T001-T010 status/commit_hash values, but T010 is now marked `done` and has a new `commit_hash`. That also drives the generated `plan.md` changes to `10/10 resolved` and `[x]` for T010, contradicting the allowed scope for this round. Restore T010 to the prior in-progress/no-commit state and regenerate `plan.md`.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:59038e9256a1b926339269df2fbc4930f31706903a7ff44178ee79a955349710",
+          "at": "2026-06-17T06:17:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59038e9256a1b926339269df2fbc4930f31706903a7ff44178ee79a955349710",
+          "at": "2026-06-17T07:59:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59038e9256a1b926339269df2fbc4930f31706903a7ff44178ee79a955349710",
+          "at": "2026-06-17T08:02:09Z"
+        }
+      ]
+    }
+  }
+}

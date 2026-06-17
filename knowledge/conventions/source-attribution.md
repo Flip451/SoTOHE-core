@@ -49,7 +49,7 @@ Tags appear inline at the end of the requirement statement:
 ## Constraints
 
 - New logic must be implemented in Rust, not Python [source: feedback — Rust-first policy]
-- TDD workflow is mandatory [source: convention — .claude/rules/05-testing.md]
+- TDD workflow is mandatory [source: convention — knowledge/conventions/testing.md]
 - Input validation uses domain types [source: track/tech-stack.md §Architecture]
 ```
 

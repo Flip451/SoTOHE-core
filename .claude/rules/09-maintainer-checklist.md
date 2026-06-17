@@ -2,16 +2,14 @@
 
 When changing workflow or architecture, update all affected layers together.
 
-Host prerequisite:
-
-- `python3` is required inside Docker for the `scripts/` Python helpers (architecture rules, convention docs, make wrappers); not directly required on the host because the workflow is invoked through Docker compose wrappers
-
 Always consider:
 
 - user-facing docs:
-  - `DEVELOPER_AI_WORKFLOW.md`
+  - `README.md`
 - track docs:
-  - `track/workflow.md`
+  - `knowledge/conventions/branch-strategy.md`
+  - `knowledge/conventions/track-lifecycle.md`
+  - `knowledge/conventions/git-notes.md`
   - `track/tech-stack.md`
   - `track/registry.md`
 - enforcement:

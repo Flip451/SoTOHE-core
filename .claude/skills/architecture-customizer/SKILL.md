@@ -1,6 +1,6 @@
 ---
 name: architecture-customizer
-description: Customize or migrate the Rust workspace architecture (layer names, crate boundaries, dependency direction) safely. Use when users want to change layered architecture structure, rename/move crates, switch architecture style, or update enforcement rules across architecture-rules.json, Cargo.toml, deny.toml, scripts/check_layers.py, Makefile tasks, and track docs.
+description: Customize or migrate the Rust workspace architecture (layer names, crate boundaries, dependency direction) safely. Use when users want to change layered architecture structure, rename/move crates, switch architecture style, or update enforcement rules across architecture-rules.json, Cargo.toml, deny.toml, Makefile tasks, and track docs.
 ---
 
 # /architecture-customizer — Workspace Architecture Migration Workflow
@@ -32,10 +32,9 @@ Define which crates may depend on which crates.
 ## Step 2: Update Enforcement Rules
 
 1. Update workspace members in `Cargo.toml`.
-2. Update `architecture-rules.json` first.
+2. Update `architecture-rules.json` first (this is the SSoT consumed by `bin/sotp verify layers`).
 3. Update layer policy in `deny.toml` (`deny = [...]` wrappers).
-4. Update `scripts/check_layers.py` crate names and forbidden edges.
-5. Update `Makefile.toml` task names if any crates were renamed (e.g., `check-layers-local` already references crate names via `scripts/check_layers.py`).
+4. Update `Makefile.toml` task names if any crates were renamed.
 
 ## Step 3: Update Crates
 
@@ -46,8 +45,8 @@ Define which crates may depend on which crates.
 ## Step 4: Update Documentation
 
 1. Update `track/tech-stack.md` workspace structure and rule text.
-2. Update `track/workflow.md` quality gates and layer check steps.
-3. Update `track/code_styleguides/rust.md` module layout example.
+2. Update `Makefile.toml` `ci-local` / `ci-container` dependencies if quality gates change, and ensure `sotp verify layers` still reflects the new architecture rules.
+3. Update `knowledge/conventions/coding-principles.md` module layout example if module conventions change.
 4. Update `CLAUDE.md` file tree if crate map changed.
 
 ## Step 5: Validation Gates
@@ -55,9 +54,8 @@ Define which crates may depend on which crates.
 Run in this order:
 
 ```bash
-python3 -m py_compile scripts/check_layers.py
 cargo fmt --all -- --check
-cargo make check-layers
+cargo make check-layers       # internally calls bin/sotp verify layers against architecture-rules.json
 cargo make verify-arch-docs
 cargo deny check -D warnings
 ```

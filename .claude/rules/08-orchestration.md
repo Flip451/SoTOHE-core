@@ -28,7 +28,9 @@ Terms:
 Read these first before planning or implementation:
 
 - `track/tech-stack.md`
-- `track/workflow.md`
+- `knowledge/conventions/branch-strategy.md`
+- `knowledge/conventions/track-lifecycle.md`
+- `knowledge/conventions/git-notes.md`
 - `track/registry.md`
 - `knowledge/conventions/README.md`
 - `track/items/<id>/metadata.json`
@@ -44,20 +46,15 @@ Read these first before planning or implementation:
 
 Operational split:
 
-- `DEVELOPER_AI_WORKFLOW.md`: user-facing operating guide
+- `README.md`: user-facing entry point (value proposition / prerequisites / getting started / free-form request examples)
 - `CLAUDE.md`: maintainer/reference guide
-- `track/workflow.md`: day-to-day workflow rules
-- `knowledge/conventions/`: project-specific engineering rules and implementation policies
-- `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
+- `knowledge/conventions/`: project-specific engineering rules, day-to-day workflow rules, and implementation policies
+- `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `sotp verify layers`
 - `.harness/config/agent-profiles.json`: capability-to-provider mapping source of truth
 
 ## Planning Gate (Mandatory)
 
 Always invoke `/track:plan` before implementation, regardless of task difficulty. `/track:plan` orchestrates Phase 0-3 (init → spec → design → impl-plan) and back-and-forth escalation when downstream signals fail. Skipping design entirely causes expensive downstream review loops (historical lesson: 15+ review rounds from skipped design).
-
-## Briefing Requirements (Provider-Agnostic)
-
-All capability briefings (regardless of provider — Codex, Claude, or future providers) must reference `.claude/rules/04-coding-principles.md` for type design patterns. The enum-first / typestate / hybrid decision table in that file is the source of truth.
 
 ## Delegation Rules
 
@@ -96,3 +93,5 @@ If unsure:
 6. ADR back-and-forth modification -> `adr-editor`
 7. Review need -> `reviewer`
 8. Implementation work -> `implementer`
+
+If stuck for 3+ iterations, use `researcher` to diagnose the root cause before escalating.

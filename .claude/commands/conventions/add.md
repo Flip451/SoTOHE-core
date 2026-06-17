@@ -18,7 +18,7 @@ Execution rules:
   - `cargo make verify-arch-docs`
 - If the new convention changes user-facing workflow guidance, update:
   - `CLAUDE.md`
-  - `DEVELOPER_AI_WORKFLOW.md`
+  - `README.md`
   - `.codex/instructions.md`
   only when actually needed.
 

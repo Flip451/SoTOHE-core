@@ -98,63 +98,6 @@ static CONVENTIONS_REQUIRED_FILES: &[RequireFile] = &[RequireFile {
 
 static REQUIRED_LINES: &[RequireLine] = &[
     // Workspace member references are checked dynamically in architecture_rules module.
-    // Workflow gates in track/workflow.md.
-    RequireLine {
-        rel_path: "track/workflow.md",
-        pattern: "`cargo make check-layers` passes",
-        label: "workflow quality gate",
-    },
-    RequireLine {
-        rel_path: "track/workflow.md",
-        pattern: "`cargo make verify-plan-progress` passes",
-        label: "workflow track gate",
-    },
-    RequireLine {
-        rel_path: "track/workflow.md",
-        pattern: "`cargo make verify-track-metadata` passes",
-        label: "workflow metadata gate",
-    },
-    RequireLine {
-        rel_path: "track/workflow.md",
-        pattern: "`cargo make verify-tech-stack` passes",
-        label: "workflow tech-stack gate",
-    },
-    RequireLine {
-        rel_path: "track/workflow.md",
-        pattern: "`cargo make verify-latest-track` passes",
-        label: "workflow latest-track gate",
-    },
-    RequireLine {
-        rel_path: "track/workflow.md",
-        pattern: "/track:revert",
-        label: "workflow revert command",
-    },
-    RequireLine {
-        rel_path: "track/workflow.md",
-        pattern: "D[Infra Layer] --> C",
-        label: "workflow mermaid dependency direction",
-    },
-    // Developer workflow references.
-    RequireLine {
-        rel_path: "DEVELOPER_AI_WORKFLOW.md",
-        pattern: "cargo make verify-track-metadata",
-        label: "workflow metadata guardrail",
-    },
-    RequireLine {
-        rel_path: "DEVELOPER_AI_WORKFLOW.md",
-        pattern: "cargo make verify-tech-stack",
-        label: "workflow tech-stack guardrail",
-    },
-    RequireLine {
-        rel_path: "DEVELOPER_AI_WORKFLOW.md",
-        pattern: "cargo make verify-latest-track",
-        label: "workflow latest-track guardrail",
-    },
-    RequireLine {
-        rel_path: "DEVELOPER_AI_WORKFLOW.md",
-        pattern: "/track:revert",
-        label: "developer workflow revert command",
-    },
 ];
 
 /// Convention-specific required lines — only checked when conventions are bootstrapped.
@@ -170,9 +113,9 @@ static CONVENTIONS_REQUIRED_LINES: &[RequireLine] = &[
         label: "Codex project conventions reference",
     },
     RequireLine {
-        rel_path: "DEVELOPER_AI_WORKFLOW.md",
+        rel_path: "README.md",
         pattern: "knowledge/conventions/",
-        label: "developer workflow project conventions reference",
+        label: "README project conventions reference",
     },
 ];
 

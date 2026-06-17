@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 /// Names of environment variables that carry authentication credentials and are
 /// intentionally passed through to the nested Codex run via `build_safe_env`.
 /// Any non-empty value for these vars must be redacted before writing to a
-/// persistent log file (`.claude/rules/06-security.md`).
+/// persistent log file (`knowledge/conventions/security.md`).
 pub(super) const CREDENTIAL_VARS: &[&str] =
     &["OPENAI_API_KEY", "CODEX_API_KEY", "OPENAI_ORG_ID", "OPENAI_BASE_URL"];
 

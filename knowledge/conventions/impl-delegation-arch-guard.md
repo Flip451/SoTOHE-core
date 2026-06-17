@@ -113,4 +113,4 @@ TODO: `/track:implement` と `/track:review` skill に Architecture Constraints 
 - `hexagonal-architecture.md`: Layer boundaries and port placement
 - `architecture-rules.json`: Machine-readable layer dependencies
 - `.claude/rules/08-orchestration.md`: Delegation rules
-- `.claude/rules/04-coding-principles.md`: Trait-Based Abstraction
+- `knowledge/conventions/hexagonal-architecture.md`: Trait-Based Abstraction

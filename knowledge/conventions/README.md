@@ -55,11 +55,15 @@
 この一覧は `bin/sotp conventions add ...` / `bin/sotp conventions update-index` により自動更新される。既知の主要カテゴリは推奨読順で並び、それ以外はファイル名順で並ぶ。
 
 <!-- convention-docs:start -->
+- `testing.md`: Testing Convention
 - `adr.md`: Convention: Architecture Decision Records (ADR)
 - `bash-write-guard.md`: Bash File-Write Guard (CON-07)
+- `branch-strategy.md`: Branch Strategy Convention
+- `coding-principles.md`: Coding Principles Convention
 - `dry-check-workflow.md`: DRY Check Workflow Convention
 - `enforce-by-mechanism.md`: Enforce by Mechanism Convention
 - `filesystem-persistence-guard.md`: Filesystem Persistence Guard Convention
+- `git-notes.md`: Git Notes Convention
 - `hexagonal-architecture.md`: Hexagonal Architecture Convention
 - `impl-delegation-arch-guard.md`: Implementation Delegation Architecture Guard
 - `language-policy.md`: Language Policy Convention
@@ -74,6 +78,7 @@
 - `source-attribution.md`: Source Attribution Convention
 - `task-completion-flow.md`: Task Completion Flow
 - `tddd-product-correctness.md`: TDDD Product Correctness Convention
+- `track-lifecycle.md`: Track Lifecycle Convention
 - `type-designer-kind-selection.md`: Type-Designer Kind Selection Convention
 - `typed-deserialization.md`: Typed Deserialization Convention
 - `workflow-ceremony-minimization.md`: Workflow Ceremony Minimization Convention

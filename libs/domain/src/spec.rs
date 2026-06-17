@@ -651,7 +651,10 @@ mod tests {
             id(id_s),
             text,
             vec![],
-            vec![make_conv_ref(".claude/rules/04-coding-principles.md", "newtype-pattern")],
+            vec![make_conv_ref(
+                "knowledge/conventions/prefer-type-safe-abstractions.md",
+                "newtype-pattern",
+            )],
             vec![],
         )
         .unwrap()

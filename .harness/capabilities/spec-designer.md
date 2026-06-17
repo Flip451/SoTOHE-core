@@ -75,7 +75,7 @@ Do NOT emit Rust code, trait signatures, module trees, or `TypeDefinitionKind` s
 
 ## Design Principles (cite, don't enumerate)
 
-Apply `.claude/rules/04-coding-principles.md` at the **contract level only**:
+Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-first / Typestate) and `knowledge/conventions/coding-principles.md` (error handling / no panics) at the **contract level only**:
 
 - Enum-first / typestate / newtype principles are the type-designer's concern; the spec can cite them by name when writing constraints (e.g., the constraint "use newtype for boundary primitives") but does not enumerate concrete type choices
 - Hexagonal layer placement is the ADR's concern; the spec can cite the layer assignment as a constraint
@@ -126,5 +126,5 @@ Choose (a) when the ground is track-specific behaviour the ADR must persist; (b)
 - Do not use `Bash(cat/grep/head/tail/sed/awk)` — dedicated tools only
 - Do not run `git` commands
 - Do not write to `knowledge/research/` or `track/items/<id>/research/` — the orchestrator saves output. Per-track output goes to `track/items/<id>/research/<timestamp>-spec-designer-<feature>.md`; track-cross analyses (version baselines, ecosystem surveys) stay under `knowledge/research/` per the research-placement convention documented in `knowledge/conventions/`
-- Required reading before writing: `track/workflow.md`, `knowledge/conventions/README.md`, `knowledge/conventions/pre-track-adr-authoring.md`, the target ADRs under `knowledge/adr/`, and `track/items/<id>/metadata.json`. If a referenced convention exists for the feature domain, read it before drafting.
+- Required reading before writing: `knowledge/conventions/README.md`, `knowledge/conventions/pre-track-adr-authoring.md`, `knowledge/conventions/track-lifecycle.md`, the target ADRs under `knowledge/adr/`, and `track/items/<id>/metadata.json`. If a referenced convention exists for the feature domain, read it before drafting.
 - Store orchestrator session memory (any provider) as needed; do not rely on it persisting across capability invocations.
