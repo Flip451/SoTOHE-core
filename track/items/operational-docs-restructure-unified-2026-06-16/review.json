@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
+          "at": "2026-06-17T00:24:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db3f048b2cb207b1cc09da587768294f61f8bed659098e94bc8885c600360cb1",
+          "at": "2026-06-17T00:27:22Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61f6385c8b91a003f936ea93b93a10c763b7205023e40157e51b699f3c76a4b",
+          "at": "2026-06-17T00:03:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61f6385c8b91a003f936ea93b93a10c763b7205023e40157e51b699f3c76a4b",
+          "at": "2026-06-17T00:06:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 で `track/workflow.md` の Quality Gates を「17 項目」と述べていますが、同文書の該当チェックリストは現状 20 項目あります。削除理由の前提が古く、採否の根拠としては不正確です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md",
+              "line": 171,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:7354ad096580a0b58c9bcf9729e22953c4758cd79d57fa54b4e6217b5b91af04",
+          "at": "2026-06-17T00:19:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fbe7129c09aa897ef477b871c0584dd03a29b1493f7a1700ffa6116b6279014b",
+          "at": "2026-06-17T00:25:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 states that `track/workflow.md`'s unique content will be distributed into the three new convention files, but D5 later says two unique Guiding Principles are preserved by appending them to `.claude/rules/08-orchestration.md` and `.claude/rules/10-guardrails.md`, outside those three convention targets. This gives conflicting aggregation targets for unique `track/workflow.md` content and can cause the implementation to either drop those principles or place them in the wrong destination. Clarify D3 as covering only branch/lifecycle/git-notes content, or include the D5 rule updates in its migration target list.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md",
+              "line": 87,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fbe7129c09aa897ef477b871c0584dd03a29b1493f7a1700ffa6116b6279014b",
+          "at": "2026-06-17T00:28:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 makes `Makefile.toml`'s `ci` task `dependencies` the source of truth for Quality Gates, but the actual `ci` task only depends on `prepare-local-cache-dirs` and delegates to `ci-local`; the real gate list is on `ci-local`/`ci-container`. As written, an implementer following this ADR would inspect or maintain the wrong dependency list and could miss the actual Quality Gates source of truth. Update the ADR to name the `ci-local`/`ci-container` dependency lists, or otherwise describe the `ci` wrapper delegation explicitly.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md",
+              "line": 173,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:fec9b9a8a1fd295a4591a77e6f762a580c38c2ca00f96e91fefdf7059ef93be1",
+          "at": "2026-06-17T00:31:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D8 still directs the rewrite to `sotp verify orchestra`, but the repository's later responsibility-boundary decision explicitly removed `verify-orchestra`, including the CLI `verify orchestra` subcommand. That makes the proposed target mechanism semantically wrong: implementers following this ADR would replace a dead Python script reference with another non-existent verifier instead of removing or rewording that guardrail path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md",
+              "line": 161,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:89812639cbaffecce39fada4f6c5258ab597d2abcd55f214932b10c2b8a225f3",
+          "at": "2026-06-17T00:35:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b9d004ee42c2ec62fadfb5af0e9c216f5770b81a9e49d724c32782d2ed938c0",
+          "at": "2026-06-17T00:37:54Z"
+        }
+      ]
+    }
+  }
+}
