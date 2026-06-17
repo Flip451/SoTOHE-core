@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
+          "at": "2026-06-17T02:16:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
+          "at": "2026-06-17T02:18:59Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -330,6 +348,35 @@
           "findings": [],
           "hash": "rvw1:sha256:29b36b5baa42399f4c0ebbe4e76e99d263fdca78edd581354f8cbe632653f6a4",
           "at": "2026-06-17T04:16:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b146d2e4d8f4f806d64c1ca571a886f2d1ff15e94a5b787b2ea1a3e93ee5880b",
+          "at": "2026-06-17T04:27:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The reviewed plan artifacts record a T005/T006 transition even though the briefing for this round says the only intended plan-artifact change is the T002 entry. Here T005 is marked done with a commit hash and T006 is moved to in_progress, so the artifact now advances the wrong tasks and the generated plan.md repeats that state. This is a semantic contradiction in the plan state, not a mechanical hash/path check.",
+              "severity": "P1",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b146d2e4d8f4f806d64c1ca571a886f2d1ff15e94a5b787b2ea1a3e93ee5880b",
+          "at": "2026-06-17T04:29:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b146d2e4d8f4f806d64c1ca571a886f2d1ff15e94a5b787b2ea1a3e93ee5880b",
+          "at": "2026-06-17T04:32:30Z"
         }
       ]
     },
@@ -573,24 +620,20 @@
           "findings": [],
           "hash": "rvw1:sha256:2503fd5e4e0b64c5b82db7151363c29e4e7bf21354be2d6f8940050669d366aa",
           "at": "2026-06-17T04:17:28Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
-          "at": "2026-06-17T02:16:53Z"
+          "hash": "rvw1:sha256:0cdb477e0aeda75065d5f25e57704fd21b216bb38eebc0b008914b3bac46773e",
+          "at": "2026-06-17T04:26:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:daa262c01ba29ba791879f74ed87d3722f6c6860a901fdc179ae4ec0f69cdb61",
-          "at": "2026-06-17T02:18:59Z"
+          "hash": "rvw1:sha256:0cdb477e0aeda75065d5f25e57704fd21b216bb38eebc0b008914b3bac46773e",
+          "at": "2026-06-17T04:28:22Z"
         }
       ]
     }
