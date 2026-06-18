@@ -1,7 +1,22 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "860bd52b15df14d70eb48587e01d4a6f455da7b29020a2201938d4ce143ca95e",
+  "catalogue_declaration_hash": "22b7aaf20f31b3700d1964b6629ddfc518c8470e0014dfb86135f6844cb9eb44",
   "signals": [
+    {
+      "type_name": "AssocConstDecl",
+      "signal": "blue",
+      "entry_hash": "498abec7e200fa24ebb8ac0582f4d6ebae37adc6fa3c5f88311f25f5810be688"
+    },
+    {
+      "type_name": "AssocConstName",
+      "signal": "blue",
+      "entry_hash": "7ad58c150444c82ae49d009d782981b2e93ec56fcdd0e496a60c681513937f81"
+    },
+    {
+      "type_name": "AssocTypeDecl",
+      "signal": "blue",
+      "entry_hash": "c444deaf6506316837c86b4c6a6f98d83aebc2eceb9aa90636b9617a2f89dfcb"
+    },
     {
       "type_name": "ChainGateEntry",
       "signal": "blue",
@@ -25,27 +40,32 @@
     {
       "type_name": "Strictness",
       "signal": "blue",
-      "entry_hash": "9c6e9844e52feaa4b9020024f04a7a7a48c8509e6964fd3a28d7075afcea10c7"
+      "entry_hash": "9437e57516d781cc00a751457b9a539eb549ca360c2b8937f8c73d223dbf0618"
+    },
+    {
+      "type_name": "TraitEntry",
+      "signal": "blue",
+      "entry_hash": "7edb423129b0fbac8474910f85c66c962f775a5fd9c77d6e64d8f01450ca5e6b"
     },
     {
       "type_name": "ChainIdentity",
       "signal": "blue",
-      "entry_hash": "dca9c86ed39bf303b0b77f618d4959e1285516842d2b8f062f4890ff001e96e2"
+      "entry_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d"
     },
     {
       "type_name": "LiveSoTChain",
       "signal": "blue",
-      "entry_hash": "84fa01e37cd5c15e3df14e15a164f473adc731745c869adbc61c287e269e4200"
+      "entry_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0"
     },
     {
       "type_name": "PersistedSoTChain",
       "signal": "blue",
-      "entry_hash": "e50e7abf5b6ddcef20e2702e705428586b946dc2f3adb0814ae22bf7e3f80ed9"
+      "entry_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d"
     },
     {
       "type_name": "SoTChain",
       "signal": "blue",
-      "entry_hash": "4eed27db31d67b0b82ed10bd9f477e8ec1e1147b2aac98c90370f9abb85ace46"
+      "entry_hash": "e815a9d92a2c602994d59279693637c7ccf90b0b018cc0f485251bf874ae123b"
     },
     {
       "type_name": "domain::chain::check_catalogue_spec_signals",

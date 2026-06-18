@@ -47,13 +47,58 @@ impl EncoderState {
         // that reference trait parameters (e.g. `fn get(&self) -> T` in `trait Foo<T>`)
         // encode `T` as `Type::Generic` rather than an unresolved-marker path.
         let methods: Vec<MethodDeclaration> = entry.methods.clone();
-        let method_ids = self.encode_method_items(
+        let mut all_items = self.encode_method_items(
             &methods,
             false,
             trait_name.as_str(),
             &module_path,
             &trait_generic_names,
         )?;
+
+        // Encode associated type declarations as ItemEnum::AssocType items.
+        // Each AssocType contributes its Id to `Trait.items` so that the A-side item
+        // count matches the C-side (rustdoc) count. The signal evaluator's
+        // `build_trait_method_map` reads these items and fingerprints them as
+        // `assoc_type[{generic_fp}]:{bounds_str}={default_str}`.
+        for assoc_type in &entry.assoc_types {
+            let id = self.alloc_id();
+            let item = self.encode_assoc_type_item(id, assoc_type, &trait_generic_names)?;
+            self.index.insert(id, item);
+            let crate_name = self.crate_name.clone();
+            let mut path_segs = vec![crate_name.as_str().to_string()];
+            for seg in module_path.segments() {
+                path_segs.push(seg.as_str().to_string());
+            }
+            path_segs.push(trait_name.as_str().to_string());
+            path_segs.push(assoc_type.name.to_string());
+            self.paths.insert(
+                id,
+                ItemSummary { crate_id: 0, path: path_segs, kind: ItemKind::AssocType },
+            );
+            all_items.push(id);
+        }
+
+        // Encode associated constant declarations as ItemEnum::AssocConst items.
+        // Each AssocConst contributes its Id to `Trait.items` so that the A-side item
+        // count matches the C-side (rustdoc) count. The signal evaluator fingerprints
+        // these as `assoc_const:{ty_str}={val_str}`.
+        for assoc_const in &entry.assoc_consts {
+            let id = self.alloc_id();
+            let item = self.encode_assoc_const_item(id, assoc_const, &trait_generic_names)?;
+            self.index.insert(id, item);
+            let crate_name = self.crate_name.clone();
+            let mut path_segs = vec![crate_name.as_str().to_string()];
+            for seg in module_path.segments() {
+                path_segs.push(seg.as_str().to_string());
+            }
+            path_segs.push(trait_name.as_str().to_string());
+            path_segs.push(assoc_const.name.to_string());
+            self.paths.insert(
+                id,
+                ItemSummary { crate_id: 0, path: path_segs, kind: ItemKind::AssocConst },
+            );
+            all_items.push(id);
+        }
 
         // Encode supertrait bounds as GenericBound::TraitBound entries.
         // Each bound string (e.g. "Send", "Sync", "Into<T>") is parsed via
@@ -74,7 +119,7 @@ impl EncoderState {
                 is_auto: false,
                 is_unsafe: false,
                 is_dyn_compatible: true,
-                items: method_ids,
+                items: all_items,
                 generics: trait_generics,
                 bounds,
                 implementations: vec![],

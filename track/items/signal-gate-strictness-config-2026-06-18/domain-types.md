@@ -12,17 +12,21 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| AssocConstDecl | value_object | — | — | 🔵 | 🔵 |
+| AssocConstName | value_object | — | — | 🔵 | 🔵 |
+| AssocTypeDecl | value_object | — | — | 🔵 | 🔵 |
 | ChainGateEntry | value_object | — | — | 🔵 | 🔵 |
 | SignalGateMatrix | value_object | — | — | 🔵 | 🔵 |
+| TraitEntry | value_object | modify | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ChainIdentity | secondary_port | — | — | 🟡 | 🔵 |
-| LiveSoTChain | secondary_port | — | fn calc_live(input: Self) -> Result<Self, Self> | 🟡 | 🔵 |
-| PersistedSoTChain | secondary_port | — | fn calc(input: Self) -> Result<Self, Self>, fn load(input: Self) -> Result<Self, Self>, fn check_freshness(input: Self, persisted: Self) -> Result<(), Self>, fn evaluate_gate(persisted: Self, strict: bool) -> VerifyOutcome, fn calc_error(error: Self) -> VerifyOutcome, fn stale_error(error: Self) -> VerifyOutcome | 🟡 | 🔵 |
-| SoTChain | secondary_port | — | fn check(input: Self, strict: bool) -> VerifyOutcome | 🟡 | 🔵 |
+| ChainIdentity | secondary_port | — | — | 🔵 | 🔵 |
+| LiveSoTChain | secondary_port | — | fn calc_live(input: &<Self>::Input<'_>) -> Result<<Self>::LiveCalc, <Self>::CalcError> | 🔵 | 🔵 |
+| PersistedSoTChain | secondary_port | — | fn calc(input: &<Self>::Input<'_>) -> Result<<Self>::Persisted, <Self>::CalcError>, fn load(input: &<Self>::Input<'_>) -> Result<<Self>::Persisted, <Self>::CalcError>, fn check_freshness(input: &<Self>::Input<'_>, persisted: &<Self>::Persisted) -> Result<(), <Self>::StaleError>, fn evaluate_gate(persisted: &<Self>::Persisted, strict: bool) -> VerifyOutcome, fn calc_error(error: <Self>::CalcError) -> VerifyOutcome, fn stale_error(error: <Self>::StaleError) -> VerifyOutcome | 🔵 | 🔵 |
+| SoTChain | secondary_port | — | fn check(input: &<Self>::Input<'_>, strict: bool) -> VerifyOutcome | 🔵 | 🔵 |
 
 ## Free Functions
 

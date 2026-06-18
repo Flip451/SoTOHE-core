@@ -80,7 +80,7 @@
       },
       "methods": [],
       "module_path": "chain",
-      "docs": "Two-valued strictness discriminant for gate evaluation. `Strict`: Yellow signals are treated as `Finding::error`. `Interim`: Yellow signals are treated as `Finding::warning` only. Red signals are always `Finding::error` regardless of strictness.",
+      "docs": "Two-valued strictness discriminant for gate evaluation. `Strict`: Yellow signals are treated as `Finding::error`. `Interim`: Yellow signals are treated as `Finding::warning` only. Red signals always produce `Finding::error` regardless of strictness.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -263,6 +263,158 @@
         }
       ],
       "informal_grounds": []
+    },
+    "TraitEntry": {
+      "action": "modify",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "action", "ty": "ItemAction" },
+            { "name": "role", "ty": "ContractRole" },
+            { "name": "methods", "ty": "Vec<MethodDeclaration>" },
+            { "name": "assoc_types", "ty": "Vec<AssocTypeDecl>" },
+            { "name": "assoc_consts", "ty": "Vec<AssocConstDecl>" },
+            { "name": "supertrait_bounds", "ty": "Vec<TypeRef>" },
+            { "name": "generics", "ty": "Vec<MethodGenericParam>" },
+            { "name": "where_predicates", "ty": "Vec<WherePredicateDecl>" },
+            { "name": "module_path", "ty": "ModulePath" },
+            { "name": "docs", "ty": "Option<String>" },
+            { "name": "spec_refs", "ty": "Vec<SpecRef>" },
+            { "name": "informal_grounds", "ty": "Vec<InformalGroundRef>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::entries",
+      "docs": "Entry in CatalogueDocument::traits BTreeMap. Extended with assoc_types and assoc_consts fields to support associated type/const declarations in traits.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-15"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AssocConstName": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "s", "ty": "impl Into<String>" }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "docs": "Validated name for an associated constant in a trait (e.g. ID in const ID: ChainId). Generated via identifier_newtype! macro. Distinct from TypeName (associated type names) and MethodName (method names) to make illegal names unrepresentable (prefer-type-safe-abstractions).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AssocTypeDecl": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "name", "ty": "TypeName" },
+            { "name": "bounds", "ty": "Vec<TypeRef>" },
+            { "name": "default", "ty": "Option<TypeRef>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::entries",
+      "docs": "Declaration of an associated type item in a trait. Used in TraitEntry::assoc_types to declare associated types so that the A-side item count matches the C-side rustdoc item count. name field uses TypeName (reuses existing validated newtype; an associated type name is a type identifier).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-15"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AssocConstDecl": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "name", "ty": "AssocConstName" },
+            { "name": "ty", "ty": "TypeRef" },
+            { "name": "default_value", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::entries",
+      "docs": "Declaration of an associated constant item in a trait. Used in TraitEntry::assoc_consts to declare associated constants so that the A-side item count matches the C-side rustdoc item count. name field uses AssocConstName (dedicated validated newtype for const identifiers).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-15"
+        }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -272,9 +424,20 @@
         "SecondaryPort": {}
       },
       "methods": [],
+      "assoc_consts": [
+        {
+          "name": "ID",
+          "ty": "ChainId"
+        }
+      ],
+      "assoc_types": [
+        {
+          "name": "Input"
+        }
+      ],
       "supertrait_bounds": [],
       "module_path": "chain",
-      "docs": "Marker trait shared by all four SoT Chain types. Carries the `ID: ChainId` associated constant and the `Input<'a>` associated type (the input data structure the chain reads). Implementing this trait declares a new chain to the harness. Note: associated const and GAT cannot be expressed in MethodDeclaration form; they are documented here in docs only.",
+      "docs": "Marker trait shared by all four SoT Chain types. Carries the `ID: ChainId` associated constant and the `Input<'a>` associated type (the input data structure the chain reads). Implementing this trait declares a new chain to the harness.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -287,6 +450,14 @@
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
           "anchor": "AC-09"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-18"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-14"
         }
       ],
       "informal_grounds": []
@@ -303,7 +474,7 @@
           "params": [
             {
               "name": "input",
-              "ty": "Self"
+              "ty": "&<Self>::Input<'_>"
             },
             {
               "name": "strict",
@@ -321,7 +492,7 @@
         "ChainIdentity"
       ],
       "module_path": "chain",
-      "docs": "Minimal check contract satisfied by all four chains. Provides `check(input, strict) -> VerifyOutcome`. For chains ①②③ this is fulfilled via blanket impl over `PersistedSoTChain`; for chain ⓪ it is fulfilled directly. CLI `check-*` dispatch goes through this trait. Note: `check()` is an associated function (null receiver) per D7 sketch; `input` param uses placeholder Self type because GAT Self::Input cannot be expressed in catalogue schema.",
+      "docs": "Minimal check contract satisfied by all four chains. Provides `check(input, strict) -> VerifyOutcome`. For chains ①②③ this is fulfilled via blanket impl over `PersistedSoTChain`; for chain ⓪ it is fulfilled directly. CLI `check-*` dispatch goes through this trait.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -338,6 +509,10 @@
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
           "anchor": "AC-11"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-14"
         }
       ],
       "informal_grounds": []
@@ -354,21 +529,29 @@
           "params": [
             {
               "name": "input",
-              "ty": "Self"
+              "ty": "&<Self>::Input<'_>"
             }
           ],
-          "returns": "Result<Self, Self>",
+          "returns": "Result<<Self>::LiveCalc, <Self>::CalcError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
           "where_predicates": []
         }
       ],
+      "assoc_types": [
+        {
+          "name": "LiveCalc"
+        },
+        {
+          "name": "CalcError"
+        }
+      ],
       "supertrait_bounds": [
         "SoTChain"
       ],
       "module_path": "chain",
-      "docs": "Extension of `SoTChain` for chains that compute signals live without persisting. Implemented only by `AdrUserChain` (chain ⓪). `calc_live` returns the live-computed result without writing any file. Compiling `PersistedSoTChain::calc` for chain ⓪ is intentionally impossible. Note: associated types LiveCalc and CalcError are represented as placeholder Self in method signatures; actual GATs cannot be expressed in MethodDeclaration form.",
+      "docs": "Extension of `SoTChain` for chains that compute signals live without persisting. Implemented only by `AdrUserChain` (chain ⓪). `calc_live` returns the live-computed result without writing any file. Compiling `PersistedSoTChain::calc` for chain ⓪ is intentionally impossible.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -393,6 +576,14 @@
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
           "anchor": "AC-11"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-18"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-14"
         }
       ],
       "informal_grounds": []
@@ -409,10 +600,10 @@
           "params": [
             {
               "name": "input",
-              "ty": "Self"
+              "ty": "&<Self>::Input<'_>"
             }
           ],
-          "returns": "Result<Self, Self>",
+          "returns": "Result<<Self>::Persisted, <Self>::CalcError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -424,10 +615,10 @@
           "params": [
             {
               "name": "input",
-              "ty": "Self"
+              "ty": "&<Self>::Input<'_>"
             }
           ],
-          "returns": "Result<Self, Self>",
+          "returns": "Result<<Self>::Persisted, <Self>::CalcError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -439,14 +630,14 @@
           "params": [
             {
               "name": "input",
-              "ty": "Self"
+              "ty": "&<Self>::Input<'_>"
             },
             {
               "name": "persisted",
-              "ty": "Self"
+              "ty": "&<Self>::Persisted"
             }
           ],
-          "returns": "Result<(), Self>",
+          "returns": "Result<(), <Self>::StaleError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -458,7 +649,7 @@
           "params": [
             {
               "name": "persisted",
-              "ty": "Self"
+              "ty": "&<Self>::Persisted"
             },
             {
               "name": "strict",
@@ -477,7 +668,7 @@
           "params": [
             {
               "name": "error",
-              "ty": "Self"
+              "ty": "<Self>::CalcError"
             }
           ],
           "returns": "VerifyOutcome",
@@ -492,7 +683,7 @@
           "params": [
             {
               "name": "error",
-              "ty": "Self"
+              "ty": "<Self>::StaleError"
             }
           ],
           "returns": "VerifyOutcome",
@@ -502,11 +693,22 @@
           "where_predicates": []
         }
       ],
+      "assoc_types": [
+        {
+          "name": "Persisted"
+        },
+        {
+          "name": "CalcError"
+        },
+        {
+          "name": "StaleError"
+        }
+      ],
       "supertrait_bounds": [
         "ChainIdentity"
       ],
       "module_path": "chain",
-      "docs": "Full contract for chains ①②③ that persist their computed signal documents. Provides `calc` (compute + persist), `load` (read persisted), `check_freshness` (stale detection), `evaluate_gate` (signal-gate logic delegating to domain pure functions), plus error-to-VerifyOutcome converters. The `SoTChain::check` blanket impl for any `T: PersistedSoTChain` runs `load → check_freshness → evaluate_gate`. Chain ⓪ does not implement this trait. Note: associated types Persisted/CalcError/StaleError are represented as placeholder Self in method signatures; catalogue schema cannot express associated types.",
+      "docs": "Full contract for chains ①②③ that persist their computed signal documents. Provides `calc` (compute + persist), `load` (read persisted), `check_freshness` (stale detection), `evaluate_gate` (signal-gate logic delegating to domain pure functions), plus error-to-VerifyOutcome converters. The `SoTChain::check` blanket impl for any `T: PersistedSoTChain` runs `load → check_freshness → evaluate_gate`. Chain ⓪ does not implement this trait.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -531,6 +733,14 @@
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
           "anchor": "AC-11"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-18"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-14"
         }
       ],
       "informal_grounds": []
@@ -693,6 +903,135 @@
       "action": "add",
       "trait_ref": "core::cmp::Eq",
       "for_type": "SignalGateMatrix"
+    },
+    {
+      "action": "add",
+      "trait_ref": "SoTChain",
+      "for_type": "T",
+      "impl_generics": [
+        {
+          "name": "T",
+          "bounds": []
+        }
+      ],
+      "impl_where_predicates": [
+        {
+          "lhs": "T",
+          "rhs": [
+            "PersistedSoTChain"
+          ]
+        }
+      ]
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TraitEntry"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TraitEntry"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TraitEntry"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TraitEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AssocTypeDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "AssocTypeDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "AssocTypeDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "AssocTypeDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AssocConstDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "AssocConstDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "AssocConstDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "AssocConstDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialOrd",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Ord",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::str::traits::FromStr",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::AsRef<str>",
+      "for_type": "AssocConstName"
     }
   ]
 }

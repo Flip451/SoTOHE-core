@@ -3,10 +3,16 @@
 use std::collections::HashMap;
 
 use domain::tddd::catalogue_v2::SelfReceiver;
+use domain::tddd::catalogue_v2::entries::{AssocConstDecl, AssocTypeDecl};
 use rustdoc_types::{
     AssocItemConstraint, AssocItemConstraintKind, DynTrait, GenericArg, GenericArgs, GenericBound,
     Generics, Id, Impl, Item, ItemEnum, Path, PolyTrait, Term, Type, Visibility,
 };
+
+use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
+use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
+
+use super::encoder::EncoderState;
 
 // ---------------------------------------------------------------------------
 // Item construction helpers
@@ -258,29 +264,39 @@ pub(super) fn rewrite_generic_types_in_bound(
 /// For `AngleBracketed` args, rewrites both type arguments and associated-type
 /// constraint values (e.g. `Iterator<Item = T>` where `T` is a method generic).
 pub(super) fn rewrite_generic_args(args: GenericArgs, generic_names: &[&str]) -> GenericArgs {
+    rewrite_generic_args_with(args, generic_names, rewrite_generic_types, rewrite_assoc_constraint)
+}
+
+/// Recursively rewrites generic args using caller-supplied type and constraint
+/// rewriters.
+pub(super) fn rewrite_generic_args_with<RewriteType, RewriteConstraint>(
+    args: GenericArgs,
+    generic_names: &[&str],
+    rewrite_type: RewriteType,
+    rewrite_constraint: RewriteConstraint,
+) -> GenericArgs
+where
+    RewriteType: Fn(Type, &[&str]) -> Type + Copy,
+    RewriteConstraint: Fn(AssocItemConstraint, &[&str]) -> AssocItemConstraint + Copy,
+{
     match args {
         GenericArgs::AngleBracketed { args: arg_list, constraints } => {
             let new_args = arg_list
                 .into_iter()
                 .map(|a| match a {
-                    GenericArg::Type(t) => {
-                        GenericArg::Type(rewrite_generic_types(t, generic_names))
-                    }
+                    GenericArg::Type(t) => GenericArg::Type(rewrite_type(t, generic_names)),
                     other => other,
                 })
                 .collect();
             // Also rewrite types inside associated-type constraints
             // (e.g. `Iterator<Item = T>` where `T` is a method generic).
-            let new_constraints = constraints
-                .into_iter()
-                .map(|c| rewrite_assoc_constraint(c, generic_names))
-                .collect();
+            let new_constraints =
+                constraints.into_iter().map(|c| rewrite_constraint(c, generic_names)).collect();
             GenericArgs::AngleBracketed { args: new_args, constraints: new_constraints }
         }
         GenericArgs::Parenthesized { inputs, output } => {
-            let new_inputs =
-                inputs.into_iter().map(|t| rewrite_generic_types(t, generic_names)).collect();
-            let new_output = output.map(|t| rewrite_generic_types(t, generic_names));
+            let new_inputs = inputs.into_iter().map(|t| rewrite_type(t, generic_names)).collect();
+            let new_output = output.map(|t| rewrite_type(t, generic_names));
             GenericArgs::Parenthesized { inputs: new_inputs, output: new_output }
         }
         // ReturnTypeNotation (`(..)`) has no nested types to rewrite.
@@ -407,9 +423,12 @@ pub(super) fn try_build_generic_projection(type_str: &str, generic_names: &[&str
     if !generic_names.contains(&prefix) {
         return None;
     }
-    // `rest` must be a valid identifier (non-empty, starts with letter or `_`).
-    let first_char = rest.chars().next()?;
-    if !first_char.is_ascii_alphabetic() && first_char != '_' {
+    // `rest` must be a valid ASCII identifier.
+    let mut chars = rest.chars();
+    let first_char = chars.next()?;
+    if (!first_char.is_ascii_alphabetic() && first_char != '_')
+        || !chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
+    {
         return None;
     }
     Some(Type::QualifiedPath {
@@ -418,4 +437,263 @@ pub(super) fn try_build_generic_projection(type_str: &str, generic_names: &[&str
         self_type: Box::new(Type::Generic(prefix.to_string())),
         trait_: None,
     })
+}
+
+impl EncoderState {
+    pub(super) fn encode_assoc_type_item(
+        &mut self,
+        id: Id,
+        decl: &AssocTypeDecl,
+        trait_generic_names: &[&str],
+    ) -> Result<rustdoc_types::Item, CatalogueToExtendedCrateCodecError> {
+        let mut bounds: Vec<GenericBound> = Vec::with_capacity(decl.bounds.len());
+        for b in &decl.bounds {
+            bounds.push(self.encode_trait_scoped_bound(b.as_str(), trait_generic_names)?);
+        }
+        let type_ = decl
+            .default
+            .as_ref()
+            .map(|d| self.encode_trait_scoped_type_ref(d.as_str(), trait_generic_names))
+            .transpose()?;
+
+        let generics = Generics { params: vec![], where_predicates: vec![] };
+
+        Ok(make_item(
+            id,
+            Some(decl.name.to_string()),
+            None,
+            ItemEnum::AssocType { generics, bounds, type_ },
+        ))
+    }
+
+    fn encode_trait_scoped_bound(
+        &mut self,
+        bound_str: &str,
+        trait_generic_names: &[&str],
+    ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
+        let shadowed_generics = self.shadow_local_type_names(trait_generic_names);
+        let raw =
+            self.encode_bound_str_with_suppressed_external_prefixes(bound_str, trait_generic_names);
+        self.restore_local_type_names(shadowed_generics);
+        let raw = raw?;
+        if trait_generic_names.is_empty() {
+            Ok(raw)
+        } else {
+            Ok(rewrite_trait_scoped_bound(raw, trait_generic_names))
+        }
+    }
+
+    fn shadow_local_type_names(&mut self, names: &[&str]) -> Vec<(String, Option<Id>)> {
+        let mut shadowed = Vec::with_capacity(names.len());
+        for name in names {
+            let key = (*name).to_string();
+            let previous = self.local_name_to_id.insert(key.clone(), Id(UNRESOLVED_CRATE_ID));
+            shadowed.push((key, previous));
+        }
+        shadowed
+    }
+
+    fn restore_local_type_names(&mut self, shadowed: Vec<(String, Option<Id>)>) {
+        for (key, previous) in shadowed {
+            if let Some(id) = previous {
+                self.local_name_to_id.insert(key, id);
+            } else {
+                self.local_name_to_id.remove(&key);
+            }
+        }
+    }
+
+    pub(super) fn encode_assoc_const_item(
+        &mut self,
+        id: Id,
+        decl: &AssocConstDecl,
+        trait_generic_names: &[&str],
+    ) -> Result<rustdoc_types::Item, CatalogueToExtendedCrateCodecError> {
+        let type_ = self.encode_trait_scoped_type_ref(decl.ty.as_str(), trait_generic_names)?;
+
+        let value = decl.default_value.clone();
+
+        Ok(make_item(id, Some(decl.name.to_string()), None, ItemEnum::AssocConst { type_, value }))
+    }
+
+    fn encode_trait_scoped_type_ref(
+        &mut self,
+        type_ref_str: &str,
+        trait_generic_names: &[&str],
+    ) -> Result<Type, CatalogueToExtendedCrateCodecError> {
+        if trait_generic_names.is_empty() {
+            return self.parse_type_ref_str(type_ref_str);
+        }
+        if is_bare_generic_name(type_ref_str, trait_generic_names) {
+            return Ok(Type::Generic(type_ref_str.trim().to_string()));
+        }
+        if let Some(proj) = try_build_generic_projection(type_ref_str, trait_generic_names) {
+            return Ok(proj);
+        }
+
+        let shadowed_generics = self.shadow_local_type_names(trait_generic_names);
+        let raw = self.parse_type_ref_str_with_suppressed_external_prefixes(
+            type_ref_str,
+            trait_generic_names,
+            trait_generic_names,
+        );
+        self.restore_local_type_names(shadowed_generics);
+        let raw = raw?;
+        Ok(rewrite_trait_scoped_type(raw, trait_generic_names))
+    }
+}
+
+fn rewrite_trait_scoped_type(ty: Type, generic_names: &[&str]) -> Type {
+    let rewritten = rewrite_generic_types(ty, generic_names);
+    rewrite_trait_scoped_type_inner(rewritten, generic_names)
+}
+
+fn rewrite_trait_scoped_type_inner(ty: Type, generic_names: &[&str]) -> Type {
+    match ty {
+        Type::ResolvedPath(p) => rewrite_trait_scoped_path_type(p, generic_names),
+        Type::BorrowedRef { lifetime, is_mutable, type_ } => Type::BorrowedRef {
+            lifetime,
+            is_mutable,
+            type_: Box::new(rewrite_trait_scoped_type_inner(*type_, generic_names)),
+        },
+        Type::RawPointer { is_mutable, type_ } => Type::RawPointer {
+            is_mutable,
+            type_: Box::new(rewrite_trait_scoped_type_inner(*type_, generic_names)),
+        },
+        Type::Tuple(types) => Type::Tuple(
+            types
+                .into_iter()
+                .map(|ty| rewrite_trait_scoped_type_inner(ty, generic_names))
+                .collect(),
+        ),
+        Type::Slice(inner) => {
+            Type::Slice(Box::new(rewrite_trait_scoped_type_inner(*inner, generic_names)))
+        }
+        Type::Array { type_, len } => Type::Array {
+            type_: Box::new(rewrite_trait_scoped_type_inner(*type_, generic_names)),
+            len,
+        },
+        Type::Pat { type_, __pat_unstable_do_not_use } => Type::Pat {
+            type_: Box::new(rewrite_trait_scoped_type_inner(*type_, generic_names)),
+            __pat_unstable_do_not_use,
+        },
+        Type::ImplTrait(bounds) => Type::ImplTrait(
+            bounds
+                .into_iter()
+                .map(|bound| rewrite_trait_scoped_bound(bound, generic_names))
+                .collect(),
+        ),
+        Type::DynTrait(dyn_trait) => {
+            let new_traits = dyn_trait
+                .traits
+                .into_iter()
+                .map(|poly_trait| rustdoc_types::PolyTrait {
+                    trait_: rewrite_trait_scoped_path(poly_trait.trait_, generic_names),
+                    generic_params: poly_trait.generic_params,
+                })
+                .collect();
+            Type::DynTrait(rustdoc_types::DynTrait {
+                traits: new_traits,
+                lifetime: dyn_trait.lifetime,
+            })
+        }
+        Type::FunctionPointer(fp) => {
+            let new_inputs = fp
+                .sig
+                .inputs
+                .into_iter()
+                .map(|(name, ty)| (name, rewrite_trait_scoped_type_inner(ty, generic_names)))
+                .collect();
+            let new_output =
+                fp.sig.output.map(|ty| rewrite_trait_scoped_type_inner(ty, generic_names));
+            Type::FunctionPointer(Box::new(rustdoc_types::FunctionPointer {
+                sig: rustdoc_types::FunctionSignature {
+                    inputs: new_inputs,
+                    output: new_output,
+                    is_c_variadic: fp.sig.is_c_variadic,
+                },
+                generic_params: fp.generic_params,
+                header: fp.header,
+            }))
+        }
+        Type::QualifiedPath { name, self_type, trait_, args } => Type::QualifiedPath {
+            name,
+            self_type: Box::new(rewrite_trait_scoped_type_inner(*self_type, generic_names)),
+            trait_: trait_.map(|path| rewrite_trait_scoped_path(path, generic_names)),
+            args: args.map(|args| Box::new(rewrite_trait_scoped_args(*args, generic_names))),
+        },
+        other => other,
+    }
+}
+
+fn rewrite_trait_scoped_path_type(path: Path, generic_names: &[&str]) -> Type {
+    if path.args.is_none()
+        && !path.path.contains("::")
+        && generic_names.contains(&path.path.as_str())
+    {
+        return Type::Generic(path.path);
+    }
+
+    if let Some((prefix, assoc_name)) = path.path.split_once("::") {
+        if !assoc_name.contains("::") && generic_names.contains(&prefix) {
+            return Type::QualifiedPath {
+                name: assoc_name.to_string(),
+                self_type: Box::new(Type::Generic(prefix.to_string())),
+                trait_: None,
+                args: path
+                    .args
+                    .map(|args| Box::new(rewrite_trait_scoped_args(*args, generic_names))),
+            };
+        }
+    }
+
+    Type::ResolvedPath(rewrite_trait_scoped_path(path, generic_names))
+}
+
+fn rewrite_trait_scoped_path(path: Path, generic_names: &[&str]) -> Path {
+    Path {
+        args: path.args.map(|args| Box::new(rewrite_trait_scoped_args(*args, generic_names))),
+        ..path
+    }
+}
+
+fn rewrite_trait_scoped_args(args: GenericArgs, generic_names: &[&str]) -> GenericArgs {
+    rewrite_generic_args_with(
+        args,
+        generic_names,
+        rewrite_trait_scoped_type_inner,
+        rewrite_trait_scoped_constraint,
+    )
+}
+
+fn rewrite_trait_scoped_constraint(
+    constraint: AssocItemConstraint,
+    generic_names: &[&str],
+) -> AssocItemConstraint {
+    let args =
+        constraint.args.map(|args| Box::new(rewrite_trait_scoped_args(*args, generic_names)));
+    let binding = match constraint.binding {
+        AssocItemConstraintKind::Equality(Term::Type(ty)) => AssocItemConstraintKind::Equality(
+            Term::Type(rewrite_trait_scoped_type_inner(ty, generic_names)),
+        ),
+        AssocItemConstraintKind::Constraint(bounds) => AssocItemConstraintKind::Constraint(
+            bounds
+                .into_iter()
+                .map(|bound| rewrite_trait_scoped_bound(bound, generic_names))
+                .collect(),
+        ),
+        other => other,
+    };
+    AssocItemConstraint { name: constraint.name, args, binding }
+}
+
+fn rewrite_trait_scoped_bound(bound: GenericBound, generic_names: &[&str]) -> GenericBound {
+    match bound {
+        GenericBound::TraitBound { trait_, generic_params, modifier } => GenericBound::TraitBound {
+            trait_: rewrite_trait_scoped_path(trait_, generic_names),
+            generic_params,
+            modifier,
+        },
+        other => other,
+    }
 }

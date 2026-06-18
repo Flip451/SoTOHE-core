@@ -240,6 +240,16 @@ identifier_newtype!(
     InvariantName
 );
 
+identifier_newtype!(
+    /// Validated name for an associated constant in a trait (e.g. `ID` in `const ID: ChainId`).
+    ///
+    /// Associated constant names follow the same Rust identifier rules as other
+    /// catalogue v2 identifier-backed newtypes. Distinct from `TypeName` (associated
+    /// type names) and `MethodName` (method names) to make illegal names unrepresentable
+    /// at the domain model level (ADR prefer-type-safe-abstractions).
+    AssocConstName
+);
+
 // ---------------------------------------------------------------------------
 // ModulePath — Vec<Identifier> joined with ::
 // ---------------------------------------------------------------------------
@@ -483,3 +493,34 @@ impl FromStr for FunctionPath {
 #[cfg(test)]
 #[path = "identifiers_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod assoc_const_name_tests {
+    use super::*;
+
+    #[test]
+    fn test_assoc_const_name_with_valid_name_succeeds() {
+        let name = AssocConstName::new("CHAIN_ID").unwrap();
+        assert_eq!(name.as_str(), "CHAIN_ID");
+    }
+
+    #[test]
+    fn test_assoc_const_name_with_empty_string_returns_empty_error() {
+        assert_eq!(AssocConstName::new(""), Err(IdentifierError::Empty));
+    }
+
+    #[test]
+    fn test_assoc_const_name_with_leading_digit_returns_invalid_characters_error() {
+        let result = AssocConstName::new("1BAD");
+        assert!(matches!(result, Err(IdentifierError::InvalidCharacters(_))));
+    }
+
+    #[test]
+    fn test_assoc_const_name_display_fromstr_roundtrip() {
+        let original = AssocConstName::new("MAX_RETRIES").unwrap();
+        let displayed = original.to_string();
+        let parsed: AssocConstName = displayed.parse().unwrap();
+        assert_eq!(original, parsed);
+    }
+}

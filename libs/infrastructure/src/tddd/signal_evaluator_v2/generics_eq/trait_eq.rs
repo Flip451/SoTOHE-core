@@ -279,7 +279,20 @@ pub(crate) fn build_trait_method_map(
                     }
                     _ => String::new(),
                 };
-                map.insert(name.clone(), sig_str);
+                // Namespace-qualify the key so that same-name items in different Rust
+                // namespaces (e.g. `type Item` and `const Item` are both legal on a
+                // single trait) do not collide in the BTreeMap.  Both A-side and
+                // C-side go through this function with identical dispatch rules, so the
+                // keys are always symmetric.  For collision-free traits (every name
+                // appears at most once across all namespaces), the prefix is invisible
+                // to equality comparisons because it is applied uniformly on both sides.
+                let qualified_key = match &item.inner {
+                    ItemEnum::Function(_) => format!("fn:{name}"),
+                    ItemEnum::AssocType { .. } => format!("type:{name}"),
+                    ItemEnum::AssocConst { .. } => format!("const:{name}"),
+                    _ => format!("other:{name}"),
+                };
+                map.insert(qualified_key, sig_str);
             }
         }
     }

@@ -40,17 +40,32 @@
     {
       "id": "T015",
       "description": "Parser D2 (ADR 2026-06-18-0822 §D2) — `generic_params` context + `Type::Generic` encoding: Add `generic_params: &[&str]` parameter to `parse_type_ref_str` (and propagate through all reachable internal parser entry points). In `convert_type_path`, insert a new step after `resolve_local` (and before the Unresolved fallback): if the single-segment identifier is found in `generic_params`, return `Type::Generic(name)` immediately. Update all infrastructure-side codec callsites that decode `TraitImplDeclV2.for_type` to compute a `generic_params` slice from the entry's `impl_generics: Vec<MethodGenericParam>` names and pass it to the parser. For method signatures, propagate a `generic_params` context derived from trait generics + method generics through `methods[].params[].ty` and `methods[].returns` decoding so that generic-param names are resolved consistently throughout a method signature. Add unit tests using a smoke-test fixture: `for_type: \"T\"` with `impl_generics: [{name: \"T\"}]` → `Type::Generic(\"T\")`; `for_type: \"T\"` with no `impl_generics` → falls through to `Type::ResolvedPath` (existing behaviour preserved). SIGNAL IMPACT: This task unlocks parser expressiveness only. No production catalogue entry with `for_type: \"T\"` + `impl_generics` exists yet; `bin/sotp track type-signals` continues to exit 0 (no regression) after this task. The fixture-level smoke test verifies the new code path independently of the catalogue. The actual catalogue blanket impl entry is NOT added until T016. Acceptance: `bin/sotp track type-signals` exits 0; smoke-test unit tests pass. Estimated diff: ~120 lines. Independent of T014. spec_anchors: IN-12, CN-11.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "55572c706e015fee023811b40083b5ede38c7ab9"
     },
     {
       "id": "T016",
-      "description": "Type-designer back-and-forth — catalogue canonical-form update (AC-14 + AC-15 precursor): Re-invoke the type-designer capability (not implementer) after T014 and T015 are both committed. The type-designer performs TWO updates to `domain-types.json`: (1) Update `params[].ty` for the affected method signatures across `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` traits from the current `\"Self\"` placeholder to the canonical GAT form that D1's parser now supports and `format_qualified_path_with` outputs (e.g., `\"<Self as ChainIdentity>::Input<'_>\"`). (2) Add the blanket impl entry under `trait_impls`: `{ \"action\": \"add\", \"trait_ref\": \"SoTChain\", \"for_type\": \"T\", \"impl_generics\": [{\"name\": \"T\", \"bounds\": []}], \"impl_where_predicates\": [{\"lhs\": \"T\", \"rhs\": [\"PersistedSoTChain\"]}] }`. SIGNAL IMPACT: After this task, `bin/sotp track type-signals` shows: the 4 trait methods Blue-promote (catalogue canonical form now matches rustdoc via D1 parser), the blanket impl entry appears as 🟡 Yellow `RustSourceAbsent` (because `#[doc(hidden)]` still hides it). Catalogue-spec-signals remain unchanged (TraitImplDeclV2 entries carry no spec_refs). Depends on T014 and T015 both being committed. spec_anchors: AC-14, AC-15.",
-      "status": "todo"
+      "description": "D3 Formatter dedup (ADR 2026-06-18-0822 §D3): In `libs/infrastructure/src/tddd/signal_evaluator_v2/format/ty_base.rs`, remove the two duplicated QualifiedPath inline arms from `format_type_common_arms` and `fmt_rec`, delegating both to the shared `format_qualified_path_with` helper. Also normalize the empty-path Self-projection trait: in `format_qualified_path_with`, treat `trait_` = `Some(Path { path: \"\" })` the same as `None`, outputting `\"_\"` in both cases. This makes the C-side empty-path Self projection and the A-side `<Self>::Assoc<args>` catalogue literal (parsed as `trait_=None`) converge to the comparison string `<Self as _>::Assoc<args>`, enabling string-equality comparison to pass. Acceptance: `bin/sotp track type-signals` exits 0 (no regression); unit/integration tests demonstrate the DRY dedup and empty-path normalization. spec_anchors: IN-13, CN-13, AC-17.",
+      "status": "done",
+      "commit_hash": null
     },
     {
       "id": "T017",
-      "description": "Cleanup — Remove `#[doc(hidden)]` from blanket impl (CN-12, AC-15 final, AC-16): Strip the `#[doc(hidden)]` attribute and the accompanying schema-limitation rationale comment from `libs/domain/src/chain.rs` on the `impl<T: PersistedSoTChain> SoTChain for T` blanket impl. Run `bin/sotp track type-signals` (or `bin/sotp signal calc-impl-catalog` once T009 is available) and verify: (1) the blanket impl entry added in T016 transitions from 🟡 Yellow to 🔵 Blue (the impl is now visible to rustdoc and matches the catalogue declaration), (2) the 4 trait methods updated in T016 remain 🔵 Blue, (3) no new Yellows appear. Depends on T016. spec_anchors: CN-12, AC-15, AC-16.",
-      "status": "todo"
+      "description": "D4 Catalogue schema extension (ADR 2026-06-18-0822 §D4): Add `assoc_types: Vec<AssocTypeDecl>` and `assoc_consts: Vec<AssocConstDecl>` fields to `TraitEntry` in `libs/domain/src/tddd/catalogue_v2/entries.rs`. `AssocTypeDecl` holds `name: TypeName` / `bounds: Vec<TypeRef>` / `default: Option<TypeRef>`; `AssocConstDecl` holds `name: AssocConstName` / `ty: TypeRef` / `default_value: Option<String>`, with `AssocConstName` added as a validated newtype for associated const identifiers. Both fields default to empty (`#[serde(default)]`) to maintain backward compat with existing TraitEntry JSON, and optional default fields are omitted when `None`. Extend the infrastructure codecs `catalogue_document_codec` and `encoder_state_fn_trait_codec` to emit `ItemEnum::AssocType` / `ItemEnum::AssocConst` items. GAT lifetime / type params are intentionally excluded from `AssocTypeDecl` per OS-09. Do NOT relax `items.len` comparison in `trait_eq.rs` per OS-10. spec_anchors: IN-14, CN-15, OS-09, OS-10, AC-18.",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T018",
+      "description": "D3c Catalogue declarations update (plan-artifact authoring): Update `domain-types.json` to reflect the canonical forms now supported by the D3 formatter and D4 schema. (1) Revise GAT projection `params[].ty` entries across `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` trait methods from the old `\"Self\"` placeholder to the `<Self>::Assoc<'_>` canonical form (qself position=0, trait_=None). (2) Add `assoc_types` and `assoc_consts` declarations to the four trait entries, listing each associated type and const with its name and bounds. (3) Add or confirm the blanket impl entry `{ \"action\": \"add\", \"trait_ref\": \"SoTChain\", \"for_type\": \"T\", \"impl_generics\": [...], \"impl_where_predicates\": [...] }`. This is a plan-artifact-only change (no source code). Acceptance: `bin/sotp track type-signals` (or `signal calc-impl-catalog`) shows the 4 trait methods and assoc-item declarations as 🔵 Blue. spec_anchors: CN-14, AC-14, AC-15.",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T019",
+      "description": "Blanket-impl `#[doc(hidden)]` removal + final signal verification (ADR 2026-06-18-0822 §D2 / CN-12): Strip `#[doc(hidden)]` and its accompanying schema-limitation comment from `libs/domain/src/chain.rs` on the `impl<T: PersistedSoTChain> SoTChain for T` blanket impl, making it visible to rustdoc. Run `bin/sotp signal calc-impl-catalog` (or equivalent) and verify: the blanket impl entry transitions from 🟡 Yellow `RustSourceAbsent` to 🔵 Blue; the 4 trait methods and assoc-item declarations from T018 remain 🔵 Blue; no new Yellows or Reds appear. Final state: domain-layer TDDD signals all Blue (CI-verified 46 Blue / 0 Yellow / 0 Red). Depends on T016, T017, T018. spec_anchors: CN-12, AC-16, AC-19.",
+      "status": "done",
+      "commit_hash": null
     },
     {
       "id": "T006",
@@ -133,20 +148,24 @@
       },
       {
         "id": "S8",
-        "title": "Parser Extension + Catalogue Canonical-Form Update (ADR 2026-06-18-0822 D1 / D2)",
+        "title": "Parser Extension + Formatter Dedup + Catalogue Schema + Canonical Declarations + doc(hidden) Removal (ADR 2026-06-18-0822 D1/D2/D3/D4)",
         "description": [
-          "Fix the two parser asymmetries (T014, T015) and then update the catalogue to use the newly-supported canonical forms (T016, T017) so the trait taxonomy reaches 🔵 Blue via TDDD signals.",
-          "T014 (parser D1, implementer): Replace the `qself.is_some()` early-return stub with a full `Type::QualifiedPath` builder. This task UNLOCKS expressiveness only — the existing 4 GAT-related Yellows remain Yellow because the catalogue still uses `\"Self\"` placeholder. Acceptance: `bin/sotp track type-signals` exits 0 (no regression).",
-          "T015 (parser D2, implementer): Add `generic_params: &[&str]` context to `parse_type_ref_str` and insert a `Type::Generic(name)` step after `resolve_local`. Also unlocks expressiveness only — no production catalogue entry with `for_type: \"T\"` + `impl_generics` exists yet. Acceptance: `bin/sotp track type-signals` exits 0 (no regression).",
-          "T016 (type-designer back-and-forth, NOT implementer): With T014+T015 in place, update `domain-types.json`: (a) change affected `params[].ty` fields from `\"Self\"` placeholder to canonical GAT form, AND (b) add the blanket impl `trait_impls` entry. After T016: 4 trait methods → 🔵 Blue; blanket impl entry → 🟡 Yellow RustSourceAbsent (because `#[doc(hidden)]` still hides it).",
-          "T017 (implementer): Remove `#[doc(hidden)]` from `libs/domain/src/chain.rs`. After T017: blanket impl entry → 🔵 Blue; 4 trait methods remain 🔵 Blue.",
-          "EXECUTION ORDER: T014 and T015 are independent and may be worked in parallel, but BOTH must be committed before T016 is invoked. T017 follows T016. T006 was bundled with T014 in commit 12ab11610ac160948f5be747ee45d3d67f8b37a5 as an accepted CI-driven sequencing deviation; the remaining S8 work (T016/T017) still waits for T015 completion and its stated dependencies."
+          "Six tasks bring the trait taxonomy to 🔵 Blue across parser, formatter, domain schema, catalogue plan-artifact, and the blanket-impl visibility fix.",
+          "T014 (parser D1, DONE/committed 12ab1161): Replace the `qself.is_some()` early-return stub with a full `Type::QualifiedPath` builder. UNLOCKS expressiveness only — GAT-related Yellows remain because the catalogue still uses `\"Self\"` placeholder.",
+          "T015 (parser D2, DONE/committed 55572c70): Add `generic_params: &[&str]` context to `parse_type_ref_str` and insert a `Type::Generic(name)` step after `resolve_local`. UNLOCKS expressiveness only.",
+          "T016 (D3 formatter dedup, implementer): Dedup the two QualifiedPath inline arms in `format_type_common_arms` / `fmt_rec` → single `format_qualified_path_with` delegation. Normalize empty-path Self-projection (`trait_=Some(Path{path:\"\"})`) to `\"_\"` token, converging C-side and A-side to the same string.",
+          "T017 (D4 catalogue schema, domain+infra): Add `assoc_types: Vec<AssocTypeDecl>` and `assoc_consts: Vec<AssocConstDecl>` to `TraitEntry`. Extend infra codecs to emit `ItemEnum::AssocType` / `ItemEnum::AssocConst`. Backward-compat: missing fields default to empty. OS-09/OS-10 explicitly NOT done.",
+          "T018 (D3c catalogue declarations, plan-artifact): Update `domain-types.json`: (a) revise GAT params[].ty from `\"Self\"` placeholder to `<Self>::Assoc<'_>` canonical form; (b) add assoc_types / assoc_consts declarations to the four trait entries; (c) confirm blanket impl entry with impl_generics+impl_where_predicates.",
+          "T019 (blanket-impl doc(hidden) removal + final signal check, domain): Strip `#[doc(hidden)]` from the blanket impl in `libs/domain/src/chain.rs`. Final verification: domain-layer signals all Blue (CI-verified 46 Blue / 0 Yellow / 0 Red).",
+          "EXECUTION ORDER: T014 and T015 are committed. T016 (formatter), T017 (schema), T018 (declarations) are implemented in the spike worktree. T019 follows T016+T017+T018. T016/T017/T018/T019 are implemented but uncommitted; commit in the order: T016+T017 together (infra+domain code), then T018 (plan-artifact), then T019 (domain code + final signal check)."
         ],
         "task_ids": [
           "T014",
           "T015",
           "T016",
-          "T017"
+          "T017",
+          "T018",
+          "T019"
         ]
       },
       {

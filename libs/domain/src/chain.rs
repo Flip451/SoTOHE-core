@@ -379,12 +379,12 @@ pub trait PersistedSoTChain: ChainIdentity {
 /// The `check` pipeline is fixed as `load → check_freshness → evaluate_gate`, making
 /// it impossible to implement a persisted chain's `check` that skips freshness.
 ///
-/// `#[doc(hidden)]` keeps this off the rustdoc-derived TDDD signal surface: catalogue
-/// schema v5 has no shape for a generic `impl<T: Bound> Trait for T` (`for_type` must
-/// be a concrete TypeRef), so without `doc(hidden)` rustdoc reports this impl as an
-/// uncatalogued extra and the chain ③ signal turns Red. The behaviour is unchanged
-/// at the language level — every `T: PersistedSoTChain` still gets a `SoTChain` impl.
-#[doc(hidden)]
+/// Previously `#[doc(hidden)]` because the catalogue schema could not express
+/// a generic blanket impl (`for_type` requires a concrete TypeRef). With T015's
+/// generic_params support on `trait_impls`, the catalogue entry with
+/// `for_type: "T"`, `impl_generics: [{name:"T"}]`, and
+/// `impl_where_predicates: [{lhs:"T", rhs:["PersistedSoTChain"]}]` now matches
+/// the rustdoc-visible blanket impl, so `doc(hidden)` is no longer needed.
 impl<T> SoTChain for T
 where
     T: PersistedSoTChain,

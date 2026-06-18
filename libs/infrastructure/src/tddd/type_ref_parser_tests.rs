@@ -435,6 +435,8 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
             action: ItemAction::Add,
             role: ContractRole::SpecificationPort,
             methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],
             where_predicates: vec![],

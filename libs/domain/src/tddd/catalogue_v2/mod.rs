@@ -45,11 +45,13 @@ pub use composite::{StructKind, StructShape, TypeKindV2, TypestateMarker, Typest
 
 pub use document::{CatalogueDocument, CatalogueDocumentError};
 
-pub use entries::{FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry};
+pub use entries::{
+    AssocConstDecl, AssocTypeDecl, FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+};
 
 pub use identifiers::{
-    CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError, InvariantName,
-    MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
+    AssocConstName, CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError,
+    InvariantName, MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
 };
 
 pub use methods::{

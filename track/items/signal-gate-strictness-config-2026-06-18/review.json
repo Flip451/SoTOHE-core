@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:40:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:43:05Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -62,177 +44,71 @@
           "findings": [],
           "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
           "at": "2026-06-18T04:28:37Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Top-level JSON shape is not validated before calling `.get(\"$schema_version\")`, so a syntactically valid but non-object document (for example `[]` or `\"foo\"`) is reported as `MissingKey { key: \"$schema_version\" }` instead of the documented parse/structure failure. That misclassifies a malformed config and makes the error contract inconsistent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
-              "line": 228,
-              "category": "error handling"
-            },
-            {
-              "message": "Gate-cell type errors fall through to `SignalGatesConfigError::ParseFailed { path: PathBuf::new(), ... }` because `find_invalid_strictness_cell` only checks string values and ignores numbers/nulls/arrays/objects. A config like `\"adr_user\": 1` therefore loses the real file path and offending key/value, violating the loader's error-reporting contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
-              "line": 255,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:b79fa9a342879c8181ccd21258ce3795e6c3542317cc358e57b369bc742564a4",
-          "at": "2026-06-18T06:18:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a5c9be9364fc31c2f51014379e3f09406fa575ec9d2fa0cdf8a981a6575a622",
-          "at": "2026-06-18T06:26:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a5c9be9364fc31c2f51014379e3f09406fa575ec9d2fa0cdf8a981a6575a622",
-          "at": "2026-06-18T06:29:34Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`read_adr_verify_report` now scans `repo_root/knowledge/adr` directly, but it no longer applies the trusted-root / symlink rejection that `execute_verify_adr_signals` uses. A branch can make `knowledge/adr` a symlink and redirect the merge-gate scan outside the repository, which is a path-traversal/security regression.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
-              "line": 440,
-              "category": "security"
-            },
-            {
-              "message": "The new qualified-path branch accepts any `qself` path but only reads the single segment at `qself.position`. If the path has additional trailing segments after the associated item, they are silently dropped instead of remaining unresolved, so valid inputs can be misrepresented as a different type.",
+              "message": "`AssocTypeDecl.name` and `AssocConstDecl.name` are plain `String`s, unlike the rest of `catalogue_v2`'s identifier-bearing fields which use validated newtypes. That lets callers construct invalid associated-item names inside the domain model and defers validation to later layers, which violates the repo's \"illegal states unrepresentable\" rule for a new public API surface.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
-              "line": 83,
+              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 48,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:9da8ce16fce14e50213076c0ee14b11089b4efba33dce15936f2f2d2a851bb8e",
-          "at": "2026-06-18T09:57:15Z"
+          "hash": "rvw1:sha256:ebc91589796efb3fd0a8ba00353feac1e5505be845d297209e5dc2fce2c0d3e9",
+          "at": "2026-06-18T15:11:51Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new QualifiedPath tests only assert a few fields (`name`, presence of `trait_`, `args`) and never compare the full `Type::QualifiedPath` literal. That leaves the main D1 regression risk untested: the builder could still emit the wrong `self_type` or other nested shape and these tests would pass. The briefing explicitly called for full `assert_eq!` coverage here.",
+              "message": "`AssocConstName` is a new public validation boundary, but this module adds no direct tests for valid construction, invalid-input rejection, or `Display`/`FromStr` round-trips. Because its validation logic is macro-backed and shared only indirectly with the other identifier wrappers, a regression here would not be caught.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
-              "line": 238,
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 243,
               "category": "testing"
             },
             {
-              "message": "`read_adr_verify_report` is a new public merge-gate adapter entry point, but the added coverage only checks the symlink rejection path. There is no test for the expected success path or for a non-symlink I/O/parse failure, so a break in the new ADR scan wiring or error mapping would ship without regression coverage.",
+              "message": "`TraitEntry` now carries `assoc_types` and `assoc_consts`, but there is no test coverage asserting their default-empty construction or that they participate in `PartialEq` the way the existing `generics` and `where_predicates` fields do. That leaves the new trait-item shape under-tested and makes a wiring regression easy to miss.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
-              "line": 440,
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 150,
               "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:f38b6534dc01ea0313e2362288241dfca13fe068a986d6f0683a4cb33a20e785",
-          "at": "2026-06-18T10:20:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Ok(false)` from `reject_symlinks_below` is not equivalent to a cleanly missing `knowledge/adr` directory. If `knowledge/` is replaced with a regular file or another non-directory ancestor, this branch returns `NotFound` and the merge gate will treat ADR scanning as absent, bypassing chain 0 instead of failing closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
-              "line": 469,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:38cd531ba03f5916288cc01e01fff8c006fa1355553b3dcd0a3f1dd7b35560a8",
-          "at": "2026-06-18T10:34:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_adr_verify_report` delegates to `FsAdrFileAdapter`, which skips non-regular entries instead of rejecting them. That means symlinked `knowledge/adr/*.md` files are silently ignored, so a branch can hide all ADR decisions behind symlinks and get an empty clean report instead of a fail-closed error.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
-              "line": 497,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:b5c74da527b546f90b786b6c4d3f1e9eaf312e89d96a89086bef7f941f9df138",
-          "at": "2026-06-18T10:54:10Z"
+          "hash": "rvw1:sha256:70537a10d0574928eec1a9cc41198cbd64cf0e8df320522c95655b8b4af959b7",
+          "at": "2026-06-18T17:00:32Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:897bb94a1da121b8b2b6f1b04c219f6e579f11ebc9d5706dc25dbc2572fdb979",
-          "at": "2026-06-18T11:14:19Z"
+          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
+          "at": "2026-06-18T17:07:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:897bb94a1da121b8b2b6f1b04c219f6e579f11ebc9d5706dc25dbc2572fdb979",
-          "at": "2026-06-18T11:17:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `TraitImplDeclV2.for_type` generic-param path is only covered by parser unit tests. There is no end-to-end codec regression test that exercises `encode(doc)` with `impl_generics = [\"T\"]` and `for_type = \"T\"`, so regressions in the new callsite plumbing or `normalize_impl_for_type_path` would not be caught.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
-              "line": 306,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:7d7755814d02e39d10c97cda6475a636b57c7ce7f0a7d01b4599468869803cf5",
-          "at": "2026-06-18T12:12:55Z"
+          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
+          "at": "2026-06-18T17:13:46Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b0ebdbd025efc9bcffb6969bb431a98929bede54da5a380e66dbff75dd6085ea",
-          "at": "2026-06-18T12:20:01Z"
+          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
+          "at": "2026-06-18T18:07:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b0ebdbd025efc9bcffb6969bb431a98929bede54da5a380e66dbff75dd6085ea",
-          "at": "2026-06-18T12:23:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:06d047adb889135b74c067a4d1d478c8be7ad4d793bd143a68b52908188e6edf",
-          "at": "2026-06-18T12:38:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:06d047adb889135b74c067a4d1d478c8be7ad4d793bd143a68b52908188e6edf",
-          "at": "2026-06-18T12:44:09Z"
+          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
+          "at": "2026-06-18T18:10:34Z"
         }
       ]
     },
@@ -712,6 +588,541 @@
           "findings": [],
           "hash": "rvw1:sha256:0847fa605808832f52863267c785e94e5ef9d9863d84efb9921725d3751a582e",
           "at": "2026-06-18T12:13:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 is internally inconsistent about the canonical QualifiedPath spelling. The ADR/spec say A-side GAT projections must use `<Self>::Assoc<args>` because `<Self as _>::...` is unparseable, but the same section also says `Some(Path{path:\"\"})` normalizes to `_` and that C-side `<Self as _>::...` and A-side `<Self>::...` converge to the same string. No extra rewrite step is specified, so those claims do not all hold together.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
+              "line": 128,
+              "category": "contradiction"
+            },
+            {
+              "message": "The new associated-item schema is described inconsistently across artifacts. The ADR/spec/plan say `AssocTypeDecl.default` and `AssocConstDecl.default` are `Option<String>`, but `domain-types.json` records `AssocTypeDecl.default` as `Option<TypeRef>` and names the const field `default_value`. That is a concrete contract mismatch between the generated plan artifact and the documented schema.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/domain-types.json",
+              "line": 320,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:a0e525273f3ecb7615053b567f460ba941c2607badd3bfec4c203ee7a8e97630",
+          "at": "2026-06-18T15:13:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5205ede3b74b9f9d8f3b6cef78597df40a84d657266905a2eaa819f10a5c4509",
+          "at": "2026-06-18T15:20:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9687c0f6109bd904711d58ec77c80dbd70f2dcc6196fc86501f774470bdff6b4",
+          "at": "2026-06-18T17:00:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-14 still specifies `AssocTypeDecl.name` and `AssocConstDecl.name` as raw `String` fields, and T017 repeats the same schema, but this same artifact set now catalogs `AssocTypeDecl.name` as `TypeName` and `AssocConstDecl.name` as `AssocConstName` in `domain-types.json`. That is a semantic contradiction in the plan artifacts: the spec/plan tell implementers to use primitive strings while the rendered domain catalogue records validated identifier newtypes for the implemented design. Align IN-14/T017/ADR D4 with the validated newtype shape so the plan has one authoritative schema.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+              "line": 221,
+              "category": "contradiction"
+            },
+            {
+              "message": "D1 still describes `<Self as ChainIdentity>::Input<'_>` as the catalogue-side canonical qualified path that will match rustdoc, but D3 later says the catalogue canonical form must be `<Self>::Assoc` because rustdoc Self projections arrive with an empty trait path and explicit `<Self as Trait>::Assoc` will not compare correctly. These are mutually exclusive conventions for the same GAT projection declarations, so the ADR leaves readers with two incompatible implementation rules. Update the D1 text to mark the explicit-trait form as the pre-D3 assumption or align it with the D3 `<Self>::...` convention.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
+              "line": 105,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9687c0f6109bd904711d58ec77c80dbd70f2dcc6196fc86501f774470bdff6b4",
+          "at": "2026-06-18T17:06:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR context still says rustdoc/formatter render `Self::Input` as `<Self as ChainIdentity>::Input`, but the later D3 root-cause section says rustdoc emits an empty trait path and the pre-D3 C-side string was `<Self as >::Input`, with the accepted canonical catalogue path being `<Self>::...` rendered as `<Self as _>::...`. These are conflicting descriptions of the same GAT projection behavior, so the ADR leaves readers with two incompatible formatter contracts.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
+              "line": 36,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AC-18` is mapped only to `T017`, but `AC-18` requires the actual `domain-types.json` assoc item declarations and a Blue `calc-impl-catalog` result. `T017` only adds the schema/codecs; the plan puts the catalogue declarations and signal verification in `T018`/later. As written, task coverage claims AC-18 is satisfied by a task that cannot complete the criterion, leaving the acceptance dependency order inconsistent.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/task-coverage.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4b9e0629fb903ca057232ce3a6756c6337ff4117a70554e75a7ca808cd79d9eb",
+          "at": "2026-06-18T17:15:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bb456fa43b413a1039e0be9d845ca7bfb749d3eebf597e0652d1243c2f2ab85a",
+          "at": "2026-06-18T17:19:04Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:40:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:43:05Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Top-level JSON shape is not validated before calling `.get(\"$schema_version\")`, so a syntactically valid but non-object document (for example `[]` or `\"foo\"`) is reported as `MissingKey { key: \"$schema_version\" }` instead of the documented parse/structure failure. That misclassifies a malformed config and makes the error contract inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
+              "line": 228,
+              "category": "error handling"
+            },
+            {
+              "message": "Gate-cell type errors fall through to `SignalGatesConfigError::ParseFailed { path: PathBuf::new(), ... }` because `find_invalid_strictness_cell` only checks string values and ignores numbers/nulls/arrays/objects. A config like `\"adr_user\": 1` therefore loses the real file path and offending key/value, violating the loader's error-reporting contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
+              "line": 255,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b79fa9a342879c8181ccd21258ce3795e6c3542317cc358e57b369bc742564a4",
+          "at": "2026-06-18T06:18:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a5c9be9364fc31c2f51014379e3f09406fa575ec9d2fa0cdf8a981a6575a622",
+          "at": "2026-06-18T06:26:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a5c9be9364fc31c2f51014379e3f09406fa575ec9d2fa0cdf8a981a6575a622",
+          "at": "2026-06-18T06:29:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_adr_verify_report` now scans `repo_root/knowledge/adr` directly, but it no longer applies the trusted-root / symlink rejection that `execute_verify_adr_signals` uses. A branch can make `knowledge/adr` a symlink and redirect the merge-gate scan outside the repository, which is a path-traversal/security regression.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 440,
+              "category": "security"
+            },
+            {
+              "message": "The new qualified-path branch accepts any `qself` path but only reads the single segment at `qself.position`. If the path has additional trailing segments after the associated item, they are silently dropped instead of remaining unresolved, so valid inputs can be misrepresented as a different type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 83,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9da8ce16fce14e50213076c0ee14b11089b4efba33dce15936f2f2d2a851bb8e",
+          "at": "2026-06-18T09:57:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new QualifiedPath tests only assert a few fields (`name`, presence of `trait_`, `args`) and never compare the full `Type::QualifiedPath` literal. That leaves the main D1 regression risk untested: the builder could still emit the wrong `self_type` or other nested shape and these tests would pass. The briefing explicitly called for full `assert_eq!` coverage here.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
+              "line": 238,
+              "category": "testing"
+            },
+            {
+              "message": "`read_adr_verify_report` is a new public merge-gate adapter entry point, but the added coverage only checks the symlink rejection path. There is no test for the expected success path or for a non-symlink I/O/parse failure, so a break in the new ADR scan wiring or error mapping would ship without regression coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 440,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f38b6534dc01ea0313e2362288241dfca13fe068a986d6f0683a4cb33a20e785",
+          "at": "2026-06-18T10:20:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Ok(false)` from `reject_symlinks_below` is not equivalent to a cleanly missing `knowledge/adr` directory. If `knowledge/` is replaced with a regular file or another non-directory ancestor, this branch returns `NotFound` and the merge gate will treat ADR scanning as absent, bypassing chain 0 instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 469,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:38cd531ba03f5916288cc01e01fff8c006fa1355553b3dcd0a3f1dd7b35560a8",
+          "at": "2026-06-18T10:34:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_adr_verify_report` delegates to `FsAdrFileAdapter`, which skips non-regular entries instead of rejecting them. That means symlinked `knowledge/adr/*.md` files are silently ignored, so a branch can hide all ADR decisions behind symlinks and get an empty clean report instead of a fail-closed error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 497,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b5c74da527b546f90b786b6c4d3f1e9eaf312e89d96a89086bef7f941f9df138",
+          "at": "2026-06-18T10:54:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:897bb94a1da121b8b2b6f1b04c219f6e579f11ebc9d5706dc25dbc2572fdb979",
+          "at": "2026-06-18T11:14:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:897bb94a1da121b8b2b6f1b04c219f6e579f11ebc9d5706dc25dbc2572fdb979",
+          "at": "2026-06-18T11:17:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `TraitImplDeclV2.for_type` generic-param path is only covered by parser unit tests. There is no end-to-end codec regression test that exercises `encode(doc)` with `impl_generics = [\"T\"]` and `for_type = \"T\"`, so regressions in the new callsite plumbing or `normalize_impl_for_type_path` would not be caught.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 306,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7d7755814d02e39d10c97cda6475a636b57c7ce7f0a7d01b4599468869803cf5",
+          "at": "2026-06-18T12:12:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0ebdbd025efc9bcffb6969bb431a98929bede54da5a380e66dbff75dd6085ea",
+          "at": "2026-06-18T12:20:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0ebdbd025efc9bcffb6969bb431a98929bede54da5a380e66dbff75dd6085ea",
+          "at": "2026-06-18T12:23:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06d047adb889135b74c067a4d1d478c8be7ad4d793bd143a68b52908188e6edf",
+          "at": "2026-06-18T12:38:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06d047adb889135b74c067a4d1d478c8be7ad4d793bd143a68b52908188e6edf",
+          "at": "2026-06-18T12:44:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AssocTypeDecl.default` and `AssocConstDecl.ty` are only checked with `TypeRef::new`, which accepts any non-empty string. Unlike the other `TypeRef` fields in this codec, these values are never run through `validate_type_ref_str`, so malformed Rust types (for example `Vec<` or `Foo<`) now survive decode and fail later in the encode path instead of being rejected at the DTO boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
+              "line": 35,
+              "category": "validation"
+            },
+            {
+              "message": "`AssocTypeDecl` defaults are parsed with `parse_type_ref_str` but never rewritten against `trait_generic_names`. That means defaults such as `type Item = Vec<T>` are still rendered with a raw `T` path instead of `Type::Generic(\"T\")`, so traits that only differ by generic parameter renames will compare unequal even though the bounds path already canonicalizes those names.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "line": 530,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0ffc12b22a559bd571e0705288d209cf90bb6a968d773fcee921b7c255d28e8",
+          "at": "2026-06-18T15:12:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new assoc-item decoders only reject empty names. `assoc_types[*].name` and `assoc_consts[*].name` are never validated as Rust identifiers, and there is no duplicate-name check before the items are fed into `Trait.items` / `build_trait_method_map`. A malformed or colliding assoc item can therefore be accepted and silently overwrite a different item during trait fingerprinting, producing a false match.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
+              "line": 21,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:c3691f6d36c70bbe7a913e151314ef114ad0f739804946f5071e94706c17f541",
+          "at": "2026-06-18T15:24:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`assoc_const_decl_from_dto` accepts `default_value: Some(\"\")` with no validation. That collapses to the same fingerprint as `None` later (`unwrap_or(\"\")` in trait comparison), so malformed wire input can silently masquerade as a missing associated-const value and change trait equality results.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
+              "line": 71,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:16c765c73532ac4b7738ecec108887256cf1ecc059fe2ad2331c1072fc61e1bd",
+          "at": "2026-06-18T15:34:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`encode_assoc_type_item()` and `encode_assoc_const_item()` still call `parse_type_ref_str()` without any trait-generic context, then rely on `rewrite_generic_types()`. That rewrite does not descend into `Type::QualifiedPath`, so valid defaults/types like `T::Item`, `<T as Trait>::Assoc`, or `Vec<T::Assoc>` will keep a non-generic self-type and can be emitted as the wrong rustdoc shape. The new assoc-item codec will therefore mis-encode valid trait-generic inputs instead of matching the C-side representation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "line": 530,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1b31ff980277e4af703c5b752f1f2f2247de6a3b2008f0dffb277e917cc20dce",
+          "at": "2026-06-18T15:48:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This appends `AssocType`/`AssocConst` IDs into `Trait.items`, but the contract-map renderer still walks `Trait.items` and emits only `ItemEnum::Function` children. As a result, traits with associated items now influence equality/signals but those items remain invisible in rendered output, so the D4 change is internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "line": 62,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:26e9fcfcb255b671ea21aeac8e7f27160059a830ce3f6e78a13a7eaca2829e39",
+          "at": "2026-06-18T16:06:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_trait_item_names` now enforces a single flat name set across methods, associated types, and associated consts. That rejects valid traits that reuse an identifier across namespaces (for example, an associated type and a method with the same name), so the codec will fail on some legal catalogues instead of round-tripping them.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
+              "line": 25,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c28d59b2f62f005d105574dbd4aef4ad8427eb7610f14771cb79ca21ea8b1a1c",
+          "at": "2026-06-18T17:04:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_trait_item_names` now accepts legal cross-namespace name reuse (`type Item; fn Item();` and `type Item; const Item: ...;`), but the trait comparer still flattens every trait item into a single `BTreeMap<String, String>` keyed only by bare `name`. Once assoc types/consts are emitted into `Trait.items`, those legal traits become order-dependent or collide during comparison, so the same source can compare unequal depending on declaration order.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
+              "line": 29,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f5dbd2eb85361c46d81559c63dba89666cb0d948c30e422a2a358608801366eb",
+          "at": "2026-06-18T17:20:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:281df62e44ddbde204d1a687f248dd9dd0e51a30338eee1983ec1a9fce058baf",
+          "at": "2026-06-18T17:37:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:281df62e44ddbde204d1a687f248dd9dd0e51a30338eee1983ec1a9fce058baf",
+          "at": "2026-06-18T17:42:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `resolve_external_type_ids` still only recurses through `ResolvedPath` and container variants, but the new assoc-item encoder now emits `Type::QualifiedPath` values. Any external crate ids inside `self_type` or `trait_` stay unresolved, so valid trait-scoped defaults like `<ext::Foo as ext::Trait>::Assoc` can compare/resolve incorrectly. See [encoder_state_type_ref_parsing.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs#L32) and [encoder_state_fn_trait_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs#L559).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
+              "line": 32,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `rewrite_trait_scoped_type_inner` does not recurse into `ImplTrait`, `DynTrait`, `FunctionPointer`, or `Pat`, so trait projections nested inside those forms are left as plain `ResolvedPath` nodes. Inputs like `Vec<fn() -> T::Item>` or `impl Iterator<Item = T::Item>` will be mis-encoded instead of producing the expected qualified projection shape. See [encoder_state_fn_trait_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs#L564).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "line": 564,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2b1e1f94a9f59ad9bf7db2ba33fda024be833fdc0965860668f1d27a1407158a",
+          "at": "2026-06-18T18:13:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13f67db8045183d4bb2d664ddf9ed6c21141f9fcc8f707c0ea0f82e43a00b6c8",
+          "at": "2026-06-18T18:26:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Associated type bounds are still encoded with `encode_and_validate_bound`, which only rewrites bare generic arguments. If a new `assoc_types` entry uses a valid projection in its bound, such as `type Output: Iterator<Item = T::Item>` or `<T as Trait>::Item`, the A-side bound keeps that projection as an unresolved/resolved path instead of the `Type::QualifiedPath` shape rustdoc emits. `build_trait_method_map` then fingerprints A as `#0::Item`/unresolved while C formats `<#0 as _>::Item`, so valid assoc-bearing traits can stay non-blue. The assoc type default path already uses `encode_trait_scoped_type_ref`; bounds need the same trait-scoped projection rewrite and coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "line": 508,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:13f67db8045183d4bb2d664ddf9ed6c21141f9fcc8f707c0ea0f82e43a00b6c8",
+          "at": "2026-06-18T18:29:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`encode_trait_scoped_bound` parses associated-type bounds without the enclosing trait generic context, then tries to rewrite the parsed tree afterward. Because `encode_bound_str`/`parse_generic_bound` resolves single-segment names against locals/std prelude before this rewrite runs, an in-scope generic that shadows a prelude/local name inside a bound argument is already lost. For example, `trait Port<From> { type Out: Iterator<Item = From>; }` should encode `From` as `Type::Generic(\"From\")` to match rustdoc, but this path will first resolve it as the prelude `std::convert::From`, and `rewrite_trait_scoped_bound` cannot recover it. That makes otherwise valid associated-type bounds produce false signal mismatches. Parse bounds with the trait generic names in scope, or otherwise prevent in-scope generic names from being resolved before rewriting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "line": 531,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:46deb08a11d5d71cb719870ce549ddf93c45c5e251032bb493db4cf2f7c03fa3",
+          "at": "2026-06-18T18:38:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `encode_trait_scoped_type_ref` now parses nested trait-generic projections like `Vec<T::Item>` through `parse_type_ref_str_with_generics`, but that parser only recognizes bare generic names. During its discovery pass it treats the `T::Item` prefix as an external crate named `T`; the later rewrite converts the type shape to `QualifiedPath` but leaves the fake external crate registered globally in the emitted `Crate`. That can pollute `external_crates` and make subsequent `T::...` references look resolved instead of unresolved. Teach the parser to handle generic-prefix multi-segment paths before external-crate registration, or pre-rewrite these projections without registering the prefix.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "line": 590,
+              "category": "logic"
+            },
+            {
+              "message": "P1: This production module is now 748 lines with no test block exemption, exceeding the repository's 700-line maximum for production modules. The new associated-item encoding and trait-scoped rewrite helpers should be split into a sibling module, similar to the `decode.rs` split done for the same size rule.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "line": 500,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:fd0e0067b29bb2597f64240dd6005e7c8999a5213ca8912d58196c8aac90c88d",
+          "at": "2026-06-18T18:47:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`try_build_generic_projection` bypasses the normal parser for `T::Assoc`-style associated projections but only validates the first character of the associated item name. Since `TypeRef::new` only rejects empty strings, an in-memory catalogue can now encode invalid Rust type refs such as `T::Item-foo` as `Type::QualifiedPath` instead of returning `InvalidTypeRef`, unlike the other encode paths. Validate the full identifier or fall through to the parser before constructing the qualified path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
+              "line": 427,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:4902d618296e95620a44134cc75ef96edfa62c8862a3dd0e7a0f0e3a0c15a616",
+          "at": "2026-06-18T19:02:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_type_ref_str_with_generics` forwards to the normal parser without shadowing local catalogue names. That parser still receives `local_name_to_id`, so a legal generic impl such as `impl<T> Trait for T` is encoded as the local catalogue type `T` whenever the catalogue also declares a type named `T`, instead of `Type::Generic(\"T\")`. Other trait-scoped paths avoid this by temporarily shadowing local names before parsing; this wrapper needs the same precedence or the A-side impl target can mismatch rustdoc for generic impls under a local-name collision.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
+              "line": 236,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:7f603d9fece0c277f82bf6cd0e6fe75218717462aa9912e8a7af0b2d60941182",
+          "at": "2026-06-18T19:10:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `assoc_types` and `assoc_consts` catalogue wire-format fields are not exercised by the `CatalogueDocumentCodec` tests: there is no decode, encode/round-trip, or invalid-input test covering these DTO fields. Since this is a public JSON schema extension, regressions in serde defaults, newtype validation, duplicate-name rejection, or `default_value` mapping could pass CI. Add focused happy-path and error-case codec tests for associated types and associated consts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto.rs",
+              "line": 390,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7b216dc5d5c45e04d411bae321e0af82983fb4520ef2512d691e06d0037d8c1d",
+          "at": "2026-06-18T19:17:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cff1f4e44f5f406771fd3d5b192e02cec2f2240a3c4f1161f9bbdbd94f070cb",
+          "at": "2026-06-18T19:24:23Z"
         }
       ]
     },
@@ -833,6 +1244,20 @@
           "findings": [],
           "hash": "rvw1:sha256:39818e433ede532476eeb14779e80fc977e38d5f445465e469d1a4da49aa69ba",
           "at": "2026-06-18T11:12:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
+          "at": "2026-06-18T15:10:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
+          "at": "2026-06-18T15:13:06Z"
         }
       ]
     },

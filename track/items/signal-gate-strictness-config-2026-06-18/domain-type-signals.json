@@ -1,8 +1,50 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-18T12:45:41Z",
-  "declaration_hash": "860bd52b15df14d70eb48587e01d4a6f455da7b29020a2201938d4ce143ca95e",
+  "generated_at": "2026-06-18T19:29:36Z",
+  "declaration_hash": "22b7aaf20f31b3700d1964b6629ddfc518c8470e0014dfb86135f6844cb9eb44",
   "signals": [
+    {
+      "type_name": "AssocConstDecl",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "AssocConstName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef<str>",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "AssocTypeDecl",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
     {
       "type_name": "ChainGateEntry",
       "kind_tag": "value_object",
@@ -32,7 +74,7 @@
     {
       "type_name": "ChainIdentity",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -51,13 +93,13 @@
     {
       "type_name": "LiveSoTChain",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "PersistedSoTChain",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -75,7 +117,7 @@
     {
       "type_name": "SoTChain",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -92,10 +134,25 @@
       ]
     },
     {
+      "type_name": "TraitEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "domain::chain::check_catalogue_spec_signals",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "_",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SoTChain"
+      ]
     }
   ]
 }

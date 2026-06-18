@@ -369,6 +369,8 @@ mod tests {
                         false,
                         None,
                     )],
+                    assoc_types: vec![],
+                    assoc_consts: vec![],
                     supertrait_bounds: vec![],
                     generics: vec![],
                     where_predicates: vec![],

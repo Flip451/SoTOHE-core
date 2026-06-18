@@ -136,6 +136,8 @@ pub(crate) mod tests {
             action: ItemAction::Add,
             role: ContractRole::SecondaryPort,
             methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],
             where_predicates: vec![],

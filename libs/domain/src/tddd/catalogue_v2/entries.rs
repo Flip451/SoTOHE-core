@@ -14,7 +14,7 @@
 
 use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
-use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeName, TypeRef};
+use crate::tddd::catalogue_v2::identifiers::{AssocConstName, ModulePath, TypeName, TypeRef};
 use crate::tddd::catalogue_v2::methods::{
     MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
 };
@@ -22,6 +22,71 @@ use crate::tddd::catalogue_v2::methods::{
 // `MethodDeclaration`, `InherentImplDeclV2`, and now also `TraitEntry`
 // (ADR `2026-05-18-1223` D2 / IN-07).
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
+
+// ---------------------------------------------------------------------------
+// AssocTypeDecl — associated type declaration in a trait
+// ---------------------------------------------------------------------------
+
+/// Declaration of an associated type item in a trait (e.g. `type Foo: Bound = Default`).
+///
+/// Used in [`TraitEntry::assoc_types`] to declare associated types so that the A-side
+/// (catalogue) item count matches the C-side (rustdoc) item count.
+///
+/// ## Scope notes
+///
+/// - `bounds`: the trait bounds on the associated type, e.g. `["Send", "Sync"]` for
+///   `type Foo: Send + Sync`. Empty when the associated type has no bounds.
+/// - `default`: the default type for the associated type, if present.
+///
+/// No generic-params field is needed for the known GAT traits in this codebase:
+/// `type Input<'a>` has only a lifetime parameter, and lifetime params are excluded
+/// from the fingerprint comparison in `build_generics_fingerprint_with_combined_canon`
+/// (only `GenericParamDefKind::Type` and `Const` are processed there). Therefore the
+/// catalogue can declare `type Input` without any generic-params field and still match
+/// the C-side's lifetime-excluded fingerprint `assoc_type[]:=`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AssocTypeDecl {
+    /// The name of the associated type (e.g. `Input` in `type Input`).
+    ///
+    /// Uses [`TypeName`] to make illegal names unrepresentable at the domain model level:
+    /// an associated type name such as `Input` is a type-level identifier and reuses the
+    /// same validated newtype as struct/enum names (prefer-type-safe-abstractions).
+    pub name: TypeName,
+    /// Trait bounds on the associated type (e.g. `["Send"]` for `type Foo: Send`).
+    /// Empty Vec when the associated type has no bounds.
+    pub bounds: Vec<TypeRef>,
+    /// Optional default type for the associated type (e.g. `Some("Vec<u8>")` for
+    /// `type Foo = Vec<u8>`). `None` when the associated type has no default.
+    pub default: Option<TypeRef>,
+}
+
+// ---------------------------------------------------------------------------
+// AssocConstDecl — associated constant declaration in a trait
+// ---------------------------------------------------------------------------
+
+/// Declaration of an associated constant item in a trait (e.g. `const ID: ChainId`).
+///
+/// Used in [`TraitEntry::assoc_consts`] to declare associated constants so that the
+/// A-side (catalogue) item count matches the C-side (rustdoc) item count.
+///
+/// ## Field mapping to the signal evaluator's `assoc_const:{ty_str}={val_str}`
+///
+/// - `ty`: feeds `ty_str` via `format_type_with_canon`.
+/// - `default_value`: feeds `val_str` via `apply_canon_to_str`; `None` becomes `""`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AssocConstDecl {
+    /// The name of the associated constant (e.g. `ID` in `const ID: ChainId`).
+    ///
+    /// Uses [`AssocConstName`] to make illegal names unrepresentable at the domain model
+    /// level: a const name like `ID` has no other existing fitting newtype, so a dedicated
+    /// validated newtype is introduced (prefer-type-safe-abstractions).
+    pub name: AssocConstName,
+    /// The type of the associated constant (e.g. `"ChainId"`).
+    pub ty: TypeRef,
+    /// Optional default value expression (e.g. `Some("42")` for `const N: usize = 42`).
+    /// `None` when the constant has no default (common for trait-required constants).
+    pub default_value: Option<String>,
+}
 
 // ---------------------------------------------------------------------------
 // TypeEntry — entry in CatalogueDocument::types
@@ -76,6 +141,19 @@ pub struct TraitEntry {
     pub role: ContractRole,
     /// Methods declared in this trait.
     pub methods: Vec<MethodDeclaration>,
+    /// Associated types declared in this trait (e.g. `type Foo: Bound`).
+    ///
+    /// Default empty Vec for backward compatibility with all existing catalogues.
+    /// When non-empty, the A-codec emits an `ItemEnum::AssocType` item for each entry
+    /// so that `Trait.items.len()` matches the C-side (rustdoc) count and the
+    /// structural comparison in `build_trait_method_map` finds matching entries.
+    pub assoc_types: Vec<AssocTypeDecl>,
+    /// Associated constants declared in this trait (e.g. `const ID: ChainId`).
+    ///
+    /// Default empty Vec for backward compatibility with all existing catalogues.
+    /// When non-empty, the A-codec emits an `ItemEnum::AssocConst` item for each entry
+    /// so that `Trait.items.len()` matches the C-side (rustdoc) count.
+    pub assoc_consts: Vec<AssocConstDecl>,
     /// Supertrait bounds for this trait (e.g. `[Send, Sync]` for `trait Foo: Send + Sync`).
     ///
     /// Default empty Vec for backward compatibility. When non-empty, the A-codec encodes
@@ -369,13 +447,13 @@ mod tests {
     // TraitEntry
     // -----------------------------------------------------------------------
 
-    #[test]
-    fn test_trait_entry_with_contract_role_compiles() {
-        // TraitEntry.role: ContractRole — assigning DataRole is a compile-time error.
-        let entry = TraitEntry {
+    fn trait_entry_fixture() -> TraitEntry {
+        TraitEntry {
             action: ItemAction::Add,
             role: ContractRole::SecondaryPort,
             methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],
             where_predicates: vec![],
@@ -383,7 +461,13 @@ mod tests {
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
-        };
+        }
+    }
+
+    #[test]
+    fn test_trait_entry_with_contract_role_compiles() {
+        // TraitEntry.role: ContractRole — assigning DataRole is a compile-time error.
+        let entry = trait_entry_fixture();
         assert_eq!(entry.role, ContractRole::SecondaryPort);
     }
 
@@ -404,6 +488,8 @@ mod tests {
             action: ItemAction::Add,
             role: ContractRole::SecondaryPort,
             methods: vec![save_method.clone()],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],
             where_predicates: vec![],
@@ -421,18 +507,8 @@ mod tests {
     fn test_trait_entry_with_supertrait_bounds() {
         let send = TypeRef::new("Send").unwrap();
         let sync = TypeRef::new("Sync").unwrap();
-        let entry = TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            supertrait_bounds: vec![send.clone(), sync.clone()],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let mut entry = trait_entry_fixture();
+        entry.supertrait_bounds = vec![send.clone(), sync.clone()];
         assert_eq!(entry.supertrait_bounds.len(), 2);
         assert_eq!(entry.supertrait_bounds[0].as_str(), "Send");
         assert_eq!(entry.supertrait_bounds[1].as_str(), "Sync");
@@ -447,18 +523,8 @@ mod tests {
             ContractRole::Repository { aggregate: TypeRef::new("Order").unwrap() },
         ];
         for role in roles {
-            let entry = TraitEntry {
-                action: ItemAction::Add,
-                role: role.clone(),
-                methods: vec![],
-                supertrait_bounds: vec![],
-                generics: vec![],
-                where_predicates: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            };
+            let mut entry = trait_entry_fixture();
+            entry.role = role.clone();
             assert_eq!(entry.role, role);
         }
     }
@@ -466,62 +532,36 @@ mod tests {
     #[test]
     fn test_trait_entry_new_has_empty_generics_by_default() {
         // AC-07: TraitEntry must carry a generics field defaulting to empty Vec.
-        let entry = TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let entry = trait_entry_fixture();
         assert!(entry.generics.is_empty());
     }
 
     #[test]
     fn test_trait_entry_new_has_empty_where_predicates_by_default() {
         // AC-07: TraitEntry must carry a where_predicates field defaulting to empty Vec.
-        let entry = TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let entry = trait_entry_fixture();
         assert!(entry.where_predicates.is_empty());
+    }
+
+    #[test]
+    fn test_trait_entry_new_has_empty_assoc_items_by_default() {
+        let entry = trait_entry_fixture();
+        assert!(entry.assoc_types.is_empty());
+        assert!(entry.assoc_consts.is_empty());
     }
 
     #[test]
     fn test_trait_entry_generics_and_where_predicates_for_generic_trait_decl() {
         // AC-07 primary: `trait Foo<T> where T: Clone` can be represented.
         use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
-        let entry = TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![MethodGenericParam {
-                name: ParamName::new("T").unwrap(),
-                bounds: vec![],
-            }],
-            where_predicates: vec![WherePredicateDecl {
-                lhs: TypeRef::new("T").unwrap(),
-                rhs: vec![TypeRef::new("Clone").unwrap()],
-                operator: BoundOp::Bound,
-            }],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let mut entry = trait_entry_fixture();
+        entry.generics =
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+        entry.where_predicates = vec![WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
+        }];
         assert_eq!(entry.generics.len(), 1);
         assert_eq!(entry.generics[0].name.as_str(), "T");
         assert_eq!(entry.where_predicates.len(), 1);
@@ -532,18 +572,7 @@ mod tests {
     #[test]
     fn test_trait_entry_generics_participates_in_equality() {
         // generics field must participate in PartialEq (derive-level guarantee).
-        let base = TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let base = trait_entry_fixture();
         let mut with_generic = base.clone();
         with_generic.generics =
             vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
@@ -554,18 +583,7 @@ mod tests {
     fn test_trait_entry_where_predicates_participates_in_equality() {
         // where_predicates field must participate in PartialEq.
         use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
-        let base = TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let base = trait_entry_fixture();
         let mut with_pred = base.clone();
         with_pred.where_predicates = vec![WherePredicateDecl {
             lhs: TypeRef::new("T").unwrap(),
@@ -573,6 +591,27 @@ mod tests {
             operator: BoundOp::Bound,
         }];
         assert_ne!(base, with_pred, "where_predicates field must participate in equality");
+    }
+
+    #[test]
+    fn test_trait_entry_assoc_items_participate_in_equality() {
+        let base = trait_entry_fixture();
+
+        let mut with_assoc_type = base.clone();
+        with_assoc_type.assoc_types = vec![AssocTypeDecl {
+            name: TypeName::new("Input").unwrap(),
+            bounds: vec![TypeRef::new("Send").unwrap()],
+            default: Some(TypeRef::new("Vec<u8>").unwrap()),
+        }];
+        assert_ne!(base, with_assoc_type, "assoc_types field must participate in equality");
+
+        let mut with_assoc_const = base.clone();
+        with_assoc_const.assoc_consts = vec![AssocConstDecl {
+            name: AssocConstName::new("CHAIN_ID").unwrap(),
+            ty: TypeRef::new("ChainId").unwrap(),
+            default_value: Some("DEFAULT_CHAIN_ID".to_string()),
+        }];
+        assert_ne!(base, with_assoc_const, "assoc_consts field must participate in equality");
     }
 
     // -----------------------------------------------------------------------
@@ -795,6 +834,8 @@ mod tests {
             action: ItemAction::Add,
             role: ContractRole::SecondaryPort,
             methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],
             where_predicates: vec![],

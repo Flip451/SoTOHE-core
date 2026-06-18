@@ -60,11 +60,15 @@ subgraph domain["domain"]
   subgraph R27_domain_domain_ChainIdentity["chain::ChainIdentity"]
     direction TB
     R27_domain_domain_ChainIdentity__self[ChainIdentity]
+    R27_domain_domain_ChainIdentity_assoctype_Input[type Input]
+    R27_domain_domain_ChainIdentity_assocconst_ID[const ID]
   end
   subgraph R26_domain_domain_LiveSoTChain["chain::LiveSoTChain"]
     direction TB
     R26_domain_domain_LiveSoTChain__self[LiveSoTChain]
     R26_domain_domain_LiveSoTChain_calc_live([calc_live])
+    R26_domain_domain_LiveSoTChain_assoctype_LiveCalc[type LiveCalc]
+    R26_domain_domain_LiveSoTChain_assoctype_CalcError[type CalcError]
   end
   subgraph R31_domain_domain_PersistedSoTChain["chain::PersistedSoTChain"]
     direction TB
@@ -75,6 +79,9 @@ subgraph domain["domain"]
     R31_domain_domain_PersistedSoTChain_evaluate_gate([evaluate_gate])
     R31_domain_domain_PersistedSoTChain_calc_error([calc_error])
     R31_domain_domain_PersistedSoTChain_stale_error([stale_error])
+    R31_domain_domain_PersistedSoTChain_assoctype_Persisted[type Persisted]
+    R31_domain_domain_PersistedSoTChain_assoctype_CalcError[type CalcError]
+    R31_domain_domain_PersistedSoTChain_assoctype_StaleError[type StaleError]
   end
   subgraph R22_domain_domain_SoTChain["chain::SoTChain"]
     direction TB
@@ -82,6 +89,27 @@ subgraph domain["domain"]
     R22_domain_domain_SoTChain_check([check])
   end
   F57_domain_domain_domain__chain__check_catalogue_spec_signals[[check_catalogue_spec_signals]]
+  end
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T28_domain_domain_AssocConstDecl["tddd::catalogue_v2::entries::AssocConstDecl"]
+    direction TB
+    T28_domain_domain_AssocConstDecl__self[AssocConstDecl]
+  end
+  subgraph T28_domain_domain_AssocConstName["tddd::catalogue_v2::identifiers::AssocConstName"]
+    direction TB
+    T28_domain_domain_AssocConstName__self[AssocConstName]
+    T28_domain_domain_AssocConstName_new([new])
+    T28_domain_domain_AssocConstName_as_str([as_str])
+  end
+  subgraph T27_domain_domain_AssocTypeDecl["tddd::catalogue_v2::entries::AssocTypeDecl"]
+    direction TB
+    T27_domain_domain_AssocTypeDecl__self[AssocTypeDecl]
+  end
+  subgraph T24_domain_domain_TraitEntry["tddd::catalogue_v2::entries::TraitEntry"]
+    direction TB
+    T24_domain_domain_TraitEntry__self[TraitEntry]
+  end
   end
 end
 subgraph usecase["usecase"]
@@ -181,6 +209,10 @@ T30_domain_domain_SignalGateMatrix__self --o|adr_user| T28_domain_domain_ChainGa
 T30_domain_domain_SignalGateMatrix__self --o|spec_adr| T28_domain_domain_ChainGateEntry__self
 T30_domain_domain_SignalGateMatrix__self --o|catalog_spec| T28_domain_domain_ChainGateEntry__self
 T30_domain_domain_SignalGateMatrix__self --o|impl_catalog| T28_domain_domain_ChainGateEntry__self
+T28_domain_domain_AssocConstDecl__self --o|name| T28_domain_domain_AssocConstName__self
+T28_domain_domain_AssocConstName_new --> T28_domain_domain_AssocConstName__self
+T24_domain_domain_TraitEntry__self --o|assoc_types| T27_domain_domain_AssocTypeDecl__self
+T24_domain_domain_TraitEntry__self --o|assoc_consts| T28_domain_domain_AssocConstDecl__self
 F60_usecase_usecase_usecase__merge_gate__check_strict_merge_gate --o T30_domain_domain_SignalGateMatrix__self
 R32_usecase_usecase_VerifyAdrSignals_verify --o T39_usecase_usecase_VerifyAdrSignalsCommand__self
 T28_usecase_usecase_AdrUserChain__self -.impl.-> R27_domain_domain_ChainIdentity__self
@@ -229,6 +261,12 @@ class R22_domain_domain_SoTChain_check method_node
 class R22_domain_domain_SoTChain__self secondary_port
 class F57_domain_domain_domain__chain__check_catalogue_spec_signals free_function
 class F57_domain_domain_domain__chain__check_catalogue_spec_signals function_node
+class T28_domain_domain_AssocConstDecl__self value_object
+class T28_domain_domain_AssocConstName_new method_node
+class T28_domain_domain_AssocConstName_as_str method_node
+class T28_domain_domain_AssocConstName__self value_object
+class T27_domain_domain_AssocTypeDecl__self value_object
+class T24_domain_domain_TraitEntry__self value_object
 class T28_usecase_usecase_AdrUserChain__self use_case
 class T32_usecase_usecase_CatalogSpecChain__self use_case
 class T32_usecase_usecase_ImplCatalogChain__self use_case
