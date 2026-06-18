@@ -1,6 +1,76 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CLI policy assigns adapter construction/DI to `apps/cli/` and explicitly exempts adapter construction from the `usecase bypass` category. In the current architecture, `cli` may depend only on `cli_composition`, and `cli_composition` owns domain/usecase/infrastructure wiring, so this briefing would tell reviewers not to report direct infrastructure/domain construction in CLI and overlaps the `cli_composition` briefing. Reframe CLI as thin arg parsing/output/ExitCode mapping that delegates wiring to `cli_composition`, and make direct domain/infrastructure construction in CLI reportable.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli.md",
+              "line": 3,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:c6f52c489e858b1742ff6f8b2cd4d33eb6234341267b1fe4547a9156a149cdd3",
+          "at": "2026-06-18T18:33:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CLI policy still assigns adapter construction/DI to `apps/cli/`, but this repository's architecture places wiring in `apps/cli-composition/` and keeps `apps/cli` to parse/dispatch/output/ExitCode mapping. As written, the `usecase bypass` exception can hide direct domain/infrastructure construction in CLI and overlaps with the `cli_composition` briefing. Reframe this briefing so CLI is thin and wiring stays reportable in the composition layer.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/custom/review-prompts/cli.md",
+              "line": 3,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:c6f52c489e858b1742ff6f8b2cd4d33eb6234341267b1fe4547a9156a149cdd3",
+          "at": "2026-06-18T18:34:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8be98ae62a90d382a49daa9f7c6981d046e325d404455c24584b44408906d5f",
+          "at": "2026-06-18T18:38:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This policy assigns adapter construction/DI to `cli_composition`, then states that CLI is the only non-infrastructure place where `std::fs`, `std::env`, and process spawning are allowed. That makes boundary I/O needed by `apps/cli-composition/` look forbidden even though this split makes composition the wiring layer. Narrow this statement to `apps/cli/` command-handler responsibilities or explicitly describe the allowed boundary I/O for `cli_composition`.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli.md",
+              "line": 7,
+              "category": "architecture-policy-contradiction"
+            },
+            {
+              "message": "The `What to report` list introduces reportable `cli_composition` categories without grounding most of them in the named conventions. The briefing requires each report category to cite its convention basis, but bullets such as port-adapter pairing, application logic in composition, leaked test fixtures, panic in wiring, and double-instantiation have no convention or architecture-rule citation. Add explicit citations or remove categories that are not convention-backed.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli_composition.md",
+              "line": 14,
+              "category": "policy-grounding"
+            }
+          ],
+          "hash": "rvw1:sha256:f8be98ae62a90d382a49daa9f7c6981d046e325d404455c24584b44408906d5f",
+          "at": "2026-06-18T18:42:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c67acfbafa54da73845174b72fcaa061c8e991a9199f852715cd1e7389728a2c",
+          "at": "2026-06-18T18:46:03Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -82,6 +152,34 @@
           "findings": [],
           "hash": "rvw1:sha256:24f1ef66d2bcfabd5e34626c0802e6a3d4ebefba9e58a1efa164f50e2cf4c42f",
           "at": "2026-06-18T18:17:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ac1b1ae14e07728c9710a34fa663ec457dffaa5f6bc5ae835bc31b26227cee9",
+          "at": "2026-06-18T18:30:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ac1b1ae14e07728c9710a34fa663ec457dffaa5f6bc5ae835bc31b26227cee9",
+          "at": "2026-06-18T18:40:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0cbe69518e915bd1c82c3831c86b9a783d1950b26bfc6ae221ade429d564ba7",
+          "at": "2026-06-18T18:50:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0cbe69518e915bd1c82c3831c86b9a783d1950b26bfc6ae221ade429d564ba7",
+          "at": "2026-06-18T18:52:33Z"
         }
       ]
     }

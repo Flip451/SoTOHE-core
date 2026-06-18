@@ -4,32 +4,27 @@
     {
       "id": "T001",
       "description": "Author all 7 briefing files under .harness/custom/review-prompts/. Copy the current contents of track/review-prompts/plan-artifacts.md into .harness/custom/review-prompts/plan-artifacts.md (content preserved verbatim) while leaving the legacy source file in place until T002 deletes the old directory. Create the 6 new per-layer briefings: domain.md / usecase.md / infrastructure.md / cli.md / cli_composition.md / harness-policy.md. Each file must follow the plan-artifacts.md 'What to report / What NOT to report' structure and include layer-specific severity viewpoints sourced from the relevant conventions (domain: type safety / invariants / enum-first / typestate / no-panics per coding-principles.md + prefer-type-safe-abstractions.md; usecase: purity rules / no std::fs|net|process|io|env / no chronological calls / orchestration-only per hexagonal-architecture.md; infrastructure: adapter placement / I-O boundary / serde codec / symlink rejection / trusted-root enforcement; cli: CLI as composition root / usecase-only call path / no domain::| infrastructure:: direct-use in non-DI code; cli_composition: wiring / DI correctness / no application-logic leakage; harness-policy: convention consistency / command wiring integrity / responsibility-boundary adherence). This task is purely additive: no existing files are modified or deleted, no loader paths change. cargo make ci passes independently at this commit boundary. (IN-01 / IN-02 / AC-01 / AC-02 / AC-03 / CN-03 / CN-04)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "Atomic migration commit: (a) Create .harness/config/review-scope.json with the contents of track/review-scope.json plus all briefing_file values repointed to .harness/custom/review-prompts/<scope>.md for all 7 scopes, and the explicit 'track/review-scope.json' entry removed from harness-policy.patterns (it is now covered by the existing '.harness/**' pattern). (b) Update the two hardcoded loader paths: apps/cli-composition/src/review_v2/scope.rs line 51 (root.join('track/review-scope.json') → root.join('.harness/config/review-scope.json')) and apps/cli-composition/src/review_v2/shared.rs line 179 (canonical_root.join('track/review-scope.json') → canonical_root.join('.harness/config/review-scope.json')). (c) Update the test helper setup_git_repo_with_scope_json in apps/cli/src/commands/review/tests.rs so it writes the scope JSON to .harness/config/review-scope.json (create the .harness/config/ subdirectory) instead of track/review-scope.json, so the production loader finds the file. (d) Delete track/review-scope.json and the legacy track/review-prompts/ directory, including the retained track/review-prompts/plan-artifacts.md source copy from T001. This commit must be paired with T003's test literal updates and T004's live-doc reference updates in the same atomic migration commit required by CN-01 (clean move, no fallback): the loader, config, test helper, test expectations, live docs, and old files must all change together to avoid a broken-CI window. Depends on T001 (the .harness/custom/review-prompts/ files must exist before the new briefing_file values are committed). Do not treat T002 alone as a CI-green boundary; cargo make ci is expected after the paired T002+T003+T004 migration edits and finally in T005. (IN-03 / IN-04 / IN-05 / IN-06 / IN-09 / IN-10 / AC-04 / AC-05 / AC-06 / AC-07 / AC-08 / AC-11 / AC-12 / CN-01 / CN-04 / CN-05 / CN-06)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T003",
       "description": "Update test string literals that embed old path values as the companion test portion of the T002 atomic migration commit. In apps/cli/src/commands/review/tests.rs: (a) test_append_scope_briefing_reference_appends_when_configured — update scope_json to use briefing_file '.harness/custom/review-prompts/plan-artifacts.md', update expected_section to show the new path. (b) test_is_safe_briefing_path_accepts_normal_path — update the first assertion from 'track/review-prompts/plan-artifacts.md' to '.harness/custom/review-prompts/plan-artifacts.md'. In libs/infrastructure/src/review_v2/scope_config_loader.rs: update the three test cases that embed 'track/review-prompts/plan-artifacts.md' as the briefing_file value (test_load_with_briefing_file, test_typo_in_briefing_file_field_is_rejected, test_load_rejects_symlink_briefing_file) to use '.harness/custom/review-prompts/plan-artifacts.md', and update the module-level doc comment (line 1) from 'Loads track/review-scope.json' to 'Loads .harness/config/review-scope.json'. Also update the briefing_dir temp path in test_load_rejects_symlink_briefing_file (dir.path().join('track/review-prompts') → dir.path().join('.harness/custom/review-prompts')) so the symlink is created at the correct relative path. In libs/domain/src/review_v2/tests.rs: update the two string literals in test_briefing_file_for_scope_returns_some_when_configured to use '.harness/custom/review-prompts/plan-artifacts.md'. This task must land in the same commit as T002 and T004; it is the point at which the paired migration commit becomes CI-passable for tests that assert path strings. (CN-01)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T004",
       "description": "Update old-path references in live convention docs as the live-doc portion of the same atomic migration commit as T002 and T003. In knowledge/conventions/enforce-by-mechanism.md: update the inline reference 'track/review-scope.json' (line ~70) to '.harness/config/review-scope.json'. In knowledge/conventions/type-designer-kind-selection.md: update the forward reference 'track/review-prompts/<scope>.md' (line ~313) to '.harness/custom/review-prompts/<scope>.md'. Perform a broad scan (grep) to confirm no other live docs under README.md / CLAUDE.md / .claude/rules/ / knowledge/conventions/ / Makefile.toml still contain 'track/review-scope.json' or 'track/review-prompts/'; fix any found before the old files are deleted in the paired migration. Merged ADRs under knowledge/adr/ are NOT updated (OS-06). Final cargo make ci validation remains T005. (IN-07 / IN-08 / AC-09 / CN-01)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T005",
       "description": "Run cargo make ci as the final validation gate. Confirms: fmt-check / clippy / test / deny / check-layers / verify-arch-docs all pass after the full migration. If any check fails, diagnose and fix in this task before committing. No new files are authored in this task; it is a pure validation step. (AC-10)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {
@@ -43,7 +38,9 @@
         "description": [
           "T001 creates the .harness/custom/review-prompts/ directory and populates all 7 briefing files (plan-artifacts.md copied from track/review-prompts/, plus 6 new layer files). The legacy source file stays in place until T002 deletes the old directory, so this step is purely additive and cargo make ci passes independently. The new briefing files must exist before T002 commits the new briefing_file values in .harness/config/review-scope.json."
         ],
-        "task_ids": ["T001"]
+        "task_ids": [
+          "T001"
+        ]
       },
       {
         "id": "S2",
@@ -51,7 +48,11 @@
         "description": [
           "T002 is the clean-move config/loader portion required by CN-01: it creates .harness/config/review-scope.json (with repointed briefing_file values and harness-policy pattern cleanup), updates both hardcoded loader paths in apps/cli-composition/src/review_v2/, updates the test helper that writes the scope JSON file so it targets the new path, and deletes track/review-scope.json plus the legacy track/review-prompts/ directory. T003's test literal updates and T004's live-doc reference updates are part of the same atomic migration commit, so CI never sees loader/config changes while tests or live docs still assert old path values. Depends on T001."
         ],
-        "task_ids": ["T002", "T003", "T004"]
+        "task_ids": [
+          "T002",
+          "T003",
+          "T004"
+        ]
       },
       {
         "id": "S3",
@@ -59,7 +60,9 @@
         "description": [
           "T005 runs cargo make ci as the final gate after all migration tasks are complete. This confirms that the full build / lint / test / check-layers / verify-arch-docs pipeline is green. Depends on T001-T004."
         ],
-        "task_ids": ["T005"]
+        "task_ids": [
+          "T005"
+        ]
       }
     ]
   }
