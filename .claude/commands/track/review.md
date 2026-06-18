@@ -17,7 +17,7 @@ Arguments: none. The current `track/<id>` branch determines the review target.
   in `## Related Conventions (Required Reading)` — check both `spec.md` and `plan.md` (legacy
   tracks may carry this section in `plan.md` instead of `spec.md`).
 - For exact type signatures / module trees / Mermaid diagrams, treat `## Canonical Blocks` in
-  `plan.md` and `knowledge/DESIGN.md` as the source of truth.
+  `plan.md` as the source of truth.
 
 ## Step 1: Resolve dispatch capabilities
 

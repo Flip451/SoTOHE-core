@@ -145,6 +145,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [運用ドキュメント断捨離方針 — SoT 一本化と narrative 重複の解消](2026-04-27-0554-doc-reorganization.md) | — | 2026-04-27 |
 | [運用ドキュメント再編（統合版）— ルート文書一本化・track/workflow.md 分散・工学規約の conventions 移管](2026-06-15-0025-operational-docs-restructure-unified.md) | — | 2026-06-15 |
+| [knowledge/strategy ディレクトリの整理方針](2026-06-17-1321-knowledge-strategy-cleanup.md) | — | 2026-06-17 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 

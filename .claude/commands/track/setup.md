@@ -9,7 +9,7 @@ Execution rules:
 - Read `knowledge/conventions/branch-strategy.md`, `knowledge/conventions/track-lifecycle.md`, `knowledge/conventions/git-notes.md`, `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`.
 - Ensure `track/registry.md` exists; if missing, create it with a minimal template list section.
 - Ensure the track convention includes `track/items/<id>/metadata.json` alongside `spec.md` and `plan.md`; `observations.md` is optional (created only when machine-non-verifiable observations need recording).
-- Confirm required top-level docs exist (`CLAUDE.md`, `knowledge/DESIGN.md`).
+- Confirm the required top-level doc `CLAUDE.md` exists.
 - Strict tech-stack guardrails are on by default. Only template maintainers may disable them locally for template work via `TRACK_TEMPLATE_DEV=1` or an untracked `.track-template-dev` marker.
 - Do not start implementation work in this command.
 - Summarize what was initialized and what TODO items must be filled next.

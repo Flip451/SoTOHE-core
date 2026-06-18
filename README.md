@@ -131,8 +131,6 @@ cargo make bootstrap      # Docker イメージビルド + CI 一括
 
 - ADR 索引: `knowledge/adr/README.md`
 - 規約索引: `knowledge/conventions/README.md`
-- 設計概要: `knowledge/DESIGN.md`
-- 全体計画: `knowledge/strategy/TODO-PLAN.md`
 - エージェント設定: `.harness/config/agent-profiles.json`
 
 ## ライセンス

@@ -19,8 +19,8 @@
 //! plain `pub struct` here keeps `LayerId` visible to the current
 //! schema-export path and lets the catalogue entry for the type reach
 //! Blue. Properly teaching `schema_export` to follow `pub use` aliases is
-//! tracked separately — see `knowledge/strategy/TODO.md`
-//! "harness-hardening-nutype-rustdoc-support".
+//! tracked separately as a `harness-hardening-nutype-rustdoc-support`
+//! follow-up.
 
 use std::fmt;
 

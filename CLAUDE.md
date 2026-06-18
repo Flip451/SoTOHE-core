@@ -13,9 +13,7 @@ Priority references:
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
 - `track/items/<id>/observations.md` (optional — manual observation log)
-- `knowledge/DESIGN.md`
 - `knowledge/adr/README.md`
-- `knowledge/strategy/TODO-PLAN.md`
 - `.harness/config/agent-profiles.json`
 - `.claude/rules/`  # Claude Code-specific operating rules only; engineering conventions live under knowledge/conventions/
 - `knowledge/conventions/README.md`
@@ -52,7 +50,6 @@ Details:
 - Orchestration / delegation: `.claude/rules/08-orchestration.md`
 - Maintainer checklist: `.claude/rules/09-maintainer-checklist.md`
 - Guardrails: `.claude/rules/10-guardrails.md`
-- `knowledge/DESIGN.md`
 - `.harness/config/agent-profiles.json`
 - `.claude/rules/07-dev-environment.md`
 - `.claude/skills/codex-system/SKILL.md`           # Codex delegation skill
