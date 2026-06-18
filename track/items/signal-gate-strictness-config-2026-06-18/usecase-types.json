@@ -1,0 +1,421 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "AdrUserChain": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "chain::adr_user",
+      "docs": "Chain ⓪ implementation struct. Implements `domain::ChainIdentity` (ID = ChainId::AdrUser), `domain::SoTChain`, and `domain::LiveSoTChain`. Does NOT implement `PersistedSoTChain` — live calc only, no persistence file. Signal source: ADR frontmatter in `knowledge/adr/`. Unit struct; stateless dispatch; UseCase role is legal for usecase layer per R1 matrix.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "SpecAdrChain": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "chain::spec_adr",
+      "docs": "Chain ① implementation struct. Implements `domain::ChainIdentity` (ID = ChainId::SpecAdr), `domain::PersistedSoTChain` (obtains `SoTChain` via blanket impl). Persistence target: the `signals` field in `track/items/<track_id>/spec.json`; no per-layer catalogue-spec-signals artifact is used for chain ①. `evaluate_gate` delegates to `domain::check_spec_doc_signals`. `check_freshness` implements the self-consistency check: `doc.evaluate_signals()` vs `doc.signals()`. Unit struct; stateless dispatch; UseCase role is legal for usecase layer per R1 matrix.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogSpecChain": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "chain::catalog_spec",
+      "docs": "Chain ② implementation struct. Implements `domain::ChainIdentity` (ID = ChainId::CatalogSpec), `domain::PersistedSoTChain` (blanket impl gives `SoTChain`). `evaluate_gate` delegates to `domain::check_catalogue_spec_signals` (the new domain pure function from D2). `check_freshness` compares entry_hash from the signals document against current catalogue bytes. Unit struct; stateless dispatch; UseCase role is legal for usecase layer per R1 matrix.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "ImplCatalogChain": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "chain::impl_catalog",
+      "docs": "Chain ③ implementation struct. Implements `domain::ChainIdentity` (ID = ChainId::ImplCatalog), `domain::PersistedSoTChain` (blanket impl gives `SoTChain`). `evaluate_gate` delegates to `domain::check_type_signals`. `check_freshness` compares declaration_hash from the type-signals document against current catalogue bytes. Unit struct; stateless dispatch; UseCase role is legal for usecase layer per R1 matrix.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyAdrSignalsCommand": {
+      "action": "modify",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "verify_adr_signals",
+      "docs": "CQRS command for the verify-ADR-signals operation. Currently a unit struct; `strict` mode is resolved from `SignalGateMatrix` at the call site rather than embedded in the command, per D3 config-driven design.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "VerifyAdrSignals": {
+      "action": "reference",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "verify",
+          "receiver": "&self",
+          "params": [{ "name": "command", "ty": "VerifyAdrSignalsCommand" }],
+          "returns": "Result<domain::AdrVerifyReport, VerifyAdrSignalsError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "verify_adr_signals",
+      "docs": "Carried as reference: baseline-identical, no structural change in this track. Exposed for contract-map edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TrackBlobReader": {
+      "action": "modify",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" },
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ],
+          "returns": "BlobFetchResult<domain::spec::SpecDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" },
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "layer", "ty": "domain::tddd::LayerId" }
+          ],
+          "returns": "BlobFetchResult<Option<String>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_impl_plan",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" },
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ],
+          "returns": "BlobFetchResult<domain::ImplPlanDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" },
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ],
+          "returns": "BlobFetchResult<Vec<domain::tddd::LayerId>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_catalogue_for_spec_ref_check",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" },
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "layer", "ty": "domain::tddd::LayerId" }
+          ],
+          "returns": "BlobFetchResult<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_catalogue_spec_signals_document",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" },
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "layer", "ty": "domain::tddd::LayerId" }
+          ],
+          "returns": "BlobFetchResult<domain::CatalogueSpecSignalsDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_catalogue_spec_signal_opted_in_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" },
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ],
+          "returns": "BlobFetchResult<Vec<domain::tddd::LayerId>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_type_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" },
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "layer", "ty": "domain::tddd::LayerId" }
+          ],
+          "returns": "BlobFetchResult<domain::TypeSignalsDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_adr_verify_report",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" }
+          ],
+          "returns": "BlobFetchResult<domain::AdrVerifyReport>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "merge_gate",
+      "docs": "Secondary port for reading track-level domain documents for merge gate evaluation. Modified in this track to add `read_adr_verify_report(branch)` supporting chain ⓪ evaluation in `check_strict_merge_gate` for the target branch without exposing filesystem paths to the usecase layer.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-06" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "usecase::merge_gate::check_strict_merge_gate": {
+      "action": "modify",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "branch", "ty": "String" },
+        { "name": "reader", "ty": "R" },
+        { "name": "gate_matrix", "ty": "domain::SignalGateMatrix" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["TrackBlobReader", "usecase::catalogue_spec_refs::SpecElementHashReader"] }
+      ],
+      "where_predicates": [],
+      "docs": "Strict merge gate orchestrating all four chains. Modified from baseline to receive a validated domain `SignalGateMatrix` from the CLI/infrastructure boundary, add chain ⓪ ADR-user evaluation (repo-global ADR directory scan), and resolve merge-gate strictness for every chain from the matrix cells (`adr_user`, `spec_adr`, `catalog_spec`, and `impl_catalog`) instead of hardcoding strict evaluation for chains ①②③. The usecase function does not load `.harness/config/signal-gates.json` directly.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "GO-03" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::ChainIdentity",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::SoTChain",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::LiveSoTChain",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::ChainIdentity",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::PersistedSoTChain",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::ChainIdentity",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::PersistedSoTChain",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::ChainIdentity",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::PersistedSoTChain",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::default::Default",
+      "for_type": "VerifyAdrSignalsCommand"
+    }
+  ]
+}

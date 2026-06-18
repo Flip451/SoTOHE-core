@@ -1,0 +1,326 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "835dfe063c53df9db8111d781f30982873554bfbaa52d36f4bf2469515d0a495",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。"
+      }
+    },
+    {
+      "claim_hash": "835dfe063c53df9db8111d781f30982873554bfbaa52d36f4bf2469515d0a495",
+      "evidence_hash": "22830ef401d4948b6d91cb208abf946ccd1dace5af25bbe6081203778278c7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` は全 chain × gate の 8 セルを完全に明示する必要があり、暗黙の default を持たない。"
+      }
+    },
+    {
+      "claim_hash": "48cf4b5d572dc524223ca3c628892623baf32e1e9cf41d27a27a94827bb0aef0",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。... 推奨デフォルト config ... を実ファイルとして commit する。"
+      }
+    },
+    {
+      "claim_hash": "48cf4b5d572dc524223ca3c628892623baf32e1e9cf41d27a27a94827bb0aef0",
+      "evidence_hash": "5ece55c90d7a4423edd247b4147b70abaf2655596a5e7a59895ce21a58232039",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` の必須化と検証: ファイル不在 / パース不能 / `$schema_version` 不正 / 不正値 / 必須キー（gate オブジェクトまたは chain×gate セル）の欠落はいずれも hard error として全ゲートを停止し、actionable なエラーメッセージを出力する。strict への暗黙フォールバックも fail-open も設けない。"
+      }
+    },
+    {
+      "claim_hash": "48cf4b5d572dc524223ca3c628892623baf32e1e9cf41d27a27a94827bb0aef0",
+      "evidence_hash": "22830ef401d4948b6d91cb208abf946ccd1dace5af25bbe6081203778278c7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` は全 chain × gate の 8 セルを完全に明示する必要があり、暗黙の default を持たない。ファイル不在・パース不能・`$schema_version` 不正・値不正・必須キー欠落のいずれかがあれば全ゲートを hard error で停止する（fail-open も silent strict フォールバックも禁止）。"
+      }
+    },
+    {
+      "claim_hash": "48cf4b5d572dc524223ca3c628892623baf32e1e9cf41d27a27a94827bb0aef0",
+      "evidence_hash": "3d5a6f941ba2dca332895491daa800693a436342e35be00fc3273f3d01fd8dd8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` の `$schema_version` は整数で、現在は `1` のみ有効とする。未知の値は schema 不正として hard error とする。config ファイルの schema version を管理する責務が生じる。"
+      }
+    },
+    {
+      "claim_hash": "331c3de9ab6402503a7739b6621a930039479b2460eda776cefcf5f2e766bec0",
+      "evidence_hash": "5ece55c90d7a4423edd247b4147b70abaf2655596a5e7a59895ce21a58232039",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` の必須化と検証: ファイル不在 / パース不能 / `$schema_version` 不正 / 不正値 / 必須キー（gate オブジェクトまたは chain×gate セル）の欠落はいずれも hard error として全ゲートを停止し、actionable なエラーメッセージを出力する。strict への暗黙フォールバックも fail-open も設けない。"
+      }
+    },
+    {
+      "claim_hash": "331c3de9ab6402503a7739b6621a930039479b2460eda776cefcf5f2e766bec0",
+      "evidence_hash": "22830ef401d4948b6d91cb208abf946ccd1dace5af25bbe6081203778278c7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` は全 chain × gate の 8 セルを完全に明示する必要があり、暗黙の default を持たない。ファイル不在・パース不能・`$schema_version` 不正・値不正・必須キー欠落のいずれかがあれば全ゲートを hard error で停止する（fail-open も silent strict フォールバックも禁止）。"
+      }
+    },
+    {
+      "claim_hash": "331c3de9ab6402503a7739b6621a930039479b2460eda776cefcf5f2e766bec0",
+      "evidence_hash": "ecad2c5c70afcb27a0a18fd989a0dc8b2a21a4313dfce10431b7308cdf9a116e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` を削除した状態、パース不能な状態、`$schema_version` 不正な状態、必須キーが欠落した状態のいずれかで commit gate / merge gate を実行すると hard error で停止する。strict への暗黙フォールバックも fail-open も発生しない。"
+      }
+    },
+    {
+      "claim_hash": "a6b98ad34fc214ca13982ae96d0be2b76f877f4bc0b9457119c43cc291cde0c9",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。"
+      }
+    },
+    {
+      "claim_hash": "a6b98ad34fc214ca13982ae96d0be2b76f877f4bc0b9457119c43cc291cde0c9",
+      "evidence_hash": "e21a3ac31a016a34c303eb135996fa1bf3ed1fe7666e71936276a15c30700467",
+      "verdict": {
+        "kind": "pass",
+        "citation": "strictness の値を現在の 2 値（`\"strict\"` / `\"interim\"`）超に拡張することは対象外。strictness 多値化は「2 値では表現できない」フィードバックが蓄積した時点で別 ADR で検討する。"
+      }
+    },
+    {
+      "claim_hash": "67cd7e7a0030c37efed714a40b5a9057ab86316cfea5c1d5543c07ebba812dae",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`execute_verify_adr_signals` に `strict: bool` 引数を追加して `signal check-adr-user --strict` で Yellow（`ReviewFindingRef`）も block できるようにする。"
+      }
+    },
+    {
+      "claim_hash": "67cd7e7a0030c37efed714a40b5a9057ab86316cfea5c1d5543c07ebba812dae",
+      "evidence_hash": "7238d93d78e0c057cc543c4fb5de9c48bcdcdb7d36a29fc210afe91437dcf10e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal check-adr-user --strict` が Yellow（`ReviewFindingRef`）を `Finding::error` とし、`--strict` なし（または `--gate` で interim に解決）では `Finding::warning` となる。"
+      }
+    },
+    {
+      "claim_hash": "67cd7e7a0030c37efed714a40b5a9057ab86316cfea5c1d5543c07ebba812dae",
+      "evidence_hash": "5f186bf753e3b087b8e4162546b8cfa877e056f62ca3386c25783873cc880457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`strict=true`（または `--gate` が strict セルに解決）→ `Finding::error`、`strict=false`（または `--gate` が interim セルに解決）→ `Finding::warning`。D2 は chain ⓪（`check-adr-user`）について `NoGrounds→error`、`Grandfathered→skip`、`ReviewFindingRef→strict 依存` を明示"
+      }
+    },
+    {
+      "claim_hash": "cdbecf26371d4f0cf806c7f1587af1c88f15f9c01586e3561915f777dfe6572d",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "cdbecf26371d4f0cf806c7f1587af1c88f15f9c01586e3561915f777dfe6572d",
+      "evidence_hash": "8d9a3f13705dbcda3a4c0799b5af2ae7c85881e61c8082c89fb0b311203942a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型のシグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "cdbecf26371d4f0cf806c7f1587af1c88f15f9c01586e3561915f777dfe6572d",
+      "evidence_hash": "89fd786d22843d2436814bc4418e13994bf5d62abb1eff30785aa45ce32f5ab1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strict)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "b7ab0cc07305def79e230c43d41751b7088408e115a2a2a820f326f5f0ad0c01",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "b7ab0cc07305def79e230c43d41751b7088408e115a2a2a820f326f5f0ad0c01",
+      "evidence_hash": "8d9a3f13705dbcda3a4c0799b5af2ae7c85881e61c8082c89fb0b311203942a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型のシグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "6579de4141abc271398936fe24be89f0799f269bef49e85369d538c6b3d69eba",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。`check-*` が `--gate commit|merge` でセルを解決し、集約コマンド `signal check --gate commit|merge`（4 chain を一括評価）も用意する。"
+      }
+    },
+    {
+      "claim_hash": "6579de4141abc271398936fe24be89f0799f269bef49e85369d538c6b3d69eba",
+      "evidence_hash": "5ece55c90d7a4423edd247b4147b70abaf2655596a5e7a59895ce21a58232039",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` の必須化と検証: ファイル不在 / パース不能 / `$schema_version` 不正 / 不正値 / 必須キー（gate オブジェクトまたは chain×gate セル）の欠落はいずれも hard error として全ゲートを停止し、actionable なエラーメッセージを出力する。strict への暗黙フォールバックも fail-open も設けない。"
+      }
+    },
+    {
+      "claim_hash": "6579de4141abc271398936fe24be89f0799f269bef49e85369d538c6b3d69eba",
+      "evidence_hash": "ecad2c5c70afcb27a0a18fd989a0dc8b2a21a4313dfce10431b7308cdf9a116e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` を削除した状態、パース不能な状態、`$schema_version` 不正な状態、必須キーが欠落した状態のいずれかで commit gate / merge gate を実行すると hard error で停止する。strict への暗黙フォールバックも fail-open も発生しない。"
+      }
+    },
+    {
+      "claim_hash": "fc6cfad4ba7517fb1ebfb541596109afdc368ea5ffafaddaf75a544218f813f4",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。"
+      }
+    },
+    {
+      "claim_hash": "fc6cfad4ba7517fb1ebfb541596109afdc368ea5ffafaddaf75a544218f813f4",
+      "evidence_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ①: `doc.evaluate_signals()` と `doc.signals()` の self-consistency check（新規実装）"
+      }
+    },
+    {
+      "claim_hash": "fc6cfad4ba7517fb1ebfb541596109afdc368ea5ffafaddaf75a544218f813f4",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① の `check-spec-adr` は calc 結果の freshness を self-consistency check（`doc.evaluate_signals()` と保存値 `doc.signals()` の比較）で検証し、不一致のとき `Finding::error` を返す。"
+      }
+    },
+    {
+      "claim_hash": "fc6cfad4ba7517fb1ebfb541596109afdc368ea5ffafaddaf75a544218f813f4",
+      "evidence_hash": "7238d93d78e0c057cc543c4fb5de9c48bcdcdb7d36a29fc210afe91437dcf10e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）が独立した `--strict` を取る。"
+      }
+    },
+    {
+      "claim_hash": "49a6a4a624476ea311fb4e6871d7d15e143701161c2cdf3c0362cd0f7a905092",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。... 推奨デフォルト config（commit_gate: ① ② strict / ③ ⓪ interim、merge_gate: 全 strict）を実ファイルとして commit する。"
+      }
+    },
+    {
+      "claim_hash": "49a6a4a624476ea311fb4e6871d7d15e143701161c2cdf3c0362cd0f7a905092",
+      "evidence_hash": "5ece55c90d7a4423edd247b4147b70abaf2655596a5e7a59895ce21a58232039",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` の必須化と検証: ファイル不在 / パース不能 / `$schema_version` 不正 / 不正値 / 必須キー（gate オブジェクトまたは chain×gate セル）の欠落はいずれも hard error として全ゲートを停止し、actionable なエラーメッセージを出力する。strict への暗黙フォールバックも fail-open も設けない。"
+      }
+    },
+    {
+      "claim_hash": "49a6a4a624476ea311fb4e6871d7d15e143701161c2cdf3c0362cd0f7a905092",
+      "evidence_hash": "22830ef401d4948b6d91cb208abf946ccd1dace5af25bbe6081203778278c7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` は全 chain × gate の 8 セルを完全に明示する必要があり、暗黙の default を持たない。ファイル不在・パース不能・`$schema_version` 不正・値不正・必須キー欠落のいずれかがあれば全ゲートを hard error で停止する（fail-open も silent strict フォールバックも禁止）。"
+      }
+    },
+    {
+      "claim_hash": "49a6a4a624476ea311fb4e6871d7d15e143701161c2cdf3c0362cd0f7a905092",
+      "evidence_hash": "3d5a6f941ba2dca332895491daa800693a436342e35be00fc3273f3d01fd8dd8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` の `$schema_version` は整数で、現在は `1` のみ有効とする。未知の値は schema 不正として hard error とする。config ファイルの schema version を管理する責務が生じる。"
+      }
+    },
+    {
+      "claim_hash": "a811915f11add339fb7499d61a11fa2dba8c25bed59ba33db5e9311b5089afbc",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。"
+      }
+    },
+    {
+      "claim_hash": "a811915f11add339fb7499d61a11fa2dba8c25bed59ba33db5e9311b5089afbc",
+      "evidence_hash": "e21a3ac31a016a34c303eb135996fa1bf3ed1fe7666e71936276a15c30700467",
+      "verdict": {
+        "kind": "pass",
+        "citation": "strictness の値を現在の 2 値（`\"strict\"` / `\"interim\"`）超に拡張することは対象外。strictness 多値化は「2 値では表現できない」フィードバックが蓄積した時点で別 ADR で検討する。"
+      }
+    },
+    {
+      "claim_hash": "df0c5efdedbd908bd359a844a18af7cb4037af201eae4768377689b8c71827b6",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。"
+      }
+    },
+    {
+      "claim_hash": "df0c5efdedbd908bd359a844a18af7cb4037af201eae4768377689b8c71827b6",
+      "evidence_hash": "5ece55c90d7a4423edd247b4147b70abaf2655596a5e7a59895ce21a58232039",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` の必須化と検証: ファイル不在 / パース不能 / `$schema_version` 不正 / 不正値 / 必須キー（gate オブジェクトまたは chain×gate セル）の欠落はいずれも hard error として全ゲートを停止し、actionable なエラーメッセージを出力する。strict への暗黙フォールバックも fail-open も設けない。"
+      }
+    },
+    {
+      "claim_hash": "df0c5efdedbd908bd359a844a18af7cb4037af201eae4768377689b8c71827b6",
+      "evidence_hash": "ecad2c5c70afcb27a0a18fd989a0dc8b2a21a4313dfce10431b7308cdf9a116e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` を削除した状態、パース不能な状態、`$schema_version` 不正な状態、必須キーが欠落した状態のいずれかで commit gate / merge gate を実行すると hard error で停止する。strict への暗黙フォールバックも fail-open も発生しない。"
+      }
+    },
+    {
+      "claim_hash": "05fd3609d5a1aa4d8c4fa5f45d5617899cbd1cdb5069980f5fe38bcf55d87fce",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。"
+      }
+    },
+    {
+      "claim_hash": "05fd3609d5a1aa4d8c4fa5f45d5617899cbd1cdb5069980f5fe38bcf55d87fce",
+      "evidence_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③: 既存の entry_hash / declaration_hash 比較 mechanism を引き継ぐ。stale 検出は全 chain で `Finding::error` 固定（strictness によらず常時 block）。"
+      }
+    },
+    {
+      "claim_hash": "05fd3609d5a1aa4d8c4fa5f45d5617899cbd1cdb5069980f5fe38bcf55d87fce",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。いずれの stale 検出も strictness によらず常時 `Finding::error` とし、warning 化しない"
+      }
+    },
+    {
+      "claim_hash": "05fd3609d5a1aa4d8c4fa5f45d5617899cbd1cdb5069980f5fe38bcf55d87fce",
+      "evidence_hash": "7238d93d78e0c057cc543c4fb5de9c48bcdcdb7d36a29fc210afe91437dcf10e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）が独立した `--strict` を取る。"
+      }
+    },
+    {
+      "claim_hash": "05fd3609d5a1aa4d8c4fa5f45d5617899cbd1cdb5069980f5fe38bcf55d87fce",
+      "evidence_hash": "52d74bdd474f4ba741adb9526c1223373147c130a16dbc8cb313cadf2f07055f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-impl-catalog` は `declaration_hash` 不一致のとき `Finding::error`。chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力では signal を正しく評価できないため）。"
+      }
+    }
+  ]
+}

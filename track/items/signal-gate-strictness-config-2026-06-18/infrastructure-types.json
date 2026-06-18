@@ -1,0 +1,291 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "SignalGatesConfig": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "schema_version", "ty": "u32" },
+            { "name": "commit_gate",    "ty": "GateRowDto" },
+            { "name": "merge_gate",     "ty": "GateRowDto" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "verify::signal_gates_config",
+      "docs": "Serde DTO for `.harness/config/signal-gates.json`. Deserializes the on-disk config and validates `$schema_version == 1`. Converts to the domain `SignalGateMatrix` after validation. All fields are required; missing keys are reported as `SignalGatesConfigError::MissingKey` per CN-01/D4.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-01" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "GateRowDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "adr_user",     "ty": "StrictnessDto" },
+            { "name": "spec_adr",     "ty": "StrictnessDto" },
+            { "name": "catalog_spec", "ty": "StrictnessDto" },
+            { "name": "impl_catalog", "ty": "StrictnessDto" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "verify::signal_gates_config",
+      "docs": "Serde DTO for one gate row (commit_gate or merge_gate) in signal-gates.json. Each field corresponds to one chain's strictness cell. Converts to a `domain::ChainGateEntry` pair.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "StrictnessDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Strict",  "payload": { "kind": "unit" } },
+          { "name": "Interim", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify::signal_gates_config",
+      "docs": "Deserializable mirror of `domain::Strictness` for signal-gates.json serde boundary. Variants map directly to `domain::Strictness`; unknown strictness strings are reported by loader validation as `SignalGatesConfigError::InvalidValue`. Domain serde-free constraint is preserved by keeping this type in infrastructure.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "OS-05" }
+      ],
+      "informal_grounds": []
+    },
+    "SignalGatesConfigError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FileNotFound",         "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "ParseFailed",          "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "SchemaVersionUnknown", "payload": { "kind": "struct", "fields": [{ "name": "expected", "ty": "u32" }, { "name": "actual", "ty": "u32" }] } },
+          { "name": "MissingKey",           "payload": { "kind": "struct", "fields": [{ "name": "key", "ty": "String" }] } },
+          { "name": "InvalidValue",         "payload": { "kind": "struct", "fields": [{ "name": "key", "ty": "String" }, { "name": "value", "ty": "String" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify::signal_gates_config",
+      "docs": "Hard error for signal-gates.json load/validate failures. All variants produce `Finding::error` and halt gate execution per D4. No silent fallback, no implicit default.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-01" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-05" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::verify::signal_gates_config::load_signal_gates_config": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "config_path", "ty": "std::path::PathBuf" }
+      ],
+      "returns": "Result<domain::SignalGateMatrix, SignalGatesConfigError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Load and validate `.harness/config/signal-gates.json` from the given path. Parses `SignalGatesConfig`, validates `$schema_version == 1`, checks all required keys, then converts to `domain::SignalGateMatrix`. Returns `SignalGatesConfigError` on any failure — file-not-found, malformed JSON parse failure, schema mismatch, missing key, or invalid strictness value. No implicit fallback.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-05" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::adr_signals::execute_verify_adr_signals": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "project_root", "ty": "std::path::PathBuf" },
+        { "name": "strict",       "ty": "bool" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute the `signal check-adr-user` path. Modified from baseline to accept a `strict: bool` parameter. When `strict=true`, `ReviewFindingRef` (Yellow) results are promoted to `Finding::error`. `NoGrounds` (Red) is always `Finding::error` regardless of strictness. `Grandfathered` is always skipped.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir",      "ty": "std::path::PathBuf" },
+        { "name": "track_id",       "ty": "String" },
+        { "name": "workspace_root", "ty": "std::path::PathBuf" },
+        { "name": "strict",         "ty": "bool" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute the `signal check-catalog-spec` path. Modified to delegate Red/Yellow evaluation to `domain::check_catalogue_spec_signals` (extracted domain pure function from D2) instead of inline logic. Signature is unchanged from baseline — `strict` was already present.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir",      "ty": "std::path::PathBuf" },
+        { "name": "workspace_root", "ty": "std::path::PathBuf" },
+        { "name": "strict",         "ty": "bool" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute the `signal check-catalog-spec` path resolving track from current git branch. Modified to delegate Red/Yellow evaluation to `domain::check_catalogue_spec_signals`.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::verify_from_spec_json": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "spec_json_path", "ty": "std::path::PathBuf" },
+        { "name": "strict",         "ty": "bool" },
+        { "name": "trusted_root",   "ty": "std::path::PathBuf" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Modified to perform Stage1 only (chain ① `check-spec-adr`) with its own `strict` parameter, with the self-consistency freshness check added. Stage2 (chain ③ `check-impl-catalog`) is separated out and has its own independent `strict` per D2.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::verify_type_signals_from_spec_json": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "spec_json_path", "ty": "std::path::PathBuf" },
+        { "name": "strict",         "ty": "bool" },
+        { "name": "trusted_root",   "ty": "std::path::PathBuf" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Public Stage2 entrypoint for chain ③ `signal check-impl-catalog`. Loads the type-signals document for the spec track, validates declaration_hash freshness against the current catalogue bytes, then delegates to `domain::check_type_signals(&doc, strict)`. Kept separate from `verify_from_spec_json` so chain ① and chain ③ have independent strictness.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalGatesConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SignalGatesConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde::de::Deserialize",
+      "for_type": "SignalGatesConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GateRowDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "GateRowDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde::de::Deserialize",
+      "for_type": "GateRowDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "StrictnessDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "StrictnessDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde::de::Deserialize",
+      "for_type": "StrictnessDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<StrictnessDto>",
+      "for_type": "domain::Strictness"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalGatesConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SignalGatesConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "SignalGatesConfigError"
+    }
+  ]
+}

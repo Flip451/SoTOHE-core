@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-18T03:17:57Z",
+  "declaration_hash": "797e4c194cd2def9932d75e9ed892df4e80d6852dbbbb1bce43cc96b5366b68f",
+  "signals": [
+    {
+      "type_name": "GateRowDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde::de::Deserialize"
+      ]
+    },
+    {
+      "type_name": "SignalGatesConfig",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde::de::Deserialize"
+      ]
+    },
+    {
+      "type_name": "SignalGatesConfigError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "StrictnessDto",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde::de::Deserialize"
+      ]
+    },
+    {
+      "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_type_signals_from_spec_json",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "Strictness",
+      "kind_tag": "unknown",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "core::convert::From<StrictnessDto>"
+      ]
+    }
+  ]
+}

@@ -91,6 +91,153 @@
           "findings": [],
           "hash": "rvw1:sha256:c77df19d40e0c48403e20e7eb7c34da34bf792097f2f816501e6b479772c0b08",
           "at": "2026-06-18T00:06:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 introduces a new separate public Stage2 entrypoint for `signal check-impl-catalog`, but the infrastructure catalogue still only declares `infrastructure::verify::spec_states::verify_from_spec_json` and explicitly says that function is Stage1-only. As written, the plan and the type catalogue disagree about the exposed public surface, so the Stage2 callable is unmodelled in the plan artifacts.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 35,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2ad033bbebfff8679ccaa1d41f48e6b187d7139a9e1ca0afe2c41f7c61b1c56c",
+          "at": "2026-06-18T02:17:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The error contract for invalid strictness values is inconsistent inside the plan. T003 hard-codes an invalid strictness string to `ParseFailed`, but T013 later treats the same case as `ParseFailed` **or** `InvalidValue`, and the infrastructure catalogue already defines `SignalGatesConfigError::InvalidValue`. That leaves the observable failure mode underspecified and makes the earlier module test target disagree with the later one.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 19,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fd84c1f349a2b714310c300fe0a4fea39becbe7d2f5700333d1b72e21517dee4",
+          "at": "2026-06-18T02:24:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_catalogue_spec_signals` is described here as taking `CatalogueSpecSignalsDocument` by value, but the plan/spec require the borrowed form `&CatalogueSpecSignalsDocument` (`plan.md:12`, `spec.md:43`). That leaves the generated contract and the implementation plan disagreeing on the API shape, so downstream work could be generated against the wrong ownership model.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/domain-types.json",
+              "line": 304,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f2e421b18221ea6e36aec11f682533beb2ea073fdacd606a5fc5d105d62e48fc",
+          "at": "2026-06-18T02:32:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 removes the old CLI entrypoints before T011 rewires `Makefile.toml` and CI to the new `signal` commands. That leaves an intermediate state where validation can still invoke deleted commands, so the required between-round `cargo make ci-rust` check can fail until the later task lands. Reorder the Makefile/docs migration ahead of the removals, or merge those steps into one task.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 48,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:5703b42fc01492df8cf12a494d674f44b3704c496a22680bde7f933b6d7a6d6f",
+          "at": "2026-06-18T02:39:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:979e5ddead88d5b205be356a460b2c7b39e2de1838ca76c46fa85b064ea24909",
+          "at": "2026-06-18T02:45:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` is only specified to resolve `SignalGateMatrix::merge_gate.adr_user`, even though the spec says `signal-gates.json` is the chain × gate strictness source of truth and that the merge gate is wired through all four `signal check-* --gate merge` cells. As written, the plan leaves the existing spec-adr/catalog-spec/impl-catalog merge checks hardcoded strict and ignores their config cells, so the declared matrix cannot actually control all four merge-gate chains.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 273,
+              "category": "contradiction"
+            },
+            {
+              "message": "`SpecAdrChain` claims its persistence target is `<track>/<layer>-catalogue-spec-signals.json`, which is the chain ② per-layer artifact, while the same sentence and the spec define chain ① as using `spec.json`'s `signals` field with a self-consistency check. This contradictory catalogue contract can lead the implementation to read or persist the wrong artifact for `check-spec-adr`.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 34,
+              "category": "contradiction"
+            },
+            {
+              "message": "T010 says the no-alias cleanup is \"per CN-06\", but CN-06 is the PersistedSoTChain/LiveSoTChain constraint for chain ⓪, not the no-backward-compat requirement. The relevant no-alias requirement is AC-07 / OS-06, so this semantic cross-reference is wrong and breaks the plan traceability for command removal.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 60,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:979e5ddead88d5b205be356a460b2c7b39e2de1838ca76c46fa85b064ea24909",
+          "at": "2026-06-18T02:50:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan places config loading inside `usecase::merge_gate::check_strict_merge_gate` while the loader is declared as `infrastructure::verify::signal_gates_config::load_signal_gates_config`. That forces a usecase-layer function to depend on infrastructure, violating the stated hexagonal layering. Load the file at the CLI/infrastructure boundary or hide it behind a usecase port, then pass a domain `SignalGateMatrix` into the merge-gate logic.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 36,
+              "category": "architecture_violation"
+            },
+            {
+              "message": "The usecase catalogue says `SpecAdrChain`, `CatalogSpecChain`, and `ImplCatalogChain` obtain `SoTChain` through the `impl<T: PersistedSoTChain> SoTChain for T` blanket impl, but `trait_impls` also declares explicit `domain::SoTChain` impls for those same persisted chains. Following both artifacts would produce conflicting Rust impls; if the entries are only intended as effective impls, the catalogue is semantically misleading. Remove the direct `SoTChain` impl entries for persisted chains or model the blanket impl separately.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 340,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0e42a90a6caabe24f60e7a9c4e92b68ed5dc7e19d4ae9793ccedf7e84bef5870",
+          "at": "2026-06-18T02:57:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackBlobReader::read_adr_verify_report` is declared as requiring a `project_root: PathBuf`, and its docs say it exists to support chain ⓪ evaluation in `check_strict_merge_gate`, but `check_strict_merge_gate` only receives `branch`, `reader`, and `gate_matrix`. The plan therefore has no way for the merge-gate usecase to supply the repo root needed for the ADR directory scan it is required to add, making the chain ⓪ merge-gate task under-specified/infeasible as written.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 237,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-13 requires unit tests for the new commands, the new trait taxonomy, and config loading, and task coverage marks AC-13 as covered by every task. However the CLI task T009, which is the task that adds all 8 `signal` commands plus aggregate dispatch, contains no test requirement at all; T001 only tests gate resolution helpers, and T013 only covers config loading. As written, the implementation plan can satisfy its listed tasks while still missing the command/dispatch tests explicitly required by AC-13.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eab3af54a410107f34e4ba0dc3148d8dd03c271699ee7f32f89cbb01735db165",
+          "at": "2026-06-18T03:03:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e789265575c1c2a59b1fdea6afe6d4e9d9187eabf02fe26a540cbd4b9ced54a1",
+          "at": "2026-06-18T03:11:48Z"
         }
       ]
     }

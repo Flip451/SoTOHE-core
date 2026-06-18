@@ -1,0 +1,429 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "c75cf14d9a17286fe0e769f5f8324f6e8cab4c7faba540199833092c2376d139",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "単一の `signal` 名前空間に集約し、**動詞 × chain の直交 8 コマンド**として再編する"
+      }
+    },
+    {
+      "claim_hash": "2feb8cf4c5cb81fabdb901807ef37dc3e62ec178b310918864d475e4f4ac99a5",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-*` が参照する strictness を宣言的に管理する。**この config は必須かつ完全**であり、不在・不正・キー欠落はいずれも §D4 で hard error（暗黙の default を持たない）。全 chain×gate セルを明示し、「ワークフロー上 `interim` が必要なセルだけ `interim`、残りは `strict`」と書き切る"
+      }
+    },
+    {
+      "claim_hash": "2feb8cf4c5cb81fabdb901807ef37dc3e62ec178b310918864d475e4f4ac99a5",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.harness/config/signal-gates.json` は**必須かつ完全**とする。... いずれかがあれば、strict へ暗黙フォールバックせず **hard error** で全ゲートを停止」"
+      }
+    },
+    {
+      "claim_hash": "1af79b8a47621ccc1cf1f557c76cae6758b4cbc3023d771aad094012fd30b70a",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal check-adr-user` に `--strict` を新設 ... `strict=true` のとき Yellow (`ReviewFindingRef`) も `Finding::error`"
+      }
+    },
+    {
+      "claim_hash": "1af79b8a47621ccc1cf1f557c76cae6758b4cbc3023d771aad094012fd30b70a",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「commit gate（ci-local）と merge gate（check_strict_merge_gate）は、それぞれ 4 つの `signal check-* --gate commit|merge` を呼ぶ。」「merge gate に **chain ⓪ の評価を追加**する（現状未結線）。repo-global な ADR 来歴評価を `merge_gate.adr_user` の strict で判定する。」"
+      }
+    },
+    {
+      "claim_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新 chain 追加時の \"うっかり忘れ\" と、chain ② で実際に起きたような **inline 重複実装による腐敗** を構造的に防ぐ」"
+      }
+    },
+    {
+      "claim_hash": "c20d96bfb1861abf685966c1fc81d59791b8c0bab508e75c926fcb9aaba4c731",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「動詞 × chain の直交 8 コマンド」「UI 表記は `catalog`（米綴り）で統一する。内部 Rust 型は既存の `catalogue` を維持」"
+      }
+    },
+    {
+      "claim_hash": "4f16a7803972c0149394a29c52ad6ed966f014ffd3850e4baae566f442e3cb4d",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「⓪ calc-adr-user は永続物を作らず ADR decision grounding を live 計算して validate / 表示する no-persist コマンドとする」 「check-* と calc-* は taxonomy 上 4 chain すべてに CLI コマンドとして存在させる」"
+      }
+    },
+    {
+      "claim_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **`verify spec-states` を分割**する: Stage1（`check_spec_doc_signals` = ①）を `signal check-spec-adr` に、Stage2（`check_type_signals` = ③）を `signal check-impl-catalog` に分離し、**各々が独立した `--strict` を取る**。\n- **`signal check-adr-user` に `--strict` を新設**する（`execute_verify_adr_signals` に `strict: bool` 引数を追加）。\n- `check_catalogue_spec_signals(&doc, strict) -> VerifyOutcome` — chain ①③ と同型の純粋関数"
+      }
+    },
+    {
+      "claim_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）は、それぞれ 4 つの `signal check-* --gate commit|merge` を呼ぶ。利便のため集約コマンド `signal check --gate commit|merge`（4 chain を一括評価し signal-gates.json を解決）も用意する。"
+      }
+    },
+    {
+      "claim_hash": "5ece55c90d7a4423edd247b4147b70abaf2655596a5e7a59895ce21a58232039",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"hard error で全ゲートを停止し\" / \"config には暗黙の default を一切持たせない\""
+      }
+    },
+    {
+      "claim_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）は、それぞれ 4 つの `signal check-* --gate commit|merge` を呼ぶ。\n- merge gate に **chain ⓪ の評価を追加**する（現状未結線）。repo-global な ADR 来歴評価を `merge_gate.adr_user` の strict で判定する。\n- `track-active-gate` の regen シーケンスを `signal calc-impl-catalog` → `signal calc-catalog-spec` → `track views sync` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "8d8c33d554104d6fdb74b32e3ed24cb0af821d41e787df3a122b1bd15a1da340",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「track signals」→「signal calc-spec-adr」…「verify adr-signals」→「signal check-adr-user」; 「内部参照（`Makefile.toml` / `.claude/hooks` / `track-active-gate` / `merge_gate.rs` / docs）を**一括置換**する（alias 期間は設けない）」。"
+      }
+    },
+    {
+      "claim_hash": "9c8bb7aa5af37d078a6ff5b2311864d641e6d45586f4f90dd149d896f79c30e8",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.harness/config/signal-gates.json` は **テンプレート利用者が編集可能** な設定ファイルとして位置づける」「`knowledge/conventions/responsibility-boundary.md` のテンプレート利用者責任リストに追記する」「必要なら参考用に `.harness/config/samples/` 配下へ別ポリシーのバリアントを置く」"
+      }
+    },
+    {
+      "claim_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「check 経路を chain 単位に分割する」および「Stage1（→ `check-spec-adr`）に self-consistency 鮮度検証を新規追加: `doc.evaluate_signals()`（`spec.rs:314`）と `doc.signals()`（`spec.rs:301`）を比較し、不一致なら stale エラー（§5 参照）」"
+      }
+    },
+    {
+      "claim_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`libs/domain/src/chain.rs`（新規）| `ChainId` enum + `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` trait 定義 + `impl<T: PersistedSoTChain> SoTChain for T`」「`libs/usecase/src/chain/`（新規, 4 モジュール）| `AdrUserChain`（`SoTChain` + `LiveSoTChain`）/ `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`（後 3 つは `PersistedSoTChain` 実装により `SoTChain` を blanket impl で得る）"
+      }
+    },
+    {
+      "claim_hash": "800c69dd4f13df0d3864b795975e4945dc19ae1262b20131131bb9483ef41cab",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`signal` 名前空間には押し込めず」"
+      }
+    },
+    {
+      "claim_hash": "23b740657e42d531958268ffc72676777ee42f62ed4ff4f6f8ed802afe7ef3da",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track catalogue-impl-signals` | on-demand diagnostic（出力ファイル無し / Makefile wrapper 無し）として現状経路に残置"
+      }
+    },
+    {
+      "claim_hash": "63ca8a548930254a53c63585b2a702f4f8e9d90fc521d4da06cbcb962ae2ef90",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify catalogue-spec-refs`（binary refs） | `--strict` を持たない別系統の binary gate として残置（`check-*` とは別物。`verify spec-signals` と同じ扱い）\n`verify spec-signals`（source-tag↔frontmatter 整合） | `--strict` を持たない binary gate として残置（`check-*` とは別系統。将来 `render` 統一時に整合チェックとして再考）"
+      }
+    },
+    {
+      "claim_hash": "07b1fd3f8d178283e3ef21f6a7821f279eada7545fe652392d2aaf1fddee164d",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "UI 表記は `catalog`（米綴り）で統一する。内部 Rust 型は既存の `catalogue` を維持し、mass rename はしない。"
+      }
+    },
+    {
+      "claim_hash": "e21a3ac31a016a34c303eb135996fa1bf3ed1fe7666e71936276a15c30700467",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「値は 2 値:」および「\"strict\"」「\"interim\"」"
+      }
+    },
+    {
+      "claim_hash": "fb87a5d2da5c44d59e85b54cce420a0bd3ec7b6dbb4b029779f3d89c17f39c45",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「**後方互換**: SoTOHE はテンプレートであり、内部参照（`Makefile.toml` / `.claude/hooks` / `track-active-gate` / `merge_gate.rs` / docs）を**一括置換**する（alias 期間は設けない）。テンプレート利用者の fork は責務境界（§D6）。」"
+      }
+    },
+    {
+      "claim_hash": "22830ef401d4948b6d91cb208abf946ccd1dace5af25bbe6081203778278c7fc",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` は**必須かつ完全**とする。... **hard error で全ゲートを停止**し、... **暗黙の default を持たせない**。"
+      }
+    },
+    {
+      "claim_hash": "4c04261ac6a9ef0e35d793b6ee60c0e26c0ad680a58b1fbc0ee028de56fab535",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`strict=true` のとき Yellow（`ReviewFindingRef`）も `Finding::error`、`strict=false` のとき `Finding::warning`。`Red`（`NoGrounds`）は常に `error`"
+      }
+    },
+    {
+      "claim_hash": "6fa4d1eb5c803440fd3904bd12269957601d4b064dc2b3ffc5afb2ad66583a59",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Red`（`NoGrounds`）は常に `error`、`Grandfathered` は常に skip（不変）."
+      }
+    },
+    {
+      "claim_hash": "6fa4d1eb5c803440fd3904bd12269957601d4b064dc2b3ffc5afb2ad66583a59",
+      "evidence_hash": "e8053a3d0c8abc6819f6d152182f3c8c006cd1996e49c430605dabd4ecdd70af",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`grandfathered: true` を付けた decision はスキップする。"
+      }
+    },
+    {
+      "claim_hash": "8d9a3f13705dbcda3a4c0799b5af2ae7c85881e61c8082c89fb0b311203942a7",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層に新規抽出 (`check_catalogue_spec_signals(&doc, strict) -> VerifyOutcome` — chain ①③ と同型の純粋関数)"
+      }
+    },
+    {
+      "claim_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「| `SoTChain` + `LiveSoTChain` | ⓪ `adr-user` | live 計算で永続化なし。`calc_live` は必要だが、永続 `calc` / `check_freshness` は**構造的に不要** |\n| `ChainIdentity` + `PersistedSoTChain`（blanket impl で `SoTChain`） | ① ② ③ | 永続化ファイルを持ち freshness 検証が必要。`SoTChain::check` は `load → check_freshness → evaluate_gate` の blanket impl でだけ提供する |`\n\n「PersistedSoTChain を ⓪ に実装しないことで **「⓪ では永続 `calc` / `check_freshness` を呼べない」をコンパイル時に保証**し、D1 の `signal calc-adr-user` は `LiveSoTChain::calc_live` として明示的な no-persist 経路に置く。」"
+      }
+    },
+    {
+      "claim_hash": "3d5a6f941ba2dca332895491daa800693a436342e35be00fc3273f3d01fd8dd8",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` は **テンプレート利用者が編集可能** な設定ファイルとして位置づける ... 設定スキーマを ADR 本体（本 ADR の D3 セクション）に文書化する"
+      }
+    },
+    {
+      "claim_hash": "b8997a01fdd2b829ce0f3e61c3bc6d48930eb8ae0ccd189f66ee31ca1c0bd2e8",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① ②（grounding 完備性）は commit gate で `strict` / `strict` | Yellow もブロック（`Finding::error`）"
+      }
+    },
+    {
+      "claim_hash": "d89568b8f4a36675ccbefa8d2e705e696e8d9b4e7d22eef71a5d6ed191a3567a",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge gate に **chain ⓪ の評価を追加**する（現状未結線）。repo-global な ADR 来歴評価を `merge_gate.adr_user` の strict で判定する。"
+      }
+    },
+    {
+      "claim_hash": "c3159f58b30b466afda655804379962d99a3f54d61c415adb55049655bc0abce",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「動詞 × chain の直交 8 コマンドとして再編する」 / 「UI 表記は `catalog`（米綴り）で統一する」 / 「⓪ `calc-adr-user` は永続物を作らず ADR decision grounding を live 計算して validate / 表示する」 / 「信号 taxonomy は `calc` / `check`（chain 直交）に限定する。描画は ... 別 ADR」"
+      }
+    },
+    {
+      "claim_hash": "7238d93d78e0c057cc543c4fb5de9c48bcdcdb7d36a29fc210afe91437dcf10e",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各々が独立した `--strict` を取る。これにより commit gate で「① strict・③ interim」を独立指定できるようになる。`signal check-adr-user` に `--strict` を新設する... `strict=true` のとき Yellow（`ReviewFindingRef`）も `Finding::error`、`strict=false` のとき `Finding::warning`。"
+      }
+    },
+    {
+      "claim_hash": "89fd786d22843d2436814bc4418e13994bf5d62abb1eff30785aa45ce32f5ab1",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「chain ② の Red/Yellow 判定ロジックを domain 層に新規抽出（`check_catalogue_spec_signals(&doc, strict) -> VerifyOutcome` — chain ①③ と同型の純粋関数）。現状 infrastructure と usecase の 2 箇所に inline 実装されている同等ロジックを、新 domain 関数の呼び出しに置換して 1 本化し、config 駆動 strict を解決可能にする」"
+      }
+    },
+    {
+      "claim_hash": "1bb553acfbf07f038990eeb770eafa6c2d0c09b54956a80f52c87d6dac2ee1d3",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この設定が chain ⓪ ① ② ③ × commit gate / merge gate の 8 セルを完全に制御する。`check-*` は `--gate commit|merge` で自分の chain × gate セルを解決し、`--strict` の明示が無い限り config を参照する。"
+      }
+    },
+    {
+      "claim_hash": "ecad2c5c70afcb27a0a18fd989a0dc8b2a21a4313dfce10431b7308cdf9a116e",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` は**必須かつ完全**とする。**存在しない / 読めない / パース不能 / `$schema_version` 不正 / 値が不正 / 必須キー（gate オブジェクトや chain×gate セル）の欠落**のいずれかがあれば、strict へ暗黙フォールバックせず **hard error で全ゲートを停止**し"
+      }
+    },
+    {
+      "claim_hash": "3590a67905d3588a475a75bbaca6b518b204bdbda1836fa0b80d614b13bdc8f4",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal check-adr-user` に `--strict` を新設する（`execute_verify_adr_signals` に `strict: bool` 引数を追加）。`strict=true` のとき Yellow（`ReviewFindingRef`）も `Finding::error`、`strict=false` のとき `Finding::warning`。`Red`（`NoGrounds`）は常に `error`、`Grandfathered` は常に skip（不変）。"
+      }
+    },
+    {
+      "claim_hash": "3590a67905d3588a475a75bbaca6b518b204bdbda1836fa0b80d614b13bdc8f4",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- merge gate に **chain ⓪ の評価を追加する**（現状未結線）。repo-global な ADR 来歴評価を `merge_gate.adr_user` の strict で判定する。\n- commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）は、それぞれ 4 つの `signal check-* --gate commit|merge` を呼ぶ。"
+      }
+    },
+    {
+      "claim_hash": "3e737860e46c8971d552123b872108c5adf282f3f36f46e405f6e12ea39254f4",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**コマンド移行（旧 → 新）**: `track signals` | `signal calc-spec-adr` ... `verify spec-states`（Stage1 ①） | `signal check-spec-adr` ... `verify adr-signals` | `signal check-adr-user`（+ `--strict` 新設） ... **後方互換**: SoTOHE はテンプレートであり、内部参照（`Makefile.toml` / `.claude/hooks` / `track-active-gate` / `merge_gate.rs` / docs）を**一括置換**する（alias 期間は設けない）。"
+      }
+    },
+    {
+      "claim_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`SoTChain` + `LiveSoTChain` | ⓪ `adr-user`」および「`ChainIdentity` + `PersistedSoTChain`（blanket impl で `SoTChain`）| ① ② ③」"
+      }
+    },
+    {
+      "claim_hash": "736d39c226f510f5dc78726dbc64a1f7216ce1feea36fcbe659afc80023b342a",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「⓪ では永続 `calc` / `check_freshness` を呼べない」をコンパイル時に保証し、D1 の `signal calc-adr-user` は `LiveSoTChain::calc_live`"
+      }
+    },
+    {
+      "claim_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/signal/` | dispatch を trait 経由に集約（`calc-adr-user` は `LiveSoTChain`、①②③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain` を経由する）"
+      }
+    },
+    {
+      "claim_hash": "ea73a67a92fa2253a673a5d7f0e91f69ddb89405d05520bd58ef96a881528dff",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`knowledge/conventions/responsibility-boundary.md` のテンプレート利用者責任リストに追記する」および「推奨デフォルトの 2 つの `commit_gate.*: \"interim\"` セルは性質が違うことに注意: - `commit_gate.impl_catalog: \"interim\"` は **TDDD ワークフローの構造的必然** ... - `commit_gate.adr_user: \"interim\"` は **SoTOHE 自身の adr2pr フロー選択** ...」「設定スキーマを ADR 本体（本 ADR の D3 セクション）に文書化する」"
+      }
+    },
+    {
+      "claim_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-*` が参照する strictness を宣言的に管理する。**この config は必須かつ完全**であり、不在・不正・キー欠落はいずれも §D4 で hard error（暗黙の default を持たない）。全 chain×gate セルを明示し、「ワークフロー上 `interim` が必要なセルだけ `interim`、残りは `strict`」と書き切る:"
+      }
+    },
+    {
+      "claim_hash": "23347563926c075c4fcc95cec5278944d758e1a817c37ca1e05807a7f623d1d3",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the evidence only specifies a new self-consistency freshness check for Stage1/check-spec-adr with stale as an error; it does not state or imply stale detection across all chains, nor a blanket rule that stale findings are always blocking regardless of strictness for every chain."
+      }
+    },
+    {
+      "claim_hash": "75e62bfd469b809ae76080d44e316c937e620aa3b4f94fd52ef7d038a8e4ebcb",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim says the listed `check-*` failures always block regardless of strictness, but the ADR explicitly gives `check-adr-user` strict-dependent behavior: Yellow is `Finding::error` only when `strict=true` and `Finding::warning` when `strict=false`."
+      }
+    },
+    {
+      "claim_hash": "32498915624478f0ac7533074680a845f1f9766e7a0d75ceb083a7e3db8909ac",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）は、それぞれ 4 つの `signal check-* --gate commit|merge` を呼ぶ。"
+      }
+    },
+    {
+      "claim_hash": "c8802d8c6f76da35427ef5e8f3cd38325316f584038e7cdf4c4249bc16faccdd",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`strict=true` のとき Yellow（`ReviewFindingRef`）も `Finding::error`、`strict=false` のとき `Finding::warning`。`Red`（`NoGrounds`）は常に `error`」"
+      }
+    },
+    {
+      "claim_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Stage1（→ `check-spec-adr`）に self-consistency 鮮度検証を新規追加: `doc.evaluate_signals()` と `doc.signals()` を比較し、不一致なら stale エラー"
+      }
+    },
+    {
+      "claim_hash": "e7f7f177c8e1691d890ae1a9904045f1243d9ebcb732df72ce9f31b4fe642f94",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各々が独立した --strict を取る `strict=true` のとき Yellow（`ReviewFindingRef`）も `Finding::error`、`strict=false` のとき `Finding::warning`。`Red`（`NoGrounds`）は常に `error`、`Grandfathered` は常に skip（不変）。"
+      }
+    },
+    {
+      "claim_hash": "e7f7f177c8e1691d890ae1a9904045f1243d9ebcb732df72ce9f31b4fe642f94",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`strict` | Yellow もブロック（`Finding::error`） … `interim` | Yellow は warning のみ（`Finding::warning`）、Red はブロック"
+      }
+    },
+    {
+      "claim_hash": "5f186bf753e3b087b8e4162546b8cfa877e056f62ca3386c25783873cc880457",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal check-adr-user` に `--strict` を新設する。`strict=true` のとき Yellow も `Finding::error`、`strict=false` のとき `Finding::warning`。`Red` は常に `error`、`Grandfathered` は常に skip"
+      }
+    },
+    {
+      "claim_hash": "52d74bdd474f4ba741adb9526c1223373147c130a16dbc8cb313cadf2f07055f",
+      "evidence_hash": "0e1abdf110844da96937a2e1aab8c2bec4eb9999b196285d686f471cd98a9121",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Stage1（→ `check-spec-adr`）に self-consistency 鮮度検証を新規追加」「不一致なら stale エラー」"
+      }
+    }
+  ]
+}

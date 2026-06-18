@@ -1,0 +1,334 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PersistedSoTChain は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194",
+      "evidence_hash": "736d39c226f510f5dc78726dbc64a1f7216ce1feea36fcbe659afc80023b342a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`PersistedSoTChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。"
+      }
+    },
+    {
+      "claim_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6",
+      "evidence_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③: 既存の entry_hash / declaration_hash 比較 mechanism を引き継ぐ。stale 検出は全 chain で `Finding::error` 固定（strictness によらず常時 block）。"
+      }
+    },
+    {
+      "claim_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
+    },
+    {
+      "claim_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6",
+      "evidence_hash": "52d74bdd474f4ba741adb9526c1223373147c130a16dbc8cb313cadf2f07055f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-catalog-spec` は `entry_hash` 不一致のとき `Finding::error`。chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力では signal を正しく評価できないため）。"
+      }
+    },
+    {
+      "claim_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。`apps/cli/src/commands/signal/` に新 `signal` モジュールが存在する。"
+      }
+    },
+    {
+      "claim_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef",
+      "evidence_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③: 既存の entry_hash / declaration_hash 比較 mechanism を引き継ぐ。stale 検出は全 chain で `Finding::error` 固定（strictness によらず常時 block）。"
+      }
+    },
+    {
+      "claim_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
+    },
+    {
+      "claim_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef",
+      "evidence_hash": "52d74bdd474f4ba741adb9526c1223373147c130a16dbc8cb313cadf2f07055f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-impl-catalog` は `declaration_hash` 不一致のとき `Finding::error`。chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力では signal を正しく評価できないため）。"
+      }
+    },
+    {
+      "claim_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "dff4a0214163c52794b416a8d6f8c79c671d4d8622aecada99e135c22283739a",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "dff4a0214163c52794b416a8d6f8c79c671d4d8622aecada99e135c22283739a",
+      "evidence_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ①: `doc.evaluate_signals()` と `doc.signals()` の self-consistency check（新規実装）"
+      }
+    },
+    {
+      "claim_hash": "dff4a0214163c52794b416a8d6f8c79c671d4d8622aecada99e135c22283739a",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① の `check-spec-adr` は calc 結果の freshness を self-consistency check（`doc.evaluate_signals()` と保存値 `doc.signals()` の比較）で検証し、不一致のとき `Finding::error` を返す。"
+      }
+    },
+    {
+      "claim_hash": "dff4a0214163c52794b416a8d6f8c79c671d4d8622aecada99e135c22283739a",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ AdrUserChain が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "dff4a0214163c52794b416a8d6f8c79c671d4d8622aecada99e135c22283739a",
+      "evidence_hash": "52d74bdd474f4ba741adb9526c1223373147c130a16dbc8cb313cadf2f07055f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-spec-adr` は `doc.evaluate_signals()` と `doc.signals()` を比較し不一致のとき `Finding::error`（stale エラー、`signal calc-spec-adr` 再実行を促すメッセージ付き）を返す。 ... chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力では signal を正しく評価できないため）。"
+      }
+    },
+    {
+      "claim_hash": "dff4a0214163c52794b416a8d6f8c79c671d4d8622aecada99e135c22283739a",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "04b52e16c636818996263543bf3ac3a5685c12404531925e59de94e0389884ca",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "04b52e16c636818996263543bf3ac3a5685c12404531925e59de94e0389884ca",
+      "evidence_hash": "7238d93d78e0c057cc543c4fb5de9c48bcdcdb7d36a29fc210afe91437dcf10e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）が独立した `--strict` を取る。`signal check-adr-user --strict` が Yellow（`ReviewFindingRef`）を `Finding::error` とし、`--strict` なし（または `--gate` で interim に解決）では `Finding::warning` となる。"
+      }
+    },
+    {
+      "claim_hash": "bef9e3566168d831638d416d22d5aab5143166964a0665388e01cadb4f092fc2",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）"
+      }
+    },
+    {
+      "claim_hash": "bef9e3566168d831638d416d22d5aab5143166964a0665388e01cadb4f092fc2",
+      "evidence_hash": "3590a67905d3588a475a75bbaca6b518b204bdbda1836fa0b80d614b13bdc8f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check_strict_merge_gate` が chain ⓪ を評価する。"
+      }
+    },
+    {
+      "claim_hash": "a201afdb5d2a7a25823ac7e126fc215cec3b010ae8dc2bb51f22781847df2d6f",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）をそれぞれ 4 つの `signal check-* --gate commit|merge` に結線する。merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）。"
+      }
+    },
+    {
+      "claim_hash": "a201afdb5d2a7a25823ac7e126fc215cec3b010ae8dc2bb51f22781847df2d6f",
+      "evidence_hash": "3590a67905d3588a475a75bbaca6b518b204bdbda1836fa0b80d614b13bdc8f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`merge_gate.adr_user: \"strict\"` のとき Yellow（`ReviewFindingRef`）が merge gate で `Finding::error` として block される。`commit_gate.adr_user: \"interim\"` のとき Yellow は `Finding::warning` で通過する。`Red`（`NoGrounds`）は両ゲートで常に `Finding::error`。`Grandfathered` は常に skip。`check_strict_merge_gate` が chain ⓪ を評価する。"
+      }
+    },
+    {
+      "claim_hash": "a201afdb5d2a7a25823ac7e126fc215cec3b010ae8dc2bb51f22781847df2d6f",
+      "evidence_hash": "1af79b8a47621ccc1cf1f557c76cae6758b4cbc3023d771aad094012fd30b70a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪（adr-user）を commit / merge gate の両方に結線し、merge gate では strict（Yellow も block）とすることで、`review_finding_ref` 止まりの ADR decision が `user_decision_ref` へ昇格しないまま merge されることを防ぐ。"
+      }
+    },
+    {
+      "claim_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f",
+      "evidence_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ①: `doc.evaluate_signals()` と `doc.signals()` の self-consistency check（新規実装）。"
+      }
+    },
+    {
+      "claim_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① の `check-spec-adr` は calc 結果の freshness を self-consistency check（`doc.evaluate_signals()` と保存値 `doc.signals()` の比較）で検証し、不一致のとき `Finding::error` を返す。"
+      }
+    },
+    {
+      "claim_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f",
+      "evidence_hash": "52d74bdd474f4ba741adb9526c1223373147c130a16dbc8cb313cadf2f07055f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-spec-adr` は `doc.evaluate_signals()` と `doc.signals()` を比較し不一致のとき `Finding::error`（stale エラー、`signal calc-spec-adr` 再実行を促すメッセージ付き）を返す。... chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない"
+      }
+    },
+    {
+      "claim_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。`apps/cli/src/commands/signal/` に新 `signal` モジュールが存在する。"
+      }
+    },
+    {
+      "claim_hash": "77b6763a8f2b20e2cf31d0df4dd8130c08762fba818475027baae08ef2354ff5",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）"
+      }
+    },
+    {
+      "claim_hash": "77b6763a8f2b20e2cf31d0df4dd8130c08762fba818475027baae08ef2354ff5",
+      "evidence_hash": "3590a67905d3588a475a75bbaca6b518b204bdbda1836fa0b80d614b13bdc8f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "check_strict_merge_gate が chain ⓪ を評価する。"
+      }
+    },
+    {
+      "claim_hash": "b51caf58688a1035800469a05e2479e2ebc220fd83b33ed21278b30adc5ab4c3",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）をそれぞれ 4 つの `signal check-* --gate commit|merge` に結線する。merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）。"
+      }
+    },
+    {
+      "claim_hash": "b51caf58688a1035800469a05e2479e2ebc220fd83b33ed21278b30adc5ab4c3",
+      "evidence_hash": "3590a67905d3588a475a75bbaca6b518b204bdbda1836fa0b80d614b13bdc8f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check_strict_merge_gate` が chain ⓪ を評価する。"
+      }
+    },
+    {
+      "claim_hash": "b51caf58688a1035800469a05e2479e2ebc220fd83b33ed21278b30adc5ab4c3",
+      "evidence_hash": "1af79b8a47621ccc1cf1f557c76cae6758b4cbc3023d771aad094012fd30b70a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「chain ⓪（adr-user）を commit / merge gate の両方に結線し、merge gate では strict（Yellow も block）とすることで」"
+      }
+    }
+  ]
+}

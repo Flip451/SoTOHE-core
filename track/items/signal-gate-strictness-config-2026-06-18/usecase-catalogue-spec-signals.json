@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e83483bb7adff357f4ebf7e9c4fb6b2c1e067c61c27d7307f8e447424687e621",
+  "signals": [
+    {
+      "type_name": "AdrUserChain",
+      "signal": "blue",
+      "entry_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194"
+    },
+    {
+      "type_name": "CatalogSpecChain",
+      "signal": "blue",
+      "entry_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6"
+    },
+    {
+      "type_name": "ImplCatalogChain",
+      "signal": "blue",
+      "entry_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef"
+    },
+    {
+      "type_name": "SpecAdrChain",
+      "signal": "blue",
+      "entry_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f"
+    },
+    {
+      "type_name": "VerifyAdrSignalsCommand",
+      "signal": "blue",
+      "entry_hash": "04b52e16c636818996263543bf3ac3a5685c12404531925e59de94e0389884ca"
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "signal": "blue",
+      "entry_hash": "77b6763a8f2b20e2cf31d0df4dd8130c08762fba818475027baae08ef2354ff5"
+    },
+    {
+      "type_name": "VerifyAdrSignals",
+      "signal": "blue",
+      "entry_hash": "539b81926089c0dd9e01bb6c4d34b22edc4990fdac00ed4caac2b918ce2d5174"
+    },
+    {
+      "type_name": "usecase::merge_gate::check_strict_merge_gate",
+      "signal": "blue",
+      "entry_hash": "b51caf58688a1035800469a05e2479e2ebc220fd83b33ed21278b30adc5ab4c3"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
+---
+version: "1.0"
+signals: { blue: 42, yellow: 0, red: 0 }
+---
+
+# signal CLI 名前空間統一と gate strictness の宣言的管理
+
+## Goal
+
+- [GO-01] SoTOHE の 4 つの SoT Chain シグナル操作（⓪ adr-user / ① spec-adr / ② catalog-spec / ③ impl-catalog）を `bin/sotp signal` の単一名前空間に集約し、`calc-<chain>` / `check-<chain>` の直交 8 コマンドとして再編することで、chain × 動詞マトリクスの組織的一覧性と将来拡張への安全な経路を提供する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D1]
+- [GO-02] 各 `check-<chain>` コマンドが参照する strictness（strict / interim）を `.harness/config/signal-gates.json` で chain × gate（commit / merge）ごとに宣言的に管理し、config の不在・不正・不完全を hard error とすることで、gate enforcement の穴を構造的に排除する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D3, knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D4]
+- [GO-03] chain ⓪（adr-user）を commit / merge gate の両方に結線し、merge gate では strict（Yellow も block）とすることで、`review_finding_ref` 止まりの ADR decision が `user_decision_ref` へ昇格しないまま merge されることを防ぐ。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2, knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5]
+- [GO-04] `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D7]
+
+## Scope
+
+### In Scope
+- [IN-01] `bin/sotp signal` 名前空間への直交 8 コマンド（`calc-adr-user` / `check-adr-user` / `calc-spec-adr` / `check-spec-adr` / `calc-catalog-spec` / `check-catalog-spec` / `calc-impl-catalog` / `check-impl-catalog`）の導入。UI 表記は `catalog`（米綴り）で統一し、内部 Rust 型の `catalogue` 表記は変更しない。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D1] [tasks: T009]
+- [IN-02] `calc-adr-user` を退化セルとして実装する。ADR decision grounding を live 計算して表示する no-persist コマンドとし、永続ファイルは作らない。4 chain すべてが `calc-*` / `check-*` の taxonomy に CLI コマンドとして存在する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D1] [tasks: T009]
+- [IN-03] 既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。`execute_verify_adr_signals` に `strict: bool` 引数を追加して `signal check-adr-user --strict` で Yellow（`ReviewFindingRef`）も block できるようにする。chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2] [tasks: T002, T006, T007, T008]
+- [IN-04] `.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`"strict"` / `"interim"`）の宣言的 SoT として新設する。`check-*` が `--gate commit|merge` でセルを解決し、集約コマンド `signal check --gate commit|merge`（4 chain を一括評価）も用意する。推奨デフォルト config（commit_gate: ① ② strict / ③ ⓪ interim、merge_gate: 全 strict）を実ファイルとして commit する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D3, knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T003, T004, T009]
+- [IN-05] `signal-gates.json` の必須化と検証: ファイル不在 / パース不能 / `$schema_version` 不正 / 不正値 / 必須キー（gate オブジェクトまたは chain×gate セル）の欠落はいずれも hard error として全ゲートを停止し、actionable なエラーメッセージを出力する。strict への暗黙フォールバックも fail-open も設けない。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D4] [tasks: T003, T013]
+- [IN-06] commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）をそれぞれ 4 つの `signal check-* --gate commit|merge` に結線する。merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）。`track-active-gate` の regen シーケンスを `signal calc-impl-catalog` → `signal calc-catalog-spec` → `track views sync` に更新する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T006, T011]
+- [IN-07] 旧コマンド（`track signals` → `signal calc-spec-adr` / `track type-signals` → `signal calc-impl-catalog` / `track catalogue-spec-signals` → `signal calc-catalog-spec` / `verify spec-states`（Stage1）→ `signal check-spec-adr` /（Stage2）→ `signal check-impl-catalog` / `verify catalogue-spec-signals` → `signal check-catalog-spec` / `verify adr-signals` → `signal check-adr-user`）を新 `signal` 名前空間に移行する。後方互換 alias 期間を設けず内部参照（`Makefile.toml` / hooks / `track-active-gate` / `merge_gate.rs` / docs）を一括置換する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T010, T011, T012]
+- [IN-08] `.harness/config/signal-gates.json` をテンプレート利用者が編集可能な設定ファイルとして位置づけ、`knowledge/conventions/responsibility-boundary.md` のテンプレート利用者責任リストに追記する。必要に応じて `.harness/config/samples/` 配下に別ポリシーのバリアント（例: `signal-gates.adr-strict.json`）を置く。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D6] [tasks: T004, T012]
+- [IN-09] 各 chain の `check-*` が calc 結果の stale 入力を検出する freshness 検証を実装する。chain ⓪: live 計算（stale 問題が構造的に発生しない）。chain ①: `doc.evaluate_signals()` と `doc.signals()` の self-consistency check（新規実装）。chain ② ③: 既存の entry_hash / declaration_hash 比較 mechanism を引き継ぐ。stale 検出は全 chain で `Finding::error` 固定（strictness によらず常時 block）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2] [tasks: T005, T007]
+- [IN-10] `libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D7] [tasks: T001, T005]
+
+### Out of Scope
+- [OS-01] `render`（描画）を `signal` 名前空間に含めない。描画は per-chain でなく per-view / per-format の責務であり、`check-*` の `--strict` / `--gate` と render の `--format` / 出力先は責務が異なる。当面は現状経路（`track views sync` 等）を維持し、将来整理する場合も別の render/view 系コマンドファミリとして別 ADR で扱う。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D1] [tasks: T009]
+- [OS-02] `track catalogue-impl-signals`（on-demand diagnostic — markdown レポート専用の派生コマンド、永続化なし / Makefile wrapper なし）は `signal` 名前空間に移設しない。`signal calc-impl-catalog` が永続化 calc を担い、`track catalogue-impl-signals` はその markdown レンダー派生として現状経路に残置する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T010]
+- [OS-03] `verify catalogue-spec-refs`（binary refs gate）と `verify spec-signals`（source-tag↔frontmatter 整合）は `--strict` を持たない別系統の binary gate として残置する。これらは `check-*` とは別物であり、将来の render / view 系統一時に別途整理する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T010]
+- [OS-04] 内部 Rust 型の大規模 rename（`catalogue` → `catalog` への mass rename）は行わない。変更は CLI サーフェスの UI 表記のみとし、`CatalogueSpecSignals` 等の Rust 型名は現状を維持する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D1] [tasks: T001]
+- [OS-05] strictness の値を現在の 2 値（`"strict"` / `"interim"`）超に拡張することは対象外。strictness 多値化は「2 値では表現できない」フィードバックが蓄積した時点で別 ADR で検討する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D3] [tasks: T001]
+- [OS-06] テンプレート利用者の fork に対する後方互換 alias 期間の提供は行わない。SoTOHE はテンプレートであり内部参照を一括置換する方針を採り、利用者の fork は責務境界（`knowledge/conventions/responsibility-boundary.md`）のとおり利用者の責任とする。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T010]
+
+## Constraints
+- [CN-01] `signal-gates.json` は全 chain × gate の 8 セルを完全に明示する必要があり、暗黙の default を持たない。ファイル不在・パース不能・`$schema_version` 不正・値不正・必須キー欠落のいずれかがあれば全ゲートを hard error で停止する（fail-open も silent strict フォールバックも禁止）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D4] [tasks: T003, T004, T013]
+- [CN-02] 各 `check-*` の Yellow 扱い: `strict=true`（または `--gate` が strict セルに解決）→ `Finding::error`、`strict=false`（または `--gate` が interim セルに解決）→ `Finding::warning`。D2 は chain ⓪（`check-adr-user`）について `NoGrounds→error`、`Grandfathered→skip`、`ReviewFindingRef→strict 依存` を明示し、chain ①②③ は per-chain 分割後の各 `check-*` で同じ strict 依存ルールを継承する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2] [tasks: T006, T009]
+- [CN-03] chain ⓪ の `Grandfathered` decision は strictness によらず常に skip する（信号対象外）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2, knowledge/adr/2026-04-27-1234-adr-decision-traceability-lifecycle.md#D1] [tasks: T009]
+- [CN-04] chain ① の `check-spec-adr` は calc 結果の freshness を self-consistency check（`doc.evaluate_signals()` と保存値 `doc.signals()` の比較）で検証し、不一致のとき `Finding::error` を返す。chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。chain ⓪ は live 計算のため stale 問題が構造的に発生しない。いずれの stale 検出も strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力で signal を評価できないため）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2] [tasks: T005, T007]
+- [CN-05] chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型のシグネチャとする。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2] [tasks: T002, T008]
+- [CN-06] `PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D7] [tasks: T001, T005]
+- [CN-07] `.harness/config/signal-gates.json` の `$schema_version` は整数で、現在は `1` のみ有効とする。未知の値は schema 不正として hard error とする。config ファイルの schema version を管理する責務が生じる。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D6] [tasks: T003, T013]
+- [CN-08] commit gate で chain ① ② を `strict` にすることで、Yellow を持ったまま commit する従来のワークフローが使えなくなる（chain ① ② の grounding 完備性は impl 進行と独立しており、途中で Yellow になる必然性がないため）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D3] [tasks: T011]
+- [CN-09] merge gate への chain ⓪ 追加は repo-global な ADR ディレクトリ走査を伴う。あるトラックの merge が「無関係な ADR の未エスカレート Yellow」で block される可能性がある（これは設計上のトレードオフとして受け入れる）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T006, T011]
+
+## Acceptance Criteria
+- [ ] [AC-01] `bin/sotp signal {calc,check}-{adr-user,spec-adr,catalog-spec,impl-catalog}` の 8 コマンドが CLI に存在する。UI 表記は `catalog`（米綴り）。`render` は `signal` 名前空間に含まれない。`calc-adr-user` は永続ファイルを作らず ADR decision grounding を live 計算して表示する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D1] [tasks: T009]
+- [ ] [AC-02] `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）が独立した `--strict` を取る。`signal check-adr-user --strict` が Yellow（`ReviewFindingRef`）を `Finding::error` とし、`--strict` なし（または `--gate` で interim に解決）では `Finding::warning` となる。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2] [tasks: T006, T007, T009]
+- [ ] [AC-03] chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strict)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2] [tasks: T002, T008]
+- [ ] [AC-04] `.harness/config/signal-gates.json`（推奨デフォルト: commit_gate = ① ② strict・③ ⓪ interim、merge_gate = 全 strict）が実ファイルとして存在し、`check-*` が `--gate commit|merge` でセルを解決する。`signal check --gate commit|merge`（4 chain 一括評価）が動作する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D3] [tasks: T003, T004, T009]
+- [ ] [AC-05] `signal-gates.json` を削除した状態、パース不能な状態、`$schema_version` 不正な状態、必須キーが欠落した状態のいずれかで commit gate / merge gate を実行すると hard error で停止する。strict への暗黙フォールバックも fail-open も発生しない。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D4] [tasks: T003, T013]
+- [ ] [AC-06] `merge_gate.adr_user: "strict"` のとき Yellow（`ReviewFindingRef`）が merge gate で `Finding::error` として block される。`commit_gate.adr_user: "interim"` のとき Yellow は `Finding::warning` で通過する。`Red`（`NoGrounds`）は両ゲートで常に `Finding::error`。`Grandfathered` は常に skip。`check_strict_merge_gate` が chain ⓪ を評価する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2, knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T006, T009]
+- [ ] [AC-07] 旧コマンド（`track signals` / `track type-signals` / `track catalogue-spec-signals` / `verify spec-states` / `verify adr-signals` / `verify catalogue-spec-signals`）が新 `signal` 名前空間に移行または廃止されており、`Makefile.toml` / hooks / `track-active-gate` / `merge_gate.rs` / docs が新コマンド名で一貫している。後方互換 alias は存在しない。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T010, T011, T012]
+- [ ] [AC-08] `check-adr-user` は ADR ファイルを直接走査して live 計算する（stale 問題が構造的に発生しない）。`check-spec-adr` は `doc.evaluate_signals()` と `doc.signals()` を比較し不一致のとき `Finding::error`（stale エラー、`signal calc-spec-adr` 再実行を促すメッセージ付き）を返す。`check-catalog-spec` は `entry_hash` 不一致のとき `Finding::error`。`check-impl-catalog` は `declaration_hash` 不一致のとき `Finding::error`。chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力では signal を正しく評価できないため）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2] [tasks: T005, T007]
+- [ ] [AC-09] `libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D7] [tasks: T001, T005]
+- [ ] [AC-10] chain ⓪ に対して永続 `calc`（`PersistedSoTChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。① ② ③ の `PersistedSoTChain::evaluate_gate` は既存 domain 純粋関数（`check_spec_doc_signals` / `check_catalogue_spec_signals`（新設） / `check_type_signals`）を薄くラップする。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D7] [tasks: T001, T005]
+- [ ] [AC-11] CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。`apps/cli/src/commands/signal/` に新 `signal` モジュールが存在する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D7] [tasks: T005, T009]
+- [ ] [AC-12] `signal-gates.json` が `knowledge/conventions/responsibility-boundary.md` のテンプレート利用者責任リストに追記されており、推奨デフォルトの 2 つの `commit_gate.*: "interim"` セルの性質の違い（③ は TDDD 構造的必然 / ⓪ は SoTOHE フロー選択）が ADR または docs に文書化されている。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D6] [tasks: T004, T012]
+- [ ] [AC-13] `cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。新コマンド・新 trait taxonomy・config 読み込みロジックに対するユニットテストが追加されており、既存テストへのリグレッションが存在しない。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013]
+
+## Related Conventions (Required Reading)
+- knowledge/conventions/coding-principles.md#No Panics in Library Code
+- knowledge/conventions/hexagonal-architecture.md#Layer Dependencies
+- knowledge/conventions/prefer-type-safe-abstractions.md#Rule
+- knowledge/conventions/enforce-by-mechanism.md#Rules
+- knowledge/conventions/workflow-ceremony-minimization.md#Rules
+- knowledge/conventions/responsibility-boundary.md#Rules
+- knowledge/conventions/no-backward-compat.md#Rules
+- knowledge/conventions/pre-track-adr-authoring.md#Rules
+- knowledge/conventions/branch-strategy.md#マージワークフロー（track/ ブランチ）
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 42  🟡 0  🔴 0
+

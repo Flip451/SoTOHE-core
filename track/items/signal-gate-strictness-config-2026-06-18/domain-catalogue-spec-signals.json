@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "53c0681b55bf68faea01447f543037a0b090fdd4e49f25bc4bac65083d0ddbee",
+  "signals": [
+    {
+      "type_name": "ChainGateEntry",
+      "signal": "blue",
+      "entry_hash": "4321342fe24b0f159369b891203d47b067275893a45f4bb9e6f3bb87bdd78df9"
+    },
+    {
+      "type_name": "ChainId",
+      "signal": "blue",
+      "entry_hash": "b724da87412e6885949a1bcd4d7fe8dec6d37742a511beefafb14a54fcc030a5"
+    },
+    {
+      "type_name": "GateKind",
+      "signal": "blue",
+      "entry_hash": "820cd2617a178cf70c69f7bac5e1b2b376f3fcfdbd28624e42c06e46f5223b33"
+    },
+    {
+      "type_name": "SignalGateMatrix",
+      "signal": "blue",
+      "entry_hash": "fba6cd20d70c40d86f539d75909a7f8d536eb1aebdc86708e0b6582036907e7f"
+    },
+    {
+      "type_name": "Strictness",
+      "signal": "blue",
+      "entry_hash": "9c6e9844e52feaa4b9020024f04a7a7a48c8509e6964fd3a28d7075afcea10c7"
+    },
+    {
+      "type_name": "ChainIdentity",
+      "signal": "blue",
+      "entry_hash": "dca9c86ed39bf303b0b77f618d4959e1285516842d2b8f062f4890ff001e96e2"
+    },
+    {
+      "type_name": "LiveSoTChain",
+      "signal": "blue",
+      "entry_hash": "84fa01e37cd5c15e3df14e15a164f473adc731745c869adbc61c287e269e4200"
+    },
+    {
+      "type_name": "PersistedSoTChain",
+      "signal": "blue",
+      "entry_hash": "e50e7abf5b6ddcef20e2702e705428586b946dc2f3adb0814ae22bf7e3f80ed9"
+    },
+    {
+      "type_name": "SoTChain",
+      "signal": "blue",
+      "entry_hash": "4eed27db31d67b0b82ed10bd9f477e8ec1e1147b2aac98c90370f9abb85ace46"
+    },
+    {
+      "type_name": "domain::chain::check_catalogue_spec_signals",
+      "signal": "blue",
+      "entry_hash": "782af7209396fe43ee23e189dcd8d457d1bf2e50ca14d7fe2be1707ad1f43e3b"
+    }
+  ]
+}

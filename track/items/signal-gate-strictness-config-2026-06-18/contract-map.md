@@ -1,0 +1,274 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_chain["domain::chain"]
+    direction TB
+  subgraph T28_domain_domain_ChainGateEntry["chain::ChainGateEntry"]
+    direction TB
+    T28_domain_domain_ChainGateEntry__self[ChainGateEntry]
+    T28_domain_domain_ChainGateEntry_resolve([resolve])
+  end
+  subgraph T21_domain_domain_ChainId["chain::ChainId"]
+    direction TB
+    T21_domain_domain_ChainId__self[ChainId]
+    T21_domain_domain_ChainId_AdrUser[AdrUser]
+    T21_domain_domain_ChainId_SpecAdr[SpecAdr]
+    T21_domain_domain_ChainId_CatalogSpec[CatalogSpec]
+    T21_domain_domain_ChainId_ImplCatalog[ImplCatalog]
+  end
+  subgraph T22_domain_domain_GateKind["chain::GateKind"]
+    direction TB
+    T22_domain_domain_GateKind__self[GateKind]
+    T22_domain_domain_GateKind_Commit[Commit]
+    T22_domain_domain_GateKind_Merge[Merge]
+  end
+  subgraph T30_domain_domain_SignalGateMatrix["chain::SignalGateMatrix"]
+    direction TB
+    T30_domain_domain_SignalGateMatrix__self[SignalGateMatrix]
+    T30_domain_domain_SignalGateMatrix_resolve([resolve])
+  end
+  subgraph T24_domain_domain_Strictness["chain::Strictness"]
+    direction TB
+    T24_domain_domain_Strictness__self[Strictness]
+    T24_domain_domain_Strictness_Strict[Strict]
+    T24_domain_domain_Strictness_Interim[Interim]
+  end
+  subgraph R27_domain_domain_ChainIdentity["chain::ChainIdentity"]
+    direction TB
+    R27_domain_domain_ChainIdentity__self[ChainIdentity]
+  end
+  subgraph R26_domain_domain_LiveSoTChain["chain::LiveSoTChain"]
+    direction TB
+    R26_domain_domain_LiveSoTChain__self[LiveSoTChain]
+    R26_domain_domain_LiveSoTChain_calc_live([calc_live])
+  end
+  subgraph R31_domain_domain_PersistedSoTChain["chain::PersistedSoTChain"]
+    direction TB
+    R31_domain_domain_PersistedSoTChain__self[PersistedSoTChain]
+    R31_domain_domain_PersistedSoTChain_calc([calc])
+    R31_domain_domain_PersistedSoTChain_load([load])
+    R31_domain_domain_PersistedSoTChain_check_freshness([check_freshness])
+    R31_domain_domain_PersistedSoTChain_evaluate_gate([evaluate_gate])
+    R31_domain_domain_PersistedSoTChain_calc_error([calc_error])
+    R31_domain_domain_PersistedSoTChain_stale_error([stale_error])
+  end
+  subgraph R22_domain_domain_SoTChain["chain::SoTChain"]
+    direction TB
+    R22_domain_domain_SoTChain__self[SoTChain]
+    R22_domain_domain_SoTChain_check([check])
+  end
+  F57_domain_domain_domain__chain__check_catalogue_spec_signals[[check_catalogue_spec_signals]]
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_chain["usecase::chain"]
+    direction TB
+  subgraph T28_usecase_usecase_AdrUserChain["chain::adr_user::AdrUserChain"]
+    direction TB
+    T28_usecase_usecase_AdrUserChain__self[AdrUserChain]
+  end
+  subgraph T32_usecase_usecase_CatalogSpecChain["chain::catalog_spec::CatalogSpecChain"]
+    direction TB
+    T32_usecase_usecase_CatalogSpecChain__self[CatalogSpecChain]
+  end
+  subgraph T32_usecase_usecase_ImplCatalogChain["chain::impl_catalog::ImplCatalogChain"]
+    direction TB
+    T32_usecase_usecase_ImplCatalogChain__self[ImplCatalogChain]
+  end
+  subgraph T28_usecase_usecase_SpecAdrChain["chain::spec_adr::SpecAdrChain"]
+    direction TB
+    T28_usecase_usecase_SpecAdrChain__self[SpecAdrChain]
+  end
+  end
+  subgraph usecase_usecase_module_merge_gate["usecase::merge_gate"]
+    direction TB
+  subgraph R31_usecase_usecase_TrackBlobReader["merge_gate::TrackBlobReader"]
+    direction TB
+    R31_usecase_usecase_TrackBlobReader__self[TrackBlobReader]
+    R31_usecase_usecase_TrackBlobReader_read_spec_document([read_spec_document])
+    R31_usecase_usecase_TrackBlobReader_read_type_catalogue([read_type_catalogue])
+    R31_usecase_usecase_TrackBlobReader_read_impl_plan([read_impl_plan])
+    R31_usecase_usecase_TrackBlobReader_read_enabled_layers([read_enabled_layers])
+    R31_usecase_usecase_TrackBlobReader_read_catalogue_for_spec_ref_check([read_catalogue_for_spec_ref_check])
+    R31_usecase_usecase_TrackBlobReader_read_catalogue_spec_signals_document([read_catalogue_spec_signals_document])
+    R31_usecase_usecase_TrackBlobReader_read_catalogue_spec_signal_opted_in_layers([read_catalogue_spec_signal_opted_in_layers])
+    R31_usecase_usecase_TrackBlobReader_read_type_signals([read_type_signals])
+    R31_usecase_usecase_TrackBlobReader_read_adr_verify_report([read_adr_verify_report])
+  end
+  F60_usecase_usecase_usecase__merge_gate__check_strict_merge_gate[[check_strict_merge_gate]]
+  end
+  subgraph usecase_usecase_module_verify_adr_signals["usecase::verify_adr_signals"]
+    direction TB
+  subgraph T39_usecase_usecase_VerifyAdrSignalsCommand["verify_adr_signals::VerifyAdrSignalsCommand"]
+    direction TB
+    T39_usecase_usecase_VerifyAdrSignalsCommand__self[VerifyAdrSignalsCommand]
+  end
+  subgraph R32_usecase_usecase_VerifyAdrSignals["verify_adr_signals::VerifyAdrSignals"]
+    direction TB
+    R32_usecase_usecase_VerifyAdrSignals__self[VerifyAdrSignals]
+    R32_usecase_usecase_VerifyAdrSignals_verify([verify])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_verify["infrastructure::verify"]
+    direction TB
+  subgraph T40_infrastructure_infrastructure_GateRowDto["verify::signal_gates_config::GateRowDto"]
+    direction TB
+    T40_infrastructure_infrastructure_GateRowDto__self[GateRowDto]
+  end
+  subgraph T47_infrastructure_infrastructure_SignalGatesConfig["verify::signal_gates_config::SignalGatesConfig"]
+    direction TB
+    T47_infrastructure_infrastructure_SignalGatesConfig__self[SignalGatesConfig]
+  end
+  subgraph T52_infrastructure_infrastructure_SignalGatesConfigError["verify::signal_gates_config::SignalGatesConfigError"]
+    direction TB
+    T52_infrastructure_infrastructure_SignalGatesConfigError__self[SignalGatesConfigError]
+    T52_infrastructure_infrastructure_SignalGatesConfigError_FileNotFound[FileNotFound]
+    T52_infrastructure_infrastructure_SignalGatesConfigError_ParseFailed[ParseFailed]
+    T52_infrastructure_infrastructure_SignalGatesConfigError_SchemaVersionUnknown[SchemaVersionUnknown]
+    T52_infrastructure_infrastructure_SignalGatesConfigError_MissingKey[MissingKey]
+    T52_infrastructure_infrastructure_SignalGatesConfigError_InvalidValue[InvalidValue]
+  end
+  subgraph T43_infrastructure_infrastructure_StrictnessDto["verify::signal_gates_config::StrictnessDto"]
+    direction TB
+    T43_infrastructure_infrastructure_StrictnessDto__self[StrictnessDto]
+    T43_infrastructure_infrastructure_StrictnessDto_Strict[Strict]
+    T43_infrastructure_infrastructure_StrictnessDto_Interim[Interim]
+  end
+  F93_infrastructure_infrastructure_infrastructure__verify__adr_signals__execute_verify_adr_signals[[execute_verify_adr_signals]]
+  F108_infrastructure_infrastructure_infrastructure__verify__catalogue_spec_signals__execute_catalogue_spec_signals[[execute_catalogue_spec_signals]]
+  F114_infrastructure_infrastructure_infrastructure__verify__catalogue_spec_signals__execute_catalogue_spec_signals_check[[execute_catalogue_spec_signals_check]]
+  F99_infrastructure_infrastructure_infrastructure__verify__signal_gates_config__load_signal_gates_config[[load_signal_gates_config]]
+  F88_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_from_spec_json[[verify_from_spec_json]]
+  F101_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_type_signals_from_spec_json[[verify_type_signals_from_spec_json]]
+  end
+end
+T28_domain_domain_ChainGateEntry_resolve --o T22_domain_domain_GateKind__self
+T28_domain_domain_ChainGateEntry_resolve --> T24_domain_domain_Strictness__self
+T28_domain_domain_ChainGateEntry__self --o|commit_gate| T24_domain_domain_Strictness__self
+T28_domain_domain_ChainGateEntry__self --o|merge_gate| T24_domain_domain_Strictness__self
+T30_domain_domain_SignalGateMatrix_resolve --o T21_domain_domain_ChainId__self
+T30_domain_domain_SignalGateMatrix_resolve --o T22_domain_domain_GateKind__self
+T30_domain_domain_SignalGateMatrix_resolve --> T24_domain_domain_Strictness__self
+T30_domain_domain_SignalGateMatrix__self --o|adr_user| T28_domain_domain_ChainGateEntry__self
+T30_domain_domain_SignalGateMatrix__self --o|spec_adr| T28_domain_domain_ChainGateEntry__self
+T30_domain_domain_SignalGateMatrix__self --o|catalog_spec| T28_domain_domain_ChainGateEntry__self
+T30_domain_domain_SignalGateMatrix__self --o|impl_catalog| T28_domain_domain_ChainGateEntry__self
+F60_usecase_usecase_usecase__merge_gate__check_strict_merge_gate --o T30_domain_domain_SignalGateMatrix__self
+R32_usecase_usecase_VerifyAdrSignals_verify --o T39_usecase_usecase_VerifyAdrSignalsCommand__self
+T28_usecase_usecase_AdrUserChain__self -.impl.-> R27_domain_domain_ChainIdentity__self
+T28_usecase_usecase_AdrUserChain__self -.impl.-> R22_domain_domain_SoTChain__self
+T28_usecase_usecase_AdrUserChain__self -.impl.-> R26_domain_domain_LiveSoTChain__self
+T28_usecase_usecase_SpecAdrChain__self -.impl.-> R27_domain_domain_ChainIdentity__self
+T28_usecase_usecase_SpecAdrChain__self -.impl.-> R31_domain_domain_PersistedSoTChain__self
+T32_usecase_usecase_CatalogSpecChain__self -.impl.-> R27_domain_domain_ChainIdentity__self
+T32_usecase_usecase_CatalogSpecChain__self -.impl.-> R31_domain_domain_PersistedSoTChain__self
+T32_usecase_usecase_ImplCatalogChain__self -.impl.-> R27_domain_domain_ChainIdentity__self
+T32_usecase_usecase_ImplCatalogChain__self -.impl.-> R31_domain_domain_PersistedSoTChain__self
+T40_infrastructure_infrastructure_GateRowDto__self --o|adr_user| T43_infrastructure_infrastructure_StrictnessDto__self
+T40_infrastructure_infrastructure_GateRowDto__self --o|spec_adr| T43_infrastructure_infrastructure_StrictnessDto__self
+T40_infrastructure_infrastructure_GateRowDto__self --o|catalog_spec| T43_infrastructure_infrastructure_StrictnessDto__self
+T40_infrastructure_infrastructure_GateRowDto__self --o|impl_catalog| T43_infrastructure_infrastructure_StrictnessDto__self
+T47_infrastructure_infrastructure_SignalGatesConfig__self --o|commit_gate| T40_infrastructure_infrastructure_GateRowDto__self
+T47_infrastructure_infrastructure_SignalGatesConfig__self --o|merge_gate| T40_infrastructure_infrastructure_GateRowDto__self
+F99_infrastructure_infrastructure_infrastructure__verify__signal_gates_config__load_signal_gates_config --> T52_infrastructure_infrastructure_SignalGatesConfigError__self
+F99_infrastructure_infrastructure_infrastructure__verify__signal_gates_config__load_signal_gates_config --> T30_domain_domain_SignalGateMatrix__self
+class T28_domain_domain_ChainGateEntry_resolve method_node
+class T28_domain_domain_ChainGateEntry__self value_object
+class T21_domain_domain_ChainId_AdrUser variant_node
+class T21_domain_domain_ChainId_SpecAdr variant_node
+class T21_domain_domain_ChainId_CatalogSpec variant_node
+class T21_domain_domain_ChainId_ImplCatalog variant_node
+class T21_domain_domain_ChainId__self value_object
+class T22_domain_domain_GateKind_Commit variant_node
+class T22_domain_domain_GateKind_Merge variant_node
+class T22_domain_domain_GateKind__self value_object
+class T30_domain_domain_SignalGateMatrix_resolve method_node
+class T30_domain_domain_SignalGateMatrix__self value_object
+class T24_domain_domain_Strictness_Strict variant_node
+class T24_domain_domain_Strictness_Interim variant_node
+class T24_domain_domain_Strictness__self value_object
+class R27_domain_domain_ChainIdentity__self secondary_port
+class R26_domain_domain_LiveSoTChain_calc_live method_node
+class R26_domain_domain_LiveSoTChain__self secondary_port
+class R31_domain_domain_PersistedSoTChain_calc method_node
+class R31_domain_domain_PersistedSoTChain_load method_node
+class R31_domain_domain_PersistedSoTChain_check_freshness method_node
+class R31_domain_domain_PersistedSoTChain_evaluate_gate method_node
+class R31_domain_domain_PersistedSoTChain_calc_error method_node
+class R31_domain_domain_PersistedSoTChain_stale_error method_node
+class R31_domain_domain_PersistedSoTChain__self secondary_port
+class R22_domain_domain_SoTChain_check method_node
+class R22_domain_domain_SoTChain__self secondary_port
+class F57_domain_domain_domain__chain__check_catalogue_spec_signals free_function
+class F57_domain_domain_domain__chain__check_catalogue_spec_signals function_node
+class T28_usecase_usecase_AdrUserChain__self use_case
+class T32_usecase_usecase_CatalogSpecChain__self use_case
+class T32_usecase_usecase_ImplCatalogChain__self use_case
+class T28_usecase_usecase_SpecAdrChain__self use_case
+class R31_usecase_usecase_TrackBlobReader_read_spec_document method_node
+class R31_usecase_usecase_TrackBlobReader_read_type_catalogue method_node
+class R31_usecase_usecase_TrackBlobReader_read_impl_plan method_node
+class R31_usecase_usecase_TrackBlobReader_read_enabled_layers method_node
+class R31_usecase_usecase_TrackBlobReader_read_catalogue_for_spec_ref_check method_node
+class R31_usecase_usecase_TrackBlobReader_read_catalogue_spec_signals_document method_node
+class R31_usecase_usecase_TrackBlobReader_read_catalogue_spec_signal_opted_in_layers method_node
+class R31_usecase_usecase_TrackBlobReader_read_type_signals method_node
+class R31_usecase_usecase_TrackBlobReader_read_adr_verify_report method_node
+class R31_usecase_usecase_TrackBlobReader__self secondary_port
+class F60_usecase_usecase_usecase__merge_gate__check_strict_merge_gate use_case_function
+class F60_usecase_usecase_usecase__merge_gate__check_strict_merge_gate function_node
+class T39_usecase_usecase_VerifyAdrSignalsCommand__self command
+class R32_usecase_usecase_VerifyAdrSignals_verify method_node
+class R32_usecase_usecase_VerifyAdrSignals__self app_service
+class T40_infrastructure_infrastructure_GateRowDto__self dto
+class T47_infrastructure_infrastructure_SignalGatesConfig__self dto
+class T52_infrastructure_infrastructure_SignalGatesConfigError_FileNotFound variant_node
+class T52_infrastructure_infrastructure_SignalGatesConfigError_ParseFailed variant_node
+class T52_infrastructure_infrastructure_SignalGatesConfigError_SchemaVersionUnknown variant_node
+class T52_infrastructure_infrastructure_SignalGatesConfigError_MissingKey variant_node
+class T52_infrastructure_infrastructure_SignalGatesConfigError_InvalidValue variant_node
+class T52_infrastructure_infrastructure_SignalGatesConfigError__self error_type
+class T43_infrastructure_infrastructure_StrictnessDto_Strict variant_node
+class T43_infrastructure_infrastructure_StrictnessDto_Interim variant_node
+class T43_infrastructure_infrastructure_StrictnessDto__self dto
+class F93_infrastructure_infrastructure_infrastructure__verify__adr_signals__execute_verify_adr_signals free_function
+class F93_infrastructure_infrastructure_infrastructure__verify__adr_signals__execute_verify_adr_signals function_node
+class F108_infrastructure_infrastructure_infrastructure__verify__catalogue_spec_signals__execute_catalogue_spec_signals free_function
+class F108_infrastructure_infrastructure_infrastructure__verify__catalogue_spec_signals__execute_catalogue_spec_signals function_node
+class F114_infrastructure_infrastructure_infrastructure__verify__catalogue_spec_signals__execute_catalogue_spec_signals_check free_function
+class F114_infrastructure_infrastructure_infrastructure__verify__catalogue_spec_signals__execute_catalogue_spec_signals_check function_node
+class F99_infrastructure_infrastructure_infrastructure__verify__signal_gates_config__load_signal_gates_config free_function
+class F99_infrastructure_infrastructure_infrastructure__verify__signal_gates_config__load_signal_gates_config function_node
+class F88_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_from_spec_json free_function
+class F88_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_from_spec_json function_node
+class F101_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_type_signals_from_spec_json free_function
+class F101_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_type_signals_from_spec_json function_node
+```

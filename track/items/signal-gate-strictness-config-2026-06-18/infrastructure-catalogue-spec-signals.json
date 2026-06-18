@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "797e4c194cd2def9932d75e9ed892df4e80d6852dbbbb1bce43cc96b5366b68f",
+  "signals": [
+    {
+      "type_name": "GateRowDto",
+      "signal": "blue",
+      "entry_hash": "835dfe063c53df9db8111d781f30982873554bfbaa52d36f4bf2469515d0a495"
+    },
+    {
+      "type_name": "SignalGatesConfig",
+      "signal": "blue",
+      "entry_hash": "49a6a4a624476ea311fb4e6871d7d15e143701161c2cdf3c0362cd0f7a905092"
+    },
+    {
+      "type_name": "SignalGatesConfigError",
+      "signal": "blue",
+      "entry_hash": "331c3de9ab6402503a7739b6621a930039479b2460eda776cefcf5f2e766bec0"
+    },
+    {
+      "type_name": "StrictnessDto",
+      "signal": "blue",
+      "entry_hash": "a811915f11add339fb7499d61a11fa2dba8c25bed59ba33db5e9311b5089afbc"
+    },
+    {
+      "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals",
+      "signal": "blue",
+      "entry_hash": "67cd7e7a0030c37efed714a40b5a9057ab86316cfea5c1d5543c07ebba812dae"
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals",
+      "signal": "blue",
+      "entry_hash": "cdbecf26371d4f0cf806c7f1587af1c88f15f9c01586e3561915f777dfe6572d"
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check",
+      "signal": "blue",
+      "entry_hash": "b7ab0cc07305def79e230c43d41751b7088408e115a2a2a820f326f5f0ad0c01"
+    },
+    {
+      "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config",
+      "signal": "blue",
+      "entry_hash": "df0c5efdedbd908bd359a844a18af7cb4037af201eae4768377689b8c71827b6"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
+      "signal": "blue",
+      "entry_hash": "fc6cfad4ba7517fb1ebfb541596109afdc368ea5ffafaddaf75a544218f813f4"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_type_signals_from_spec_json",
+      "signal": "blue",
+      "entry_hash": "05fd3609d5a1aa4d8c4fa5f45d5617899cbd1cdb5069980f5fe38bcf55d87fce"
+    }
+  ]
+}
