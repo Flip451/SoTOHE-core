@@ -1,6 +1,116 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_symlinks_from_root` now delegates through the shared `reject_symlinks_below` mapper, which converts every `InvalidInput` from the underlying stat path into `SymlinkFound`. That mapping is only justified below for validated catalogue/baseline filenames, but this method validates untrusted root paths and its contract says unexpected stat failures should be `Io`. A malformed root path that produces `InvalidInput` is now misreported as a confirmed symlink, so keep the direct root walk here or introduce a structured helper that preserves the real error cause.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+              "line": 75,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4cacb3d90e9ede4d82f7b39d07bcb8fb795b12de998151b4708091df1561ab72",
+          "at": "2026-06-18T01:10:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acacd1f8a3fc7de151fa49c205a3245002c36b8f73400e5f022c49e813eff01e",
+          "at": "2026-06-18T01:16:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_symlinks_from_root` now routes all errors through `map_infra_symlink_guard_result`, which converts every `InvalidInput` into `SymlinkFound`. That caveat is documented as acceptable only for `reject_symlinks_below` because its callers pass validated filenames, but `reject_symlinks_from_root` is the public check for an untrusted root path. A malformed path that makes `symlink_metadata` return `InvalidInput` (for example an embedded NUL on Unix) is now reported as a confirmed symlink instead of `SymlinkGuardError::Io`, violating the `SymlinkGuardPort` contract that non-`NotFound` stat failures are I/O errors. Keep the from-root path on a mapper that preserves non-symlink `InvalidInput` as `Io`, or keep the direct loop here.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+              "line": 74,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:fc14bd456ed64a11b6c58a68d45b89b6da63c4f3ba52c5b49a0695cc6f8c4a85",
+          "at": "2026-06-18T01:26:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The round is scoped as a doc-comment-only cleanup, but this change rewrites live production code by extracting the `reject_symlinks_below` result mapping into a new helper. Even if the behavior is intended to be equivalent, this touches infrastructure logic outside the stated fix scope; keep this round to the TODO/TDDD doc-reference removals only.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+              "line": 135,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:cfcaa73a181729651e67330822294fabfa3d53f433075f4cc11b5ed104ae1fcd",
+          "at": "2026-06-18T01:31:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8fdaeed88c39e7bc43f716f2005fe58f662131a2b307500ee9b7b3a40ba1c495",
+          "at": "2026-06-18T01:34:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36a1530db47e45a994319d9c1c3f616105abe49b9ee167a17e7a92369af11bb9",
+          "at": "2026-06-18T01:48:12Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `knowledge/strategy/TODO-PLAN.md` leaves active top-level docs pointing at a path that no longer exists: `CLAUDE.md:18` and `README.md:135` still list it as the roadmap/priority reference. These are current onboarding/maintainer entry points, not historical ADR records covered by the accepted D4 exception, so the final branch would contain live dead references after the strategy directory removal.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO-PLAN.md",
+              "line": 1,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:f5da3ad1fd051ff4108dae618b70f2ef78946188d1338565e560a2b6c18c64c4",
+          "at": "2026-06-17T23:24:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5da3ad1fd051ff4108dae618b70f2ef78946188d1338565e560a2b6c18c64c4",
+          "at": "2026-06-17T23:31:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cace154b55fdfd26f881dc495020d75eb10405032631b7c65d7cb004e81a896c",
+          "at": "2026-06-17T23:47:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acb1a20f775bab571aaaa7227bc768d92a00f4fb94fe16ee46400911080acccf",
+          "at": "2026-06-18T00:19:20Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -30,6 +140,17 @@
           "findings": [],
           "hash": "rvw1:sha256:21f9d772c5cb485e280a101edb28db7c6ca3b8cde589abaf5f1da9db5fb9e19c",
           "at": "2026-06-18T00:47:26Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:242f0998993ea1b55d30c9e7cdff935889f57886bd53955df733f4632f2a4889",
+          "at": "2026-06-18T01:09:21Z"
         }
       ]
     },
@@ -142,46 +263,6 @@
           "findings": [],
           "hash": "rvw1:sha256:01b75bbda9e0678a06bd5979578360e18432d94d04c8395526c818ac3a528168",
           "at": "2026-06-18T00:47:57Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting `knowledge/strategy/TODO-PLAN.md` leaves active top-level docs pointing at a path that no longer exists: `CLAUDE.md:18` and `README.md:135` still list it as the roadmap/priority reference. These are current onboarding/maintainer entry points, not historical ADR records covered by the accepted D4 exception, so the final branch would contain live dead references after the strategy directory removal.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO-PLAN.md",
-              "line": 1,
-              "category": "dead-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:f5da3ad1fd051ff4108dae618b70f2ef78946188d1338565e560a2b6c18c64c4",
-          "at": "2026-06-17T23:24:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f5da3ad1fd051ff4108dae618b70f2ef78946188d1338565e560a2b6c18c64c4",
-          "at": "2026-06-17T23:31:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cace154b55fdfd26f881dc495020d75eb10405032631b7c65d7cb004e81a896c",
-          "at": "2026-06-17T23:47:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:acb1a20f775bab571aaaa7227bc768d92a00f4fb94fe16ee46400911080acccf",
-          "at": "2026-06-18T00:19:20Z"
         }
       ]
     }

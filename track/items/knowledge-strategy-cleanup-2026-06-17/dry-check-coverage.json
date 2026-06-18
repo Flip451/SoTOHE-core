@@ -1,7 +1,75 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "05cfd84b60900c4520e7450dbb0c6234eee94500143a92cbb48f75517dfb12d5",
-  "fragment_refs": [],
-  "processed_pair_keys": []
+  "corpus_fingerprint": "e1114baa0c69bd3c006a5691c9da3c929b0bafbcf50957a0d05ec7ae97b28d9c",
+  "fragment_refs": [
+    {
+      "path": "libs/domain/src/tddd/catalogue.rs",
+      "content_hash": "b08e632c987603d17c8b30ab9b781c6d3c5b6b9f15e9462b8e487ef2677593bf"
+    },
+    {
+      "path": "libs/domain/src/tddd/layer_id.rs",
+      "content_hash": "a0e60f47d820ccc2e769c34c88317469242f5125b449ef09ece76d1245d5bbe2"
+    },
+    {
+      "path": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+      "content_hash": "0208d60a994ed7e6f85ee90e2b6af72787a552d86cc2ca8b54c52df72bf68181"
+    },
+    {
+      "path": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+      "content_hash": "98ef08cad89af71c2e2de3d5cdf86ec3a09ba01aea5329bfb222f751404fd5ce"
+    }
+  ],
+  "processed_pair_keys": [
+    {
+      "low": {
+        "path": "libs/domain/src/symlink_guard_port.rs",
+        "content_hash": "77e48260e469e79603584ff5d32d90b1b03643b60b5f0c1d15f3a7b5c6cb30e8"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+        "content_hash": "98ef08cad89af71c2e2de3d5cdf86ec3a09ba01aea5329bfb222f751404fd5ce"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+        "content_hash": "0208d60a994ed7e6f85ee90e2b6af72787a552d86cc2ca8b54c52df72bf68181"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+        "content_hash": "950ba22127a844374a6447b29526f966b4af4f4ae4e5f59a7adad46dcf9ab071"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+        "content_hash": "0208d60a994ed7e6f85ee90e2b6af72787a552d86cc2ca8b54c52df72bf68181"
+      },
+      "high": {
+        "path": "libs/usecase/src/baseline_capture/interactor_tests.rs",
+        "content_hash": "cc4e65fb3581449206a8976c57ac9afd67a5edfcfdfe15d5f5e0322d8e2db798"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+        "content_hash": "0208d60a994ed7e6f85ee90e2b6af72787a552d86cc2ca8b54c52df72bf68181"
+      },
+      "high": {
+        "path": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+        "content_hash": "0e8a95eaa361d67eb0860ae6aad9ed7aa58443d0e0dd2d2f1e721ceb296161d3"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/track/fs_symlink_guard.rs",
+        "content_hash": "98ef08cad89af71c2e2de3d5cdf86ec3a09ba01aea5329bfb222f751404fd5ce"
+      },
+      "high": {
+        "path": "libs/usecase/src/baseline_capture/interactor_tests.rs",
+        "content_hash": "cc4e65fb3581449206a8976c57ac9afd67a5edfcfdfe15d5f5e0322d8e2db798"
+      }
+    }
+  ]
 }
