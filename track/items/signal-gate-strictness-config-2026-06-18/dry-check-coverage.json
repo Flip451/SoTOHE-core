@@ -1,7 +1,325 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "56c9d2458e15f3d765ade860db775eb20b126d88f6af16bb2fb3fe2b35b22257",
-  "fragment_refs": [],
-  "processed_pair_keys": []
+  "corpus_fingerprint": "cb266ea3fbdaead6108996b2ebd6163e9dde98a5c56d64c886275ada6017ad14",
+  "fragment_refs": [
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "106963840d2f3c87e9c9c271c5af78e728ede5ca726642bf8845e70556793a76"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "3157874ebb10aa05898615661e7a5fd5e36b98d95baae986a2458316d857366e"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "4160bef7a7eb195ad7e52d6a984a45218b19db90444846ab18ad5479c8ec1571"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "445b159ce0c33b49acdbde29b5b27c93fdcd40c8a09e55a2014c60f05692fad7"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "4611386c6cad4e30ebc744da0f0c029a187e47978ddaf901c04a6e13d2297ee9"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "472bfa2bb9923a58957e3f0f15e0f084fb81b737ed5d5932854adcfc3be6cec9"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "4ea710b46c5ee80a8e55c0ec08d9014ad1c7dd5f347b970db41783dcdfcf04f9"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "65213aa97cda2daf6272f79781fd1ff536fc591f589e933645591f11e12b9166"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "77661b6f25bad89d4e41ac5012fc776d2259b09786faf0c10d0845604bd316e8"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "7b3000c11eaf24b4b49778f5e1288ee0d8ec77c3b4c611964496de59a358b67c"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "99cb8b76ed44dc46bddf40300501b7264d9d22478eb06f5670365ea0a012eb33"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "a3f4c4b563e359d686df0cbce05285802ae718db8c32f91cde28fb9a3f623871"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "af8d618d3c9f743576857c7db072e4441e063aeae01d29598c20a193c8d0a9c3"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "c3efccd69b01f8fdd4da4fa64f68ccf5254cb159784f0dea851bfc4cdea51f13"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "c97c5d3c69d03760fec5c6a103a6cb64fcb84bc8ff820e1420abb176f7b0a2ef"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "d2d80d77272563a3bfa17fb3f048172727e876bd963d63dbc8f816bc3405f86c"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "d952e98872be4781a8687ed1dc09c7b1380a0a6bf2c67e4082409cfc6aeba56a"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "dcf5d074cf1cc26e7470e4ebc25407015af46fc1355aa487bd502b78647704a2"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "e4735bc477c5b2e74950ed72584b0a588a8414547dbf88443d470d1532acf50f"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "e4c0085bd62f8b88af877ed6f5480502e2f2bad2a5c4ef26718b429ec870e6b6"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "f09ec1ae0fb20b2cc53b352fd5794cd6299f0c586ad93c1d7018a4d38dd82c79"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "f6462f6a2a179a738f2661b2cc9cdf130292dfe2991805f55e2194af74f63f97"
+    },
+    {
+      "path": "libs/domain/src/chain.rs",
+      "content_hash": "f6ccfa0b657be3cf52c2425fa16eb35db13fa36618f3f7924d9580262e48f16c"
+    },
+    {
+      "path": "libs/domain/src/lib.rs",
+      "content_hash": "fd1a6e8dece86234d693e0eea48befcd6928de942d12630ec970749cff9ceb09"
+    }
+  ],
+  "processed_pair_keys": [
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "106963840d2f3c87e9c9c271c5af78e728ede5ca726642bf8845e70556793a76"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "106963840d2f3c87e9c9c271c5af78e728ede5ca726642bf8845e70556793a76"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "106963840d2f3c87e9c9c271c5af78e728ede5ca726642bf8845e70556793a76"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "d952e98872be4781a8687ed1dc09c7b1380a0a6bf2c67e4082409cfc6aeba56a"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "d952e98872be4781a8687ed1dc09c7b1380a0a6bf2c67e4082409cfc6aeba56a"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "445b159ce0c33b49acdbde29b5b27c93fdcd40c8a09e55a2014c60f05692fad7"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "445b159ce0c33b49acdbde29b5b27c93fdcd40c8a09e55a2014c60f05692fad7"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "445b159ce0c33b49acdbde29b5b27c93fdcd40c8a09e55a2014c60f05692fad7"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "d952e98872be4781a8687ed1dc09c7b1380a0a6bf2c67e4082409cfc6aeba56a"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "7b3000c11eaf24b4b49778f5e1288ee0d8ec77c3b4c611964496de59a358b67c"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "a3f4c4b563e359d686df0cbce05285802ae718db8c32f91cde28fb9a3f623871"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "7b3000c11eaf24b4b49778f5e1288ee0d8ec77c3b4c611964496de59a358b67c"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "e4735bc477c5b2e74950ed72584b0a588a8414547dbf88443d470d1532acf50f"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "a3f4c4b563e359d686df0cbce05285802ae718db8c32f91cde28fb9a3f623871"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "e4735bc477c5b2e74950ed72584b0a588a8414547dbf88443d470d1532acf50f"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+      },
+      "high": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/lib.rs",
+        "content_hash": "fd1a6e8dece86234d693e0eea48befcd6928de942d12630ec970749cff9ceb09"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/lib.rs",
+        "content_hash": "ec737db1e7cbea0bfecd609b6f23cf2a62f59575f2593f24331d88b01792dcfb"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/lib.rs",
+        "content_hash": "fd1a6e8dece86234d693e0eea48befcd6928de942d12630ec970749cff9ceb09"
+      },
+      "high": {
+        "path": "libs/usecase/src/lib.rs",
+        "content_hash": "92d3f1b4e6c5d04c57921e63de8b200911b7a8c66eae9c46624e5fd93633c49e"
+      }
+    }
+  ]
 }

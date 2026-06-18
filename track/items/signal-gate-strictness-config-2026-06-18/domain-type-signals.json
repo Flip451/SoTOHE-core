@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-18T03:17:52Z",
-  "declaration_hash": "53c0681b55bf68faea01447f543037a0b090fdd4e49f25bc4bac65083d0ddbee",
+  "generated_at": "2026-06-18T04:09:55Z",
+  "declaration_hash": "860bd52b15df14d70eb48587e01d4a6f455da7b29020a2201938d4ce143ca95e",
   "signals": [
     {
       "type_name": "ChainGateEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -18,9 +18,9 @@
     {
       "type_name": "ChainId",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -33,14 +33,14 @@
       "type_name": "ChainIdentity",
       "kind_tag": "secondary_port",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true
     },
     {
       "type_name": "GateKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -52,20 +52,20 @@
       "type_name": "LiveSoTChain",
       "kind_tag": "secondary_port",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true
     },
     {
       "type_name": "PersistedSoTChain",
       "kind_tag": "secondary_port",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true
     },
     {
       "type_name": "SignalGateMatrix",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -76,14 +76,14 @@
       "type_name": "SoTChain",
       "kind_tag": "secondary_port",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true
     },
     {
       "type_name": "Strictness",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",

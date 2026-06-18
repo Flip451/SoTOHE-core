@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "53c0681b55bf68faea01447f543037a0b090fdd4e49f25bc4bac65083d0ddbee",
+  "catalogue_declaration_hash": "860bd52b15df14d70eb48587e01d4a6f455da7b29020a2201938d4ce143ca95e",
   "signals": [
     {
       "type_name": "ChainGateEntry",

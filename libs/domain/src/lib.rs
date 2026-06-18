@@ -3,6 +3,7 @@
 
 pub mod adr_decision;
 pub mod auto_phase;
+pub mod chain;
 mod decision;
 pub mod dry_check;
 mod error;
@@ -35,6 +36,10 @@ pub use adr_decision::{
     AdrFilePortError, AdrFrontMatter, AdrFrontMatterError, AdrVerifyReport, DecisionGroundRef,
     DecisionGrounds, DeprecatedDecision, ImplementedDecision, ProposedDecision, SupersededDecision,
     evaluate_adr_decision,
+};
+pub use chain::{
+    ChainGateEntry, ChainId, ChainIdentity, GateKind, LiveSoTChain, PersistedSoTChain,
+    SignalGateMatrix, SoTChain, Strictness,
 };
 pub use decision::Decision;
 pub use dry_check::{

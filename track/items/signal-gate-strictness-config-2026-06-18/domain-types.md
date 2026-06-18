@@ -4,16 +4,16 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ChainId | enum | — | AdrUser, SpecAdr, CatalogSpec, ImplCatalog | 🟡 | 🔵 |
-| GateKind | enum | — | Commit, Merge | 🟡 | 🔵 |
-| Strictness | enum | — | Strict, Interim | 🟡 | 🔵 |
+| ChainId | enum | — | AdrUser, SpecAdr, CatalogSpec, ImplCatalog | 🔵 | 🔵 |
+| GateKind | enum | — | Commit, Merge | 🔵 | 🔵 |
+| Strictness | enum | — | Strict, Interim | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ChainGateEntry | value_object | — | — | 🟡 | 🔵 |
-| SignalGateMatrix | value_object | — | — | 🟡 | 🔵 |
+| ChainGateEntry | value_object | — | — | 🔵 | 🔵 |
+| SignalGateMatrix | value_object | — | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 

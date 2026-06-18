@@ -4,7 +4,7 @@
     {
       "id": "T001",
       "description": "D7: Add `libs/domain/src/chain.rs` (new file) with: `ChainId` enum (AdrUser/SpecAdr/CatalogSpec/ImplCatalog), `Strictness` enum (Strict/Interim), `GateKind` enum (Commit/Merge), `ChainGateEntry` struct with `commit_gate: Strictness` + `merge_gate: Strictness` + `resolve(GateKind) -> Strictness` method, `SignalGateMatrix` struct with four `ChainGateEntry` fields + `resolve(ChainId, GateKind) -> Strictness` method, and four trait definitions: `ChainIdentity` (associated const ID + GAT Input), `SoTChain: ChainIdentity` (associated fn `check`), `LiveSoTChain: SoTChain` (associated fn `calc_live`), `PersistedSoTChain: ChainIdentity` (associated fns `calc`, `load`, `check_freshness`, `evaluate_gate`, `calc_error`, `stale_error`), plus `impl<T: PersistedSoTChain> SoTChain for T` blanket impl. Re-export types from `libs/domain/src/lib.rs`. Standard derives: Debug, Clone, Copy, PartialEq, Eq for all enums; Debug, Clone, PartialEq, Eq for structs. No serde on domain types (serde-free constraint). Unit tests: ChainGateEntry::resolve returns correct Strictness for each GateKind variant; SignalGateMatrix::resolve returns correct cell for each (ChainId, GateKind) pair. Estimated diff: ~200 lines.",
-      "status": "todo",
+      "status": "in_progress",
       "commit_hash": null
     },
     {
@@ -81,6 +81,7 @@
     }
   ],
   "plan": {
+    "summary": [],
     "sections": [
       {
         "id": "S1",
@@ -89,7 +90,10 @@
           "Establish the Rust type foundation in `libs/domain/src/chain.rs`: the four chain value-object types (ChainId, Strictness, GateKind, ChainGateEntry, SignalGateMatrix), the four trait definitions (ChainIdentity, SoTChain, LiveSoTChain, PersistedSoTChain), and the `impl<T: PersistedSoTChain> SoTChain for T` blanket impl.",
           "Extract the chain ② Red/Yellow gate logic into `domain::check_catalogue_spec_signals` — a pure domain function symmetric with the existing chain ① and ③ pure functions."
         ],
-        "task_ids": ["T001", "T002"]
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
       },
       {
         "id": "S2",
@@ -98,7 +102,10 @@
           "Add the `signal_gates_config` infrastructure module: DTO structs, `SignalGatesConfigError`, and `load_signal_gates_config` — the single function that reads, validates, and converts `.harness/config/signal-gates.json` to `domain::SignalGateMatrix` with hard errors on any problem.",
           "Commit the recommended default `.harness/config/signal-gates.json` and the ADR-strict sample variant. Update `responsibility-boundary.md`."
         ],
-        "task_ids": ["T003", "T004"]
+        "task_ids": [
+          "T003",
+          "T004"
+        ]
       },
       {
         "id": "S3",
@@ -106,7 +113,9 @@
         "description": [
           "Implement the four chain structs in `libs/usecase/src/chain/`: AdrUserChain (LiveSoTChain, no persistence), SpecAdrChain, CatalogSpecChain, ImplCatalogChain (all PersistedSoTChain, gaining SoTChain via blanket impl). Each struct wires its evaluate_gate to the appropriate domain pure function and its check_freshness to the appropriate hash comparison mechanism."
         ],
-        "task_ids": ["T005"]
+        "task_ids": [
+          "T005"
+        ]
       },
       {
         "id": "S4",
@@ -116,7 +125,11 @@
           "Split `verify_from_spec_json` into Stage1 (check-spec-adr with self-consistency freshness check) and separate Stage2 (check-impl-catalog with independent strict).",
           "Replace inline Red/Yellow logic in `execute_catalogue_spec_signals*` and `chain2_gate.rs` with calls to `domain::check_catalogue_spec_signals`."
         ],
-        "task_ids": ["T006", "T007", "T008"]
+        "task_ids": [
+          "T006",
+          "T007",
+          "T008"
+        ]
       },
       {
         "id": "S5",
@@ -124,7 +137,9 @@
         "description": [
           "Add `apps/cli/src/commands/signal/` with the 8 orthogonal commands (`calc-*` / `check-*` × 4 chains) and the aggregate `signal check --gate commit|merge`. CLI surface uses `catalog` spelling. Each `check-*` resolves strictness from `--strict` or from `load_signal_gates_config` when `--gate` is specified."
         ],
-        "task_ids": ["T009"]
+        "task_ids": [
+          "T009"
+        ]
       },
       {
         "id": "S6",
@@ -132,7 +147,11 @@
         "description": [
           "First rewire Makefile.toml and CI to the new `signal` namespace while old commands still exist, then update remaining internal references (hooks, docs, CLAUDE.md), and only then remove superseded CLI commands from verify.rs and track/ sub-commands. No backward-compat alias period."
         ],
-        "task_ids": ["T011", "T012", "T010"]
+        "task_ids": [
+          "T011",
+          "T012",
+          "T010"
+        ]
       },
       {
         "id": "S7",
@@ -140,7 +159,9 @@
         "description": [
           "Comprehensive unit tests for `load_signal_gates_config` covering all hard-error branches: file not found, parse failure, schema version unknown, missing key, invalid value. Integration test that the committed default config parses to the expected SignalGateMatrix."
         ],
-        "task_ids": ["T013"]
+        "task_ids": [
+          "T013"
+        ]
       }
     ]
   }

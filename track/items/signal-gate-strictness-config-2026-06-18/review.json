@@ -1,6 +1,38 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
+          "at": "2026-06-18T03:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
+          "at": "2026-06-18T03:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
+          "at": "2026-06-18T04:04:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
+          "at": "2026-06-18T04:08:01Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -238,6 +270,64 @@
           "findings": [],
           "hash": "rvw1:sha256:e789265575c1c2a59b1fdea6afe6d4e9d9187eabf02fe26a540cbd4b9ced54a1",
           "at": "2026-06-18T03:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001` explicitly covers the four trait definitions (`ChainIdentity`, `SoTChain`, `LiveSoTChain`, `PersistedSoTChain`), but the generated table still leaves all four of those entries yellow while only the enums/value objects were promoted to blue. That makes the plan artifacts internally inconsistent about what this round actually landed.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/domain-types.md",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0ce975e2e58580dd1bd561a0eb86bc36be10622a604e7d5f683a29c7af8a26f3",
+          "at": "2026-06-18T03:38:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ce975e2e58580dd1bd561a0eb86bc36be10622a604e7d5f683a29c7af8a26f3",
+          "at": "2026-06-18T03:45:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked `in_progress`, but its `commit_hash` field was removed instead of remaining explicitly `null`; the same field was also removed from every still-`todo` task. This makes the plan artifact inconsistent with the task-tracking contract that unresolved/in-progress tasks carry a nullable commit slot to be filled when the task is recorded, and it changes T002-T013 even though their semantic state remains `todo`. Restore `\"commit_hash\": null` for the task entries.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0ce975e2e58580dd1bd561a0eb86bc36be10622a604e7d5f683a29c7af8a26f3",
+          "at": "2026-06-18T03:48:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2af3fd5d9f7af1a2462ab7f522381ce2f90f4f71781281ef89b451178d1399ec",
+          "at": "2026-06-18T03:50:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ff9019d9e4fa20c0d3988163a929a7c6ea7529110b7a9c435bc1066c12f8eb1",
+          "at": "2026-06-18T04:03:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ff9019d9e4fa20c0d3988163a929a7c6ea7529110b7a9c435bc1066c12f8eb1",
+          "at": "2026-06-18T04:08:06Z"
         }
       ]
     }
