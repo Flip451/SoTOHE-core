@@ -424,6 +424,198 @@
         "kind": "pass",
         "citation": "「Stage1（→ `check-spec-adr`）に self-consistency 鮮度検証を新規追加」「不一致なら stale エラー」"
       }
+    },
+    {
+      "claim_hash": "b5069b23f620d4d12989884164b98b7071d3ee5c2dad89d70a9f3961777d7553",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl_generics: Vec<MethodGenericParam>` から導出した generic-param 名集合（`[\"T\"]` 等）を parser に渡し、`convert_type_path` で single-segment path の識別子がその集合に含まれていれば `Type::Generic(name)` を返すように拡張する"
+      }
+    },
+    {
+      "claim_hash": "48a0a747d0e5a93e517bca9a7acf123ebf1085a4e9d2b8479d4da9ee868dfb18",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs::convert_type_path` において、`type_path.qself.is_some()` 時に unresolved_type marker を返している現行実装（line 60-63）を、`rustdoc_types::Type::QualifiedPath { name, self_type, trait_, args }` を構築する処理に置き換える。\n\n- `qself.ty`（`syn::QSelf` の self_type フィールド）を `convert_type` で再帰的に変換し、`Box<Type>` として `self_type` に格納する\n- `type_path.path.segments` のうち `qself.position` より前のセグメント群を trait path として `resolve_trait_bound_path` で解決し、`trait_` に格納する\n- `qself.position` 以降の最初のセグメントを `name`（associated item 名）として抽出する\n- そのセグメントの generic arguments を `convert_generic_args` で変換し、`args` に格納する\n- 出力を `rustdoc_types::Type::QualifiedPath { name, self_type, trait_, args }` とする\n\n変更は `convert_type_path` 関数 1 箇所と関連テスト 1-2 件に留まる。format layer・比較ロジック・catalogue schema のいずれも変更しない。"
+      }
+    },
+    {
+      "claim_hash": "44f2c8d673bd6de654dbd7a9e5f9009ad3fb7cd991aa7c10d8625fb9e0d10e7a",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitImplDeclV2.for_type` を parse する際に、その entry の `impl_generics: Vec<MethodGenericParam>` から導出した generic-param 名集合を parser に渡し、`convert_type_path` で single-segment path の識別子がその集合に含まれていれば `Type::Generic(name)` を返すように拡張する。"
+      }
+    },
+    {
+      "claim_hash": "d64cfc025813a5f4f960f6be6870f899bd19fc0fe0e13bcc69bd0970277847b8",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitImplDeclV2.for_type` を parse する際に、その entry の `impl_generics: Vec<MethodGenericParam>` から導出した generic-param 名集合（`[\"T\"]` 等）を parser に渡し、`convert_type_path` で single-segment path の識別子がその集合に含まれていれば `Type::Generic(name)` を返すように拡張する。"
+      }
+    },
+    {
+      "claim_hash": "1be4006629bec006d0679c7bc3db41d209458591b24d44bffbd7f4c29d60ba32",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`parse_type_ref_str` ... に `generic_params` 引数を追加し、`convert_type_path` ... `Type::Generic(name)` を即返す"
+      }
+    },
+    {
+      "claim_hash": "96cd8bb90942c642b96ac430642f5d79d97a6a5828a201b839e060d3b580c1b7",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`type_path.qself.is_some()` 時に `unresolved_type` を返している現行実装を、`rustdoc_types::Type::QualifiedPath { name, self_type, trait_, args }` を構築する処理に置き換える。"
+      }
+    },
+    {
+      "claim_hash": "c93891836df90b8996b3159b0636a3e0cc37158c825467373d8a20c193ac4cf2",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "step 3（`resolve_local`）の直後に新ステップ「local impl_generics に含まれる generic param 名か?」を挿入し、含まれていれば `Type::Generic(name)` を即返す"
+      }
+    },
+    {
+      "claim_hash": "20a22738ca26e361811317b4d29c8c0955663236fa72f9731907321758d9dd13",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行の `#[doc(hidden)]` ワークアラウンドが不要になる。`#[doc(hidden)]` の除去は本 ADR の実装後に別タスクで行う。"
+      }
+    },
+    {
+      "claim_hash": "c6142cd34eedd7b0cd5f6fe758ac01394823ef8a5ed59e9dcfa1558cef141eae",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「rustdoc 出力も同じ文字列形式を持つため、文字列等価比較で 🔵 Blue が立つ。」"
+      }
+    },
+    {
+      "claim_hash": "05f076aed17e363c971145c184aa796f5935c34b68334c9ed480db9576f0d649",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitImplDeclV2.for_type` を parse する際に、その entry の `impl_generics: Vec<MethodGenericParam>` から導出した generic-param 名集合（`[\"T\"]` 等）を parser に渡し、`convert_type_path` で single-segment path の識別子がその集合に含まれていれば `Type::Generic(name)` を返すように拡張する。\n\n- 結果: catalogue 側で `for_type: \"T\"` + `impl_generics: [{name: \"T\", ...}]` + `impl_where_predicates: [{lhs: \"T\", bound: \"domain::PersistedSoTChain\"}]` と宣言された blanket impl が、rustdoc が報告する `impl<T: PersistedSoTChain> SoTChain for T`（`for_: Type::Generic(\"T\")`、`generics.params: [{name: \"T\", kind: Type, bounds: [PersistedSoTChain]}]`）と `structural_eq` で一致し 🔵 Blue が立つ"
+      }
+    },
+    {
+      "claim_hash": "845f0f1a72ca1fb08520724bf2234de9a5d2559315e084cd24b1a7bac8ada7c1",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「rustdoc が報告する `impl<T: PersistedSoTChain> SoTChain for T` ... と `structural_eq` で一致し 🔵 Blue が立つ」"
+      }
+    },
+    {
+      "claim_hash": "b5069b23f620d4d12989884164b98b7071d3ee5c2dad89d70a9f3961777d7553",
+      "evidence_hash": "de9e04755101b30e88b95b9428e79f8a1a2bc118cabe1cceb3a5abf45f967061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この encoding により、catalogue 側の `Self::Input<'_>` 宣言が `Type::QualifiedPath` として正しく内部表現され、format layer の既存実装 `format_qualified_path_with` がそれを `<Self as ChainIdentity>::Input<'_>` という文字列にレンダーする。rustdoc 出力も同じ文字列形式を持つため、文字列等価比較で 🔵 Blue が立つ。"
+      }
+    },
+    {
+      "claim_hash": "b5069b23f620d4d12989884164b98b7071d3ee5c2dad89d70a9f3961777d7553",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「rustdoc 出力も同じ文字列形式を持つため、文字列等価比較で 🔵 Blue が立つ。」"
+      }
+    },
+    {
+      "claim_hash": "b5069b23f620d4d12989884164b98b7071d3ee5c2dad89d70a9f3961777d7553",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"impl_generics: Vec<MethodGenericParam> ... Type::Generic(name) を返すように拡張する。 ... structural_eq で一致し 🔵 Blue が立つ\""
+      }
+    },
+    {
+      "claim_hash": "48a0a747d0e5a93e517bca9a7acf123ebf1085a4e9d2b8479d4da9ee868dfb18",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「type_path.qself.is_some() 時に unresolved_type marker を返している現行実装 ... を、rustdoc_types::Type::QualifiedPath { name, self_type, trait_, args } を構築する処理に置き換える。... format layer・比較ロジック・catalogue schema のいずれも変更しない。」"
+      }
+    },
+    {
+      "claim_hash": "0bd1bd7130211bc5773174a6169cc3116dbef0cc80f50824c45021c2fd7b91f3",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`parse_type_ref_str`（または同等の entry point）に `generic_params: &[&str]`（または `&BTreeSet<&str>`）引数を追加し、既存の callsite を網羅的に更新する\n- method 本体内の他フィールド（例: `methods[].params[].ty`、`methods[].returns`）の解釈にも同一の `generic_params` 文脈 ... を渡せるよう、infrastructure 側 codec の伝播経路を整える"
+      }
+    },
+    {
+      "claim_hash": "d64cfc025813a5f4f960f6be6870f899bd19fc0fe0e13bcc69bd0970277847b8",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitImplDeclV2.for_type` を parse する際に、その entry の `impl_generics: Vec<MethodGenericParam>` から導出した generic-param 名集合（`[\"T\"]` 等）を parser に渡し、`convert_type_path` で single-segment path の識別子がその集合に含まれていれば `Type::Generic(name)` を返すように拡張する。"
+      }
+    },
+    {
+      "claim_hash": "1be4006629bec006d0679c7bc3db41d209458591b24d44bffbd7f4c29d60ba32",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`parse_type_ref_str`（または同等の entry point）に `generic_params: &[&str]`（または `&BTreeSet<&str>`）引数を追加し、既存の callsite を網羅的に更新する\n- `convert_type_path`（`parse_ctx.rs:53`）のレジストリ chain（step 1: Primitive → step 6: Unresolved）のうち、step 3（`resolve_local`）の直後に新ステップ「local impl_generics に含まれる generic param 名か?」を挿入し、含まれていれば `Type::Generic(name)` を即返す"
+      }
+    },
+    {
+      "claim_hash": "96cd8bb90942c642b96ac430642f5d79d97a6a5828a201b839e060d3b580c1b7",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`type_path.qself.is_some()` 時に `unresolved_type` marker を返している現行実装を、`rustdoc_types::Type::QualifiedPath { name, self_type, trait_, args }` を構築する処理に置き換える。"
+      }
+    },
+    {
+      "claim_hash": "c93891836df90b8996b3159b0636a3e0cc37158c825467373d8a20c193ac4cf2",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"step 3（resolve_local）の直後に新ステップ…を挿入し、含まれていれば `Type::Generic(name)` を即返す\""
+      }
+    },
+    {
+      "claim_hash": "20a22738ca26e361811317b4d29c8c0955663236fa72f9731907321758d9dd13",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行の `#[doc(hidden)]` ワークアラウンドが不要になる。`#[doc(hidden)]` の除去は本 ADR の実装後に別タスクで行う。"
+      }
+    },
+    {
+      "claim_hash": "c6142cd34eedd7b0cd5f6fe758ac01394823ef8a5ed59e9dcfa1558cef141eae",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この encoding により、catalogue 側で `<Self as ChainIdentity>::Input<'_>` のような canonical qualified-path 宣言を書いた場合に `Type::QualifiedPath` として正しく内部表現され、format layer の既存実装 `format_qualified_path_with` がそれを同じ `<Self as ChainIdentity>::Input<'_>` 文字列にレンダーする。rustdoc 出力も同じ文字列形式を持つため、文字列等価比較で 🔵 Blue が立つ。"
+      }
+    },
+    {
+      "claim_hash": "46e0f86ed9336db848c81bf56d87d743001dba7bee7f7cf13cab92c2ed638abd",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "結果: catalogue 側で `for_type: \"T\"` + `impl_generics: [{name: \"T\", ...}]` + `impl_where_predicates: [{lhs: \"T\", rhs: [\"PersistedSoTChain\"]}]` と宣言された blanket impl が、rustdoc が報告する `impl<T: PersistedSoTChain> SoTChain for T`（`for_: Type::Generic(\"T\")`、`generics.params: [{name: \"T\", kind: Type, bounds: [PersistedSoTChain]}]`）と `structural_eq` で一致し 🔵 Blue が立つ"
+      }
+    },
+    {
+      "claim_hash": "845f0f1a72ca1fb08520724bf2234de9a5d2559315e084cd24b1a7bac8ada7c1",
+      "evidence_hash": "9422be02367e4e2e1d0a93913d41055c78b2160aa23b6ba63c9fec2722a0eaa2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この変更により、現行の `#[doc(hidden)]` ワークアラウンドが不要になる。"
+      }
     }
   ]
 }

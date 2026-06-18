@@ -1,39 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
-          "at": "2026-06-18T07:29:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogSpecChain::check_freshness` only compares the document-level `catalogue_declaration_hash` with the current catalogue hash. The chain ② contract requires the persisted per-entry `CatalogueSpecSignal::entry_hash()` values to be checked against freshly computed entry hashes before `evaluate_gate`; otherwise `SoTChain::check` can accept a signals document with stale, missing, or manually trimmed per-entry signals as long as the aggregate declaration hash still matches. Carry the current entry hashes in `CatalogSpecInput` and fail closed on missing/mismatched entries before delegating to `check_catalogue_spec_signals`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/chain/catalog_spec.rs",
-              "line": 160,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
-          "at": "2026-06-18T07:33:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9394221141e132d3d8c4372eb3d93650dc3b7218c4ccf6aceb5290341ac7c16b",
-          "at": "2026-06-18T07:49:22Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -71,6 +38,94 @@
           "findings": [],
           "hash": "rvw1:sha256:9a5c9be9364fc31c2f51014379e3f09406fa575ec9d2fa0cdf8a981a6575a622",
           "at": "2026-06-18T06:29:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_adr_verify_report` now scans `repo_root/knowledge/adr` directly, but it no longer applies the trusted-root / symlink rejection that `execute_verify_adr_signals` uses. A branch can make `knowledge/adr` a symlink and redirect the merge-gate scan outside the repository, which is a path-traversal/security regression.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 440,
+              "category": "security"
+            },
+            {
+              "message": "The new qualified-path branch accepts any `qself` path but only reads the single segment at `qself.position`. If the path has additional trailing segments after the associated item, they are silently dropped instead of remaining unresolved, so valid inputs can be misrepresented as a different type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 83,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9da8ce16fce14e50213076c0ee14b11089b4efba33dce15936f2f2d2a851bb8e",
+          "at": "2026-06-18T09:57:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new QualifiedPath tests only assert a few fields (`name`, presence of `trait_`, `args`) and never compare the full `Type::QualifiedPath` literal. That leaves the main D1 regression risk untested: the builder could still emit the wrong `self_type` or other nested shape and these tests would pass. The briefing explicitly called for full `assert_eq!` coverage here.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
+              "line": 238,
+              "category": "testing"
+            },
+            {
+              "message": "`read_adr_verify_report` is a new public merge-gate adapter entry point, but the added coverage only checks the symlink rejection path. There is no test for the expected success path or for a non-symlink I/O/parse failure, so a break in the new ADR scan wiring or error mapping would ship without regression coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 440,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f38b6534dc01ea0313e2362288241dfca13fe068a986d6f0683a4cb33a20e785",
+          "at": "2026-06-18T10:20:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Ok(false)` from `reject_symlinks_below` is not equivalent to a cleanly missing `knowledge/adr` directory. If `knowledge/` is replaced with a regular file or another non-directory ancestor, this branch returns `NotFound` and the merge gate will treat ADR scanning as absent, bypassing chain 0 instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 469,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:38cd531ba03f5916288cc01e01fff8c006fa1355553b3dcd0a3f1dd7b35560a8",
+          "at": "2026-06-18T10:34:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_adr_verify_report` delegates to `FsAdrFileAdapter`, which skips non-regular entries instead of rejecting them. That means symlinked `knowledge/adr/*.md` files are silently ignored, so a branch can hide all ADR decisions behind symlinks and get an empty clean report instead of a fail-closed error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 497,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b5c74da527b546f90b786b6c4d3f1e9eaf312e89d96a89086bef7f941f9df138",
+          "at": "2026-06-18T10:54:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:897bb94a1da121b8b2b6f1b04c219f6e579f11ebc9d5706dc25dbc2572fdb979",
+          "at": "2026-06-18T11:14:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:897bb94a1da121b8b2b6f1b04c219f6e579f11ebc9d5706dc25dbc2572fdb979",
+          "at": "2026-06-18T11:17:49Z"
         }
       ]
     },
@@ -504,6 +559,226 @@
           "findings": [],
           "hash": "rvw1:sha256:793842abcdcfe610eb85c7c0438b81ad497c150566287bbae7cd58e763bc83be",
           "at": "2026-06-18T07:32:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` under-covers AC-14/AC-15: they are only linked to T016/T017, but the Blue transitions still depend on the parser tasks T014/T015 (`QualifiedPath` and `Generic`). As written, the coverage map makes the later catalogue updates look sufficient on their own when they are not.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/task-coverage.json",
+              "line": 55,
+              "category": "contradiction"
+            },
+            {
+              "message": "The blanket-impl where-clause is specified with two incompatible shapes: the ADR/spec prose uses `bound: \"domain::PersistedSoTChain\"`, while T016 uses `rhs: [\"PersistedSoTChain\"]`. The plan never reconciles those representations, so the intended JSON shape for `impl_where_predicates` is ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c78d53199389fc7f6c26586b395ec7ec4416a8fdc1ead9eaa4dc1f2f1ff25049",
+          "at": "2026-06-18T09:15:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-12` / `T015` describe propagating `trait generics + impl_generics` when decoding `methods[].params[].ty` and `methods[].returns`, but the source ADR says the shared context should be `trait generics + method generics` instead. That mismatch leaves method-local generic parameters uncovered and makes the task text inconsistent with its own design reference.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+              "line": 187,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ba68975aafb1746e6e6d522edd0959eef7263ddafc4523b2f1a83892ed5da850",
+          "at": "2026-06-18T09:20:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15aa59a971d4cc3446b78658591ea8b07f987a0c4d20fa0be8d74455e1127b8e",
+          "at": "2026-06-18T09:25:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 says the catalogue-side `Self::Input<'_>` declaration will be parsed into `Type::QualifiedPath`, and T014 repeats that by asking for a `&Self::Input<'_>` unit test. But the D1 implementation target is specifically `syn::TypePath.qself.is_some()`, which is exercised by fully qualified syntax such as `<Self as ChainIdentity>::Input<'_>`, not plain `Self::Input`. This contradicts the later T016 canonical form and can let T014 pass without testing the new QualifiedPath builder for the actual catalogue form that must become Blue.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
+              "line": 79,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:15aa59a971d4cc3446b78658591ea8b07f987a0c4d20fa0be8d74455e1127b8e",
+          "at": "2026-06-18T09:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T006` is still marked `in_progress` even though the newly inserted S8 section states that T014-T017 must all complete before T006 resumes. With T014 only in progress and T015-T017 still todo, the plan's active state contradicts its required execution order and can lead the next implementer to continue T006 before the parser/catalogue Blue path is restored.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 57,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:818a46ea838a022861d6c0eec768ab90ff271dadb565fdd5fa7baec1502b8328",
+          "at": "2026-06-18T09:34:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d37d90dcaf91e5012f659ff5022e14ba04fe53f0749296924287d08ee1b7d229",
+          "at": "2026-06-18T09:38:20Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
+          "at": "2026-06-18T07:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogSpecChain::check_freshness` only compares the document-level `catalogue_declaration_hash` with the current catalogue hash. The chain ② contract requires the persisted per-entry `CatalogueSpecSignal::entry_hash()` values to be checked against freshly computed entry hashes before `evaluate_gate`; otherwise `SoTChain::check` can accept a signals document with stale, missing, or manually trimmed per-entry signals as long as the aggregate declaration hash still matches. Carry the current entry hashes in `CatalogSpecInput` and fail closed on missing/mismatched entries before delegating to `check_catalogue_spec_signals`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/chain/catalog_spec.rs",
+              "line": 160,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
+          "at": "2026-06-18T07:33:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9394221141e132d3d8c4372eb3d93650dc3b7218c4ccf6aceb5290341ac7c16b",
+          "at": "2026-06-18T07:49:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The chain-0 result is only merged at the end of the function, but the early returns here and at the later `stage1.has_errors()` check exit before that merge. Invalid branches or missing/failed `spec.json` therefore drop ADR findings entirely, which contradicts the new requirement that chain ⓪ be accumulated independently of the other stages.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "line": 305,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `strict=false` arm in `check_chain2_for_layer` is not exercised by any test in this scope, and every existing test now hardcodes `all_strict_matrix()`. That leaves the new warning-mode behavior and the added ADR reader port effectively unverified, so a regression in the non-blocking path could ship unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate/chain2_gate.rs",
+              "line": 275,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:ae16c95a27ef368c750b6df6c610cc94671494805594ed1e36b78102a69e83ff",
+          "at": "2026-06-18T09:54:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
+          "at": "2026-06-18T10:18:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` reads the ADR report before calling `validate_branch_ref`, so an untrusted branch string reaches the `TrackBlobReader` port unvalidated. That reintroduces the very ref-safety check this function is supposed to enforce and can make the adapter operate on malicious refs like `..` or `@{...}` before the branch is rejected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "line": 287,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
+          "at": "2026-06-18T10:19:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
+          "at": "2026-06-18T10:31:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Only `catalog_spec` is exercised with a non-strict matrix; the newly matrix-driven `adr_user`, `spec_adr`, and `impl_catalog` paths all run under `all_strict_matrix()` in tests. A swapped ChainId or accidental hardcoded strict value for any of those cells would still pass the current suite. Add focused interim-mode tests for Chain ⓪, Chain ①, and Chain ③ Yellow signals.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 599,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
+          "at": "2026-06-18T10:34:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Chain ⓪ `read_adr_verify_report` error path is untested. The trait documents `FetchError` as fail-closed and this branch turns it into a blocking finding, but the added tests only cover `NotFound` and `Found` ADR reports. A regression that accidentally skipped ADR scan I/O/parse failures would still pass the current suite. Add a test with an otherwise clean gate and `BlobFetchResult::FetchError` from `read_adr_verify_report`, asserting `has_errors()` and the ADR failure message.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 302,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7ce09d370511ec4bdf5d979ea634cb37372db4aa5505f95c6ba4a2048d46b98a",
+          "at": "2026-06-18T10:51:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39818e433ede532476eeb14779e80fc977e38d5f445465e469d1a4da49aa69ba",
+          "at": "2026-06-18T11:12:10Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T09:53:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T10:16:42Z"
         }
       ]
     }

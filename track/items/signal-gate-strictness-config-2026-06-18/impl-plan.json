@@ -28,7 +28,28 @@
     {
       "id": "T005",
       "description": "D7: Add `libs/usecase/src/chain/` directory with four sub-modules: `adr_user.rs` (AdrUserChain unit struct implementing ChainIdentity + SoTChain + LiveSoTChain — live scan of knowledge/adr/ frontmatter, no persistence file); `spec_adr.rs` (SpecAdrChain unit struct implementing ChainIdentity + PersistedSoTChain — `evaluate_gate` delegates to `domain::check_spec_doc_signals`, `check_freshness` implements self-consistency check comparing `doc.evaluate_signals()` vs `doc.signals()`); `catalog_spec.rs` (CatalogSpecChain unit struct implementing ChainIdentity + PersistedSoTChain — `evaluate_gate` delegates to `domain::check_catalogue_spec_signals` (T002), `check_freshness` compares entry_hash from signals doc with current catalogue bytes SHA-256); `impl_catalog.rs` (ImplCatalogChain unit struct implementing ChainIdentity + PersistedSoTChain — `evaluate_gate` delegates to `domain::check_type_signals`, `check_freshness` compares declaration_hash from type-signals doc with current catalogue bytes SHA-256). Add `mod.rs` to re-export all four. All four get SoTChain via blanket impl from T001 (chains ①②③) or direct impl (chain ⓪). Unit/static trait-bound tests: assert AdrUserChain satisfies ChainIdentity + SoTChain + LiveSoTChain, assert SpecAdrChain/CatalogSpecChain/ImplCatalogChain satisfy ChainIdentity + PersistedSoTChain and are accepted by SoTChain-bound helper functions through the blanket impl, and cover freshness/evaluate_gate delegation happy/error paths with mocked persisted documents. Depends on T001 and T002. Estimated diff: ~350 lines.",
+      "status": "done",
+      "commit_hash": "2b0c636ebfe8ed73308f072f5cb0b6f83f105497"
+    },
+    {
+      "id": "T014",
+      "description": "Parser D1 (ADR 2026-06-18-0822 §D1) — `Type::QualifiedPath` builder: Replace the early-return `unresolved_type(\"<qualified_path>\")` branch at `libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs` line 60-63 with a builder that constructs `rustdoc_types::Type::QualifiedPath { name, self_type, trait_, args }`. Use `convert_type` recursively on `qself.ty` for `self_type`, `resolve_trait_bound_path` on the path segments before `qself.position` for `trait_`, the immediately-following segment ident for `name`, and `convert_generic_args` on that segment's generic arguments for `args`. Do not touch `format_qualified_path_with`, `methods_structurally_equal`, or the catalogue schema. Add unit tests in the same module covering: simple `<T as Trait>::Assoc` without args, canonical GAT projection `&<Self as ChainIdentity>::Input<'_>`, and qualified-path inside Vec args `Vec<<T as Trait>::Item>`. SIGNAL IMPACT: This task unlocks parser expressiveness only. The production catalogue still uses `\"Self\"` placeholder in `params[].ty`; the existing 4 GAT-related Yellows (`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain`) REMAIN Yellow after this task. Acceptance: `bin/sotp track type-signals` continues to exit 0 (no regression) and the new unit tests pass. Estimated diff: ~60 lines (net addition replaces 4-line stub). Depends on T005. spec_anchors: IN-11, CN-10.",
       "status": "in_progress"
+    },
+    {
+      "id": "T015",
+      "description": "Parser D2 (ADR 2026-06-18-0822 §D2) — `generic_params` context + `Type::Generic` encoding: Add `generic_params: &[&str]` parameter to `parse_type_ref_str` (and propagate through all reachable internal parser entry points). In `convert_type_path`, insert a new step after `resolve_local` (and before the Unresolved fallback): if the single-segment identifier is found in `generic_params`, return `Type::Generic(name)` immediately. Update all infrastructure-side codec callsites that decode `TraitImplDeclV2.for_type` to compute a `generic_params` slice from the entry's `impl_generics: Vec<MethodGenericParam>` names and pass it to the parser. For method signatures, propagate a `generic_params` context derived from trait generics + method generics through `methods[].params[].ty` and `methods[].returns` decoding so that generic-param names are resolved consistently throughout a method signature. Add unit tests using a smoke-test fixture: `for_type: \"T\"` with `impl_generics: [{name: \"T\"}]` → `Type::Generic(\"T\")`; `for_type: \"T\"` with no `impl_generics` → falls through to `Type::ResolvedPath` (existing behaviour preserved). SIGNAL IMPACT: This task unlocks parser expressiveness only. No production catalogue entry with `for_type: \"T\"` + `impl_generics` exists yet; `bin/sotp track type-signals` continues to exit 0 (no regression) after this task. The fixture-level smoke test verifies the new code path independently of the catalogue. The actual catalogue blanket impl entry is NOT added until T016. Acceptance: `bin/sotp track type-signals` exits 0; smoke-test unit tests pass. Estimated diff: ~120 lines. Independent of T014. spec_anchors: IN-12, CN-11.",
+      "status": "todo"
+    },
+    {
+      "id": "T016",
+      "description": "Type-designer back-and-forth — catalogue canonical-form update (AC-14 + AC-15 precursor): Re-invoke the type-designer capability (not implementer) after T014 and T015 are both committed. The type-designer performs TWO updates to `domain-types.json`: (1) Update `params[].ty` for the affected method signatures across `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` traits from the current `\"Self\"` placeholder to the canonical GAT form that D1's parser now supports and `format_qualified_path_with` outputs (e.g., `\"<Self as ChainIdentity>::Input<'_>\"`). (2) Add the blanket impl entry under `trait_impls`: `{ \"action\": \"add\", \"trait_ref\": \"SoTChain\", \"for_type\": \"T\", \"impl_generics\": [{\"name\": \"T\", \"bounds\": []}], \"impl_where_predicates\": [{\"lhs\": \"T\", \"rhs\": [\"PersistedSoTChain\"]}] }`. SIGNAL IMPACT: After this task, `bin/sotp track type-signals` shows: the 4 trait methods Blue-promote (catalogue canonical form now matches rustdoc via D1 parser), the blanket impl entry appears as 🟡 Yellow `RustSourceAbsent` (because `#[doc(hidden)]` still hides it). Catalogue-spec-signals remain unchanged (TraitImplDeclV2 entries carry no spec_refs). Depends on T014 and T015 both being committed. spec_anchors: AC-14, AC-15.",
+      "status": "todo"
+    },
+    {
+      "id": "T017",
+      "description": "Cleanup — Remove `#[doc(hidden)]` from blanket impl (CN-12, AC-15 final, AC-16): Strip the `#[doc(hidden)]` attribute and the accompanying schema-limitation rationale comment from `libs/domain/src/chain.rs` on the `impl<T: PersistedSoTChain> SoTChain for T` blanket impl. Run `bin/sotp track type-signals` (or `bin/sotp signal calc-impl-catalog` once T009 is available) and verify: (1) the blanket impl entry added in T016 transitions from 🟡 Yellow to 🔵 Blue (the impl is now visible to rustdoc and matches the catalogue declaration), (2) the 4 trait methods updated in T016 remain 🔵 Blue, (3) no new Yellows appear. Depends on T016. spec_anchors: CN-12, AC-15, AC-16.",
+      "status": "todo"
     },
     {
       "id": "T006",
@@ -106,6 +127,24 @@
         ],
         "task_ids": [
           "T005"
+        ]
+      },
+      {
+        "id": "S8",
+        "title": "Parser Extension + Catalogue Canonical-Form Update (ADR 2026-06-18-0822 D1 / D2) — EXECUTE BEFORE T006",
+        "description": [
+          "Fix the two parser asymmetries (T014, T015) and then update the catalogue to use the newly-supported canonical forms (T016, T017) so the trait taxonomy reaches 🔵 Blue via TDDD signals.",
+          "T014 (parser D1, implementer): Replace the `qself.is_some()` early-return stub with a full `Type::QualifiedPath` builder. This task UNLOCKS expressiveness only — the existing 4 GAT-related Yellows remain Yellow because the catalogue still uses `\"Self\"` placeholder. Acceptance: `bin/sotp track type-signals` exits 0 (no regression).",
+          "T015 (parser D2, implementer): Add `generic_params: &[&str]` context to `parse_type_ref_str` and insert a `Type::Generic(name)` step after `resolve_local`. Also unlocks expressiveness only — no production catalogue entry with `for_type: \"T\"` + `impl_generics` exists yet. Acceptance: `bin/sotp track type-signals` exits 0 (no regression).",
+          "T016 (type-designer back-and-forth, NOT implementer): With T014+T015 in place, update `domain-types.json`: (a) change affected `params[].ty` fields from `\"Self\"` placeholder to canonical GAT form, AND (b) add the blanket impl `trait_impls` entry. After T016: 4 trait methods → 🔵 Blue; blanket impl entry → 🟡 Yellow RustSourceAbsent (because `#[doc(hidden)]` still hides it).",
+          "T017 (implementer): Remove `#[doc(hidden)]` from `libs/domain/src/chain.rs`. After T017: blanket impl entry → 🔵 Blue; 4 trait methods remain 🔵 Blue.",
+          "EXECUTION ORDER: T014 and T015 are independent and may be worked in parallel, but BOTH must be committed before T016 is invoked. T017 follows T016. The entire S8 group must complete before T006, because the track designer's constraint prohibits committing T006 while any GAT-related signal is Yellow."
+        ],
+        "task_ids": [
+          "T014",
+          "T015",
+          "T016",
+          "T017"
         ]
       },
       {

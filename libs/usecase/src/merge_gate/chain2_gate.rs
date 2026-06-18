@@ -29,12 +29,16 @@ use crate::catalogue_traversal::iter_catalogue_entries;
 /// - `layer_id`: the TDDD layer being evaluated (e.g. `"domain"`, `"usecase"`).
 /// - `spec_element_hashes`: the spec-element anchor → hash map produced by
 ///   [`crate::catalogue_spec_refs::SpecElementHashReader::read_spec_element_hashes`].
+/// - `strict`: when `true`, Yellow catalogue-spec signals produce blocking errors;
+///   when `false`, Yellow produces warnings. Resolved from `gate_matrix.catalog_spec`
+///   at `GateKind::Merge` by the caller.
 pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
     reader: &R,
     branch: &str,
     track_id: &str,
     layer_id: &str,
     spec_element_hashes: &BTreeMap<SpecElementId, ContentHash>,
+    strict: bool,
 ) -> VerifyOutcome {
     let mut outcome = VerifyOutcome::pass();
 
@@ -260,14 +264,19 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
         .map(|s| s.type_name.as_str())
         .collect();
     if !yellows.is_empty() {
-        outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+        let message = format!(
             "{catalogue_file}: {} catalogue entry/entries have Yellow catalogue-spec signal \
              — merge gate will block these until upgraded to Blue. Upgrade by promoting \
              informal_grounds[] to spec_refs[] entries with file + anchor, \
              then regenerate catalogue-spec signals: {}",
             yellows.len(),
             yellows.join(", ")
-        ))]));
+        );
+        if strict {
+            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]));
+        } else {
+            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)]));
+        }
     }
 
     outcome

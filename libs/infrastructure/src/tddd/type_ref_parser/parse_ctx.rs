@@ -57,9 +57,42 @@ where
             return unresolved_type("<empty_path>");
         }
 
-        // Qualified path (`<T as Trait>::Assoc`) — encode as unresolved marker.
-        if type_path.qself.is_some() {
-            return unresolved_type("<qualified_path>");
+        // Qualified path (`<T as Trait>::Assoc`) — build a full `Type::QualifiedPath`.
+        //
+        // ADR 2026-06-18-0822 D1 needs this faithful `QualifiedPath` shape so
+        // GAT projections compare against rustdoc instead of collapsing to an
+        // unresolved marker. `syn::QSelf.position` is the index into
+        // `type_path.path.segments` that marks the boundary between the trait
+        // prefix and the associated-item name:
+        //   - `segments[..position]` → trait path (may be empty when position == 0)
+        //   - `segments[position]`   → associated item name + its generic args
+        if let Some(qself) = type_path.qself.as_ref() {
+            // 1. Recursively convert the self type.
+            let self_type = Box::new(self.convert_type(&qself.ty));
+
+            // 2. Build the trait path from the prefix segments (before `position`).
+            //    When position == 0 there is no trait prefix, so trait_ is None.
+            let trait_ = if qself.position == 0 {
+                None
+            } else {
+                // Reconstruct a `syn::Path` from the prefix segments and resolve it.
+                let prefix_segs: syn::punctuated::Punctuated<syn::PathSegment, syn::Token![::]> =
+                    type_path.path.segments.iter().take(qself.position).cloned().collect();
+                let trait_syn_path = syn::Path { leading_colon: None, segments: prefix_segs };
+                Some(self.resolve_trait_bound_path(&trait_syn_path))
+            };
+
+            // 3. The associated-item segment (at `position`): name + generic args.
+            let Some(assoc_seg) = segments.get(qself.position).copied() else {
+                return unresolved_type("<qualified_path_missing_assoc>");
+            };
+            if segments.len() != qself.position.saturating_add(1) {
+                return unresolved_type("<qualified_path_trailing_segments>");
+            }
+            let name = assoc_seg.ident.to_string();
+            let args = self.convert_generic_args(&assoc_seg.arguments);
+
+            return Type::QualifiedPath { name, self_type, trait_, args: args.map(Box::new) };
         }
 
         // Multi-segment: first segment is a crate name prefix.

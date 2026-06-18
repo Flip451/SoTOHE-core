@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use rustdoc_types::{GenericArgs, Id, Type};
+use rustdoc_types::{GenericArg, GenericArgs, Id, Path, Type};
 
 use super::*;
 
@@ -222,4 +222,121 @@ fn test_parse_type_ref_slice_succeeds() {
 fn test_parse_type_ref_invalid_syntax_returns_err() {
     let result = parse_type_ref("Result<", &no_local, 100, &HashMap::new(), &mut |_: String| 1u32);
     assert!(result.is_err(), "expected parse error for 'Result<'");
+}
+
+// -----------------------------------------------------------------------
+// T014: QualifiedPath — `<T as Trait>::Assoc` builder (ADR D1)
+// -----------------------------------------------------------------------
+
+/// `<Self as ChainIdentity>::Input<'_>` → QualifiedPath with name="Input",
+/// self_type=ResolvedPath("Self"), trait_=Some(ChainIdentity path), args=Some(lifetime '_).
+#[test]
+fn test_qualified_path_self_as_trait_with_generic_args() {
+    // simple_local doesn't know "ChainIdentity", so it becomes UNRESOLVED_CRATE_ID.
+    let ty = parse_local("<Self as ChainIdentity>::Input<'_>");
+    assert_eq!(
+        ty,
+        Type::QualifiedPath {
+            name: "Input".to_owned(),
+            self_type: Box::new(Type::ResolvedPath(Path {
+                path: "Self".to_owned(),
+                id: Id(0),
+                args: None,
+            })),
+            trait_: Some(Path {
+                path: "ChainIdentity".to_owned(),
+                id: Id(UNRESOLVED_CRATE_ID),
+                args: None,
+            }),
+            args: Some(Box::new(GenericArgs::AngleBracketed {
+                args: vec![GenericArg::Lifetime("'_".to_owned())],
+                constraints: vec![],
+            })),
+        }
+    );
+}
+
+/// `<T as Trait>::Assoc` without generic args → QualifiedPath with args=None.
+#[test]
+fn test_qualified_path_without_generic_args() {
+    let ty = parse("<T as Trait>::Assoc");
+    assert_eq!(
+        ty,
+        Type::QualifiedPath {
+            name: "Assoc".to_owned(),
+            self_type: Box::new(Type::ResolvedPath(Path {
+                path: "T".to_owned(),
+                id: Id(UNRESOLVED_CRATE_ID),
+                args: None,
+            })),
+            trait_: Some(Path {
+                path: "Trait".to_owned(),
+                id: Id(UNRESOLVED_CRATE_ID),
+                args: None,
+            }),
+            args: None,
+        }
+    );
+}
+
+/// `Vec<<T as Trait>::Item>` — QualifiedPath nested inside generic args of Vec.
+#[test]
+fn test_qualified_path_nested_in_generic_args() {
+    let ty = parse("Vec<<T as Trait>::Item>");
+    assert_eq!(
+        ty,
+        Type::ResolvedPath(Path {
+            path: "std::vec::Vec".to_owned(),
+            id: Id(UNRESOLVED_CRATE_ID),
+            args: Some(Box::new(GenericArgs::AngleBracketed {
+                args: vec![GenericArg::Type(Type::QualifiedPath {
+                    name: "Item".to_owned(),
+                    self_type: Box::new(Type::ResolvedPath(Path {
+                        path: "T".to_owned(),
+                        id: Id(UNRESOLVED_CRATE_ID),
+                        args: None,
+                    })),
+                    trait_: Some(Path {
+                        path: "Trait".to_owned(),
+                        id: Id(UNRESOLVED_CRATE_ID),
+                        args: None,
+                    }),
+                    args: None,
+                })],
+                constraints: vec![],
+            })),
+        })
+    );
+}
+
+/// Boundary case: `<Self>::Assoc` — qself.position == 0 means no trait prefix → trait_ = None.
+#[test]
+fn test_qualified_path_position_zero_gives_none_trait() {
+    // `<Self>::Assoc` is `qself.position == 0`: no segments before the assoc name.
+    let ty = parse("<Self>::Assoc");
+    assert_eq!(
+        ty,
+        Type::QualifiedPath {
+            name: "Assoc".to_owned(),
+            self_type: Box::new(Type::ResolvedPath(Path {
+                path: "Self".to_owned(),
+                id: Id(0),
+                args: None,
+            })),
+            trait_: None,
+            args: None,
+        }
+    );
+}
+
+#[test]
+fn test_qualified_path_with_trailing_segments_returns_unresolved_marker() {
+    let ty = parse("<T as Trait>::Assoc::Nested");
+    match ty {
+        Type::ResolvedPath(p) => {
+            assert_eq!(p.path, "<qualified_path_trailing_segments>");
+            assert_eq!(p.id, Id(UNRESOLVED_CRATE_ID));
+        }
+        other => panic!("expected unresolved marker, got: {other:?}"),
+    }
 }

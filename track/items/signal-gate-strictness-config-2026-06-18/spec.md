@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 42, yellow: 0, red: 0 }
+signals: { blue: 53, yellow: 0, red: 0 }
 ---
 
 # signal CLI 名前空間統一と gate strictness の宣言的管理
@@ -12,6 +12,7 @@ signals: { blue: 42, yellow: 0, red: 0 }
 - [GO-02] 各 `check-<chain>` コマンドが参照する strictness（strict / interim）を `.harness/config/signal-gates.json` で chain × gate（commit / merge）ごとに宣言的に管理し、config の不在・不正・不完全を hard error とすることで、gate enforcement の穴を構造的に排除する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D3, knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D4]
 - [GO-03] chain ⓪（adr-user）を commit / merge gate の両方に結線し、merge gate では strict（Yellow も block）とすることで、`review_finding_ref` 止まりの ADR decision が `user_decision_ref` へ昇格しないまま merge されることを防ぐ。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2, knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5]
 - [GO-04] `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D7]
+- [GO-05] TypeRef パーサに `Type::QualifiedPath` encoding（D1）と impl_generics 文脈を使った `Type::Generic` encoding（D2）を追加することで、GAT projection を持つメソッドシグネチャおよび blanket impl の catalogue 宣言が rustdoc 出力と文字列一致し、trait taxonomy が TDDD signal として評価可能な 🔵 Blue 状態を達成できるようにする。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D1, knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D2]
 
 ## Scope
 
@@ -26,6 +27,8 @@ signals: { blue: 42, yellow: 0, red: 0 }
 - [IN-08] `.harness/config/signal-gates.json` をテンプレート利用者が編集可能な設定ファイルとして位置づけ、`knowledge/conventions/responsibility-boundary.md` のテンプレート利用者責任リストに追記する。必要に応じて `.harness/config/samples/` 配下に別ポリシーのバリアント（例: `signal-gates.adr-strict.json`）を置く。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D6] [tasks: T004, T012]
 - [IN-09] 各 chain の `check-*` が calc 結果の stale 入力を検出する freshness 検証を実装する。chain ⓪: live 計算（stale 問題が構造的に発生しない）。chain ①: `doc.evaluate_signals()` と `doc.signals()` の self-consistency check（新規実装）。chain ② ③: 既存の entry_hash / declaration_hash 比較 mechanism を引き継ぐ。stale 検出は全 chain で `Finding::error` 固定（strictness によらず常時 block）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D2] [tasks: T005, T007]
 - [IN-10] `libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D7] [tasks: T001, T005]
+- [IN-11] `libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs::convert_type_path` の `qself.is_some()` 時に `unresolved_type("<qualified_path>")` を返している現行実装（line 60-63）を、`rustdoc_types::Type::QualifiedPath { name, self_type, trait_, args }` を構築する処理に置き換える。`qself.ty` を再帰的に変換して `self_type` に、`qself.position` 前のセグメントを `resolve_trait_bound_path` で解決して `trait_` に、`qself.position` 以降の最初のセグメント名を `name` に、そのセグメントの generic arguments を `convert_generic_args` で変換して `args` に格納する。format layer（`format_qualified_path_with`）・比較ロジック（`methods_structurally_equal`）・catalogue schema はいずれも変更しない。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D1] [tasks: T014]
+- [IN-12] `parse_type_ref_str`（または同等の entry point）に `generic_params: &[&str]`（または `&BTreeSet<&str>`）引数を追加し、`convert_type_path` のレジストリ chain において `resolve_local` の直後に「識別子が `generic_params` に含まれるか」ステップを挿入して含まれていれば `Type::Generic(name)` を返す。`TraitImplDeclV2` の `for_type` を parse する際に `impl_generics` から導出した名前集合を渡す。method 本体内の他フィールド（`params[].ty`・`returns`）の解釈では、trait generics と method generics から導出した `generic_params` 文脈を伝播させるよう infrastructure 側 codec の callsite を網羅的に更新する。`TraitImplDeclV2.impl_generics` / `impl_where_predicates` フィールドは既存 schema v5 のもので、schema 変更は不要。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D2] [tasks: T015]
 
 ### Out of Scope
 - [OS-01] `render`（描画）を `signal` 名前空間に含めない。描画は per-chain でなく per-view / per-format の責務であり、`check-*` の `--strict` / `--gate` と render の `--format` / 出力先は責務が異なる。当面は現状経路（`track views sync` 等）を維持し、将来整理する場合も別の render/view 系コマンドファミリとして別 ADR で扱う。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D1] [tasks: T009]
@@ -34,6 +37,8 @@ signals: { blue: 42, yellow: 0, red: 0 }
 - [OS-04] 内部 Rust 型の大規模 rename（`catalogue` → `catalog` への mass rename）は行わない。変更は CLI サーフェスの UI 表記のみとし、`CatalogueSpecSignals` 等の Rust 型名は現状を維持する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D1] [tasks: T001]
 - [OS-05] strictness の値を現在の 2 値（`"strict"` / `"interim"`）超に拡張することは対象外。strictness 多値化は「2 値では表現できない」フィードバックが蓄積した時点で別 ADR で検討する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D3] [tasks: T001]
 - [OS-06] テンプレート利用者の fork に対する後方互換 alias 期間の提供は行わない。SoTOHE はテンプレートであり内部参照を一括置換する方針を採り、利用者の fork は責務境界（`knowledge/conventions/responsibility-boundary.md`）のとおり利用者の責任とする。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T010]
+- [OS-07] lifetime param および const param を blanket impl の `impl_generics` / `impl_where_predicates` で表現することは対象外。現状の `impl_generics` は type param のみを扱う。lifetime / const param への拡張需要が生じた場合は別 ADR で対応する。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D2] [tasks: T015]
+- [OS-08] catalogue schema の構造化型移行（`params[].ty` を文字列から `{ kind, name, self_type, ... }` オブジェクトに変更する schema v6 化）は対象外。本トラックは既存 schema v5 を維持したままパーサのみを最小限に拡張する方針を採る。catalogue linter による `impl_generics` / `impl_where_predicates` 整合の静的検査も対象外（D2 の Negative consequences に記載されたフォローアップ候補）。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D2] [tasks: T015, T016]
 
 ## Constraints
 - [CN-01] `signal-gates.json` は全 chain × gate の 8 セルを完全に明示する必要があり、暗黙の default を持たない。ファイル不在・パース不能・`$schema_version` 不正・値不正・必須キー欠落のいずれかがあれば全ゲートを hard error で停止する（fail-open も silent strict フォールバックも禁止）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D4] [tasks: T003, T004, T013]
@@ -45,6 +50,9 @@ signals: { blue: 42, yellow: 0, red: 0 }
 - [CN-07] `.harness/config/signal-gates.json` の `$schema_version` は整数で、現在は `1` のみ有効とする。未知の値は schema 不正として hard error とする。config ファイルの schema version を管理する責務が生じる。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D6] [tasks: T003, T013]
 - [CN-08] commit gate で chain ① ② を `strict` にすることで、Yellow を持ったまま commit する従来のワークフローが使えなくなる（chain ① ② の grounding 完備性は impl 進行と独立しており、途中で Yellow になる必然性がないため）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D3] [tasks: T011]
 - [CN-09] merge gate への chain ⓪ 追加は repo-global な ADR ディレクトリ走査を伴う。あるトラックの merge が「無関係な ADR の未エスカレート Yellow」で block される可能性がある（これは設計上のトレードオフとして受け入れる）。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T006, T011]
+- [CN-10] `convert_type_path` は `syn::TypePath.qself.is_some()` の場合、`unresolved_type("<qualified_path>")` を返してはならず、`rustdoc_types::Type::QualifiedPath { name, self_type, trait_, args }` を構築して返さなければならない。この変更は当該関数 1 箇所と関連テストに限定し、format layer・比較ロジック・catalogue schema には一切手を加えない。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D1] [tasks: T014]
+- [CN-11] `parse_type_ref_str` に渡される `generic_params` 集合に含まれる single-segment 識別子は `Type::ResolvedPath` として扱わず、`Type::Generic(name)` を返さなければならない。この generic-param 名解決ステップは `resolve_local` の直後（Unresolved フォールバックの前）に挿入する。`TraitImplDeclV2.for_type` の parse 時には `impl_generics` から導出した名前集合を必ず渡し、schema 変更（v5 → v6）は不要。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D2] [tasks: T015]
+- [CN-12] `libs/domain/src/chain.rs` の `impl<T: PersistedSoTChain> SoTChain for T` blanket impl に付与されている `#[doc(hidden)]` ワークアラウンドは、IN-11 および IN-12 の parser 拡張が完了した後に別タスクで除去する。本トラックの実装フェーズで parser 拡張と `#[doc(hidden)]` 除去を一体で扱っても構わないが、除去は parser 拡張が Blue 評価を確認してから行う後工程として位置づける。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D2] [tasks: T017]
 
 ## Acceptance Criteria
 - [ ] [AC-01] `bin/sotp signal {calc,check}-{adr-user,spec-adr,catalog-spec,impl-catalog}` の 8 コマンドが CLI に存在する。UI 表記は `catalog`（米綴り）。`render` は `signal` 名前空間に含まれない。`calc-adr-user` は永続ファイルを作らず ADR decision grounding を live 計算して表示する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D1] [tasks: T009]
@@ -60,6 +68,9 @@ signals: { blue: 42, yellow: 0, red: 0 }
 - [ ] [AC-11] CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。`apps/cli/src/commands/signal/` に新 `signal` モジュールが存在する。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D7] [tasks: T005, T009]
 - [ ] [AC-12] `signal-gates.json` が `knowledge/conventions/responsibility-boundary.md` のテンプレート利用者責任リストに追記されており、推奨デフォルトの 2 つの `commit_gate.*: "interim"` セルの性質の違い（③ は TDDD 構造的必然 / ⓪ は SoTOHE フロー選択）が ADR または docs に文書化されている。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D6] [tasks: T004, T012]
 - [ ] [AC-13] `cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。新コマンド・新 trait taxonomy・config 読み込みロジックに対するユニットテストが追加されており、既存テストへのリグレッションが存在しない。 [adr: knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md#D5] [tasks: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013]
+- [ ] [AC-14] `bin/sotp signal calc-impl-catalog` 実行後に `domain-type-signals.json` 内の GAT projection メソッドに起因する 4 つの 🟡 Yellow 信号が 🔵 Blue に転じる。parser 拡張（IN-11）適用前後での比較で Yellow が残留していないこと。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D1] [tasks: T014, T016]
+- [ ] [AC-15] `domain-types.json` に `for_type: "T"` + `impl_generics: [{name: "T", ...}]` + `impl_where_predicates: [{lhs: "T", rhs: ["PersistedSoTChain"]}]` として宣言された blanket impl エントリが、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue として評価される。rustdoc 側の `impl<T: PersistedSoTChain> SoTChain for T`（`for_: Type::Generic("T")`）と `structural_eq` で一致すること。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D2] [tasks: T015, T016, T017]
+- [ ] [AC-16] `libs/domain/src/chain.rs` の `impl<T: PersistedSoTChain> SoTChain for T` blanket impl から `#[doc(hidden)]` 属性が除去されており（CN-12 のクリーンアップ後）、当該 impl が rustdoc に露出した状態でも `signal calc-impl-catalog` が 🔵 Blue を維持する。 [adr: knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md#D2] [tasks: T017]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#No Panics in Library Code
@@ -75,5 +86,5 @@ signals: { blue: 42, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 42  🟡 0  🔴 0
+🔵 53  🟡 0  🔴 0
 

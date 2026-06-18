@@ -164,7 +164,30 @@ impl CliApp {
             });
         }
 
-        let gate_outcome = usecase::merge_gate::check_strict_merge_gate(&branch, &reader);
+        // Load SignalGateMatrix from `.harness/config/signal-gates.json`.
+        // The config lives in the repo root, resolved from the git repo discovery.
+        // If the file is absent or invalid, block fail-closed so that a missing
+        // config does not silently bypass the gate.
+        let signal_gates_path = repo.root().join(".harness/config/signal-gates.json");
+        let gate_matrix =
+            match infrastructure::verify::signal_gates_config::load_signal_gates_config(
+                signal_gates_path.clone(),
+            ) {
+                Ok(matrix) => matrix,
+                Err(e) => {
+                    return Ok(CommandOutcome {
+                        stdout: None,
+                        stderr: Some(format!(
+                            "[BLOCKED] failed to load signal-gates config from {}: {e}",
+                            signal_gates_path.display()
+                        )),
+                        exit_code: 1,
+                    });
+                }
+            };
+
+        let gate_outcome =
+            usecase::merge_gate::check_strict_merge_gate(&branch, &reader, &gate_matrix);
         if gate_outcome.has_errors() {
             let mut lines = vec!["[BLOCKED] strict spec signal gate failed:".to_owned()];
             for finding in gate_outcome.findings() {

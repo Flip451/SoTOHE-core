@@ -20,7 +20,10 @@ use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::validate_branch_ref;
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{CatalogueSpecSignalsDocument, ContentHash, ImplPlanDocument, TrackId};
+use domain::{
+    AdrVerifyReport, CatalogueSpecSignalsDocument, ChainId, ContentHash, GateKind,
+    ImplPlanDocument, SignalGateMatrix, Strictness, TrackId,
+};
 use domain::{TypeSignalsDocument, check_type_signals};
 
 use crate::catalogue_spec_refs::SpecElementHashReader;
@@ -206,75 +209,141 @@ pub trait TrackBlobReader {
     ) -> BlobFetchResult<TypeSignalsDocument> {
         BlobFetchResult::FetchError("read_type_signals not implemented".to_owned())
     }
+
+    /// Scans ADR frontmatter for the given branch and returns a domain
+    /// [`AdrVerifyReport`] without exposing a filesystem path to the usecase
+    /// layer (Chain ⓪ / ADR §D2, D5).
+    ///
+    /// The infrastructure adapter runs the ADR signal scan internally
+    /// (equivalent to `execute_verify_adr_signals` but returning the domain
+    /// report rather than a `VerifyOutcome`) and returns the aggregate signal
+    /// counts. The `branch` argument is provided so adapters that operate on
+    /// git refs rather than the local filesystem can scope the scan to the
+    /// correct branch blob if needed; adapters that always scan from the local
+    /// workspace may ignore the argument.
+    ///
+    /// Returns:
+    /// - `Found(report)` when the ADR scan succeeds.
+    /// - `NotFound` when the ADR directory does not exist on the target ref.
+    /// - `FetchError(msg)` on I/O or parse failure.
+    ///
+    /// A default implementation returns `NotFound` (treated as Chain ⓪ skip —
+    /// no ADR directory means no decisions to evaluate) so that mocks that have
+    /// not been updated continue to work without modification. `GitShowTrackBlobReader`
+    /// overrides this in T006 to perform the actual ADR scan.
+    fn read_adr_verify_report(&self, _branch: String) -> BlobFetchResult<AdrVerifyReport> {
+        BlobFetchResult::NotFound
+    }
 }
 
 /// Evaluates the strict merge gate for the given branch using the provided
-/// [`TrackBlobReader`].
+/// [`TrackBlobReader`] and [`SignalGateMatrix`].
 ///
-/// This is the **strict** entry point: Yellow signals are always blocked.
-/// The merge gate is the only caller; interim mode lives in the CI path
-/// (`verify_from_spec_json` with `strict=false`).
+/// Strictness for each chain is resolved from `gate_matrix` at the
+/// [`GateKind::Merge`] axis rather than being hardcoded. The caller (CLI
+/// composition root) loads the matrix via `load_signal_gates_config` before
+/// invoking this function; the usecase layer does not depend on infrastructure.
 ///
 /// # Behavior
 ///
 /// 1. Run [`validate_branch_ref`] on the branch name (fail-closed on dangerous
 ///    characters — `..`, `@{`, `~`, `^`, `:`, whitespace, control chars).
-/// 2. Require a `track/` branch, then strip the prefix and validate the suffix
+/// 2. Chain ⓪ (ADR → user): call `reader.read_adr_verify_report(branch)` and
+///    evaluate ADR signal counts with `strict` resolved from
+///    `gate_matrix.adr_user` at `GateKind::Merge`.
+/// 3. Require a `track/` branch, then strip the prefix and validate the suffix
 ///    against [`TrackId`] slug rules (fail-closed on empty suffix, uppercase
 ///    letters, `//`, etc.).
-/// 3. Read `spec.json` via the reader:
-///    - `Found(doc)` → delegate to [`check_spec_doc_signals`] with `strict=true`
+/// 4. Read `spec.json` via the reader (Chain ①):
+///    - `Found(doc)` → delegate to [`check_spec_doc_signals`] with `strict`
+///      resolved from `gate_matrix.spec_adr` at `GateKind::Merge`
 ///    - `NotFound` → BLOCKED (spec.json is required for every track)
 ///    - `FetchError` → BLOCKED
-/// 4. If Stage 1 passes, read `domain-types.json`:
-///    - `Found(doc)` → delegate to [`check_type_signals`] with `strict=true`
+/// 5. If Stage 1 passes, read `domain-types.json` (Chain ③, Stage 2):
+///    - `Found(doc)` → delegate to [`check_type_signals`] with `strict`
+///      resolved from `gate_matrix.impl_catalog` at `GateKind::Merge`
 ///    - `NotFound` → skip (TDDD opt-in)
 ///    - `FetchError` → BLOCKED
 ///
-/// Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D5.2.
+/// Reference: ADR `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md`
+/// §D2, §D5.
 #[must_use]
-pub fn check_strict_merge_gate<R>(branch: &str, reader: &R) -> VerifyOutcome
+pub fn check_strict_merge_gate<R>(
+    branch: &str,
+    reader: &R,
+    gate_matrix: &SignalGateMatrix,
+) -> VerifyOutcome
 where
     R: TrackBlobReader + SpecElementHashReader,
 {
-    // 1. Branch-name validation (D4.2, D5.2)
+    // 1. Branch-name validation (D4.2, D5.2). No reader port is called before
+    // this guard because adapters may interpret `branch` as a git ref.
     if let Err(err) = validate_branch_ref(branch) {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "invalid branch ref: {err}"
         ))]);
     }
 
-    // 2. Derive and validate track_id (fail-closed on non-track branches or a
+    // 2. Chain ⓪ (ADR → user): evaluate ADR signal counts with strictness
+    //    resolved from gate_matrix.adr_user at GateKind::Merge. This is a soft
+    //    dependency: Chain ⓪ does not gate the remaining stages — its findings
+    //    are accumulated into `outcome` but do not short-circuit Chains ①②③.
+    let adr_strict = gate_matrix.resolve(ChainId::AdrUser, GateKind::Merge) == Strictness::Strict;
+    let chain0_outcome = match reader.read_adr_verify_report(branch.to_owned()) {
+        BlobFetchResult::Found(report) => {
+            crate::chain::adr_user::adr_report_to_outcome(&report, adr_strict)
+        }
+        BlobFetchResult::NotFound => {
+            // ADR directory absent on the branch — treat as clean (no decisions
+            // to evaluate). This is not a block: the ADR directory is optional
+            // on branches that predate the ADR convention.
+            VerifyOutcome::pass()
+        }
+        BlobFetchResult::FetchError(msg) => {
+            // Fail-closed: an I/O error reading the ADR directory must block.
+            VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "chain ⓪ (adr-user): failed to read ADR verify report: {msg}"
+            ))])
+        }
+    };
+    let with_chain0 = |mut outcome: VerifyOutcome| {
+        outcome.merge(chain0_outcome.clone());
+        outcome
+    };
+
+    // 3. Derive and validate track_id (fail-closed on non-track branches or a
     //    malformed track/ suffix).
     let Some(track_id) = branch.strip_prefix("track/") else {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+        return with_chain0(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "strict merge gate requires a track/<id> branch (current: {branch})"
-        ))]);
+        ))]));
     };
     if let Err(err) = TrackId::try_new(track_id) {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+        return with_chain0(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "invalid track id derived from branch '{branch}': {err}"
-        ))]);
+        ))]));
     }
 
-    // 3. Stage 1: spec.json is required (D5.2).
+    // 4. Stage 1: spec.json is required (D5.2). (Chain ①: spec → ADR)
     let spec_doc = match reader.read_spec_document(branch, track_id) {
         BlobFetchResult::Found(doc) => doc,
         BlobFetchResult::NotFound => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            return with_chain0(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "spec.json not found on origin/{branch} — every track must have a spec.json"
-            ))]);
+            ))]));
         }
         BlobFetchResult::FetchError(msg) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            return with_chain0(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "failed to read spec.json on origin/{branch}: {msg}"
-            ))]);
+            ))]));
         }
     };
 
-    let stage1 = check_spec_doc_signals(&spec_doc, /* strict */ true);
+    let spec_adr_strict =
+        gate_matrix.resolve(ChainId::SpecAdr, GateKind::Merge) == Strictness::Strict;
+    let stage1 = check_spec_doc_signals(&spec_doc, spec_adr_strict);
     if stage1.has_errors() {
-        return stage1;
+        return with_chain0(stage1);
     }
 
     // 4. Stage 2: multi-layer TDDD gate — loop every `tddd.enabled` layer
@@ -293,10 +362,12 @@ where
                 // PR that disables every layer bypass strict gating. The
                 // caller must enable at least one layer (or explicitly
                 // delete the file, which is caught by the `NotFound` arm).
-                return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                    "architecture-rules.json on origin/{branch} declares no tddd.enabled \
+                return with_chain0(VerifyOutcome::from_findings(vec![VerifyFinding::error(
+                    format!(
+                        "architecture-rules.json on origin/{branch} declares no tddd.enabled \
                      layers — the strict merge gate cannot verify an empty layer set"
-                ))]);
+                    ),
+                )]));
             }
             ids
         }
@@ -306,19 +377,19 @@ where
             // enforcement. The strict merge gate always requires the file
             // to exist so that the enabled-layer set is auditable on the PR
             // branch itself (ADR 0002 D1 + strict-signal-gate-v2 §D5.2).
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            return with_chain0(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "architecture-rules.json not found on origin/{branch} — \
                  the strict merge gate requires the file to exist to enumerate TDDD layers"
-            ))]);
+            ))]));
         }
         BlobFetchResult::FetchError(msg) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            return with_chain0(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "failed to read architecture-rules.json on origin/{branch}: {msg}"
-            ))]);
+            ))]));
         }
     };
 
-    // Stage 2: multi-layer TDDD type-signal gate (v3-native, T022).
+    // Stage 2: multi-layer TDDD type-signal gate (v3-native, T022). (Chain ③: impl → catalogue)
     //
     // For each tddd.enabled layer:
     //   1. Read the catalogue bytes + pre-computed hash (`read_type_catalogue`).
@@ -329,10 +400,13 @@ where
     //      FetchError → fail-closed.
     //   3. Compare `signals_doc.declaration_hash()` to the catalogue hash from
     //      step 1 — a mismatch means the signals file is stale (fail-closed, CN-11).
-    //   4. Evaluate `check_type_signals(&signals_doc, strict=true)`.
+    //   4. Evaluate `check_type_signals(&signals_doc, strict)` with strictness
+    //      resolved from gate_matrix.impl_catalog at GateKind::Merge.
     //
     // The catalogue's TDDD opt-out check (step 1 NotFound) preserves the pre-T022
     // behavior: a layer without a catalogue file is not enrolled in Stage 2.
+    let impl_catalog_strict =
+        gate_matrix.resolve(ChainId::ImplCatalog, GateKind::Merge) == Strictness::Strict;
     let mut outcome = stage1;
     for layer_id in &layer_ids {
         // Step 1: read catalogue bytes + hash (opt-out check and freshness data).
@@ -385,8 +459,8 @@ where
             continue;
         }
 
-        // Step 4: signal gate — strict=true (Yellow blocks in merge gate).
-        outcome.merge(check_type_signals(&signals_doc, /* strict */ true));
+        // Step 4: signal gate — strictness resolved from gate_matrix.impl_catalog.
+        outcome.merge(check_type_signals(&signals_doc, impl_catalog_strict));
     }
 
     // Stage 3 (Chain ② — ADR §D3.6 / IN-14): catalogue-spec integrity binary
@@ -402,7 +476,7 @@ where
     // would only add unrelated failures on top of a known-broken state. Return
     // early so the caller sees only the primary failure first.
     if outcome.has_errors() {
-        return outcome;
+        return with_chain0(outcome);
     }
 
     // Per-layer Chain ② loop (ADR §D3.6 / briefing §Design Intent).
@@ -420,7 +494,7 @@ where
         }
     }
     if outcome.has_errors() {
-        return outcome;
+        return with_chain0(outcome);
     }
 
     // Opt-out gate: `read_spec_element_hashes` NotFound/FetchError means the
@@ -432,7 +506,7 @@ where
     let spec_element_hashes = match reader.read_spec_element_hashes(branch, track_id) {
         BlobFetchResult::Found(map) => map,
         BlobFetchResult::NotFound | BlobFetchResult::FetchError(_) => {
-            return outcome; // hash codec unavailable → skip whole Chain ②
+            return with_chain0(outcome); // hash codec unavailable → skip whole Chain ②
         }
     };
 
@@ -458,17 +532,21 @@ where
     // the Stage 2 `read_enabled_layers` fail-closed check above (this code is
     // unreachable on such a PR in practice; the empty-set fallback is just
     // defensive).
-    let opted_in_layers: std::collections::HashSet<String> =
-        match reader.read_catalogue_spec_signal_opted_in_layers(branch) {
-            BlobFetchResult::Found(ids) => ids.into_iter().collect(),
-            BlobFetchResult::NotFound => std::collections::HashSet::new(),
-            BlobFetchResult::FetchError(msg) => {
-                return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                    "failed to read catalogue-spec opt-in layers on origin/{branch}: {msg}"
-                ))]);
-            }
-        };
+    let opted_in_layers: std::collections::HashSet<String> = match reader
+        .read_catalogue_spec_signal_opted_in_layers(branch)
+    {
+        BlobFetchResult::Found(ids) => ids.into_iter().collect(),
+        BlobFetchResult::NotFound => std::collections::HashSet::new(),
+        BlobFetchResult::FetchError(msg) => {
+            return with_chain0(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "failed to read catalogue-spec opt-in layers on origin/{branch}: {msg}"
+            ))]));
+        }
+    };
 
+    // Resolve strictness for Chain ② (catalog-spec) from gate_matrix.
+    let catalog_spec_strict =
+        gate_matrix.resolve(ChainId::CatalogSpec, GateKind::Merge) == Strictness::Strict;
     for layer_id in &layer_ids {
         // Skip layers that have NOT opted in to Chain ② — mere presence of a
         // signals file is insufficient (see the opted_in_layers comment above).
@@ -483,10 +561,14 @@ where
             track_id,
             layer_id,
             &spec_element_hashes,
+            catalog_spec_strict,
         ));
     }
 
-    outcome
+    // Merge Chain ⓪ (ADR → user) outcome last. Chain ⓪ findings are accumulated
+    // independently of the other chains and do not short-circuit them; the gate
+    // reports all findings together so the caller sees the complete picture.
+    with_chain0(outcome)
 }
 
 #[cfg(test)]
@@ -495,9 +577,48 @@ mod tests {
     use std::cell::RefCell;
 
     use domain::spec::SpecScope;
-    use domain::{ConfidenceSignal, SignalCounts};
+    use domain::verify::Severity;
+    use domain::{ChainGateEntry, ConfidenceSignal, SignalCounts};
 
     use super::*;
+
+    /// Returns an all-strict `SignalGateMatrix` for use in tests that do not
+    /// specifically test per-chain strictness resolution.  Mirrors the
+    /// recommended default from ADR §D3 (all merge-gate cells = strict).
+    fn all_strict_matrix() -> SignalGateMatrix {
+        let strict_entry =
+            || ChainGateEntry { commit_gate: Strictness::Strict, merge_gate: Strictness::Strict };
+        SignalGateMatrix {
+            adr_user: strict_entry(),
+            spec_adr: strict_entry(),
+            catalog_spec: strict_entry(),
+            impl_catalog: strict_entry(),
+        }
+    }
+
+    fn catalog_spec_interim_matrix() -> SignalGateMatrix {
+        let mut matrix = all_strict_matrix();
+        matrix.catalog_spec.merge_gate = Strictness::Interim;
+        matrix
+    }
+
+    fn adr_user_interim_matrix() -> SignalGateMatrix {
+        let mut matrix = all_strict_matrix();
+        matrix.adr_user.merge_gate = Strictness::Interim;
+        matrix
+    }
+
+    fn spec_adr_interim_matrix() -> SignalGateMatrix {
+        let mut matrix = all_strict_matrix();
+        matrix.spec_adr.merge_gate = Strictness::Interim;
+        matrix
+    }
+
+    fn impl_catalog_interim_matrix() -> SignalGateMatrix {
+        let mut matrix = all_strict_matrix();
+        matrix.impl_catalog.merge_gate = Strictness::Interim;
+        matrix
+    }
 
     /// Minimal SHA-256 hex of an all-zeroes byte sequence, used as a stable
     /// "fresh" hash for test signals documents that carry this hash.
@@ -643,6 +764,8 @@ mod tests {
     /// - `track_id` has the `track/` prefix stripped
     struct RecordingTrackBlobReader {
         spec_result: BlobFetchResult<SpecDocument>,
+        adr_result: BlobFetchResult<AdrVerifyReport>,
+        recorded_adr_branch: RefCell<Option<String>>,
         recorded_spec_branch: RefCell<Option<String>>,
         recorded_spec_track_id: RefCell<Option<String>>,
         recorded_dt_branch: RefCell<Option<String>>,
@@ -653,6 +776,30 @@ mod tests {
         fn new(spec_result: BlobFetchResult<SpecDocument>) -> Self {
             Self {
                 spec_result,
+                adr_result: BlobFetchResult::NotFound,
+                recorded_adr_branch: RefCell::new(None),
+                recorded_spec_branch: RefCell::new(None),
+                recorded_spec_track_id: RefCell::new(None),
+                recorded_dt_branch: RefCell::new(None),
+                recorded_dt_track_id: RefCell::new(None),
+            }
+        }
+
+        fn with_adr_report(
+            spec_result: BlobFetchResult<SpecDocument>,
+            adr_report: AdrVerifyReport,
+        ) -> Self {
+            Self::with_adr_result(spec_result, BlobFetchResult::Found(adr_report))
+        }
+
+        fn with_adr_result(
+            spec_result: BlobFetchResult<SpecDocument>,
+            adr_result: BlobFetchResult<AdrVerifyReport>,
+        ) -> Self {
+            Self {
+                spec_result,
+                adr_result,
+                recorded_adr_branch: RefCell::new(None),
                 recorded_spec_branch: RefCell::new(None),
                 recorded_spec_track_id: RefCell::new(None),
                 recorded_dt_branch: RefCell::new(None),
@@ -673,6 +820,11 @@ mod tests {
     }
 
     impl TrackBlobReader for RecordingTrackBlobReader {
+        fn read_adr_verify_report(&self, branch: String) -> BlobFetchResult<AdrVerifyReport> {
+            *self.recorded_adr_branch.borrow_mut() = Some(branch);
+            self.adr_result.clone()
+        }
+
         fn read_spec_document(
             &self,
             branch: &str,
@@ -740,30 +892,7 @@ mod tests {
         signals_doc_with(&[("TrackId", ConfidenceSignal::Red)])
     }
 
-    // --- U1–U18 test matrix ---
-
-    #[test]
-    fn test_u1_spec_all_blue_dt_not_found_passes() {
-        // U1: spec=Found(all-Blue), dt=NotFound → PASS (Stage 2 opt-out)
-        let reader = MockTrackBlobReader::new(
-            BlobFetchResult::Found(all_blue_spec()),
-            BlobFetchResult::NotFound,
-        );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
-        assert!(!outcome.has_errors(), "{outcome:?}");
-        assert!(outcome.findings().is_empty());
-    }
-
-    #[test]
-    fn test_u2_spec_blue_dt_all_blue_passes() {
-        // U2: spec=all-Blue, dt=all-Blue → PASS
-        let reader = MockTrackBlobReader::new(
-            BlobFetchResult::Found(all_blue_spec()),
-            BlobFetchResult::Found(dt_all_blue()),
-        );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
-        assert!(!outcome.has_errors(), "{outcome:?}");
-    }
+    // --- U3–U18 test matrix ---
 
     #[test]
     fn test_u3_spec_blue_dt_yellow_blocks_in_strict() {
@@ -772,9 +901,29 @@ mod tests {
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::Found(dt_with_yellow()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("Yellow")));
+    }
+
+    #[test]
+    fn test_chain3_type_yellow_warns_when_impl_catalog_merge_gate_is_interim() {
+        let reader = MockTrackBlobReader::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            BlobFetchResult::Found(dt_with_yellow()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader, &impl_catalog_interim_matrix());
+
+        assert!(
+            !outcome.has_errors(),
+            "Yellow type signal must not block when impl-catalog merge gate is interim: {outcome:?}"
+        );
+        let finding = outcome
+            .findings()
+            .iter()
+            .find(|f| f.message().contains("type(s) have Yellow signal"))
+            .expect("expected an impl-catalog warning");
+        assert_eq!(finding.severity(), Severity::Warning);
     }
 
     #[test]
@@ -784,7 +933,7 @@ mod tests {
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::Found(dt_with_red()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("Red")));
     }
@@ -798,7 +947,7 @@ mod tests {
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::Found(signals_doc_with(&[])),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.findings().is_empty(), "empty signals must pass per D6.4: {outcome:?}");
     }
 
@@ -811,7 +960,7 @@ mod tests {
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::NotFound,
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         // catalogue NotFound → skip → no findings from Stage 2
         assert!(!outcome.has_errors(), "TDDD opt-out (catalogue NotFound) must pass: {outcome:?}");
         assert!(outcome.findings().is_empty());
@@ -824,7 +973,7 @@ mod tests {
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::Found(dt_all_blue()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(!outcome.has_errors(), "all-Blue type-signals must pass: {outcome:?}");
     }
 
@@ -836,7 +985,7 @@ mod tests {
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::FetchError("git show failed".to_owned()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "catalogue FetchError must block: {outcome:?}");
         // FetchError message identifies the layer by id, not a hardcoded filename.
         assert!(
@@ -854,9 +1003,29 @@ mod tests {
         let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::Found(
             spec_doc_with_signals(Some(SignalCounts::new(3, 2, 0))),
         ));
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("yellow")));
+    }
+
+    #[test]
+    fn test_chain1_spec_yellow_warns_when_spec_adr_merge_gate_is_interim() {
+        let reader = MockTrackBlobReader::new(
+            BlobFetchResult::Found(spec_doc_with_signals(Some(SignalCounts::new(3, 2, 0)))),
+            BlobFetchResult::NotFound,
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader, &spec_adr_interim_matrix());
+
+        assert!(
+            !outcome.has_errors(),
+            "Yellow spec signal must not block when spec-ADR merge gate is interim: {outcome:?}"
+        );
+        let finding = outcome
+            .findings()
+            .iter()
+            .find(|f| f.message().contains("spec.json: 2 yellow signal"))
+            .expect("expected a spec-ADR warning");
+        assert_eq!(finding.severity(), Severity::Warning);
     }
 
     #[test]
@@ -865,7 +1034,7 @@ mod tests {
         let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::Found(
             spec_doc_with_signals(Some(SignalCounts::new(2, 0, 1))),
         ));
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("red")));
     }
@@ -876,7 +1045,7 @@ mod tests {
         let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::Found(
             spec_doc_with_signals(None),
         ));
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
     }
 
@@ -886,7 +1055,7 @@ mod tests {
         let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::Found(
             spec_doc_with_signals(Some(SignalCounts::new(0, 0, 0))),
         ));
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
     }
 
@@ -894,7 +1063,7 @@ mod tests {
     fn test_u13_spec_not_found_blocks() {
         // U13: spec=NotFound → BLOCKED (Stage 1 required)
         let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::NotFound);
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("spec.json")));
     }
@@ -905,7 +1074,7 @@ mod tests {
         let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::FetchError(
             "git show failed for spec.json".to_owned(),
         ));
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
     }
 
@@ -916,7 +1085,8 @@ mod tests {
             BlobFetchResult::FetchError("must not read".to_owned()),
             BlobFetchResult::FetchError("must not read".to_owned()),
         );
-        let outcome = check_strict_merge_gate("track/feature/foo..bar", &reader);
+        let outcome =
+            check_strict_merge_gate("track/feature/foo..bar", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("invalid branch ref")));
     }
@@ -928,7 +1098,8 @@ mod tests {
             BlobFetchResult::FetchError("must not read".to_owned()),
             BlobFetchResult::FetchError("must not read".to_owned()),
         );
-        let outcome = check_strict_merge_gate("track/feature/foo@{0}", &reader);
+        let outcome =
+            check_strict_merge_gate("track/feature/foo@{0}", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
     }
 
@@ -939,8 +1110,19 @@ mod tests {
             BlobFetchResult::FetchError("must not read".to_owned()),
             BlobFetchResult::FetchError("must not read".to_owned()),
         );
-        let outcome = check_strict_merge_gate("", &reader);
+        let outcome = check_strict_merge_gate("", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
+    }
+
+    #[test]
+    fn test_invalid_branch_ref_blocks_before_adr_reader() {
+        let reader = RecordingTrackBlobReader::new(BlobFetchResult::Found(all_blue_spec()));
+        let outcome =
+            check_strict_merge_gate("track/feature/foo..bar", &reader, &all_strict_matrix());
+
+        assert!(outcome.has_errors());
+        assert_eq!(reader.recorded_adr_branch.borrow().as_deref(), None);
+        assert_eq!(reader.recorded_spec_branch.borrow().as_deref(), None);
     }
 
     // --- Port contract: argument passing ---
@@ -951,12 +1133,18 @@ mod tests {
         // - passes the original branch name verbatim to the reader (no stripping)
         // - strips the "track/" prefix when computing track_id for the reader
         let reader = RecordingTrackBlobReader::new(BlobFetchResult::Found(all_blue_spec()));
-        let outcome = check_strict_merge_gate("track/some-feature-2026-04-12", &reader);
+        let outcome =
+            check_strict_merge_gate("track/some-feature-2026-04-12", &reader, &all_strict_matrix());
 
         // Should PASS (all-blue spec, dt NotFound)
         assert!(!outcome.has_errors(), "{outcome:?}");
 
         // Stage 1: branch passed verbatim
+        assert_eq!(
+            reader.recorded_adr_branch.borrow().as_deref(),
+            Some("track/some-feature-2026-04-12"),
+            "ADR read must receive the original branch"
+        );
         assert_eq!(
             reader.recorded_spec_branch.borrow().as_deref(),
             Some("track/some-feature-2026-04-12"),
@@ -985,12 +1173,68 @@ mod tests {
     #[test]
     fn test_non_track_branch_blocks_without_reading() {
         let reader = RecordingTrackBlobReader::new(BlobFetchResult::Found(all_blue_spec()));
-        let outcome = check_strict_merge_gate("plan/no-prefix", &reader);
+        let outcome = check_strict_merge_gate("plan/no-prefix", &reader, &all_strict_matrix());
 
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("track/<id> branch")));
         assert_eq!(reader.recorded_spec_branch.borrow().as_deref(), None);
         assert_eq!(reader.recorded_spec_track_id.borrow().as_deref(), None);
+    }
+
+    #[test]
+    fn test_chain0_findings_are_merged_when_spec_not_found_blocks() {
+        let reader = RecordingTrackBlobReader::with_adr_report(
+            BlobFetchResult::NotFound,
+            AdrVerifyReport::new(0, 1, 0, 0),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
+
+        assert!(outcome.has_errors(), "{outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("spec.json not found")),
+            "expected the Stage 1 spec failure: {outcome:?}"
+        );
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("ADR decision")),
+            "expected Chain ⓪ ADR finding to survive the early return: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_chain0_yellow_warns_when_adr_user_merge_gate_is_interim() {
+        let reader = RecordingTrackBlobReader::with_adr_report(
+            BlobFetchResult::Found(all_blue_spec()),
+            AdrVerifyReport::new(0, 1, 0, 0),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader, &adr_user_interim_matrix());
+
+        assert!(
+            !outcome.has_errors(),
+            "Yellow ADR-user signal must not block when adr-user merge gate is interim: {outcome:?}"
+        );
+        let finding = outcome
+            .findings()
+            .iter()
+            .find(|f| f.message().contains("ADR decision(s) have Yellow signal"))
+            .expect("expected an ADR-user warning");
+        assert_eq!(finding.severity(), Severity::Warning);
+    }
+
+    #[test]
+    fn test_chain0_fetch_error_blocks_even_when_other_chains_are_clean() {
+        let reader = RecordingTrackBlobReader::with_adr_result(
+            BlobFetchResult::Found(all_blue_spec()),
+            BlobFetchResult::FetchError("ADR parse failed".to_owned()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
+
+        assert!(outcome.has_errors(), "{outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains(
+                "chain ⓪ (adr-user): failed to read ADR verify report: ADR parse failed"
+            )),
+            "expected fail-closed ADR read error: {outcome:?}"
+        );
     }
 
     // --- Track-id validation (step 2) ---
@@ -1002,7 +1246,7 @@ mod tests {
             BlobFetchResult::FetchError("must not read".to_owned()),
             BlobFetchResult::FetchError("must not read".to_owned()),
         );
-        let outcome = check_strict_merge_gate("track/", &reader);
+        let outcome = check_strict_merge_gate("track/", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
         assert!(
             outcome.findings().iter().any(|f| f.message().contains("invalid track id")),
@@ -1018,7 +1262,7 @@ mod tests {
             BlobFetchResult::FetchError("must not read".to_owned()),
             BlobFetchResult::FetchError("must not read".to_owned()),
         );
-        let outcome = check_strict_merge_gate("track/FooBar", &reader);
+        let outcome = check_strict_merge_gate("track/FooBar", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("invalid track id")));
     }
@@ -1030,7 +1274,7 @@ mod tests {
             BlobFetchResult::FetchError("must not read".to_owned()),
             BlobFetchResult::FetchError("must not read".to_owned()),
         );
-        let outcome = check_strict_merge_gate("track//foo", &reader);
+        let outcome = check_strict_merge_gate("track//foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("invalid track id")));
     }
@@ -1139,7 +1383,7 @@ mod tests {
             vec!["domain".to_string(), "usecase".to_string()],
             vec![],
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(!outcome.has_errors(), "both layers NotFound must pass: {outcome:?}");
     }
 
@@ -1153,7 +1397,7 @@ mod tests {
                 ("usecase", BlobFetchResult::Found(dt_all_blue())),
             ],
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(!outcome.has_errors(), "both all-Blue must pass: {outcome:?}");
     }
 
@@ -1167,7 +1411,7 @@ mod tests {
                 ("usecase", BlobFetchResult::Found(dt_with_red())),
             ],
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "Red in usecase must block: {outcome:?}");
     }
 
@@ -1178,7 +1422,7 @@ mod tests {
             vec!["domain".to_string(), "usecase".to_string()],
             vec![("domain", BlobFetchResult::Found(dt_all_blue()))],
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             !outcome.has_errors(),
             "NotFound for usecase + Blue for domain must pass: {outcome:?}"
@@ -1195,7 +1439,7 @@ mod tests {
                 ("usecase", BlobFetchResult::Found(dt_with_yellow())),
             ],
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "Yellow in strict mode must block even with the other layer Blue: {outcome:?}"
@@ -1212,7 +1456,7 @@ mod tests {
                 ("usecase", BlobFetchResult::FetchError("network".to_string())),
             ],
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "FetchError must block: {outcome:?}");
         assert!(
             outcome
@@ -1233,7 +1477,7 @@ mod tests {
             enabled_layers: BlobFetchResult::NotFound,
             catalogues: std::collections::HashMap::new(),
         };
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "architecture-rules.json NotFound must fail-closed: {outcome:?}"
@@ -1253,7 +1497,7 @@ mod tests {
             BlobFetchResult::Found(all_blue_spec()),
             "git show failed",
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "architecture-rules.json FetchError must block");
         assert!(
             outcome.findings().iter().any(|f| f.message().contains("architecture-rules.json")),
@@ -1281,7 +1525,7 @@ mod tests {
             vec!["domain".to_string(), "usecase".to_string()],
             vec![("usecase", BlobFetchResult::Found(dt_all_blue()))],
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             !outcome.has_errors(),
             "NotFound for domain + Blue for usecase must pass: {outcome:?}"
@@ -1298,7 +1542,7 @@ mod tests {
             vec!["domain".to_string(), "usecase".to_string()],
             vec![("usecase", BlobFetchResult::Found(dt_with_red()))],
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "Red in usecase must block even when domain is NotFound: {outcome:?}"
@@ -1316,7 +1560,7 @@ mod tests {
             vec!["domain".to_string(), "usecase".to_string()],
             vec![("usecase", BlobFetchResult::Found(dt_with_yellow()))],
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "Yellow in usecase must block in strict mode even when domain is NotFound: {outcome:?}"
@@ -1334,7 +1578,7 @@ mod tests {
         // nothing to check" — fail-closed prevents a configuration-level
         // bypass of Stage 2 enforcement.
         let reader = MultiLayerMock::new(BlobFetchResult::Found(all_blue_spec()), vec![], vec![]);
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "empty enabled_layers must fail-closed: {outcome:?}");
         assert!(
             outcome.findings().iter().any(|f| f.message().contains("architecture-rules.json")),
@@ -1561,7 +1805,7 @@ mod tests {
             BlobFetchResult::NotFound,
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "signals NotFound on opted-in layer must block: {outcome:?}");
         assert!(
             outcome
@@ -1581,7 +1825,7 @@ mod tests {
             catalogue_with_trackid_entry(),
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "Yellow catalogue-spec signal must block in strict mode: {outcome:?}"
@@ -1594,6 +1838,27 @@ mod tests {
     }
 
     #[test]
+    fn test_chain2_yellow_signal_warns_when_catalog_spec_merge_gate_is_interim() {
+        let reader = ChainTwoMock::new(
+            BlobFetchResult::Found(all_yellow_signals()),
+            catalogue_with_trackid_entry(),
+            BlobFetchResult::Found(std::collections::BTreeMap::new()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader, &catalog_spec_interim_matrix());
+
+        assert!(
+            !outcome.has_errors(),
+            "Yellow catalogue-spec signal must not block in interim mode: {outcome:?}"
+        );
+        let finding = outcome
+            .findings()
+            .iter()
+            .find(|f| f.message().contains("Yellow catalogue-spec signal"))
+            .expect("expected a catalogue-spec warning");
+        assert_eq!(finding.severity(), Severity::Warning);
+    }
+
+    #[test]
     fn test_u33_chain2_blue_signals_passes() {
         // U33: Chain ② activated layer with all-Blue signals → PASS
         // Catalogue is provided with a matching `TrackId` entry so the
@@ -1603,7 +1868,7 @@ mod tests {
             catalogue_with_trackid_entry(),
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(!outcome.has_errors(), "all-Blue catalogue-spec signals must pass: {outcome:?}");
     }
 
@@ -1615,7 +1880,7 @@ mod tests {
             BlobFetchResult::NotFound,
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "signals FetchError must block: {outcome:?}");
         assert!(
             outcome
@@ -1641,7 +1906,7 @@ mod tests {
             BlobFetchResult::NotFound, // catalogue missing
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "catalogue NotFound on opted-in layer must block: {outcome:?}"
@@ -1751,7 +2016,7 @@ mod tests {
         // are not in the opt-in set — even when the signals file is Found and
         // Yellow (which would otherwise block in strict mode per U32).
         let reader = ChainTwoOptOutMock { signals: BlobFetchResult::Found(all_yellow_signals()) };
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             !outcome.has_errors(),
             "opted-out layer with stale Yellow signals must NOT block merge: {outcome:?}"
@@ -1823,7 +2088,7 @@ mod tests {
         // error on `architecture-rules.json` would silently disable Chain ②
         // for opted-in layers, which PR #111 explicitly flagged.
         let reader = ChainTwoOptInLookupErrorMock;
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "opt-in lookup FetchError must block merge (fail-closed): {outcome:?}"
@@ -1845,7 +2110,7 @@ mod tests {
         let reader = ChainTwoOptOutMock {
             signals: BlobFetchResult::FetchError("signals file corrupted".to_owned()),
         };
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             !outcome.has_errors(),
             "opted-out layer signals FetchError must NOT surface: {outcome:?}"
@@ -1917,7 +2182,7 @@ mod tests {
             }
         }
         let reader = Stage2SignalsNotFoundMock;
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "catalogue Found + signals NotFound must block (fail-closed): {outcome:?}"
@@ -1987,7 +2252,7 @@ mod tests {
             }
         }
         let reader = Stage2HashMismatchMock;
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "declaration_hash mismatch must block (fail-closed, CN-11): {outcome:?}"
@@ -2058,7 +2323,7 @@ mod tests {
             }
         }
         let reader = Stage2SignalsFetchErrorMock;
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(
             outcome.has_errors(),
             "catalogue Found + signals FetchError must block (fail-closed): {outcome:?}"
@@ -2094,7 +2359,7 @@ mod tests {
             catalogue,
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "missing per-entry hash must block fail-closed: {outcome:?}");
         assert!(
             outcome.findings().iter().any(|f| f.message().contains("per-entry hash missing")),
@@ -2116,7 +2381,7 @@ mod tests {
             catalogue,
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "stale per-entry hash must block: {outcome:?}");
         assert!(
             outcome.findings().iter().any(|f| f.message().contains("per-entry hash mismatch")),
@@ -2206,7 +2471,7 @@ mod tests {
             }
         }
         let reader = Stage2FailWithChain2Mock;
-        let outcome = check_strict_merge_gate("track/foo", &reader);
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "Stage 2 Red must block: {outcome:?}");
         // If the guard were removed, Chain ② would run and `check_catalogue_spec_signals`
         // would emit a finding containing "catalogue-spec" for the Yellow signal.

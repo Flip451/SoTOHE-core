@@ -16,17 +16,23 @@
 //! §D5.3.
 
 use std::collections::{BTreeMap, HashMap};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
+use domain::AdrVerifyReport;
 use domain::ImplPlanDocument;
 use domain::TypeSignalsDocument;
 use domain::spec::SpecDocument;
 use domain::tddd::catalogue_v2::CatalogueDocument;
-use domain::{CatalogueSpecSignalsDocument, ContentHash, SpecElementId};
+use domain::{AdrFilePort, CatalogueSpecSignalsDocument, ContentHash, SpecElementId};
 use usecase::catalogue_spec_refs::SpecElementHashReader;
 use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
+use usecase::verify_adr_signals::{
+    VerifyAdrSignals, VerifyAdrSignalsCommand, VerifyAdrSignalsInteractor,
+};
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
+use crate::track::symlink_guard::reject_symlinks_below;
 
 use crate::git_cli::show::{BlobResult, fetch_blob_safe};
 
@@ -133,6 +139,22 @@ fn signal_file_name_for(catalogue_filename: &str) -> String {
         format!("{stem}-signals")
     };
     format!("{signal_stem}.json")
+}
+
+fn reject_direct_adr_entry_symlinks(
+    adr_dir: &Path,
+    trusted_root: &Path,
+) -> Result<(), std::io::Error> {
+    let entries = std::fs::read_dir(adr_dir).map_err(|e| {
+        std::io::Error::new(e.kind(), format!("failed to list {}: {e}", adr_dir.display()))
+    })?;
+    for entry in entries {
+        let entry = entry.map_err(|e| {
+            std::io::Error::new(e.kind(), format!("failed to list {}: {e}", adr_dir.display()))
+        })?;
+        reject_symlinks_below(&entry.path(), trusted_root)?;
+    }
+    Ok(())
 }
 
 impl TrackBlobReader for GitShowTrackBlobReader {
@@ -411,6 +433,95 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             Err(e) => {
                 BlobFetchResult::FetchError(format!("{path}: {signal_filename} decode error: {e}"))
             }
+        }
+    }
+
+    /// Scans ADR frontmatter from the local `knowledge/adr/` directory and
+    /// returns a domain [`AdrVerifyReport`].
+    ///
+    /// The `_branch` argument is unused here — this adapter always scans from
+    /// the local workspace, not from a git-blob ref. This is intentional for
+    /// the merge gate: the merge gate runs on the checked-out branch, so the
+    /// local workspace corresponds to the branch being evaluated.
+    ///
+    /// Internally builds a `FsAdrFileAdapter` rooted at `repo_root/knowledge/adr`
+    /// and runs `VerifyAdrSignalsInteractor` — the same pipeline as
+    /// `execute_verify_adr_signals` but returning the domain report rather than
+    /// a `VerifyOutcome`.
+    ///
+    /// Returns:
+    /// - `Found(report)` on success.
+    /// - `NotFound` when `knowledge/adr` does not exist under `repo_root`.
+    /// - `FetchError(msg)` on I/O or parse failure.
+    fn read_adr_verify_report(&self, _branch: String) -> BlobFetchResult<AdrVerifyReport> {
+        match self.repo_root.symlink_metadata() {
+            Ok(meta) if meta.file_type().is_symlink() => {
+                return BlobFetchResult::FetchError(format!(
+                    "refusing to use symlinked repo_root: {}",
+                    self.repo_root.display()
+                ));
+            }
+            Ok(_) => {}
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "cannot stat repo_root {}: {e}",
+                    self.repo_root.display()
+                ));
+            }
+        }
+
+        let repo_root = match self.repo_root.canonicalize() {
+            Ok(path) => path,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "cannot canonicalize repo_root {}: {e}",
+                    self.repo_root.display()
+                ));
+            }
+        };
+        let adr_dir = repo_root.join("knowledge/adr");
+        match reject_symlinks_below(&adr_dir, &repo_root) {
+            Ok(true) => {}
+            Ok(false) => {
+                let knowledge_dir = repo_root.join("knowledge");
+                match knowledge_dir.symlink_metadata() {
+                    Ok(meta) if meta.is_dir() => return BlobFetchResult::NotFound,
+                    Ok(_) => {
+                        return BlobFetchResult::FetchError(format!(
+                            "{} is not a directory",
+                            knowledge_dir.display()
+                        ));
+                    }
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                        return BlobFetchResult::NotFound;
+                    }
+                    Err(e) => {
+                        return BlobFetchResult::FetchError(format!(
+                            "failed to stat {}: {e}",
+                            knowledge_dir.display()
+                        ));
+                    }
+                }
+            }
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "refusing to read ADR directory {}: {e}",
+                    adr_dir.display()
+                ));
+            }
+        }
+        if let Err(e) = reject_direct_adr_entry_symlinks(&adr_dir, &repo_root) {
+            return BlobFetchResult::FetchError(format!(
+                "refusing to read ADR directory {}: {e}",
+                adr_dir.display()
+            ));
+        }
+        let adapter = crate::adr_decision::FsAdrFileAdapter::new(adr_dir);
+        let port: Arc<dyn AdrFilePort> = Arc::new(adapter);
+        let interactor = VerifyAdrSignalsInteractor::new(port);
+        match interactor.verify(VerifyAdrSignalsCommand) {
+            Ok(report) => BlobFetchResult::Found(report),
+            Err(e) => BlobFetchResult::FetchError(format!("adr scan failed: {e}")),
         }
     }
 }
@@ -940,6 +1051,101 @@ mod tests {
                 assert!(msg.contains("symlink"), "{msg}");
             }
             other => panic!("expected FetchError(symlink), got {other:?}"),
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_adr_verify_report_rejects_symlink_adr_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        let repo = dir.path();
+        let outside = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(repo.join("knowledge")).unwrap();
+        std::os::unix::fs::symlink(outside.path(), repo.join("knowledge/adr")).unwrap();
+
+        let reader = GitShowTrackBlobReader::new(repo.to_path_buf());
+        match reader.read_adr_verify_report("main".to_owned()) {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(msg.contains("symlink"), "{msg}");
+            }
+            other => panic!("expected FetchError(symlink), got {other:?}"),
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_adr_verify_report_rejects_symlink_adr_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let adr_dir = dir.path().join("knowledge/adr");
+        std::fs::create_dir_all(&adr_dir).unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let target = outside.path().join("2026-06-18-0001-test.md");
+        std::fs::write(
+            &target,
+            "---\nadr_id: test\ndecisions:\n  - id: D1\n    status: accepted\n    user_decision_ref: chat\n---\n",
+        )
+        .unwrap();
+        std::os::unix::fs::symlink(&target, adr_dir.join("2026-06-18-0001-test.md")).unwrap();
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_adr_verify_report("main".to_owned()) {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(msg.contains("symlink"), "{msg}");
+            }
+            other => panic!("expected FetchError(symlink), got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_adr_verify_report_found_counts_adr_signals() {
+        let dir = tempfile::tempdir().unwrap();
+        let adr_dir = dir.path().join("knowledge/adr");
+        std::fs::create_dir_all(&adr_dir).unwrap();
+        std::fs::write(
+            adr_dir.join("2026-06-18-0001-test.md"),
+            "---\nadr_id: test\ndecisions:\n  - id: D1\n    status: accepted\n    user_decision_ref: chat\n---\n",
+        )
+        .unwrap();
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_adr_verify_report("main".to_owned()) {
+            BlobFetchResult::Found(report) => {
+                assert_eq!(report.blue_count(), 1);
+                assert_eq!(report.yellow_count(), 0);
+                assert_eq!(report.red_count(), 0);
+                assert_eq!(report.grandfathered_count(), 0);
+            }
+            other => panic!("expected Found, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_adr_verify_report_parse_failure_returns_fetch_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let adr_dir = dir.path().join("knowledge/adr");
+        std::fs::create_dir_all(&adr_dir).unwrap();
+        std::fs::write(adr_dir.join("bad.md"), "# missing frontmatter\n").unwrap();
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_adr_verify_report("main".to_owned()) {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(msg.contains("adr scan failed"), "{msg}");
+            }
+            other => panic!("expected FetchError, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_adr_verify_report_regular_file_knowledge_returns_fetch_error() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("knowledge"), "not a directory").unwrap();
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_adr_verify_report("main".to_owned()) {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(msg.to_lowercase().contains("directory"), "{msg}");
+            }
+            other => panic!("expected FetchError, got {other:?}"),
         }
     }
 
