@@ -26,6 +26,7 @@ pub mod layers;
 pub mod merge_gate_adapter;
 pub mod module_size;
 pub mod plan_artifact_refs;
+pub mod signal_gates_config;
 pub mod spec_attribution;
 pub mod spec_frontmatter;
 pub mod spec_signals;

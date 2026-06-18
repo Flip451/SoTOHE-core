@@ -1,36 +1,36 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-18T04:32:42Z",
-  "declaration_hash": "797e4c194cd2def9932d75e9ed892df4e80d6852dbbbb1bce43cc96b5366b68f",
+  "generated_at": "2026-06-18T06:33:13Z",
+  "declaration_hash": "adfdf059e1ca5b946a38bb999dc28e411b1c7bbdb74ff27ab77341cecd398cb3",
   "signals": [
     {
       "type_name": "GateRowDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug",
-        "serde::de::Deserialize"
+        "serde_core::de::Deserialize<'de>"
       ]
     },
     {
       "type_name": "SignalGatesConfig",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug",
-        "serde::de::Deserialize"
+        "serde_core::de::Deserialize<'de>"
       ]
     },
     {
       "type_name": "SignalGatesConfigError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -39,12 +39,12 @@
     {
       "type_name": "StrictnessDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug",
-        "serde::de::Deserialize"
+        "serde_core::de::Deserialize<'de>"
       ]
     },
     {
@@ -68,8 +68,8 @@
     {
       "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
@@ -86,9 +86,9 @@
     {
       "type_name": "Strictness",
       "kind_tag": "unknown",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
+      "found_items": [
         "core::convert::From<StrictnessDto>"
       ]
     }

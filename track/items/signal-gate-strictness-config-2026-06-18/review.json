@@ -47,6 +47,46 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Top-level JSON shape is not validated before calling `.get(\"$schema_version\")`, so a syntactically valid but non-object document (for example `[]` or `\"foo\"`) is reported as `MissingKey { key: \"$schema_version\" }` instead of the documented parse/structure failure. That misclassifies a malformed config and makes the error contract inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
+              "line": 228,
+              "category": "error handling"
+            },
+            {
+              "message": "Gate-cell type errors fall through to `SignalGatesConfigError::ParseFailed { path: PathBuf::new(), ... }` because `find_invalid_strictness_cell` only checks string values and ignores numbers/nulls/arrays/objects. A config like `\"adr_user\": 1` therefore loses the real file path and offending key/value, violating the loader's error-reporting contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
+              "line": 255,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b79fa9a342879c8181ccd21258ce3795e6c3542317cc358e57b369bc742564a4",
+          "at": "2026-06-18T06:18:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a5c9be9364fc31c2f51014379e3f09406fa575ec9d2fa0cdf8a981a6575a622",
+          "at": "2026-06-18T06:26:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a5c9be9364fc31c2f51014379e3f09406fa575ec9d2fa0cdf8a981a6575a622",
+          "at": "2026-06-18T06:29:34Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -371,6 +411,20 @@
           "findings": [],
           "hash": "rvw1:sha256:3cfbeb8ad129a242e87095dee41b9ed8aed5e9fb7799a17b7be12b0aeea7c06b",
           "at": "2026-06-18T04:31:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4fec36400adc9644fff50875826a8e7ac4ff2d54f1f0b88d3a613e59b737a75",
+          "at": "2026-06-18T06:17:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4fec36400adc9644fff50875826a8e7ac4ff2d54f1f0b88d3a613e59b737a75",
+          "at": "2026-06-18T06:29:53Z"
         }
       ]
     }

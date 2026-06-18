@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "797e4c194cd2def9932d75e9ed892df4e80d6852dbbbb1bce43cc96b5366b68f",
+  "catalogue_declaration_hash": "adfdf059e1ca5b946a38bb999dc28e411b1c7bbdb74ff27ab77341cecd398cb3",
   "signals": [
     {
       "type_name": "GateRowDto",

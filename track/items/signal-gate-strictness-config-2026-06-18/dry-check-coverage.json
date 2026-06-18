@@ -1,284 +1,206 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "35bf7e36d6f22227e36be94a45a21559e9086b7270dd2502ba5983cfa92ce7eb",
+  "corpus_fingerprint": "8e51bb7c973c33f855a2629bb6a70fc6a4890809d2ee5af0bac771eb37708087",
   "fragment_refs": [
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "25b5c75ab58a87e199bd07c33694b95a046e3750a25da08b64a2ecf46846b587"
+      "path": "libs/infrastructure/src/verify/mod.rs",
+      "content_hash": "8631e845aa01359ae379cc59478e92182f36cdfb9abe36bcb67a7d8c195d8c47"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "350bd5227199e5016a761a9d340ba7eada9943c5bfd7942f8cbe377c57dc5b7b"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "027e323c6aeb6e5270af0346e88f5f2facac9d6d008fa378d6ff9624ed38afe3"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "42f0fc50f46e9266dff6e402f49b2e0f76bb29e2800e3b92472956ba2aa19412"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "0bdff96971f8c411aa56ff4e4e97406f9a80b7a9945d5b84085f04be999cf9fe"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "80afc649b0d29b181cc97bb7e60180fc00ad2b3e0fae5cb3ab56e8cd3190379e"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "22f393aeccf50db65f72c4d77acdc59735b746a01302e8466af391e7471658e5"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "824ad2168ad7d037c6a3f8a7dd389e37a03718b8cee1250c36ec6eed9f817304"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "2d63ef1f7a019902c8f72a0eec5591ac27c5d56617f15be5c6db0503f2d35519"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "39d3ad1f20367a4abed12e86c3973bff8f6ab2980d2de9893b2bb8c879b64a65"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "3b633c3e5a65e764e24a6f0229a5ceb25f202c9dc017bf50cab2313e9c499a73"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "c8319cca32c021503e5bca777bfbeeca901d7e4549a0efa5c30ce3da5270a19f"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "3d25641bc171009e4333747209b3c1956c464cbd74a4e6076d70b96f56373655"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "d2654b4428f0574880b72f5b3ee58fbe7366e8e13f53185908180925712bc8eb"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "44403a73729347e1d0e83102854901a9bb962c340ae5bf970ba60672d73ba1e6"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "d7b0ab580b810e73bdbafe4d572baf6712fce3e6216980362ee29d2c259d3aec"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "46b9f9869cd9349a0fd9ce526925b0febbbd1117f209776cc10a8de380c9dd14"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "dcc7058a6e1b2b164db9d63e2971793b9e0bc4794a91819e75bcfc5070852641"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "4ae86a67957876dfce4007857799a5d30967a207ad580eb658f0f3e060f5b7ae"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "5c1df43d6e13256395e7d03e29054b1d885c596a94a7ea67e559dcd7b7963d75"
     },
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "f1943181197c0b7283aba34278f5690ffc2549d734254a22e11aa51b5bf0cc7a"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "5c3402417f9297aeaf3ed8cb813a2ec62ece04fa1aba3a5e436e76284d26908e"
     },
     {
-      "path": "libs/domain/src/lib.rs",
-      "content_hash": "b63fe6f8bcf9c03c9267c93209c421b2b026779b628c411470b833f144389684"
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "6a82ba1dc992dd2aed97c6cd2285a6d5a575079752665610b1e3c94e69aed785"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "8634271c3373371b593d84e390cb145a14643035ba5868849a6485046c90d9ce"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "94ef8fd8e98cf7b0ebff5daff6ad9e8d3dfbd5c3266056946199a699d69d59cf"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "aacf13142f5e52b01f5f469c3627ab57403db51007076b2fe5ae33640fa5bbd0"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "aaefd95a5a9d52ec7e2896f0da036cf59385247c2846cb8f005f48f0d0981974"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "b128500be015a8c4a81a52e55052f1ddaeffc4782d14be7b9ad9e1ee76ac5109"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "bca7339ae74e4c3e3c00287fd1cf786e874ac34cfc060eb86e8bc7b7cdd827c1"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "be1352fa7d2085f7cadf97901a6663a0b30f43aea63e6548925ff05fd66aab5b"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "c77ec2eb8fd91ae1ef52c7956a9910ec1b21b95be3535e1d28722e873ce027e4"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "c8f5d7965ce4e8359d5ff34a889397a8e0943554d81ea4e818d90a8a94dc08f5"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "c9e724ebad9495f2cc4994647eb086a6c6fead92783055e216ffbfdc697a0130"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "cb724f92622cae6cfc423498a6aec17c286867a45e7f6471bb174fd6f1df4cfd"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "e92226085f76507a022c6acdb4ef0fd07528f458216694418c29b8ea8f623e03"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "fbd6f494cc9c64f5cbf9334c09baa1c7b236ed09e63d2903e6cee8a29690a9f1"
     }
   ],
   "processed_pair_keys": [
     {
       "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "2d63ef1f7a019902c8f72a0eec5591ac27c5d56617f15be5c6db0503f2d35519"
       },
       "high": {
-        "path": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-        "content_hash": "da73ffde46e9203aabf1984dd30dba01b97bc019664b8ca903d89b7598b9fb08"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "94ef8fd8e98cf7b0ebff5daff6ad9e8d3dfbd5c3266056946199a699d69d59cf"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "2d63ef1f7a019902c8f72a0eec5591ac27c5d56617f15be5c6db0503f2d35519"
       },
       "high": {
-        "path": "libs/infrastructure/src/ref_verify.rs",
-        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "cb724f92622cae6cfc423498a6aec17c286867a45e7f6471bb174fd6f1df4cfd"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "3b633c3e5a65e764e24a6f0229a5ceb25f202c9dc017bf50cab2313e9c499a73"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
-        "content_hash": "f14d37aacfa64c17487e8dec55de1aa640b3048bfa10a1c5a3a70850e38e8d37"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "5c1df43d6e13256395e7d03e29054b1d885c596a94a7ea67e559dcd7b7963d75"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "3b633c3e5a65e764e24a6f0229a5ceb25f202c9dc017bf50cab2313e9c499a73"
       },
       "high": {
-        "path": "libs/usecase/src/catalogue_spec_refs.rs",
-        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "cb724f92622cae6cfc423498a6aec17c286867a45e7f6471bb174fd6f1df4cfd"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "3d25641bc171009e4333747209b3c1956c464cbd74a4e6076d70b96f56373655"
       },
       "high": {
-        "path": "libs/usecase/src/ref_verify/interactor.rs",
-        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "6a82ba1dc992dd2aed97c6cd2285a6d5a575079752665610b1e3c94e69aed785"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "3d25641bc171009e4333747209b3c1956c464cbd74a4e6076d70b96f56373655"
       },
       "high": {
-        "path": "libs/domain/src/tddd/consistency.rs",
-        "content_hash": "1de31f71b3a934e22e9594d688e11b41fea91a87d349f395ca73c3b35081e0d5"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "94ef8fd8e98cf7b0ebff5daff6ad9e8d3dfbd5c3266056946199a699d69d59cf"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "44403a73729347e1d0e83102854901a9bb962c340ae5bf970ba60672d73ba1e6"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs",
-        "content_hash": "4f4d67d27f4bc788cc955b4aa302e12f3a5579fc6bf2119b6e4c9b76c8060c50"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "c77ec2eb8fd91ae1ef52c7956a9910ec1b21b95be3535e1d28722e873ce027e4"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "6a82ba1dc992dd2aed97c6cd2285a6d5a575079752665610b1e3c94e69aed785"
       },
       "high": {
-        "path": "libs/infrastructure/src/type_catalogue_render.rs",
-        "content_hash": "088fb046b93bab3236481be0de2e87b4582915fc13592f18a0ae4944a853aec7"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "94ef8fd8e98cf7b0ebff5daff6ad9e8d3dfbd5c3266056946199a699d69d59cf"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "94ef8fd8e98cf7b0ebff5daff6ad9e8d3dfbd5c3266056946199a699d69d59cf"
       },
       "high": {
-        "path": "libs/usecase/src/catalogue_spec_signals.rs",
-        "content_hash": "d5e41ccaeaeada4af54518c7ec175b5cbda4d42ffa04569624edd6bc440a2314"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "c8319cca32c021503e5bca777bfbeeca901d7e4549a0efa5c30ce3da5270a19f"
-      },
-      "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "c8319cca32c021503e5bca777bfbeeca901d7e4549a0efa5c30ce3da5270a19f"
-      },
-      "high": {
-        "path": "libs/domain/src/spec.rs",
-        "content_hash": "b298fdafb88c78a38dbd4c25cb0b112033f3b77c6bb95108cbbbe5d8188af18a"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "d2654b4428f0574880b72f5b3ee58fbe7366e8e13f53185908180925712bc8eb"
-      },
-      "high": {
-        "path": "libs/domain/src/tddd/consistency.rs",
-        "content_hash": "82297b00eba12d6b0b4489cfd7efb175f86ae645c4123cca368195e930e8d650"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "d7b0ab580b810e73bdbafe4d572baf6712fce3e6216980362ee29d2c259d3aec"
-      },
-      "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "d7b0ab580b810e73bdbafe4d572baf6712fce3e6216980362ee29d2c259d3aec"
-      },
-      "high": {
-        "path": "libs/domain/src/spec.rs",
-        "content_hash": "6cbd878d794ba9d252c023e4f4a346f2838c018cb65ea435a4812d08c5f3fa4f"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "d7b0ab580b810e73bdbafe4d572baf6712fce3e6216980362ee29d2c259d3aec"
-      },
-      "high": {
-        "path": "libs/domain/src/tddd/consistency.rs",
-        "content_hash": "2713f1f2172d88f882bf086d97b4f677464a93d09d32dd745f7cb2d7fb7e1d6d"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "dcc7058a6e1b2b164db9d63e2971793b9e0bc4794a91819e75bcfc5070852641"
-      },
-      "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "dcc7058a6e1b2b164db9d63e2971793b9e0bc4794a91819e75bcfc5070852641"
-      },
-      "high": {
-        "path": "libs/domain/src/spec.rs",
-        "content_hash": "091860ebbf311d669c0d742fab71cac34361c1a3c92766e1df02f2665b24fc60"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "dcc7058a6e1b2b164db9d63e2971793b9e0bc4794a91819e75bcfc5070852641"
-      },
-      "high": {
-        "path": "libs/domain/src/tddd/consistency.rs",
-        "content_hash": "f8ea11cfdc3fe2aa687931102ef0440c4c1710b803152ba9700232b4e46c082d"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
-      },
-      "high": {
-        "path": "libs/domain/src/tddd/consistency.rs",
-        "content_hash": "2713f1f2172d88f882bf086d97b4f677464a93d09d32dd745f7cb2d7fb7e1d6d"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
-      },
-      "high": {
-        "path": "libs/domain/src/tddd/consistency.rs",
-        "content_hash": "970ff21255697cbb1c4d75566b5aa440e8b934a9e4fed5a3bebc2314a1aa272b"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/lib.rs",
-        "content_hash": "b63fe6f8bcf9c03c9267c93209c421b2b026779b628c411470b833f144389684"
-      },
-      "high": {
-        "path": "libs/infrastructure/src/lib.rs",
-        "content_hash": "ec737db1e7cbea0bfecd609b6f23cf2a62f59575f2593f24331d88b01792dcfb"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/lib.rs",
-        "content_hash": "b63fe6f8bcf9c03c9267c93209c421b2b026779b628c411470b833f144389684"
-      },
-      "high": {
-        "path": "libs/usecase/src/lib.rs",
-        "content_hash": "92d3f1b4e6c5d04c57921e63de8b200911b7a8c66eae9c46624e5fd93633c49e"
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "cb724f92622cae6cfc423498a6aec17c286867a45e7f6471bb174fd6f1df4cfd"
       }
     }
   ]
