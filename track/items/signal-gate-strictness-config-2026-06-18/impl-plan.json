@@ -22,12 +22,13 @@
     {
       "id": "T004",
       "description": "D6: (1) Create `.harness/config/signal-gates.json` with the recommended default (commit_gate: adr_user=interim, spec_adr=strict, catalog_spec=strict, impl_catalog=interim; merge_gate: all strict) and `$schema_version: 1`. (2) Create `.harness/config/samples/signal-gates.adr-strict.json` with commit_gate.adr_user=strict variant for users who want adr_user strict at commit time. (3) Update `knowledge/conventions/responsibility-boundary.md` to add `.harness/config/signal-gates.json` to the template-user-editable list, noting the distinction between commit_gate.impl_catalog=interim (TDDD structural necessity) vs commit_gate.adr_user=interim (SoTOHE workflow choice). Estimated diff: ~70 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d4edb7f2910b3b78734856f32ebd3b42e2af355f"
     },
     {
       "id": "T005",
       "description": "D7: Add `libs/usecase/src/chain/` directory with four sub-modules: `adr_user.rs` (AdrUserChain unit struct implementing ChainIdentity + SoTChain + LiveSoTChain — live scan of knowledge/adr/ frontmatter, no persistence file); `spec_adr.rs` (SpecAdrChain unit struct implementing ChainIdentity + PersistedSoTChain — `evaluate_gate` delegates to `domain::check_spec_doc_signals`, `check_freshness` implements self-consistency check comparing `doc.evaluate_signals()` vs `doc.signals()`); `catalog_spec.rs` (CatalogSpecChain unit struct implementing ChainIdentity + PersistedSoTChain — `evaluate_gate` delegates to `domain::check_catalogue_spec_signals` (T002), `check_freshness` compares entry_hash from signals doc with current catalogue bytes SHA-256); `impl_catalog.rs` (ImplCatalogChain unit struct implementing ChainIdentity + PersistedSoTChain — `evaluate_gate` delegates to `domain::check_type_signals`, `check_freshness` compares declaration_hash from type-signals doc with current catalogue bytes SHA-256). Add `mod.rs` to re-export all four. All four get SoTChain via blanket impl from T001 (chains ①②③) or direct impl (chain ⓪). Unit/static trait-bound tests: assert AdrUserChain satisfies ChainIdentity + SoTChain + LiveSoTChain, assert SpecAdrChain/CatalogSpecChain/ImplCatalogChain satisfy ChainIdentity + PersistedSoTChain and are accepted by SoTChain-bound helper functions through the blanket impl, and cover freshness/evaluate_gate delegation happy/error paths with mocked persisted documents. Depends on T001 and T002. Estimated diff: ~350 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",

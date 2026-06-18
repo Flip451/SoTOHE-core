@@ -16,10 +16,10 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrUserChain | use_case | — | — | 🟡 | 🔵 |
-| CatalogSpecChain | use_case | — | — | 🟡 | 🔵 |
-| ImplCatalogChain | use_case | — | — | 🟡 | 🔵 |
-| SpecAdrChain | use_case | — | — | 🟡 | 🔵 |
+| AdrUserChain | use_case | — | — | 🔵 | 🔵 |
+| CatalogSpecChain | use_case | — | — | 🔵 | 🔵 |
+| ImplCatalogChain | use_case | — | — | 🔵 | 🔵 |
+| SpecAdrChain | use_case | — | — | 🔵 | 🔵 |
 
 ## Commands
 

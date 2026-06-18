@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-18T06:43:57Z",
+  "generated_at": "2026-06-18T07:56:37Z",
   "declaration_hash": "e83483bb7adff357f4ebf7e9c4fb6b2c1e067c61c27d7307f8e447424687e621",
   "signals": [
     {
       "type_name": "AdrUserChain",
       "kind_tag": "use_case",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ChainIdentity",
         "LiveSoTChain",
         "SoTChain",
@@ -20,9 +20,9 @@
     {
       "type_name": "CatalogSpecChain",
       "kind_tag": "use_case",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ChainIdentity",
         "PersistedSoTChain",
         "core::clone::Clone",
@@ -33,9 +33,9 @@
     {
       "type_name": "ImplCatalogChain",
       "kind_tag": "use_case",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ChainIdentity",
         "PersistedSoTChain",
         "core::clone::Clone",
@@ -46,9 +46,9 @@
     {
       "type_name": "SpecAdrChain",
       "kind_tag": "use_case",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ChainIdentity",
         "PersistedSoTChain",
         "core::clone::Clone",
