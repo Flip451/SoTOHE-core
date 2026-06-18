@@ -96,24 +96,13 @@
           "findings": [],
           "hash": "rvw1:sha256:1d3773b2dcd988bd070aa34eaf0e6ac6b6d04419c90549ae01744139baf64da7",
           "at": "2026-06-17T23:48:52Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8c6d59386f49c36f0d8a95e48c5cde5fa9c278d91d19340980b1ac29e28c020",
-          "at": "2026-06-17T23:30:12Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5f0097cdb9c1253d3876b3b1df45257ba87b100ae5f6f65c4eff78189940977b",
-          "at": "2026-06-17T23:35:01Z"
+          "hash": "rvw1:sha256:7ee9d36ab6f304a17adc10c255591c05e7dc2be914bb4c45ef6f2294d35cd4c4",
+          "at": "2026-06-18T00:19:55Z"
         }
       ]
     },
@@ -147,6 +136,38 @@
           "findings": [],
           "hash": "rvw1:sha256:cace154b55fdfd26f881dc495020d75eb10405032631b7c65d7cb004e81a896c",
           "at": "2026-06-17T23:47:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acb1a20f775bab571aaaa7227bc768d92a00f4fb94fe16ee46400911080acccf",
+          "at": "2026-06-18T00:19:20Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8c6d59386f49c36f0d8a95e48c5cde5fa9c278d91d19340980b1ac29e28c020",
+          "at": "2026-06-17T23:30:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f0097cdb9c1253d3876b3b1df45257ba87b100ae5f6f65c4eff78189940977b",
+          "at": "2026-06-17T23:35:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:557937eacaa480f386e53abc651919dc4bea36db699a5c8ae22948f97086e538",
+          "at": "2026-06-18T00:19:44Z"
         }
       ]
     }

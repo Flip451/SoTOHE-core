@@ -10,22 +10,23 @@
     {
       "id": "T002",
       "description": "knowledge/designs/ and knowledge/schemas/ — salvage then delete. Read all 3 files in knowledge/designs/ (auto-mode-*) and all 2 files in knowledge/schemas/ (auto-mode-config-schema.md, auto-state-schema.md). Apply the same salvage judgment: encode novel information to knowledge/research/ independent files, then delete both directories. (IN-02 / IN-03 / IN-05 / AC-02 / AC-03 / AC-05 / AC-06)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "996258534c36aee635c92034d7b209b535b1c47a"
     },
     {
       "id": "T003",
       "description": "knowledge/DESIGN.md — salvage then delete. Read knowledge/DESIGN.md (50 lines). The content is mostly pointers to other SSoTs (architecture-rules.json, agent-profiles.json, adr/README.md). Apply salvage judgment; if any novel information exists, encode to knowledge/research/ independent file. Then delete knowledge/DESIGN.md. (IN-04 / IN-05 / AC-04 / AC-05 / AC-06)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",
       "description": "Update active doc references to deleted paths. Remove or replace references to knowledge/DESIGN.md and to files under deleted directories (knowledge/strategy/ / knowledge/designs/ / knowledge/schemas/) in active docs not otherwise handled by T005/T006: CLAUDE.md, README.md, .claude/rules/08-orchestration.md, .claude/rules/01-language.md, .claude/commands/track/implement.md, .claude/commands/track/review.md, .claude/commands/track/setup.md, .claude/settings.json (context-compaction echo command), .codex/instructions.md, .claude/skills/codex-system/SKILL.md, knowledge/conventions/task-completion-flow.md, and any other surviving active doc found by rg. For each reference, either delete the line or redirect to the appropriate replacement SSoT / current track artifact (architecture-rules.json / agent-profiles.json / knowledge/adr/README.md / track/items/<id>/plan.md). (IN-06 / AC-07 / AC-08 / AC-09)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",
       "description": "Update knowledge/README.md Directory Structure. Remove the strategy/, designs/, schemas/ rows from the Directory Structure table in knowledge/README.md and remove the knowledge/DESIGN.md entry from the Related Top-Level Files section. Also remove the 'strategy/TODO-PLAN.md — Strategic roadmap' reference from the numbered list if present. (IN-07 / AC-10)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",

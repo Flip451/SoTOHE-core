@@ -7,7 +7,6 @@ and architecture decisions live here.
 
 1. `conventions/README.md` — Project-specific engineering rules and implementation policies
 2. `adr/README.md` — Architecture Decision Records
-3. `strategy/TODO-PLAN.md` — Strategic roadmap
 
 ## Directory Structure
 
@@ -16,11 +15,7 @@ and architecture decisions live here.
 | `conventions/` | Project-specific implementation rules |
 | `adr/` | Architecture Decision Records |
 | `research/` | Crate surveys, version baselines, analysis results |
-| `designs/` | Design documents (auto-mode, etc.) |
-| `schemas/` | Schema documentation |
-| `strategy/` | Strategic planning and roadmap |
 
 ## Related Top-Level Files
 
 - `architecture-rules.json` — Machine-readable layer dependency rules (repo root)
-- `knowledge/DESIGN.md` — Architecture decisions with Canonical Blocks

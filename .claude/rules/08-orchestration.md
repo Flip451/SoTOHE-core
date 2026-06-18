@@ -40,7 +40,6 @@ Read these first before planning or implementation:
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
 - `track/items/<id>/observations.md` (optional — manual observation log)
-- `knowledge/DESIGN.md`
 - `.claude/rules/`
 - `architecture-rules.json`
 
