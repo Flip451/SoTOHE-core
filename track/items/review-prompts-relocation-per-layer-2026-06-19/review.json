@@ -16,6 +16,72 @@
           "findings": [],
           "hash": "rvw1:sha256:c508cc43f6fffc7da0140ef3fc85919a5c9ab1644ad58eade9f9c528f5d741b8",
           "at": "2026-06-18T16:55:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is internally inconsistent: it says the step is \"purely additive\" and that \"no existing files are modified\", but the same step also requires moving `track/review-prompts/plan-artifacts.md` into `.harness/custom/review-prompts/`. A move changes the source tree, so this step cannot satisfy both statements as written.",
+              "severity": "P1",
+              "file": "track/items/review-prompts-relocation-per-layer-2026-06-19/plan.md",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "T002 is declared CI-green at the commit boundary, but T003 is where the tests that still assert the old path strings are updated. If those tests are part of `cargo make ci`, the T002 boundary is not actually passable until the T003 expectation changes land too.",
+              "severity": "P1",
+              "file": "track/items/review-prompts-relocation-per-layer-2026-06-19/plan.md",
+              "line": 20,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:2ce05a0cac451a47512a6e4e5e71158e389bfacb02b7338779152892bdc7fb6c",
+          "at": "2026-06-18T17:53:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe2bd75434644be1c3b4072052aceeba88eb2cc28c010e4d2f632d8ebf0eb774",
+          "at": "2026-06-18T18:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01/ADR D5 require the clean-move migration commit to update all references, explicitly including docs, at the same time as loader paths, briefing_file values, harness-policy patterns, and tests. The implementation plan instead makes T002+T003 the atomic migration and then schedules the live-doc reference updates as T004 after that paired migration. That leaves an intermediate planned commit sequence that violates the stated clean-move constraint and contradicts the task coverage that maps CN-01 only to T002/T003 while IN-07/IN-08 are deferred to T004.",
+              "severity": "P1",
+              "file": "track/items/review-prompts-relocation-per-layer-2026-06-19/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fe2bd75434644be1c3b4072052aceeba88eb2cc28c010e4d2f632d8ebf0eb774",
+          "at": "2026-06-18T18:06:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-01 says the broken `briefing_file` path lint is deferred per the ADR Open Questions, but its ADR reference points to D6. D6 defines `.harness/custom/` ownership and CI behavior, not the broken-path lint deferral, so the rendered spec sends readers to the wrong design rationale for this out-of-scope item.",
+              "severity": "P1",
+              "file": "track/items/review-prompts-relocation-per-layer-2026-06-19/spec.json",
+              "line": 163,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:bbf99b6a5e7791f79fcff2b623d1a47d74e8653dc02111dcad8c6199326c8b77",
+          "at": "2026-06-18T18:11:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24f1ef66d2bcfabd5e34626c0802e6a3d4ebefba9e58a1efa164f50e2cf4c42f",
+          "at": "2026-06-18T18:17:26Z"
         }
       ]
     }
