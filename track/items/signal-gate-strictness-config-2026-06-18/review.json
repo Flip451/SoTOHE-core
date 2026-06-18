@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`calc-adr-user` is described as optional here (“薄い validate に留める（または省略）”), but the same ADR later makes the 8-command taxonomy mandatory in AC-01 (`signal {calc,check}-adr-user,...` must exist). Those two requirements conflict, so the command surface is underspecified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 132,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b498632a30fe035573c1deaa100fa4d06b72583636b36e877c99451b8d1ea6e7",
+          "at": "2026-06-17T23:45:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:515fa6a1b83ae895f0d04f536ddb068298e7da96bd019f34a59acb3e97cd95ea",
+          "at": "2026-06-17T23:49:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7 says chain ⓪ implements only `SoTChain` and that calling `calc` for ⓪ is compile-time forbidden, but D1/AC-01 require `signal calc-adr-user` to exist as a no-persist live calculation command. As written, the trait contract and CLI acceptance criteria cannot both be implemented through the stated trait-driven dispatch; clarify whether `calc-adr-user` is outside `PersistedSoTChain` or add a separate no-persist calc contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 309,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:515fa6a1b83ae895f0d04f536ddb068298e7da96bd019f34a59acb3e97cd95ea",
+          "at": "2026-06-17T23:52:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-08 contradicts D7's trait contract. D7 defines three traits and repeatedly states that chain ⓪ `AdrUserChain` must implement `LiveSoTChain` so `signal calc-adr-user` has a typed no-persist `calc_live` path, but the acceptance criteria here require only two traits and say `AdrUserChain` implements `SoTChain` only. If implementers follow AC-08, the planned `calc-adr-user` contract from D1/D7 is dropped, so the plan is internally inconsistent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 385,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:562c34591008e2f34c45b5ea0d22dd0723de5dea70a5d1370c53bf2fd3ef7913",
+          "at": "2026-06-17T23:55:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR keeps `signal render` open as a future namespace option, but the scope briefing says the user explicitly rejected pushing render into the signal namespace. That leaves a rejected API direction alive instead of recording it as rejected, so downstream planning could implement an option this baseline was supposed to rule out.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 141,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a6534aab5bb70797efc217db1f454d0c18c681fec2198d7b0f6f2546d3cc4af2",
+          "at": "2026-06-17T23:58:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7 relies on `PersistedSoTChain: SoTChain` providing the default `SoTChain::check` flow (`load -> check_freshness -> evaluate_gate`), but a Rust subtrait cannot implement a method declared by its supertrait for all implementers. As written, each persisted chain still has to implement `SoTChain::check` separately, so the plan does not actually force freshness checks through the trait surface and the AC-08 compile-time guarantee is not achievable without changing the trait design (for example, a blanket impl or an explicit helper method pattern).",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 295,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:e1480cc877dde05db2c591fa62380d5a521ad1fe2cd46f77a9a0c9926dd02c4d",
+          "at": "2026-06-18T00:01:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c77df19d40e0c48403e20e7eb7c34da34bf792097f2f816501e6b479772c0b08",
+          "at": "2026-06-18T00:06:10Z"
+        }
+      ]
+    }
+  }
+}
