@@ -39,7 +39,7 @@ pub use adr_decision::{
 };
 pub use chain::{
     ChainGateEntry, ChainId, ChainIdentity, GateKind, LiveSoTChain, PersistedSoTChain,
-    SignalGateMatrix, SoTChain, Strictness,
+    SignalGateMatrix, SoTChain, Strictness, check_catalogue_spec_signals,
 };
 pub use decision::Decision;
 pub use dry_check::{

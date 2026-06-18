@@ -1,310 +1,270 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "cb266ea3fbdaead6108996b2ebd6163e9dde98a5c56d64c886275ada6017ad14",
+  "corpus_fingerprint": "35bf7e36d6f22227e36be94a45a21559e9086b7270dd2502ba5983cfa92ce7eb",
   "fragment_refs": [
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+      "content_hash": "25b5c75ab58a87e199bd07c33694b95a046e3750a25da08b64a2ecf46846b587"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "106963840d2f3c87e9c9c271c5af78e728ede5ca726642bf8845e70556793a76"
+      "content_hash": "350bd5227199e5016a761a9d340ba7eada9943c5bfd7942f8cbe377c57dc5b7b"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+      "content_hash": "42f0fc50f46e9266dff6e402f49b2e0f76bb29e2800e3b92472956ba2aa19412"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "3157874ebb10aa05898615661e7a5fd5e36b98d95baae986a2458316d857366e"
+      "content_hash": "80afc649b0d29b181cc97bb7e60180fc00ad2b3e0fae5cb3ab56e8cd3190379e"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+      "content_hash": "824ad2168ad7d037c6a3f8a7dd389e37a03718b8cee1250c36ec6eed9f817304"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "4160bef7a7eb195ad7e52d6a984a45218b19db90444846ab18ad5479c8ec1571"
+      "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "445b159ce0c33b49acdbde29b5b27c93fdcd40c8a09e55a2014c60f05692fad7"
+      "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "4611386c6cad4e30ebc744da0f0c029a187e47978ddaf901c04a6e13d2297ee9"
+      "content_hash": "c8319cca32c021503e5bca777bfbeeca901d7e4549a0efa5c30ce3da5270a19f"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "472bfa2bb9923a58957e3f0f15e0f084fb81b737ed5d5932854adcfc3be6cec9"
+      "content_hash": "d2654b4428f0574880b72f5b3ee58fbe7366e8e13f53185908180925712bc8eb"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "4ea710b46c5ee80a8e55c0ec08d9014ad1c7dd5f347b970db41783dcdfcf04f9"
+      "content_hash": "d7b0ab580b810e73bdbafe4d572baf6712fce3e6216980362ee29d2c259d3aec"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "65213aa97cda2daf6272f79781fd1ff536fc591f589e933645591f11e12b9166"
+      "content_hash": "dcc7058a6e1b2b164db9d63e2971793b9e0bc4794a91819e75bcfc5070852641"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "77661b6f25bad89d4e41ac5012fc776d2259b09786faf0c10d0845604bd316e8"
+      "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
     },
     {
       "path": "libs/domain/src/chain.rs",
-      "content_hash": "7b3000c11eaf24b4b49778f5e1288ee0d8ec77c3b4c611964496de59a358b67c"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "99cb8b76ed44dc46bddf40300501b7264d9d22478eb06f5670365ea0a012eb33"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "a3f4c4b563e359d686df0cbce05285802ae718db8c32f91cde28fb9a3f623871"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "af8d618d3c9f743576857c7db072e4441e063aeae01d29598c20a193c8d0a9c3"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "c3efccd69b01f8fdd4da4fa64f68ccf5254cb159784f0dea851bfc4cdea51f13"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "c97c5d3c69d03760fec5c6a103a6cb64fcb84bc8ff820e1420abb176f7b0a2ef"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "d2d80d77272563a3bfa17fb3f048172727e876bd963d63dbc8f816bc3405f86c"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "d952e98872be4781a8687ed1dc09c7b1380a0a6bf2c67e4082409cfc6aeba56a"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "dcf5d074cf1cc26e7470e4ebc25407015af46fc1355aa487bd502b78647704a2"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "e4735bc477c5b2e74950ed72584b0a588a8414547dbf88443d470d1532acf50f"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "e4c0085bd62f8b88af877ed6f5480502e2f2bad2a5c4ef26718b429ec870e6b6"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "f09ec1ae0fb20b2cc53b352fd5794cd6299f0c586ad93c1d7018a4d38dd82c79"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "f6462f6a2a179a738f2661b2cc9cdf130292dfe2991805f55e2194af74f63f97"
-    },
-    {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "f6ccfa0b657be3cf52c2425fa16eb35db13fa36618f3f7924d9580262e48f16c"
+      "content_hash": "f1943181197c0b7283aba34278f5690ffc2549d734254a22e11aa51b5bf0cc7a"
     },
     {
       "path": "libs/domain/src/lib.rs",
-      "content_hash": "fd1a6e8dece86234d693e0eea48befcd6928de942d12630ec970749cff9ceb09"
+      "content_hash": "b63fe6f8bcf9c03c9267c93209c421b2b026779b628c411470b833f144389684"
     }
   ],
   "processed_pair_keys": [
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+        "path": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+        "content_hash": "da73ffde46e9203aabf1984dd30dba01b97bc019664b8ca903d89b7598b9fb08"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+        "path": "libs/infrastructure/src/ref_verify.rs",
+        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+        "path": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+        "content_hash": "f14d37aacfa64c17487e8dec55de1aa640b3048bfa10a1c5a3a70850e38e8d37"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "0f5f758bfd4373b46df1bbe53918a3e2e1c534ca6e7310eb21547f07ce867cc6"
+        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
+        "path": "libs/usecase/src/catalogue_spec_refs.rs",
+        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "106963840d2f3c87e9c9c271c5af78e728ede5ca726642bf8845e70556793a76"
+        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+        "path": "libs/usecase/src/ref_verify/interactor.rs",
+        "content_hash": "9295a1e62737936647fa87aa9631ba0d589f8fca69dc4e83c86a86e204e6acae"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "106963840d2f3c87e9c9c271c5af78e728ede5ca726642bf8845e70556793a76"
+        "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
+        "path": "libs/domain/src/tddd/consistency.rs",
+        "content_hash": "1de31f71b3a934e22e9594d688e11b41fea91a87d349f395ca73c3b35081e0d5"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "106963840d2f3c87e9c9c271c5af78e728ede5ca726642bf8845e70556793a76"
+        "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "d952e98872be4781a8687ed1dc09c7b1380a0a6bf2c67e4082409cfc6aeba56a"
+        "path": "libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs",
+        "content_hash": "4f4d67d27f4bc788cc955b4aa302e12f3a5579fc6bf2119b6e4c9b76c8060c50"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+        "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+        "path": "libs/infrastructure/src/type_catalogue_render.rs",
+        "content_hash": "088fb046b93bab3236481be0de2e87b4582915fc13592f18a0ae4944a853aec7"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+        "content_hash": "9f4b8d938cad5f4de6611a8949f4c4e2d63a55126b85a3d44cb03f1b2e8b9560"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+        "path": "libs/usecase/src/catalogue_spec_signals.rs",
+        "content_hash": "d5e41ccaeaeada4af54518c7ec175b5cbda4d42ffa04569624edd6bc440a2314"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "2f1b87911e21e24b5b7a8395f7b9a276ae8798fd77ccd3f26b323c5553f50ce3"
+        "content_hash": "c8319cca32c021503e5bca777bfbeeca901d7e4549a0efa5c30ce3da5270a19f"
       },
       "high": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "d952e98872be4781a8687ed1dc09c7b1380a0a6bf2c67e4082409cfc6aeba56a"
+        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+        "content_hash": "c8319cca32c021503e5bca777bfbeeca901d7e4549a0efa5c30ce3da5270a19f"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "445b159ce0c33b49acdbde29b5b27c93fdcd40c8a09e55a2014c60f05692fad7"
+        "path": "libs/domain/src/spec.rs",
+        "content_hash": "b298fdafb88c78a38dbd4c25cb0b112033f3b77c6bb95108cbbbe5d8188af18a"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "3c1f55317328c703e97d85b892b6c2d6b0f55bf4347da75573726a100c55b314"
+        "content_hash": "d2654b4428f0574880b72f5b3ee58fbe7366e8e13f53185908180925712bc8eb"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+        "path": "libs/domain/src/tddd/consistency.rs",
+        "content_hash": "82297b00eba12d6b0b4489cfd7efb175f86ae645c4123cca368195e930e8d650"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "445b159ce0c33b49acdbde29b5b27c93fdcd40c8a09e55a2014c60f05692fad7"
+        "content_hash": "d7b0ab580b810e73bdbafe4d572baf6712fce3e6216980362ee29d2c259d3aec"
       },
       "high": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
+        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "445b159ce0c33b49acdbde29b5b27c93fdcd40c8a09e55a2014c60f05692fad7"
+        "content_hash": "d7b0ab580b810e73bdbafe4d572baf6712fce3e6216980362ee29d2c259d3aec"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "d952e98872be4781a8687ed1dc09c7b1380a0a6bf2c67e4082409cfc6aeba56a"
+        "path": "libs/domain/src/spec.rs",
+        "content_hash": "6cbd878d794ba9d252c023e4f4a346f2838c018cb65ea435a4812d08c5f3fa4f"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "7b3000c11eaf24b4b49778f5e1288ee0d8ec77c3b4c611964496de59a358b67c"
+        "content_hash": "d7b0ab580b810e73bdbafe4d572baf6712fce3e6216980362ee29d2c259d3aec"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "a3f4c4b563e359d686df0cbce05285802ae718db8c32f91cde28fb9a3f623871"
+        "path": "libs/domain/src/tddd/consistency.rs",
+        "content_hash": "2713f1f2172d88f882bf086d97b4f677464a93d09d32dd745f7cb2d7fb7e1d6d"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "7b3000c11eaf24b4b49778f5e1288ee0d8ec77c3b4c611964496de59a358b67c"
+        "content_hash": "dcc7058a6e1b2b164db9d63e2971793b9e0bc4794a91819e75bcfc5070852641"
       },
       "high": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "e4735bc477c5b2e74950ed72584b0a588a8414547dbf88443d470d1532acf50f"
+        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "a3f4c4b563e359d686df0cbce05285802ae718db8c32f91cde28fb9a3f623871"
+        "content_hash": "dcc7058a6e1b2b164db9d63e2971793b9e0bc4794a91819e75bcfc5070852641"
       },
       "high": {
-        "path": "libs/domain/src/chain.rs",
-        "content_hash": "e4735bc477c5b2e74950ed72584b0a588a8414547dbf88443d470d1532acf50f"
+        "path": "libs/domain/src/spec.rs",
+        "content_hash": "091860ebbf311d669c0d742fab71cac34361c1a3c92766e1df02f2665b24fc60"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "cf98aff75cd37163da7b1ed6d8e2a7a2565062f4cb30a82b0f6386f9da40c73d"
+        "content_hash": "dcc7058a6e1b2b164db9d63e2971793b9e0bc4794a91819e75bcfc5070852641"
       },
       "high": {
+        "path": "libs/domain/src/tddd/consistency.rs",
+        "content_hash": "f8ea11cfdc3fe2aa687931102ef0440c4c1710b803152ba9700232b4e46c082d"
+      }
+    },
+    {
+      "low": {
         "path": "libs/domain/src/chain.rs",
-        "content_hash": "d8d5ad75db49bf96ce1263cdbb1f46fb1082499b274c71d019544565fb2fb5fe"
+        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
+      },
+      "high": {
+        "path": "libs/domain/src/tddd/consistency.rs",
+        "content_hash": "2713f1f2172d88f882bf086d97b4f677464a93d09d32dd745f7cb2d7fb7e1d6d"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/chain.rs",
+        "content_hash": "e2066208c654b02a6ed79f3ceda05b42631cadefcd0cf9a7787382146a291564"
+      },
+      "high": {
+        "path": "libs/domain/src/tddd/consistency.rs",
+        "content_hash": "970ff21255697cbb1c4d75566b5aa440e8b934a9e4fed5a3bebc2314a1aa272b"
       }
     },
     {
       "low": {
         "path": "libs/domain/src/lib.rs",
-        "content_hash": "fd1a6e8dece86234d693e0eea48befcd6928de942d12630ec970749cff9ceb09"
+        "content_hash": "b63fe6f8bcf9c03c9267c93209c421b2b026779b628c411470b833f144389684"
       },
       "high": {
         "path": "libs/infrastructure/src/lib.rs",
@@ -314,7 +274,7 @@
     {
       "low": {
         "path": "libs/domain/src/lib.rs",
-        "content_hash": "fd1a6e8dece86234d693e0eea48befcd6928de942d12630ec970749cff9ceb09"
+        "content_hash": "b63fe6f8bcf9c03c9267c93209c421b2b026779b628c411470b833f144389684"
       },
       "high": {
         "path": "libs/usecase/src/lib.rs",

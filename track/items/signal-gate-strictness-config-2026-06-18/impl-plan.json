@@ -4,13 +4,13 @@
     {
       "id": "T001",
       "description": "D7: Add `libs/domain/src/chain.rs` (new file) with: `ChainId` enum (AdrUser/SpecAdr/CatalogSpec/ImplCatalog), `Strictness` enum (Strict/Interim), `GateKind` enum (Commit/Merge), `ChainGateEntry` struct with `commit_gate: Strictness` + `merge_gate: Strictness` + `resolve(GateKind) -> Strictness` method, `SignalGateMatrix` struct with four `ChainGateEntry` fields + `resolve(ChainId, GateKind) -> Strictness` method, and four trait definitions: `ChainIdentity` (associated const ID + GAT Input), `SoTChain: ChainIdentity` (associated fn `check`), `LiveSoTChain: SoTChain` (associated fn `calc_live`), `PersistedSoTChain: ChainIdentity` (associated fns `calc`, `load`, `check_freshness`, `evaluate_gate`, `calc_error`, `stale_error`), plus `impl<T: PersistedSoTChain> SoTChain for T` blanket impl. Re-export types from `libs/domain/src/lib.rs`. Standard derives: Debug, Clone, Copy, PartialEq, Eq for all enums; Debug, Clone, PartialEq, Eq for structs. No serde on domain types (serde-free constraint). Unit tests: ChainGateEntry::resolve returns correct Strictness for each GateKind variant; SignalGateMatrix::resolve returns correct cell for each (ChainId, GateKind) pair. Estimated diff: ~200 lines.",
-      "status": "in_progress",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "858ff46e7ba4fe4fb7613b4a07cdf3738664d9f7"
     },
     {
       "id": "T002",
       "description": "D2 / CN-05: Add `domain::chain::check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strict: bool) -> VerifyOutcome` pure domain free function in `libs/domain/src/chain.rs` (or a sub-module `libs/domain/src/chain/check.rs` re-exported from `chain`). This function extracts the Red/Yellow gate logic currently duplicated in `libs/usecase/src/merge_gate/chain2_gate.rs` (inline) and `libs/infrastructure/src/verify/catalogue_spec_signals.rs` (inline) into a single domain-layer pure function, symmetric with the existing `check_spec_doc_signals` (chain ①) and `check_type_signals` (chain ③). Rules: Red signals always `Finding::error` regardless of `strict`; Yellow signals → `Finding::error` when `strict=true`, `Finding::warning` when `strict=false`. Export from `libs/domain/src/lib.rs`. Unit tests: all-blue doc passes; red signal errors regardless of strict; yellow strict=true errors; yellow strict=false warns. Estimated diff: ~100 lines.",
-      "status": "todo",
+      "status": "in_progress",
       "commit_hash": null
     },
     {

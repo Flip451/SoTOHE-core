@@ -30,6 +30,20 @@
           "findings": [],
           "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
           "at": "2026-06-18T04:08:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
+          "at": "2026-06-18T04:25:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
+          "at": "2026-06-18T04:28:37Z"
         }
       ]
     },
@@ -328,6 +342,35 @@
           "findings": [],
           "hash": "rvw1:sha256:7ff9019d9e4fa20c0d3988163a929a7c6ea7529110b7a9c435bc1066c12f8eb1",
           "at": "2026-06-18T04:08:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8018f0e7590e8fd7bea62ec926dc38e663d547f17378c3e97f39e88d718e6152",
+          "at": "2026-06-18T04:25:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` now omits the `commit_hash` field for T002-T013. The plan-artifact task shape and briefing/checklist expect unresolved or in-progress tasks to retain an explicit nullable commit slot (`commit_hash: null`), with only T001 filled after completion. As written, T002 is in progress and T003-T013 are still todo, but their commit slots were removed, making the artifact inconsistent with the task-recording workflow. Restore `\"commit_hash\": null` for the unresolved task entries.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8018f0e7590e8fd7bea62ec926dc38e663d547f17378c3e97f39e88d718e6152",
+          "at": "2026-06-18T04:28:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cfbeb8ad129a242e87095dee41b9ed8aed5e9fb7799a17b7be12b0aeea7c06b",
+          "at": "2026-06-18T04:31:38Z"
         }
       ]
     }

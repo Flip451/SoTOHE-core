@@ -28,5 +28,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| domain::chain::check_catalogue_spec_signals | free_function | — | fn(doc: &CatalogueSpecSignalsDocument, strict: bool) -> VerifyOutcome | 🟡 | 🔵 |
+| domain::chain::check_catalogue_spec_signals | free_function | — | fn(doc: &CatalogueSpecSignalsDocument, strict: bool) -> VerifyOutcome | 🔵 | 🔵 |
 

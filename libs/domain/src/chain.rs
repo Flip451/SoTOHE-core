@@ -38,7 +38,9 @@
 //! unrepresentable: chain ⓪ cannot be asked to `calc` into a file or to `check_freshness`
 //! against a persisted document — those operations do not exist on the type.
 
-use crate::verify::VerifyOutcome;
+use crate::ConfidenceSignal;
+use crate::tddd::catalogue_spec_signal::CatalogueSpecSignalsDocument;
+use crate::verify::{VerifyFinding, VerifyOutcome};
 
 // ── Value types ──────────────────────────────────────────────────────────────
 
@@ -133,6 +135,87 @@ impl SignalGateMatrix {
         };
         entry.resolve(gate)
     }
+}
+
+// ── Pure gate functions ───────────────────────────────────────────────────────
+
+/// Evaluates Chain ② (catalogue → spec) signal gate rules against a
+/// [`CatalogueSpecSignalsDocument`].
+///
+/// Pure function used by both the CI path (`execute_catalogue_spec_signals`)
+/// and the merge gate (via `check_chain2_for_layer`). Callers are responsible
+/// for all integrity checks — coverage count, positional name match, entry-hash
+/// freshness, and `catalogue_declaration_hash` staleness — **before** calling
+/// this function. This function only evaluates the Red/Yellow signal gate on the
+/// signals already present in `doc`.
+///
+/// Symmetric with:
+/// - `check_spec_doc_signals` (chain ①, `libs/domain/src/spec.rs`)
+/// - `check_type_signals` (chain ③, `libs/domain/src/tddd/consistency.rs`)
+///
+/// # Rules
+///
+/// - No signals (`doc.signals` is empty) → `VerifyOutcome::pass()` (empty catalogue / no entries).
+/// - Any Red signal → `VerifyFinding::error` (unconditional, regardless of `strict`).
+/// - Yellow signal, `strict = true` → `VerifyFinding::error`.
+/// - Yellow signal, `strict = false` → `VerifyFinding::warning`.
+/// - All Blue / no Yellow → `VerifyOutcome::pass()`.
+///
+/// The `strict` parameter is:
+/// - `true` for the merge gate (all Yellow must be upgraded to Blue before merge).
+/// - `false` for CI interim mode (Yellow is allowed during iteration but visualized).
+///
+/// Reference: ADR `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md` §D2.
+#[must_use]
+pub fn check_catalogue_spec_signals(
+    doc: &CatalogueSpecSignalsDocument,
+    strict: bool,
+) -> VerifyOutcome {
+    let signals = &doc.signals;
+
+    // Empty signals → pass (empty catalogue / no entries).
+    if signals.is_empty() {
+        return VerifyOutcome::pass();
+    }
+
+    // Red check: always an error, regardless of strict mode.
+    let reds: Vec<&str> = signals
+        .iter()
+        .filter(|s| s.signal == ConfidenceSignal::Red)
+        .map(|s| s.type_name.as_str())
+        .collect();
+    if !reds.is_empty() {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{} catalogue entry/entries have Red catalogue-spec signal \
+             (missing both spec_refs[] and informal_grounds[] — every entry must carry \
+             at least one grounding ref): {}",
+            reds.len(),
+            reds.join(", ")
+        ))]);
+    }
+
+    // Yellow check: error in strict mode, warning in interim mode.
+    let yellows: Vec<&str> = signals
+        .iter()
+        .filter(|s| s.signal == ConfidenceSignal::Yellow)
+        .map(|s| s.type_name.as_str())
+        .collect();
+    if !yellows.is_empty() {
+        let message = format!(
+            "{} catalogue entry/entries have Yellow catalogue-spec signal \
+             — merge gate will block these until upgraded to Blue. Upgrade by promoting \
+             informal_grounds[] to spec_refs[] entries with file + anchor, \
+             then regenerate catalogue-spec signals: {}",
+            yellows.len(),
+            yellows.join(", ")
+        );
+        if strict {
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]);
+        }
+        return VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)]);
+    }
+
+    VerifyOutcome::pass()
 }
 
 // ── Traits ───────────────────────────────────────────────────────────────────
@@ -321,7 +404,7 @@ where
 // ── Unit tests ────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 
@@ -455,5 +538,104 @@ mod tests {
                 );
             }
         }
+    }
+
+    // ── check_catalogue_spec_signals ─────────────────────────────────────────
+
+    use crate::plan_ref::ContentHash;
+    use crate::tddd::catalogue_spec_signal::{CatalogueSpecSignal, CatalogueSpecSignalsDocument};
+    use crate::verify::Severity;
+
+    fn hash(byte: u8) -> ContentHash {
+        ContentHash::from_bytes([byte; 32])
+    }
+
+    fn signal(name: &str, sig: ConfidenceSignal) -> CatalogueSpecSignal {
+        CatalogueSpecSignal::new(name, sig, hash(0x00))
+    }
+
+    fn doc(signals: Vec<CatalogueSpecSignal>) -> CatalogueSpecSignalsDocument {
+        CatalogueSpecSignalsDocument::new(hash(0xcd), signals)
+    }
+
+    #[test]
+    fn test_check_catalogue_spec_signals_empty_signals_passes() {
+        let outcome = check_catalogue_spec_signals(&doc(vec![]), false);
+        assert!(outcome.findings().is_empty(), "empty signals must pass (no entries): {outcome:?}");
+    }
+
+    #[test]
+    fn test_check_catalogue_spec_signals_all_blue_passes_in_both_modes() {
+        let d = doc(vec![
+            signal("TypeA", ConfidenceSignal::Blue),
+            signal("TypeB", ConfidenceSignal::Blue),
+        ]);
+
+        let outcome_interim = check_catalogue_spec_signals(&d, false);
+        assert!(
+            outcome_interim.findings().is_empty(),
+            "all-Blue interim must produce zero findings: {outcome_interim:?}"
+        );
+
+        let outcome_strict = check_catalogue_spec_signals(&d, true);
+        assert!(
+            outcome_strict.findings().is_empty(),
+            "all-Blue strict must produce zero findings: {outcome_strict:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_catalogue_spec_signals_red_is_error_regardless_of_strict() {
+        let d = doc(vec![
+            signal("TypeA", ConfidenceSignal::Blue),
+            signal("TypeB", ConfidenceSignal::Red),
+        ]);
+
+        let outcome_interim = check_catalogue_spec_signals(&d, false);
+        assert!(
+            outcome_interim.has_errors(),
+            "red must be an error in interim mode: {outcome_interim:?}"
+        );
+        let msg = outcome_interim.findings()[0].message();
+        assert!(msg.contains("TypeB"), "error must name the offending entry: {msg}");
+
+        let outcome_strict = check_catalogue_spec_signals(&d, true);
+        assert!(
+            outcome_strict.has_errors(),
+            "red must be an error in strict mode: {outcome_strict:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_catalogue_spec_signals_yellow_is_warning_in_interim_mode() {
+        let d = doc(vec![
+            signal("TypeA", ConfidenceSignal::Blue),
+            signal("TypeB", ConfidenceSignal::Yellow),
+        ]);
+
+        let outcome = check_catalogue_spec_signals(&d, false);
+        assert!(!outcome.has_errors(), "yellow in interim mode must not be an error: {outcome:?}");
+        let findings = outcome.findings();
+        assert_eq!(findings.len(), 1, "expected exactly one warning finding");
+        assert_eq!(findings[0].severity(), Severity::Warning);
+        let msg = findings[0].message();
+        assert!(msg.contains("TypeB"), "warning must name the offending entry: {msg}");
+        assert!(msg.contains("merge gate will block"), "must warn about merge gate: {msg}");
+    }
+
+    #[test]
+    fn test_check_catalogue_spec_signals_yellow_is_error_in_strict_mode() {
+        let d = doc(vec![
+            signal("TypeA", ConfidenceSignal::Blue),
+            signal("TypeB", ConfidenceSignal::Yellow),
+        ]);
+
+        let outcome = check_catalogue_spec_signals(&d, true);
+        assert!(outcome.has_errors(), "yellow in strict mode must be an error: {outcome:?}");
+        let findings = outcome.findings();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].severity(), Severity::Error);
+        let msg = findings[0].message();
+        assert!(msg.contains("TypeB"), "error must name the offending entry: {msg}");
     }
 }
