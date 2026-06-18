@@ -1,6 +1,70 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:40:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:43:05Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
+          "at": "2026-06-18T03:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
+          "at": "2026-06-18T03:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
+          "at": "2026-06-18T04:04:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
+          "at": "2026-06-18T04:08:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
+          "at": "2026-06-18T04:25:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
+          "at": "2026-06-18T04:28:37Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -126,70 +190,49 @@
           "findings": [],
           "hash": "rvw1:sha256:897bb94a1da121b8b2b6f1b04c219f6e579f11ebc9d5706dc25dbc2572fdb979",
           "at": "2026-06-18T11:17:49Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
-          "at": "2026-06-18T03:39:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
-          "at": "2026-06-18T03:48:27Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
-          "at": "2026-06-18T04:04:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
-          "at": "2026-06-18T04:08:01Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `TraitImplDeclV2.for_type` generic-param path is only covered by parser unit tests. There is no end-to-end codec regression test that exercises `encode(doc)` with `impl_generics = [\"T\"]` and `for_type = \"T\"`, so regressions in the new callsite plumbing or `normalize_impl_for_type_path` would not be caught.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 306,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7d7755814d02e39d10c97cda6475a636b57c7ce7f0a7d01b4599468869803cf5",
+          "at": "2026-06-18T12:12:55Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
-          "at": "2026-06-18T04:25:08Z"
+          "hash": "rvw1:sha256:b0ebdbd025efc9bcffb6969bb431a98929bede54da5a380e66dbff75dd6085ea",
+          "at": "2026-06-18T12:20:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
-          "at": "2026-06-18T04:28:37Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+          "hash": "rvw1:sha256:b0ebdbd025efc9bcffb6969bb431a98929bede54da5a380e66dbff75dd6085ea",
+          "at": "2026-06-18T12:23:18Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:40:09Z"
+          "hash": "rvw1:sha256:06d047adb889135b74c067a4d1d478c8be7ad4d793bd143a68b52908188e6edf",
+          "at": "2026-06-18T12:38:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:43:05Z"
+          "hash": "rvw1:sha256:06d047adb889135b74c067a4d1d478c8be7ad4d793bd143a68b52908188e6edf",
+          "at": "2026-06-18T12:44:09Z"
         }
       ]
     },
@@ -640,6 +683,35 @@
           "findings": [],
           "hash": "rvw1:sha256:d37d90dcaf91e5012f659ff5022e14ba04fe53f0749296924287d08ee1b7d229",
           "at": "2026-06-18T09:38:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The execution-order note says the entire S8 group must complete before T006, but the same artifact now marks T006 as done while T015 is still `in_progress`. That leaves the plan self-contradictory about what has to precede T006 and makes the remaining ordering guidance misleading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 35,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:adae94d20dde67b00eafd22c9fe8b0f92a60631b5af8991225b35860c7ddd669",
+          "at": "2026-06-18T12:08:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0847fa605808832f52863267c785e94e5ef9d9863d84efb9921725d3751a582e",
+          "at": "2026-06-18T12:11:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0847fa605808832f52863267c785e94e5ef9d9863d84efb9921725d3751a582e",
+          "at": "2026-06-18T12:13:16Z"
         }
       ]
     },

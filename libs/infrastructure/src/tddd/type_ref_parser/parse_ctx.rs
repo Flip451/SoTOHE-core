@@ -21,6 +21,13 @@ pub(super) struct ParseCtx<'a, F, G> {
     pub(super) resolve_local: &'a F,
     pub(super) external_crate_ids: &'a HashMap<String, u32>,
     pub(super) emit_external_crate: &'a mut G,
+    /// Impl-block generic type parameter names (e.g. `["T", "U"]`).
+    ///
+    /// When a single-segment type name matches one of these names, it is encoded
+    /// as `Type::Generic(name)` instead of falling through to the unresolved-marker
+    /// path. This implements ADR 2026-06-18-0822 D2: `for_type: "T"` with
+    /// `impl_generics: [{name: "T", ...}]` should produce `Type::Generic("T")`.
+    pub(super) generic_params: &'a [&'a str],
 }
 
 impl<'a, F, G> ParseCtx<'a, F, G>
@@ -129,6 +136,20 @@ where
                 id: local_id,
                 args: generic_args.map(Box::new),
             });
+        }
+
+        // 3.5. Impl-block generic type parameter? (ADR 2026-06-18-0822 D2)
+        //
+        // If the name matches one of the caller-supplied `generic_params` names, it
+        // represents a type variable (e.g. `T` in `impl<T> Trait for T`). Encode it
+        // as `Type::Generic(name)` so that the A-codec representation matches the
+        // `Type::Generic` variant that rustdoc emits for generic type parameters.
+        //
+        // This step is placed AFTER `resolve_local` so that a catalogue type that
+        // happens to share a name with a generic parameter keeps its local-catalogue
+        // identity rather than being downgraded to a generic placeholder.
+        if self.generic_params.iter().any(|g| *g == name) {
+            return Type::Generic(name);
         }
 
         // 4. `Self` keyword — represents the implementing type. Encoded as a
