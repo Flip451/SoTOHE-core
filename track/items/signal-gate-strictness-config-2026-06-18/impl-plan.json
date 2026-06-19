@@ -102,7 +102,7 @@
     {
       "id": "T012",
       "description": "D5 / AC-07: Update all remaining internal references to old signal commands. (1) Any `.claude/` hook scripts or agent prompts referencing `track signals` / `track type-signals` / `track catalogue-spec-signals` / `verify spec-states` / `verify adr-signals` / `verify catalogue-spec-signals` → replace with new `signal` namespace equivalents. (2) Update `knowledge/` documentation files and convention files that reference the old commands. (3) Update any `CLAUDE.md` / `README.md` references. (4) Update `track/tech-stack.md` if it references old commands. (5) Verify `architecture-rules.json` and `Makefile.toml` are consistent (no orphaned task references). No alias period. Depends on T011. Estimated diff: ~100 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T013",

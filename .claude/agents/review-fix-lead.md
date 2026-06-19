@@ -63,14 +63,15 @@ severity filter for this round.
 
 **Always invoke review via `bin/sotp review local`.** The native subcommand
 auto-resolves the provider and is the canonical entry point for the review cycle.
-Before every review round, run the former `track-active-gate` as separate native
-commands so generated signals and rendered views are fresh:
-
-```bash
-bin/sotp track type-signals
-bin/sotp track catalogue-spec-signals
-bin/sotp track views sync
-```
+Before every review round, regenerate the signals and views so the reviewer
+reads a fresh state. For each TDDD-active layer (typically `domain`, `usecase`,
+`infrastructure`), **skip the layer entirely when `<layer>-types.json` is absent**
+(Phase <2 tracks have no catalogue yet). For each layer whose catalogue file
+exists, run `bin/sotp signal calc-impl-catalog` and
+`bin/sotp signal calc-catalog-spec`, both with `--signals-path` pointing at the
+per-layer signals JSON under `track/items/<track-id>/` and `--catalog-hash` set
+to the SHA-256 of the corresponding `<layer>-types.json`. Finish with
+`bin/sotp track views sync` to refresh `plan.md` and `registry.md`.
 
 Then run `bin/sotp review local` with the assigned round type and briefing.
 
