@@ -892,6 +892,15 @@ mod tests {
         signals_doc_with(&[("TrackId", ConfidenceSignal::Red)])
     }
 
+    fn assert_tddd_not_found_opt_out_passes<R>(reader: &R, branch: &str)
+    where
+        R: TrackBlobReader + SpecElementHashReader,
+    {
+        let outcome = check_strict_merge_gate(branch, reader, &all_strict_matrix());
+        assert!(!outcome.has_errors(), "TDDD opt-out (catalogue NotFound) must pass: {outcome:?}");
+        assert!(outcome.findings().is_empty());
+    }
+
     // --- U3–U18 test matrix ---
 
     #[test]
@@ -960,10 +969,7 @@ mod tests {
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::NotFound,
         );
-        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
-        // catalogue NotFound → skip → no findings from Stage 2
-        assert!(!outcome.has_errors(), "TDDD opt-out (catalogue NotFound) must pass: {outcome:?}");
-        assert!(outcome.findings().is_empty());
+        assert_tddd_not_found_opt_out_passes(&reader, "track/foo");
     }
 
     #[test]
@@ -1133,11 +1139,8 @@ mod tests {
         // - passes the original branch name verbatim to the reader (no stripping)
         // - strips the "track/" prefix when computing track_id for the reader
         let reader = RecordingTrackBlobReader::new(BlobFetchResult::Found(all_blue_spec()));
-        let outcome =
-            check_strict_merge_gate("track/some-feature-2026-04-12", &reader, &all_strict_matrix());
 
-        // Should PASS (all-blue spec, dt NotFound)
-        assert!(!outcome.has_errors(), "{outcome:?}");
+        assert_tddd_not_found_opt_out_passes(&reader, "track/some-feature-2026-04-12");
 
         // Stage 1: branch passed verbatim
         assert_eq!(

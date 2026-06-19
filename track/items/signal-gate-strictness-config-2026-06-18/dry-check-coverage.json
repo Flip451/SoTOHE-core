@@ -1,814 +1,604 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "98f3cb2d0e24f404e6cd590a69ff525f5b3c05f2619bd7d40279adca5f8d7af6",
+  "corpus_fingerprint": "094189c75fb163774209ffe8b746203dddcba14c632f04f89c71926b1ad3960f",
   "fragment_refs": [
     {
-      "path": "libs/domain/src/chain.rs",
-      "content_hash": "1c5915e293b7827736f94dd9ab70ae32bab1ce8b4fbd5cd5800dc9ad195d5d33"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "03b972611c26dd54c4a0be576dc3560f7bf0ac367ddfb7eea2570442ad6dbdcd"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_linter.rs",
-      "content_hash": "9716b8461771c20eb96e246cdbc5e6d2b2850d5a8f8c9b009f09f86eb6db7af7"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "056cba34823a59edc989f5141f4b73d27c188373f17d8d202a0508eeba2556c4"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "00d6a33527ee93018054aa06c1e8707043495b391bd87d8cc02fd8fb0f147289"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "08641d374a80adad4ca654f1379ab74a1fbea17105b2a1bcd67d0b152f60ab27"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "141f3727bf53356f558d9e22fefe24d5fd8a0d67517c0e0db4a871edb4c5daf3"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "0cfe0ac8a8aa0a2014e22f041ec0bc43b70c2e68ecf03b24cca63b58941d0e50"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "19dae8d3e56f9b60921c3eb8f809f7edb897d6d1acbeb4a1dc612012fc4aa2e2"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "11c573ba45155f840bae5bfc1cf6d7cc91328fcbf486a4350adbb60aeb07ff92"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "1b99e124d3a842009346a86775a8b3d759b1025613c78fef3462b22b2baa25c7"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "15088905c4d1e947286cacdd08da6867da1ffd0ad8012216a20b552f085e10d3"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "1d40f133bb1da817dfbe165156f15f2c453c2a3c665e0d5ffe16ae7a456fcc05"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "18a1e871547d3ac1dd9cee1277060104ea2cfd0bf7b721aa298bba3aafc0bc92"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "3569240afd8080f9046a353e57ceededa22b5ecf79c3c0655b234849ab5b1fa5"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "2738f609ed55b59bd6cd1819dca6cd1feca900f0ce3bce81dc0e910b92238276"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "489f0a32efa30d06561ba16f1ef3fe164687eac6d2d72b618a8a489b0d6e0567"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "27d5768302fc61d8541e56938242d6ceb5f5ffc862b5443ed1ea2e04bd8d9810"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "6705f3ab174b7d9510d79e79ac3f69c9112195cec26b90698880249d2163b905"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "344f8a4733557edbe85c730a499d4ae5539454b81f9601b34719c77d77abd4fb"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "7321fdb403ee8b3fe173fabcee1702d120965c95bc730b0c93ade47740afd798"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "42320b7e14fc4c429a62716dba0b9e93c5ba8c3087e0c14404ecf5763709a5bc"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "a6650f497f40ed18f40401ed77182bb6ee53b4360b8c4a13f6fb6f27630b36a5"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "43b58dc2f10e0187512223b40399d1dd623ca172b348b29b99acd1d80ec7265b"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "bdf5cba2b8ad6aff25f5c86a52a8736e367aadb6fc6020f11ebcdee187bcb410"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "48c2ab5b605ca8999ebc90d089c6f07c90ecc1a9f22b49941fa5b7703ab0ca13"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "c82892bdeeef5276a146bb8a4acab038506a566ffc1f0645c2d5414fc570241a"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "4b7ea2a9dcf10e2afd2f9fd9df59e180bdfe0d225b2be1d92b7d5b4f7d7a4511"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "d8e0cc30cc412442ef3910d0b825aaf480b22ad91967b0496a4a4556ce0b413c"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "4dacb7f8fc4afcb4776542589d00764d80a43c3b0b425c68290b5a508e46bf5b"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-      "content_hash": "f4ec8dab676a1eaa5432ac7e4b72a417ed720983d72dbcd27508c304bc880c11"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "4f211a12a0a25798e991c14d6c66c98a9857b1096ab288be2bab0b6fd8a0b858"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-      "content_hash": "2d55ffec8821553913379700d1603fcaa8ad45f17fbf9398e34685c215767c9a"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "559cc2ea26bf327d949fbd14bcb3c64457ed1942cbf13143c425b7532fef56e3"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-      "content_hash": "2ec7aa74df3e537f5824e3357f071e7b9ea8306113d530a2f30ac5cabb7cc991"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "570c001e398228bc62f33100953b9c0d09b7e7888fadb7e85bd05316b173ca2d"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-      "content_hash": "53f1d80a567000cc2e4416f3bcf63ef54016f92908812f6bb968776987ed2d2c"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "576624fd7c73115889830fee39d01c282875df048ecbf27e4efdc15b59106ec4"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-      "content_hash": "a690faaba7775a88a3f27e313df62eaaabecd0e628cbd27a413cb04a1602eec3"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "5802ecfaf6dd5d37b8ae2bcebd7a704f28912dec331995de0c45bcc5083fb3fd"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-      "content_hash": "c8ff3dc8c415a1ca6a23e4d1aff621652356b67b93e10cb67cdced11f6542ab3"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "5acc36fd27dddd9dd929dd2aaf396b386554d779a6b80d8663c07413483b2657"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-      "content_hash": "ef206b6d25156e2d3ea7e2b6b12217c67ee6daf0d4a55f4cca6b7e2ea314c62c"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "5c2aa9fbc7496dac80b29985881d5e2f3e74e6d98c8022f9ec71cbc781a1572e"
     },
     {
-      "path": "libs/domain/src/tddd/catalogue_v2/mod.rs",
-      "content_hash": "a7db19c41022fb5ae3d823812feed2a9ed6b854c8d4fa75a6cc0a2db8b441e2f"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "5df03ca67fddc3ae9e0a98422d5e6aac686547ef547c03b48b9dff6ffe620c54"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
-      "content_hash": "640ad527acffcdd81f25ae6c9cdbf278981886b33b5623196c7828e7a9dda616"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "656b7eb01a8ac23d35cd8503f06a505c8d4344b40734cd662a31c44ac3b182e3"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
-      "content_hash": "93bbbd9b45aa1dff8a082477d427d1773b28820a1ae5c89441464c55840be6df"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "6b204d4b5e8c97ae37a89ac26a14d18078a672f5349d57e85c6221f27c4005da"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
-      "content_hash": "abfce5e802de615610bcd91c984f482cc500f9f48e69072263e5302bb6200748"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "6fff0b8706442cbd21d0736e41a152f130afda908045f8f00b5ad7271951b4c0"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
-      "content_hash": "b00b31a0b3186af4281766c2cbd4caa4833ad91a698bbc5b07bbadd037cdddcf"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "704ab2c15c37d17072dd56c3ef877637f3b61e307a208b0c6a044004b3310052"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
-      "content_hash": "bd6bfd2c3a1e94f597ab6dafc9376898d3a98526ebf9983a0a410ae3292f0225"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "828bca1d5c33954b781202b0a4ed83e28c926b7aefb6ecd5f0438381f48af493"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
-      "content_hash": "6e144725a9177d8cce662252c58bbe85c88f0464a5b162edfa48524e28319b03"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "8f28c1caf1e0d406939e4a0f405932ce46cb48ae14a183545855422441ad6eb5"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
-      "content_hash": "d5c7bf7b3fb6e54d6095bfb15e17467b7558f87f3b7b8e4a617fb37d3521b759"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "9f3d6eb4553412d530291bed08be72cb4f290f6767cf3f0969b7803d4c85192c"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
-      "content_hash": "e8c13e98bbd81f3aaa5fd2d7b7e245a7c1f381d690ad8b10d9306983e38fab40"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "a421ad8c3ba98c384c4156536f7557fc8f81c8412b3ed05df6be1cc8090e1dc3"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "0dd6014a8c295bbf30bedf9e320ff39ca5bb44e4753f85bada0b9740b7a28e57"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "a9ebb4da78e81aa23005dfddce5f173baeee46812827670c5ffc430cb9213e60"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "2189a58027984e1b928092d9605698ece1fbbb37bb79a3d2d9826fa90575c046"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "abdaca0356f6c2fc697e96f2955d5d812976a97013e82de620812784f1356988"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "2793dc959254fdd50ebbcb293b7f3b50d5a5549dccc505e41ea1bdb9f869f042"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "b0a2e718e8cb61d09f6a9bae90a18a23235a6b6a9a8f1b7e5f9d17eac05c1bc5"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "5d94f97a3846612cfbbb8e651a6115e5833b122cbd50471cbc932aae2a20e2b5"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "b12337c490ba50206810c003aa4e5f0e2d4a8c678e65904285a627c6e720ab21"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "9aac5d04c0c49e2b2fbaf1ad48e4c5e749405a8af76fddc901e6d7e1443461dc"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "b4d0e44209a1d2f277312cdde76b10537065853ae04e56273aee5b81a0d4fab5"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "bf276625f864a8ad66a2aa1859e7c133c2abca035cd6ad51a3cdadcb3155b9b6"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "b5e5c62aa5b311221f94a474900df842387ffa7288f36dc93a121630d2bb2ecd"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "c63c72d0b2e6e2e7ccbc120e597829f6f52473681246833d3c0456540593af44"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "b63ac42dd5af8473a143f5f15c5378156fa79aa635069ee49c6081e92c0c9537"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "c70e21cebb7d41a2ac32be0e3f01ffc21627f14138247fcd86370163427831b0"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "bf69b95fa3bae3f4bc11f1a04d4e1357b3cab3db967e61137f6bd725e6403afe"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "c88c56f4b490f475337cee029bb80095773258be0bbda8431aa0e87026f3205c"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "c22342acd659d6d2239ba28c96cb0b2fa2a0d605c1c750519d7138d162072dd2"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-      "content_hash": "dfe80f658f1475de10de02d6083a8ac3005ba7e1fe4e0349495d5be7ad293571"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "c69431d03f9f001dd804c62f20b75075ba2ad0caeaf214e00e11d7fed77ebb4a"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/dto.rs",
-      "content_hash": "a6bc0e97216e711354b9354276a43d80d773e75e7c9575fbd273ea5a5167d534"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "cd7efc75b68c10a358a2c0dedaf4f96b4de8480f91f1283cc132779d32e7b7bd"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-      "content_hash": "19228824d5000a78e9024eb4b8638d5ef8f65a40a3972325188f6db09caf3e48"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "cf762993298888e8ee53d85c5467a1e80b330349985c5ae2b4b502f82685ed2e"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-      "content_hash": "76144500b514f84bc99d47b1a7ce00ea371eeb608552eb1ea10a774f962413f0"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "d38745f9455c92d0c7b2b46acdbff536890fcce0688347343469ea5bd50f2475"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-      "content_hash": "e769ef09e6b67635a023e8ab8da8837e6414674212a44dc99ae673f77a55949f"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "d3900fe37a92f6a31c994f65ea0b75364d24ab7655a2daa218d0f768ba0b853a"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-      "content_hash": "f30d47bf6dd7f5e46ec167eb5215eec7c67add85ab516b05b140fa8082567121"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "d69c29bf2fbfb4c266faa8185eb7ff0f2821ac986159791727e16988dc22883b"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-      "content_hash": "0fe66f4c474523b2a049e337db8e469cdab2e70970b2ad9b3376c8fc0aaa074d"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "d70a3cb2a29b38e04c5c385f2c588e4c3412b0449f1cbc75b76b158790021cd6"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-      "content_hash": "15a45aac62e1594232bb67e72b48873012f4ea5018f328df09df41badfd1f971"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "dcebe1c3385924d3b5733a78ef63a6964285e0a378f3b7d6222dc9331ea28617"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-      "content_hash": "6e087ff860bbce46932033b2a59f81854031ec331b07e397a80be70a45864a77"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "de8a3d2c1bc70efd8ea633e2df14f57f19399e9783d7e3331d869b17d80945bb"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-      "content_hash": "828b05dfd0c0f3455cf285cd731067cfb50b3c38bd4c39ba63e211f752feb4d4"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "e2396fa7426bc673d28b08e5ab5af03874f7b8c2a1efe9b8f1ff1ebafdfa954c"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-      "content_hash": "8e446a8bf192c51288434cfcc1ed09ef3b084cda06402140ab97c54b7521ff38"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "e66e3c23b3c250d57eb76cd26c5e1ba238ff867dec484c221503d40442470999"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-      "content_hash": "dbe2e1b01070929f1669a52f571e647b0c69a801bde6710621eda7073f22edc7"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "e9a4c693f44bc333f1cea0ddd7b9164b864a12374a3f5fb128f7cc66237348ee"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-      "content_hash": "ee5f8ede80f2ab594aa3e04c2672a673f8100703853e347567349020f355ecab"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "f0d9e54c0e022bdd7b75ca64923755afac31dd881869456b45d9ec5ee8dfb8d1"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
-      "content_hash": "ef875eecae0d4a66f5f2e73371b5e4b4ccc1693f7ede968f787ae9876104215a"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "f2c4ee7a3259cacd9be1e04163c8bc854e5187ce6a06c0d7dc8a41398a3c2c72"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "0a3c673f6fae2ead42f480bb82094fee14c312dbab335daaf061ca3e394f7ff2"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "fa833047c0a3cb1d6ffc827f1be98cefeb2611d794cd8e6a51df6f931de7a970"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "1101bcba6e36cccfcb8c2210ff0f2d6b16b3fd05cab0fa176c19eb7805ba9883"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "fc4313d07139916604d95e5879da7498825f43dcbfa0155e7b81c963f221c679"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "6eacdcf3583462e50d40906ebf79959f0ab39c97b31cdddf3c1e05afbe63c7e6"
+      "path": "libs/usecase/src/merge_gate.rs",
+      "content_hash": "9634b80f175c7fafd348ea7019a88ea17ebe83d65bffddd04deb7e4566f3948d"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "7a6c6e2253ba4cbacdc9e1cccd2a3d53da219fb450bfd3e7170c6297fd45be1f"
+      "path": "libs/usecase/src/merge_gate.rs",
+      "content_hash": "be13aed3a29bbee7e12e5baf3f3c8ce009359c04ea758f0f22c475f1d55f6327"
     },
     {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "875341cb448e1c6cd24ccd5d960e5a7a98a5268d7b82e9976dac30476e840416"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "92f1c3a3d34e3bb1b9fd98c512dbc1bc2f97c160af6b51ca0ec379ed31da4ba6"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "95da4d763592600b3decabcc367a1dcaa8925d379381019e20936131edf942fe"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "9b55804ff085e125d96bc63012df0204c51b5a391fff54b499780f4f60e076fa"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "b9db38c9e6384442a7daf1ccff5e5b41ecfa8203309218afff89dc53a8852648"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "bb9e69e98b5b0b69e67d3ae92d6ac96c0dfd35996e1967aadd566d35d0364288"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "bd916b892653983212269d3daa57413a3a44170e638298216fc3e63f96562e33"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "dae2937d53fb73fbc51af3973cf969a34cf0f50cfe529b888fd9dec312a34953"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "ded8f35241917815dc4dbfd7225d0a48d6885ebfa6187755eec29cb9a2517c61"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "e90a7c42a5a5906bcb4f43fb4a2997f68ffc52cf515d0839762f769e825520ea"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-      "content_hash": "ec57d7c10371c73eae439dee0a3666327f99a33b5fd154c745a549f04321fdeb"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "30ffb20b57d73c0ca4c651c173bb0c1c90ac04dec4ddb77eaf81f1e23a472469"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "50d3b55c27000aba0ae1bfd584a4c6de8767ffd7e7e154c8615fb77f1180704b"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "52aff7efbf61b582d94372371a586cbf0451638e4f6442fc193e0a7bbf4a99a3"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "57b3a48a0c19ce2c8e2c7d64ba703174c55c5ad1bad96203f5b9ed72c01526e2"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "73b75c73f618dd26aa67beceab75f2ea574b84ba419cfa5eb1c2c06f759a1777"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "783136047c48ea0fbb89fc6d2d341e1decb8df2caabafb6b06109b4aa419db07"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "7f5405b7e32f608237fe6a5fc72e0dce96ad7194a877b8fdeee22ce1f78377bb"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "899f92ac7d75fef172a3df69d3aae1bb13d9138d0a4abab28bfe81bf606d1c04"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "92665cd16045a82f140ebac65afc7e26598f023c3d019d60c60168a9b4067232"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "9dc1cc7f964fdff7a10daeeab6d4b28d6579478ac37d3fd645f375830309b309"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "9ddaba51353a3bb892450e28313b0772f83bc31db0f45b65a6b83d5094ff4f96"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "a8813836cd3db42ad7f8ab03aba708c045bbf98af608a8502480b058e9627e7f"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "b7984dd388e2d3025508b39434e56f134ec594a3b4d5198f220de7e8286c0810"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "c33f1d8a4691d933c63fc76d8a026f978073cd29c446ee88678d54c1e74150b2"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "d6197c2cb524af4e1b63a0bf0e051573ca0f7a65c0f3e57a66fab89f6efbd168"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "de42f64cf307d00700877e0975368918639099fa1ba0380383ae42bbe97a1f3b"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "e6fd09f5bade715c9cc3bebe5784a1cbf53c46b8ff1dd3740129a0624b269c6c"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-      "content_hash": "ecb813b54332e7ed8db3029b3280103fe3a5bfdc78f979c8dcb5ea3d49ddccbb"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "0e28eb3517e4262b66aace17d721c221a6d2d945ed01dbdc4716fb84e3ea8d29"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "2df9fb234c7686e0ba2ec742572b88538261333b4c31c95aeea8410050c83dd6"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "39e80382d5b1f9ce586f296130546128d54d498dd072df8e37c255153257233d"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "71811ec95bc43d22ae2dc6eb479bc72dc78c03f3bea0e2e51c6077ef17c8ba1c"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "8421e89fac04316e2541d41a8c30b3739fd7205bf3364f2259cade47e416b863"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "87def16f58663349d3e37268473a514e9be301b9f9afc1188be1528b50740fa1"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "8a68e6526521547d5cb50cc86a1e5681350adb6f56163528681de457b564098a"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "a4f4d8390490230b1d991c26ac00c932152185c0a49c34021b72d5692f322768"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "a9668a80aa81f0454d3af0ecae1bf92de627b6e18711a485631edf5aa14494f1"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "b388302f00bb6800b1933b7c1a587035c2d77569c7fbe904e838082d2856d6dd"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "b56c5e2fe1aeb5d80651bb66f189bb301039a0dd755581ea84cae34889e634b9"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "bcf92fdebb17b97b6718f0347ce6b92a2fa154bfe67590e018ae16c9aed29429"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "bf5a73f651dce8af57d00725faa8e32cee3c186a0e4ba3fb048648876b958822"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "da2d23be37e9865446fd167c2c321322e495bb7760537b7becdc7e9125f495ee"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "e5e47f2075e2cd0e82f3da02890aa60276bb93fcf8c88e001759f1967da1acf8"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-      "content_hash": "edc3e7f1806ae869085ccb936c174069c0daabd525c7256fad48a2211953a373"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs",
-      "content_hash": "536b5f7d3a9a9955904aad48451b325f3b0badf160bf7d10f1f7b3e93da24400"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs",
-      "content_hash": "5cc6d7048742e59af1243d2489f0375a8dc6e401c5562e2f2f00cce92a93df6a"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs",
-      "content_hash": "eb7fa27570b2fb7646f23809ac583178f93e04db6c12a0d7733472b3ce34a604"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
-      "content_hash": "a48856797445e011de4d0632e02d9932c04903be3da2d96284f9a110ac110ff8"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/format/ty_base.rs",
-      "content_hash": "4dfb9662d180f56f79d44a81bc36d2a19526feee6fc623560bbfa086e3ee4267"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/format/ty_base.rs",
-      "content_hash": "66ce0344a164addaaa1350e7395c8db0fd8222e2c1f970f94260ea40cdd9ee91"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq/mod.rs",
-      "content_hash": "2a75660d5640af3249b2d8bbe14a796b69b992354194be9c2ebd8886212272c1"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq/mod.rs",
-      "content_hash": "9a0f2cf559778bdea56df82fb6e3d922c0125fc60c4993a5158f699f92d1532d"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq/mod.rs",
-      "content_hash": "fc116068fb4de511b9e380f464e091f50b218ea99e6cb1bae93f60883ed019ea"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq/trait_eq.rs",
-      "content_hash": "ce6f91efa69ff9e696bcd5893e27b2bf92511fa4ec938066e8155d28679aa9bf"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
-      "content_hash": "395b1c31e8873f0d598791265b2488331cd93bffc929a5cd8e62d4c93d195b31"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
-      "content_hash": "4dde6ee5da2f3e1050daf76a032fb66c90b163948743674b90bf5cf96fd0d1d1"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
-      "content_hash": "5d8090ae4995509e02891cfc107ef118b3f976aa01641877e2374f4b74f2e866"
-    },
-    {
-      "path": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
-      "content_hash": "e20a7b85bc1e163d900a67315de38ac7e3803b9e7f8a440dec1fd029cdd94a0f"
-    },
-    {
-      "path": "libs/usecase/src/catalogue_traversal.rs",
-      "content_hash": "b3003c9f631290474ff8084c32d3dd419e710f64ac5283a25024bae2d12c6238"
-    },
-    {
-      "path": "libs/usecase/src/contract_map_workflow.rs",
-      "content_hash": "5de85a215bd1d163f8bc85b560a296c583ac544788f63c5cacde7df02a86177f"
+      "path": "libs/usecase/src/merge_gate.rs",
+      "content_hash": "f47f5577f72e0d30e694244ff1a05c1599a39a3fcbece0bc023e9412cfb73b24"
     }
   ],
   "processed_pair_keys": [
     {
       "low": {
-        "path": "libs/domain/src/tddd/catalogue_linter.rs",
-        "content_hash": "2a8d73bae33c4d5cccd46702d81cbbfa7124ca49c6e6e0aa010ce033ac0e8278"
+        "path": "libs/infrastructure/src/ref_verify/scope_resolver.rs",
+        "content_hash": "1c04e67befffecdacccd72b105149b9454cec1579fafb74d7ef22adbc347603c"
       },
       "high": {
-        "path": "libs/usecase/src/contract_map_workflow.rs",
-        "content_hash": "5de85a215bd1d163f8bc85b560a296c583ac544788f63c5cacde7df02a86177f"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b4d0e44209a1d2f277312cdde76b10537065853ae04e56273aee5b81a0d4fab5"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/tddd/catalogue_linter.rs",
-        "content_hash": "9716b8461771c20eb96e246cdbc5e6d2b2850d5a8f8c9b009f09f86eb6db7af7"
+        "path": "libs/infrastructure/src/track/fs_spec_file_loader.rs",
+        "content_hash": "33b021ec8bcd53fd1d169a12d3fc997cef8c11cc66c13ef18e5271fe81860212"
       },
       "high": {
-        "path": "libs/usecase/src/catalogue_traversal.rs",
-        "content_hash": "b3003c9f631290474ff8084c32d3dd419e710f64ac5283a25024bae2d12c6238"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "fa833047c0a3cb1d6ffc827f1be98cefeb2611d794cd8e6a51df6f931de7a970"
       }
     },
     {
       "low": {
-        "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-        "content_hash": "141f3727bf53356f558d9e22fefe24d5fd8a0d67517c0e0db4a871edb4c5daf3"
+        "path": "libs/infrastructure/src/track/symlink_guard.rs",
+        "content_hash": "ea8e82f46f035672b27e9b56ac1860427ac8940d6c6e447f200ffbc4655c2341"
       },
       "high": {
-        "path": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-        "content_hash": "1d40f133bb1da817dfbe165156f15f2c453c2a3c665e0d5ffe16ae7a456fcc05"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "03b972611c26dd54c4a0be576dc3560f7bf0ac367ddfb7eea2570442ad6dbdcd"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/schema_export/format_helpers.rs",
-        "content_hash": "3d50c82f4b0527eba2ddb6359da9f678f5435445363b0d63bc856bf636eb55d4"
+        "path": "libs/infrastructure/src/verify/plan_artifact_refs_tests.rs",
+        "content_hash": "0c6bc48cb893c11c8b5fbdc22551da552fae80e272720d423a34f8ed918540b6"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/format/ty_base.rs",
-        "content_hash": "66ce0344a164addaaa1350e7395c8db0fd8222e2c1f970f94260ea40cdd9ee91"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "03b972611c26dd54c4a0be576dc3560f7bf0ac367ddfb7eea2570442ad6dbdcd"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
-        "content_hash": "abfce5e802de615610bcd91c984f482cc500f9f48e69072263e5302bb6200748"
+        "path": "libs/infrastructure/src/verify/plan_artifact_refs_tests.rs",
+        "content_hash": "0c6bc48cb893c11c8b5fbdc22551da552fae80e272720d423a34f8ed918540b6"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-        "content_hash": "e769ef09e6b67635a023e8ab8da8837e6414674212a44dc99ae673f77a55949f"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "fa833047c0a3cb1d6ffc827f1be98cefeb2611d794cd8e6a51df6f931de7a970"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-        "content_hash": "2189a58027984e1b928092d9605698ece1fbbb37bb79a3d2d9826fa90575c046"
+        "path": "libs/infrastructure/src/verify/spec_attribution.rs",
+        "content_hash": "b5247f516eb1f01e6057d7cdb325492242516e7e74a5d46ca862211175639042"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-        "content_hash": "c63c72d0b2e6e2e7ccbc120e597829f6f52473681246833d3c0456540593af44"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "abdaca0356f6c2fc697e96f2955d5d812976a97013e82de620812784f1356988"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-        "content_hash": "bf276625f864a8ad66a2aa1859e7c133c2abca035cd6ad51a3cdadcb3155b9b6"
+        "path": "libs/infrastructure/src/verify/spec_attribution.rs",
+        "content_hash": "df5d737c2c96cfac3852ae1c963eeb798945a6ea723e836e17c1b889b4eb431b"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
-        "content_hash": "c63c72d0b2e6e2e7ccbc120e597829f6f52473681246833d3c0456540593af44"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "5802ecfaf6dd5d37b8ae2bcebd7a704f28912dec331995de0c45bcc5083fb3fd"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-        "content_hash": "19228824d5000a78e9024eb4b8638d5ef8f65a40a3972325188f6db09caf3e48"
+        "path": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+        "content_hash": "9ef52caf229e9b6ab80f0180ac6389ca9ecc22d7ca14706baf9361bf13ee3319"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-        "content_hash": "76144500b514f84bc99d47b1a7ce00ea371eeb608552eb1ea10a774f962413f0"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "abdaca0356f6c2fc697e96f2955d5d812976a97013e82de620812784f1356988"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-        "content_hash": "5756b1ddeba9b82be329b4b05bb57d5e0e21a9f39bc6cdc476c220a7fed113f2"
+        "path": "libs/infrastructure/src/verify/spec_signals.rs",
+        "content_hash": "7fc9bb083289b0ada60b5d23f5c7647b253c5a64c76005ef1653fa20de10be97"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-        "content_hash": "f30d47bf6dd7f5e46ec167eb5215eec7c67add85ab516b05b140fa8082567121"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "5802ecfaf6dd5d37b8ae2bcebd7a704f28912dec331995de0c45bcc5083fb3fd"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "169884a0bb4bc038e517def22186ee464e5e0bc423bcd36eb55513247aa21e52"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "03b972611c26dd54c4a0be576dc3560f7bf0ac367ddfb7eea2570442ad6dbdcd"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "dbe2e1b01070929f1669a52f571e647b0c69a801bde6710621eda7073f22edc7"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "fa833047c0a3cb1d6ffc827f1be98cefeb2611d794cd8e6a51df6f931de7a970"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "289054cf99aba1fde36c9f1515583c28ff839a8b9b90a20969c8e904bf42aa54"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "11c573ba45155f840bae5bfc1cf6d7cc91328fcbf486a4350adbb60aeb07ff92"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "dbe2e1b01070929f1669a52f571e647b0c69a801bde6710621eda7073f22edc7"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "559cc2ea26bf327d949fbd14bcb3c64457ed1942cbf13143c425b7532fef56e3"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "3a9adf3c0676fa81463b99833d36a8ac275d202ff7ec673b3cb7382f36f4bdf7"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "11c573ba45155f840bae5bfc1cf6d7cc91328fcbf486a4350adbb60aeb07ff92"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "ee5f8ede80f2ab594aa3e04c2672a673f8100703853e347567349020f355ecab"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "6b204d4b5e8c97ae37a89ac26a14d18078a672f5349d57e85c6221f27c4005da"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "7c3c4af18336fb1d95323a9b05add36ed7e0ae41aba0b374cf6a41120980ae5d"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "11c573ba45155f840bae5bfc1cf6d7cc91328fcbf486a4350adbb60aeb07ff92"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "ee5f8ede80f2ab594aa3e04c2672a673f8100703853e347567349020f355ecab"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "8f28c1caf1e0d406939e4a0f405932ce46cb48ae14a183545855422441ad6eb5"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "a8310dd6cf2c9dd9f96eacd47c319dd93ed2b09010d7fbd5fe157ef38160e3a5"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "11c573ba45155f840bae5bfc1cf6d7cc91328fcbf486a4350adbb60aeb07ff92"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-        "content_hash": "dbe2e1b01070929f1669a52f571e647b0c69a801bde6710621eda7073f22edc7"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b5e5c62aa5b311221f94a474900df842387ffa7288f36dc93a121630d2bb2ecd"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_core.rs",
-        "content_hash": "71196acd82fb0fc2611f2ac980c8a8e1eb6db66b7b30b2cffce14acc6dde48dd"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "11c573ba45155f840bae5bfc1cf6d7cc91328fcbf486a4350adbb60aeb07ff92"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
-        "content_hash": "6eacdcf3583462e50d40906ebf79959f0ab39c97b31cdddf3c1e05afbe63c7e6"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "d38745f9455c92d0c7b2b46acdbff536890fcce0688347343469ea5bd50f2475"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_core.rs",
-        "content_hash": "e6fd09f5bade715c9cc3bebe5784a1cbf53c46b8ff1dd3740129a0624b269c6c"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "11c573ba45155f840bae5bfc1cf6d7cc91328fcbf486a4350adbb60aeb07ff92"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "e6fd09f5bade715c9cc3bebe5784a1cbf53c46b8ff1dd3740129a0624b269c6c"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "de8a3d2c1bc70efd8ea633e2df14f57f19399e9783d7e3331d869b17d80945bb"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "30ffb20b57d73c0ca4c651c173bb0c1c90ac04dec4ddb77eaf81f1e23a472469"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "4b7ea2a9dcf10e2afd2f9fd9df59e180bdfe0d225b2be1d92b7d5b4f7d7a4511"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "de42f64cf307d00700877e0975368918639099fa1ba0380383ae42bbe97a1f3b"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "5acc36fd27dddd9dd929dd2aaf396b386554d779a6b80d8663c07413483b2657"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "52aff7efbf61b582d94372371a586cbf0451638e4f6442fc193e0a7bbf4a99a3"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "4dacb7f8fc4afcb4776542589d00764d80a43c3b0b425c68290b5a508e46bf5b"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "9dc1cc7f964fdff7a10daeeab6d4b28d6579478ac37d3fd645f375830309b309"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "704ab2c15c37d17072dd56c3ef877637f3b61e307a208b0c6a044004b3310052"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "538f1db9864473479a65f7889ddfd340744ca429268fc3b5e2b262903fc2493e"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "4dacb7f8fc4afcb4776542589d00764d80a43c3b0b425c68290b5a508e46bf5b"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "d6197c2cb524af4e1b63a0bf0e051573ca0f7a65c0f3e57a66fab89f6efbd168"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b5e5c62aa5b311221f94a474900df842387ffa7288f36dc93a121630d2bb2ecd"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "899f92ac7d75fef172a3df69d3aae1bb13d9138d0a4abab28bfe81bf606d1c04"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "4dacb7f8fc4afcb4776542589d00764d80a43c3b0b425c68290b5a508e46bf5b"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "c33f1d8a4691d933c63fc76d8a026f978073cd29c446ee88678d54c1e74150b2"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "e2396fa7426bc673d28b08e5ab5af03874f7b8c2a1efe9b8f1ff1ebafdfa954c"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "d6197c2cb524af4e1b63a0bf0e051573ca0f7a65c0f3e57a66fab89f6efbd168"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "559cc2ea26bf327d949fbd14bcb3c64457ed1942cbf13143c425b7532fef56e3"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
-        "content_hash": "f337e96220ff98f45e2e439efa42079d640a5630b64ade510ba612e04c53ea31"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "6b204d4b5e8c97ae37a89ac26a14d18078a672f5349d57e85c6221f27c4005da"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "0e28eb3517e4262b66aace17d721c221a6d2d945ed01dbdc4716fb84e3ea8d29"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "559cc2ea26bf327d949fbd14bcb3c64457ed1942cbf13143c425b7532fef56e3"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "2df9fb234c7686e0ba2ec742572b88538261333b4c31c95aeea8410050c83dd6"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "704ab2c15c37d17072dd56c3ef877637f3b61e307a208b0c6a044004b3310052"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "0e28eb3517e4262b66aace17d721c221a6d2d945ed01dbdc4716fb84e3ea8d29"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "559cc2ea26bf327d949fbd14bcb3c64457ed1942cbf13143c425b7532fef56e3"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
-        "content_hash": "e20a7b85bc1e163d900a67315de38ac7e3803b9e7f8a440dec1fd029cdd94a0f"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b0a2e718e8cb61d09f6a9bae90a18a23235a6b6a9a8f1b7e5f9d17eac05c1bc5"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "2df9fb234c7686e0ba2ec742572b88538261333b4c31c95aeea8410050c83dd6"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "559cc2ea26bf327d949fbd14bcb3c64457ed1942cbf13143c425b7532fef56e3"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "5ebbff068a488d8264832c17e9d6eedb2d2fd8d5f699114945c51e10a3821c75"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b5e5c62aa5b311221f94a474900df842387ffa7288f36dc93a121630d2bb2ecd"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "2df9fb234c7686e0ba2ec742572b88538261333b4c31c95aeea8410050c83dd6"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "570c001e398228bc62f33100953b9c0d09b7e7888fadb7e85bd05316b173ca2d"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
-        "content_hash": "4dde6ee5da2f3e1050daf76a032fb66c90b163948743674b90bf5cf96fd0d1d1"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "8f28c1caf1e0d406939e4a0f405932ce46cb48ae14a183545855422441ad6eb5"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "2df9fb234c7686e0ba2ec742572b88538261333b4c31c95aeea8410050c83dd6"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "6b204d4b5e8c97ae37a89ac26a14d18078a672f5349d57e85c6221f27c4005da"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
-        "content_hash": "e20a7b85bc1e163d900a67315de38ac7e3803b9e7f8a440dec1fd029cdd94a0f"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "704ab2c15c37d17072dd56c3ef877637f3b61e307a208b0c6a044004b3310052"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "39e80382d5b1f9ce586f296130546128d54d498dd072df8e37c255153257233d"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "6b204d4b5e8c97ae37a89ac26a14d18078a672f5349d57e85c6221f27c4005da"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
-        "content_hash": "5d8090ae4995509e02891cfc107ef118b3f976aa01641877e2374f4b74f2e866"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "8f28c1caf1e0d406939e4a0f405932ce46cb48ae14a183545855422441ad6eb5"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "5ebbff068a488d8264832c17e9d6eedb2d2fd8d5f699114945c51e10a3821c75"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "6b204d4b5e8c97ae37a89ac26a14d18078a672f5349d57e85c6221f27c4005da"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
-        "content_hash": "4dde6ee5da2f3e1050daf76a032fb66c90b163948743674b90bf5cf96fd0d1d1"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b5e5c62aa5b311221f94a474900df842387ffa7288f36dc93a121630d2bb2ecd"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "8421e89fac04316e2541d41a8c30b3739fd7205bf3364f2259cade47e416b863"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "6b204d4b5e8c97ae37a89ac26a14d18078a672f5349d57e85c6221f27c4005da"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "d722013796ede651638b3652e6b45b2c1e33a0d334bbd5a20689aac1c1e260ef"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "e66e3c23b3c250d57eb76cd26c5e1ba238ff867dec484c221503d40442470999"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "8421e89fac04316e2541d41a8c30b3739fd7205bf3364f2259cade47e416b863"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "704ab2c15c37d17072dd56c3ef877637f3b61e307a208b0c6a044004b3310052"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "e5e47f2075e2cd0e82f3da02890aa60276bb93fcf8c88e001759f1967da1acf8"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b0a2e718e8cb61d09f6a9bae90a18a23235a6b6a9a8f1b7e5f9d17eac05c1bc5"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "d722013796ede651638b3652e6b45b2c1e33a0d334bbd5a20689aac1c1e260ef"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "704ab2c15c37d17072dd56c3ef877637f3b61e307a208b0c6a044004b3310052"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-        "content_hash": "e5e47f2075e2cd0e82f3da02890aa60276bb93fcf8c88e001759f1967da1acf8"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b5e5c62aa5b311221f94a474900df842387ffa7288f36dc93a121630d2bb2ecd"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs",
-        "content_hash": "2dcc3681ec5e898f0c4d0a055dca2fa3ae20f93687356fd820bfc6afb9952561"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "8f28c1caf1e0d406939e4a0f405932ce46cb48ae14a183545855422441ad6eb5"
       },
       "high": {
-        "path": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs",
-        "content_hash": "536b5f7d3a9a9955904aad48451b325f3b0badf160bf7d10f1f7b3e93da24400"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "d38745f9455c92d0c7b2b46acdbff536890fcce0688347343469ea5bd50f2475"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs",
-        "content_hash": "5cc6d7048742e59af1243d2489f0375a8dc6e401c5562e2f2f00cce92a93df6a"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "8f28c1caf1e0d406939e4a0f405932ce46cb48ae14a183545855422441ad6eb5"
       },
       "high": {
-        "path": "libs/usecase/src/catalogue_traversal.rs",
-        "content_hash": "b3003c9f631290474ff8084c32d3dd419e710f64ac5283a25024bae2d12c6238"
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "de8a3d2c1bc70efd8ea633e2df14f57f19399e9783d7e3331d869b17d80945bb"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "a9ebb4da78e81aa23005dfddce5f173baeee46812827670c5ffc430cb9213e60"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b12337c490ba50206810c003aa4e5f0e2d4a8c678e65904285a627c6e720ab21"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b0a2e718e8cb61d09f6a9bae90a18a23235a6b6a9a8f1b7e5f9d17eac05c1bc5"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "b5e5c62aa5b311221f94a474900df842387ffa7288f36dc93a121630d2bb2ecd"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "de8a3d2c1bc70efd8ea633e2df14f57f19399e9783d7e3331d869b17d80945bb"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/verify/spec_states.rs",
+        "content_hash": "e2396fa7426bc673d28b08e5ab5af03874f7b8c2a1efe9b8f1ff1ebafdfa954c"
       }
     }
   ]

@@ -47,25 +47,25 @@
       "id": "T016",
       "description": "D3 Formatter dedup (ADR 2026-06-18-0822 §D3): In `libs/infrastructure/src/tddd/signal_evaluator_v2/format/ty_base.rs`, remove the two duplicated QualifiedPath inline arms from `format_type_common_arms` and `fmt_rec`, delegating both to the shared `format_qualified_path_with` helper. Also normalize the empty-path Self-projection trait: in `format_qualified_path_with`, treat `trait_` = `Some(Path { path: \"\" })` the same as `None`, outputting `\"_\"` in both cases. This makes the C-side empty-path Self projection and the A-side `<Self>::Assoc<args>` catalogue literal (parsed as `trait_=None`) converge to the comparison string `<Self as _>::Assoc<args>`, enabling string-equality comparison to pass. Acceptance: `bin/sotp track type-signals` exits 0 (no regression); unit/integration tests demonstrate the DRY dedup and empty-path normalization. spec_anchors: IN-13, CN-13, AC-17.",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "f3e3b9b5e5b491a0c1608987070d84a5af470929"
     },
     {
       "id": "T017",
       "description": "D4 Catalogue schema extension (ADR 2026-06-18-0822 §D4): Add `assoc_types: Vec<AssocTypeDecl>` and `assoc_consts: Vec<AssocConstDecl>` fields to `TraitEntry` in `libs/domain/src/tddd/catalogue_v2/entries.rs`. `AssocTypeDecl` holds `name: TypeName` / `bounds: Vec<TypeRef>` / `default: Option<TypeRef>`; `AssocConstDecl` holds `name: AssocConstName` / `ty: TypeRef` / `default_value: Option<String>`, with `AssocConstName` added as a validated newtype for associated const identifiers. Both fields default to empty (`#[serde(default)]`) to maintain backward compat with existing TraitEntry JSON, and optional default fields are omitted when `None`. Extend the infrastructure codecs `catalogue_document_codec` and `encoder_state_fn_trait_codec` to emit `ItemEnum::AssocType` / `ItemEnum::AssocConst` items. GAT lifetime / type params are intentionally excluded from `AssocTypeDecl` per OS-09. Do NOT relax `items.len` comparison in `trait_eq.rs` per OS-10. spec_anchors: IN-14, CN-15, OS-09, OS-10, AC-18.",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "f3e3b9b5e5b491a0c1608987070d84a5af470929"
     },
     {
       "id": "T018",
       "description": "D3c Catalogue declarations update (plan-artifact authoring): Update `domain-types.json` to reflect the canonical forms now supported by the D3 formatter and D4 schema. (1) Revise GAT projection `params[].ty` entries across `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` trait methods from the old `\"Self\"` placeholder to the `<Self>::Assoc<'_>` canonical form (qself position=0, trait_=None). (2) Add `assoc_types` and `assoc_consts` declarations to the four trait entries, listing each associated type and const with its name and bounds. (3) Add or confirm the blanket impl entry `{ \"action\": \"add\", \"trait_ref\": \"SoTChain\", \"for_type\": \"T\", \"impl_generics\": [...], \"impl_where_predicates\": [...] }`. This is a plan-artifact-only change (no source code). Acceptance: `bin/sotp track type-signals` (or `signal calc-impl-catalog`) shows the 4 trait methods and assoc-item declarations as 🔵 Blue. spec_anchors: CN-14, AC-14, AC-15.",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "f3e3b9b5e5b491a0c1608987070d84a5af470929"
     },
     {
       "id": "T019",
       "description": "Blanket-impl `#[doc(hidden)]` removal + final signal verification (ADR 2026-06-18-0822 §D2 / CN-12): Strip `#[doc(hidden)]` and its accompanying schema-limitation comment from `libs/domain/src/chain.rs` on the `impl<T: PersistedSoTChain> SoTChain for T` blanket impl, making it visible to rustdoc. Run `bin/sotp signal calc-impl-catalog` (or equivalent) and verify: the blanket impl entry transitions from 🟡 Yellow `RustSourceAbsent` to 🔵 Blue; the 4 trait methods and assoc-item declarations from T018 remain 🔵 Blue; no new Yellows or Reds appear. Final state: domain-layer TDDD signals all Blue (CI-verified 46 Blue / 0 Yellow / 0 Red). Depends on T016, T017, T018. spec_anchors: CN-12, AC-16, AC-19.",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "f3e3b9b5e5b491a0c1608987070d84a5af470929"
     },
     {
       "id": "T006",
@@ -76,7 +76,7 @@
     {
       "id": "T007",
       "description": "D2 / IN-03 / CN-04: Modify `libs/infrastructure/src/verify/spec_states.rs::verify_from_spec_json` to split Stage1 and Stage2. Stage1 (chain ① `check-spec-adr`): keep `check_spec_doc_signals(&spec_doc, strict)` — add the new self-consistency freshness check: compute `spec_doc.evaluate_signals()` and compare with stored `spec_doc.signals()`; if they differ, return stale error with a message prompting `signal calc-spec-adr`. Stage2 (chain ③ `check-impl-catalog`): extract into a new separate public function (e.g., `verify_type_signals_from_spec_json` or similar) callable independently by the new `signal check-impl-catalog` CLI command, accepting its own `strict: bool`. The existing `verify_from_spec_json` signature is modified per the infrastructure-types.json catalogue (Stage1 only). Ensure backward-compat compile: any internal callers of the old combined function are updated in this same task. Estimated diff: ~200 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T008",
@@ -157,7 +157,7 @@
           "T017 (D4 catalogue schema, domain+infra): Add `assoc_types: Vec<AssocTypeDecl>` and `assoc_consts: Vec<AssocConstDecl>` to `TraitEntry`. Extend infra codecs to emit `ItemEnum::AssocType` / `ItemEnum::AssocConst`. Backward-compat: missing fields default to empty. OS-09/OS-10 explicitly NOT done.",
           "T018 (D3c catalogue declarations, plan-artifact): Update `domain-types.json`: (a) revise GAT params[].ty from `\"Self\"` placeholder to `<Self>::Assoc<'_>` canonical form; (b) add assoc_types / assoc_consts declarations to the four trait entries; (c) confirm blanket impl entry with impl_generics+impl_where_predicates.",
           "T019 (blanket-impl doc(hidden) removal + final signal check, domain): Strip `#[doc(hidden)]` from the blanket impl in `libs/domain/src/chain.rs`. Final verification: domain-layer signals all Blue (CI-verified 46 Blue / 0 Yellow / 0 Red).",
-          "EXECUTION ORDER: T014 and T015 are committed. T016 (formatter), T017 (schema), T018 (declarations) are implemented in the spike worktree. T019 follows T016+T017+T018. T016/T017/T018/T019 are implemented but uncommitted; commit in the order: T016+T017 together (infra+domain code), then T018 (plan-artifact), then T019 (domain code + final signal check)."
+          "EXECUTION ORDER: T014 and T015 are committed. T016 (formatter), T017 (schema), T018 (declarations), and T019 (domain final signal check) are completed and recorded under commit f3e3b9b5. No S8 commit sequencing remains for the next operator."
         ],
         "task_ids": [
           "T014",
