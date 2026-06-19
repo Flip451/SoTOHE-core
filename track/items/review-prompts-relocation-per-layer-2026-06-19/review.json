@@ -1,85 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
-          "at": "2026-06-19T00:01:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
-          "at": "2026-06-19T00:02:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting the tracked `track/review-scope.json` leaves no tracked replacement in the diff: `.harness/config/review-scope.json` exists only as an untracked file (`git ls-files` does not list it, and `git diff --cached --name-status` is empty). Since the loaders in this same change now resolve `.harness/config/review-scope.json`, a clean checkout of the PR would fail to load the review scope config after this deletion. Add the new config file to the tracked change set before removing the legacy file.",
-              "severity": "P0",
-              "file": "track/review-scope.json",
-              "line": 1,
-              "category": "broken migration"
-            }
-          ],
-          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
-          "at": "2026-06-19T00:07:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6fc285c2dc57df43b712e1f44389330ba91f8d3b058a4192f3001c0d88dcd27d",
-          "at": "2026-06-19T00:24:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6fc285c2dc57df43b712e1f44389330ba91f8d3b058a4192f3001c0d88dcd27d",
-          "at": "2026-06-19T00:27:12Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54e2ace9a2760ab3cf38fa398fbb767a7b7421eabac304dabf8789870ed0bae4",
-          "at": "2026-06-19T00:00:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54e2ace9a2760ab3cf38fa398fbb767a7b7421eabac304dabf8789870ed0bae4",
-          "at": "2026-06-19T00:06:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb057b161562dc6f71960f3d6bc44a7437e97413901733f41ef487e593a1d54b",
-          "at": "2026-06-19T00:33:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb057b161562dc6f71960f3d6bc44a7437e97413901733f41ef487e593a1d54b",
-          "at": "2026-06-19T00:36:21Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -183,24 +104,27 @@
           "findings": [],
           "hash": "rvw1:sha256:47a9ac3c592688cf531f7d5cb6dd74db4e78e3a52d226ee6821c6cd006ee26d4",
           "at": "2026-06-19T00:26:15Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c7fef38468c0f672d8dbc2f7693d3e85470e435b1bd2d63f862aa6b1e05596bf",
-          "at": "2026-06-19T00:00:43Z"
+          "hash": "rvw1:sha256:68b927dfaaffc92f54638a3507f4efa601a2468d48c743b5f05a99713abaaed2",
+          "at": "2026-06-19T00:55:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ffdffbf1c4bf6eb0a862cbd9def03c9f0d8bbcaddaab38eafe4b362bc72acf8b",
+          "at": "2026-06-19T01:07:19Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c7fef38468c0f672d8dbc2f7693d3e85470e435b1bd2d63f862aa6b1e05596bf",
-          "at": "2026-06-19T00:06:37Z"
+          "hash": "rvw1:sha256:ffdffbf1c4bf6eb0a862cbd9def03c9f0d8bbcaddaab38eafe4b362bc72acf8b",
+          "at": "2026-06-19T01:09:58Z"
         }
       ]
     },
@@ -241,6 +165,89 @@
           "findings": [],
           "hash": "rvw1:sha256:6ebd4c3891556d8daa533c084126a378fa3cec26a2e09dfe74403e92e9c59c18",
           "at": "2026-06-19T00:27:00Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:212b760f2892f34328b6164c9a93ca11f75122bc567e6021c0cac7fc68021a88",
+          "at": "2026-06-19T00:00:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:212b760f2892f34328b6164c9a93ca11f75122bc567e6021c0cac7fc68021a88",
+          "at": "2026-06-19T00:06:43Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
+          "at": "2026-06-19T00:01:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
+          "at": "2026-06-19T00:02:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting the tracked `track/review-scope.json` leaves no tracked replacement in the diff: `.harness/config/review-scope.json` exists only as an untracked file (`git ls-files` does not list it, and `git diff --cached --name-status` is empty). Since the loaders in this same change now resolve `.harness/config/review-scope.json`, a clean checkout of the PR would fail to load the review scope config after this deletion. Add the new config file to the tracked change set before removing the legacy file.",
+              "severity": "P0",
+              "file": "track/review-scope.json",
+              "line": 1,
+              "category": "broken migration"
+            }
+          ],
+          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
+          "at": "2026-06-19T00:07:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fc285c2dc57df43b712e1f44389330ba91f8d3b058a4192f3001c0d88dcd27d",
+          "at": "2026-06-19T00:24:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fc285c2dc57df43b712e1f44389330ba91f8d3b058a4192f3001c0d88dcd27d",
+          "at": "2026-06-19T00:27:12Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7fef38468c0f672d8dbc2f7693d3e85470e435b1bd2d63f862aa6b1e05596bf",
+          "at": "2026-06-19T00:00:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7fef38468c0f672d8dbc2f7693d3e85470e435b1bd2d63f862aa6b1e05596bf",
+          "at": "2026-06-19T00:06:37Z"
         }
       ]
     },
@@ -384,21 +391,35 @@
         }
       ]
     },
-    "domain": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:212b760f2892f34328b6164c9a93ca11f75122bc567e6021c0cac7fc68021a88",
-          "at": "2026-06-19T00:00:13Z"
+          "hash": "rvw1:sha256:54e2ace9a2760ab3cf38fa398fbb767a7b7421eabac304dabf8789870ed0bae4",
+          "at": "2026-06-19T00:00:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:212b760f2892f34328b6164c9a93ca11f75122bc567e6021c0cac7fc68021a88",
-          "at": "2026-06-19T00:06:43Z"
+          "hash": "rvw1:sha256:54e2ace9a2760ab3cf38fa398fbb767a7b7421eabac304dabf8789870ed0bae4",
+          "at": "2026-06-19T00:06:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb057b161562dc6f71960f3d6bc44a7437e97413901733f41ef487e593a1d54b",
+          "at": "2026-06-19T00:33:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb057b161562dc6f71960f3d6bc44a7437e97413901733f41ef487e593a1d54b",
+          "at": "2026-06-19T00:36:21Z"
         }
       ]
     }

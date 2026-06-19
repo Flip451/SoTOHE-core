@@ -22,6 +22,16 @@ Report findings ONLY for the following categories:
   composition wiring. Composition should be a flat sequence of constructor
   calls, not a state machine. Cite `hexagonal-architecture.md` §CLI as
   Composition Root and §Usecase Layer Purity Rules.
+- **orchestration leak**: a usecase-level orchestration (port composition,
+  multi-step flow, error mapping, transactional boundary) hand-inlined into
+  a `cli_composition` builder or wiring fn. `cli_composition` binds adapters
+  to ports; **orchestrating those ports is the `usecase` layer's
+  responsibility** (use-case function / Interactor). A wiring fn that calls
+  port methods, threads results between ports, or expresses business-flow
+  ordering is an orchestration leak — extract it into a usecase entrypoint
+  and have `cli_composition` invoke that entrypoint with the wired
+  dependencies. Cite `hexagonal-architecture.md` §CLI as Composition Root
+  and §Usecase Layer Purity Rules.
 - **leaked test fixture in production wiring**: a `pub fn` that returns
   an adapter with a hard-coded test profile / fake path / in-memory store
   and is reachable from a real CLI command (production code paths must
