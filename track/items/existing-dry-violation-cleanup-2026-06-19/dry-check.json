@@ -70,6 +70,48 @@
       "rationale": "The changed fragment adds documentation around `validate_track_id`; the candidate fragment contains the single implementation of that helper. There is no duplicated logic or repeated abstraction here, just a doc comment describing the existing validation path.",
       "recorded_at": "2026-06-19T16:16:40Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/mod.rs",
+      "low_hash": "abbabadd35804074c99fb1e9009074671a153c6e2d82334e7d29003f1d6b2f26",
+      "high_path": "apps/cli/src/commands/track/validate.rs",
+      "high_hash": "bcd4c8b7c3651981a3d375d58d0f6a1a5f9aba273bde8ebb4a044f39a0b68a38",
+      "changed_path": "apps/cli/src/commands/track/validate.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8800578713417053,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d044848b92dc9c05264b4651a70517c2f325ab9b",
+      "rationale": "The changed fragment is a wrapper in the CLI layer that delegates validation to the canonical implementation in `cli_composition`, so it is not duplicating the business rule itself. The similarity in doc comments does not indicate duplicated logic, and the existing code explicitly centralizes the slug validator in one place.",
+      "recorded_at": "2026-06-19T16:46:26Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/verify.rs",
+      "low_hash": "e5be638cae81bf086273fb34cb721e77c7bff628b9fa5dde7ebeea1631d8b7ca",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_refs.rs",
+      "high_hash": "4db76cb7bb9922cd23133fa7c3972a989233540ab7878f04b473178f97f9c1af",
+      "changed_path": "apps/cli-composition/src/verify.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8861799240112305,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d044848b92dc9c05264b4651a70517c2f325ab9b",
+      "rationale": "This is not a DRY violation. The two checks enforce the same track-id invariant at different layers for different reasons: the CLI path validates early for user-facing input, while the infrastructure path defensively revalidates before joining paths so the function remains safe when called directly. The candidate code explicitly documents that it is the canonical internal guard, so this is layered validation rather than duplicated business logic.",
+      "recorded_at": "2026-06-19T16:46:26Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli/src/commands/track/tddd/baseline.rs",
+      "low_hash": "7937e3d2a3b9480e49db217dd51a8c9db8ea2ca533e75868df47c054c103e681",
+      "high_path": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+      "high_hash": "1ba07cd86272ce00f7f35d66b5935df7cf89d323e455eea5a390d1f482906b64",
+      "changed_path": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8547025918960571,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d044848b92dc9c05264b4651a70517c2f325ab9b",
+      "rationale": "The two snippets share only a small amount of test setup and the same invalid input, but they exercise different code paths (`execute_baseline_graph` vs. `execute_baseline_capture`) and assert different failure behavior. This is normal test reuse, not harmful duplication.",
+      "recorded_at": "2026-06-19T16:46:26Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }

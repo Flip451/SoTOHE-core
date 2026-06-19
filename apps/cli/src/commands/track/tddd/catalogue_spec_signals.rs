@@ -208,8 +208,12 @@ mod tests {
         // git / metadata I/O occurs, so the error message always mentions the failure.
         assert!(result.is_err());
         let err = result.unwrap_err().to_string();
+        // Error text is the domain form: "track id '...' must be a lowercase slug".
+        // Accept either the domain form or legacy "invalid" prefix (behaviour: rejection).
         assert!(
-            err.contains("invalid track ID") || err.contains("invalid"),
+            err.contains("must be a lowercase slug")
+                || err.contains("invalid track ID")
+                || err.contains("invalid"),
             "expected path-traversal rejection, got: {err}"
         );
     }

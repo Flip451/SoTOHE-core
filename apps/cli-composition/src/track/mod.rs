@@ -8,35 +8,12 @@ use crate::{CliApp, CommandOutcome};
 use infrastructure::git_cli::GitRepository;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-/// Validates a track ID string (lowercase slug).
+/// Validates a track ID string by delegating to the canonical domain rule.
+///
+/// This is the single slug validator for the `cli_composition` crate; all internal
+/// callers route through here so the rule lives in exactly one place (`domain::TrackId`).
 pub(crate) fn validate_track_id_str(value: &str) -> Result<(), String> {
-    if value.is_empty() {
-        return Err(format!("invalid track id: '{value}' (must not be empty)"));
-    }
-    let mut chars = value.chars();
-    match chars.next() {
-        Some(first) if first.is_ascii_lowercase() || first.is_ascii_digit() => {}
-        _ => {
-            return Err(format!(
-                "invalid track id: '{value}' (must start with lowercase letter or digit)"
-            ));
-        }
-    }
-    let mut previous_was_hyphen = false;
-    for ch in chars {
-        let is_valid = ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-';
-        if !is_valid {
-            return Err(format!("invalid track id: '{value}' (invalid character '{ch}')"));
-        }
-        if ch == '-' && previous_was_hyphen {
-            return Err(format!("invalid track id: '{value}' (double hyphen not allowed)"));
-        }
-        previous_was_hyphen = ch == '-';
-    }
-    if previous_was_hyphen {
-        return Err(format!("invalid track id: '{value}' (must not end with hyphen)"));
-    }
-    Ok(())
+    domain::TrackId::try_new(value).map(|_| ()).map_err(|e| e.to_string())
 }
 /// Resolves `<project-root>/track/items` → `<project-root>`.
 pub(crate) fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, String> {
