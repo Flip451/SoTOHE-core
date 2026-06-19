@@ -401,6 +401,78 @@
         "kind": "pass",
         "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
       }
+    },
+    {
+      "claim_hash": "a2fce744db445304aa687191f883a235e237cc2615672d14020f9282e5afd83a",
+      "evidence_hash": "5f186bf753e3b087b8e4162546b8cfa877e056f62ca3386c25783873cc880457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `check-*` の Yellow 扱い: `strict=true`（または `--gate` が strict セルに解決）→ `Finding::error`、`strict=false`（または `--gate` が interim セルに解決）→ `Finding::warning`。"
+      }
+    },
+    {
+      "claim_hash": "a2fce744db445304aa687191f883a235e237cc2615672d14020f9282e5afd83a",
+      "evidence_hash": "3e737860e46c8971d552123b872108c5adf282f3f36f46e405f6e12ea39254f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧コマンド（`track signals` / `track type-signals` / `track catalogue-spec-signals` / `verify spec-states` / `verify adr-signals` / `verify catalogue-spec-signals`）が新 `signal` 名前空間に移行または廃止されており、`Makefile.toml` / hooks / `track-active-gate` / `merge_gate.rs` / docs が新コマンド名で一貫している。後方互換 alias は存在しない。"
+      }
+    },
+    {
+      "claim_hash": "a2fce744db445304aa687191f883a235e237cc2615672d14020f9282e5afd83a",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）をそれぞれ 4 つの `signal check-* --gate commit|merge` に結線する。merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）。"
+      }
+    },
+    {
+      "claim_hash": "8281a2814a105d99b5aabe26303a77fff1466eb8d1858a8aef82f28facde07bc",
+      "evidence_hash": "3e737860e46c8971d552123b872108c5adf282f3f36f46e405f6e12ea39254f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧コマンド（`track signals` / `track type-signals` / `track catalogue-spec-signals` / `verify spec-states` / `verify adr-signals` / `verify catalogue-spec-signals`）が新 `signal` 名前空間に移行または廃止されており、`Makefile.toml` / hooks / `track-active-gate` / `merge_gate.rs` / docs が新コマンド名で一貫している。後方互換 alias は存在しない。"
+      }
+    },
+    {
+      "claim_hash": "8281a2814a105d99b5aabe26303a77fff1466eb8d1858a8aef82f28facde07bc",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）をそれぞれ 4 つの `signal check-* --gate commit|merge` に結線する。"
+      }
+    },
+    {
+      "claim_hash": "987381e4bf6d40f7d7df7218a20aeebb8df01bd3e50b19506a78cc9285d5f63d",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。chain ⓪ は live 計算のため stale 問題が構造的に発生しない。いずれの stale 検出も strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力で signal を評価できないため）。"
+      }
+    },
+    {
+      "claim_hash": "987381e4bf6d40f7d7df7218a20aeebb8df01bd3e50b19506a78cc9285d5f63d",
+      "evidence_hash": "3e737860e46c8971d552123b872108c5adf282f3f36f46e405f6e12ea39254f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧コマンド（`track signals` / `track type-signals` / `track catalogue-spec-signals` / `verify spec-states` / `verify adr-signals` / `verify catalogue-spec-signals`）が新 `signal` 名前空間に移行または廃止されており、`Makefile.toml` / hooks / `track-active-gate` / `merge_gate.rs` / docs が新コマンド名で一貫している。後方互換 alias は存在しない。"
+      }
+    },
+    {
+      "claim_hash": "987381e4bf6d40f7d7df7218a20aeebb8df01bd3e50b19506a78cc9285d5f63d",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）をそれぞれ 4 つの `signal check-* --gate commit|merge` に結線する。"
+      }
+    },
+    {
+      "claim_hash": "8281a2814a105d99b5aabe26303a77fff1466eb8d1858a8aef82f28facde07bc",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
     }
   ]
 }

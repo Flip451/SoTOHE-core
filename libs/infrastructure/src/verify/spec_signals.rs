@@ -15,6 +15,7 @@ use domain::verify::{VerifyFinding, VerifyOutcome};
 use domain::{ConfidenceSignal, SignalCounts, evaluate_source_tag};
 
 use super::frontmatter::parse_yaml_frontmatter;
+use super::spec_states::{read_legacy_spec_markdown_with_label, sibling_spec_json};
 
 /// Top-level `##` sections whose list items are evaluated.
 const INCLUDED_H2_SECTIONS: &[&str] = &["## Scope", "## Constraints", "## Acceptance Criteria"];
@@ -247,32 +248,11 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
         }
     }
 
-    // Legacy markdown-based flow.
-    let content = match std::fs::read_to_string(spec_path) {
+    // Shared legacy markdown prelude: read the file and guard against generated v2 content.
+    let content = match read_legacy_spec_markdown_with_label(spec_path, "signal") {
         Ok(c) => c,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "cannot read {}: {e}",
-                spec_path.display()
-            ))]);
-        }
+        Err(outcome) => return outcome,
     };
-
-    // Schema v2 spec.md files are generated from spec.json and carry a
-    // machine-readable header comment. The legacy `[source: ...]` evaluator
-    // cannot process v2 content (typed adr_refs / convention_refs instead of
-    // [source: ...] tags); running it would produce false all-red results.
-    //
-    // Fail closed: if the generated header is present but spec.json is absent
-    // (e.g. manual deletion or spoofed header), return an error rather than a
-    // silent pass. Verification must be performed against spec.json.
-    if content.starts_with("<!-- Generated from spec.json") {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{}: generated v2 spec.md requires a sibling spec.json for signal verification \
-             (spec.json is absent — restore it or re-generate spec.md from spec.json)",
-            spec_path.display()
-        ))]);
-    }
 
     let Some(fm) = parse_yaml_frontmatter(&content) else {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
@@ -300,17 +280,6 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     }
 
     if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
-}
-
-/// Derives the sibling `spec.json` path from a `spec.md` path by replacing
-/// the filename component.
-///
-/// Returns `None` when the path has no parent directory.
-fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
-    spec_md_path
-        .parent()
-        .map(|dir| if dir.as_os_str().is_empty() { Path::new(".") } else { dir })
-        .map(|dir| dir.join("spec.json"))
 }
 
 #[cfg(test)]

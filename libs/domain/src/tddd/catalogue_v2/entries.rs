@@ -484,20 +484,9 @@ mod tests {
             false,
             None,
         );
-        let entry = TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![save_method.clone()],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: Some("User repository port.".to_string()),
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let mut entry = trait_entry_fixture();
+        entry.methods = vec![save_method.clone()];
+        entry.docs = Some("User repository port.".to_string());
         assert_eq!(entry.methods.len(), 1);
         assert_eq!(entry.methods[0], save_method);
         assert_eq!(entry.docs, Some("User repository port.".to_string()));
@@ -830,20 +819,8 @@ mod tests {
         let summary = InformalGroundSummary::try_new("discussed in planning session").unwrap();
         let ground = InformalGroundRef::new(InformalGroundKind::Discussion, summary);
 
-        let entry = TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![ground.clone()],
-        };
+        let mut entry = trait_entry_fixture();
+        entry.informal_grounds = vec![ground.clone()];
         assert_eq!(entry.informal_grounds.len(), 1);
         assert_eq!(entry.informal_grounds[0], ground);
         assert!(entry.spec_refs.is_empty());

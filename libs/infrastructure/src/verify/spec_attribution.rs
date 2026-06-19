@@ -5,6 +5,9 @@
 //! have non-empty sources. Otherwise falls back to the markdown scan (legacy).
 
 use super::frontmatter::parse_yaml_frontmatter;
+use super::spec_states::{
+    MarkdownFence, markdown_line_is_visible, read_legacy_spec_markdown_with_label,
+};
 use domain::verify::{VerifyFinding, VerifyOutcome};
 use std::path::Path;
 
@@ -122,65 +125,26 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
         }
     }
 
-    // Legacy markdown-based flow.
-    let content = match std::fs::read_to_string(spec_path) {
+    // Shared legacy markdown prelude: read the file and guard against generated v2 content.
+    let content = match read_legacy_spec_markdown_with_label(spec_path, "attribution") {
         Ok(c) => c,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "cannot read {}: {e}",
-                spec_path.display()
-            ))]);
-        }
+        Err(outcome) => return outcome,
     };
 
-    // Schema v2 spec.md is generated from spec.json and uses typed refs
-    // (adr_refs / convention_refs) instead of [source: ...] tags.
-    // The legacy `### S-` / `### REQ-` heading scan cannot process v2 content.
-    //
-    // Fail closed: if the generated header is present but spec.json is absent
-    // (e.g. manual deletion or spoofed header), return an error rather than a
-    // silent pass. Verification must be performed against spec.json.
-    if content.starts_with("<!-- Generated from spec.json") {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{}: generated v2 spec.md requires a sibling spec.json for attribution verification \
-             (spec.json is absent — restore it or re-generate spec.md from spec.json)",
-            spec_path.display()
-        ))]);
-    }
-
     let mut findings = Vec::new();
-    // (fence_char, min_count) — closing fence must use same char, at least as many
-    let mut fence: Option<(char, usize)> = None;
 
     // Skip YAML frontmatter using shared parser.
     // If no valid frontmatter is found, scan all lines.
-    let lines_vec: Vec<(usize, &str)> = content.lines().enumerate().collect();
     let body_start = parse_yaml_frontmatter(&content).map(|fm| fm.body_start).unwrap_or(0);
+    let mut active_fence: Option<MarkdownFence> = None;
 
-    for &(line_num, line) in lines_vec.get(body_start..).unwrap_or_default() {
+    for (line_num, line) in content.lines().enumerate().skip(body_start) {
+        // Skip fenced code block lines using the shared fence-tracking helper.
+        if !markdown_line_is_visible(line, &mut active_fence) {
+            continue;
+        }
+
         let trimmed = line.trim();
-
-        // Track fenced code blocks (``` or ~~~, 3+ chars)
-        if let Some((fc, fc_len)) = fence {
-            // Inside a code block — check for closing fence (same char, >= length, nothing else)
-            let run = trimmed.len() - trimmed.trim_start_matches(fc).len();
-            if run >= fc_len && trimmed.chars().all(|c| c == fc) {
-                fence = None;
-            }
-            continue;
-        }
-        // Check for opening fence
-        let backtick_count = trimmed.len() - trimmed.trim_start_matches('`').len();
-        let tilde_count = trimmed.len() - trimmed.trim_start_matches('~').len();
-        if backtick_count >= 3 {
-            fence = Some(('`', backtick_count));
-            continue;
-        }
-        if tilde_count >= 3 {
-            fence = Some(('~', tilde_count));
-            continue;
-        }
-
         let is_requirement = trimmed.starts_with("### S-") || trimmed.starts_with("### REQ-");
         if !is_requirement {
             continue;

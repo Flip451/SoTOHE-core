@@ -1,381 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
-          "at": "2026-06-19T02:08:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
-          "at": "2026-06-19T02:10:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`#[arg(long)]` on `catalogue_hash` exposes the public flag as `--catalogue-hash`, but T009 and this module's own CLI-surface rule require the new `signal` UI to use `catalog` spelling. The same field appears in the catalog-spec and impl-catalog calc/check adapters, and the parser tests now lock in the wrong flag, so documented invocations using `--catalog-hash` will be rejected.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
-              "line": 16,
-              "category": "correctness"
-            },
-            {
-              "message": "The aggregate `signal check` parser allows the catalog hash inputs to be omitted by defaulting both hashes to `\"\"`, but `run_aggregate_check` always forwards those values into chain ②/③ checks, where they are parsed as SHA-256 content hashes. As a result, the advertised `sotp signal check --gate commit|merge` path fails before evaluating all four chains unless callers manually provide both hashes, so AC-04's aggregate gate is not actually runnable with the default arguments tested here.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/signal/mod.rs",
-              "line": 137,
-              "category": "correctness"
-            },
-            {
-              "message": "The fallback `spec_json` path for the aggregate check is `track/items/spec.json`, but track specs in this repository live under `track/items/<track-id>/spec.json` or as `spec.json` within a track directory. With `--spec-json` omitted, the aggregate check points chain ① at a non-existent file, so the no-extra-args aggregate command cannot work from the normal repo layout.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/signal/mod.rs",
-              "line": 200,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b2f064d4458171950a8276a6743229e18e726c2d45c653583ea936556bec1bfb",
-          "at": "2026-06-19T04:52:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`signal check --gate commit|merge` is specified as the aggregate command, with fallback paths when optional args are absent, but the parser now requires `--spec-json`, `--catalog-spec-hash`, and `--impl-catalog-hash` before dispatch. This means the advertised aggregate gate invocation is rejected by clap and cannot run all four chains unless callers know and provide extra arguments, breaking the aggregate gate surface described by the spec/briefing.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/signal/mod.rs",
-              "line": 131,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:81cd6a40453c1b8f075bb16830e9db08d92cef1ac0c692fba5c47fddc145a158",
-          "at": "2026-06-19T04:58:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0dc02409fe6df9bcfe6e06fcffca942e7f2eaf290d9cbe5b42ea95ecb2f576c6",
-          "at": "2026-06-19T05:12:48Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:40:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:43:05Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
-          "at": "2026-06-18T07:29:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogSpecChain::check_freshness` only compares the document-level `catalogue_declaration_hash` with the current catalogue hash. The chain ② contract requires the persisted per-entry `CatalogueSpecSignal::entry_hash()` values to be checked against freshly computed entry hashes before `evaluate_gate`; otherwise `SoTChain::check` can accept a signals document with stale, missing, or manually trimmed per-entry signals as long as the aggregate declaration hash still matches. Carry the current entry hashes in `CatalogSpecInput` and fail closed on missing/mismatched entries before delegating to `check_catalogue_spec_signals`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/chain/catalog_spec.rs",
-              "line": 160,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
-          "at": "2026-06-18T07:33:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9394221141e132d3d8c4372eb3d93650dc3b7218c4ccf6aceb5290341ac7c16b",
-          "at": "2026-06-18T07:49:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The chain-0 result is only merged at the end of the function, but the early returns here and at the later `stage1.has_errors()` check exit before that merge. Invalid branches or missing/failed `spec.json` therefore drop ADR findings entirely, which contradicts the new requirement that chain ⓪ be accumulated independently of the other stages.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
-              "line": 305,
-              "category": "correctness"
-            },
-            {
-              "message": "The new `strict=false` arm in `check_chain2_for_layer` is not exercised by any test in this scope, and every existing test now hardcodes `all_strict_matrix()`. That leaves the new warning-mode behavior and the added ADR reader port effectively unverified, so a regression in the non-blocking path could ship unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate/chain2_gate.rs",
-              "line": 275,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:ae16c95a27ef368c750b6df6c610cc94671494805594ed1e36b78102a69e83ff",
-          "at": "2026-06-18T09:54:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
-          "at": "2026-06-18T10:18:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_strict_merge_gate` reads the ADR report before calling `validate_branch_ref`, so an untrusted branch string reaches the `TrackBlobReader` port unvalidated. That reintroduces the very ref-safety check this function is supposed to enforce and can make the adapter operate on malicious refs like `..` or `@{...}` before the branch is rejected.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
-              "line": 287,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
-          "at": "2026-06-18T10:19:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
-          "at": "2026-06-18T10:31:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Only `catalog_spec` is exercised with a non-strict matrix; the newly matrix-driven `adr_user`, `spec_adr`, and `impl_catalog` paths all run under `all_strict_matrix()` in tests. A swapped ChainId or accidental hardcoded strict value for any of those cells would still pass the current suite. Add focused interim-mode tests for Chain ⓪, Chain ①, and Chain ③ Yellow signals.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 599,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
-          "at": "2026-06-18T10:34:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Chain ⓪ `read_adr_verify_report` error path is untested. The trait documents `FetchError` as fail-closed and this branch turns it into a blocking finding, but the added tests only cover `NotFound` and `Found` ADR reports. A regression that accidentally skipped ADR scan I/O/parse failures would still pass the current suite. Add a test with an otherwise clean gate and `BlobFetchResult::FetchError` from `read_adr_verify_report`, asserting `has_errors()` and the ADR failure message.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 302,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7ce09d370511ec4bdf5d979ea634cb37372db4aa5505f95c6ba4a2048d46b98a",
-          "at": "2026-06-18T10:51:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39818e433ede532476eeb14779e80fc977e38d5f445465e469d1a4da49aa69ba",
-          "at": "2026-06-18T11:12:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
-          "at": "2026-06-18T15:10:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
-          "at": "2026-06-18T15:13:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
-          "at": "2026-06-19T01:11:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
-          "at": "2026-06-19T01:14:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
-          "at": "2026-06-19T01:37:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
-          "at": "2026-06-19T01:40:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
-          "at": "2026-06-19T02:08:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
-          "at": "2026-06-19T02:11:21Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
-          "at": "2026-06-18T03:39:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
-          "at": "2026-06-18T03:48:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
-          "at": "2026-06-18T04:04:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
-          "at": "2026-06-18T04:08:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
-          "at": "2026-06-18T04:25:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
-          "at": "2026-06-18T04:28:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AssocTypeDecl.name` and `AssocConstDecl.name` are plain `String`s, unlike the rest of `catalogue_v2`'s identifier-bearing fields which use validated newtypes. That lets callers construct invalid associated-item names inside the domain model and defers validation to later layers, which violates the repo's \"illegal states unrepresentable\" rule for a new public API surface.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-              "line": 48,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ebc91589796efb3fd0a8ba00353feac1e5505be845d297209e5dc2fce2c0d3e9",
-          "at": "2026-06-18T15:11:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AssocConstName` is a new public validation boundary, but this module adds no direct tests for valid construction, invalid-input rejection, or `Display`/`FromStr` round-trips. Because its validation logic is macro-backed and shared only indirectly with the other identifier wrappers, a regression here would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-              "line": 243,
-              "category": "testing"
-            },
-            {
-              "message": "`TraitEntry` now carries `assoc_types` and `assoc_consts`, but there is no test coverage asserting their default-empty construction or that they participate in `PartialEq` the way the existing `generics` and `where_predicates` fields do. That leaves the new trait-item shape under-tested and makes a wiring regression easy to miss.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/entries.rs",
-              "line": 150,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:70537a10d0574928eec1a9cc41198cbd64cf0e8df320522c95655b8b4af959b7",
-          "at": "2026-06-18T17:00:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
-          "at": "2026-06-18T17:07:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
-          "at": "2026-06-18T17:13:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
-          "at": "2026-06-18T18:07:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
-          "at": "2026-06-18T18:10:34Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -956,46 +581,478 @@
           "findings": [],
           "hash": "rvw1:sha256:f87e8d8252e5059df4e9e2ac00ca992ec91c28e28c446e8264a105a21c755979",
           "at": "2026-06-19T02:59:38Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
-          "at": "2026-06-18T09:53:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
-          "at": "2026-06-18T10:16:42Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`signal_check_gate` treats the resolved strictness as if it were an override when calling the per-chain helpers, but `strict_override=false` means \"load config and resolve again\" in those helpers. For any interim cell, this re-reads config from CWD with `gate=None` and drops the `workspace_root`/selected gate already used by the aggregate command, so `signal check --gate ... --workspace-root ...` can fail or evaluate against the wrong matrix instead of the one loaded at line 459. The aggregate path needs to dispatch with the already-resolved boolean directly, or use a helper that accepts effective strictness without re-resolving.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 474,
+              "message": "`check_catalog_spec_from_signals_file` verifies only the document-level `catalogue_declaration_hash` before delegating to `check_catalogue_spec_signals`, but that domain function explicitly assumes the caller has already performed coverage, positional-name, and per-entry `entry_hash` freshness checks. Because this helper is wired as the direct `signal check-catalog-spec` path and receives only `signals_path` plus a hash, a truncated or hand-edited signals file with the current declaration hash and Blue remaining entries can pass while catalogue entries are missing or stale. Reuse the integrity checks from `execute_catalogue_spec_signals` or pass enough catalogue context to perform them here before the domain gate call.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 444,
               "category": "logic"
+            },
+            {
+              "message": "`check_impl_catalog_from_signals_file` reads `signals_path` directly with `read_to_string`, so the explicit `check-impl-catalog` entrypoint follows symlinked signal files. The existing guarded path rejects symlinks before reading, and this function's own contract says symlinked signal files should fail closed. Add trusted-root symlink validation before the read, or route this command through the existing guarded path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 419,
+              "category": "security"
             }
           ],
-          "hash": "rvw1:sha256:2c7e75c3c38704659c2ebcd2e54fa488b2d62706794dd0119a06675d0dfc4163",
-          "at": "2026-06-19T04:50:07Z"
+          "hash": "rvw1:sha256:ea8117802376362857bf0de107bc1305fb53a8b718b1b54af579663ae77e37ed",
+          "at": "2026-06-19T05:57:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_catalog_spec_from_signals_file` derives `catalogue_path` and then reads it directly with `std::fs::read_to_string` without applying the shared symlink guard. The existing `execute_catalogue_spec_signals` path rejects symlinked catalogue files before reading, but the new direct `signal check-catalog-spec` path will follow a symlinked `<layer>-types.json`; because the caller also hashes that same path, crafted linked catalogue/signals content can satisfy the hash check while bypassing the fail-closed symlink policy. Guard `catalogue_path` and its ancestors before reading it.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 526,
+              "category": "security"
+            },
+            {
+              "message": "The hand-rolled signals symlink check only stats the leaf and immediate parent. If an earlier component is a symlink, such as `track/items/<track-id>` pointing elsewhere while `<track-id>/<layer>-catalogue-spec-signals.json` itself is regular, both `symlink_metadata` calls follow that ancestor and `read_to_string` reads through it. This regresses the existing `reject_symlinks_below` behavior, which rejects every component below the trusted root for this gate.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 446,
+              "category": "security"
+            },
+            {
+              "message": "The new `check_impl_catalog_from_signals_file` has the same partial symlink guard: it checks only `signals_path` and its immediate parent before reading. A symlinked grandparent path is followed, so the explicit `signal check-impl-catalog` entrypoint can read a signal file through a symlinked track/items component even though the existing `evaluate_layer_catalogue` path rejects that via `reject_symlinks_below`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 423,
+              "category": "security"
+            },
+            {
+              "message": "`catalogue_path_from_signals` hard-codes `<layer>-types.json` from the catalogue-spec signals filename. TDDD already supports `tddd.catalogue_file` overrides, and the calc path resolves the real `TdddLayerBinding` before generating `<layer>-catalogue-spec-signals.json` from the custom catalogue. For such a layer, this check reads `domain-types.json` instead of the configured catalogue, causing a fresh generated signal file to fail or be checked against the wrong catalogue. The explicit check path needs the resolved catalogue path/binding rather than deriving the default name.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 399,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0ee9a960c9803966aaf3db66b509981adbef19d3fabb3c3ac74e22697b06dc4d",
+          "at": "2026-06-19T06:05:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_catalog_spec_from_signals_file` treats `current_dir()` as the trusted workspace root but only calls `reject_symlinks_below`, which does not enforce that `signals_path` is actually below that root. An absolute or `..` path outside the repo with the expected `*-catalogue-spec-signals.json` basename is accepted, then the catalogue is resolved from that outside directory and can pass with a matching supplied hash. The gate should fail closed unless the resolved signals and catalogue paths are contained in the workspace/track directory, matching the existing guarded `execute_catalogue_spec_signals` path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 450,
+              "category": "security"
+            },
+            {
+              "message": "`check_impl_catalog_from_signals_file` has the same containment gap: `reject_symlinks_below(signals_path, &workspace_root)` rejects symlinks but still allows reading a signal file outside the workspace when given an absolute or traversing path. Since this direct `signal check-impl-catalog` path trusts the caller-provided catalogue hash, an out-of-workspace forged signal document can pass without validating the real track file. Canonicalize and require `signals_path` to stay under the workspace/track root before reading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 435,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:c59cbd0356cfbf8a8b0f800e1a6d0922922b3531ba4bacbab7d7492ecad2a763",
+          "at": "2026-06-19T06:15:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The containment check can be bypassed with `..` components: `Path::components().collect()` does not collapse parent-directory components, so a path like `<repo>/../outside/domain-catalogue-spec-signals.json` still starts with `workspace_root` lexically. `reject_symlinks_below` and the later reads then operate on the outside path, and the derived catalogue path has the same issue. This lets the explicit catalog-spec gate read and validate files outside the workspace despite the fail-closed containment contract.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 458,
+              "category": "security"
+            },
+            {
+              "message": "The explicit impl-catalog gate has the same lexical containment bypass: `components().collect()` preserves `..`, and `starts_with(&workspace_root)` still accepts paths such as `<repo>/../outside/domain-type-signals.json`. The subsequent symlink guard and `read_to_string` can therefore read a signals file outside the workspace, bypassing the intended workspace-only boundary.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 441,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8f009dae0ece92071385c05f17e9624063ca419476c7acc0ab8d1b475a82f79a",
+          "at": "2026-06-19T06:20:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_catalog_spec_from_signals_file` derives `workspace_root` from `std::env::current_dir()`, so a valid `--signals-path` under the repo is rejected whenever the command is invoked from a repo subdirectory or with an absolute repo path while CWD is not the repo root. That makes the new chain ② gate depend on caller CWD instead of the actual workspace root; pass/discover the repo root before doing containment and architecture-rules lookups.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 473,
+              "category": "correctness"
+            },
+            {
+              "message": "`check_impl_catalog_from_signals_file` has the same CWD-as-workspace-root assumption, so valid type-signal files under the repository fail the containment check when the gate is run outside the repo root. The chain ③ check should use a trusted/repo root supplied by the caller or discovered from git, not `current_dir()`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 450,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c7ba7083146c45d4c6e4deb83e0db3d87c2a080d952b07b929f740ff6318e857",
+          "at": "2026-06-19T06:28:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_spec_signals.rs` now has production code through line 753 before the `#[cfg(test)]` block, exceeding the AGENTS.md 700-line maximum for production modules. The new `check_catalog_spec_from_signals_file`/path-normalization block is large enough to push the module over the cap; split the new direct-check helper into a smaller module or reuse/extract the existing integrity-check path so this production module stays within the limit.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 393,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:57902824897b196fb4e55ecc9c8ee4301a3f09ca53f525a903d4e0e53c83521f",
+          "at": "2026-06-19T06:32:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_impl_catalog_from_signals_file` pushes this production module past the AGENTS.md size limit: the `#[cfg(test)]` block now starts at line 759, so `spec_states.rs` has 758 production lines, exceeding the 700-line maximum. This scope added the 133-line direct check helper; split the new helper/path-normalization code into a smaller module or reuse an existing shared gate helper so the production module stays within the enforced bound.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 443,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:11eb50b77ad8f9841a622cdb6a3c53d7ce39e80da0246540168b464833d270c1",
+          "at": "2026-06-19T06:41:54Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:217ab9f4d73c21bb53140301cfc346583fdcef5a07a81882ab5c9fec1ca15f2f",
-          "at": "2026-06-19T04:56:25Z"
+          "hash": "rvw1:sha256:64c5fbc126eaba872aac0ae36fca2d58c9ca403fdd4198901d356b83dab5676b",
+          "at": "2026-06-19T06:48:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_signals_file` is intended to support explicit `--signals-path` checks, but it discovers the workspace from the process current directory via `SystemGitRepo::discover()`. If the command is invoked from outside the target repo, or from another repo while passing an absolute signals path, valid files under the target workspace are rejected or checked against the wrong `architecture-rules.json`. Make this derive the repo from the supplied path, or pass the resolved workspace root into this helper.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/path_safety.rs",
+              "line": 102,
+              "category": "correctness"
+            },
+            {
+              "message": "This new public gate entrypoint has no direct tests. Existing tests cover `execute_catalogue_spec_signals`, but not the explicit-path path through `check_signals_file`, catalogue resolution, hash mismatch handling, or strict Yellow promotion used by `signal check-catalog-spec`; regressions in the new CLI path would not be caught.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 390,
+              "category": "testing"
+            },
+            {
+              "message": "This new public gate entrypoint has no direct tests. Existing tests cover `verify_type_signals_from_spec_json`, but not the explicit-path path through `check_signals_file`, workspace containment, hash mismatch handling, or strict Yellow promotion used by `signal check-impl-catalog`; regressions in the new CLI path would not be caught.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 346,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:9625a17571a738fed6107b27318cb9608d68c9399f44a11ff12e19ac94cb5765",
+          "at": "2026-06-19T08:04:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_verify_adr_signals_with_strict` adds the strictness behavior used by `signal check-adr-user`, but the changed scope has no test exercising a Yellow ADR report with `strict=true` versus `strict=false`. Existing ADR tests only call the non-strict wrapper and cover Blue/Red/listing-error paths, so a regression that leaves Yellow as a warning in the strict gate would not be caught. Add focused tests for the new public function's Yellow handling in both strict modes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/adr_signals.rs",
+              "line": 51,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:380fec7c30978073a334b3863846952df1bd892769fd21b8775de84cfb8d8a8c",
+          "at": "2026-06-19T08:15:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3574f2f49c18e48fcb4dca02e52873044f7d38355d5700df1e7532cba81c46cc",
+          "at": "2026-06-19T08:23:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3574f2f49c18e48fcb4dca02e52873044f7d38355d5700df1e7532cba81c46cc",
+          "at": "2026-06-19T08:25:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4d3b2fb1efb1c354877f4a01ed0986a14f3543a49d0bdbf7792328409b7450f",
+          "at": "2026-06-19T08:52:36Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
+          "at": "2026-06-18T07:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogSpecChain::check_freshness` only compares the document-level `catalogue_declaration_hash` with the current catalogue hash. The chain ② contract requires the persisted per-entry `CatalogueSpecSignal::entry_hash()` values to be checked against freshly computed entry hashes before `evaluate_gate`; otherwise `SoTChain::check` can accept a signals document with stale, missing, or manually trimmed per-entry signals as long as the aggregate declaration hash still matches. Carry the current entry hashes in `CatalogSpecInput` and fail closed on missing/mismatched entries before delegating to `check_catalogue_spec_signals`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/chain/catalog_spec.rs",
+              "line": 160,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
+          "at": "2026-06-18T07:33:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9394221141e132d3d8c4372eb3d93650dc3b7218c4ccf6aceb5290341ac7c16b",
+          "at": "2026-06-18T07:49:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The chain-0 result is only merged at the end of the function, but the early returns here and at the later `stage1.has_errors()` check exit before that merge. Invalid branches or missing/failed `spec.json` therefore drop ADR findings entirely, which contradicts the new requirement that chain ⓪ be accumulated independently of the other stages.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "line": 305,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `strict=false` arm in `check_chain2_for_layer` is not exercised by any test in this scope, and every existing test now hardcodes `all_strict_matrix()`. That leaves the new warning-mode behavior and the added ADR reader port effectively unverified, so a regression in the non-blocking path could ship unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate/chain2_gate.rs",
+              "line": 275,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:ae16c95a27ef368c750b6df6c610cc94671494805594ed1e36b78102a69e83ff",
+          "at": "2026-06-18T09:54:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
+          "at": "2026-06-18T10:18:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` reads the ADR report before calling `validate_branch_ref`, so an untrusted branch string reaches the `TrackBlobReader` port unvalidated. That reintroduces the very ref-safety check this function is supposed to enforce and can make the adapter operate on malicious refs like `..` or `@{...}` before the branch is rejected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "line": 287,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
+          "at": "2026-06-18T10:19:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
+          "at": "2026-06-18T10:31:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Only `catalog_spec` is exercised with a non-strict matrix; the newly matrix-driven `adr_user`, `spec_adr`, and `impl_catalog` paths all run under `all_strict_matrix()` in tests. A swapped ChainId or accidental hardcoded strict value for any of those cells would still pass the current suite. Add focused interim-mode tests for Chain ⓪, Chain ①, and Chain ③ Yellow signals.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 599,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
+          "at": "2026-06-18T10:34:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Chain ⓪ `read_adr_verify_report` error path is untested. The trait documents `FetchError` as fail-closed and this branch turns it into a blocking finding, but the added tests only cover `NotFound` and `Found` ADR reports. A regression that accidentally skipped ADR scan I/O/parse failures would still pass the current suite. Add a test with an otherwise clean gate and `BlobFetchResult::FetchError` from `read_adr_verify_report`, asserting `has_errors()` and the ADR failure message.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 302,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7ce09d370511ec4bdf5d979ea634cb37372db4aa5505f95c6ba4a2048d46b98a",
+          "at": "2026-06-18T10:51:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39818e433ede532476eeb14779e80fc977e38d5f445465e469d1a4da49aa69ba",
+          "at": "2026-06-18T11:12:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
+          "at": "2026-06-18T15:10:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
+          "at": "2026-06-18T15:13:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
+          "at": "2026-06-19T01:11:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
+          "at": "2026-06-19T01:14:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
+          "at": "2026-06-19T01:37:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
+          "at": "2026-06-19T01:40:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
+          "at": "2026-06-19T02:08:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
+          "at": "2026-06-19T02:11:21Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
+          "at": "2026-06-19T02:08:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
+          "at": "2026-06-19T02:10:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`#[arg(long)]` on `catalogue_hash` exposes the public flag as `--catalogue-hash`, but T009 and this module's own CLI-surface rule require the new `signal` UI to use `catalog` spelling. The same field appears in the catalog-spec and impl-catalog calc/check adapters, and the parser tests now lock in the wrong flag, so documented invocations using `--catalog-hash` will be rejected.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+              "line": 16,
+              "category": "correctness"
+            },
+            {
+              "message": "The aggregate `signal check` parser allows the catalog hash inputs to be omitted by defaulting both hashes to `\"\"`, but `run_aggregate_check` always forwards those values into chain ②/③ checks, where they are parsed as SHA-256 content hashes. As a result, the advertised `sotp signal check --gate commit|merge` path fails before evaluating all four chains unless callers manually provide both hashes, so AC-04's aggregate gate is not actually runnable with the default arguments tested here.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/mod.rs",
+              "line": 137,
+              "category": "correctness"
+            },
+            {
+              "message": "The fallback `spec_json` path for the aggregate check is `track/items/spec.json`, but track specs in this repository live under `track/items/<track-id>/spec.json` or as `spec.json` within a track directory. With `--spec-json` omitted, the aggregate check points chain ① at a non-existent file, so the no-extra-args aggregate command cannot work from the normal repo layout.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/mod.rs",
+              "line": 200,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b2f064d4458171950a8276a6743229e18e726c2d45c653583ea936556bec1bfb",
+          "at": "2026-06-19T04:52:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal check --gate commit|merge` is specified as the aggregate command, with fallback paths when optional args are absent, but the parser now requires `--spec-json`, `--catalog-spec-hash`, and `--impl-catalog-hash` before dispatch. This means the advertised aggregate gate invocation is rejected by clap and cannot run all four chains unless callers know and provide extra arguments, breaking the aggregate gate surface described by the spec/briefing.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/mod.rs",
+              "line": 131,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:81cd6a40453c1b8f075bb16830e9db08d92cef1ac0c692fba5c47fddc145a158",
+          "at": "2026-06-19T04:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0dc02409fe6df9bcfe6e06fcffca942e7f2eaf290d9cbe5b42ea95ecb2f576c6",
+          "at": "2026-06-19T05:12:48Z"
         }
       ]
     },
@@ -1656,6 +1713,298 @@
           "findings": [],
           "hash": "rvw1:sha256:900e1628b5c2328f4de39e24dceb5d35d434b6a7d9d0b27544a95c231967db07",
           "at": "2026-06-19T04:49:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7fc26cc25c13afc6f07d01739ca716c6cf1b0b1bd1bc44cf423edda379c1fc9",
+          "at": "2026-06-19T05:58:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:804db77f63e54054e0d2713897bed8f946bb94b27328e3e2542ec28896e445d6",
+          "at": "2026-06-19T09:00:12Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
+          "at": "2026-06-18T03:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
+          "at": "2026-06-18T03:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
+          "at": "2026-06-18T04:04:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
+          "at": "2026-06-18T04:08:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
+          "at": "2026-06-18T04:25:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
+          "at": "2026-06-18T04:28:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AssocTypeDecl.name` and `AssocConstDecl.name` are plain `String`s, unlike the rest of `catalogue_v2`'s identifier-bearing fields which use validated newtypes. That lets callers construct invalid associated-item names inside the domain model and defers validation to later layers, which violates the repo's \"illegal states unrepresentable\" rule for a new public API surface.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 48,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ebc91589796efb3fd0a8ba00353feac1e5505be845d297209e5dc2fce2c0d3e9",
+          "at": "2026-06-18T15:11:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AssocConstName` is a new public validation boundary, but this module adds no direct tests for valid construction, invalid-input rejection, or `Display`/`FromStr` round-trips. Because its validation logic is macro-backed and shared only indirectly with the other identifier wrappers, a regression here would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 243,
+              "category": "testing"
+            },
+            {
+              "message": "`TraitEntry` now carries `assoc_types` and `assoc_consts`, but there is no test coverage asserting their default-empty construction or that they participate in `PartialEq` the way the existing `generics` and `where_predicates` fields do. That leaves the new trait-item shape under-tested and makes a wiring regression easy to miss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 150,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:70537a10d0574928eec1a9cc41198cbd64cf0e8df320522c95655b8b4af959b7",
+          "at": "2026-06-18T17:00:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
+          "at": "2026-06-18T17:07:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
+          "at": "2026-06-18T17:13:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
+          "at": "2026-06-18T18:07:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
+          "at": "2026-06-18T18:10:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_trait_entry_with_non_empty_informal_grounds_stores_grounding` still constructs `TraitEntry` inline with all fields instead of using `trait_entry_fixture()` and mutating `informal_grounds`. This leaves a TraitEntry-related test outside the intended DRY refactor and will keep this test coupled to future field additions.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 822,
+              "category": "test-maintenance"
+            }
+          ],
+          "hash": "rvw1:sha256:d3245742fb0ef8e5a5b22c2bfae60a62894e438f5c7666054bfb1ddf5519fea0",
+          "at": "2026-06-19T07:59:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6c32151ac4f0fd961c4294ba46c45e6b8c6175325f15eef50f2572ec7122c9a",
+          "at": "2026-06-19T08:02:17Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:40:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:43:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Makefile.toml is explicitly outside the harness-policy/T004 modification boundary: the briefing says Makefile migrations belong to T011 and that this config is read by tests only until T006/T011. This diff wires signal-gate config into CI/commit tasks now, giving the config production effects in the config-only task.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 322,
+              "category": "scope_boundary"
+            },
+            {
+              "message": "The new chain ③ task skips a layer whenever `<layer>-type-signals.json` is absent, even if the corresponding `<layer>-types.json` catalogue exists. That bypasses `check-impl-catalog`'s fail-closed missing-signal behavior, so `cargo make ci` can pass after a generated type-signals file is deleted instead of blocking until it is regenerated.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 364,
+              "category": "missing_error_handling"
+            },
+            {
+              "message": "The chain ② task similarly skips missing `<layer>-catalogue-spec-signals.json` files before invoking `signal check-catalog-spec`. With `catalog_spec` strict at the commit gate, a layer with a catalogue but no persisted catalog-spec signals can pass CI instead of failing closed on the missing signal file.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 405,
+              "category": "missing_error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:c1317f86884c1c614442924909a53d924154d94e62d903ad82f59787753cc092",
+          "at": "2026-06-19T05:57:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b19693c0f2f30c1b2d8bffa3e4f1b9a79e5b59b1d3ce1b65f7c41971b9c6b8e",
+          "at": "2026-06-19T06:04:21Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T09:53:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T10:16:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_check_gate` treats the resolved strictness as if it were an override when calling the per-chain helpers, but `strict_override=false` means \"load config and resolve again\" in those helpers. For any interim cell, this re-reads config from CWD with `gate=None` and drops the `workspace_root`/selected gate already used by the aggregate command, so `signal check --gate ... --workspace-root ...` can fail or evaluate against the wrong matrix instead of the one loaded at line 459. The aggregate path needs to dispatch with the already-resolved boolean directly, or use a helper that accepts effective strictness without re-resolving.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 474,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:2c7e75c3c38704659c2ebcd2e54fa488b2d62706794dd0119a06675d0dfc4163",
+          "at": "2026-06-19T04:50:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:217ab9f4d73c21bb53140301cfc346583fdcef5a07a81882ab5c9fec1ca15f2f",
+          "at": "2026-06-19T04:56:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_hash` is no longer validated before running the chain checks. This change deleted the `parse_catalogue_hash` helper and now passes user input directly to the infrastructure checks, which only compare the raw string against the stored canonical hash. That makes malformed or empty hashes flow through the gate path as if they were a current catalogue hash, producing stale/missing-file findings instead of the intended hash-parse failure, and violates the boundary requirement that external input be validated via the `ContentHash` domain type. The same pattern is repeated in the aggregate check for chains 2 and 3, so restore validation before dispatching to these checks.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 403,
+              "category": "missing_validation"
+            }
+          ],
+          "hash": "rvw1:sha256:82d77c18399cf67dde6c905f0b588c3f02fd4a6692eee31dd1bf017033f573ab",
+          "at": "2026-06-19T05:58:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_calc_adr_user` still delegates to `AdrUserChain::calc_live`, but that usecase method is the not-yet-wired placeholder and always returns an error. As a result, the new public `sotp signal calc-adr-user` command fails for every invocation instead of performing the live ADR scan that the signal namespace is meant to expose. Wire this path through the same infrastructure-backed ADR scanner used by `signal_check_adr_user` or another real calc helper.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 186,
+              "category": "correctness"
+            },
+            {
+              "message": "`signal_calc_spec_adr` delegates to `SpecAdrChain::calc`, which is also still a placeholder returning `SpecAdrCalcError(\"calc not yet wired\")`. This leaves `sotp signal calc-spec-adr` permanently unable to refresh `spec.json` signals, so the command family cannot recover from the stale-signal failures produced by `signal check-spec-adr`. The composition root should call the existing spec read/evaluate/write path rather than the placeholder usecase method.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 261,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e29c5207570a169314dd8413177119329e260c17cfd5ee3d5e33cb5960ce489f",
+          "at": "2026-06-19T06:04:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69d0df4aa4c9010f9d4129ba7d45bd0c208d90dd8377b8ec1753d2495a003a3f",
+          "at": "2026-06-19T06:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ba4cfc8756e10490ddb80c2afbf0148fbf9f75db0164774239701c95a993910",
+          "at": "2026-06-19T08:02:22Z"
         }
       ]
     }

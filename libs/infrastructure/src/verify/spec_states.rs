@@ -14,55 +14,22 @@ use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard;
 
 use super::frontmatter::parse_yaml_frontmatter;
+use super::path_safety::check_signals_file;
 use super::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
 
 /// Verifies spec.json Stage 1 signals (chain ① `check-spec-adr`).
 ///
-/// This is a thin wrapper around the shared domain-layer pure function
-/// `check_spec_doc_signals`. It reads `spec.json` from the filesystem,
-/// rejects symlinks via `reject_symlinks_below` (D4.3), decodes the JSON,
-/// runs a self-consistency freshness check (IN-09), and delegates the actual
-/// signal-gate rules to the domain layer.
+/// Reads `spec.json`, rejects symlinks (D4.3), decodes JSON, runs a self-consistency
+/// freshness check against `evaluate_signals()` (IN-09), and delegates the actual
+/// signal-gate rules to `check_spec_doc_signals`. Stage 2 (chain ③) is performed by
+/// `verify_type_signals_from_spec_json`.
 ///
-/// **Stage 1 only**: Stage 2 (chain ③ `check-impl-catalog`) is performed by
-/// the separate `verify_type_signals_from_spec_json` function, which accepts
-/// its own `strict` parameter per D2 / IN-03.
-///
-/// ## Self-consistency freshness check (IN-09)
-///
-/// After decoding `spec.json`, this function computes `spec_doc.evaluate_signals()`
-/// (live recalculation from all requirements) and compares it against
-/// `spec_doc.signals()` (the stored aggregate). If they differ, the stored
-/// signals are considered stale and the function returns a `VerifyFinding::error`
-/// prompting the user to run `sotp signal calc-spec-adr` (CN-04: stale detection
-/// is always `Finding::error`, regardless of `strict`).
-///
-/// The `strict` parameter controls Yellow handling for the signal-gate rules:
-/// - `true`: declared Yellow → `VerifyFinding::error` (merge gate)
-/// - `false`: declared Yellow → `VerifyFinding::warning` (CI interim mode — D8.6)
-///
-/// Red, None, all-zero, and coverage-gap conditions always return
-/// `VerifyFinding::error` regardless of `strict`.
-///
-/// The `trusted_root` parameter anchors the symlink guard (`reject_symlinks_below`):
-/// the guard walks ancestors of `spec_json_path` only until it reaches
-/// `trusted_root`, then stops. Callers must pass an absolute path to the
-/// repository root (e.g. `SystemGitRepo::discover()?.root()`) so that
-/// host-level symlinks above the repo (for example `/var` on macOS) are NOT
-/// walked and the gate behavior is environment-independent. Tests may pass
-/// a tempdir root.
+/// `strict=true` promotes Yellow → error (merge gate); `false` → warning (D8.6).
+/// `trusted_root` anchors the symlink guard to the repo root (pass the git root).
 ///
 /// # Errors
 ///
-/// Returns findings when:
-/// - `spec.json` is a symlink or lives under a symlink'd directory (fail-closed).
-/// - `spec.json` cannot be read or decoded.
-/// - The stored signals do not match the live recalculation (stale — always error).
-/// - Stage 1 signal-gate rules are violated.
-///
-/// Reference: ADR `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md`
-/// §D2, §5 (per-chain freshness); ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
-/// §D2.1, §D4.3, §D8.6.
+/// Returns findings on symlinks, read/decode errors, stale signals, or gate violations.
 pub fn verify_from_spec_json(
     spec_json_path: PathBuf,
     strict: bool,
@@ -119,40 +86,15 @@ fn spec_signal_freshness(spec_doc: &SpecDocument) -> SpecSignalFreshness {
 /// Verifies Stage 2 type signals (chain ③ `check-impl-catalog`) for the spec
 /// track identified by `spec_json_path`.
 ///
-/// This is the public Stage 2 entrypoint, extracted from the former combined
-/// `verify_from_spec_json` so that chain ① (`check-spec-adr`) and chain ③
-/// (`check-impl-catalog`) can each carry an independent `strict` parameter
-/// per D2 / IN-03.
-///
 /// Reads `architecture-rules.json` from `trusted_root`, enumerates every
-/// `tddd.enabled` layer, and runs the signal gate against each layer's
-/// catalogue file. All findings are AND-aggregated.
+/// `tddd.enabled` layer, and runs the signal gate. Layers without a catalogue
+/// are skipped (opt-in, ADR §D2.1). All findings are AND-aggregated.
 ///
-/// Stage 2 is **opt-in** per layer: when a layer's catalogue file is absent,
-/// that layer is treated as "TDDD not active" and its evaluation is skipped
-/// entirely (ADR §D2.1). The same opt-in semantics apply to both the CI path
-/// and the merge gate.
-///
-/// The `strict` parameter controls Yellow handling:
-/// - `true`: declared Yellow → `VerifyFinding::error` (merge gate)
-/// - `false`: declared Yellow → `VerifyFinding::warning` (CI interim mode — D8.6)
-///
-/// Red, None, all-zero, empty entries, and coverage-gap conditions always
-/// return `VerifyFinding::error` regardless of `strict`.
+/// `strict=true` promotes Yellow → error (merge gate); `false` → warning (D8.6).
 ///
 /// # Errors
 ///
-/// Returns findings when:
-/// - `spec.json` is a symlink or lives under a symlink'd directory (fail-closed).
-/// - `spec.json` cannot be read or decoded (needed to validate the track input).
-/// - `architecture-rules.json` is missing or declares no `tddd.enabled` layers.
-/// - A layer's catalogue exists but cannot be read or its signal file is missing,
-///   stale, or has a decode error.
-/// - Stage 2 signal-gate rules are violated.
-///
-/// Reference: ADR `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md`
-/// §D2, §IN-03, §AC-08; ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
-/// §D2.1, §D4.3, §D5, §D7, §D8.6.
+/// Returns findings on symlinks, read/decode errors, or gate violations.
 pub fn verify_type_signals_from_spec_json(
     spec_json_path: PathBuf,
     strict: bool,
@@ -393,6 +335,41 @@ fn evaluate_layer_catalogue(
     check_type_signals(&signals_doc, strict)
 }
 
+/// Evaluate chain ③ (`check-impl-catalog`) gate for a single layer with explicit paths.
+///
+/// Called by `signal check-impl-catalog --signals-path P --catalog-hash H --gate commit|merge`.
+/// Performs symlink guards, `declaration_hash` freshness, and the Red/Yellow/Blue domain gate.
+///
+/// # Errors
+///
+/// Returns a `VerifyOutcome` with error findings on I/O, decode, or gate failures.
+pub fn check_impl_catalog_from_signals_file(
+    signals_path: &Path,
+    catalog_hash_hex: &str,
+    strict: bool,
+) -> VerifyOutcome {
+    check_signals_file(
+        signals_path,
+        catalog_hash_hex,
+        &format!(
+            "{} not found — run `sotp track type-signals` to generate the evaluation result",
+            signals_path.display()
+        ),
+        |text| type_signals_codec::decode(text).map_err(|e| e.to_string()),
+        |doc| doc.declaration_hash().to_owned(),
+        |recorded, current, path| {
+            format!(
+                "{}: declaration_hash mismatch (recorded={}, current={}) — \
+                 re-run `sotp signal calc-impl-catalog` to refresh the evaluation result",
+                path.display(),
+                recorded,
+                current
+            )
+        },
+        |doc, _normalized_signals, _workspace_root| check_type_signals(&doc, strict),
+    )
+}
+
 /// Verifies that `spec.md` contains a `## Domain States` section with a markdown table
 /// that has at least one data row (beyond the header and separator rows).
 ///
@@ -418,9 +395,10 @@ pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutc
         return outcome;
     }
 
-    let content = match read_legacy_spec_markdown(spec_path) {
+    // Shared legacy markdown prelude: read the file and guard against generated v2 content.
+    let content = match read_legacy_spec_markdown_with_label(spec_path, "states") {
         Ok(c) => c,
-        Err(finding) => return VerifyOutcome::from_findings(vec![finding]),
+        Err(outcome) => return outcome,
     };
     verify_domain_states_markdown(spec_path, &content)
 }
@@ -455,9 +433,49 @@ fn merge_unique_findings(outcome: &mut VerifyOutcome, other: VerifyOutcome) {
     }
 }
 
-fn read_legacy_spec_markdown(spec_path: &Path) -> Result<String, VerifyFinding> {
-    std::fs::read_to_string(spec_path)
-        .map_err(|e| VerifyFinding::error(format!("cannot read {}: {e}", spec_path.display())))
+/// Read a `spec.md` file and guard against generated v2 content.
+///
+/// Shared prelude for legacy markdown verifiers (`spec_signals`, `spec_attribution`,
+/// `spec_states`).
+///
+/// Returns `Ok(content)` when the file is a readable, non-empty legacy markdown spec.
+///
+/// Returns `Err(outcome)` early when:
+/// - The file cannot be read.
+/// - The file is empty or contains only whitespace — a blank spec.md is not a valid
+///   legacy specification and likely indicates a generation or checkout error.
+/// - The file starts with the generated-v2 header (`<!-- Generated from spec.json`),
+///   indicating that `spec.json` is absent — verification cannot proceed without it.
+///
+/// `verifier_label` is embedded in the generated-header error message (e.g.
+/// `"signal"`, `"attribution"`, `"states"`) so users know which check triggered the
+/// error.
+pub(crate) fn read_legacy_spec_markdown_with_label(
+    spec_path: &Path,
+    verifier_label: &str,
+) -> Result<String, VerifyOutcome> {
+    let content = std::fs::read_to_string(spec_path).map_err(|e| {
+        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "cannot read {}: {e}",
+            spec_path.display()
+        ))])
+    })?;
+    if content.trim().is_empty() {
+        return Err(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{}: spec.md is empty — a blank spec cannot be verified for {}",
+            spec_path.display(),
+            verifier_label
+        ))]));
+    }
+    if content.starts_with("<!-- Generated from spec.json") {
+        return Err(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{}: generated v2 spec.md requires a sibling spec.json for {} verification \
+             (spec.json is absent — restore it or re-generate spec.md from spec.json)",
+            spec_path.display(),
+            verifier_label
+        ))]));
+    }
+    Ok(content)
 }
 
 enum DomainStatesMarkdownCheck {
@@ -541,7 +559,7 @@ fn check_domain_states_markdown(content: &str) -> DomainStatesMarkdownCheck {
     }
 }
 
-fn visible_markdown_body_lines(content: &str) -> Vec<&str> {
+pub(crate) fn visible_markdown_body_lines(content: &str) -> Vec<&str> {
     let body_start = parse_yaml_frontmatter(content).map_or(0, |fm| fm.body_start);
     let mut active_fence = None;
     content
@@ -552,26 +570,29 @@ fn visible_markdown_body_lines(content: &str) -> Vec<&str> {
 }
 
 #[derive(Clone, Copy)]
-struct MarkdownFence {
+pub(crate) struct MarkdownFence {
     marker: char,
     len: usize,
 }
 
 impl MarkdownFence {
-    fn opening(trimmed: &str) -> Option<Self> {
+    pub(crate) fn opening(trimmed: &str) -> Option<Self> {
         ['`', '~'].into_iter().find_map(|marker| {
             let len = leading_marker_count(trimmed, marker);
             (len >= 3).then_some(Self { marker, len })
         })
     }
 
-    fn closes(self, trimmed: &str) -> bool {
+    pub(crate) fn closes(self, trimmed: &str) -> bool {
         leading_marker_count(trimmed, self.marker) >= self.len
             && trimmed.chars().all(|c| c == self.marker)
     }
 }
 
-fn markdown_line_is_visible(line: &str, active_fence: &mut Option<MarkdownFence>) -> bool {
+pub(crate) fn markdown_line_is_visible(
+    line: &str,
+    active_fence: &mut Option<MarkdownFence>,
+) -> bool {
     let trimmed = line.trim();
     if let Some(fence) = *active_fence {
         if fence.closes(trimmed) {
@@ -599,7 +620,7 @@ fn is_markdown_section_boundary(line: &str) -> bool {
 /// the filename component.
 ///
 /// Returns `None` when the path has no parent directory.
-fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
+pub(crate) fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
     spec_md_path
         .parent()
         .map(|dir| if dir.as_os_str().is_empty() { Path::new(".") } else { dir })
@@ -1687,6 +1708,97 @@ mod tests {
         assert!(
             !outcome.has_errors(),
             "consistent Stage 1 signals must pass in interim mode: {outcome:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Tests for check_impl_catalog_from_signals_file (T011 explicit-path gate)
+    // -----------------------------------------------------------------------
+
+    use crate::verify::test_support::git_init;
+
+    /// Minimal catalogue bytes for a type-signals fixture.
+    const MINIMAL_CATALOGUE_JSON: &str = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"plain"}},"docs":"A value object."}},"traits":{},"functions":{}}"#;
+
+    /// Build a fresh `<layer>-type-signals.json` JSON string whose
+    /// `declaration_hash` matches the given catalogue bytes.
+    fn build_fresh_type_signals(catalogue_bytes: &[u8], signal: &str) -> String {
+        let hash = crate::tddd::type_signals_codec::declaration_hash(catalogue_bytes);
+        // `TypeSignalDto` requires `kind_tag`, `signal`, and `found_type` fields
+        // (deny_unknown_fields; missing fields fail decoding).
+        format!(
+            r#"{{"schema_version":1,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
+        )
+    }
+
+    /// Set up a minimal git repo containing catalogue + type-signals files.
+    ///
+    /// Returns `(TempDir, signals_path)`.
+    fn setup_type_signals_git_repo(signal: &str) -> (tempfile::TempDir, PathBuf) {
+        let dir = tempfile::tempdir().unwrap();
+        git_init(dir.path());
+        let catalogue_bytes = MINIMAL_CATALOGUE_JSON.as_bytes();
+        std::fs::write(dir.path().join("domain-types.json"), catalogue_bytes).unwrap();
+        let signals_json = build_fresh_type_signals(catalogue_bytes, signal);
+        let signals_path = dir.path().join("domain-type-signals.json");
+        std::fs::write(&signals_path, signals_json).unwrap();
+        (dir, signals_path)
+    }
+
+    #[test]
+    fn test_check_impl_catalog_blue_signal_non_strict_passes() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let catalog_hash =
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes());
+
+        let outcome = check_impl_catalog_from_signals_file(&signals_path, &catalog_hash, false);
+
+        assert!(
+            !outcome.has_errors(),
+            "blue signal with correct hash must pass (non-strict): {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_impl_catalog_stale_hash_returns_error() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let stale_hash = "0000000000000000000000000000000000000000000000000000000000000000";
+
+        let outcome = check_impl_catalog_from_signals_file(&signals_path, stale_hash, false);
+
+        let has_mismatch =
+            outcome.findings().iter().any(|f| f.message().contains("declaration_hash mismatch"));
+        assert!(
+            has_mismatch,
+            "stale catalog_hash must produce a declaration_hash mismatch error: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_impl_catalog_signals_file_not_found_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        git_init(dir.path());
+        let missing_path = dir.path().join("domain-type-signals.json");
+        let any_hash = "0000000000000000000000000000000000000000000000000000000000000000";
+
+        let outcome = check_impl_catalog_from_signals_file(&missing_path, any_hash, false);
+
+        assert!(outcome.has_errors(), "missing signals file must return an error: {outcome:?}");
+    }
+
+    #[test]
+    fn test_check_impl_catalog_yellow_strict_returns_error() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("yellow");
+        let catalog_hash =
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes());
+
+        let outcome = check_impl_catalog_from_signals_file(&signals_path, &catalog_hash, true);
+
+        let has_error =
+            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
+        assert!(
+            has_error,
+            "yellow signal with strict=true must produce an error finding: {outcome:?}"
         );
     }
 }

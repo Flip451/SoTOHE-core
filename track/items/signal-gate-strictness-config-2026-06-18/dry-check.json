@@ -8424,6 +8424,666 @@
       "rationale": "These two tests share the same parse-and-assert structure, but they exercise different CLI subcommands and different enum variants. The repeated setup is small and localized, and removing it would likely obscure the intent of each behavior-specific test more than it would improve maintainability.",
       "recorded_at": "2026-06-19T05:15:39Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "75c01eab6e5e3824cc4eb18ce438a50a3087fadc7fccba37cf93cbe4af97f4f7",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "959d7477d6ba01975f09a1df8865d2b3ed4996fd729133a6f69d0897220e5270",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8891207575798035,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments share only a small amount of orchestration boilerplate: repository discovery, path parsing, and building `items_dir`. The actual behavior diverges materially after that point, with one path loading TDDD layers and refreshing catalogue-spec signals, and the other constructing a type-signals interactor and running a different use case. This is not repeated business logic, just similar command setup.",
+      "recorded_at": "2026-06-19T05:56:04Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "9b1c4b6a321e26e0f4ed2fa89b9ace1453062c1aa9deb7b1229668b6efd09c78",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "9dca8bbe81351da6a9dd46978b6b13cfad9c07358c0102fdea523b71394e74b8",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8923822045326233,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments share only a generic CLI-wrapper shape, not a duplicated algorithm or business rule. `signal_calc_adr_user` and `signal_check_adr_user` do different work: one calls `AdrUserChain::calc_live` and formats a grounding report, while the other resolves strictness and invokes `execute_verify_adr_signals_with_strict`. The common structure is a normal command-entry pattern and does not justify extraction on DRY grounds by itself.",
+      "recorded_at": "2026-06-19T05:56:04Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "a2385b065c89723004274061dc5bb2129be0cc2db75bd3efeadbd06d56a2548a",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "f5b51ef2d8d7e4b91c0ead3bab4d8ec33fb62113828ef9419044ca1ff38285bf",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9002211093902588,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two functions share the same small wrapper shape, but the repetition is localized to composition-root wiring and each wrapper differs in its chain ID, verifier call, and rendered command name. This is intentional symmetry rather than harmful duplication, and the abstraction cost would likely outweigh the benefit here.",
+      "recorded_at": "2026-06-19T05:56:04Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "aaca5a7b76b429e616f0a911daebda671532cc4e6b8f6ab758fb9067fb0fbd0f",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "d929b3541aea1b8e9ca7b26543ec149817baba998f03ecd89eb2e6d66fb7678b",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared helper such as `fn parse_signals_path_with_suffix(signals_path: &Path, suffix: &str) -> Option<(String, String)>` that contains the common file-name, parent, grandparent, and `items` validation logic. Then implement `parse_signals_path_for_impl_catalog` and `parse_signals_path_for_catalog_spec` as thin wrappers passing `\"-type-signals.json\"` and `\"-catalogue-spec-signals.json\"` respectively."
+        }
+      },
+      "similarity_score": 0.9008545875549316,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "Both fragments implement the same path-parsing algorithm: read the file name, strip a suffix to get the layer, read the parent directory as the track id, verify the grandparent is `items`, and return owned strings. The only behavioral difference is the expected filename suffix. This duplicates parsing structure and validation logic in the same module, so future changes to the path convention or validation would need to be made in multiple places.",
+      "recorded_at": "2026-06-19T05:56:04Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_refs.rs",
+      "low_hash": "4db76cb7bb9922cd23133fa7c3972a989233540ab7878f04b473178f97f9c1af",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "high_hash": "fe459fdaa7ceb40ad2af6420803459392da24277f16d5c41c9d2b3e209bc842f",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared helper, e.g. `prepare_catalogue_verify_context(items_dir, track_id, workspace_root) -> Result<CatalogueVerifyContext, VerifySetupError>`, that performs root symlink checks, canonical containment, `TrackId` validation, track directory validation, rules loading, and empty-binding validation once. Let both callers adapt the shared error type into their local result shape (`VerifyOutcome` vs `Result<bool, String>`) and keep only their layer-specific verification logic local."
+        }
+      },
+      "similarity_score": 0.8778348565101624,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "Both fragments duplicate the same entrypoint setup policy for catalogue verification: guard trusted roots against symlinks, validate `track_id` with `domain::TrackId`, derive and validate `track_dir`, load `architecture-rules.json`, and fail closed when TDDD bindings are empty. This is not just superficial similarity; the duplicate has already diverged. `execute_catalogue_spec_signals` now performs canonical workspace containment and stricter track-directory symlink/non-directory checks, while `execute_verify_catalogue_spec_refs` keeps a manual, weaker version. That drift is exactly the maintenance risk DRY is meant to prevent.",
+      "recorded_at": "2026-06-19T05:56:04Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "7204d7e8d34888e656dc4c0bbf0a885328d5e78109d45b5037083019cfd6c461",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "7928790a6b2f2de40b94855151a4b2ae1ba35e21299a55074a83676aa333f221",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a small shared helper for 'check signals file against current catalog hash' that accepts decode, recorded-hash extraction, mismatch-message construction, and final validation callbacks. Then implement both `check_impl_catalog_from_signals_file` and `check_catalog_spec_from_signals_file` as thin wrappers supplying their codec/checker-specific behavior."
+        }
+      },
+      "similarity_score": 0.8885797262191772,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "Both fragments implement the same verification workflow: read a signals file, convert read/decode failures into `VerifyOutcome` error findings, compare a recorded declaration/catalogue hash against the current hash, emit a stale/mismatch finding, then delegate to the signal-specific checker. The domain-specific differences are limited to the codec, hash accessor, error text, refresh command, and final checker, so the changed function repeats an existing control-flow template rather than expressing a distinct algorithm.",
+      "recorded_at": "2026-06-19T05:56:04Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "ef58743c3cbe73e21dca093a35f298253864975419fe7cdd05f34ff90394b477",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "high_hash": "fe459fdaa7ceb40ad2af6420803459392da24277f16d5c41c9d2b3e209bc842f",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8502119183540344,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments do not duplicate the same implementation in a way that creates a DRY problem. `execute_catalogue_spec_signals_check` is a thin wrapper that resolves repository context and then delegates to `execute_catalogue_spec_signals`, while the changed fragment contains the actual verification logic. The overlap is intentional orchestration, not repeated business logic.",
+      "recorded_at": "2026-06-19T05:56:04Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "15f219eb81f1cede53a328f81df73508fbf990cf671373dbefa8a53e5faa5369",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "4a5c91481f810c07b583de779e36cc03a90a4f57d89814810a2a489fc5b9e060",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8627124428749084,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments share only a high-level composition-root pattern and some similar error-wrapping style, but they perform different work: `signal_calc_spec_adr` reads, decodes, evaluates, updates, and atomically writes `spec.json`, while `signal_check_spec_adr` resolves strictness, loads a trusted root, and verifies the spec. The overlap is incidental and does not indicate duplicated business logic that should be factored out.",
+      "recorded_at": "2026-06-19T06:51:20Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "2fa87b34619339842672222b7266a33b944fd8abb59c485b0549e06ca921be2f",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "4fe32885a8ce541859642b6f0583ca09260640c37bef587ca35572649c7804e6",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8837736248970032,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "These fragments share the same low-level executor call, but they do not duplicate the same business rule. `signal_check_adr_user` resolves strictness from CLI/gate state and then runs the verifier, while `signal_calc_adr_user` intentionally hardcodes `strict=false` to display the current distribution without enforcement. That is a small, deliberate composition-root reuse, not repeated logic that would benefit from extraction.",
+      "recorded_at": "2026-06-19T06:51:20Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "59e9714c3d37015fedc4578ae6d5295c6b4c87d2f6b7e5be3fb3ba556c868af6",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "e10b2ea01e51cf14cd3355e5f61134090a77c9c99445d4cb342f3a79fbbf89bb",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9172259569168092,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments share the same wrapper shape, but the repetition is small and intentional at the composition root. Each function binds a different chain ID, parse label, and downstream verifier, so extracting a generic helper would mostly hide the command-specific wiring without removing meaningful duplication. This looks like straightforward boilerplate rather than a DRY problem.",
+      "recorded_at": "2026-06-19T06:51:20Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_refs.rs",
+      "low_hash": "4db76cb7bb9922cd23133fa7c3972a989233540ab7878f04b473178f97f9c1af",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "high_hash": "736f4844bee15ba4bc966e1a0622e0c1e3fde39a33840b1513318a38839467b9",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.8778348565101624,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "These fragments share a few common preflight checks (symlink guards, track_id validation, layer binding loading), but they serve different verification flows and have materially different behavior afterward. The overlap is limited to straightforward safety setup rather than a problematic repeated algorithm, so this is better treated as intentional reuse than a DRY violation.",
+      "recorded_at": "2026-06-19T06:51:20Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "2b4c59492104a7a87c5091f039531cdf2e0a9758a8ac65908f8e2694c1d1baed",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "172405004d998fe9fe31c6845698d3a9530a28d4483b72fd454d24bacc12eb09",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Move `lexical_normalize` into a shared verification path utility module, for example `libs/infrastructure/src/verify/path_safety.rs` or an existing shared verify utility, and have both `catalogue_spec_signals.rs` and `spec_states.rs` call that single helper. Keep the public path-safety behavior tested once with callers retaining only their module-specific error mapping."
+        }
+      },
+      "similarity_score": 0.9806302785873412,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "Both fragments implement the same private `lexical_normalize` helper with the same component-stack algorithm for collapsing `.` and `..` without filesystem canonicalization. The differences are only import style and comments/doc wording, so this is duplicated behavior that can drift between verification modules.",
+      "recorded_at": "2026-06-19T06:51:20Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "736f4844bee15ba4bc966e1a0622e0c1e3fde39a33840b1513318a38839467b9",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "high_hash": "ef58743c3cbe73e21dca093a35f298253864975419fe7cdd05f34ff90394b477",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8502119183540344,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments are not duplicating the same logic in a way that violates DRY. `execute_catalogue_spec_signals_check` is a thin orchestration wrapper that discovers the repo, resolves the active track, normalizes paths, and then delegates to `execute_catalogue_spec_signals`, which contains the actual verification workflow. That separation removes, rather than introduces, repetition.",
+      "recorded_at": "2026-06-19T06:51:20Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "e97247835d4c53c490848ee976fc1e9b7794b6d9312648c786ad11dcec363288",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "0379398022858dd33cd6f7c6ad65eb9dff05547cbabfc474825604e9bdcc5ad5",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared helper, for example normalize_and_guard_path(path, workspace_root, display_path, not_found_msg), into a common verify/path_guard module and have spec_states.rs call it with display_path = path. Re-export or import the same helper from catalogue_spec_signals.rs so both checks share the exact workspace and symlink validation behavior."
+        }
+      },
+      "similarity_score": 0.9053252935409546,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "Both fragments implement the same path-normalization and workspace/symlink guard sequence: absolutize relative paths against the workspace root, lexical-normalize, reject paths outside the workspace, call the symlink guard, and map missing paths and guard errors into the same VerifyFinding messages. The changed version only adds a separate display_path for diagnostics, which is a parameterization of the same behavior rather than distinct logic. Keeping these separate risks future drift in a security-sensitive path validation path.",
+      "recorded_at": "2026-06-19T06:51:20Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "f81316213a805badf618de1921cbbae0715abdfd3458d5a390535875806e493d",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "355ff5adc868649ca330dbbbac90900469cc6cf14553350bbd9bc73ffef1f599",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.9478031396865844,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The fragments share a verifier-entrypoint skeleton: discover workspace root, normalize/guard a signals path, read the file, decode it, compare a recorded declaration/catalogue hash, and return findings through VerifyOutcome. That is real duplication, but the repeated part is mostly orchestration around two different signal formats and domain-specific checks, with different codecs, error wording, hash accessors, and follow-up validation. Given only two instances and the changed function’s additional catalogue resolution/integrity work, this is acceptable duplication rather than a DRY violation requiring refactor now.",
+      "recorded_at": "2026-06-19T06:51:20Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "15f219eb81f1cede53a328f81df73508fbf990cf671373dbefa8a53e5faa5369",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "87f70abe4d2642795fcc171daed6f08fcdc69b5cf165b172fac8538edc42b942",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8635430932044983,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments do not repeat the same business logic. The existing function performs a check/gate flow (strict resolution, trusted-root lookup, verification), while the changed function performs a calculate-and-persist flow (read, decode, evaluate, encode, atomic write). They share a similar composition-root style and error-wrapping pattern, but that is incidental boilerplate rather than duplicated algorithmic behavior.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "8e931abc3f598b059f64eca91e803e74fc4587742852409cb499cb173b66650a",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "93ff692b564fb1c0dbdfca3dd8a9feae4a6b03ff67fd6562ef9c78fa6e7dc088",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.897052526473999,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The new `signal_check_catalog_spec` wrapper follows the same intentional pattern already used by `signal_check_impl_catalog`: both are thin composition-root entry points that differ only in the chain-specific label, `ChainId`, and verification function. The shared behavior is already centralized in `run_catalogue_hash_check`, so this does not introduce meaningful copy-paste logic duplication.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/signal.rs",
+      "low_hash": "ab5953e54a9ce4130daa83af9f6aecb0aa7345c6eeb1eb3f0bee03a2d6e3103d",
+      "high_path": "apps/cli-composition/src/signal.rs",
+      "high_hash": "b2897681c44fc6f9697a86e5b23418cccd54a98f403cf1d8755027d4784c0d49",
+      "changed_path": "apps/cli-composition/src/signal.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8593844771385193,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "These fragments do not duplicate independent logic in a problematic way. The existing `parse_signals_path_for_impl_catalog` function is a thin wrapper that delegates to the new shared helper `parse_signals_path_with_suffix`, so the repetition is limited to the call site and not the parsing implementation itself. This is a DRY improvement, not a violation.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_refs.rs",
+      "low_hash": "4db76cb7bb9922cd23133fa7c3972a989233540ab7878f04b473178f97f9c1af",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "high_hash": "2ff576e6e737d8e59725aa846a44ab2e32e8766e9c37391c7b71f4ce512728fb",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared verifier preflight helper, e.g. `prepare_catalogue_verification(items_dir, track_id, workspace_root) -> Result<CatalogueVerificationContext, VerifyPrepError>`, that performs trusted-root checks, canonical containment, TrackId validation, track_dir symlink/non-directory/not-found validation, and TDDD layer loading. Adapt callers to convert the shared error into their local result type (`VerifyOutcome` vs `Result<bool, String>`), and keep only verifier-specific behavior such as missing-signal leniency and formatted findings in each function."
+        }
+      },
+      "similarity_score": 0.8778348565101624,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The fragments duplicate the same verifier preflight knowledge: trusted-root symlink checks, track_id validation before joining, track_dir construction/existence handling, architecture-rules loading, empty-bindings fail-closed behavior, and enabled-layer iteration. This is not just similar shape; it encodes security-sensitive invariants in two places and they have already diverged. The changed fragment adds canonical workspace containment and stricter track_dir symlink/non-directory handling, while catalogue_spec_refs still has a manual root check and only tests track_dir.exists(). That makes future fixes easy to apply to one verifier but not the other.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "2ff576e6e737d8e59725aa846a44ab2e32e8766e9c37391c7b71f4ce512728fb",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "high_hash": "ef58743c3cbe73e21dca093a35f298253864975419fe7cdd05f34ff90394b477",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8502119183540344,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "These fragments do not repeat the same implementation logic in a way that violates DRY. `execute_catalogue_spec_signals_check` is a thin orchestration wrapper that discovers the repo, resolves the active track, and normalizes paths before delegating to `execute_catalogue_spec_signals`, which contains the actual verification workflow and safety checks. The only overlap is intentional plumbing around inputs, not duplicated business logic.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "f81316213a805badf618de1921cbbae0715abdfd3458d5a390535875806e493d",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "d5985fa18d5a29874aae1bf7c20382d2b9a2e564e7c0e4c2fed443708b3b28ff",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared helper for guarded signal-file loading and freshness validation, parameterized by the decoder, recorded-hash accessor, not-found/decode/stale message builders, and strict downstream checker. Keep catalogue-specific path resolution and integrity checks in `check_catalog_spec_from_signals_file`, but reuse the common helper for workspace discovery, path guarding, file read, decode, and hash comparison."
+        }
+      },
+      "similarity_score": 0.9551435112953186,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "Both fragments repeat the same verification pipeline: discover the workspace root, normalize and guard the signals path, read the file, decode it, compare a recorded declaration/catalogue hash against the current hash, and convert each failure into a `VerifyOutcome`. The changed function adds catalogue-path resolution and integrity checks afterward, but the front half duplicates the existing signal-file loading and freshness-check behavior with only codec, error wording, and hash-accessor differences.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_attribution.rs",
+      "low_hash": "0e2fadd75ad5bdeb76deadc62fb0085a6004a110a62e258d0ebfed0f8e6c20d6",
+      "high_path": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+      "high_hash": "66940cdd47ab710e0e37dbb5c04ead8651282f472015bf151d71551e9627f331",
+      "changed_path": "libs/infrastructure/src/verify/spec_attribution.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8716327548027039,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two functions share only a small amount of standard setup: the sibling `spec.json` fast path and the file-read error handling. After that, they implement different verification rules over different markdown sections, so the similarity is mostly unavoidable boilerplate rather than duplicated business logic that would benefit from a shared abstraction. The shared pieces are already factored through helpers like `sibling_spec_json`, `parse_yaml_frontmatter`, and `markdown_line_is_visible`, which further reduces DRY risk.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_attribution.rs",
+      "low_hash": "0e2fadd75ad5bdeb76deadc62fb0085a6004a110a62e258d0ebfed0f8e6c20d6",
+      "high_path": "libs/infrastructure/src/verify/spec_signals.rs",
+      "high_hash": "22dc9ba0dcc77672483b1c211eadf50dc7423ae2be55405bba2d469260209f51",
+      "changed_path": "libs/infrastructure/src/verify/spec_attribution.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the shared setup into a helper, for example `prepare_legacy_spec_markdown(spec_path, verification_label) -> Result<String, VerifyOutcome>` or an enum that returns either `UseSpecJson(PathBuf)`, `LegacyMarkdown(String)`, or `Outcome(VerifyOutcome)`. Parameterize only the verifier label (`signal` vs `attribution`) used in the generated-spec error message, then keep each verifier's distinct markdown evaluation logic in its own module."
+        }
+      },
+      "similarity_score": 0.9477956891059875,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two `verify` functions repeat the same legacy-entry prelude: sibling `spec.json` delegation, `read_to_string` error handling, generated-v2 `spec.md` detection, and fail-closed outcome construction. The verifier-specific logic only starts after that shared setup. Because this duplicated policy controls correctness for v2 specs and missing files, future changes could easily fix one verifier while leaving the other inconsistent.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_attribution.rs",
+      "low_hash": "0e2fadd75ad5bdeb76deadc62fb0085a6004a110a62e258d0ebfed0f8e6c20d6",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "5802ecfaf6dd5d37b8ae2bcebd7a704f28912dec331995de0c45bcc5083fb3fd",
+      "changed_path": "libs/infrastructure/src/verify/spec_attribution.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8592728972434998,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The overlap is limited to a small, mechanical wrapper pattern: prefer sibling `spec.json`, otherwise read legacy markdown and fail closed on generated v2 headers. The changed `spec_attribution` code still contains distinct attribution-specific scanning and validation logic, and it already reuses shared helpers for frontmatter and fence handling. This is not a meaningful duplication of knowledge that would create a maintenance problem.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_signals.rs",
+      "low_hash": "22dc9ba0dcc77672483b1c211eadf50dc7423ae2be55405bba2d469260209f51",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "5802ecfaf6dd5d37b8ae2bcebd7a704f28912dec331995de0c45bcc5083fb3fd",
+      "changed_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8731985092163086,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments share the same high-level verification shape, but that is an intentional orchestration pattern rather than harmful duplication: prefer sibling spec.json when present, otherwise fall back to legacy markdown parsing and report findings on read errors. The underlying work is domain-specific in each file (`spec_states` vs `spec_signals`), and the changed fragment already factors the shared behavior into helpers instead of copying the full implementation. That is common reuse, not a DRY violation.",
+      "recorded_at": "2026-06-19T07:26:05Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+      "low_hash": "5dae39b456cccb2342bc4a8c9808cd1850106cb1593344d30b4a231944374e06",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_refs.rs",
+      "high_hash": "e9873081de264a4bfcf948f06ecedeae6ea96ebbc6cb71d39d4d266f5c1ee2a6",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_refs.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8635937571525574,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The changed fragment is a new infrastructure helper with documentation and imports that reference the existing domain types; it does not reimplement the data model or algorithm from `libs/domain/src/tddd/catalogue_spec_signal.rs`. The overlap is conceptual and intentional, not duplicated logic or a maintenance-hostile copy of the same code path.",
+      "recorded_at": "2026-06-19T07:40:33Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "c894839c07d303ca0ad6889f7df18d8bd3268854069794a9bf1715e250f2a5b8",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "d654226d3d1d783fd39132afd2e945579da5ad935e351ba191a996c01e80cdbf",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8921464681625366,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments share the same higher-level pattern of wrapping `check_signals_file`, but that pattern is already abstracted behind the helper. The changed code does not duplicate the candidate's concrete business logic; it adds catalogue-specific resolution, guarding, decoding, and integrity checks that are materially different. This is normal reuse of a common verifier scaffold, not an avoidable copy-paste violation.",
+      "recorded_at": "2026-06-19T07:40:33Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_attribution.rs",
+      "low_hash": "9cc9eccc7481f577c774bc9863f7d0c119c678e0647b5d716160637f0c782daf",
+      "high_path": "libs/infrastructure/src/verify/spec_signals.rs",
+      "high_hash": "920ca28b55313d16828fdaf9665d5b6a508d1ee2b69b816533a04091f3562c6e",
+      "changed_path": "libs/infrastructure/src/verify/spec_attribution.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8849852085113525,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The overlap is limited to a small, intentional verification prelude: both functions delegate to `spec.json` when present and then load the legacy markdown via the same shared helper. The actual validation logic diverges immediately after that, so this looks like reasonable reuse of common setup rather than duplicated business logic that should be abstracted further.",
+      "recorded_at": "2026-06-19T07:40:33Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_signals.rs",
+      "low_hash": "920ca28b55313d16828fdaf9665d5b6a508d1ee2b69b816533a04091f3562c6e",
+      "high_path": "libs/infrastructure/src/verify/spec_signals.rs",
+      "high_hash": "ca82c7e7afaa4602abd59eb253ec306c7a39f5086e1bbd89121a326e61a608dc",
+      "changed_path": "libs/infrastructure/src/verify/spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8614662289619446,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments share the same high-level verification pattern, but they are not redundant copies of the same responsibility. `verify_from_spec_json` handles JSON decoding and cached-signal consistency, while `verify(spec_path)` is the markdown fallback that reads frontmatter and evaluates the body directly. The repeated red-gate check is a small, policy-level reuse across two distinct code paths, not a meaningful DRY violation.",
+      "recorded_at": "2026-06-19T07:40:33Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "low_hash": "0ea301c6632612d96df600bfe8711b7c1e9428c3b7aceb50f161514daf6741f7",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "709f88cd154adcfbb392ca384d445451b4b1536cd2fd7170483649f4ae20baeb",
+      "changed_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Remove the standalone read-only helper or rewrite it as a thin adapter over `read_legacy_spec_markdown_with_label`, converting `VerifyOutcome` to the caller's expected error shape if that API is still needed. Prefer routing all legacy spec markdown reads through the labeled helper so read errors and generated-v2 handling stay in one place."
+        }
+      },
+      "similarity_score": 0.8784171342849731,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "Both fragments implement the same legacy spec markdown read path and construct the same read-error message for the same input file. The candidate helper already centralizes this behavior and adds the generated-v2 guard described by the new documentation, so keeping `read_legacy_spec_markdown` as a separate read-only helper duplicates part of the contract and can let callers bypass the generated-header validation.",
+      "recorded_at": "2026-06-19T07:40:33Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli/src/commands/git.rs",
+      "low_hash": "64195957d3f93f16514ad778b040b1cf0e01106e570f662b3491c316b637b58c",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "high_hash": "7fa4d255786e53cb3cf269961869c05af1e9af3f3a735dc36e2fb8e5ff3d4d24",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.8505740165710449,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "Both fragments implement the same test setup concern: create a temporary git repository and configure `user.email`/`user.name`. The changed fragment duplicates that logic rather than reusing a shared helper, so this is a DRY issue, though it is limited to test code and not a correctness bug.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/adr_signals.rs",
+      "low_hash": "26f8185128f572fa5af2f96967ade086e7278c670bea8600197adb84dcd239df",
+      "high_path": "libs/infrastructure/src/verify/adr_signals.rs",
+      "high_hash": "4c0d754d943391e9c3544a637d707b0b9be9ca003b989c06195a0ca3249db616",
+      "changed_path": "libs/infrastructure/src/verify/adr_signals.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared helper such as `write_minimal_adr(adr_dir, filename, ref_key, ref_value)` or a small enum like `AdrSignalFixture::{Yellow, Blue}` that generates the common YAML once, then have `write_yellow_adr` and `write_blue_adr` delegate to it for readable test intent."
+        }
+      },
+      "similarity_score": 0.8788959980010986,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two helpers duplicate the same ADR fixture structure and file-write behavior, differing only in the decision reference field and value (`review_finding_ref: RF-1` vs `user_decision_ref: chat:2026-01-01`). That repeats schema knowledge in multiple places, so any ADR fixture format change would need parallel edits.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/adr_signals.rs",
+      "low_hash": "492e4515064e2cc7c5e864fe9af60c997ce674981e8dfe5ac61cf408773bedad",
+      "high_path": "libs/infrastructure/src/verify/adr_signals.rs",
+      "high_hash": "d453f4d8a79d56fb330f5ccee571a82297647313e86d0979087004508a8c4b64",
+      "changed_path": "libs/infrastructure/src/verify/adr_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9472435712814332,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The changed test follows the same setup pattern as the existing test, but it exercises the opposite branch of the strictness behavior and asserts a different outcome. This is normal test duplication for coverage of complementary cases, not an unnecessary DRY violation.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "07d9e80deb747233e80089083f8ec14dfea58dd12d0a252dad18f8efe8d0bbf2",
+      "high_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "high_hash": "86f4f757213ea0d3e31d1dfbcf02d47bc45ca978994f8853da3f2ea3f57f8634",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8623380661010742,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments reuse the same test harness pattern, but they are exercising different behaviors: one verifies non-strict acceptance of a blue signal, the other verifies strict rejection of a yellow signal. This is normal test duplication for clarity and does not indicate a meaningful DRY problem.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "07d9e80deb747233e80089083f8ec14dfea58dd12d0a252dad18f8efe8d0bbf2",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "2a15e2889fae86a06d81934b2a721bf637dd4a7ed43618fdb2b73527a61fce0b",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9584085941314696,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments repeat a small test idiom, but they exercise different functions, fixtures, and domains (`catalog_spec` vs `impl_catalog`). This is localized test duplication rather than a maintainability problem, and extracting a shared helper would add indirection for little benefit.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "19cf7154eeac4b2ff1c7b9a870a3e932b6026950bded9825f118716311323e41",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "adbf804b1ff2448a3385efe71c844c1461a81d4f5d9395e4027d62f63816deb4",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9357417225837708,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The fragments share a common negative-test shape, but they exercise different verification APIs, setup helpers, and expected findings in separate modules. This is test scaffolding similarity rather than duplicated production logic or duplicated domain knowledge that must remain synchronized. Factoring it out would likely reduce readability more than risk.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "7fa4d255786e53cb3cf269961869c05af1e9af3f3a735dc36e2fb8e5ff3d4d24",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "628d6d1886fa01cdd19ce7370e967b0c9fe034692e3eae16f3fd900f6a4f3f01",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared test helper, for example `verify::test_support::git_init(dir: &Path)`, and have both `catalogue_spec_signals.rs` and `spec_states.rs` call it. Keep the clearer `expect(\"git must be installed for these tests\")` behavior in the shared helper."
+        }
+      },
+      "similarity_score": 0.8955422043800354,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "Both fragments define the same `git_init` test helper with the same command sequence, working directory behavior, identity configuration, and success assertion. The only differences are `expect` vs `unwrap` and one explanatory comment, so the duplicated maintenance knowledge is the minimal git repository setup required by multiple verifier tests.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "80db9ff32146029eb82e3fdcf916853fab7ecec13fa7ed379c4cd2d70a306c3d",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "8ae2d333240b0d418341fe9d25762959639464ae30e9b40c4f0343e7de2121c0",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.981067955493927,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The fragments are similar test boilerplate, but they exercise two different public checker entry points with different expected missing file names. The repeated setup is small and keeps each module's error-case test explicit; extracting it would couple otherwise independent tests without removing meaningful duplicated domain logic.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "86f4f757213ea0d3e31d1dfbcf02d47bc45ca978994f8853da3f2ea3f57f8634",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "2a15e2889fae86a06d81934b2a721bf637dd4a7ed43618fdb2b73527a61fce0b",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8706095814704895,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two tests share a common arrange/act/assert shape, but they exercise different helpers, different input setups, different checker functions, and different outcomes. This is normal test duplication rather than a DRY violation, since extracting a shared abstraction here would likely reduce readability more than it would remove meaningful repetition.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "86f4f757213ea0d3e31d1dfbcf02d47bc45ca978994f8853da3f2ea3f57f8634",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "e4c69adfeeaa93252f97f7c5d0a7c58f55d4ba9d770e8061bf2a154c8e47aa4b",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.949873387813568,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "These tests share a common shape, but they exercise different code paths (`check_catalog_spec_from_signals_file` vs `check_impl_catalog_from_signals_file`) with different fixtures and hash sources. The repeated assertion wording is small and intentional for readability in separate test modules, so this is not a meaningful DRY violation.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "e56fce62b7013d1953eb9c749eb878fa412c186c30214cd292b0c2a50d5b0ecc",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "ddf2b986f2692bfc234f5f57acf001b741f6da91e5db4e54cf7dabf13a04b947",
+      "changed_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9113561511039734,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "These helpers share only a small amount of test fixture boilerplate: create a temp repo, initialize git, and write a couple of files. The substantive logic diverges immediately afterward: one builds type-signals from minimal catalogue bytes, the other builds catalogue-spec signals by deriving hashes and rewriting a placeholder signal. That level of overlap is normal in test setup and not enough to justify a shared abstraction.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "low_hash": "2a15e2889fae86a06d81934b2a721bf637dd4a7ed43618fdb2b73527a61fce0b",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "e4c69adfeeaa93252f97f7c5d0a7c58f55d4ba9d770e8061bf2a154c8e47aa4b",
+      "changed_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8787113428115845,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "These are two separate tests that intentionally reuse the same setup and hash computation while varying the signal color, strictness flag, and assertion target. The shared lines are ordinary test boilerplate rather than duplicated logic that should be abstracted, so this does not rise to a DRY violation.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "low_hash": "3a1425e30954e81ae7580b8b5c76bd18d2f51966eb9e2cb686479d6e9618918b",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "5acc36fd27dddd9dd929dd2aaf396b386554d779a6b80d8663c07413483b2657",
+      "changed_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.866646409034729,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments reuse the same test harness and fixture shape, but this is limited, intentional duplication in adjacent tests that exercise opposite outcomes of the same behavior. The repeated JSON structure is a small, readable setup cost rather than an unnecessary abstraction leak, and the only substantive differences are the stored signal values and expected assertion outcome.",
+      "recorded_at": "2026-06-19T08:29:10Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "low_hash": "07ac79de06f063839ea6ec6cc2bbfe876280af839c9c1726f31c8db2cf697893",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "5acc36fd27dddd9dd929dd2aaf396b386554d779a6b80d8663c07413483b2657",
+      "changed_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.853481650352478,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b6afedeb874fb8692e87d0ac2a5eddf9788bb03c",
+      "rationale": "The two fragments share a small amount of setup, but they exercise opposite outcomes for the same validation rule: one test asserts stale signals fail, the other asserts matching signals pass. In test code, this kind of mirrored setup is an intentional and readable pattern rather than harmful duplication. There is no repeated production logic or abstraction that would materially reduce duplication without making the tests harder to understand.",
+      "recorded_at": "2026-06-19T08:34:04Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }

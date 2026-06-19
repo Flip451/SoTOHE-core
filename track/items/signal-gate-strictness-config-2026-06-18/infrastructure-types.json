@@ -517,6 +517,116 @@
         }
       ],
       "informal_grounds": []
+    },
+    "infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute the `signal check-adr-user` gate with explicit strictness. When `strict=true`, Yellow signals (ReviewFindingRef) promote to error (same as Red). When `strict=false`, Yellow signals remain warnings (same as the legacy `verify adr-signals` behavior). Used by the `signal check-adr-user --gate commit|merge` command family to wire chain ⓪ at the composition root.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-02"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "signals_path",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "catalog_hash_hex",
+          "ty": "&str"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Evaluate chain ② (`check-catalog-spec`) gate for a single layer with explicit paths. Called by `signal check-catalog-spec --signals-path P --catalog-hash H --gate commit|merge`. Checks the signals file against a pre-computed `catalog_hash_hex` (SHA-256 of the catalogue file bytes). Missing or decode-error signals file is fail-closed; `catalogue_declaration_hash` mismatch is a stale error; Red is always error; Yellow is error when `strict=true`, warning when `strict=false`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "signals_path",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "catalog_hash_hex",
+          "ty": "&str"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Evaluate chain ③ (`check-impl-catalog`) gate for a single layer with explicit paths. Called by `signal check-impl-catalog --signals-path P --catalog-hash H --gate commit|merge`. Checks a single layer's signals file against a pre-computed `catalog_hash_hex` (SHA-256 of the catalogue file bytes). Missing or decode-error signals file is fail-closed; `declaration_hash` mismatch is a stale error; Red is always error; Yellow is error when `strict=true`, warning when `strict=false`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
     }
   },
   "inherent_impls": [],

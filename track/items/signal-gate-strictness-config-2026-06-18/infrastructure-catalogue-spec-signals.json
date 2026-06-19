@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6ed6a9a46b5cd80885411b80497729d2cea63b4ee51ed79e800606d6b95c4ef5",
+  "catalogue_declaration_hash": "c129768ac700279284d77bb9d7bfc42a988ae3901adae3a65de0a94f0b401594",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -28,6 +28,16 @@
       "entry_hash": "67cd7e7a0030c37efed714a40b5a9057ab86316cfea5c1d5543c07ebba812dae"
     },
     {
+      "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict",
+      "signal": "blue",
+      "entry_hash": "a2fce744db445304aa687191f883a235e237cc2615672d14020f9282e5afd83a"
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file",
+      "signal": "blue",
+      "entry_hash": "8281a2814a105d99b5aabe26303a77fff1466eb8d1858a8aef82f28facde07bc"
+    },
+    {
       "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
       "signal": "blue",
       "entry_hash": "07a596232d995368d8925e948f4c99cea16b7c4e353a494b0a4a04fd719f9928"
@@ -51,6 +61,11 @@
       "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config",
       "signal": "blue",
       "entry_hash": "df0c5efdedbd908bd359a844a18af7cb4037af201eae4768377689b8c71827b6"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file",
+      "signal": "blue",
+      "entry_hash": "987381e4bf6d40f7d7df7218a20aeebb8df01bd3e50b19506a78cc9285d5f63d"
     },
     {
       "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",

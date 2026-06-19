@@ -20,6 +20,7 @@ use crate::tddd::{
     type_signals_codec,
 };
 use crate::track::symlink_guard::reject_symlinks_below;
+use crate::verify::catalogue_spec_signals::CatalogueVerifyContext;
 use crate::verify::tddd_layers::TdddLayerBinding;
 
 /// Detect whether any TDDD-enabled layer with `catalogue_spec_signal` opt-in
@@ -354,67 +355,12 @@ pub fn execute_verify_catalogue_spec_refs(
     skip_stale: bool,
     formatted_findings: &mut Vec<String>,
 ) -> Result<bool, String> {
-    // Security: guard `items_dir` itself before using it as the trusted root.
-    // Mirrors `execute_catalogue_spec_signals` (catalogue_spec_signals.rs).
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(format!(
-                "symlink guard: refusing to follow symlink at items_dir: {}",
-                items_dir.display()
-            ));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(format!(
-                "symlink guard: cannot stat items_dir {}: {e}",
-                items_dir.display()
-            ));
-        }
-    }
-
-    // Security: guard `workspace_root` against symlinks at the leaf.
-    match workspace_root.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(format!(
-                "symlink guard: refusing to follow symlink at workspace_root: {}",
-                workspace_root.display()
-            ));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(format!(
-                "symlink guard: cannot stat workspace_root {}: {e}",
-                workspace_root.display()
-            ));
-        }
-    }
-
-    // Security: validate track_id via domain::TrackId before joining onto items_dir.
-    // `Path::join` resolves `..`, `/`, and multi-segment paths (`foo/bar`) at the OS
-    // level. Using the domain type enforces the slug rules (single-segment, no `..`,
-    // no path separators) and makes this function safe when called directly without
-    // upstream CLI validation.
-    let valid_track_id = domain::TrackId::try_new(&track_id)
-        .map_err(|e| format!("invalid track_id '{track_id}': {e}"))?;
-
-    // Fail-closed existence guard for the track directory.
-    let track_dir = items_dir.join(valid_track_id.as_ref());
-    if !track_dir.exists() {
-        return Err(format!(
-            "track directory does not exist: {} (check the track_id)",
-            track_dir.display()
-        ));
-    }
-
-    // Binary-gate fail-closed: load TDDD layer bindings from architecture-rules.json.
-    let rules_path = workspace_root.join("architecture-rules.json");
-    let bindings = crate::verify::tddd_layers::load_tddd_layers(&rules_path, &workspace_root)
-        .map_err(|e| {
-            format!("cannot load architecture-rules.json at '{}': {e}", rules_path.display())
-        })?;
-    if bindings.is_empty() {
-        return Err("no tddd.enabled layers found in architecture-rules.json".to_owned());
-    }
+    // Shared preflight: symlink guards, canonical containment, TrackId validation,
+    // track_dir validation, and architecture-rules loading.
+    // Uses the stricter `CatalogueVerifyContext` policy (canonical containment +
+    // track_dir symlink/non-directory checks) in place of the previous manual guards.
+    let ctx = CatalogueVerifyContext::prepare(items_dir, &track_id, workspace_root)?;
+    let CatalogueVerifyContext { items_dir, track_dir, bindings } = ctx;
 
     // ADR D2.3: silent PASS when no enabled layer's catalogue file exists.
     if !any_enabled_catalogue_present(&bindings, &track_dir, &items_dir)

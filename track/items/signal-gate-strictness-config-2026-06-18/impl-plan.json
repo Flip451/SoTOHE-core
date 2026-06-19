@@ -97,7 +97,7 @@
     {
       "id": "T011",
       "description": "D5 / AC-07: Update `Makefile.toml` to replace all references to old commands with the new `signal` namespace while old commands still exist, so each task boundary remains CI-runnable. Key changes: (1) `track-active-gate` script: `bin/sotp track type-signals` → `bin/sotp signal calc-impl-catalog`; `bin/sotp track catalogue-spec-signals` → `bin/sotp signal calc-catalog-spec`. (2) `verify-adr-signals-local` task: replace `verify adr-signals` arg with `signal check-adr-user --gate commit`. (3) `verify-spec-states-current-local` task: replace `verify spec-states` with `signal check-spec-adr --gate commit` + add separate `signal check-impl-catalog --gate commit`. (4) `check-catalogue-spec-signals-local` task: replace `verify catalogue-spec-signals` with `signal check-catalog-spec --gate commit`. (5) Update `ci-local` and `ci` dependency arrays to reference new task names. (6) Remove task definitions for `verify-adr-signals` / `verify-spec-states-current-local` / `check-catalogue-spec-signals-local` that directly called old commands, and add new equivalents. Depends on T009. Estimated diff: ~120 lines.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T012",
