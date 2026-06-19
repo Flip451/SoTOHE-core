@@ -16,7 +16,8 @@
     {
       "id": "T003",
       "description": "[D2-ids] Replace inline is_empty/trim().is_empty guards in domain ids.rs with NonEmptyString::try_new delegation: specifically the ReviewGroupName::try_new guard at ids.rs line 214-217 (the NonEmptyString::try_new at 178-181 is already the canonical form and stays). Extract a shared private fn validate_trimmed_non_empty if needed to avoid a 1-line duplication inside the same file.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "8f2999655b579c848a827ef65f00736f4474d68e"
     },
     {
       "id": "T004",

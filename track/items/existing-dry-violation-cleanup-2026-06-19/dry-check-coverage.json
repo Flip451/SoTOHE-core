@@ -1,51 +1,32 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "c89a5599c0958314368cf9104e503fcbcad666fffb8fb751d2682d391afe224d",
+  "corpus_fingerprint": "4d761b9e7e9ed4712a7d2dd23ccc90c18faa41c1ed5077d91aeb2d1cdba991f5",
   "fragment_refs": [
     {
-      "path": "libs/domain/src/ids.rs",
-      "content_hash": "477ca43d44e6dde133fea1f8b45b7fc6409edb8e19d08a9a514c67919fde7f96"
+      "path": "libs/domain/src/plan.rs",
+      "content_hash": "96213703863728cf8cdee9f3f28e5860dce982aaebe83d0883a2d50c180024ae"
     },
     {
-      "path": "libs/domain/src/ids.rs",
-      "content_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6"
+      "path": "libs/domain/src/plan.rs",
+      "content_hash": "a4d4ec176fca8919d719d5ec859537bb5d3cfdc735afad5675ee5b752916310b"
     },
     {
-      "path": "libs/domain/src/ids.rs",
-      "content_hash": "8954aabda3de90f86e63ff417768ae02aa5aa244b0e386e1adc8ac68c543c997"
+      "path": "libs/domain/src/spec.rs",
+      "content_hash": "5d3714795d8866eb108db36bc27c66bb1fd82462f238ddcd14a3a4e3f044897d"
+    },
+    {
+      "path": "libs/domain/src/spec.rs",
+      "content_hash": "784ba6fdb320247eb865d2735198d562d00e268c15794cb9f7458899018abf68"
+    },
+    {
+      "path": "libs/domain/src/spec.rs",
+      "content_hash": "b638d0f6f4ac1d6073095d1b2580c05553fa57fb36bb09a96138ab60f2454be4"
+    },
+    {
+      "path": "libs/domain/src/spec.rs",
+      "content_hash": "e6ee63681b4ec42bcc2f06ec86a75c605dffc373309ac511d06fc6c0993e6ff9"
     }
   ],
-  "processed_pair_keys": [
-    {
-      "low": {
-        "path": "libs/domain/src/ids.rs",
-        "content_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6"
-      },
-      "high": {
-        "path": "libs/domain/src/plan_ref/adr_ref.rs",
-        "content_hash": "4cb4390596081d81b8d9b4e2d2057ebb94d68836856470db3622bb18fb178306"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/ids.rs",
-        "content_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6"
-      },
-      "high": {
-        "path": "libs/domain/src/plan_ref/convention_ref.rs",
-        "content_hash": "fc1eea285796fee17302e1ba2d3f9e0ff60f1ab0565a5205fe13106e237cf3d0"
-      }
-    },
-    {
-      "low": {
-        "path": "libs/domain/src/ids.rs",
-        "content_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6"
-      },
-      "high": {
-        "path": "libs/domain/src/plan_ref/informal_ground_ref.rs",
-        "content_hash": "473964ce34bb6289a71bb9b57b0256f508b7c10b48e84520575f7f7b3fbe3452"
-      }
-    }
-  ]
+  "processed_pair_keys": []
 }
