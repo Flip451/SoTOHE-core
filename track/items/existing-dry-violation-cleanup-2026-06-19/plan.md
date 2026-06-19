@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # 既存 DRY 違反の一掃 — 横断・既存重複を正典へ集約する
 
-## Tasks (1/13 resolved)
+## Tasks (2/13 resolved)
 
 ### S1 — D1: Track-ID validation — delegate to domain canonical
 
@@ -9,7 +9,7 @@
 > These two tasks are independent at the source-file level and can be worked in parallel, but each must produce its own commit (CN-04).
 
 - [x] **T001**: [D1-usecase] Remove standalone validate_track_id copies from usecase: delete the private validate_track_id functions and associated inline test blocks in catalogue_impl_signals/mod.rs, type_signals/interactor.rs, and baseline_capture/mod.rs; replace every call site with TrackId::try_new from domain, mapping the DomainError to the module-local error variant. (`d044848b92dc9c05264b4651a70517c2f325ab9b`)
-- [~] **T002**: [D1-cli] Remove standalone validate_track_id / validate_track_id_str copies from CLI layer: delete validate_track_id_str_local in apps/cli-composition/src/verify.rs and validate_track_id_str in apps/cli/src/commands/track/validate.rs; replace each call site with TrackId::try_new (domain) delegation. Verify cargo make ci passes.
+- [x] **T002**: [D1-cli] Remove standalone validate_track_id / validate_track_id_str copies from CLI layer: delete validate_track_id_str_local in apps/cli-composition/src/verify.rs and validate_track_id_str in apps/cli/src/commands/track/validate.rs; replace each call site with TrackId::try_new (domain) delegation. Verify cargo make ci passes. (`66c7e2c24e0ac86690fdc9d3e8bf23eda942d4b0`)
 
 ### S2 — D2: Empty/whitespace invariant — delegate to NonEmptyString
 

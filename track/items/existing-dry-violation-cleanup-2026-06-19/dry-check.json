@@ -112,6 +112,48 @@
       "rationale": "The two snippets share only a small amount of test setup and the same invalid input, but they exercise different code paths (`execute_baseline_graph` vs. `execute_baseline_capture`) and assert different failure behavior. This is normal test reuse, not harmful duplication.",
       "recorded_at": "2026-06-19T16:46:26Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/domain/src/ids.rs",
+      "low_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6",
+      "high_path": "libs/domain/src/plan_ref/adr_ref.rs",
+      "high_hash": "4cb4390596081d81b8d9b4e2d2057ebb94d68836856470db3622bb18fb178306",
+      "changed_path": "libs/domain/src/ids.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8777085542678833,
+      "threshold": 0.8500000238418579,
+      "base_commit": "66c7e2c24e0ac86690fdc9d3e8bf23eda942d4b0",
+      "rationale": "The fragments share the same constructor shape and both reject trim-empty input, but they do not currently duplicate the same semantic operation: `adr_ref::AdrRef::try_new` maps the empty-anchor case to `ValidationError::EmptyAdrAnchor`, while the changed fragment delegates to `validate_trimmed_non_empty`, which likely returns a shared/non-ADR-specific validation error. Until the helper can parameterize or preserve the ADR-specific error variant, consolidating these would change the public error contract.",
+      "recorded_at": "2026-06-19T17:02:18Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/domain/src/ids.rs",
+      "low_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6",
+      "high_path": "libs/domain/src/plan_ref/convention_ref.rs",
+      "high_hash": "fc1eea285796fee17302e1ba2d3f9e0ff60f1ab0565a5205fe13106e237cf3d0",
+      "changed_path": "libs/domain/src/ids.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8969597816467285,
+      "threshold": 0.8500000238418579,
+      "base_commit": "66c7e2c24e0ac86690fdc9d3e8bf23eda942d4b0",
+      "rationale": "Both constructors validate that an input string is not empty after trimming, but the candidate fragment maps that condition to a domain-specific error variant, ValidationError::EmptyConventionAnchor. The changed fragment delegates to validate_trimmed_non_empty and likely shares a generic helper for ID-like types. Because the observable error semantics differ, the candidate code is not a straightforward duplicate that can be collapsed without changing behavior.",
+      "recorded_at": "2026-06-19T17:02:18Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/domain/src/ids.rs",
+      "low_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6",
+      "high_path": "libs/domain/src/plan_ref/informal_ground_ref.rs",
+      "high_hash": "473964ce34bb6289a71bb9b57b0256f508b7c10b48e84520575f7f7b3fbe3452",
+      "changed_path": "libs/domain/src/ids.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8588466644287109,
+      "threshold": 0.8500000238418579,
+      "base_commit": "66c7e2c24e0ac86690fdc9d3e8bf23eda942d4b0",
+      "rationale": "The two constructors share only a small overlap: both reject blank input after trimming, but the existing `informal_ground_ref` version also enforces a separate no-newline invariant and returns domain-specific errors. That makes the second implementation a distinct domain rule set rather than a duplicate copy of the new helper logic.",
+      "recorded_at": "2026-06-19T17:02:18Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }

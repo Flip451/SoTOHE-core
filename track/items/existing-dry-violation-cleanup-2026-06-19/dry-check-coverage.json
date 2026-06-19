@@ -1,74 +1,50 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "12f5d868de231daeedbb56934f9bcd8933dea2b93eafa34ca88e950fc84d6af3",
+  "corpus_fingerprint": "c89a5599c0958314368cf9104e503fcbcad666fffb8fb751d2682d391afe224d",
   "fragment_refs": [
     {
-      "path": "apps/cli-composition/src/track/mod.rs",
-      "content_hash": "a710bce696ee83f36c1c2f79690fd4f79d934c75fddc922de9644d234ed9aa2b"
+      "path": "libs/domain/src/ids.rs",
+      "content_hash": "477ca43d44e6dde133fea1f8b45b7fc6409edb8e19d08a9a514c67919fde7f96"
     },
     {
-      "path": "apps/cli-composition/src/track/mod.rs",
-      "content_hash": "abbabadd35804074c99fb1e9009074671a153c6e2d82334e7d29003f1d6b2f26"
+      "path": "libs/domain/src/ids.rs",
+      "content_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6"
     },
     {
-      "path": "apps/cli-composition/src/verify.rs",
-      "content_hash": "e5be638cae81bf086273fb34cb721e77c7bff628b9fa5dde7ebeea1631d8b7ca"
-    },
-    {
-      "path": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
-      "content_hash": "1ba07cd86272ce00f7f35d66b5935df7cf89d323e455eea5a390d1f482906b64"
-    },
-    {
-      "path": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-      "content_hash": "b3ba1ce87af4ea1e6d8311ec1e2e6fba82fa405846fa525810141d4977c6f247"
-    },
-    {
-      "path": "apps/cli/src/commands/track/tddd/contract_map.rs",
-      "content_hash": "4c530c9e0dfc69b67cb4ce01077c1aa0a28a7b1f8a044c78eb76127379adc597"
-    },
-    {
-      "path": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-      "content_hash": "c18f1606f128a5d4da56d971a7fc969698566a3f52b047fc2c812ee434bfc59f"
-    },
-    {
-      "path": "apps/cli/src/commands/track/validate.rs",
-      "content_hash": "aa87363a601912835b30a7f14bb1884762010869329e9515d97ff0968049765c"
-    },
-    {
-      "path": "apps/cli/src/commands/track/validate.rs",
-      "content_hash": "bcd4c8b7c3651981a3d375d58d0f6a1a5f9aba273bde8ebb4a044f39a0b68a38"
+      "path": "libs/domain/src/ids.rs",
+      "content_hash": "8954aabda3de90f86e63ff417768ae02aa5aa244b0e386e1adc8ac68c543c997"
     }
   ],
   "processed_pair_keys": [
     {
       "low": {
-        "path": "apps/cli-composition/src/track/mod.rs",
-        "content_hash": "abbabadd35804074c99fb1e9009074671a153c6e2d82334e7d29003f1d6b2f26"
+        "path": "libs/domain/src/ids.rs",
+        "content_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6"
       },
       "high": {
-        "path": "apps/cli/src/commands/track/validate.rs",
-        "content_hash": "bcd4c8b7c3651981a3d375d58d0f6a1a5f9aba273bde8ebb4a044f39a0b68a38"
+        "path": "libs/domain/src/plan_ref/adr_ref.rs",
+        "content_hash": "4cb4390596081d81b8d9b4e2d2057ebb94d68836856470db3622bb18fb178306"
       }
     },
     {
       "low": {
-        "path": "apps/cli-composition/src/verify.rs",
-        "content_hash": "e5be638cae81bf086273fb34cb721e77c7bff628b9fa5dde7ebeea1631d8b7ca"
+        "path": "libs/domain/src/ids.rs",
+        "content_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6"
       },
       "high": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_refs.rs",
-        "content_hash": "4db76cb7bb9922cd23133fa7c3972a989233540ab7878f04b473178f97f9c1af"
+        "path": "libs/domain/src/plan_ref/convention_ref.rs",
+        "content_hash": "fc1eea285796fee17302e1ba2d3f9e0ff60f1ab0565a5205fe13106e237cf3d0"
       }
     },
     {
       "low": {
-        "path": "apps/cli/src/commands/track/tddd/baseline.rs",
-        "content_hash": "7937e3d2a3b9480e49db217dd51a8c9db8ea2ca533e75868df47c054c103e681"
+        "path": "libs/domain/src/ids.rs",
+        "content_hash": "767748493e94db1e6e7ac9563d05586d60e967bf71c149552a0ab8cc3bcb48c6"
       },
       "high": {
-        "path": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
-        "content_hash": "1ba07cd86272ce00f7f35d66b5935df7cf89d323e455eea5a390d1f482906b64"
+        "path": "libs/domain/src/plan_ref/informal_ground_ref.rs",
+        "content_hash": "473964ce34bb6289a71bb9b57b0256f508b7c10b48e84520575f7f7b3fbe3452"
       }
     }
   ]

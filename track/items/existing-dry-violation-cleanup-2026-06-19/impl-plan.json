@@ -10,7 +10,8 @@
     {
       "id": "T002",
       "description": "[D1-cli] Remove standalone validate_track_id / validate_track_id_str copies from CLI layer: delete validate_track_id_str_local in apps/cli-composition/src/verify.rs and validate_track_id_str in apps/cli/src/commands/track/validate.rs; replace each call site with TrackId::try_new (domain) delegation. Verify cargo make ci passes.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "66c7e2c24e0ac86690fdc9d3e8bf23eda942d4b0"
     },
     {
       "id": "T003",
