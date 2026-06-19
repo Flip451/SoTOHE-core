@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file dates PR #148's merge as 2026-06-04, but the bundle README and evaluation.md both place the same merge on 2026-06-02. The evidence set is internally inconsistent about the snapshot boundary.",
+              "severity": "medium",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/gate-cache-evaluation.md",
+              "line": 4,
+              "category": "contradiction"
+            },
+            {
+              "message": "The bullet says `\"tmp/reviewer-runtime\"` is defined in four separate locations, but the rationale says five occurrences and the locations list contains five paths. The count in the heading is wrong.",
+              "severity": "medium",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/after/report.md",
+              "line": 255,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:fe84374edf98ba29171e2050540ff88696c16a76bdbec5c8fac9c6d86585e6d0",
+          "at": "2026-06-19T12:45:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluation.md` says the overall density drop is \"fully concentrated in cli and cli-composition\", but the table immediately above shows domain density also fell from 0.743 to 0.713 (-4.0%). The statement should say the drop is mostly, not fully, concentrated in those two crates.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/evaluation.md",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3c45adcd75fec328948332edebd3002b15b36645ba81ad1a9dde19e323c86beb",
+          "at": "2026-06-19T12:51:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80a191d146da859e9c91bb13d3da72d2d39c724a9e8600c3b9f82ea5b74e7f70",
+          "at": "2026-06-19T12:56:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluation.md` says the before/after census used the same model `claude-sonnet-4-6`, but the checked-in workflow documents and implements a mixed model setup: Sonnet for scan/load/synthesis and Opus for adversarial verification (`dry-scan.workflow.js` lines 6-7 and 335-346). This makes the methodology claim internally inconsistent; update the fairness-control wording to describe the model mix, or adjust the workflow/provenance if Sonnet-only was intended.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-06-19-dry-check/evaluation.md",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:80a191d146da859e9c91bb13d3da72d2d39c724a9e8600c3b9f82ea5b74e7f70",
+          "at": "2026-06-19T13:02:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The report generator labels every cross-layer finding as “Cross-layer (knowledge) duplications — the DRY gate's prime targets”, but it only filters on cross-layer locations and includes exact-clone/near-clone/data-dup entries, while the evaluation says the gate targets semantic diff-vs-corpus duplication and structurally misses cross-layer knowledge/data duplication. This makes the generated before/after reports contradict the bundle’s own gate model and misclassify the highlighted section.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-06-19-dry-check/methodology/report-gen.jq",
+              "line": 50,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f275016aeb88f5818c21ef5bae5ee74701c2fdfa008eb266bdabc19e3c632ccc",
+          "at": "2026-06-19T13:07:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d99aaebf4b2770c84c82813bc21e80267e6727dd7696a249d6e4d47aecfb41a",
+          "at": "2026-06-19T13:13:22Z"
+        }
+      ]
+    }
+  }
+}

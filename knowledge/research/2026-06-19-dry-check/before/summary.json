@@ -1,0 +1,32 @@
+{
+  "label": "before",
+  "commit": "c4da67a4",
+  "totalLoc": 157104,
+  "unitCount": 40,
+  "totalFindings": 148,
+  "bySeverity": {
+    "high": 23,
+    "medium": 85,
+    "low": 40
+  },
+  "byCategory": {
+    "knowledge-dup": 7,
+    "near-clone": 56,
+    "structural-dup": 41,
+    "data-dup": 12,
+    "semantic-dup": 15,
+    "exact-clone": 17
+  },
+  "byLayer": {
+    "cli-composition": 25,
+    "cli": 22,
+    "domain": 17,
+    "infrastructure": 64,
+    "usecase": 20
+  },
+  "crossLayerFindings": 26,
+  "unverifiedKept": 0,
+  "weightedScore": 279,
+  "densityPerKLoc": 0.942,
+  "weightedDensityPerKLoc": 1.776
+}

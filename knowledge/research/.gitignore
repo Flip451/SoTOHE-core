@@ -11,3 +11,9 @@
 # Legacy filenames (kept for backward compatibility)
 !version-baseline-*.md
 !tsumiki-hearing-deep-dive-2026-04-01.md
+
+# Tracked research bundles (directory form: data + reports + methodology).
+# Re-include the directory first, then all of its contents (required because `*`
+# excludes the parent dir, which would otherwise block file-level negations).
+!2026-06-19-dry-check/
+!2026-06-19-dry-check/**
