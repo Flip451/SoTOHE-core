@@ -11614,6 +11614,34 @@
       "rationale": "These fragments are not a DRY violation in context. They represent two deliberately different implementations of `run_git`: one test-only helper that panics/asserts for concise test failures, and one feature-gated library variant that returns a `RunGitResult`/error type to avoid panic paths in production builds. The shared command invocation is minimal and justified by the differing error-handling contracts.",
       "recorded_at": "2026-06-19T18:17:07Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli/src/commands/track/dispatch.rs",
+      "low_hash": "f271727dd3a22c9031ea3b610d629a55ba3187d4919115367773ea29ac7e19ad",
+      "high_path": "apps/cli/src/commands/track/mod.rs",
+      "high_hash": "af50457e0c3e2f419e944ab41b0cb431a4a1e30974d7daf3927aceb27854bc83",
+      "changed_path": "apps/cli/src/commands/track/dispatch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8743128180503845,
+      "threshold": 0.8500000238418579,
+      "base_commit": "68606a36bba4342629f4abd5e94abdacce6beee9",
+      "rationale": "The changed fragment is an extraction of dispatch logic out of `mod.rs`, not a duplicate implementation. `mod.rs` now only declares modules and re-exports shared APIs, while `dispatch.rs` consumes those exports. The two fragments are complementary and do not repeat the same logic or data structures in a way that creates a DRY problem.",
+      "recorded_at": "2026-06-19T23:19:12Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli/src/commands/track/mod.rs",
+      "low_hash": "0c82d63a999664c60697209d297261090a8b516be746d20f53a600c466a9f2e4",
+      "high_path": "apps/cli/src/commands/verify.rs",
+      "high_hash": "80306e7a0a5560def6b30fa911adb1f7a7618bec367fb7e9320f8fc03da893ee",
+      "changed_path": "apps/cli/src/commands/track/mod.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9265003800392151,
+      "threshold": 0.8500000238418579,
+      "base_commit": "68606a36bba4342629f4abd5e94abdacce6beee9",
+      "rationale": "These two fragments are similar in shape, but they are not duplicating the same business logic. `track/mod.rs` resolves `items_dir` for track subcommands using several distinct sources (`items_dir`, `project_root`, `workspace_root`, git discovery), while `verify.rs` resolves it for a different command set with different invariants and fallback rules. The shared `match` structure is an implementation pattern, not a DRY violation.",
+      "recorded_at": "2026-06-19T23:19:12Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }

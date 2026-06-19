@@ -92,7 +92,7 @@
     {
       "id": "T010",
       "description": "D5 / AC-07: Final cleanup after Makefile/CI and docs references have moved to the new `signal` namespace. Remove old CLI commands that are superseded by the new `signal` namespace. In `apps/cli/src/commands/verify.rs`: remove `AdrSignals` variant (→ `signal check-adr-user`), remove `CatalogueSpecSignals` variant (→ `signal check-catalog-spec`), remove `SpecStates` variant (→ `signal check-spec-adr` + `signal check-impl-catalog`). In `apps/cli/src/commands/track/signals.rs`: remove or repurpose `sotp track signals` (→ `signal calc-spec-adr`). In `apps/cli/src/commands/track/tddd/signals.rs`: remove `sotp track type-signals` (→ `signal calc-impl-catalog`). In `apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs`: remove `sotp track catalogue-spec-signals` (→ `signal calc-catalog-spec`). No backward-compat aliases per AC-07 / OS-06 / no-backward-compat.md. Also remove corresponding CLI composition wiring in `apps/cli-composition/` for the removed commands. Depends on T009, T011, T012. Estimated diff: ~300 lines (deletions-heavy).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T011",

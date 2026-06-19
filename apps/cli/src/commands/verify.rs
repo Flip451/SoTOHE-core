@@ -16,19 +16,6 @@ pub struct SpecVerifyArgs {
     spec_path: PathBuf,
 }
 
-/// Arguments for spec-states verify subcommand (includes strict-mode gate).
-#[derive(Args)]
-pub struct SpecStatesArgs {
-    /// Path to the spec.md file to verify.
-    /// When omitted, the active track is resolved from the current branch name
-    /// and `track/items/<id>/spec.md` is verified. Fail-closed on non-track
-    /// branches (CN-01, IN-08, AC-10).
-    spec_path: Option<PathBuf>,
-    /// Strict mode (merge gate): Yellow signals also fail. Default: only Red fails.
-    #[arg(long)]
-    strict: bool,
-}
-
 /// Verify subcommands for CI validation.
 #[derive(Subcommand)]
 pub enum VerifyCommand {
@@ -62,8 +49,6 @@ pub enum VerifyCommand {
     ViewFreshness(VerifyArgs),
     /// Check spec.md source tag signals match frontmatter and red == 0 gate.
     SpecSignals(SpecVerifyArgs),
-    /// Check spec.md contains a ## Domain States section with table data rows.
-    SpecStates(SpecStatesArgs),
     /// Validate structured-ref fields (adr_refs, convention_refs, spec_refs, informal_grounds)
     /// per ADR 2026-04-19-1242 §D2.3.
     PlanArtifactRefs(PlanArtifactRefsArgs),
@@ -73,35 +58,6 @@ pub enum VerifyCommand {
     ///
     /// ADR `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.5 / §D3.2.
     CatalogueSpecRefs(CatalogueSpecRefsArgs),
-
-    /// Check catalogue-spec signal gate results
-    /// (`check_catalogue_spec_signals`) for each tddd-enabled layer on the
-    /// current branch. `strict=false` CI interim mode: Red → error, Yellow
-    /// → warning. ADR `2026-04-23-0344-catalogue-spec-signal-activation.md`
-    /// §D4.1.
-    CatalogueSpecSignals(CatalogueSpecSignalsArgs),
-
-    /// Verify ADR decision signal grounds across `knowledge/adr/`
-    /// (SoT Chain ADR-internal binary gate): `red_count >= 1` → exit 1
-    /// with a stderr summary; `red_count == 0` → exit 0. ADR
-    /// `2026-04-27-1234-adr-decision-traceability-lifecycle.md` §D1 / AC-01.
-    AdrSignals(VerifyArgs),
-}
-
-/// Arguments for `catalogue-spec-signals` verify subcommand.
-#[derive(Args)]
-pub struct CatalogueSpecSignalsArgs {
-    /// Path to the track items root directory.
-    #[arg(long, default_value = "track/items")]
-    items_dir: PathBuf,
-
-    /// Workspace root directory.
-    #[arg(long, default_value = ".")]
-    workspace_root: PathBuf,
-
-    /// Enable strict mode (Yellow also blocks). Default: CI interim mode.
-    #[arg(long)]
-    strict: bool,
 }
 
 /// Arguments for `catalogue-spec-refs` verify subcommand.
@@ -164,8 +120,7 @@ impl VerifyCommand {
             | VerifyCommand::DomainStrings(a)
             | VerifyCommand::UsecasePurity(a)
             | VerifyCommand::DocLinks(a)
-            | VerifyCommand::ViewFreshness(a)
-            | VerifyCommand::AdrSignals(a) => a.project_root.join("track").join("items"),
+            | VerifyCommand::ViewFreshness(a) => a.project_root.join("track").join("items"),
 
             // Workspace-root–based commands: the explicit --items-dir field is the
             // primary artifact root.  Only rewrite to `<workspace_root>/track/items`
@@ -180,15 +135,6 @@ impl VerifyCommand {
                     a.items_dir.clone()
                 }
             }
-            // CatalogueSpecSignals is CWD-anchored for branch gating: the underlying
-            // command uses --workspace-root for file I/O but git branch discovery
-            // always runs against the CWD repo.  Passing the workspace_root-joined
-            // path to resolve_telemetry_writer would anchor branch discovery to a
-            // different checkout, causing GateEval misattribution.  Return the raw
-            // items_dir field (defaulting to "track/items") so that
-            // resolve_telemetry_writer uses CWD for branch discovery.
-            VerifyCommand::CatalogueSpecSignals(a) => a.items_dir.clone(),
-
             // Spec-path–based commands: derive items_dir from the spec path when
             // the path is deep enough (spec.md → <track_id>/ → track/items/).
             // Only trust the derived path when it has more than one component
@@ -211,17 +157,6 @@ impl VerifyCommand {
                 .and_then(|p| p.parent())
                 .filter(|p| p.components().count() > 1)
                 .map(|p| p.to_path_buf())
-                .unwrap_or_else(|| PathBuf::from("track/items")),
-            VerifyCommand::SpecStates(a) => a
-                .spec_path
-                .as_deref()
-                .and_then(|p| p.parent())
-                .and_then(|p| p.parent())
-                .filter(|p| p.components().count() > 1)
-                .map(|p| p.to_path_buf())
-                // No explicit spec path: use CWD-relative "track/items" (the same
-                // layout resolve_telemetry_writer expects). The underlying command
-                // also does git discovery from CWD, so both anchor to the same root.
                 .unwrap_or_else(|| PathBuf::from("track/items")),
             // PlanArtifactRefs: track_dir is track/items/<track_id>/, so .parent() =
             // track/items/. When omitted, use the same CWD-relative fallback.
@@ -260,7 +195,6 @@ fn dispatch_to_outcome(
         VerifyCommand::DocLinks(args) => app.verify_doc_links(args.project_root),
         VerifyCommand::ViewFreshness(args) => app.verify_view_freshness(args.project_root),
         VerifyCommand::SpecSignals(args) => app.verify_spec_signals(args.spec_path),
-        VerifyCommand::SpecStates(args) => app.verify_spec_states(args.spec_path, args.strict),
         VerifyCommand::PlanArtifactRefs(args) => app.verify_plan_artifact_refs(args.track_dir),
         VerifyCommand::CatalogueSpecRefs(args) => app.verify_catalogue_spec_refs(
             args.track_id,
@@ -268,10 +202,6 @@ fn dispatch_to_outcome(
             args.workspace_root,
             args.skip_stale,
         ),
-        VerifyCommand::CatalogueSpecSignals(args) => {
-            app.verify_catalogue_spec_signals(args.items_dir, args.workspace_root, args.strict)
-        }
-        VerifyCommand::AdrSignals(args) => app.verify_adr_signals(args.project_root),
     }
 }
 
@@ -381,74 +311,6 @@ pub(super) fn resolve_ci_verify_track_id_with_reader(
 // They call the shared `resolve_ci_verify_track_id_with_reader` helper directly,
 // bypassing the CliApp layer — sufficient for testing the skip detection contract.
 
-/// Execute the `SpecStates` dispatch logic with an injected branch reader.
-#[cfg(test)]
-pub(super) fn dispatch_spec_states_with_resolver(
-    args: SpecStatesArgs,
-    resolver: impl Fn() -> Result<Option<String>, String>,
-) -> ExitCode {
-    dispatch_spec_states_with_resolver_and_repo_root(args, resolver, || {
-        use infrastructure::git_cli::GitRepository as _;
-        infrastructure::git_cli::SystemGitRepo::discover()
-            .map(|repo| repo.root().to_path_buf())
-            .map_err(|e| format!("cannot discover git repository: {e}"))
-    })
-}
-
-/// Execute the `SpecStates` dispatch logic with injected branch and repo-root readers.
-#[cfg(test)]
-pub(super) fn dispatch_spec_states_with_resolver_and_repo_root(
-    args: SpecStatesArgs,
-    resolver: impl Fn() -> Result<Option<String>, String>,
-    repo_root_resolver: impl Fn() -> Result<PathBuf, String>,
-) -> ExitCode {
-    use infrastructure::verify::{VerifyFinding, VerifyOutcome};
-
-    let spec_path = match args.spec_path {
-        Some(p) => p,
-        None => match resolver() {
-            Ok(None) => {
-                return print_skip("verify spec states", "not on a track branch; skipping");
-            }
-            Ok(Some(track_id)) => {
-                let repo_root = match repo_root_resolver() {
-                    Ok(root) => root,
-                    Err(msg) => {
-                        eprintln!("{msg}");
-                        return ExitCode::FAILURE;
-                    }
-                };
-                let track_dir = repo_root.join("track/items").join(&track_id);
-                let spec_json_path = track_dir.join("spec.json");
-                let spec_md_path = track_dir.join("spec.md");
-                if spec_json_path.exists() || spec_md_path.exists() {
-                    spec_md_path
-                } else {
-                    // Neither spec artifact exists (Phase 0) — emit SKIP instead of failing.
-                    return print_skip(
-                        "verify spec states",
-                        "spec artifacts not yet generated (Phase 0); skipping",
-                    );
-                }
-            }
-            Err(msg) => {
-                eprintln!("{msg}");
-                return ExitCode::FAILURE;
-            }
-        },
-    };
-    let outcome = match infrastructure::verify::trusted_root::resolve_trusted_root(&spec_path) {
-        Ok(trusted_root) => {
-            infrastructure::verify::spec_states::verify(&spec_path, args.strict, &trusted_root)
-        }
-        Err(e) => VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "cannot resolve trusted_root for {}: {e}",
-            spec_path.display()
-        ))]),
-    };
-    dispatch_print_outcome("verify spec states", &outcome)
-}
-
 /// Execute the `PlanArtifactRefs` dispatch logic with an injected branch reader.
 #[cfg(test)]
 pub(super) fn dispatch_plan_artifact_refs_with_resolver(
@@ -528,30 +390,6 @@ pub(super) fn dispatch_catalogue_spec_refs_skip_with_resolver(
     None
 }
 
-/// Execute the `CatalogueSpecSignals` dispatch logic with an injected branch reader.
-#[cfg(test)]
-pub(super) fn dispatch_catalogue_spec_signals_with_resolver(
-    args: CatalogueSpecSignalsArgs,
-    resolver: impl Fn() -> Result<Option<String>, String>,
-) -> ExitCode {
-    match resolver() {
-        Ok(None) => print_skip("verify catalogue-spec signals", "not on a track branch; skipping"),
-        Ok(Some(_)) => {
-            let outcome =
-                infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check(
-                    args.items_dir,
-                    args.workspace_root,
-                    args.strict,
-                );
-            dispatch_print_outcome("verify catalogue-spec signals", &outcome)
-        }
-        Err(msg) => {
-            eprintln!("{msg}");
-            ExitCode::FAILURE
-        }
-    }
-}
-
 /// `print_outcome` variant for `VerifyOutcome` used exclusively by `#[cfg(test)]` dispatch helpers.
 ///
 /// Production code uses `print_outcome(&CommandOutcome)`. This variant is kept
@@ -579,34 +417,6 @@ pub(super) fn dispatch_print_outcome(
             ExitCode::SUCCESS
         }
     }
-}
-
-/// `execute_catalogue_spec_signals` for `#[cfg(test)]` direct-infra tests.
-///
-/// Production delegates to CliApp; tests that need `VerifyOutcome` semantics
-/// (`.has_errors()`, `.findings()`) call this to check the infrastructure layer
-/// directly without going through the CommandOutcome boundary.
-#[cfg(test)]
-pub(super) fn execute_catalogue_spec_signals(
-    items_dir: std::path::PathBuf,
-    track_id: String,
-    workspace_root: std::path::PathBuf,
-    strict: bool,
-) -> infrastructure::verify::VerifyOutcome {
-    infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals(
-        items_dir,
-        track_id,
-        workspace_root,
-        strict,
-    )
-}
-
-/// `execute_verify_adr_signals` for `#[cfg(test)]` direct-infra tests.
-#[cfg(test)]
-pub(super) fn execute_verify_adr_signals(
-    project_root: &std::path::Path,
-) -> infrastructure::verify::VerifyOutcome {
-    infrastructure::verify::adr_signals::execute_verify_adr_signals(project_root)
 }
 
 #[cfg(test)]

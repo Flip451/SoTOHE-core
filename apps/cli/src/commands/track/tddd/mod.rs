@@ -3,9 +3,7 @@
 pub(crate) mod baseline;
 pub(crate) mod baseline_graph;
 pub(crate) mod catalogue_impl_signals;
-pub(crate) mod catalogue_spec_signals;
 pub(crate) mod contract_map;
 pub(crate) mod graph;
 pub(crate) mod lint;
-pub(crate) mod signals;
 pub(crate) mod spec_element_hash;

@@ -473,11 +473,8 @@ fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static s
         VerifyCommand::DocLinks(_) => "verify-doc-links",
         VerifyCommand::ViewFreshness(_) => "verify-view-freshness",
         VerifyCommand::SpecSignals(_) => "verify-spec-signals",
-        VerifyCommand::SpecStates(_) => "verify-spec-states",
         VerifyCommand::PlanArtifactRefs(_) => "verify-plan-artifact-refs",
         VerifyCommand::CatalogueSpecRefs(_) => "verify-catalogue-spec-refs",
-        VerifyCommand::CatalogueSpecSignals(_) => "verify-catalogue-spec-signals",
-        VerifyCommand::AdrSignals(_) => "verify-adr-signals",
     }
 }
 
@@ -501,12 +498,9 @@ fn track_command_label(cmd: &commands::track::TrackCommand) -> &'static str {
         TrackCommand::ClearOverride { .. } => "track clear-override",
         TrackCommand::NextTask { .. } => "track next-task",
         TrackCommand::TaskCounts { .. } => "track task-counts",
-        TrackCommand::Signals { .. } => "track signals",
-        TrackCommand::TypeSignals { .. } => "track type-signals",
         TrackCommand::TypeGraph { .. } => "track type-graph",
         TrackCommand::BaselineGraph { .. } => "track baseline-graph",
         TrackCommand::ContractMap { .. } => "track contract-map",
-        TrackCommand::CatalogueSpecSignals { .. } => "track catalogue-spec-signals",
         TrackCommand::SpecElementHash { .. } => "track spec-element-hash",
         TrackCommand::BaselineCapture { .. } => "track baseline-capture",
         TrackCommand::CatalogueImplSignals { .. } => "track catalogue-impl-signals",
