@@ -6,8 +6,8 @@
 
 use crate::track::validate_plan_invariants;
 use crate::{
-    DomainError, PlanSection, PlanView, TaskId, TaskStatus, TaskStatusKind, TaskTransition,
-    TrackTask, TransitionError, ValidationError,
+    DomainError, NonEmptyString, PlanSection, PlanView, TaskId, TaskStatus, TaskStatusKind,
+    TaskTransition, TrackTask, TransitionError, ValidationError,
 };
 
 /// The current schema version for `impl-plan.json`.
@@ -193,9 +193,8 @@ impl ImplPlanDocument {
         after_task_id: Option<&TaskId>,
     ) -> Result<TaskId, DomainError> {
         let description = description.into();
-        if description.trim().is_empty() {
-            return Err(ValidationError::EmptyTaskDescription.into());
-        }
+        NonEmptyString::try_new(description.as_str())
+            .map_err(|_| ValidationError::EmptyTaskDescription)?;
 
         // --- Validate all inputs before mutating state ---
 

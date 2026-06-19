@@ -22,7 +22,8 @@
     {
       "id": "T004",
       "description": "[D2-plan-spec] Replace inline trim().is_empty guards in domain plan.rs (lines 24-30 for id and title) and spec.rs (lines 52-53, 149-151, 212-216 for text/title/version fields) with NonEmptyString::try_new delegation at the constructor call sites. Internal String storage is preserved (OQ-3). Verify cargo make ci passes.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "da90fcf73d1df586095661317cb95ae52bde721c"
     },
     {
       "id": "T005",

@@ -1,31 +1,23 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "4d761b9e7e9ed4712a7d2dd23ccc90c18faa41c1ed5077d91aeb2d1cdba991f5",
+  "corpus_fingerprint": "38bd11a65056bca721f971834556bdc3c7acc666e611a421090906c0bbb6c426",
   "fragment_refs": [
     {
-      "path": "libs/domain/src/plan.rs",
-      "content_hash": "96213703863728cf8cdee9f3f28e5860dce982aaebe83d0883a2d50c180024ae"
+      "path": "libs/domain/src/impl_plan.rs",
+      "content_hash": "315c8b4d54ef0a10b0ac418592982cef929c959a21d71209ae6d4ef28a50eaf6"
     },
     {
-      "path": "libs/domain/src/plan.rs",
-      "content_hash": "a4d4ec176fca8919d719d5ec859537bb5d3cfdc735afad5675ee5b752916310b"
+      "path": "libs/domain/src/impl_plan.rs",
+      "content_hash": "c51c635c5e176a3f645516badc4c12f32a6382a1e9ef8040dfefb36c81a4e1a9"
     },
     {
-      "path": "libs/domain/src/spec.rs",
-      "content_hash": "5d3714795d8866eb108db36bc27c66bb1fd82462f238ddcd14a3a4e3f044897d"
+      "path": "libs/domain/src/review_v2/types.rs",
+      "content_hash": "3029e4bcce9082fa3eeb74614bf4053fbba9f02c9afcb75ab5be1ced43e9823f"
     },
     {
-      "path": "libs/domain/src/spec.rs",
-      "content_hash": "784ba6fdb320247eb865d2735198d562d00e268c15794cb9f7458899018abf68"
-    },
-    {
-      "path": "libs/domain/src/spec.rs",
-      "content_hash": "b638d0f6f4ac1d6073095d1b2580c05553fa57fb36bb09a96138ab60f2454be4"
-    },
-    {
-      "path": "libs/domain/src/spec.rs",
-      "content_hash": "e6ee63681b4ec42bcc2f06ec86a75c605dffc373309ac511d06fc6c0993e6ff9"
+      "path": "libs/domain/src/review_v2/types.rs",
+      "content_hash": "536c4f36cf62a1ce05dbb3a85c7f4fa35330ca1af5ef294ad4eb83345363aa4e"
     }
   ],
   "processed_pair_keys": []

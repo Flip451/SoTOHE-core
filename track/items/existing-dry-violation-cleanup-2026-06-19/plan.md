@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # 既存 DRY 違反の一掃 — 横断・既存重複を正典へ集約する
 
-## Tasks (3/13 resolved)
+## Tasks (4/13 resolved)
 
 ### S1 — D1: Track-ID validation — delegate to domain canonical
 
@@ -20,7 +20,7 @@
 > Internal String field types are NOT changed (D2 / OQ-3).
 
 - [x] **T003**: [D2-ids] Replace inline is_empty/trim().is_empty guards in domain ids.rs with NonEmptyString::try_new delegation: specifically the ReviewGroupName::try_new guard at ids.rs line 214-217 (the NonEmptyString::try_new at 178-181 is already the canonical form and stays). Extract a shared private fn validate_trimmed_non_empty if needed to avoid a 1-line duplication inside the same file. (`8f2999655b579c848a827ef65f00736f4474d68e`)
-- [ ] **T004**: [D2-plan-spec] Replace inline trim().is_empty guards in domain plan.rs (lines 24-30 for id and title) and spec.rs (lines 52-53, 149-151, 212-216 for text/title/version fields) with NonEmptyString::try_new delegation at the constructor call sites. Internal String storage is preserved (OQ-3). Verify cargo make ci passes.
+- [x] **T004**: [D2-plan-spec] Replace inline trim().is_empty guards in domain plan.rs (lines 24-30 for id and title) and spec.rs (lines 52-53, 149-151, 212-216 for text/title/version fields) with NonEmptyString::try_new delegation at the constructor call sites. Internal String storage is preserved (OQ-3). Verify cargo make ci passes. (`da90fcf73d1df586095661317cb95ae52bde721c`)
 - [ ] **T005**: [D2-impl-plan-review] Replace inline trim().is_empty guards in domain impl_plan.rs (line 196-198 for task description) and review_v2/types.rs (lines 24, 72, 233 for ReviewGroupName/ReviewerFinding message fields — the is_empty guards, NOT the is_empty query methods on lines 128-129 and 193) with NonEmptyString::try_new delegation. Verify cargo make ci passes.
 
 ### S3 — D3: Subprocess / SHA-256 helpers — extract to shared infrastructure module

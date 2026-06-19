@@ -3,6 +3,7 @@ use std::fmt;
 use super::error::{
     FilePathError, ReviewHashError, ReviewerFindingError, ScopeNameError, VerdictError,
 };
+use crate::NonEmptyString;
 
 // ── FilePath ──────────────────────────────────────────────────────────
 
@@ -230,9 +231,8 @@ impl ReviewerFinding {
         category: Option<String>,
     ) -> Result<Self, ReviewerFindingError> {
         let message = message.into();
-        if message.trim().is_empty() {
-            return Err(ReviewerFindingError::EmptyMessage);
-        }
+        NonEmptyString::try_new(message.as_str())
+            .map_err(|_| ReviewerFindingError::EmptyMessage)?;
         Ok(Self { message, severity, file, line, category })
     }
 
