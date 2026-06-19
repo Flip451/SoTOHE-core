@@ -215,6 +215,104 @@
           "findings": [],
           "hash": "rvw1:sha256:57ed7c9cd7b9d5c5ec4955fb62ad33670ab76ff2d3a8e1e19b395aaaaf3c14e3",
           "at": "2026-06-19T15:32:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T012 lists existing `\"tmp/reviewer-runtime\"` inline literals, then excludes them as \"call-site literals\" and only requires replacing the three const definitions. That contradicts IN-04/AC-05, which require this value to be consolidated to a single const per architectural-layer boundary; the current task can leave same-boundary runtime-dir literals outside remediation while still claiming D4 is complete.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:edb71bf3bf7cf4188da4509c2fe020603ae02b027b629bf094d4dfaaced18cfd",
+          "at": "2026-06-19T15:45:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 cites ADR D4 but changes the constants remediation from D4's single `const` definitions into one const per architecture boundary, and explicitly treats cross-boundary occurrences as non-violations. That lets T011/T012/T013 complete while still leaving duplicate `POLL_INTERVAL` or `tmp/reviewer-runtime` values across cli/infrastructure boundaries, so the plan no longer satisfies the D4 data-dup cleanup it claims to implement.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json",
+              "line": 250,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:20d01ca072a5ad175611134d7ca7932b399fa0468ea86d39ad9c93bcbc53688e",
+          "at": "2026-06-19T15:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99d895f061b22a5c0f055830348c49e1c5f90ab98c579479000ad2fae44bf8f9",
+          "at": "2026-06-19T15:59:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`related_conventions` makes `hexagonal-architecture.md#Layer Dependencies` required reading, but that section says the CLI may depend on `infrastructure`, while AC-05/T011/T012 rely on `architecture-rules.json` forbidding `cli -> infrastructure` and explicitly prohibit introducing that dependency. This leaves the constants tasks with contradictory layer guidance: following the cited convention would produce the dependency the acceptance criteria says must not exist.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json",
+              "line": 281,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:99d895f061b22a5c0f055830348c49e1c5f90ab98c579479000ad2fae44bf8f9",
+          "at": "2026-06-19T16:01:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19e0fad4d8448ad71cda14756acc5a6f840b23a062d74c568c816d8b2fcc1bdd",
+          "at": "2026-06-19T16:09:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19e0fad4d8448ad71cda14756acc5a6f840b23a062d74c568c816d8b2fcc1bdd",
+          "at": "2026-06-19T16:12:05Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
+          "at": "2026-06-19T15:54:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
+          "at": "2026-06-19T15:57:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
+          "at": "2026-06-19T16:20:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
+          "at": "2026-06-19T16:22:04Z"
         }
       ]
     }

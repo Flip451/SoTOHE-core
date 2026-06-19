@@ -18,49 +18,17 @@ use super::service::{TypeSignalsError, TypeSignalsRequest, TypeSignalsService};
 
 /// Validates a track ID string (lowercase slug).
 ///
-/// Mirrors the domain `TrackId::try_new` validation without importing domain
-/// types (the validation logic is duplicated to avoid a direct domain dep in
-/// the module-level helper; the interactor uses it before injecting domain).
+/// Delegates to the canonical domain `TrackId::try_new` validation, mapping the
+/// domain `ValidationError` into this module's `InvalidTrackId` variant so the
+/// slug rule has a single source of truth (ADR D1).
 ///
 /// # Errors
 ///
 /// Returns `TypeSignalsError::InvalidTrackId` if the ID is invalid.
 fn validate_track_id(id: &str) -> Result<(), TypeSignalsError> {
-    if id.is_empty() {
-        return Err(TypeSignalsError::InvalidTrackId { reason: "must not be empty".to_owned() });
-    }
-    let mut chars = id.chars();
-    match chars.next() {
-        Some(first) if first.is_ascii_lowercase() || first.is_ascii_digit() => {}
-        _ => {
-            return Err(TypeSignalsError::InvalidTrackId {
-                reason: format!(
-                    "invalid track id: '{id}' (must start with lowercase letter or digit)"
-                ),
-            });
-        }
-    }
-    let mut previous_was_hyphen = false;
-    for ch in chars {
-        let is_valid = ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-';
-        if !is_valid {
-            return Err(TypeSignalsError::InvalidTrackId {
-                reason: format!("invalid track id: '{id}' (invalid character '{ch}')"),
-            });
-        }
-        if ch == '-' && previous_was_hyphen {
-            return Err(TypeSignalsError::InvalidTrackId {
-                reason: format!("invalid track id: '{id}' (double hyphen not allowed)"),
-            });
-        }
-        previous_was_hyphen = ch == '-';
-    }
-    if previous_was_hyphen {
-        return Err(TypeSignalsError::InvalidTrackId {
-            reason: format!("invalid track id: '{id}' (must not end with hyphen)"),
-        });
-    }
-    Ok(())
+    domain::TrackId::try_new(id)
+        .map(|_| ())
+        .map_err(|e| TypeSignalsError::InvalidTrackId { reason: e.to_string() })
 }
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "records": [
+    {
+      "low_path": "libs/usecase/src/baseline_capture/interactor.rs",
+      "low_hash": "8890452c16799992e93888cfd3c8b73560fd867a3e2ea0623846bca761d744e4",
+      "high_path": "libs/usecase/src/baseline_capture/mod.rs",
+      "high_hash": "5ea0974cd6ff518b9e28e38bf05c3b5f1748dde6cdfa3b22dddc97a477ff1245",
+      "changed_path": "libs/usecase/src/baseline_capture/mod.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8583918213844299,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b826a0d75b96b002d8c5f79d2edc3f3375e2c917",
+      "rationale": "The changed fragment introduces a single private helper, `validate_track_id`, in `mod.rs` so `interactor.rs` can reuse the same validation logic. That reduces duplication rather than repeating it, and the existing interactor simply calls the shared helper instead of reimplementing the check.",
+      "recorded_at": "2026-06-19T15:49:07Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/type_signals/interactor.rs",
+      "low_hash": "018714644c715710f136a6c22ab8c7db79499dcce5b23cdfaf5c23d68aabaa9c",
+      "high_path": "libs/usecase/src/type_signals/interactor.rs",
+      "high_hash": "0269812b585bf78891df75d1a5ea91740da35636eef71dec198c8350fda78faa",
+      "changed_path": "libs/usecase/src/type_signals/interactor.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8919016718864441,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b826a0d75b96b002d8c5f79d2edc3f3375e2c917",
+      "rationale": "The new fragment only adds documentation for the existing `validate_track_id` helper; it does not duplicate executable logic or create a second source of truth. The helper remains the single implementation of track ID validation, and the comment is a concise description of that behavior rather than a separate copy of it.",
+      "recorded_at": "2026-06-19T15:49:07Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/baseline_capture/interactor.rs",
+      "low_hash": "8890452c16799992e93888cfd3c8b73560fd867a3e2ea0623846bca761d744e4",
+      "high_path": "libs/usecase/src/baseline_capture/mod.rs",
+      "high_hash": "21897a0667bd2e313e84cd7fde123d1a461b6ad780c263fd9392325eff252dc7",
+      "changed_path": "libs/usecase/src/baseline_capture/mod.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8624016642570496,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b826a0d75b96b002d8c5f79d2edc3f3375e2c917",
+      "rationale": "The overlap is limited to module-level documentation that summarizes the same use case in two files. There is no duplicated implementation or competing source of truth here, and the new `mod.rs` comment actually points validation to the canonical `TrackId::try_new` path instead of re-implementing it. This is repetitive prose, but not a DRY violation in the code sense.",
+      "recorded_at": "2026-06-19T16:16:40Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+      "low_hash": "2977e1469877a59c01fb13b13961378a0d9ba1e7dafd99ba32d15ca6b49c4bc0",
+      "high_path": "libs/usecase/src/catalogue_impl_signals/mod.rs",
+      "high_hash": "0bac9eedbe1233703824c603d63e5c1ebbb0256624c8c7b1824da4d6d7de382d",
+      "changed_path": "libs/usecase/src/catalogue_impl_signals/mod.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8507046699523926,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b826a0d75b96b002d8c5f79d2edc3f3375e2c917",
+      "rationale": "The overlap is limited to high-level documentation describing the same use case and architecture in a module header and a type-level doc comment. There is no duplicated implementation logic or duplicated validation/behavior here, so this does not rise to a DRY violation.",
+      "recorded_at": "2026-06-19T16:16:40Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/type_signals/interactor.rs",
+      "low_hash": "018714644c715710f136a6c22ab8c7db79499dcce5b23cdfaf5c23d68aabaa9c",
+      "high_path": "libs/usecase/src/type_signals/interactor.rs",
+      "high_hash": "228103a03a64dc766427b22f736c336a5e7aa07cf2b9bee33a58ad0eaeff529d",
+      "changed_path": "libs/usecase/src/type_signals/interactor.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8768947720527649,
+      "threshold": 0.8500000238418579,
+      "base_commit": "b826a0d75b96b002d8c5f79d2edc3f3375e2c917",
+      "rationale": "The changed fragment adds documentation around `validate_track_id`; the candidate fragment contains the single implementation of that helper. There is no duplicated logic or repeated abstraction here, just a doc comment describing the existing validation path.",
+      "recorded_at": "2026-06-19T16:16:40Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    }
+  ]
+}

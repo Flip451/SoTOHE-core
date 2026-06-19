@@ -1,7 +1,63 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "67da2a951f422b683592ee299d2c66b33e9700d5714c455234256ce5dfabbf5e",
-  "fragment_refs": [],
-  "processed_pair_keys": []
+  "corpus_fingerprint": "b79c2ea7674f0b9a767eeec480363944dbd4f2da8c80edcd29bc6c98f5ef34fe",
+  "fragment_refs": [
+    {
+      "path": "libs/usecase/src/baseline_capture/mod.rs",
+      "content_hash": "21897a0667bd2e313e84cd7fde123d1a461b6ad780c263fd9392325eff252dc7"
+    },
+    {
+      "path": "libs/usecase/src/baseline_capture/mod.rs",
+      "content_hash": "f305df2c409324be45899a8b2a41d646903ceba57eeca9813f66b81bab57ffb1"
+    },
+    {
+      "path": "libs/usecase/src/catalogue_impl_signals/mod.rs",
+      "content_hash": "0bac9eedbe1233703824c603d63e5c1ebbb0256624c8c7b1824da4d6d7de382d"
+    },
+    {
+      "path": "libs/usecase/src/catalogue_impl_signals/mod.rs",
+      "content_hash": "ad13348edcacf6df1c4e3621c80deae8c2f69a5045e3c62d1d4db035e67baab0"
+    },
+    {
+      "path": "libs/usecase/src/type_signals/interactor.rs",
+      "content_hash": "018714644c715710f136a6c22ab8c7db79499dcce5b23cdfaf5c23d68aabaa9c"
+    },
+    {
+      "path": "libs/usecase/src/type_signals/interactor.rs",
+      "content_hash": "228103a03a64dc766427b22f736c336a5e7aa07cf2b9bee33a58ad0eaeff529d"
+    }
+  ],
+  "processed_pair_keys": [
+    {
+      "low": {
+        "path": "libs/usecase/src/baseline_capture/interactor.rs",
+        "content_hash": "8890452c16799992e93888cfd3c8b73560fd867a3e2ea0623846bca761d744e4"
+      },
+      "high": {
+        "path": "libs/usecase/src/baseline_capture/mod.rs",
+        "content_hash": "21897a0667bd2e313e84cd7fde123d1a461b6ad780c263fd9392325eff252dc7"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+        "content_hash": "2977e1469877a59c01fb13b13961378a0d9ba1e7dafd99ba32d15ca6b49c4bc0"
+      },
+      "high": {
+        "path": "libs/usecase/src/catalogue_impl_signals/mod.rs",
+        "content_hash": "0bac9eedbe1233703824c603d63e5c1ebbb0256624c8c7b1824da4d6d7de382d"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/type_signals/interactor.rs",
+        "content_hash": "018714644c715710f136a6c22ab8c7db79499dcce5b23cdfaf5c23d68aabaa9c"
+      },
+      "high": {
+        "path": "libs/usecase/src/type_signals/interactor.rs",
+        "content_hash": "228103a03a64dc766427b22f736c336a5e7aa07cf2b9bee33a58ad0eaeff529d"
+      }
+    }
+  ]
 }

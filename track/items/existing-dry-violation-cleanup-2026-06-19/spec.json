@@ -58,7 +58,7 @@
       },
       {
         "id": "IN-04",
-        "text": "【D4 クラスタ】test ヘルパ・定数のテスト・コンパイル境界ごとの単一定義への集約。`CwdGuard` / `init_git_repo`（6 箇所）/ stub bindings（usecase test 3 モジュール）などの test-only ヘルパを、テスト・コンパイル境界（src ユニットテスト向けの `#[cfg(test)]` モジュールと integration-test crate 向けの `tests/common` モジュール）ごとにそれぞれ一つの共通 test-support モジュールへ集約し、各境界内での冗長コピーを削除する。Rust のテスト・コンパイルモデル上、`src` 内の `#[cfg(test)] pub(crate)` 定義は integration-test crate からは不可視であり、`tests/common` は src ユニットテストからは不可視であるため、境界をまたいだ文字どおりの単一定義は dev-visible API を追加せずには不可能である。stub bindings（usecase-only）はすでに単一境界内にのみ存在するため、その境界内での単一定義に集約する。定数は `POLL_INTERVAL`（5 箇所）と `\"tmp/reviewer-runtime\"`（4 つの const 定義 + inline literal）を対象にし、それぞれ単一の `const` 定義に統合する",
+        "text": "【D4 クラスタ】test ヘルパ・定数の境界ごとの単一定義への集約。`CwdGuard` / `init_git_repo`（6 箇所）/ stub bindings（usecase test 3 モジュール）などの test-only ヘルパを、テスト・コンパイル境界（src ユニットテスト向けの `#[cfg(test)]` モジュールと integration-test crate 向けの `tests/common` モジュール）ごとにそれぞれ一つの共通 test-support モジュールへ集約し、各境界内での冗長コピーを削除する。Rust のテスト・コンパイルモデル上、`src` 内の `#[cfg(test)] pub(crate)` 定義は integration-test crate からは不可視であり、`tests/common` は src ユニットテストからは不可視であるため、境界をまたいだ文字どおりの単一定義は dev-visible API を追加せずには不可能である。stub bindings（usecase-only）はすでに単一境界内にのみ存在するため、その境界内での単一定義に集約する。定数（`POLL_INTERVAL` / `\"tmp/reviewer-runtime\"`）についても `architecture-rules.json` が規定する許可依存境界ごとの単一定義に集約する。`architecture-rules.json` に従い `apps/cli`（`cli` クレート）が依存できるのは `cli_composition` クレートのみであり `infrastructure` への直接依存は禁止されているため、`apps/cli` と `infrastructure` にまたがる等値定数を単一定義に統合することは layer check 違反となる。当該等値定数は許可依存境界に起因する偶然の一致定数（coincidental constant）として保持し、DRY 違反とは扱わない（詳細は AC-05 参照）",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md",
@@ -247,7 +247,7 @@
     },
     {
       "id": "AC-05",
-      "text": "【D4 完了基準 — 定数】`POLL_INTERVAL`（`Duration::from_millis(50)`）が単一の `const` 定義（例: infrastructure の共通定数モジュール）に集約され、5 箇所の独立定義が削除されている。`\"tmp/reviewer-runtime\"` が単一の `const` 定義に集約され、4 つの const 定義 + inline literal が削除されている。`cargo make ci` が pass する",
+      "text": "【D4 完了基準 — 定数】`POLL_INTERVAL`（`Duration::from_millis(50)`）と `\"tmp/reviewer-runtime\"` が、`architecture-rules.json` が規定する許可依存境界（allowed-dependency boundary）ごとに単一の `const` 定義へ集約される。`architecture-rules.json` の `layers` 定義に従い `apps/cli`（`cli` クレート）の `may_depend_on` は `[\"cli_composition\"]` のみであり `infrastructure` への直接依存は禁止（`apps/cli` ↛ `infrastructure`）されているため、当該禁止境界をまたぐ等値定数の単一定義は `cargo make check-layers` 違反となり行わない。`apps/cli-composition`（`cli_composition` クレート）が composition root であり `infrastructure` を含む全層を wiring するため、composition root 内の定数は infrastructure 側と共存してよい。同一許可依存境界内に複数の独立定義が残存している場合はその境界内で一つの `const` に統合する（例: infrastructure 側の重複コピー同士 → infrastructure 内の単一 `const`；cli 側の重複コピー同士 → cli 内の単一 `const`）。`apps/cli` と `infrastructure` にまたがる同一リテラル値は、禁止依存境界に起因する偶然の一致定数（coincidental constant）として保持し、ADR D4 の判断に従い DRY 違反とは扱わない。D3 の排他ロック・git-diff union と同様に「境界固有の並行定数」として現状維持とする。`cargo make ci`（`check-layers` を含む）が pass する",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md",
@@ -267,7 +267,7 @@
     },
     {
       "id": "AC-07",
-      "text": "remediation 完了後に DRY 違反 census を再実行し、4 クラスタに対応する違反群（D1: cross-layer knowledge-dup の validate_track_id 系、D2: domain の NonEmptyString 系インライン再実装、D3: subprocess helper / SHA-256 hex エンコードの重複、D4: test ヘルパ・`POLL_INTERVAL` / `\"tmp/reviewer-runtime\"` 定数の重複）が census から消滅していることを確認する。D3 の排他ロック取得パターンと 4-source git-diff union は port 固有の parallel structure として扱い、未解消違反には数えない",
+      "text": "remediation 完了後に DRY 違反 census を再実行し、4 クラスタに対応する違反群（D1: cross-layer knowledge-dup の validate_track_id 系、D2: domain の NonEmptyString 系インライン再実装、D3: subprocess helper / SHA-256 hex エンコードの重複、D4: test ヘルパ・`POLL_INTERVAL` / `\"tmp/reviewer-runtime\"` 定数の同一層境界内重複）が census から消滅していることを確認する。D3 の排他ロック取得パターンと 4-source git-diff union は port 固有の parallel structure として扱い、未解消違反には数えない。D4 の定数についても、異なる架構層境界（cli と infrastructure）にわたる同一リテラル値の出現は層境界に起因する coincidental constant であり、census の未解消違反には数えない",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md",
@@ -278,8 +278,8 @@
   ],
   "related_conventions": [
     {
-      "file": "knowledge/conventions/hexagonal-architecture.md",
-      "anchor": "Layer Dependencies"
+      "file": "architecture-rules.json",
+      "anchor": "layers"
     },
     {
       "file": "knowledge/conventions/hexagonal-architecture.md",
