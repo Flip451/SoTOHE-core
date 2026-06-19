@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "[D1-usecase] Remove standalone validate_track_id copies from usecase: delete the private validate_track_id functions and associated inline test blocks in catalogue_impl_signals/mod.rs, type_signals/interactor.rs, and baseline_capture/mod.rs; replace every call site with TrackId::try_new from domain, mapping the DomainError to the module-local error variant.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "[D1-cli] Remove standalone validate_track_id / validate_track_id_str copies from CLI layer: delete validate_track_id_str_local in apps/cli-composition/src/verify.rs and validate_track_id_str in apps/cli/src/commands/track/validate.rs; replace each call site with TrackId::try_new (domain) delegation. Verify cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "[D2-ids] Replace inline is_empty/trim().is_empty guards in domain ids.rs with NonEmptyString::try_new delegation: specifically the ReviewGroupName::try_new guard at ids.rs line 214-217 (the NonEmptyString::try_new at 178-181 is already the canonical form and stays). Extract a shared private fn validate_trimmed_non_empty if needed to avoid a 1-line duplication inside the same file.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "[D2-plan-spec] Replace inline trim().is_empty guards in domain plan.rs (lines 24-30 for id and title) and spec.rs (lines 52-53, 149-151, 212-216 for text/title/version fields) with NonEmptyString::try_new delegation at the constructor call sites. Internal String storage is preserved (OQ-3). Verify cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "[D2-impl-plan-review] Replace inline trim().is_empty guards in domain impl_plan.rs (line 196-198 for task description) and review_v2/types.rs (lines 24, 72, 233 for ReviewGroupName/ReviewerFinding message fields — the is_empty guards, NOT the is_empty query methods on lines 128-129 and 193) with NonEmptyString::try_new delegation. Verify cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "[D3-subprocess] Extract the byte-for-byte duplicated Codex subprocess helpers from infrastructure into a new pub(crate) module infrastructure::codex_subprocess (or extend the existing codex_common module): extract spawn_codex, the run_codex_child timeout-poll loop, drain_pipe, tee_stderr_to_file, and the runtime-path builder (runtime_path / prepare_runtime_path → a single unified helper) from codex_reviewer.rs and codex_dry_checker.rs into the shared module; update both callers to use the shared versions. Respects CN-02: all code stays inside infrastructure.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "[D3-sha256] Replace the inline format!(\"{hash_bytes:x}\") at codex_dry_checker.rs line 261 with a call to the existing infrastructure::dry_check::corpus::sha256_hex, eliminating the semantic dup with corpus fingerprinting. Verify cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "[D4-test-helpers-cwd] Consolidate CwdGuard / CurrentDirGuard RAII definitions to one definition per test-compilation boundary — never crossing crate boundaries via dev-visible API. (a) libs/infrastructure: add a single #[cfg(test)] pub(crate) CurrentDirGuard in a shared test_support submodule and replace the independent copies in libs/infrastructure/src/git_cli/mod.rs and libs/infrastructure/src/dry_check/diff_getter.rs with imports of the shared definition. (b) apps/cli-composition: the shared canonical already exists as process_guards::CwdGuard in apps/cli-composition/src/review_v2/helpers.rs (#[cfg(test)]); migrate the local inline CwdGuard in apps/cli-composition/src/review_v2/commit_hash.rs (#[cfg(test)] mod tests) to use that shared canonical instead of its own copy — no other independent CwdGuard struct definition exists in apps/cli-composition. (c) apps/cli — src unit-test boundary only: both CurrentDirGuard copies in apps/cli/src/commands/git.rs (#[cfg(test)] mod tests) and apps/cli/src/commands/review/tests.rs (#[cfg(test)] mod tests) are exclusively within the src unit-test compilation boundary; no CwdGuard usage exists anywhere in apps/cli/tests/; consolidate to a single #[cfg(test)] pub(crate) definition (e.g. a test_support module in apps/cli/src/) and update both call sites — the feasible minimum for apps/cli is one definition total. Do NOT create a workspace dev-dependency, a public test-support crate, or any public/feature-gated cross-crate API. References AC-04/IN-04. Verify cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "[D4-test-helpers-git-init] Consolidate init_git_repo / init_git_repo_on_track_branch test helpers to one definition per test-compilation boundary — never crossing crate boundaries via dev-visible API. (a) libs/infrastructure: both helpers already live in a single file (libs/infrastructure/src/track/render_tests.rs) with no cross-file duplication within the crate; no copies to remove, but canonicalise git flags (commit.gpgsign=false, --no-gpg-sign) in that file's definitions. (b) apps/cli-composition — src unit-test boundary: two independent copies exist — init_git_repo in apps/cli-composition/src/review_v2/commit_hash.rs (#[cfg(test)] mod tests) and init_git_repo in apps/cli-composition/src/track/mod.rs (#[cfg(test)] block); both are in the same src unit-test compilation boundary; consolidate to a single #[cfg(test)] pub(crate) definition in a shared test_support module and update both call sites. (c) apps/cli — two separate test-compilation boundaries: (c1) src unit-test boundary: three independent copies of init_git_repo_on_track_branch in apps/cli/src/commands/track/tddd/baseline.rs, apps/cli/src/commands/track/tddd/signals.rs, and apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs (all #[cfg(test)] blocks); consolidate to a single #[cfg(test)] pub(crate) definition in a shared test_support module in apps/cli/src/ and update the three call sites. (c2) integration-test boundary: apps/cli/tests/transition_integration.rs defines init_git_repo_on_track_branch at file level — this is the only definition in this boundary and is NOT a redundant copy; retain in place or extract to tests/common/mod.rs if other files in apps/cli/tests/ also use it; either way this is a legitimate per-boundary definition. The per-boundary feasible minimum for apps/cli is one in src + one in tests/: this is NOT a DRY violation, it is the unavoidable consequence of the Rust test-compilation model. apps/cli is explicitly permitted to have up to two init_git_repo definitions (one per boundary). Canonicalise git flags in all retained definitions. Do NOT create a workspace dev-dependency, a public test-support crate, or any public/feature-gated cross-crate API. References AC-04/IN-04. Verify cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T010",
+      "description": "[D4-test-helpers-stubs] Consolidate stub_binding / StubLayerBindings / NoLayersBindings usecase test helpers: extract to a single #[cfg(test)] test_support module in libs/usecase/src/test_support.rs (pub(crate)), replacing the triplicated definitions in catalogue_impl_signals/interactor_tests.rs (and interactor_happy_tests.rs), type_signals/interactor_tests.rs, and baseline_capture/interactor_tests.rs. Verify cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T011",
+      "description": "[D4-const-poll-interval] Consolidate POLL_INTERVAL = Duration::from_millis(50): define a single dependency-visible const in a shared infrastructure constants module (e.g. libs/infrastructure/src/reviewer_runtime.rs or the existing codex_common module) and expose it as internal workspace API with `pub`, not `pub(crate)`, because apps/cli is a separate crate. Remove the 5 independent definitions in codex_reviewer.rs, claude_reviewer.rs, codex_dry_checker.rs, apps/cli/src/commands/plan/mod.rs, apps/cli/src/commands/review/mod.rs, add/promote a production infrastructure dependency for apps/cli if this import path is chosen, and have each file import the single const. Verify cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T012",
+      "description": "[D4-const-runtime-dir] Consolidate \"tmp/reviewer-runtime\" path constant: define a single dependency-visible REVIEWER_RUNTIME_DIR const in a shared infrastructure constants module and expose it as internal workspace API with `pub`, not `pub(crate)`, because apps/cli and apps/cli-composition are separate crates. Remove the independent const definitions in codex_reviewer.rs, review_fix_runner/spawn.rs, codex_dry_checker.rs (DRY_CHECK_RUNTIME_DIR), and apps/cli/src/commands/review/mod.rs; replace inline PathBuf::from(\"tmp/reviewer-runtime\") literals in apps/cli-composition/src/dry_fix_runner.rs; add/promote a production infrastructure dependency for apps/cli if this import path is chosen. Verify cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T013",
+      "description": "[post-remediation] Re-run the DRY violation census (sotp dry or equivalent) after all cluster tasks are committed, confirm that D1/D2/D3/D4 violation groups are no longer present in the census output, and record the updated density metrics.",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "D1: Track-ID validation — delegate to domain canonical",
+        "description": [
+          "Remove the standalone validate_track_id / slug-validation copies from the 3 usecase modules (T001) and the 2 CLI sites (T002). Each removal replaces the local function with a direct call to domain::TrackId::try_new, mapping the domain error to the module-local error type.",
+          "These two tasks are independent at the source-file level and can be worked in parallel, but each must produce its own commit (CN-04)."
+        ],
+        "task_ids": ["T001", "T002"]
+      },
+      {
+        "id": "S2",
+        "title": "D2: Empty/whitespace invariant — delegate to NonEmptyString",
+        "description": [
+          "Replace inline is_empty / trim().is_empty guards across the domain layer with NonEmptyString::try_new delegation. Split into three commits by file group to stay under 500 lines (CN-04):",
+          "T003: ids.rs (ReviewGroupName::try_new guard).",
+          "T004: plan.rs + spec.rs (4+ guards across two files).",
+          "T005: impl_plan.rs + review_v2/types.rs (3 guards).",
+          "Internal String field types are NOT changed (D2 / OQ-3)."
+        ],
+        "task_ids": ["T003", "T004", "T005"]
+      },
+      {
+        "id": "S3",
+        "title": "D3: Subprocess / SHA-256 helpers — extract to shared infrastructure module",
+        "description": [
+          "T006 extracts spawn_codex, the run_codex_child timeout-poll loop, drain_pipe, tee_stderr_to_file, and the runtime-path builder into a new pub(crate) infrastructure module (codex_subprocess or extending codex_common), making both codex_reviewer.rs and codex_dry_checker.rs call the shared versions. All code stays inside the infrastructure crate (CN-02).",
+          "T007 replaces the inline format!(\"{hash_bytes:x}\") at codex_dry_checker.rs:261 with a call to the existing infrastructure::dry_check::corpus::sha256_hex.",
+          "NOTE — 4-source git-diff union (deferred): The review_v2::diff_getter (GitDiffGetter -> Vec<FilePath>, BTreeSet) and dry_check::diff_getter (GitDryCheckDiffGetter -> Vec<DiffFileHunks>, BTreeMap) implement different ports with fundamentally different output types and line-level vs file-level semantics. Source verification confirms they are port-specific parallel structures (analogous to the lock-acquisition pattern per D3/OQ-2) and are NOT cleanly extractable without creating cross-port coupling. This sub-item is deferred; no task is authored."
+        ],
+        "task_ids": ["T006", "T007"]
+      },
+      {
+        "id": "S4",
+        "title": "D4: Test helpers — consolidate to single #[cfg(test)] definitions per crate",
+        "description": [
+          "T008: CwdGuard / CurrentDirGuard — one #[cfg(test)] definition per test-compilation boundary per crate. infrastructure: 2 copies -> 1 shared test_support definition. cli-composition: commit_hash.rs local copy -> use existing process_guards::CwdGuard canonical (helpers.rs). apps/cli: 2 src unit-test copies -> 1 shared definition; no CwdGuard exists in apps/cli/tests/ so the feasible minimum is 1 total. No cross-crate public API created.",
+          "T009: init_git_repo / init_git_repo_on_track_branch — one #[cfg(test)] definition per test-compilation boundary per crate, with canonicalised git flags (gpgsign=false, --no-gpg-sign). infrastructure: already 1 file, no copies to remove. cli-composition: 2 src unit-test copies -> 1 shared test_support definition. apps/cli: 3 src unit-test copies -> 1 shared definition (src boundary) + 1 existing definition in tests/transition_integration.rs (integration-test boundary) — 2 definitions total is the feasible minimum given the test-crate split, not a DRY violation. No cross-crate public API created.",
+          "T010: stub_binding / StubLayerBindings / NoLayersBindings — single #[cfg(test)] pub(crate) usecase test_support module; 3 sets of copies eliminated.",
+          "Each task produces its own commit to keep diffs reviewable. All definitions stay #[cfg(test)] within the appropriate crate — no workspace dev-dependency or public test-support crate is introduced (AC-04/IN-04)."
+        ],
+        "task_ids": ["T008", "T009", "T010"]
+      },
+      {
+        "id": "S5",
+        "title": "D4: Constants — consolidate to single definitions",
+        "description": [
+          "T011: POLL_INTERVAL — one dependency-visible shared const, 5 independent definitions removed; the shared item must not be pub(crate) when consumed by apps/cli.",
+          "T012: REVIEWER_RUNTIME_DIR (\"tmp/reviewer-runtime\") — one dependency-visible shared const, 4 const definitions + inline literals consolidated; the shared item must not be pub(crate) when consumed by apps/cli or apps/cli-composition.",
+          "Each task produces its own commit."
+        ],
+        "task_ids": ["T011", "T012"]
+      },
+      {
+        "id": "S6",
+        "title": "Post-remediation census verification",
+        "description": [
+          "T013: Re-run DRY violation census after all cluster commits, verify D1/D2/D3/D4 violation groups are absent, and record updated density metrics.",
+          "This task confirms AC-07 (GO-02 completion criterion)."
+        ],
+        "task_ids": ["T013"]
+      }
+    ]
+  }
+}

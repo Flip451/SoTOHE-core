@@ -1,0 +1,58 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "CodexDryChecker": {
+      "action": "reference",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry_check::codex_dry_checker",
+      "docs": "D3: public API unchanged. Internal private subprocess helpers (spawn_codex, run_codex_child timeout-poll loop, drain_pipe, tee_stderr_to_file, prepare_runtime_path, AutoCleanup) are extracted to a shared pub(crate) module, leaving CodexDryChecker's pub surface (new, DryCheckAgentPort impl) identical to baseline.",
+      "spec_refs": [
+        { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "IN-03" }
+      ],
+      "informal_grounds": []
+    },
+    "CodexReviewer": {
+      "action": "reference",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::codex_reviewer",
+      "docs": "D3: public API unchanged. Internal private subprocess helpers (spawn_codex, run_codex_child timeout-poll loop, drain_pipe, tee_stderr_to_file, runtime_path, AutoManagedArtifacts) are extracted to a shared pub(crate) module, leaving CodexReviewer's pub surface (new, with_scope_label, Reviewer impl) identical to baseline.",
+      "spec_refs": [
+        { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "IN-03" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::dry_check::corpus::sha256_hex": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "data", "ty": "&[u8]" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "D3: canonical SHA-256 -> lowercase hex encoder already in infrastructure::dry_check::corpus. The inline format!('{hash_bytes:x}') in codex_dry_checker.rs delegates to this function post-remediation, eliminating the semantic dup with corpus fingerprinting.",
+      "spec_refs": [
+        { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "IN-03" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": []
+}

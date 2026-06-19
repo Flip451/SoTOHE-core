@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "686a8562351281e6b126bdbfa13b5544a86a8cdf3a042e5c9b36fe8ff5ce2899",
+  "signals": [
+    {
+      "type_name": "CodexDryChecker",
+      "signal": "blue",
+      "entry_hash": "e80ed914e4a6686efaf5d3ba1d24d681ed683d41135d0e7d10273d4fd0bdb68f"
+    },
+    {
+      "type_name": "CodexReviewer",
+      "signal": "blue",
+      "entry_hash": "8ea335f44c6ce36605beac287c3a29420fe0c34bc45ec04f9808f268357dc68f"
+    },
+    {
+      "type_name": "infrastructure::dry_check::corpus::sha256_hex",
+      "signal": "blue",
+      "entry_hash": "fcd73fc7c5c722dd2be3e52dc7ccf686e58d0ed38e2b7490937467cbfb454847"
+    }
+  ]
+}

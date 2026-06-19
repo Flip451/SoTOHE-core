@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-19T15:34:20Z",
+  "declaration_hash": "686a8562351281e6b126bdbfa13b5544a86a8cdf3a042e5c9b36fe8ff5ce2899",
+  "signals": [
+    {
+      "type_name": "CodexDryChecker",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodexReviewer",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::dry_check::corpus::sha256_hex",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

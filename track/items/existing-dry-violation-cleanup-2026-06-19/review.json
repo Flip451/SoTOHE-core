@@ -83,6 +83,138 @@
           "findings": [],
           "hash": "rvw1:sha256:0d99aaebf4b2770c84c82813bc21e80267e6727dd7696a249d6e4d47aecfb41a",
           "at": "2026-06-19T13:13:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011/T012 are not executable as written: both tasks place the shared constant in `libs/infrastructure` as `pub(crate)`, but the listed consumers include `apps/cli` and `apps/cli-composition`, which are different crates and cannot import a `pub(crate)` item from infrastructure. This needs either a public re-export/shared module or a different home for the constants.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/plan.md",
+              "line": 48,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:55ce1e4c9d9fd19bfe46e2eb39e2d46882eee63557098cdedff84a4a59ed72df",
+          "at": "2026-06-19T14:01:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e49f2711e7d70754b3a0a7f4e8771098bb1a8f01720d32d3c0240cb7d5e9fd1",
+          "at": "2026-06-19T14:06:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03 requires lock acquisition and 4-source git-diff union to be extracted to a shared module, but the implementation plan explicitly defers git-diff union and T006/T007 only cover subprocess helpers plus SHA-256. `task-coverage.json` still marks AC-03 as covered by T006/T007, so completing the plan can leave AC-03 unsatisfied. Update the spec/acceptance criteria or add tasks so the accepted D3 deferral is represented consistently.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/task-coverage.json",
+              "line": 28,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-04 includes consolidating track-directory magic strings and other constants, but the D4 implementation tasks only cover CwdGuard, git init helpers, stub bindings, POLL_INTERVAL, and REVIEWER_RUNTIME_DIR. `task-coverage.json` marks IN-04 fully covered by T008-T012 even though none of those tasks addresses the track-directory string consolidation called out by the spec, leaving in-scope work without an executable task.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/task-coverage.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2e49f2711e7d70754b3a0a7f4e8771098bb1a8f01720d32d3c0240cb7d5e9fd1",
+          "at": "2026-06-19T14:13:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03 requires the D3 remediation to extract the Codex subprocess timeout-poll loop, but T006 only schedules `spawn_codex`, `drain_pipe`, `tee_stderr_to_file`, and the runtime-path builder, while T007 only handles SHA-256 hex delegation. As written, the implementation plan can complete all listed D3 tasks while leaving the timeout-poll loop outside any task, so the claimed AC-03 coverage is incomplete.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/plan.md",
+              "line": 32,
+              "category": "contradiction"
+            },
+            {
+              "message": "T008 directs the shared `CwdGuard`/`CurrentDirGuard` definition into a `#[cfg(test)]` location and then has separate crates (`apps/cli`, `apps/cli-composition`) import it. In Rust, `cfg(test)` items in the infrastructure crate are not exported when that crate is compiled as a dependency of another crate's tests, so this task is not executable as described; it needs a dev-visible public test-support API, feature, or separate test-support crate.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/plan.md",
+              "line": 42,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d05edfb4c62cd728e3b6409409102f04519ebe87f8ddeaa5c558be8c87b52a56",
+          "at": "2026-06-19T14:20:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7623c565b271433278b3b3b72a922556087b2de59177a41c76581fa2c6d5373",
+          "at": "2026-06-19T14:26:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b27a09d4eb793f76dfede40795c0aaf8a4d7817a508fbc51ced9567799894e6",
+          "at": "2026-06-19T14:55:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` still tells T008/T009 to create a dev-visible shared test-support API that dependent crates import, including a workspace dev-dependency/public feature and a public API. That contradicts ADR D4 and spec IN-04/AC-04, which deliberately scope these helpers to `#[cfg(test)]` common test-support modules and exclude the earlier cross-crate dev-visible API approach. An implementer following these tasks would add an out-of-scope API instead of the reconciled design, so the D4 tasks/rendered plan need to be realigned with the ADR/spec before implementation.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f4cc6cc26fc5bdcf12ea9b6c28427a5fbbeb1359bf6cb4ad4e22f7447e4448e0",
+          "at": "2026-06-19T15:11:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 requires one `#[cfg(test)]` apps/cli helper to replace both `apps/cli/tests/transition_integration.rs` and the unit-test helpers under `apps/cli/src/...`. Those are different Cargo test crates: integration tests cannot use the binary crate's `#[cfg(test)] pub(crate)` module, while `tests/common` is not normally visible to source unit tests. As written, the task is infeasible without either keeping duplicate helpers, moving tests, or introducing a dev-visible helper that the plan explicitly forbids, so AC-04 cannot be satisfied by the described implementation.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/plan.md",
+              "line": 43,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6a5fc9db4b4ee3dec4fc49fc4f7c48aee553150f3e886609a61757c61292af29",
+          "at": "2026-06-19T15:18:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011, and the same instruction in T012, makes the plan infeasible: it tells implementers to promote `apps/cli` to a production dependency on `libs/infrastructure` while also requiring `cargo make ci` to pass. The repository architecture rules allow the `cli` crate to depend only on `cli_composition`, so this implementation path will fail the layer check; the shared constant needs to be consumed without adding a direct CLI -> infrastructure production dependency.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 66,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:57ed7c9cd7b9d5c5ec4955fb62ad33670ab76ff2d3a8e1e19b395aaaaf3c14e3",
+          "at": "2026-06-19T15:32:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ed7c9cd7b9d5c5ec4955fb62ad33670ab76ff2d3a8e1e19b395aaaaf3c14e3",
+          "at": "2026-06-19T15:32:30Z"
         }
       ]
     }

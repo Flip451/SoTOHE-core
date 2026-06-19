@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "56290a27f2f319c571b8ee29dbbd5323978d1ad649e05a653917ed0075d398e7",
+  "signals": [
+    {
+      "type_name": "NonEmptyString",
+      "signal": "blue",
+      "entry_hash": "9a4473297d9ee1c7e06d153b8b40a744d19f8c8eeda7cb4bbc8f9343e9493442"
+    },
+    {
+      "type_name": "TrackId",
+      "signal": "blue",
+      "entry_hash": "1432a31c17a6b9175a5b0a438bd787b2edf369a470e633aa8e67c867a7364054"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "3c32b1ce7423aa697b29d45a6f908115a4ae765d031d5d8d21284df388551cab",
+      "evidence_hash": "5428f402100e8d9c02d75b3bb943c5b1dbf26a60a300801971a33b6083d0cd34",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「review_v2 と dry_check の重複する subprocess / lock / git 処理の共通化。Codex subprocess 管理（`spawn_codex` / timeout-poll ループ / `drain_pipe` / `tee_stderr_to_file`）・排他ロック取得パターン・4-source git-diff union（merge-base + cached + worktree + untracked）・SHA-256 → 小文字 hex エンコードの重複を共通モジュールへ抽出する。抽出先の層は hexagonal の層配置（domain / usecase / infrastructure）を侵さない位置とする」"
+      }
+    },
+    {
+      "claim_hash": "83928ffa3ac3d629711ac7c74e343dade45fe0b53ea54a22343349ad00cfeed4",
+      "evidence_hash": "5428f402100e8d9c02d75b3bb943c5b1dbf26a60a300801971a33b6083d0cd34",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex subprocess 管理（`spawn_codex` / timeout-poll ループ / `drain_pipe` / `tee_stderr_to_file`）・排他ロック取得パターン・4-source git-diff union（merge-base + cached + worktree + untracked）・SHA-256 → 小文字 hex エンコードの重複を共通モジュールへ抽出する。抽出先の層は hexagonal の層配置（domain / usecase / infrastructure）を侵さない位置とする"
+      }
+    },
+    {
+      "claim_hash": "fcd73fc7c5c722dd2be3e52dc7ccf686e58d0ed38e2b7490937467cbfb454847",
+      "evidence_hash": "5428f402100e8d9c02d75b3bb943c5b1dbf26a60a300801971a33b6083d0cd34",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SHA-256 → 小文字 hex エンコードの重複を共通モジュールへ抽出する。抽出先の層は hexagonal の層配置（domain / usecase / infrastructure）を侵さない位置とする"
+      }
+    },
+    {
+      "claim_hash": "e80ed914e4a6686efaf5d3ba1d24d681ed683d41135d0e7d10273d4fd0bdb68f",
+      "evidence_hash": "c719f6268946d397a3a5148b6d21db256aecc9af47c77ba5dfb71a65e8b3c1a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex subprocess 管理（`spawn_codex` / timeout-poll ループ / `drain_pipe` / `tee_stderr_to_file`）を infrastructure 内の共通モジュールへ抽出し"
+      }
+    },
+    {
+      "claim_hash": "8ea335f44c6ce36605beac287c3a29420fe0c34bc45ec04f9808f268357dc68f",
+      "evidence_hash": "c719f6268946d397a3a5148b6d21db256aecc9af47c77ba5dfb71a65e8b3c1a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex subprocess 管理（`spawn_codex` / timeout-poll ループ / `drain_pipe` / `tee_stderr_to_file`）を infrastructure 内の共通モジュールへ抽出し、SHA-256 → 小文字 hex エンコードは既存の `sha256_hex` 正典へ委譲する。"
+      }
+    },
+    {
+      "claim_hash": "fcd73fc7c5c722dd2be3e52dc7ccf686e58d0ed38e2b7490937467cbfb454847",
+      "evidence_hash": "c719f6268946d397a3a5148b6d21db256aecc9af47c77ba5dfb71a65e8b3c1a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SHA-256 → 小文字 hex エンコードは既存の `sha256_hex` 正典へ委譲する"
+      }
+    },
+    {
+      "claim_hash": "e80ed914e4a6686efaf5d3ba1d24d681ed683d41135d0e7d10273d4fd0bdb68f",
+      "evidence_hash": "fb5a3f33aeaa7fe27ea56c3aa6bee674de1d346ab969f4075665cb77d66a7349",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する Codex subprocess 管理（`spawn_codex` / timeout-poll ループ / `drain_pipe` / `tee_stderr_to_file`）、排他ロック取得パターン（`WriteGuard` ↔ `FsDryCheckStore::acquire_write_lock`）、4-source git-diff union（merge-base + cached + worktree + untracked）、SHA-256 → 小文字 hex エンコードを共通モジュールへ抽出する。抽出先の層は hexagonal の層配置（domain / usecase / infrastructure）を侵さない位置とする"
+      }
+    },
+    {
+      "claim_hash": "8ea335f44c6ce36605beac287c3a29420fe0c34bc45ec04f9808f268357dc68f",
+      "evidence_hash": "fb5a3f33aeaa7fe27ea56c3aa6bee674de1d346ab969f4075665cb77d66a7349",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する Codex subprocess 管理（`spawn_codex` / timeout-poll ループ / `drain_pipe` / `tee_stderr_to_file`）、排他ロック取得パターン（`WriteGuard` ↔ `FsDryCheckStore::acquire_write_lock`）、4-source git-diff union（merge-base + cached + worktree + untracked）、SHA-256 → 小文字 hex エンコードを共通モジュールへ抽出する。"
+      }
+    },
+    {
+      "claim_hash": "fcd73fc7c5c722dd2be3e52dc7ccf686e58d0ed38e2b7490937467cbfb454847",
+      "evidence_hash": "fb5a3f33aeaa7fe27ea56c3aa6bee674de1d346ab969f4075665cb77d66a7349",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SHA-256 → 小文字 hex エンコードを共通モジュールへ抽出する。抽出先の層は hexagonal の層配置（domain / usecase / infrastructure）を侵さない位置とする"
+      }
+    },
+    {
+      "claim_hash": "e80ed914e4a6686efaf5d3ba1d24d681ed683d41135d0e7d10273d4fd0bdb68f",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する (1) Codex subprocess 管理（`spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダ）と (4) SHA-256→lowercase-hex エンコードを共通モジュールへ抽出する。抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない（CN-02）。"
+      }
+    },
+    {
+      "claim_hash": "8ea335f44c6ce36605beac287c3a29420fe0c34bc45ec04f9808f268357dc68f",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する (1) Codex subprocess 管理（`spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダ）と (4) SHA-256→lowercase-hex エンコードを共通モジュールへ抽出する。抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない"
+      }
+    },
+    {
+      "claim_hash": "fcd73fc7c5c722dd2be3e52dc7ccf686e58d0ed38e2b7490937467cbfb454847",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(4) SHA-256→lowercase-hex エンコードを共通モジュールへ抽出する。抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない（CN-02）。"
+      }
+    }
+  ]
+}

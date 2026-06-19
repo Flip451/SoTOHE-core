@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "9a4473297d9ee1c7e06d153b8b40a744d19f8c8eeda7cb4bbc8f9343e9493442",
+      "evidence_hash": "004faf7eea04e84a8492d8a30ff39d2d06f508748e62ec706029404677eede29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "空/空白禁止不変条件の `NonEmptyString` への集約。domain の 8 箇所以上（`ids.rs` / `plan.rs` / `spec.rs` / `impl_plan.rs` / `review_v2/types.rs` 等）でインライン再実装されている「フィールドが空・空白のみであってはならない」不変条件を削除し、各箇所を `NonEmptyString::try_new` への委譲に置き換える"
+      }
+    },
+    {
+      "claim_hash": "9a4473297d9ee1c7e06d153b8b40a744d19f8c8eeda7cb4bbc8f9343e9493442",
+      "evidence_hash": "a892c4915ab3761f157a45b8b745b4717a92cd990d31a9acbcd046619aa4b527",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D2 正典制約: 空/空白禁止の不変条件の正典は `NonEmptyString`（domain 既存型）とする。domain の各コンストラクタは `NonEmptyString::try_new` を呼び出してバリデーションを行い、インラインの `is_empty()` / `trim().is_empty()` チェックを独立実装してはならない"
+      }
+    },
+    {
+      "claim_hash": "1432a31c17a6b9175a5b0a438bd787b2edf369a470e633aa8e67c867a7364054",
+      "evidence_hash": "7cad102a541d364a175ddc236120d2c4d3c3c5ec888322c52f1089e266d413d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track-ID / slug 検証ロジックの一本化。`validate_track_id` / slug 検証ロジックを domain の正典（`libs/domain/src/ids.rs` の `is_valid_track_id` / `TrackId::try_new`）に集約し、usecase 3 モジュール（`catalogue_impl_signals` / `type_signals` / `baseline_capture`）と CLI 2 箇所（`apps/cli-composition/src/verify.rs` の `validate_track_id_str` / `apps/cli/src/commands/track/validate.rs`）の独立実装を削除して `TrackId::try_new` への委譲に置き換える"
+      }
+    },
+    {
+      "claim_hash": "1432a31c17a6b9175a5b0a438bd787b2edf369a470e633aa8e67c867a7364054",
+      "evidence_hash": "ea64605a548e03f7ab96d826135154d016e5fb5700bf6cd62122eda6e384d0b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D1 正典制約: track-ID / slug 検証の正典は domain の `TrackId::try_new`（`libs/domain/src/ids.rs` の `is_valid_track_id`）とする。usecase や CLI 層は独立した文字集合チェックを再実装してはならず、domain 経由の委譲に限定する"
+      }
+    }
+  ]
+}
