@@ -1833,10 +1833,10 @@ mod tests {
             outcome.has_errors(),
             "Yellow catalogue-spec signal must block in strict mode: {outcome:?}"
         );
-        // Error message must reference the catalogue file (not the signals file)
+        // Error message must reference the Yellow signal (delegated to domain::check_catalogue_spec_signals).
         assert!(
-            outcome.findings().iter().any(|f| f.message().contains("domain-types.json")),
-            "error must mention the catalogue file 'domain-types.json', not the signals file: {outcome:?}"
+            outcome.findings().iter().any(|f| f.message().contains("Yellow catalogue-spec signal")),
+            "error must mention Yellow catalogue-spec signal: {outcome:?}"
         );
     }
 
@@ -2387,8 +2387,11 @@ mod tests {
         let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors(), "stale per-entry hash must block: {outcome:?}");
         assert!(
-            outcome.findings().iter().any(|f| f.message().contains("per-entry hash mismatch")),
-            "error must mention 'per-entry hash mismatch': {outcome:?}"
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("catalogue-spec signals are stale for")),
+            "error must mention stale per-entry hash: {outcome:?}"
         );
     }
 

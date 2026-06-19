@@ -6,13 +6,110 @@
 
 use std::path::PathBuf;
 
-use domain::ConfidenceSignal;
 use domain::verify::{VerifyFinding, VerifyOutcome};
+use domain::{CatalogueSpecSignalsDocument, ContentHash, check_catalogue_spec_signals};
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::catalogue_spec_signals_codec;
+use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
+use crate::verify::plan_artifact_refs::{canonical_json, canonical_json_sha256};
 use crate::verify::tddd_layers;
+
+struct CatalogueEntryKey {
+    section: &'static str,
+    name: String,
+}
+
+impl CatalogueEntryKey {
+    fn new(section: &'static str, name: impl Into<String>) -> Self {
+        Self { section, name: name.into() }
+    }
+}
+
+fn content_hash_from_hex(hex: String, context: &str) -> Result<ContentHash, VerifyFinding> {
+    ContentHash::try_from_hex(&hex).map_err(|e| {
+        VerifyFinding::error(format!("internal: {context} produced a non-canonical hash: {e}"))
+    })
+}
+
+fn catalogue_spec_signal_freshness_findings(
+    catalogue_file: &str,
+    catalogue_text: &str,
+    entries: &[CatalogueEntryKey],
+    doc: &CatalogueSpecSignalsDocument,
+) -> Vec<VerifyFinding> {
+    let mut findings = Vec::new();
+    let current_catalogue_hash = match content_hash_from_hex(
+        type_signals_codec::declaration_hash(catalogue_text.as_bytes()),
+        "catalogue declaration hash",
+    ) {
+        Ok(hash) => hash,
+        Err(finding) => return vec![finding],
+    };
+    if doc.catalogue_declaration_hash != current_catalogue_hash {
+        findings.push(VerifyFinding::error(format!(
+            "{catalogue_file}: catalogue-spec signals are stale — \
+             catalogue_declaration_hash {} does not match current catalogue hash {}. \
+             Run `sotp signal calc-catalog-spec` to regenerate.",
+            doc.catalogue_declaration_hash.to_hex(),
+            current_catalogue_hash.to_hex()
+        )));
+    }
+
+    for (entry, signal) in entries.iter().zip(doc.signals.iter()) {
+        let current_entry_hash =
+            match compute_catalogue_entry_hash(catalogue_text, entry.section, &entry.name) {
+                Ok(hash) => hash,
+                Err(e) => {
+                    findings.push(VerifyFinding::error(format!(
+                        "{catalogue_file}: entry_hash validation failed for '{}': {e}",
+                        entry.name
+                    )));
+                    continue;
+                }
+            };
+        let signal_entry_hash = signal.entry_hash().to_hex();
+        if signal_entry_hash != current_entry_hash {
+            findings.push(VerifyFinding::error(format!(
+                "{catalogue_file}: catalogue-spec signals are stale for '{}' — entry_hash {} \
+                 does not match current catalogue entry hash {}. \
+                 Run `sotp signal calc-catalog-spec` to regenerate.",
+                entry.name, signal_entry_hash, current_entry_hash
+            )));
+        }
+    }
+    findings
+}
+
+/// Computes the SHA-256 declaration hash for the given catalogue file bytes.
+///
+/// Exposed for integration tests in other crates that need to build fresh
+/// `catalogue-spec-signals.json` fixtures without going through the full
+/// refresher pipeline.
+pub fn compute_catalogue_declaration_hash(catalogue_bytes: &[u8]) -> String {
+    type_signals_codec::declaration_hash(catalogue_bytes)
+}
+
+/// Computes the per-entry hash for the given section key and entry name
+/// from a catalogue JSON string.
+///
+/// Exposed for integration tests in other crates that need to build fresh
+/// `catalogue-spec-signals.json` fixtures without going through the full
+/// refresher pipeline.
+pub fn compute_catalogue_entry_hash(
+    catalogue_json: &str,
+    section: &str,
+    entry_key: &str,
+) -> Result<String, String> {
+    let raw: serde_json::Value = serde_json::from_str(catalogue_json)
+        .map_err(|e| format!("cannot parse catalogue JSON: {e}"))?;
+    let value = raw.get(section).and_then(|s| s.get(entry_key)).ok_or_else(|| {
+        format!("catalogue entry '{entry_key}' not found in section '{section}' of raw JSON")
+    })?;
+    let json_str = canonical_json(value);
+    Ok(canonical_json_sha256(&json_str))
+}
 
 /// Core catalogue-spec-signals check logic with explicit, resolved parameters.
 ///
@@ -31,38 +128,15 @@ pub fn execute_catalogue_spec_signals(
     workspace_root: PathBuf,
     strict: bool,
 ) -> VerifyOutcome {
-    // Security: guard `items_dir` itself before using it as the trusted root.
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "symlink guard: refusing to follow symlink at items_dir: {}",
-                items_dir.display()
-            ))]);
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "symlink guard: cannot stat items_dir {}: {e}",
-                items_dir.display()
-            ))]);
-        }
+    if let Err(e) = crate::verify::trusted_root::ensure_not_symlink_root(items_dir.clone()) {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "symlink guard: {e}"
+        ))]);
     }
-
-    // Security: guard `workspace_root` against a directly symlinked root directory.
-    match workspace_root.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "symlink guard: refusing to follow symlink at workspace_root: {}",
-                workspace_root.display()
-            ))]);
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "symlink guard: cannot stat workspace_root {}: {e}",
-                workspace_root.display()
-            ))]);
-        }
+    if let Err(e) = crate::verify::trusted_root::ensure_not_symlink_root(workspace_root.clone()) {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "symlink guard: {e}"
+        ))]);
     }
 
     // Containment: verify items_dir resolves under workspace_root.
@@ -146,37 +220,11 @@ pub fn execute_catalogue_spec_signals(
     // Enumerate tddd-enabled layers. Fail-closed: a missing `architecture-rules.json`
     // means we cannot know which catalogues to check.
     let rules_path = workspace_root.join("architecture-rules.json");
-    let bindings = match reject_symlinks_below(&rules_path, &workspace_root) {
-        Ok(true) => {
-            let content = match std::fs::read_to_string(&rules_path) {
-                Ok(s) => s,
-                Err(e) => {
-                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                        "cannot read architecture-rules.json at '{}': {e}",
-                        rules_path.display()
-                    ))]);
-                }
-            };
-            match tddd_layers::parse_tddd_layers(&content) {
-                Ok(b) => b,
-                Err(e) => {
-                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                        "architecture-rules.json parse error at '{}': {e}",
-                        rules_path.display()
-                    ))]);
-                }
-            }
-        }
-        Ok(false) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "architecture-rules.json not found at '{}'; \
-                 cannot enumerate TDDD layers for verification",
-                rules_path.display()
-            ))]);
-        }
+    let bindings = match tddd_layers::load_tddd_layers(&rules_path, &workspace_root) {
+        Ok(bindings) => bindings,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "symlink guard: architecture-rules.json at '{}': {e}",
+                "cannot load architecture-rules.json at '{}': {e}",
                 rules_path.display()
             ))]);
         }
@@ -281,84 +329,62 @@ pub fn execute_catalogue_spec_signals(
             }
         };
 
-        // T024: inline equivalent of `check_catalogue_spec_signals` over v3 `CatalogueDocument`.
+        // T024: coverage + positional-name check over v3 `CatalogueDocument`.
         // Entry ordering: types (BTreeMap sorted) → traits → functions.
-        let total_entries =
-            catalogue_doc.types.len() + catalogue_doc.traits.len() + catalogue_doc.functions.len();
+        let catalogue_entries: Vec<CatalogueEntryKey> = catalogue_doc
+            .types
+            .keys()
+            .map(|k| CatalogueEntryKey::new("types", k.as_str()))
+            .chain(
+                catalogue_doc.traits.keys().map(|k| CatalogueEntryKey::new("traits", k.as_str())),
+            )
+            .chain(
+                catalogue_doc
+                    .functions
+                    .keys()
+                    .map(|k| CatalogueEntryKey::new("functions", k.to_string())),
+            )
+            .collect();
+        let total_entries = catalogue_entries.len();
         if total_entries != doc.signals.len() {
             outcome.add(VerifyFinding::error(format!(
                 "{catalogue_file}: catalogue-spec signals coverage mismatch — catalogue has \
-                 {total_entries} entry/entries, signals document has {} signal(s). Regenerate \
-                 the signals file with `sotp track catalogue-spec-signals` so every catalogue \
-                 entry is covered.",
+                 {total_entries} entry/entries, signals document has {} signal(s). \
+                 Run `sotp signal calc-catalog-spec` so every catalogue entry is covered.",
                 doc.signals.len()
             )));
             continue;
         }
 
-        let catalogue_names: Vec<String> = catalogue_doc
-            .types
-            .keys()
-            .map(|k| k.as_str().to_owned())
-            .chain(catalogue_doc.traits.keys().map(|k| k.as_str().to_owned()))
-            .chain(catalogue_doc.functions.keys().map(|k| k.to_string()))
-            .collect();
-        if let Some((i, cat_name, sig)) = catalogue_names
+        if let Some((i, entry, sig)) = catalogue_entries
             .iter()
             .zip(doc.signals.iter())
             .enumerate()
-            .find(|(_, (cat_name, sig))| cat_name.as_str() != sig.type_name.as_str())
-            .map(|(i, (cat_name, sig))| (i, cat_name, sig))
+            .find(|(_, (entry, sig))| entry.name.as_str() != sig.type_name.as_str())
+            .map(|(i, (entry, sig))| (i, entry, sig))
         {
+            let cat_name = &entry.name;
             outcome.add(VerifyFinding::error(format!(
                 "{catalogue_file}: catalogue-spec signals positional mismatch at index {i} \
-                 (catalogue entry '{cat_name}' vs signal '{}'). Regenerate the signals file.",
+                 (catalogue entry '{cat_name}' vs signal '{}'). \
+                 Run `sotp signal calc-catalog-spec` to regenerate.",
                 sig.type_name
             )));
             continue;
         }
 
-        if doc.signals.is_empty() {
+        let freshness_findings = catalogue_spec_signal_freshness_findings(
+            catalogue_file,
+            &catalogue_text,
+            &catalogue_entries,
+            &doc,
+        );
+        if !freshness_findings.is_empty() {
+            outcome.merge(VerifyOutcome::from_findings(freshness_findings));
             continue;
         }
 
-        let reds: Vec<&str> = doc
-            .signals
-            .iter()
-            .filter(|s| s.signal == ConfidenceSignal::Red)
-            .map(|s| s.type_name.as_str())
-            .collect();
-        if !reds.is_empty() {
-            outcome.add(VerifyFinding::error(format!(
-                "{catalogue_file}: {} catalogue entry/entries have Red catalogue-spec signal \
-                 (missing both spec_refs[] and informal_grounds[] — every entry must carry \
-                 at least one grounding ref): {}",
-                reds.len(),
-                reds.join(", ")
-            )));
-            continue;
-        }
-
-        let yellows: Vec<&str> = doc
-            .signals
-            .iter()
-            .filter(|s| s.signal == ConfidenceSignal::Yellow)
-            .map(|s| s.type_name.as_str())
-            .collect();
-        if !yellows.is_empty() {
-            let message = format!(
-                "{catalogue_file}: {} catalogue entry/entries have Yellow catalogue-spec signal \
-                 — merge gate will block these until upgraded to Blue. Upgrade by promoting \
-                 informal_grounds[] to spec_refs[] with anchor + canonical SHA-256 hash: {}",
-                yellows.len(),
-                yellows.join(", ")
-            );
-            if strict {
-                outcome.add(VerifyFinding::error(message));
-            } else {
-                outcome.add(VerifyFinding::warning(message));
-            }
-        }
+        outcome.merge(check_catalogue_spec_signals(&doc, strict));
     }
     outcome
 }
@@ -458,42 +484,113 @@ mod tests {
   "functions": {}
 }"#;
 
-    /// Minimal valid v3 domain catalogue with no types.
-    const V3_CATALOGUE_EMPTY: &str = r#"{
-  "schema_version": 5,
-  "crate_name": "domain",
-  "layer": "domain",
-  "types": {},
-  "traits": {},
-  "functions": {}
-}"#;
-
     /// Builds a `domain-catalogue-spec-signals.json` fixture referencing the given `type_name`
     /// with a Blue signal.
     ///
     /// Uses the production codec shape: `catalogue_declaration_hash` + `signals` array.
     /// `entry_hash` is a required field per T003/AC-06.
-    fn signals_referencing_type(type_name: &str) -> String {
+    fn signals_referencing_type(
+        type_name: &str,
+        declaration_hash: &str,
+        entry_hash: &str,
+    ) -> String {
         format!(
             r#"{{
   "schema_version": 1,
-  "catalogue_declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "catalogue_declaration_hash": "{declaration_hash}",
   "signals": [
-    {{"type_name": "{type_name}", "signal": "blue", "entry_hash": "0000000000000000000000000000000000000000000000000000000000000000"}}
+    {{"type_name": "{type_name}", "signal": "blue", "entry_hash": "{entry_hash}"}}
   ]
 }}"#
         )
     }
 
+    fn declaration_hash_for(catalogue_content: &str) -> String {
+        type_signals_codec::declaration_hash(catalogue_content.as_bytes())
+    }
+
+    fn entry_hash_for(catalogue_content: &str, section: &str, entry_key: &str) -> String {
+        compute_catalogue_entry_hash(catalogue_content, section, entry_key).unwrap()
+    }
+
     /// A `domain-catalogue-spec-signals.json` referencing `MyType` with a Blue signal.
     fn signals_referencing_existing_type() -> String {
-        signals_referencing_type("MyType")
+        signals_referencing_type(
+            "MyType",
+            &declaration_hash_for(V3_CATALOGUE_ONE_TYPE),
+            &entry_hash_for(V3_CATALOGUE_ONE_TYPE, "types", "MyType"),
+        )
     }
 
     /// A `domain-catalogue-spec-signals.json` referencing a type `NonExistentType`
     /// that does NOT appear in the v3 catalogue.
     fn signals_referencing_nonexistent_type() -> String {
-        signals_referencing_type("NonExistentType")
+        signals_referencing_type(
+            "NonExistentType",
+            &declaration_hash_for(V3_CATALOGUE_ONE_TYPE),
+            &entry_hash_for(V3_CATALOGUE_ONE_TYPE, "types", "MyType"),
+        )
+    }
+
+    fn signals_with_hashes(declaration_hash: &str, entry_hash: &str) -> String {
+        signals_referencing_type("MyType", declaration_hash, entry_hash)
+    }
+
+    #[test]
+    fn test_compute_catalogue_declaration_hash_valid_catalogue_matches_declaration_hash() {
+        let hash = compute_catalogue_declaration_hash(V3_CATALOGUE_ONE_TYPE.as_bytes());
+
+        assert_eq!(hash, declaration_hash_for(V3_CATALOGUE_ONE_TYPE));
+        assert_eq!(hash.len(), 64, "declaration hash must be lowercase hex SHA-256");
+        assert!(
+            hash.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()),
+            "declaration hash must be lowercase hex: {hash}"
+        );
+    }
+
+    #[test]
+    fn test_compute_catalogue_entry_hash_valid_type_matches_canonical_entry_hash() {
+        let hash = compute_catalogue_entry_hash(V3_CATALOGUE_ONE_TYPE, "types", "MyType")
+            .expect("entry hash should compute for existing type");
+
+        assert_eq!(hash, entry_hash_for(V3_CATALOGUE_ONE_TYPE, "types", "MyType"));
+        assert_eq!(hash.len(), 64, "entry hash must be lowercase hex SHA-256");
+        assert!(
+            hash.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()),
+            "entry hash must be lowercase hex: {hash}"
+        );
+    }
+
+    #[test]
+    fn test_compute_catalogue_entry_hash_invalid_json_returns_error() {
+        let err = compute_catalogue_entry_hash("{", "types", "MyType").unwrap_err();
+
+        assert!(
+            err.contains("cannot parse catalogue JSON"),
+            "invalid JSON error must identify parse failure: {err}"
+        );
+    }
+
+    #[test]
+    fn test_compute_catalogue_entry_hash_missing_section_returns_error() {
+        let err =
+            compute_catalogue_entry_hash(V3_CATALOGUE_ONE_TYPE, "missing", "MyType").unwrap_err();
+
+        assert!(
+            err.contains("catalogue entry 'MyType' not found in section 'missing'"),
+            "missing section error must identify section and key: {err}"
+        );
+    }
+
+    #[test]
+    fn test_compute_catalogue_entry_hash_missing_key_returns_error() {
+        let err =
+            compute_catalogue_entry_hash(V3_CATALOGUE_ONE_TYPE, "types", "Missing").unwrap_err();
+
+        assert!(
+            err.contains("catalogue entry 'Missing' not found in section 'types'"),
+            "missing key error must identify section and key: {err}"
+        );
     }
 
     fn write_file(dir: &std::path::Path, relative: &str, content: &str) {
@@ -553,31 +650,106 @@ mod tests {
             "v3 catalogue must not produce UnsupportedSchemaVersion; findings: {:?}",
             outcome.findings()
         );
+        assert!(
+            outcome.findings().is_empty(),
+            "valid fresh catalogue-spec signals must pass: {:?}",
+            outcome.findings()
+        );
+    }
+
+    fn assert_stale_declaration_hash_returns_error(strict: bool) {
+        use domain::verify::Severity;
+
+        let tmp = tempfile::TempDir::new().unwrap();
+        let stale_signals = signals_with_hashes(
+            "0000000000000000000000000000000000000000000000000000000000000000",
+            &entry_hash_for(V3_CATALOGUE_ONE_TYPE, "types", "MyType"),
+        );
+        let (items_dir, track_id) = setup_workspace(
+            tmp.path(),
+            "my-track-2026-01-01",
+            V3_CATALOGUE_ONE_TYPE,
+            &stale_signals,
+        );
+
+        let outcome =
+            execute_catalogue_spec_signals(items_dir, track_id, tmp.path().to_path_buf(), strict);
+
+        let stale_error = outcome.findings().iter().find(|f| {
+            f.message().contains("catalogue-spec signals are stale")
+                && f.severity() == Severity::Error
+        });
+        assert!(
+            stale_error.is_some(),
+            "stale catalogue_declaration_hash must be Severity::Error with strict={strict}: {:?}",
+            outcome.findings()
+        );
+    }
+
+    /// CN-04: stale `catalogue_declaration_hash` must produce a `Severity::Error` finding
+    /// regardless of the `strict` flag. Verifies both strict=false and strict=true.
+    #[test]
+    fn test_stale_catalogue_declaration_hash_is_always_error_regardless_of_strict() {
+        for strict in [false, true] {
+            assert_stale_declaration_hash_returns_error(strict);
+        }
+    }
+
+    #[test]
+    fn test_v3_catalogue_stale_entry_hash_produces_finding() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let stale_signals = signals_with_hashes(
+            &declaration_hash_for(V3_CATALOGUE_ONE_TYPE),
+            "0000000000000000000000000000000000000000000000000000000000000000",
+        );
+        let (items_dir, track_id) = setup_workspace(
+            tmp.path(),
+            "my-track-2026-01-01",
+            V3_CATALOGUE_ONE_TYPE,
+            &stale_signals,
+        );
+
+        let outcome =
+            execute_catalogue_spec_signals(items_dir, track_id, tmp.path().to_path_buf(), false);
+
+        let has_stale_entry = outcome
+            .findings()
+            .iter()
+            .any(|f| f.message().contains("catalogue-spec signals are stale for 'MyType'"));
+        assert!(has_stale_entry, "stale entry hash must produce finding: {:?}", outcome.findings());
     }
 
     // -----------------------------------------------------------------------
-    // Test: v3 catalogue + signals referencing NON-EXISTENT type → real finding
+    // Test: v3 catalogue + signals referencing NON-EXISTENT type → positional finding
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_v3_catalogue_signals_referencing_nonexistent_type_produces_finding() {
+    fn test_v3_catalogue_signals_referencing_nonexistent_type_produces_positional_finding() {
         let tmp = tempfile::TempDir::new().unwrap();
         let (items_dir, track_id) = setup_workspace(
             tmp.path(),
             "my-track-2026-01-01",
-            V3_CATALOGUE_EMPTY,
+            V3_CATALOGUE_ONE_TYPE,
             &signals_referencing_nonexistent_type(),
         );
 
         let outcome =
             execute_catalogue_spec_signals(items_dir, track_id, tmp.path().to_path_buf(), false);
 
-        // The outcome must have at least one finding (signals reference a type that
-        // does not exist in the catalogue — proves the validation is real, not pass-through).
+        let messages: Vec<&str> = outcome.findings().iter().map(|f| f.message()).collect();
         assert!(
-            !outcome.is_ok() || !outcome.findings().is_empty(),
-            "signals referencing a non-existent type must produce findings; outcome: {:?}",
-            outcome.findings()
+            messages.iter().any(|m| {
+                m.contains("positional mismatch")
+                    && m.contains("MyType")
+                    && m.contains("NonExistentType")
+            }),
+            "signals referencing a non-existent type must produce a positional mismatch finding; outcome: {:?}",
+            messages
+        );
+        assert!(
+            !messages.iter().any(|m| m.contains("coverage mismatch")),
+            "test fixture must not stop at coverage mismatch before positional validation: {:?}",
+            messages
         );
     }
 }

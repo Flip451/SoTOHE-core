@@ -24,6 +24,8 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | infrastructure::verify::adr_signals::execute_verify_adr_signals | free_function | modify | fn(project_root: std::path::PathBuf, strict: bool) -> domain::verify::VerifyOutcome | 🟡 | 🔵 |
+| infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash | free_function | — | fn(catalogue_bytes: &[u8]) -> String | 🔵 | 🔵 |
+| infrastructure::verify::catalogue_spec_signals::compute_catalogue_entry_hash | free_function | — | fn(catalogue_json: &str, section: &str, entry_key: &str) -> Result<String, String> | 🔵 | 🔵 |
 | infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals | free_function | modify | fn(items_dir: std::path::PathBuf, track_id: String, workspace_root: std::path::PathBuf, strict: bool) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 | infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check | free_function | modify | fn(items_dir: std::path::PathBuf, workspace_root: std::path::PathBuf, strict: bool) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 | infrastructure::verify::signal_gates_config::load_signal_gates_config | free_function | — | fn(config_path: std::path::PathBuf) -> Result<domain::SignalGateMatrix, SignalGatesConfigError> | 🔵 | 🔵 |

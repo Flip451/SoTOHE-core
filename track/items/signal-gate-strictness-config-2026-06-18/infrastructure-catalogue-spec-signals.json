@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "adfdf059e1ca5b946a38bb999dc28e411b1c7bbdb74ff27ab77341cecd398cb3",
+  "catalogue_declaration_hash": "6ed6a9a46b5cd80885411b80497729d2cea63b4ee51ed79e800606d6b95c4ef5",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -26,6 +26,16 @@
       "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals",
       "signal": "blue",
       "entry_hash": "67cd7e7a0030c37efed714a40b5a9057ab86316cfea5c1d5543c07ebba812dae"
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+      "signal": "blue",
+      "entry_hash": "07a596232d995368d8925e948f4c99cea16b7c4e353a494b0a4a04fd719f9928"
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_entry_hash",
+      "signal": "blue",
+      "entry_hash": "9402c6cf42cf141a27dea403c4f9ff5f403797a5493f0c8ed6e81af4f94c5007"
     },
     {
       "type_name": "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals",

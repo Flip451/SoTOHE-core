@@ -8,7 +8,9 @@ use std::collections::{BTreeMap, HashMap};
 
 use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{CatalogueSpecSignalsDocument, ConfidenceSignal, ContentHash, SpecElementId};
+use domain::{
+    CatalogueSpecSignalsDocument, ContentHash, SpecElementId, check_catalogue_spec_signals,
+};
 
 use super::{BlobFetchResult, TrackBlobReader};
 use crate::catalogue_traversal::iter_catalogue_entries;
@@ -140,11 +142,14 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
     }
 
     // StaleSignals: compare signals_doc.catalogue_declaration_hash to current hash.
+    // This is a freshness check (CN-04): always error regardless of `strict`.
     if signals_doc.catalogue_declaration_hash != catalogue_hash {
         integrity_errors.push(VerifyFinding::error(format!(
-            "catalogue-spec integrity violation on layer '{layer_id}': \
-             StaleSignals {{ declared: {:?}, actual: {:?} }}",
-            signals_doc.catalogue_declaration_hash, catalogue_hash
+            "{catalogue_file}: catalogue-spec signals are stale — \
+             catalogue_declaration_hash {} does not match current catalogue hash {}. \
+             Run `sotp signal calc-catalog-spec` to regenerate.",
+            signals_doc.catalogue_declaration_hash.to_hex(),
+            catalogue_hash.to_hex()
         )));
     }
 
@@ -163,8 +168,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
         outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{catalogue_file}: catalogue-spec signals coverage mismatch — catalogue has \
              {total_entries} entry/entries, signals document has {} signal(s). \
-             Regenerate the signals file with `sotp track catalogue-spec-signals` so \
-             every catalogue entry is covered.",
+             Run `sotp signal calc-catalog-spec` so every catalogue entry is covered.",
             signals.len()
         ))]));
         return outcome;
@@ -209,7 +213,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
     // A mismatch means the signals file was not regenerated after the
     // catalogue changed, so a semantic Chain ② cache key would reference
     // the wrong entry content. The gate blocks until the signals file is
-    // regenerated (`sotp track catalogue-spec-signals`).
+    // regenerated (`sotp signal calc-catalog-spec`).
     let mut entry_hash_errors: Vec<VerifyFinding> = Vec::new();
     for (entry, signal) in iter_catalogue_entries(&catalogue).zip(signals.iter()) {
         match entry_hashes.get(entry.section_key.as_str()) {
@@ -217,20 +221,19 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
                 entry_hash_errors.push(VerifyFinding::error(format!(
                     "{catalogue_file}: per-entry hash missing for '{entry_key}' \
                      (section_key '{section_key}') — the catalogue adapter did not \
-                     supply a hash for this entry. Regenerate the signals file.",
+                     supply a hash for this entry. Run `sotp signal calc-catalog-spec` to regenerate.",
                     entry_key = entry.key,
                     section_key = entry.section_key,
                 )));
             }
             Some(current_hash) if current_hash != signal.entry_hash() => {
+                let entry_key = &entry.key;
+                let declared_hex = signal.entry_hash().to_hex();
+                let actual_hex = current_hash.to_hex();
                 entry_hash_errors.push(VerifyFinding::error(format!(
-                    "{catalogue_file}: per-entry hash mismatch for '{entry_key}' — \
-                     signals file records {{declared: {declared:?}}} but current catalogue \
-                     entry has {{actual: {actual:?}}}. Regenerate the signals file with \
-                     `sotp track catalogue-spec-signals`.",
-                    entry_key = entry.key,
-                    declared = signal.entry_hash(),
-                    actual = current_hash,
+                    "{catalogue_file}: catalogue-spec signals are stale for '{entry_key}' — \
+                     entry_hash {declared_hex} does not match current catalogue entry hash \
+                     {actual_hex}. Run `sotp signal calc-catalog-spec` to regenerate.",
                 )));
             }
             Some(_) => {} // hash matches — no finding
@@ -241,43 +244,8 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
         return outcome;
     }
 
-    // Confidence signal gate: Red and Yellow both block in strict merge mode.
-    let reds: Vec<&str> = signals
-        .iter()
-        .filter(|s| s.signal == ConfidenceSignal::Red)
-        .map(|s| s.type_name.as_str())
-        .collect();
-    if !reds.is_empty() {
-        outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{catalogue_file}: {} catalogue entry/entries have Red catalogue-spec signal \
-             (missing both spec_refs[] and informal_grounds[] — every entry must carry \
-             at least one grounding ref): {}",
-            reds.len(),
-            reds.join(", ")
-        ))]));
-        return outcome;
-    }
-
-    let yellows: Vec<&str> = signals
-        .iter()
-        .filter(|s| s.signal == ConfidenceSignal::Yellow)
-        .map(|s| s.type_name.as_str())
-        .collect();
-    if !yellows.is_empty() {
-        let message = format!(
-            "{catalogue_file}: {} catalogue entry/entries have Yellow catalogue-spec signal \
-             — merge gate will block these until upgraded to Blue. Upgrade by promoting \
-             informal_grounds[] to spec_refs[] entries with file + anchor, \
-             then regenerate catalogue-spec signals: {}",
-            yellows.len(),
-            yellows.join(", ")
-        );
-        if strict {
-            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]));
-        } else {
-            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)]));
-        }
-    }
+    // Confidence signal gate — delegate to domain pure function (D2 / CN-05 / AC-03).
+    outcome.merge(check_catalogue_spec_signals(&signals_doc, strict));
 
     outcome
 }

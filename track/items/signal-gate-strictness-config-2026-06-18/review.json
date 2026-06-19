@@ -501,42 +501,86 @@
           "findings": [],
           "hash": "rvw1:sha256:88bd047dabe39ee725ce15a6f66aa15727b6b285bc6df725028d8383d046e0da",
           "at": "2026-06-19T01:18:28Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
-          "at": "2026-06-18T09:53:31Z"
+          "hash": "rvw1:sha256:bb01ca894b0852fa256c43704a61bcd1c08981276eaa34f9cbc4058b5711ceb1",
+          "at": "2026-06-19T01:38:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_catalogue_spec_signals` only evaluates Red/Yellow signals, but this caller now delegates to it without first validating signal freshness. The path reads both the current catalogue and the persisted signals document, yet only checks count and positional names before merging the gate result; it never compares `doc.catalogue_declaration_hash` or per-entry `entry_hash` values against the current catalogue. A stale all-Blue signals file with the same entries can therefore pass strict verification after catalogue grounding changes. Add the freshness check before this delegation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 272,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bb01ca894b0852fa256c43704a61bcd1c08981276eaa34f9cbc4058b5711ceb1",
+          "at": "2026-06-19T01:42:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 testing gap: `test_v3_catalogue_signals_referencing_nonexistent_type_produces_finding` does not exercise the missing-entry path it claims to cover. It writes `V3_CATALOGUE_EMPTY` plus all-zero hashes, so `execute_catalogue_spec_signals` exits earlier on the coverage-mismatch branch before the new freshness / domain-gate delegation is reached. A regression in the real non-existent-type path would still pass this test.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 749,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:12a8a98ce60214f5f9cb7d60b98b875dac3eb70bc2e521be2470b133563ac012",
+          "at": "2026-06-19T02:16:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These two new `pub` helpers are only exercised indirectly by the module tests. `compute_catalogue_entry_hash` has untested failure paths (`invalid JSON`, missing section/key), and `compute_catalogue_declaration_hash` expands the public surface without a direct contract test. Either keep them `pub(crate)` if they are test-only, or add direct happy-path and error-path coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 108,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:9f30dea86bcbba062e8e4ba82088b6e51bcedf7d3791ea46137a2b2b1f9c066c",
+          "at": "2026-06-19T02:23:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f88be2b027160dbcec2e1123f7d40fbb86ee4bc51583a8e5e8b59065da0f51dd",
+          "at": "2026-06-19T02:28:04Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
-          "at": "2026-06-18T10:16:42Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+          "hash": "rvw1:sha256:f88be2b027160dbcec2e1123f7d40fbb86ee4bc51583a8e5e8b59065da0f51dd",
+          "at": "2026-06-19T02:31:47Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:40:09Z"
+          "hash": "rvw1:sha256:f87e8d8252e5059df4e9e2ac00ca992ec91c28e28c446e8264a105a21c755979",
+          "at": "2026-06-19T02:55:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:43:05Z"
+          "hash": "rvw1:sha256:f87e8d8252e5059df4e9e2ac00ca992ec91c28e28c446e8264a105a21c755979",
+          "at": "2026-06-19T02:59:38Z"
         }
       ]
     },
@@ -1132,6 +1176,82 @@
           "findings": [],
           "hash": "rvw1:sha256:7f76046a042525ad76ce9babe40978902c3088a88cd202b126b07871e933f7c3",
           "at": "2026-06-19T00:17:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdb1a6e51959aacf968f30f1d68a7442699cad536fea8f4ee0b9c7151218966d",
+          "at": "2026-06-19T01:37:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdb1a6e51959aacf968f30f1d68a7442699cad536fea8f4ee0b9c7151218966d",
+          "at": "2026-06-19T01:39:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 still states that there are \"no public API surface changes,\" but the same plan-artifacts change adds two `infrastructure::verify::catalogue_spec_signals::*` functions as `action: \"add\"` FreeFunction entries whose docs say they are exposed for integration tests. That is a semantic contradiction in the plan: reviewers and implementers cannot tell whether T008 is expected to preserve the public API or intentionally add these public helpers. Update the T008 description or the catalogue entries so the public API intent is consistent.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 84,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:77de3c666afa69c7560059bf8d10f43eb380fbc045b8ead109b0b54eb89b0703",
+          "at": "2026-06-19T03:10:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:deccb5f97ec8f9a9363248a445429411b5d2e172dd9c1ca5571a719361f2cdea",
+          "at": "2026-06-19T03:13:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`compute_catalogue_declaration_hash` is documented as part of chain ② `catalogue-spec-signals` stale detection and says callers compare a stored `declaration_hash`, but the same plan defines chain ② (`CatalogSpecChain` / `check_catalog_spec`) as using `entry_hash` freshness while `declaration_hash` belongs to chain ③ (`ImplCatalogChain` / `check_impl_catalog`). That leaves the plan with two conflicting stale-detection contracts for chain ②, so an implementer or test author could validate the catalogue-spec gate against the wrong hash granularity.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/infrastructure-types.json",
+              "line": 318,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:13f34e453ba04d7a03f8d69412a92391bb6c6d7757f932a6120be5bad9d2e908",
+          "at": "2026-06-19T04:09:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1368449952f6f3c5e728622bbde245ab826e7f0f8c4938a79dc983a7e5a263aa",
+          "at": "2026-06-19T04:13:42Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:40:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:43:05Z"
         }
       ]
     },
@@ -1281,6 +1401,70 @@
           "findings": [],
           "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
           "at": "2026-06-19T01:14:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
+          "at": "2026-06-19T01:37:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
+          "at": "2026-06-19T01:40:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
+          "at": "2026-06-19T02:08:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
+          "at": "2026-06-19T02:11:21Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T09:53:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T10:16:42Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
+          "at": "2026-06-19T02:08:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
+          "at": "2026-06-19T02:10:22Z"
         }
       ]
     },

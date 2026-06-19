@@ -321,6 +321,86 @@
         "kind": "pass",
         "citation": "`check-impl-catalog` は `declaration_hash` 不一致のとき `Finding::error`。chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力では signal を正しく評価できないため）。"
       }
+    },
+    {
+      "claim_hash": "59bc440107aa8c3345c7d44156807425899cc8718fe592f8ff310b7f0dea8e4f",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
+    },
+    {
+      "claim_hash": "59bc440107aa8c3345c7d44156807425899cc8718fe592f8ff310b7f0dea8e4f",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track-active-gate` の regen シーケンスを `signal calc-impl-catalog` → `signal calc-catalog-spec` → `track views sync` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "fe7909f9f8e33e3c46a1e1875df46a3a640f728d58a2fc8c77a8f954be63835b",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
+    },
+    {
+      "claim_hash": "fe7909f9f8e33e3c46a1e1875df46a3a640f728d58a2fc8c77a8f954be63835b",
+      "evidence_hash": "89fd786d22843d2436814bc4418e13994bf5d62abb1eff30785aa45ce32f5ab1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strict)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "fe7909f9f8e33e3c46a1e1875df46a3a640f728d58a2fc8c77a8f954be63835b",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track-active-gate` の regen シーケンスを `signal calc-impl-catalog` → `signal calc-catalog-spec` → `track views sync` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "59bc440107aa8c3345c7d44156807425899cc8718fe592f8ff310b7f0dea8e4f",
+      "evidence_hash": "89fd786d22843d2436814bc4418e13994bf5d62abb1eff30785aa45ce32f5ab1",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the entry commits to a public SHA-256 declaration-hash helper for integration-test fixture generation, but AC-03 only requires Chain2 Red/Yellow judgment to be centralized in domain `check_catalogue_spec_signals(&doc, strict)` and the duplicate inline implementations to be replaced; the hash helper is not a natural implementation of that requirement."
+      }
+    },
+    {
+      "claim_hash": "e8d3ea955edf0b2b62682f1b9f5ba6b5d075a3a82603d818aa36e3ffc7a4e0ce",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
+    },
+    {
+      "claim_hash": "0c3cff1cd1a38dbb277561b652f7a8f0b6ae03a77a1a142d9efa15fb991cca90",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
+    },
+    {
+      "claim_hash": "07a596232d995368d8925e948f4c99cea16b7c4e353a494b0a4a04fd719f9928",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく Finding::error。"
+      }
+    },
+    {
+      "claim_hash": "9402c6cf42cf141a27dea403c4f9ff5f403797a5493f0c8ed6e81af4f94c5007",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
     }
   ]
 }

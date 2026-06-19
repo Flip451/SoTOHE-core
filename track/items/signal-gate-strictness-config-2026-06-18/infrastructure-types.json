@@ -302,6 +302,58 @@
       ],
       "informal_grounds": []
     },
+    "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "catalogue_bytes",
+          "ty": "&[u8]"
+        }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "SHA-256 helper used by chain ② (`check-catalog-spec`) stale detection (CN-04). Computes the catalogue-file-level hash over the raw catalogue bytes; callers compare this value against the stored `catalogue_declaration_hash` field in `catalogue-spec-signals.json` to detect a stale whole-catalogue signal document before evaluating Red/Yellow judgments.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::compute_catalogue_entry_hash": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "catalogue_json",
+          "ty": "&str"
+        },
+        {
+          "name": "section",
+          "ty": "&str"
+        },
+        {
+          "name": "entry_key",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<String, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "SHA-256 helper used by chain ② (`check-catalog-spec`) stale detection (CN-04). Computes the per-entry hash for the given section and entry key from a catalogue JSON string; callers compare this value against the stored `entry_hash` per signal entry in `catalogue-spec-signals.json` to detect per-entry staleness before evaluating Red/Yellow judgments.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        }
+      ],
+      "informal_grounds": []
+    },
     "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals": {
       "action": "modify",
       "role": "FreeFunction",

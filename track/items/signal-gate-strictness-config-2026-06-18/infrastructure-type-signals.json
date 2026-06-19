@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-19T01:20:10Z",
-  "declaration_hash": "adfdf059e1ca5b946a38bb999dc28e411b1c7bbdb74ff27ab77341cecd398cb3",
+  "generated_at": "2026-06-19T04:16:32Z",
+  "declaration_hash": "6ed6a9a46b5cd80885411b80497729d2cea63b4ee51ed79e800606d6b95c4ef5",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -51,6 +51,18 @@
       "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals",
       "kind_tag": "free_function",
       "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_entry_hash",
+      "kind_tag": "free_function",
+      "signal": "blue",
       "found_type": true
     },
     {

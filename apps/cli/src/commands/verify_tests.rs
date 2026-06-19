@@ -613,6 +613,39 @@ fn write_matching_domain_catalogue_with_single_entry(
     .unwrap();
 }
 
+/// Builds a fresh (non-stale) signals JSON string for a catalogue with a single `entry_name`
+/// type entry and the given `signal` value.
+///
+/// Computes the real `catalogue_declaration_hash` and `entry_hash` from the catalogue
+/// that was already written to `track_dir/domain-types.json` by
+/// `write_matching_domain_catalogue_with_single_entry`. Fresh hashes are required so
+/// the freshness gate (CN-04) passes and the actual signal value is evaluated.
+fn fresh_signals_json_for_single_type(
+    track_dir: &std::path::Path,
+    type_name: &str,
+    signal: &str,
+) -> String {
+    let catalogue_text = std::fs::read_to_string(track_dir.join("domain-types.json")).unwrap();
+    let decl_hash =
+        infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash(
+            catalogue_text.as_bytes(),
+        );
+    let entry_hash = infrastructure::verify::catalogue_spec_signals::compute_catalogue_entry_hash(
+        &catalogue_text,
+        "types",
+        type_name,
+    )
+    .unwrap();
+    serde_json::to_string_pretty(&serde_json::json!({
+        "schema_version": 1,
+        "catalogue_declaration_hash": decl_hash,
+        "signals": [
+            { "type_name": type_name, "signal": signal, "entry_hash": entry_hash }
+        ]
+    }))
+    .unwrap()
+}
+
 // Helper: write architecture-rules.json with one TDDD-enabled domain layer.
 fn write_arch_rules_for_signals_test(workspace_root: &std::path::Path) {
     let rules = serde_json::json!({
@@ -665,6 +698,9 @@ fn test_catalogue_spec_signals_strict_false_yellow_is_warning_only() {
     // Exercises the --strict=false path: a Yellow signal produces a Warning
     // finding (not an Error), so `has_errors()` is false and CI stays green
     // in interim mode.
+    //
+    // Uses fresh hashes so the CN-04 freshness gate passes and the Yellow
+    // signal evaluation is reached.
     let tmp = TempDir::new().unwrap();
     let ws = tmp.path().to_path_buf();
     let track_id = "test-track";
@@ -673,20 +709,10 @@ fn test_catalogue_spec_signals_strict_false_yellow_is_warning_only() {
     std::fs::create_dir_all(&track_dir).unwrap();
     write_arch_rules_for_signals_test(&ws);
     write_matching_domain_catalogue_with_single_entry(&track_dir, "MyType");
-    // Write a signals file with one Yellow entry (informal_grounds[] non-empty,
-    // spec_refs[] empty).
-    let signals_json = serde_json::json!({
-        "schema_version": 1,
-        "catalogue_declaration_hash": "a".repeat(64),
-        "signals": [
-            { "type_name": "MyType", "signal": "yellow", "entry_hash": "a".repeat(64) }
-        ]
-    });
-    std::fs::write(
-        track_dir.join("domain-catalogue-spec-signals.json"),
-        serde_json::to_string_pretty(&signals_json).unwrap(),
-    )
-    .unwrap();
+    // Write a signals file with one Yellow entry with FRESH hashes so the
+    // freshness gate passes and the signal value is evaluated.
+    let signals = fresh_signals_json_for_single_type(&track_dir, "MyType", "yellow");
+    std::fs::write(track_dir.join("domain-catalogue-spec-signals.json"), &signals).unwrap();
 
     let outcome = execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws, false);
     assert!(
@@ -705,6 +731,9 @@ fn test_catalogue_spec_signals_strict_true_yellow_is_error() {
     // Exercises the --strict=true path: a Yellow signal is promoted to an Error
     // finding, so `has_errors()` returns true and the gate blocks. This is the
     // merge-gate / strict-mode behavior.
+    //
+    // Uses fresh hashes so the CN-04 freshness gate passes and the Yellow
+    // signal evaluation is reached.
     let tmp = TempDir::new().unwrap();
     let ws = tmp.path().to_path_buf();
     let track_id = "test-track";
@@ -713,18 +742,8 @@ fn test_catalogue_spec_signals_strict_true_yellow_is_error() {
     std::fs::create_dir_all(&track_dir).unwrap();
     write_arch_rules_for_signals_test(&ws);
     write_matching_domain_catalogue_with_single_entry(&track_dir, "MyType");
-    let signals_json = serde_json::json!({
-        "schema_version": 1,
-        "catalogue_declaration_hash": "a".repeat(64),
-        "signals": [
-            { "type_name": "MyType", "signal": "yellow", "entry_hash": "a".repeat(64) }
-        ]
-    });
-    std::fs::write(
-        track_dir.join("domain-catalogue-spec-signals.json"),
-        serde_json::to_string_pretty(&signals_json).unwrap(),
-    )
-    .unwrap();
+    let signals = fresh_signals_json_for_single_type(&track_dir, "MyType", "yellow");
+    std::fs::write(track_dir.join("domain-catalogue-spec-signals.json"), &signals).unwrap();
 
     let outcome = execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws, true);
     assert!(outcome.has_errors(), "Yellow signal with strict=true must be an error: {outcome:?}");

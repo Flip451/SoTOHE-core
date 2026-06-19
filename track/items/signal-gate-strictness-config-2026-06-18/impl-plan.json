@@ -76,12 +76,13 @@
     {
       "id": "T007",
       "description": "D2 / IN-03 / CN-04: Modify `libs/infrastructure/src/verify/spec_states.rs::verify_from_spec_json` to split Stage1 and Stage2. Stage1 (chain ① `check-spec-adr`): keep `check_spec_doc_signals(&spec_doc, strict)` — add the new self-consistency freshness check: compute `spec_doc.evaluate_signals()` and compare with stored `spec_doc.signals()`; if they differ, return stale error with a message prompting `signal calc-spec-adr`. Stage2 (chain ③ `check-impl-catalog`): extract into a new separate public function (e.g., `verify_type_signals_from_spec_json` or similar) callable independently by the new `signal check-impl-catalog` CLI command, accepting its own `strict: bool`. The existing `verify_from_spec_json` signature is modified per the infrastructure-types.json catalogue (Stage1 only). Ensure backward-compat compile: any internal callers of the old combined function are updated in this same task. Estimated diff: ~200 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "c73c6f508f45a5a56dbe451126adb9d6963fb12d"
     },
     {
       "id": "T008",
-      "description": "D2 / CN-05 / AC-03: Modify `libs/infrastructure/src/verify/catalogue_spec_signals.rs`: (1) `execute_catalogue_spec_signals` — replace the inline Red/Yellow evaluation logic with a call to `domain::check_catalogue_spec_signals(&doc, strict)` from T002. (2) `execute_catalogue_spec_signals_check` — same delegation. Also remove the corresponding inline logic from `libs/usecase/src/merge_gate/chain2_gate.rs::check_chain2_for_layer` and replace with a call to `domain::check_catalogue_spec_signals`. This completes the consolidation of the three inline implementations into the single domain pure function. All callers still compile; no public API surface changes. Depends on T002. Estimated diff: ~130 lines.",
-      "status": "todo"
+      "description": "D2 / CN-05 / AC-03: Modify `libs/infrastructure/src/verify/catalogue_spec_signals.rs`: (1) `execute_catalogue_spec_signals` — replace the inline Red/Yellow evaluation logic with a call to `domain::check_catalogue_spec_signals(&doc, strict)` from T002. (2) `execute_catalogue_spec_signals_check` — same delegation. Also remove the corresponding inline logic from `libs/usecase/src/merge_gate/chain2_gate.rs::check_chain2_for_layer` and replace with a call to `domain::check_catalogue_spec_signals`. This completes the consolidation of the three inline implementations into the single domain pure function. Additionally, expose two `pub` helper functions `compute_catalogue_declaration_hash` and `compute_catalogue_entry_hash` for use by integration tests in other crates that need to build `catalogue-spec-signals.json` fixtures without going through the full refresher pipeline. All existing callers still compile; no existing public API surface changes. Depends on T002. Estimated diff: ~130 lines.",
+      "status": "in_progress"
     },
     {
       "id": "T009",
