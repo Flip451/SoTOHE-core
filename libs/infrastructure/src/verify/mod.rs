@@ -39,5 +39,5 @@ pub mod trusted_root;
 pub mod usecase_purity;
 pub mod view_freshness;
 
-#[cfg(test)]
-pub(crate) mod test_support;
+#[cfg(any(test, feature = "test-helpers"))]
+pub mod test_support;

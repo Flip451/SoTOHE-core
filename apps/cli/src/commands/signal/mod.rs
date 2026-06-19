@@ -130,14 +130,11 @@ pub use check_spec_adr::CheckSpecAdrArgs;
 
 /// Arguments for the aggregate `signal check --gate commit|merge` command.
 ///
-/// All hash and path arguments are optional at the parser level so that the
-/// command can be invoked without a full track context.  However, when hash
-/// arguments are absent the corresponding chains ② and ③ will report
-/// hash-parse failures in the merged outcome — the overall result will not
-/// pass unless both hashes are supplied.
-///
-/// Typically the `cargo make track-active-gate` wrapper supplies these
-/// arguments automatically from the active track context.
+/// Chains ② and ③ are now argless (T020 / D8): active track and layer
+/// enumeration are resolved from the current git branch and
+/// `architecture-rules.json` via the usecase orchestrator.  The only user-
+/// facing arguments are `--gate`, `--workspace-root`, `--project-root`, and
+/// `--spec-json`.
 #[derive(Args, Debug)]
 pub struct SignalCheckArgs {
     /// Gate context: resolve strictness from `signal-gates.json` for all chains.
@@ -159,28 +156,6 @@ pub struct SignalCheckArgs {
     /// a file-not-found failure if that path does not exist.
     #[arg(long)]
     pub spec_json: Option<PathBuf>,
-
-    /// Path to catalogue-spec signals file for chain ②.
-    /// When absent, falls back to `domain-catalogue-spec-signals.json`.
-    #[arg(long)]
-    pub catalog_spec_signals: Option<PathBuf>,
-
-    /// SHA-256 hex digest of the current `<layer>-types.json` for chain ②.
-    /// **Required for chain ② to produce a meaningful result.**
-    /// When absent, chain ② reports a hash-parse failure in the merged outcome.
-    #[arg(long)]
-    pub catalog_spec_hash: Option<String>,
-
-    /// Path to impl-catalog signals file for chain ③.
-    /// When absent, falls back to `domain-type-signals.json`.
-    #[arg(long)]
-    pub impl_catalog_signals: Option<PathBuf>,
-
-    /// SHA-256 hex digest of the current `<layer>-types.json` for chain ③.
-    /// **Required for chain ③ to produce a meaningful result.**
-    /// When absent, chain ③ reports a hash-parse failure in the merged outcome.
-    #[arg(long)]
-    pub impl_catalog_hash: Option<String>,
 }
 
 // ── Top-level enum ────────────────────────────────────────────────────────────
@@ -233,35 +208,9 @@ fn run_aggregate_check(
     args: SignalCheckArgs,
 ) -> Result<cli_composition::CommandOutcome, String> {
     let gate: SignalGateName = args.gate.into();
-    // Resolve paths: each optional path arg falls back to a conventional default.
-    // Signal-file fall-backs are best-effort; if the file does not exist the
-    // underlying chain will report a read error rather than panicking.
-    //
-    // Hash args are passed as-is (empty string when absent). `signal_check_gate`
-    // calls `parse_catalogue_hash` internally: an empty or malformed hash string
-    // produces a formatted hash-parse failure in the merged outcome for chains
-    // ② and ③ respectively. This is expected — callers that need a full-pass
-    // aggregate result must supply both `--catalog-spec-hash` and
-    // `--impl-catalog-hash`.
     let spec_json = args.spec_json.unwrap_or_else(|| PathBuf::from("track/items/spec.json"));
-    let catalog_signals = args
-        .catalog_spec_signals
-        .unwrap_or_else(|| PathBuf::from("domain-catalogue-spec-signals.json"));
-    let impl_signals =
-        args.impl_catalog_signals.unwrap_or_else(|| PathBuf::from("domain-type-signals.json"));
-    let catalog_spec_hash = args.catalog_spec_hash.unwrap_or_default();
-    let impl_catalog_hash = args.impl_catalog_hash.unwrap_or_default();
 
-    app.signal_check_gate(
-        args.project_root,
-        spec_json,
-        catalog_signals,
-        catalog_spec_hash,
-        impl_signals,
-        impl_catalog_hash,
-        gate,
-        args.workspace_root,
-    )
+    app.signal_check_gate(args.project_root, spec_json, gate, args.workspace_root)
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -313,58 +262,29 @@ mod tests {
 
     #[test]
     fn test_signal_calc_catalog_spec_name_uses_catalog_not_catalogue() {
-        // Command name must be `calc-catalog-spec` (US spelling)
-        let cli = TestCli::try_parse_from([
-            "sotp",
-            "calc-catalog-spec",
-            "--signals-path",
-            "/tmp/sig.json",
-            "--catalog-hash",
-            &"a".repeat(64),
-        ])
-        .unwrap();
+        // Command name must be `calc-catalog-spec` (US spelling); argless in T020.
+        let cli = TestCli::try_parse_from(["sotp", "calc-catalog-spec"]).unwrap();
         assert!(matches!(cli.cmd, SignalCommand::CalcCatalogSpec(_)));
     }
 
     #[test]
     fn test_signal_check_catalog_spec_name_uses_catalog_not_catalogue() {
-        let cli = TestCli::try_parse_from([
-            "sotp",
-            "check-catalog-spec",
-            "--signals-path",
-            "/tmp/sig.json",
-            "--catalog-hash",
-            &"a".repeat(64),
-        ])
-        .unwrap();
+        // Argless in T020: no --signals-path / --catalog-hash needed.
+        let cli = TestCli::try_parse_from(["sotp", "check-catalog-spec"]).unwrap();
         assert!(matches!(cli.cmd, SignalCommand::CheckCatalogSpec(_)));
     }
 
     #[test]
     fn test_signal_calc_impl_catalog_parses_correctly() {
-        let cli = TestCli::try_parse_from([
-            "sotp",
-            "calc-impl-catalog",
-            "--signals-path",
-            "/tmp/ts.json",
-            "--catalog-hash",
-            &"b".repeat(64),
-        ])
-        .unwrap();
+        // Argless in T020.
+        let cli = TestCli::try_parse_from(["sotp", "calc-impl-catalog"]).unwrap();
         assert!(matches!(cli.cmd, SignalCommand::CalcImplCatalog(_)));
     }
 
     #[test]
     fn test_signal_check_impl_catalog_parses_correctly() {
-        let cli = TestCli::try_parse_from([
-            "sotp",
-            "check-impl-catalog",
-            "--signals-path",
-            "/tmp/ts.json",
-            "--catalog-hash",
-            &"c".repeat(64),
-        ])
-        .unwrap();
+        // Argless in T020.
+        let cli = TestCli::try_parse_from(["sotp", "check-impl-catalog"]).unwrap();
         assert!(matches!(cli.cmd, SignalCommand::CheckImplCatalog(_)));
     }
 
@@ -406,24 +326,14 @@ mod tests {
     }
 
     #[test]
-    fn test_signal_check_with_explicit_hashes_parses_correctly() {
-        // Explicit hashes: catalog_spec_hash and impl_catalog_hash are Some when provided.
-        let cli = TestCli::try_parse_from([
-            "sotp",
-            "check",
-            "--spec-json",
-            "/tmp/spec.json",
-            "--catalog-spec-hash",
-            &"a".repeat(64),
-            "--impl-catalog-hash",
-            &"b".repeat(64),
-        ])
-        .unwrap();
+    fn test_signal_check_with_spec_json_parses_correctly() {
+        // T020: hash/signals-path args removed; spec-json is still optional.
+        let cli =
+            TestCli::try_parse_from(["sotp", "check", "--spec-json", "/tmp/spec.json"]).unwrap();
         match cli.cmd {
             SignalCommand::Check(args) => {
                 assert_eq!(args.spec_json, Some(PathBuf::from("/tmp/spec.json")));
-                assert_eq!(args.catalog_spec_hash, Some("a".repeat(64)));
-                assert_eq!(args.impl_catalog_hash, Some("b".repeat(64)));
+                assert_eq!(args.gate, GateArg::Commit);
             }
             other => panic!("expected Check, got {other:?}"),
         }
@@ -457,16 +367,8 @@ mod tests {
 
     #[test]
     fn test_check_catalog_spec_strict_flag_accepted() {
-        let cli = TestCli::try_parse_from([
-            "sotp",
-            "check-catalog-spec",
-            "--signals-path",
-            "/tmp/sig.json",
-            "--catalog-hash",
-            &"a".repeat(64),
-            "--strict",
-        ])
-        .unwrap();
+        // T020: argless command; --strict is the only required flag change.
+        let cli = TestCli::try_parse_from(["sotp", "check-catalog-spec", "--strict"]).unwrap();
         match cli.cmd {
             SignalCommand::CheckCatalogSpec(args) => {
                 assert!(args.flags.strict);
@@ -478,17 +380,9 @@ mod tests {
 
     #[test]
     fn test_check_catalog_spec_gate_flag_accepted() {
-        let cli = TestCli::try_parse_from([
-            "sotp",
-            "check-catalog-spec",
-            "--signals-path",
-            "/tmp/sig.json",
-            "--catalog-hash",
-            &"a".repeat(64),
-            "--gate",
-            "merge",
-        ])
-        .unwrap();
+        // T020: argless command.
+        let cli =
+            TestCli::try_parse_from(["sotp", "check-catalog-spec", "--gate", "merge"]).unwrap();
         match cli.cmd {
             SignalCommand::CheckCatalogSpec(args) => {
                 assert!(!args.flags.strict);
@@ -500,17 +394,9 @@ mod tests {
 
     #[test]
     fn test_check_impl_catalog_strict_and_gate_together_is_parser_error() {
-        let result = TestCli::try_parse_from([
-            "sotp",
-            "check-impl-catalog",
-            "--signals-path",
-            "/tmp/ts.json",
-            "--catalog-hash",
-            &"a".repeat(64),
-            "--strict",
-            "--gate",
-            "commit",
-        ]);
+        // T020: argless command; only --strict and --gate matter.
+        let result =
+            TestCli::try_parse_from(["sotp", "check-impl-catalog", "--strict", "--gate", "commit"]);
         assert!(result.is_err(), "--strict and --gate must be mutually exclusive");
     }
 

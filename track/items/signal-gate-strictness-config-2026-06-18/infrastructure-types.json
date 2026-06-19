@@ -234,6 +234,22 @@
         }
       ],
       "informal_grounds": []
+    },
+    "LocalSignalLayerReaderAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [{ "name": "workspace_root", "ty": "std::path::PathBuf" }], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "signal_layer_reader",
+      "docs": "Local filesystem adapter implementing `usecase::signal::SignalLayerReader`. Provides local I/O behind the usecase-owned orchestration flow: the usecase asks for the active track through the port, obtains the domain-defined TDDD layer set through the port, and requests per-layer catalogue bytes from `track/items/<track-id>/<layer>-types.json`. This adapter does not own per-layer iteration, TDDD layer semantics, catalogue SHA-256 calculation, or signals output path construction; those remain in the domain/usecase/infrastructure responsibilities defined by D8.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {},
@@ -573,7 +589,7 @@
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Evaluate chain ② (`check-catalog-spec`) gate for a single layer with explicit paths. Called by `signal check-catalog-spec --signals-path P --catalog-hash H --gate commit|merge`. Checks the signals file against a pre-computed `catalog_hash_hex` (SHA-256 of the catalogue file bytes). Missing or decode-error signals file is fail-closed; `catalogue_declaration_hash` mismatch is a stale error; Red is always error; Yellow is error when `strict=true`, warning when `strict=false`.",
+      "docs": "Evaluate chain ② (`check-catalog-spec`) gate for a single layer from an explicit signals file path and pre-computed `catalog_hash_hex` (SHA-256 of the catalogue file bytes). This T011 public primitive is retained as a low-level file evaluator for infrastructure-owned path resolution; it is not a CLI/Makefile entrypoint and is not called through removed `--signals-path` / `--catalog-hash` flags. D8/T020 argless CLI wiring must inject an infrastructure-layer per-layer wrapper/equivalent that derives the signals-file path from the layer context before delegating here. Missing or decode-error signals file is fail-closed; `catalogue_declaration_hash` mismatch is a stale error; Red is always error; Yellow is error when `strict=true`, warning when `strict=false`.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -586,6 +602,102 @@
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
           "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_for_layer": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "domain::TrackId"
+        },
+        {
+          "name": "layer_id",
+          "ty": "domain::tddd::LayerId"
+        },
+        {
+          "name": "catalog_hash_hex",
+          "ty": "&str"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "D8/T020 per-layer check primitive for chain ② (`check-catalog-spec`). This infrastructure-layer wrapper receives the workspace root, the usecase-resolved TrackId, the usecase-owned layer ID, and pre-computed catalogue SHA-256 hex. It derives the track-scoped `track/items/<track-id>/<layer>-catalogue-spec-signals.json` path inside infrastructure and delegates to `check_catalog_spec_from_signals_file`. CLI command files and cli-composition do not pass `--signals-path` / `--catalog-hash`, resolve the active track, or construct paths.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-16"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-20"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-21"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::calc_catalog_spec_for_layer": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "domain::TrackId"
+        },
+        {
+          "name": "layer_id",
+          "ty": "domain::tddd::LayerId"
+        },
+        {
+          "name": "catalog_hash_hex",
+          "ty": "&str"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "D8/T020 per-layer calc primitive for chain ② (`calc-catalog-spec`). This infrastructure-layer wrapper receives the workspace root, the usecase-resolved TrackId, the usecase-owned layer ID, and pre-computed catalogue SHA-256 hex from the argless usecase orchestrator. It derives the track-scoped layer catalogue and `track/items/<track-id>/<layer>-catalogue-spec-signals.json` output paths inside infrastructure, refreshes the catalogue-spec signal document for exactly that layer, and persists the provided catalogue hash as the document-level freshness hash. CLI command files and cli-composition do not pass per-layer paths or hashes, resolve the active track, enumerate layers, compute hashes, or construct output paths.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-16"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-20"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-21"
         }
       ],
       "informal_grounds": []
@@ -611,7 +723,7 @@
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Evaluate chain ③ (`check-impl-catalog`) gate for a single layer with explicit paths. Called by `signal check-impl-catalog --signals-path P --catalog-hash H --gate commit|merge`. Checks a single layer's signals file against a pre-computed `catalog_hash_hex` (SHA-256 of the catalogue file bytes). Missing or decode-error signals file is fail-closed; `declaration_hash` mismatch is a stale error; Red is always error; Yellow is error when `strict=true`, warning when `strict=false`.",
+      "docs": "Evaluate chain ③ (`check-impl-catalog`) gate for a single layer from an explicit signals file path and pre-computed `catalog_hash_hex` (SHA-256 of the catalogue file bytes). This T011 public primitive is retained as a low-level file evaluator for infrastructure-owned path resolution; it is not a CLI/Makefile entrypoint and is not called through removed `--signals-path` / `--catalog-hash` flags. D8/T020 argless CLI wiring must inject an infrastructure-layer per-layer wrapper/equivalent that derives the signals-file path from the layer context before delegating here. Missing or decode-error signals file is fail-closed; `declaration_hash` mismatch is a stale error; Red is always error; Yellow is error when `strict=true`, warning when `strict=false`.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -624,6 +736,102 @@
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
           "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::check_impl_catalog_for_layer": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "domain::TrackId"
+        },
+        {
+          "name": "layer_id",
+          "ty": "domain::tddd::LayerId"
+        },
+        {
+          "name": "catalog_hash_hex",
+          "ty": "&str"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "D8/T020 per-layer check primitive for chain ③ (`check-impl-catalog`). This infrastructure-layer wrapper receives the workspace root, the usecase-resolved TrackId, the usecase-owned layer ID, and pre-computed catalogue SHA-256 hex. It derives the track-scoped `track/items/<track-id>/<layer>-type-signals.json` path inside infrastructure and delegates to `check_impl_catalog_from_signals_file`. CLI command files and cli-composition do not pass `--signals-path` / `--catalog-hash`, resolve the active track, or construct paths.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-16"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-20"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-21"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::calc_impl_catalog_for_layer": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "domain::TrackId"
+        },
+        {
+          "name": "layer_id",
+          "ty": "domain::tddd::LayerId"
+        },
+        {
+          "name": "catalog_hash_hex",
+          "ty": "&str"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "D8/T020 per-layer calc primitive for chain ③ (`calc-impl-catalog`). This infrastructure-layer wrapper receives the workspace root, the usecase-resolved TrackId, the usecase-owned layer ID, and pre-computed catalogue SHA-256 hex from the argless usecase orchestrator. It derives the track-scoped layer catalogue, baseline, and `track/items/<track-id>/<layer>-type-signals.json` output paths inside infrastructure, evaluates type signals for exactly that layer, and persists the provided catalogue hash as the declaration freshness hash. CLI command files and cli-composition do not pass per-layer paths or hashes, resolve the active track, enumerate layers, compute hashes, or construct output paths.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-16"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-20"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-21"
         }
       ],
       "informal_grounds": []
@@ -695,6 +903,16 @@
       "action": "add",
       "trait_ref": "core::error::Error",
       "for_type": "SignalGatesConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LocalSignalLayerReaderAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::signal::SignalLayerReader",
+      "for_type": "LocalSignalLayerReaderAdapter"
     }
   ]
 }

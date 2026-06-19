@@ -473,6 +473,262 @@
         "kind": "pass",
         "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
       }
+    },
+    {
+      "claim_hash": "b0ecc57264f7fbe3c0829f177c59fdd87924632f3cf360b8acf7e3461838a6f5",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "b0ecc57264f7fbe3c0829f177c59fdd87924632f3cf360b8acf7e3461838a6f5",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来のレイヤーセット）は `libs/domain/src/` の domain primitive 責務、catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務でなければならず、... per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり"
+      }
+    },
+    {
+      "claim_hash": "57a006159e5c4ef2f7de85e146633f102fa3b4bde400bcd68ad0c5e34c7930aa",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。gate 選択フラグ（`--gate commit|merge`）や strictness フラグ（`--strict`）はレイヤー指定フラグではないため許容される。"
+      }
+    },
+    {
+      "claim_hash": "57a006159e5c4ef2f7de85e146633f102fa3b4bde400bcd68ad0c5e34c7930aa",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "57a006159e5c4ef2f7de85e146633f102fa3b4bde400bcd68ad0c5e34c7930aa",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同様に `bin/sotp signal calc-catalog-spec`（per-layer フラグなし）、`bin/sotp signal check-impl-catalog`（per-layer フラグなし）、`bin/sotp signal check-catalog-spec`（per-layer フラグなし）、および `bin/sotp signal check --gate commit|merge`（per-layer フラグなし; `--gate` は gate 選択フラグであり per-layer フラグではない）が同条件で正常に動作する。いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "57a006159e5c4ef2f7de85e146633f102fa3b4bde400bcd68ad0c5e34c7930aa",
+      "evidence_hash": "f3f3db576b0e7b4122c60ef2fb79771c36a1be1a4e681bb094adaaa334973e41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "916bf192d33e18a05396137b8cf78831804e5638380cba75df0cd8ffc9d7b286",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。... いずれの stale 検出も strictness によらず常時 `Finding::error` とし、warning 化しない"
+      }
+    },
+    {
+      "claim_hash": "916bf192d33e18a05396137b8cf78831804e5638380cba75df0cd8ffc9d7b286",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track-active-gate の regen シーケンスを `signal calc-impl-catalog` → `signal calc-catalog-spec` → `track views sync` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "0123d828262935e384bbffb2adc0137712de5d51ecfe5f17bc96688d9ef59acd",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--signals-path`、`--catalog-hash`、`--layer` ... 呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "0123d828262935e384bbffb2adc0137712de5d51ecfe5f17bc96688d9ef59acd",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "0123d828262935e384bbffb2adc0137712de5d51ecfe5f17bc96688d9ef59acd",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD 対象レイヤーが存在するトラックブランチから `bin/sotp signal check-impl-catalog`（per-layer フラグなし）を実行すると、`<layer>-types.json` が存在する全レイヤーについて `<layer>-type-signals.json` が生成または更新され、catalogue が存在しないレイヤーに対しては no-op となる。"
+      }
+    },
+    {
+      "claim_hash": "0123d828262935e384bbffb2adc0137712de5d51ecfe5f17bc96688d9ef59acd",
+      "evidence_hash": "f3f3db576b0e7b4122c60ef2fb79771c36a1be1a4e681bb094adaaa334973e41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signals ファイルパス構築（D8-4 に追加された行に従い）が libs/infrastructure/src/ に存在し、apps/cli/src/commands/signal/ および apps/cli-composition/src/signal.rs には存在しない。`"
+      }
+    },
+    {
+      "claim_hash": "ce470e03344cdd6d6a2de579db05aa785fa7972845bc3a4c4c29bca406cdf48b",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。... いずれの stale 検出も strictness によらず常時 `Finding::error` とし、warning 化しない"
+      }
+    },
+    {
+      "claim_hash": "ce470e03344cdd6d6a2de579db05aa785fa7972845bc3a4c4c29bca406cdf48b",
+      "evidence_hash": "3e737860e46c8971d552123b872108c5adf282f3f36f46e405f6e12ea39254f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧コマンド（`track signals` / `track type-signals` / `track catalogue-spec-signals` / `verify spec-states` / `verify adr-signals` / `verify catalogue-spec-signals`）が新 `signal` 名前空間に移行または廃止されており、`Makefile.toml` / hooks / `track-active-gate` / `merge_gate.rs` / docs が新コマンド名で一貫している。後方互換 alias は存在しない。"
+      }
+    },
+    {
+      "claim_hash": "ce470e03344cdd6d6a2de579db05aa785fa7972845bc3a4c4c29bca406cdf48b",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track-active-gate の regen シーケンスを `signal calc-impl-catalog` → `signal calc-catalog-spec` → `track views sync` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "916bf192d33e18a05396137b8cf78831804e5638380cba75df0cd8ffc9d7b286",
+      "evidence_hash": "3e737860e46c8971d552123b872108c5adf282f3f36f46e405f6e12ea39254f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧コマンド（`track signals` / `track type-signals` / `track catalogue-spec-signals` / `verify spec-states` / `verify adr-signals` / `verify catalogue-spec-signals`）が新 `signal` 名前空間に移行または廃止されており、"
+      }
+    },
+    {
+      "claim_hash": "e7204de614bcda074a6ad9f4e8a8f9dfbab3d2976f9134d59381ba91b97f8ef0",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "e7204de614bcda074a6ad9f4e8a8f9dfbab3d2976f9134d59381ba91b97f8ef0",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "e7204de614bcda074a6ad9f4e8a8f9dfbab3d2976f9134d59381ba91b97f8ef0",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "e7204de614bcda074a6ad9f4e8a8f9dfbab3d2976f9134d59381ba91b97f8ef0",
+      "evidence_hash": "f3f3db576b0e7b4122c60ef2fb79771c36a1be1a4e681bb094adaaa334973e41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙は `libs/domain/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "032a2ac72efb7567b209aac68dadf5fcf02c01861eb4cbd76d5bff437fba1e9b",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "032a2ac72efb7567b209aac68dadf5fcf02c01861eb4cbd76d5bff437fba1e9b",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "032a2ac72efb7567b209aac68dadf5fcf02c01861eb4cbd76d5bff437fba1e9b",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal check-catalog-spec`（per-layer フラグなし）... 同条件で正常に動作する。いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "032a2ac72efb7567b209aac68dadf5fcf02c01861eb4cbd76d5bff437fba1e9b",
+      "evidence_hash": "f3f3db576b0e7b4122c60ef2fb79771c36a1be1a4e681bb094adaaa334973e41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "a465cee78fceb50b5318a1f27e5f3d993f746d14c3bc1d90461ca7c6fd4b304e",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。"
+      }
+    },
+    {
+      "claim_hash": "a465cee78fceb50b5318a1f27e5f3d993f746d14c3bc1d90461ca7c6fd4b304e",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務でなければならず、... per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり"
+      }
+    },
+    {
+      "claim_hash": "a465cee78fceb50b5318a1f27e5f3d993f746d14c3bc1d90461ca7c6fd4b304e",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD 対象レイヤーが存在するトラックブランチから `bin/sotp signal calc-impl-catalog`（per-layer フラグなし）を実行すると、`<layer>-types.json` が存在する全レイヤーについて `<layer>-type-signals.json` が生成または更新され、catalogue が存在しないレイヤーに対しては no-op となる。"
+      }
+    },
+    {
+      "claim_hash": "a465cee78fceb50b5318a1f27e5f3d993f746d14c3bc1d90461ca7c6fd4b304e",
+      "evidence_hash": "f3f3db576b0e7b4122c60ef2fb79771c36a1be1a4e681bb094adaaa334973e41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙は `libs/domain/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "15974546c12a51a71c2ecaa4cf886e6c04eb41b337f25fd204d55c489ec640b0",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。gate 選択フラグ（`--gate commit|merge`）や strictness フラグ（`--strict`）はレイヤー指定フラグではないため許容される。"
+      }
+    },
+    {
+      "claim_hash": "15974546c12a51a71c2ecaa4cf886e6c04eb41b337f25fd204d55c489ec640b0",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer の signals ファイル（出力）のパス構築は infrastructure の責務"
+      }
+    },
+    {
+      "claim_hash": "15974546c12a51a71c2ecaa4cf886e6c04eb41b337f25fd204d55c489ec640b0",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal check-impl-catalog`（per-layer フラグなし）... いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "15974546c12a51a71c2ecaa4cf886e6c04eb41b337f25fd204d55c489ec640b0",
+      "evidence_hash": "f3f3db576b0e7b4122c60ef2fb79771c36a1be1a4e681bb094adaaa334973e41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
     }
   ]
 }

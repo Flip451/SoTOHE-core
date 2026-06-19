@@ -137,17 +137,6 @@ mod tests {
 
     use crate::verify::test_support::write_minimal_adr;
 
-    /// Write a minimal ADR YAML file with `review_finding_ref` (→ Yellow signal).
-    fn write_yellow_adr(adr_dir: &std::path::Path, filename: &str) {
-        write_minimal_adr(adr_dir, filename, "review_finding_ref", "RF-1");
-    }
-
-    /// Write a minimal ADR YAML file with `user_decision_ref` and no `review_finding_ref`
-    /// (→ Blue signal).
-    fn write_blue_adr(adr_dir: &std::path::Path, filename: &str) {
-        write_minimal_adr(adr_dir, filename, "user_decision_ref", "chat:2026-01-01");
-    }
-
     fn setup_project_dir() -> tempfile::TempDir {
         let tmp = tempfile::tempdir().unwrap();
         std::fs::create_dir_all(tmp.path().join("knowledge/adr")).unwrap();
@@ -157,7 +146,12 @@ mod tests {
     #[test]
     fn test_execute_verify_adr_signals_with_strict_yellow_strict_returns_error() {
         let tmp = setup_project_dir();
-        write_yellow_adr(&tmp.path().join("knowledge/adr"), "2026-01-01-test.md");
+        write_minimal_adr(
+            &tmp.path().join("knowledge/adr"),
+            "2026-01-01-test.md",
+            "review_finding_ref",
+            "RF-1",
+        );
 
         let outcome = execute_verify_adr_signals_with_strict(tmp.path(), true);
 
@@ -171,7 +165,12 @@ mod tests {
     #[test]
     fn test_execute_verify_adr_signals_with_strict_yellow_non_strict_produces_warning_not_error() {
         let tmp = setup_project_dir();
-        write_yellow_adr(&tmp.path().join("knowledge/adr"), "2026-01-01-test.md");
+        write_minimal_adr(
+            &tmp.path().join("knowledge/adr"),
+            "2026-01-01-test.md",
+            "review_finding_ref",
+            "RF-1",
+        );
 
         let outcome = execute_verify_adr_signals_with_strict(tmp.path(), false);
 
@@ -186,7 +185,12 @@ mod tests {
     #[test]
     fn test_execute_verify_adr_signals_with_strict_blue_signal_passes_in_both_modes() {
         let tmp = setup_project_dir();
-        write_blue_adr(&tmp.path().join("knowledge/adr"), "2026-01-01-test.md");
+        write_minimal_adr(
+            &tmp.path().join("knowledge/adr"),
+            "2026-01-01-test.md",
+            "user_decision_ref",
+            "chat:2026-01-01",
+        );
 
         let outcome_strict = execute_verify_adr_signals_with_strict(tmp.path(), true);
         let outcome_interim = execute_verify_adr_signals_with_strict(tmp.path(), false);

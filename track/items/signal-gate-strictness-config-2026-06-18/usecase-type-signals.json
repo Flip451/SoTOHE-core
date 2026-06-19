@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-19T14:53:01Z",
+  "generated_at": "2026-06-19T19:19:00Z",
   "declaration_hash": "19cbb2e401d7fa6aa5da1dd89c32cf6f38a2888e8d410106ad3188eee204d4f3",
   "signals": [
     {
@@ -46,15 +46,15 @@
     {
       "type_name": "SignalLayerReader",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SignalLayerReaderError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -102,26 +102,26 @@
     {
       "type_name": "usecase::signal::calc_catalog_spec",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "usecase::signal::calc_impl_catalog",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "usecase::signal::check_catalog_spec",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "usecase::signal::check_impl_catalog",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "VerifyAdrSignals",

@@ -349,32 +349,14 @@ esac
 
 [tasks.signal-check-impl-catalog-local]
 private = true
-description = "[internal] Chain ③ check-impl-catalog --gate commit: per-layer impl↔catalog signal gate. Active track auto-resolved from branch; skips layer when catalogue absent (Phase <2); fails closed when catalogue present but signals absent. Layers: domain, usecase, infrastructure."
+description = "[internal] Chain ③ check-impl-catalog --gate commit: argless impl↔catalog signal gate (T020 / D8 — active track and layers resolved internally). Skips gracefully when not on a track branch."
 script_runner = "@shell"
 script = ['''
 set -e
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 case "$BRANCH" in
   track/*)
-    TRACK_ID="${BRANCH#track/}"
-    FAILED=0
-    for LAYER in domain usecase infrastructure; do
-      SIGNALS_PATH="track/items/${TRACK_ID}/${LAYER}-type-signals.json"
-      CATALOG_PATH="track/items/${TRACK_ID}/${LAYER}-types.json"
-      if [ ! -f "$CATALOG_PATH" ]; then
-        printf "[SKIP] signal-check-impl-catalog-local(%s): catalogue absent (Phase <2); skipping\n" "$LAYER"
-        continue
-      fi
-      if [ ! -f "$SIGNALS_PATH" ]; then
-        printf "[ERROR] signal-check-impl-catalog-local(%s): catalogue present but signals file absent; run 'bin/sotp signal calc-impl-catalog' first\n" "$LAYER" >&2
-        FAILED=1
-        continue
-      fi
-      CATALOG_HASH=$(sha256sum "$CATALOG_PATH" | cut -d" " -f1)
-      cargo run --quiet -p cli -- signal check-impl-catalog --gate commit \
-        --signals-path "$SIGNALS_PATH" --catalog-hash "$CATALOG_HASH" || FAILED=1
-    done
-    exit $FAILED
+    cargo run --quiet -p cli -- signal check-impl-catalog --gate commit
     ;;
   *)
     printf "[SKIP] signal-check-impl-catalog-local: not on a track branch; skipping\n"
@@ -391,40 +373,21 @@ args = ["run", "--quiet", "-p", "cli", "--", "verify", "catalogue-spec-refs"]
 
 [tasks.check-catalogue-spec-signals-local]
 private = true
-description = "[internal] Chain ② check-catalog-spec --gate commit: per-layer catalog→spec signal gate. Active track auto-resolved from branch; skips layer when catalogue absent (Phase <2); fails closed when catalogue present but signals absent. Layers: domain, usecase, infrastructure."
+description = "[internal] Chain ② check-catalog-spec --gate commit: argless catalog→spec signal gate (T020 / D8 — active track and layers resolved internally). Skips gracefully when not on a track branch."
 script_runner = "@shell"
 script = ['''
 set -e
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 case "$BRANCH" in
   track/*)
-    TRACK_ID="${BRANCH#track/}"
-    FAILED=0
-    for LAYER in domain usecase infrastructure; do
-      SIGNALS_PATH="track/items/${TRACK_ID}/${LAYER}-catalogue-spec-signals.json"
-      CATALOG_PATH="track/items/${TRACK_ID}/${LAYER}-types.json"
-      if [ ! -f "$CATALOG_PATH" ]; then
-        printf "[SKIP] check-catalogue-spec-signals-local(%s): catalogue absent (Phase <2); skipping\n" "$LAYER"
-        continue
-      fi
-      if [ ! -f "$SIGNALS_PATH" ]; then
-        printf "[ERROR] check-catalogue-spec-signals-local(%s): catalogue present but signals file absent; run 'bin/sotp signal calc-catalog-spec' first\n" "$LAYER" >&2
-        FAILED=1
-        continue
-      fi
-      CATALOG_HASH=$(sha256sum "$CATALOG_PATH" | cut -d" " -f1)
-      cargo run --quiet -p cli -- signal check-catalog-spec --gate commit \
-        --signals-path "$SIGNALS_PATH" --catalog-hash "$CATALOG_HASH" || FAILED=1
-    done
-    exit $FAILED
+    cargo run --quiet -p cli -- signal check-catalog-spec --gate commit
     ;;
   *)
     printf "[SKIP] check-catalogue-spec-signals-local: not on a track branch; skipping\n"
     exit 0
     ;;
 esac
-'''
-]
+''']
 
 [tasks.ci-rust-local]
 private = true
@@ -654,30 +617,12 @@ args = ["pr", "review-cycle", "${@}"]
 
 [tasks.track-active-gate]
 private = true
-description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec (per TDDD layer) → views sync. Both track-commit-message and review invocations depend on this shared task (D4 symmetry, CN-11 DRY). Active track resolved from current branch (D1). Absent catalogue files are skipped unconditionally per layer. Fail-closed: non-zero exit aborts the chain (CN-09)."
+description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → views sync (T020 / D8: argless; active track and layers resolved internally). Both track-commit-message and review invocations depend on this shared task (D4 symmetry, CN-11 DRY). Fail-closed: non-zero exit aborts the chain (CN-09)."
 script_runner = "@shell"
 script = ['''
 set -e
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-TRACK_ID="${BRANCH#track/}"
-for LAYER in domain usecase infrastructure; do
-  SIGNALS_PATH="track/items/${TRACK_ID}/${LAYER}-type-signals.json"
-  CATALOG_PATH="track/items/${TRACK_ID}/${LAYER}-types.json"
-  if [ ! -f "$CATALOG_PATH" ]; then
-    continue
-  fi
-  CATALOG_HASH=$(sha256sum "$CATALOG_PATH" | cut -d" " -f1)
-  bin/sotp signal calc-impl-catalog --signals-path "$SIGNALS_PATH" --catalog-hash "$CATALOG_HASH"
-done
-for LAYER in domain usecase infrastructure; do
-  SIGNALS_PATH="track/items/${TRACK_ID}/${LAYER}-catalogue-spec-signals.json"
-  CATALOG_PATH="track/items/${TRACK_ID}/${LAYER}-types.json"
-  if [ ! -f "$CATALOG_PATH" ]; then
-    continue
-  fi
-  CATALOG_HASH=$(sha256sum "$CATALOG_PATH" | cut -d" " -f1)
-  bin/sotp signal calc-catalog-spec --signals-path "$SIGNALS_PATH" --catalog-hash "$CATALOG_HASH"
-done
+bin/sotp signal calc-impl-catalog
+bin/sotp signal calc-catalog-spec
 bin/sotp track views sync
 ''']
 

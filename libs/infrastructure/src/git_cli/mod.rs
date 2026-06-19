@@ -388,7 +388,6 @@ mod tests {
     use std::ffi::OsStr;
     use std::fs;
     use std::path::PathBuf;
-    use std::process::Command;
     use std::sync::{Mutex, OnceLock};
 
     use usecase::track_resolution::{BranchReadError, BranchReaderPort};
@@ -398,6 +397,8 @@ mod tests {
         collect_track_branch_claims, guarded_git_command, load_explicit_track_branch,
         load_explicit_track_branch_from_items_dir, resolve_repo_path,
     };
+
+    use crate::verify::test_support::run_git;
 
     fn cwd_lock() -> &'static Mutex<()> {
         static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
@@ -420,11 +421,6 @@ mod tests {
         fn drop(&mut self) {
             std::env::set_current_dir(&self.original).unwrap();
         }
-    }
-
-    fn run_git(root: &std::path::Path, args: &[&str]) {
-        let status = Command::new("git").args(args).current_dir(root).status().unwrap();
-        assert!(status.success(), "git command failed: git {}", args.join(" "));
     }
 
     #[test]

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-19T14:53:05Z",
-  "declaration_hash": "c129768ac700279284d77bb9d7bfc42a988ae3901adae3a65de0a94f0b401594",
+  "generated_at": "2026-06-19T19:19:03Z",
+  "declaration_hash": "83e5c5d4102befdf24477a7f2a9bc56e8bd483681107c9fbf9068774f4bf2558",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -12,6 +12,16 @@
         "core::clone::Clone",
         "core::fmt::Debug",
         "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "LocalSignalLayerReaderAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "SignalLayerReader",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -60,6 +70,18 @@
       "found_type": true
     },
     {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::calc_catalog_spec_for_layer",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_for_layer",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
       "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file",
       "kind_tag": "free_function",
       "signal": "blue",
@@ -94,6 +116,18 @@
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::calc_impl_catalog_for_layer",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::check_impl_catalog_for_layer",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
     },
     {
       "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file",

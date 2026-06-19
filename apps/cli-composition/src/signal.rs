@@ -1,21 +1,10 @@
-//! `signal` command family — CliApp impl methods.
-//!
-//! Each method corresponds to one `signal calc-*` or `signal check-*` CLI
-//! subcommand.  The aggregate `signal check --gate commit|merge` is handled
-//! by [`CliApp::signal_check_gate`], which runs all four chains in declared
-//! order and aggregates their findings.
-//!
-//! # Gate name enum
-//!
-//! Callers pass [`SignalGateName`] (a pure value type defined in this module)
-//! to select the gate context.  This keeps `domain` types off the `cli` →
-//! `cli_composition` public boundary (CN-02).
+//! `signal` command family for [`CliApp`].
 
 use std::path::{Path, PathBuf};
 
 use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome};
-
-// ── Public gate-name DTO (crosses the cli_composition boundary) ───────────────
+use infrastructure::verify::tddd_layers::TdddLayerBinding;
+use usecase::signal::{SignalLayerReader as _, SignalLayerReaderError};
 
 /// Selects the gate context when resolving strictness from `signal-gates.json`.
 ///
@@ -29,29 +18,139 @@ pub enum SignalGateName {
     Merge,
 }
 
-// ── Signal-local helpers (private) ───────────────────────────────────────────
-
-/// Parse a hex-encoded catalogue hash, returning a failure `CommandOutcome` on error.
-///
-/// Used by both calc and check catalogue commands to avoid duplicating the
-/// `ContentHash::try_from_hex` + error-format pattern.
-fn parse_catalogue_hash(
-    command_label: &str,
-    catalogue_hash: &str,
-) -> Result<domain::ContentHash, CommandOutcome> {
-    domain::ContentHash::try_from_hex(catalogue_hash).map_err(|e| {
-        CommandOutcome::failure(Some(format!(
-            "--- {command_label} ---\n\
-             [ERROR] invalid catalogue-hash: {e}\n\
-             --- {command_label} FAILED ---"
-        )))
-    })
+struct BindingSignalLayerReader {
+    inner: infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter,
+    bindings: Vec<TdddLayerBinding>,
 }
 
-/// Merge multiple `CommandOutcome` values (all run in declared order).
-///
-/// Collects stdout lines from each outcome; exit code is non-zero if any
-/// outcome has `exit_code != 0`.
+impl usecase::signal::SignalLayerReader for BindingSignalLayerReader {
+    fn active_track_id(&self) -> Result<domain::TrackId, SignalLayerReaderError> {
+        self.inner.active_track_id()
+    }
+
+    fn enabled_layers(
+        &self,
+        _track_id: domain::TrackId,
+    ) -> Result<Vec<domain::tddd::LayerId>, SignalLayerReaderError> {
+        self.bindings
+            .iter()
+            .map(|b| {
+                domain::tddd::LayerId::try_new(b.layer_id().to_owned())
+                    .map_err(|_| SignalLayerReaderError::Io)
+            })
+            .collect()
+    }
+
+    fn catalogue_bytes(
+        &self,
+        track_id: domain::TrackId,
+        layer: domain::tddd::LayerId,
+    ) -> Result<Option<Vec<u8>>, SignalLayerReaderError> {
+        self.inner.catalogue_bytes(track_id, layer)
+    }
+}
+
+/// Shared body for `signal_check_catalog_spec` and `signal_check_impl_catalog`.
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+fn signal_check_layer_chain(
+    strict_override: bool,
+    gate: Option<SignalGateName>,
+    workspace_root: Option<PathBuf>,
+    chain_id: domain::ChainId,
+    command_label: &str,
+    signal_file_name: impl Fn(&TdddLayerBinding) -> String + 'static,
+    include_binding: impl Fn(&TdddLayerBinding) -> bool + 'static,
+    verifier: impl Fn(&std::path::Path, &str, bool) -> infrastructure::verify::VerifyOutcome + 'static,
+    run_usecase: impl Fn(
+        &BindingSignalLayerReader,
+        Box<dyn Fn(domain::tddd::LayerId, &str) -> infrastructure::verify::VerifyOutcome>,
+    ) -> infrastructure::verify::VerifyOutcome,
+) -> Result<CommandOutcome, String> {
+    let strict = match resolve_strict(strict_override, gate, chain_id, workspace_root.as_deref()) {
+        Ok(s) => s,
+        Err(outcome) => return Ok(outcome),
+    };
+
+    signal_check_layer_chain_with_strict(
+        strict,
+        workspace_root,
+        command_label,
+        signal_file_name,
+        include_binding,
+        verifier,
+        run_usecase,
+    )
+}
+
+#[allow(clippy::type_complexity, clippy::too_many_arguments)]
+fn signal_check_layer_chain_with_strict(
+    strict: bool,
+    workspace_root: Option<PathBuf>,
+    command_label: &str,
+    signal_file_name: impl Fn(&TdddLayerBinding) -> String + 'static,
+    include_binding: impl Fn(&TdddLayerBinding) -> bool + 'static,
+    verifier: impl Fn(&std::path::Path, &str, bool) -> infrastructure::verify::VerifyOutcome + 'static,
+    run_usecase: impl Fn(
+        &BindingSignalLayerReader,
+        Box<dyn Fn(domain::tddd::LayerId, &str) -> infrastructure::verify::VerifyOutcome>,
+    ) -> infrastructure::verify::VerifyOutcome,
+) -> Result<CommandOutcome, String> {
+    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
+    use infrastructure::verify::tddd_layers::{
+        LoadTdddLayersError, find_binding, load_tddd_layers,
+    };
+
+    let root = match workspace_root {
+        Some(ref r) => r.clone(),
+        None => {
+            let repo = SystemGitRepo::discover()
+                .map_err(|e| format!("{command_label}: cannot discover git repo: {e}"))?;
+            repo.root().to_path_buf()
+        }
+    };
+    let items_dir = root.join("track").join("items");
+    let rules_path = root.join("architecture-rules.json");
+    let bindings = load_tddd_layers(&rules_path, &root).map_err(|e| match e {
+        LoadTdddLayersError::Io { path, source } => format!("{}: {source}", path.display()),
+        LoadTdddLayersError::Parse(err) => format!("{}: {err}", rules_path.display()),
+    })?;
+    let bindings: Vec<_> = bindings.into_iter().filter(|b| include_binding(b)).collect();
+    let reader = BindingSignalLayerReader {
+        inner: LocalSignalLayerReaderAdapter::new(root.clone()),
+        bindings: bindings.clone(),
+    };
+
+    let track_id_str = {
+        reader
+            .active_track_id()
+            .map_err(|e| format!("{command_label}: cannot resolve active track id: {e}"))?
+            .to_string()
+    };
+
+    let per_layer_fn: Box<
+        dyn Fn(domain::tddd::LayerId, &str) -> infrastructure::verify::VerifyOutcome,
+    > = {
+        let items_dir = items_dir.clone();
+        let track_id_str = track_id_str.clone();
+        Box::new(move |layer: domain::tddd::LayerId, hash_hex: &str| {
+            let layer_str = layer.as_ref();
+            let Some(binding) = find_binding(&bindings, layer_str) else {
+                return infrastructure::verify::VerifyOutcome::from_findings(vec![
+                    infrastructure::verify::VerifyFinding::error(format!(
+                        "TDDD layer binding for '{layer_str}' not found"
+                    )),
+                ]);
+            };
+            let signals_path = items_dir.join(&track_id_str).join(signal_file_name(binding));
+            verifier(&signals_path, hash_hex, strict)
+        })
+    };
+
+    let outcome = run_usecase(&reader, per_layer_fn);
+    Ok(render_outcome(command_label, &outcome))
+}
+
 fn merge_outcomes(label: &str, outcomes: Vec<CommandOutcome>) -> CommandOutcome {
     let mut all_lines: Vec<String> = vec![format!("--- {label} ---")];
     let mut any_failure = false;
@@ -78,11 +177,6 @@ fn merge_outcomes(label: &str, outcomes: Vec<CommandOutcome>) -> CommandOutcome 
     CommandOutcome { stdout: Some(all_lines.join("\n")), stderr: None, exit_code }
 }
 
-/// Resolve the `signal-gates.json` path from the workspace root (discovered
-/// from the CWD via git).
-///
-/// Returns `Err` with an actionable message when git discovery fails or when
-/// the config cannot be loaded.
 fn load_gate_matrix(
     workspace_root: Option<&Path>,
 ) -> Result<domain::SignalGateMatrix, CommandOutcome> {
@@ -106,10 +200,6 @@ fn load_gate_matrix(
         })
 }
 
-/// Resolve the effective `strict: bool` from a `--strict` override or
-/// a `--gate commit|merge` + config lookup.
-///
-/// Returns `Err(CommandOutcome)` when the config cannot be loaded.
 fn resolve_strict(
     strict_override: bool,
     gate: Option<SignalGateName>,
@@ -131,95 +221,9 @@ fn gate_name_to_kind(gate: SignalGateName) -> domain::GateKind {
     }
 }
 
-// ── Path-parsing helpers for calc commands ────────────────────────────────────
-
-/// Parse `<track-id>` and `<layer>` from a signals path that follows the
-/// convention `track/items/<track-id>/<layer><suffix>`.
-///
-/// Returns `None` when the path does not match the expected structure.
-fn parse_signals_path_with_suffix(signals_path: &Path, suffix: &str) -> Option<(String, String)> {
-    // We look for the `.../track/items/<track-id>/<layer><suffix>` convention.
-    // The path may be absolute or relative; we walk the components from the end.
-    let file_name = signals_path.file_name()?.to_str()?;
-    let layer = file_name.strip_suffix(suffix)?;
-    let track_id_component = signals_path.parent()?.file_name()?.to_str()?;
-    // Sanity: grandparent should be "items".
-    let maybe_items = signals_path.parent()?.parent()?.file_name()?.to_str()?;
-    if maybe_items != "items" {
-        return None;
-    }
-    Some((track_id_component.to_owned(), layer.to_owned()))
-}
-
-/// Parse `<track-id>` and `<layer>` from a signals path that follows the
-/// convention `track/items/<track-id>/<layer>-type-signals.json`.
-///
-/// Returns `None` when the path does not match the expected structure.
-fn parse_signals_path_for_impl_catalog(signals_path: &Path) -> Option<(String, String)> {
-    parse_signals_path_with_suffix(signals_path, "-type-signals.json")
-}
-
-/// Parse `<track-id>` and `<layer>` from a signals path that follows the
-/// convention `track/items/<track-id>/<layer>-catalogue-spec-signals.json`.
-///
-/// Returns `None` when the path does not match the expected structure.
-fn parse_signals_path_for_catalog_spec(signals_path: &Path) -> Option<(String, String)> {
-    parse_signals_path_with_suffix(signals_path, "-catalogue-spec-signals.json")
-}
-
-/// Shared orchestration for catalogue-hash-based signal check commands.
-///
-/// Resolves strictness, validates the catalogue hash, delegates to the
-/// chain-specific check function via `check_fn`, and renders the outcome.
-///
-/// `check_fn` receives `(signals_path, hex_hash, strict)` and returns a
-/// `infrastructure::verify::VerifyOutcome`.
-#[allow(clippy::too_many_arguments)]
-fn run_catalogue_hash_check(
-    command_label: &str,
-    signals_path: &Path,
-    catalogue_hash: &str,
-    strict_override: bool,
-    gate: Option<SignalGateName>,
-    chain_id: domain::ChainId,
-    workspace_root: Option<&Path>,
-    check_fn: impl FnOnce(&Path, &str, bool) -> infrastructure::verify::VerifyOutcome,
-) -> Result<CommandOutcome, String> {
-    let strict = match resolve_strict(strict_override, gate, chain_id, workspace_root) {
-        Ok(s) => s,
-        Err(outcome) => return Ok(outcome),
-    };
-    let hash = match parse_catalogue_hash(command_label, catalogue_hash) {
-        Ok(h) => h,
-        Err(outcome) => return Ok(outcome),
-    };
-    let outcome = check_fn(signals_path, &hash.to_hex(), strict);
-    Ok(render_outcome(command_label, &outcome))
-}
-
-// ── CliApp impl ───────────────────────────────────────────────────────────────
-
 impl CliApp {
-    // ── calc-adr-user ─────────────────────────────────────────────────────────
-
     /// Compute ADR signal grounding live from `project_root/knowledge/adr/`.
-    ///
-    /// Compute ADR signal grounding live from `project_root/knowledge/adr/`.
-    ///
-    /// Wired at the composition root via
-    /// `infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict`
-    /// (same path as `signal check-adr-user` but with `strict = false` — no
-    /// gate enforcement, result is displayed only).
-    /// `usecase::chain::AdrUserChain::calc_live` remains a placeholder until T006.
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` when the infrastructure ADR scanner fails (I/O errors).
     pub fn signal_calc_adr_user(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
-        // Wire chain ⓪ calc at the composition root.
-        // `usecase::chain::AdrUserChain::calc_live` carries a T006 placeholder; we bypass
-        // it and call `execute_verify_adr_signals_with_strict` directly with `strict=false`
-        // (no gate enforcement — calc only displays the current signal distribution).
         let outcome = infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict(
             &project_root,
             false,
@@ -227,17 +231,7 @@ impl CliApp {
         Ok(render_outcome("signal calc-adr-user", &outcome))
     }
 
-    // ── check-adr-user ────────────────────────────────────────────────────────
-
     /// Evaluate chain ⓪ (ADR→user) gate.
-    ///
-    /// Strictness is resolved from `strict_override` (takes precedence) or
-    /// from `signal-gates.json` using `gate` context.  The `--strict` and
-    /// `--gate` flags are mutually exclusive (enforced by the CLI parser).
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` when gate config cannot be loaded and no override is given.
     pub fn signal_check_adr_user(
         &self,
         project_root: PathBuf,
@@ -255,11 +249,6 @@ impl CliApp {
             Err(outcome) => return Ok(outcome),
         };
 
-        // Wire AdrUserChain at the composition root using FsAdrFileAdapter.
-        // `usecase::chain::AdrUserChain::calc_live` carries a placeholder until the
-        // usecase-layer wiring (T006 follow-up) lands; we bypass it here and call
-        // `execute_verify_adr_signals_with_strict` directly, which uses
-        // `infrastructure::adr_decision::FsAdrFileAdapter` to perform the live scan.
         let outcome = infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict(
             &project_root,
             strict,
@@ -267,26 +256,11 @@ impl CliApp {
         Ok(render_outcome("signal check-adr-user", &outcome))
     }
 
-    // ── calc-spec-adr ─────────────────────────────────────────────────────────
-
     /// Compute and persist chain ① (spec→ADR) signals to `spec.json`.
-    ///
-    /// Wired at the composition root: reads `spec.json`, evaluates signals via
-    /// `SpecDocument::evaluate_signals`, writes them back with `set_signals`, then
-    /// atomically overwrites `spec.json`.  This is the same path as `sotp track
-    /// signals` but scoped to a single `spec.json` path.
-    /// `usecase::chain::SpecAdrChain::calc` remains a placeholder until T007.
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` when `spec.json` cannot be read, decoded, or written.
     pub fn signal_calc_spec_adr(&self, spec_json_path: PathBuf) -> Result<CommandOutcome, String> {
         use infrastructure::spec::codec as spec_codec;
         use infrastructure::track::atomic_write::atomic_write_file;
 
-        // Wire chain ① calc at the composition root.
-        // `usecase::chain::SpecAdrChain::calc` carries a T007 placeholder; we bypass
-        // it and call the spec read/evaluate/write path directly.
         let json_content = std::fs::read_to_string(&spec_json_path).map_err(|e| {
             format!("signal calc-spec-adr: cannot read {}: {e}", spec_json_path.display())
         })?;
@@ -303,13 +277,7 @@ impl CliApp {
         Ok(render_outcome("signal calc-spec-adr", &outcome))
     }
 
-    // ── check-spec-adr ────────────────────────────────────────────────────────
-
     /// Evaluate chain ① (spec→ADR) gate.
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` when gate config cannot be loaded.
     pub fn signal_check_spec_adr(
         &self,
         spec_json_path: PathBuf,
@@ -327,9 +295,6 @@ impl CliApp {
             Err(outcome) => return Ok(outcome),
         };
 
-        // Wire chain ① at the composition root.
-        // `usecase::chain::SpecAdrChain::calc`/`load` carry T007 placeholders; we bypass
-        // them and call `verify_from_spec_json` (Stage 1 only) directly.
         let trusted_root =
             match infrastructure::verify::trusted_root::resolve_trusted_root(&spec_json_path) {
                 Ok(r) => r,
@@ -353,135 +318,116 @@ impl CliApp {
         Ok(render_outcome("signal check-spec-adr", &outcome))
     }
 
-    // ── calc-catalog-spec ─────────────────────────────────────────────────────
-
-    /// Compute and persist chain ② (catalog→spec) signals for a single layer.
-    ///
-    /// Wired at the composition root via
-    /// `infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer`
-    /// (same path as `track catalogue-spec-signals`, but scoped to one layer).
-    ///
-    /// `signals_path` must follow the convention
-    /// `track/items/<track-id>/<layer>-catalogue-spec-signals.json` so the
-    /// track-id and layer can be inferred.
-    ///
-    /// `_catalogue_hash` is accepted but ignored — `refresh_one_layer` computes
-    /// the hash itself from the catalogue file bytes.
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` on workspace-discovery, path-parse, layer-lookup, or
-    /// execution failures.
-    pub fn signal_calc_catalog_spec(
-        &self,
-        signals_path: PathBuf,
-        _catalogue_hash: String,
-    ) -> Result<CommandOutcome, String> {
+    /// Compute and persist chain ② (catalog→spec) signals for all TDDD-enabled layers.
+    pub fn signal_calc_catalog_spec(&self) -> Result<CommandOutcome, String> {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
         use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
         use infrastructure::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
 
-        // Discover workspace root from git.
         let repo = SystemGitRepo::discover()
             .map_err(|e| format!("signal calc-catalog-spec: cannot discover git repo: {e}"))?;
         let workspace_root = repo.root().to_path_buf();
-
-        // Parse track_id and layer from signals_path convention:
-        // track/items/<track-id>/<layer>-catalogue-spec-signals.json
-        let (track_id, layer_id) =
-            parse_signals_path_for_catalog_spec(&signals_path).ok_or_else(|| {
-                format!(
-                    "signal calc-catalog-spec: cannot infer track-id/layer from signals path '{}'. \
-                     Expected convention: track/items/<track-id>/<layer>-catalogue-spec-signals.json",
-                    signals_path.display()
-                )
-            })?;
-
-        // Resolve the TdddLayerBinding for this layer.
-        let rules_path = workspace_root.join("architecture-rules.json");
-        let bindings = load_tddd_layers(&rules_path, &workspace_root).map_err(|e| match e {
-            LoadTdddLayersError::Io { path, source } => {
-                format!("{}: {source}", path.display())
-            }
-            LoadTdddLayersError::Parse(err) => {
-                format!("{}: {err}", rules_path.display())
-            }
-        })?;
-        let binding = bindings.into_iter().find(|b| b.layer_id() == layer_id).ok_or_else(|| {
-            format!(
-                "signal calc-catalog-spec: layer '{layer_id}' is not tddd.enabled in \
-                     architecture-rules.json"
-            )
-        })?;
-
         let items_dir = workspace_root.join("track").join("items");
-        let track_dir = items_dir.join(&track_id);
+        let rules_path = workspace_root.join("architecture-rules.json");
+
+        let bindings: Vec<_> = load_tddd_layers(&rules_path, &workspace_root)
+            .map_err(|e| match e {
+                LoadTdddLayersError::Io { path, source } => format!("{}: {source}", path.display()),
+                LoadTdddLayersError::Parse(err) => format!("{}: {err}", rules_path.display()),
+            })?
+            .into_iter()
+            .filter(TdddLayerBinding::catalogue_spec_signal_enabled)
+            .collect();
         let writer = FsCatalogueSpecSignalsStore::new(items_dir.clone());
 
-        infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer(
-            &items_dir, &track_dir, &track_id, &binding, &writer,
-        )?;
+        let reader = BindingSignalLayerReader {
+            inner: LocalSignalLayerReaderAdapter::new(workspace_root.clone()),
+            bindings: bindings.clone(),
+        };
 
-        Ok(CommandOutcome::success(None))
+        let track_id_str = {
+            reader
+                .active_track_id()
+                .map_err(|e| {
+                    format!("signal calc-catalog-spec: cannot resolve active track id: {e}")
+                })?
+                .to_string()
+        };
+
+        let per_layer_fn = {
+            let items_dir = items_dir.clone();
+            let track_id_str = track_id_str.clone();
+            move |layer: domain::tddd::LayerId, _hash_hex: &str| {
+                let layer_str = layer.as_ref();
+                let binding = match bindings.iter().find(|b| b.layer_id() == layer_str) {
+                    Some(b) => b,
+                    None => {
+                        return infrastructure::verify::VerifyOutcome::from_findings(vec![
+                            infrastructure::verify::VerifyFinding::error(format!(
+                                "signal calc-catalog-spec: layer '{layer_str}' not found in bindings"
+                            )),
+                        ]);
+                    }
+                };
+                let track_dir = items_dir.join(&track_id_str);
+                match infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer(
+                    &items_dir,
+                    &track_dir,
+                    &track_id_str,
+                    binding,
+                    &writer,
+                ) {
+                    Ok(()) => infrastructure::verify::VerifyOutcome::pass(),
+                    Err(e) => infrastructure::verify::VerifyOutcome::from_findings(vec![
+                        infrastructure::verify::VerifyFinding::error(format!(
+                            "signal calc-catalog-spec: layer '{layer_str}': {e}"
+                        )),
+                    ]),
+                }
+            }
+        };
+
+        let outcome = usecase::signal::calc_catalog_spec(&reader, per_layer_fn);
+        Ok(render_outcome("signal calc-catalog-spec", &outcome))
     }
 
-    // ── check-catalog-spec ────────────────────────────────────────────────────
-
-    /// Evaluate chain ② (catalog→spec) gate.
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` when gate config cannot be loaded.
+    /// Evaluate chain ② (catalog→spec) gate for all TDDD-enabled layers.
     pub fn signal_check_catalog_spec(
         &self,
-        signals_path: PathBuf,
-        catalogue_hash: String,
         strict_override: bool,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
     ) -> Result<CommandOutcome, String> {
-        // Wire chain ② at the composition root.
-        // `usecase::chain::CatalogSpecChain::load`/`calc` carry T008 placeholders; we bypass
-        // them and call `check_catalog_spec_from_signals_file` directly.
-        run_catalogue_hash_check(
-            "signal check-catalog-spec",
-            &signals_path,
-            &catalogue_hash,
+        signal_check_layer_chain(
             strict_override,
             gate,
+            workspace_root,
             domain::ChainId::CatalogSpec,
-            workspace_root.as_deref(),
-            infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file,
+            "signal check-catalog-spec",
+            TdddLayerBinding::catalogue_spec_signal_file,
+            TdddLayerBinding::catalogue_spec_signal_enabled,
+            |signals_path, hash_hex, strict| {
+                infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file(
+                    signals_path,
+                    hash_hex,
+                    strict,
+                )
+            },
+            |reader, per_layer_fn| usecase::signal::check_catalog_spec(reader, per_layer_fn),
         )
     }
 
-    // ── calc-impl-catalog ─────────────────────────────────────────────────────
-
-    /// Compute and persist chain ③ (impl↔catalog) signals for a single layer.
-    ///
-    /// Wired at the composition root via `TypeSignalsInteractor` (same path as
-    /// `track type-signals`, but scoped to one layer).
-    ///
-    /// `signals_path` must follow the convention
-    /// `track/items/<track-id>/<layer>-type-signals.json` so the track-id and
-    /// layer can be inferred without requiring the caller to pass them separately.
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` on workspace-discovery, path-parse, or execution failures.
-    pub fn signal_calc_impl_catalog(
-        &self,
-        signals_path: PathBuf,
-        _catalogue_hash: String,
-    ) -> Result<CommandOutcome, String> {
+    /// Compute and persist chain ③ (impl↔catalog) signals for all TDDD-enabled layers.
+    pub fn signal_calc_impl_catalog(&self) -> Result<CommandOutcome, String> {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
         use usecase::type_signals::{
             TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService,
         };
 
-        // Discover workspace root from git.
         let repo = SystemGitRepo::discover()
             .map_err(|e| format!("signal calc-impl-catalog: cannot discover git repo: {e}"))?;
         let workspace_root = repo.root().to_path_buf();
@@ -490,100 +436,86 @@ impl CliApp {
             .map_err(|e| format!("signal calc-impl-catalog: cannot read current branch: {e}"))?
             .ok_or_else(|| "signal calc-impl-catalog: cannot read current branch".to_owned())?;
 
-        // Parse track_id and layer from signals_path convention:
-        // track/items/<track-id>/<layer>-type-signals.json
-        let (track_id, layer) =
-            parse_signals_path_for_impl_catalog(&signals_path).ok_or_else(|| {
-                format!(
-                    "signal calc-impl-catalog: cannot infer track-id/layer from signals path '{}'. \
-                     Expected convention: track/items/<track-id>/<layer>-type-signals.json",
-                    signals_path.display()
-                )
-            })?;
-
         let items_dir = workspace_root.join("track").join("items");
         let layer_bindings = std::sync::Arc::new(FsTdddLayerBindingsAdapter::new());
         let executor = std::sync::Arc::new(TypeSignalsExecutorAdapter::new());
         let interactor = TypeSignalsInteractor::new(layer_bindings, executor);
 
-        interactor
-            .run(TypeSignalsRequest {
-                items_dir,
-                track_id,
-                branch,
-                workspace_root,
-                layer: Some(layer),
-            })
+        let reader = LocalSignalLayerReaderAdapter::discover()
             .map_err(|e| format!("signal calc-impl-catalog: {e}"))?;
 
-        Ok(CommandOutcome::success(None))
+        let track_id_str = {
+            use usecase::signal::SignalLayerReader as _;
+            reader
+                .active_track_id()
+                .map_err(|e| {
+                    format!("signal calc-impl-catalog: cannot resolve active track id: {e}")
+                })?
+                .to_string()
+        };
+
+        let per_layer_fn = {
+            let items_dir = items_dir.clone();
+            let workspace_root = workspace_root.clone();
+            let branch = branch.clone();
+            let track_id_str = track_id_str.clone();
+            move |layer: domain::tddd::LayerId, _hash_hex: &str| {
+                let layer_str = layer.as_ref().to_owned();
+                match interactor.run(TypeSignalsRequest {
+                    items_dir: items_dir.clone(),
+                    track_id: track_id_str.clone(),
+                    branch: branch.clone(),
+                    workspace_root: workspace_root.clone(),
+                    layer: Some(layer_str.clone()),
+                }) {
+                    Ok(()) => infrastructure::verify::VerifyOutcome::pass(),
+                    Err(e) => infrastructure::verify::VerifyOutcome::from_findings(vec![
+                        infrastructure::verify::VerifyFinding::error(format!(
+                            "signal calc-impl-catalog: layer '{layer_str}': {e}"
+                        )),
+                    ]),
+                }
+            }
+        };
+
+        let outcome = usecase::signal::calc_impl_catalog(&reader, per_layer_fn);
+        Ok(render_outcome("signal calc-impl-catalog", &outcome))
     }
 
-    // ── check-impl-catalog ────────────────────────────────────────────────────
-
-    /// Evaluate chain ③ (impl↔catalog) gate.
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` when gate config cannot be loaded.
+    /// Evaluate chain ③ (impl↔catalog) gate for all TDDD-enabled layers.
     pub fn signal_check_impl_catalog(
         &self,
-        signals_path: PathBuf,
-        catalogue_hash: String,
         strict_override: bool,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
     ) -> Result<CommandOutcome, String> {
-        // Wire chain ③ at the composition root.
-        // `usecase::chain::ImplCatalogChain::load`/`calc` carry T007 placeholders; we bypass
-        // them and call `check_impl_catalog_from_signals_file` directly.
-        run_catalogue_hash_check(
-            "signal check-impl-catalog",
-            &signals_path,
-            &catalogue_hash,
+        signal_check_layer_chain(
             strict_override,
             gate,
+            workspace_root,
             domain::ChainId::ImplCatalog,
-            workspace_root.as_deref(),
-            infrastructure::verify::spec_states::check_impl_catalog_from_signals_file,
+            "signal check-impl-catalog",
+            TdddLayerBinding::signal_file,
+            |_| true,
+            |signals_path, hash_hex, strict| {
+                infrastructure::verify::spec_states::check_impl_catalog_from_signals_file(
+                    signals_path,
+                    hash_hex,
+                    strict,
+                )
+            },
+            |reader, per_layer_fn| usecase::signal::check_impl_catalog(reader, per_layer_fn),
         )
     }
 
-    // ── aggregate: signal check --gate ────────────────────────────────────────
-
     /// Aggregate gate check: runs all four chains in declared order.
-    ///
-    /// Chains: ⓪ `adr-user`, ① `spec-adr`, ② `catalog-spec`, ③ `impl-catalog`.
-    /// Strictness for each chain is resolved from `signal-gates.json` using
-    /// the given `gate` context.
-    ///
-    /// Returns non-zero exit if any chain reports a blocking finding.
-    ///
-    /// # Parameters
-    ///
-    /// - `project_root`: used for chain ⓪ (`knowledge/adr/` scan).
-    /// - `spec_json_path`: used for chain ① (`spec.json`).
-    /// - `catalog_spec_signals_path` + `catalog_spec_hash`: used for chain ②.
-    /// - `impl_catalog_signals_path` + `impl_catalog_hash`: used for chain ③.
-    /// - `gate`: selects commit vs merge gate strictness from config.
-    /// - `workspace_root`: when provided, overrides git discovery for config path.
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` when gate config cannot be loaded.
-    #[allow(clippy::too_many_arguments)]
     pub fn signal_check_gate(
         &self,
         project_root: PathBuf,
         spec_json_path: PathBuf,
-        catalog_spec_signals_path: PathBuf,
-        catalog_spec_hash: String,
-        impl_catalog_signals_path: PathBuf,
-        impl_catalog_hash: String,
         gate: SignalGateName,
         workspace_root: Option<PathBuf>,
     ) -> Result<CommandOutcome, String> {
-        // Load the gate matrix once — all four chains use the same config.
         let matrix = match load_gate_matrix(workspace_root.as_deref()) {
             Ok(m) => m,
             Err(outcome) => return Ok(outcome),
@@ -595,12 +527,7 @@ impl CliApp {
             SignalGateName::Merge => "signal check --gate merge",
         };
 
-        // All four chains use the already-loaded matrix.  Call chain-specific infrastructure
-        // functions directly — the usecase-layer chain structs carry T006/T007/T008
-        // placeholders in `calc_live` / `calc` / `load`; bypassing them keeps each gate
-        // functional until the usecase-layer wiring is completed.
-
-        // Chain ⓪: adr-user — live scan via FsAdrFileAdapter (T006 follow-up wiring).
+        // Chain ⓪: adr-user — live scan via FsAdrFileAdapter.
         let adr_strict =
             matrix.resolve(domain::ChainId::AdrUser, gate_kind) == domain::Strictness::Strict;
         let chain0 = {
@@ -612,7 +539,7 @@ impl CliApp {
             render_outcome("signal check-adr-user", &outcome)
         };
 
-        // Chain ①: spec-adr — Stage 1 of verify_from_spec_json (T007 wiring).
+        // Chain ①: spec-adr — Stage 1 of verify_from_spec_json.
         let spec_strict =
             matrix.resolve(domain::ChainId::SpecAdr, gate_kind) == domain::Strictness::Strict;
         let chain1 = {
@@ -633,36 +560,48 @@ impl CliApp {
             render_outcome("signal check-spec-adr", &outcome)
         };
 
-        // Chain ②: catalog-spec — explicit per-layer check (T008 wiring).
+        // Chains ②③: use the argless orchestrators with per-layer closures.
         let catalog_strict =
             matrix.resolve(domain::ChainId::CatalogSpec, gate_kind) == domain::Strictness::Strict;
-        let chain2 = match parse_catalogue_hash("signal check-catalog-spec", &catalog_spec_hash) {
-            Err(err_outcome) => err_outcome,
-            Ok(hash) => {
-                let outcome =
-                    infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file(
-                        &catalog_spec_signals_path,
-                        &hash.to_hex(),
-                        catalog_strict,
-                    );
-                render_outcome("signal check-catalog-spec", &outcome)
-            }
-        };
-
-        // Chain ③: impl-catalog — explicit per-layer check (T007 wiring).
         let impl_strict =
             matrix.resolve(domain::ChainId::ImplCatalog, gate_kind) == domain::Strictness::Strict;
-        let chain3 = match parse_catalogue_hash("signal check-impl-catalog", &impl_catalog_hash) {
-            Err(err_outcome) => err_outcome,
-            Ok(hash) => {
-                let outcome =
-                    infrastructure::verify::spec_states::check_impl_catalog_from_signals_file(
-                        &impl_catalog_signals_path,
-                        &hash.to_hex(),
-                        impl_strict,
-                    );
-                render_outcome("signal check-impl-catalog", &outcome)
-            }
+
+        let chain2 = match signal_check_layer_chain_with_strict(
+            catalog_strict,
+            workspace_root.clone(),
+            "signal check-catalog-spec",
+            TdddLayerBinding::catalogue_spec_signal_file,
+            TdddLayerBinding::catalogue_spec_signal_enabled,
+            |signals_path, hash_hex, strict| {
+                infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file(
+                    signals_path,
+                    hash_hex,
+                    strict,
+                )
+            },
+            |reader, per_layer_fn| usecase::signal::check_catalog_spec(reader, per_layer_fn),
+        ) {
+            Ok(outcome) => outcome,
+            Err(e) => CommandOutcome::failure(Some(e)),
+        };
+
+        let chain3 = match signal_check_layer_chain_with_strict(
+            impl_strict,
+            workspace_root,
+            "signal check-impl-catalog",
+            TdddLayerBinding::signal_file,
+            |_| true,
+            |signals_path, hash_hex, strict| {
+                infrastructure::verify::spec_states::check_impl_catalog_from_signals_file(
+                    signals_path,
+                    hash_hex,
+                    strict,
+                )
+            },
+            |reader, per_layer_fn| usecase::signal::check_impl_catalog(reader, per_layer_fn),
+        ) {
+            Ok(outcome) => outcome,
+            Err(e) => CommandOutcome::failure(Some(e)),
         };
 
         Ok(merge_outcomes(gate_label, vec![chain0, chain1, chain2, chain3]))

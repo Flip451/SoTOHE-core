@@ -571,19 +571,9 @@ impl CliApp {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use super::*;
+    use infrastructure::verify::test_support::run_git;
 
-    fn run_git(root: &std::path::Path, args: &[&str]) {
-        let output =
-            std::process::Command::new("git").args(args).current_dir(root).output().unwrap();
-        assert!(
-            output.status.success(),
-            "git command failed: git {}\nstdout:\n{}\nstderr:\n{}",
-            args.join(" "),
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
-        );
-    }
+    use super::*;
 
     #[test]
     fn test_verify_hooks_path_with_githooks_configured_returns_success() {

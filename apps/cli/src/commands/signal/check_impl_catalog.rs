@@ -1,23 +1,17 @@
 //! `signal check-impl-catalog` — evaluate impl↔catalog gate (chain ③).
 
-use std::path::PathBuf;
-
 use clap::Args;
 use cli_composition::{CliApp, CommandOutcome};
 
 use super::CheckFlags;
 
 /// Arguments for `signal check-impl-catalog`.
+///
+/// Path and hash arguments are removed (T020 / D8): the active track and layer
+/// enumeration are resolved internally via the usecase orchestrator.
+/// Strictness is still configurable via `--strict` or `--gate commit|merge`.
 #[derive(Args, Debug)]
 pub struct CheckImplCatalogArgs {
-    /// Path to the `<layer>-type-signals.json` signals file.
-    #[arg(long)]
-    pub signals_path: PathBuf,
-
-    /// SHA-256 hex digest of the current `<layer>-types.json` bytes.
-    #[arg(long)]
-    pub catalog_hash: String,
-
     #[command(flatten)]
     pub flags: CheckFlags,
 }
@@ -25,11 +19,5 @@ pub struct CheckImplCatalogArgs {
 /// Execute `signal check-impl-catalog`.
 pub fn run(app: &CliApp, args: CheckImplCatalogArgs) -> Result<CommandOutcome, String> {
     let gate = args.flags.gate_name();
-    app.signal_check_impl_catalog(
-        args.signals_path,
-        args.catalog_hash,
-        args.flags.strict,
-        gate,
-        args.flags.workspace_root,
-    )
+    app.signal_check_impl_catalog(args.flags.strict, gate, args.flags.workspace_root)
 }

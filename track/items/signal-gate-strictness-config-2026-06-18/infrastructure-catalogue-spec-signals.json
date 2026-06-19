@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c129768ac700279284d77bb9d7bfc42a988ae3901adae3a65de0a94f0b401594",
+  "catalogue_declaration_hash": "83e5c5d4102befdf24477a7f2a9bc56e8bd483681107c9fbf9068774f4bf2558",
   "signals": [
     {
       "type_name": "GateRowDto",
       "signal": "blue",
       "entry_hash": "835dfe063c53df9db8111d781f30982873554bfbaa52d36f4bf2469515d0a495"
+    },
+    {
+      "type_name": "LocalSignalLayerReaderAdapter",
+      "signal": "blue",
+      "entry_hash": "b0ecc57264f7fbe3c0829f177c59fdd87924632f3cf360b8acf7e3461838a6f5"
     },
     {
       "type_name": "SignalGatesConfig",
@@ -33,9 +38,19 @@
       "entry_hash": "a2fce744db445304aa687191f883a235e237cc2615672d14020f9282e5afd83a"
     },
     {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::calc_catalog_spec_for_layer",
+      "signal": "blue",
+      "entry_hash": "e7204de614bcda074a6ad9f4e8a8f9dfbab3d2976f9134d59381ba91b97f8ef0"
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_for_layer",
+      "signal": "blue",
+      "entry_hash": "032a2ac72efb7567b209aac68dadf5fcf02c01861eb4cbd76d5bff437fba1e9b"
+    },
+    {
       "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file",
       "signal": "blue",
-      "entry_hash": "8281a2814a105d99b5aabe26303a77fff1466eb8d1858a8aef82f28facde07bc"
+      "entry_hash": "916bf192d33e18a05396137b8cf78831804e5638380cba75df0cd8ffc9d7b286"
     },
     {
       "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
@@ -63,9 +78,19 @@
       "entry_hash": "df0c5efdedbd908bd359a844a18af7cb4037af201eae4768377689b8c71827b6"
     },
     {
+      "type_name": "infrastructure::verify::spec_states::calc_impl_catalog_for_layer",
+      "signal": "blue",
+      "entry_hash": "a465cee78fceb50b5318a1f27e5f3d993f746d14c3bc1d90461ca7c6fd4b304e"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::check_impl_catalog_for_layer",
+      "signal": "blue",
+      "entry_hash": "15974546c12a51a71c2ecaa4cf886e6c04eb41b337f25fd204d55c489ec640b0"
+    },
+    {
       "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file",
       "signal": "blue",
-      "entry_hash": "987381e4bf6d40f7d7df7218a20aeebb8df01bd3e50b19506a78cc9285d5f63d"
+      "entry_hash": "ce470e03344cdd6d6a2de579db05aa785fa7972845bc3a4c4c29bca406cdf48b"
     },
     {
       "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
