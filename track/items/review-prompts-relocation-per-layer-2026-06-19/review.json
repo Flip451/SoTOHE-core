@@ -1,256 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The CLI policy assigns adapter construction/DI to `apps/cli/` and explicitly exempts adapter construction from the `usecase bypass` category. In the current architecture, `cli` may depend only on `cli_composition`, and `cli_composition` owns domain/usecase/infrastructure wiring, so this briefing would tell reviewers not to report direct infrastructure/domain construction in CLI and overlaps the `cli_composition` briefing. Reframe CLI as thin arg parsing/output/ExitCode mapping that delegates wiring to `cli_composition`, and make direct domain/infrastructure construction in CLI reportable.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/cli.md",
-              "line": 3,
-              "category": "architecture violation"
-            }
-          ],
-          "hash": "rvw1:sha256:c6f52c489e858b1742ff6f8b2cd4d33eb6234341267b1fe4547a9156a149cdd3",
-          "at": "2026-06-18T18:33:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The CLI policy still assigns adapter construction/DI to `apps/cli/`, but this repository's architecture places wiring in `apps/cli-composition/` and keeps `apps/cli` to parse/dispatch/output/ExitCode mapping. As written, the `usecase bypass` exception can hide direct domain/infrastructure construction in CLI and overlaps with the `cli_composition` briefing. Reframe this briefing so CLI is thin and wiring stays reportable in the composition layer.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/custom/review-prompts/cli.md",
-              "line": 3,
-              "category": "architecture violation"
-            }
-          ],
-          "hash": "rvw1:sha256:c6f52c489e858b1742ff6f8b2cd4d33eb6234341267b1fe4547a9156a149cdd3",
-          "at": "2026-06-18T18:34:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f8be98ae62a90d382a49daa9f7c6981d046e325d404455c24584b44408906d5f",
-          "at": "2026-06-18T18:38:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This policy assigns adapter construction/DI to `cli_composition`, then states that CLI is the only non-infrastructure place where `std::fs`, `std::env`, and process spawning are allowed. That makes boundary I/O needed by `apps/cli-composition/` look forbidden even though this split makes composition the wiring layer. Narrow this statement to `apps/cli/` command-handler responsibilities or explicitly describe the allowed boundary I/O for `cli_composition`.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/cli.md",
-              "line": 7,
-              "category": "architecture-policy-contradiction"
-            },
-            {
-              "message": "The `What to report` list introduces reportable `cli_composition` categories without grounding most of them in the named conventions. The briefing requires each report category to cite its convention basis, but bullets such as port-adapter pairing, application logic in composition, leaked test fixtures, panic in wiring, and double-instantiation have no convention or architecture-rule citation. Add explicit citations or remove categories that are not convention-backed.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/cli_composition.md",
-              "line": 14,
-              "category": "policy-grounding"
-            }
-          ],
-          "hash": "rvw1:sha256:f8be98ae62a90d382a49daa9f7c6981d046e325d404455c24584b44408906d5f",
-          "at": "2026-06-18T18:42:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c67acfbafa54da73845174b72fcaa061c8e991a9199f852715cd1e7389728a2c",
-          "at": "2026-06-18T18:46:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db20c42b7a0cf86662f4add0bca8b8db8edf9351c926e1b8004c25aad20b8b5d",
-          "at": "2026-06-19T00:02:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The convention now identifies `.harness/custom/review-prompts/<scope>.md` as the enforcement location for the R1-R10 type-design checklist. That path is the consumer-owned, freely editable severity-policy area, so putting framework methodology/gate-enforcement content there crosses the responsibility boundary and makes the enforcement removable by consumer customization.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 313,
-              "category": "responsibility-boundary cross"
-            }
-          ],
-          "hash": "rvw1:sha256:db20c42b7a0cf86662f4add0bca8b8db8edf9351c926e1b8004c25aad20b8b5d",
-          "at": "2026-06-19T00:08:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47a9ac3c592688cf531f7d5cb6dd74db4e78e3a52d226ee6821c6cd006ee26d4",
-          "at": "2026-06-19T00:23:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47a9ac3c592688cf531f7d5cb6dd74db4e78e3a52d226ee6821c6cd006ee26d4",
-          "at": "2026-06-19T00:26:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68b927dfaaffc92f54638a3507f4efa601a2468d48c743b5f05a99713abaaed2",
-          "at": "2026-06-19T00:55:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ffdffbf1c4bf6eb0a862cbd9def03c9f0d8bbcaddaab38eafe4b362bc72acf8b",
-          "at": "2026-06-19T01:07:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ffdffbf1c4bf6eb0a862cbd9def03c9f0d8bbcaddaab38eafe4b362bc72acf8b",
-          "at": "2026-06-19T01:09:58Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:edb062e48d84158cd26ba8cf83eea5b16dfc56524a2d7adc08f880ed150318ce",
-          "at": "2026-06-19T00:01:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `write_domain_scope_config` still writes the fixture to `track/review-scope.json`, but the review pipeline now loads `.harness/config/review-scope.json` (`load_scope_config_only` / `build_review_v2`). The `check_approved_*` tests all call `execute_check_approved`, so they will fail before exercising the intended approved/bypass/blocked verdict mapping. Update this helper to create `.harness/config` and write `review-scope.json` there.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/tests.rs",
-              "line": 650,
-              "category": "test regression"
-            }
-          ],
-          "hash": "rvw1:sha256:edb062e48d84158cd26ba8cf83eea5b16dfc56524a2d7adc08f880ed150318ce",
-          "at": "2026-06-19T00:07:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ebd4c3891556d8daa533c084126a378fa3cec26a2e09dfe74403e92e9c59c18",
-          "at": "2026-06-19T00:24:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ebd4c3891556d8daa533c084126a378fa3cec26a2e09dfe74403e92e9c59c18",
-          "at": "2026-06-19T00:27:00Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:212b760f2892f34328b6164c9a93ca11f75122bc567e6021c0cac7fc68021a88",
-          "at": "2026-06-19T00:00:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:212b760f2892f34328b6164c9a93ca11f75122bc567e6021c0cac7fc68021a88",
-          "at": "2026-06-19T00:06:43Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
-          "at": "2026-06-19T00:01:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
-          "at": "2026-06-19T00:02:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting the tracked `track/review-scope.json` leaves no tracked replacement in the diff: `.harness/config/review-scope.json` exists only as an untracked file (`git ls-files` does not list it, and `git diff --cached --name-status` is empty). Since the loaders in this same change now resolve `.harness/config/review-scope.json`, a clean checkout of the PR would fail to load the review scope config after this deletion. Add the new config file to the tracked change set before removing the legacy file.",
-              "severity": "P0",
-              "file": "track/review-scope.json",
-              "line": 1,
-              "category": "broken migration"
-            }
-          ],
-          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
-          "at": "2026-06-19T00:07:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6fc285c2dc57df43b712e1f44389330ba91f8d3b058a4192f3001c0d88dcd27d",
-          "at": "2026-06-19T00:24:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6fc285c2dc57df43b712e1f44389330ba91f8d3b058a4192f3001c0d88dcd27d",
-          "at": "2026-06-19T00:27:12Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7fef38468c0f672d8dbc2f7693d3e85470e435b1bd2d63f862aa6b1e05596bf",
-          "at": "2026-06-19T00:00:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7fef38468c0f672d8dbc2f7693d3e85470e435b1bd2d63f862aa6b1e05596bf",
-          "at": "2026-06-19T00:06:37Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -391,6 +141,252 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:edb062e48d84158cd26ba8cf83eea5b16dfc56524a2d7adc08f880ed150318ce",
+          "at": "2026-06-19T00:01:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `write_domain_scope_config` still writes the fixture to `track/review-scope.json`, but the review pipeline now loads `.harness/config/review-scope.json` (`load_scope_config_only` / `build_review_v2`). The `check_approved_*` tests all call `execute_check_approved`, so they will fail before exercising the intended approved/bypass/blocked verdict mapping. Update this helper to create `.harness/config` and write `review-scope.json` there.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 650,
+              "category": "test regression"
+            }
+          ],
+          "hash": "rvw1:sha256:edb062e48d84158cd26ba8cf83eea5b16dfc56524a2d7adc08f880ed150318ce",
+          "at": "2026-06-19T00:07:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ebd4c3891556d8daa533c084126a378fa3cec26a2e09dfe74403e92e9c59c18",
+          "at": "2026-06-19T00:24:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ebd4c3891556d8daa533c084126a378fa3cec26a2e09dfe74403e92e9c59c18",
+          "at": "2026-06-19T00:27:00Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:212b760f2892f34328b6164c9a93ca11f75122bc567e6021c0cac7fc68021a88",
+          "at": "2026-06-19T00:00:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:212b760f2892f34328b6164c9a93ca11f75122bc567e6021c0cac7fc68021a88",
+          "at": "2026-06-19T00:06:43Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CLI policy assigns adapter construction/DI to `apps/cli/` and explicitly exempts adapter construction from the `usecase bypass` category. In the current architecture, `cli` may depend only on `cli_composition`, and `cli_composition` owns domain/usecase/infrastructure wiring, so this briefing would tell reviewers not to report direct infrastructure/domain construction in CLI and overlaps the `cli_composition` briefing. Reframe CLI as thin arg parsing/output/ExitCode mapping that delegates wiring to `cli_composition`, and make direct domain/infrastructure construction in CLI reportable.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli.md",
+              "line": 3,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:c6f52c489e858b1742ff6f8b2cd4d33eb6234341267b1fe4547a9156a149cdd3",
+          "at": "2026-06-18T18:33:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CLI policy still assigns adapter construction/DI to `apps/cli/`, but this repository's architecture places wiring in `apps/cli-composition/` and keeps `apps/cli` to parse/dispatch/output/ExitCode mapping. As written, the `usecase bypass` exception can hide direct domain/infrastructure construction in CLI and overlaps with the `cli_composition` briefing. Reframe this briefing so CLI is thin and wiring stays reportable in the composition layer.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/custom/review-prompts/cli.md",
+              "line": 3,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:c6f52c489e858b1742ff6f8b2cd4d33eb6234341267b1fe4547a9156a149cdd3",
+          "at": "2026-06-18T18:34:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8be98ae62a90d382a49daa9f7c6981d046e325d404455c24584b44408906d5f",
+          "at": "2026-06-18T18:38:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This policy assigns adapter construction/DI to `cli_composition`, then states that CLI is the only non-infrastructure place where `std::fs`, `std::env`, and process spawning are allowed. That makes boundary I/O needed by `apps/cli-composition/` look forbidden even though this split makes composition the wiring layer. Narrow this statement to `apps/cli/` command-handler responsibilities or explicitly describe the allowed boundary I/O for `cli_composition`.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli.md",
+              "line": 7,
+              "category": "architecture-policy-contradiction"
+            },
+            {
+              "message": "The `What to report` list introduces reportable `cli_composition` categories without grounding most of them in the named conventions. The briefing requires each report category to cite its convention basis, but bullets such as port-adapter pairing, application logic in composition, leaked test fixtures, panic in wiring, and double-instantiation have no convention or architecture-rule citation. Add explicit citations or remove categories that are not convention-backed.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli_composition.md",
+              "line": 14,
+              "category": "policy-grounding"
+            }
+          ],
+          "hash": "rvw1:sha256:f8be98ae62a90d382a49daa9f7c6981d046e325d404455c24584b44408906d5f",
+          "at": "2026-06-18T18:42:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c67acfbafa54da73845174b72fcaa061c8e991a9199f852715cd1e7389728a2c",
+          "at": "2026-06-18T18:46:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db20c42b7a0cf86662f4add0bca8b8db8edf9351c926e1b8004c25aad20b8b5d",
+          "at": "2026-06-19T00:02:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The convention now identifies `.harness/custom/review-prompts/<scope>.md` as the enforcement location for the R1-R10 type-design checklist. That path is the consumer-owned, freely editable severity-policy area, so putting framework methodology/gate-enforcement content there crosses the responsibility boundary and makes the enforcement removable by consumer customization.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 313,
+              "category": "responsibility-boundary cross"
+            }
+          ],
+          "hash": "rvw1:sha256:db20c42b7a0cf86662f4add0bca8b8db8edf9351c926e1b8004c25aad20b8b5d",
+          "at": "2026-06-19T00:08:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47a9ac3c592688cf531f7d5cb6dd74db4e78e3a52d226ee6821c6cd006ee26d4",
+          "at": "2026-06-19T00:23:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47a9ac3c592688cf531f7d5cb6dd74db4e78e3a52d226ee6821c6cd006ee26d4",
+          "at": "2026-06-19T00:26:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68b927dfaaffc92f54638a3507f4efa601a2468d48c743b5f05a99713abaaed2",
+          "at": "2026-06-19T00:55:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ffdffbf1c4bf6eb0a862cbd9def03c9f0d8bbcaddaab38eafe4b362bc72acf8b",
+          "at": "2026-06-19T01:07:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ffdffbf1c4bf6eb0a862cbd9def03c9f0d8bbcaddaab38eafe4b362bc72acf8b",
+          "at": "2026-06-19T01:09:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:332bea2c336d2cb8110f314b802fbf3ce0cb04d57c788a4665ee1f0b71b89c82",
+          "at": "2026-06-19T01:20:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:332bea2c336d2cb8110f314b802fbf3ce0cb04d57c788a4665ee1f0b71b89c82",
+          "at": "2026-06-19T01:23:10Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
+          "at": "2026-06-19T00:01:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
+          "at": "2026-06-19T00:02:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting the tracked `track/review-scope.json` leaves no tracked replacement in the diff: `.harness/config/review-scope.json` exists only as an untracked file (`git ls-files` does not list it, and `git diff --cached --name-status` is empty). Since the loaders in this same change now resolve `.harness/config/review-scope.json`, a clean checkout of the PR would fail to load the review scope config after this deletion. Add the new config file to the tracked change set before removing the legacy file.",
+              "severity": "P0",
+              "file": "track/review-scope.json",
+              "line": 1,
+              "category": "broken migration"
+            }
+          ],
+          "hash": "rvw1:sha256:5fcab82d4a76da7e565c33668624a0509e4641175dcb50bb1f79d87b1fa9ef3f",
+          "at": "2026-06-19T00:07:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fc285c2dc57df43b712e1f44389330ba91f8d3b058a4192f3001c0d88dcd27d",
+          "at": "2026-06-19T00:24:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fc285c2dc57df43b712e1f44389330ba91f8d3b058a4192f3001c0d88dcd27d",
+          "at": "2026-06-19T00:27:12Z"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -420,6 +416,24 @@
           "findings": [],
           "hash": "rvw1:sha256:eb057b161562dc6f71960f3d6bc44a7437e97413901733f41ef487e593a1d54b",
           "at": "2026-06-19T00:36:21Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7fef38468c0f672d8dbc2f7693d3e85470e435b1bd2d63f862aa6b1e05596bf",
+          "at": "2026-06-19T00:00:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7fef38468c0f672d8dbc2f7693d3e85470e435b1bd2d63f862aa6b1e05596bf",
+          "at": "2026-06-19T00:06:37Z"
         }
       ]
     }
