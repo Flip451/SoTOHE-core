@@ -104,6 +104,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::ref_verify::RefVerifyCommand,
     },
+    /// Signal evaluation commands: calc-*/check-* for all 4 SoT Chain chains.
+    Signal {
+        #[command(subcommand)]
+        cmd: commands::signal::SignalCommand,
+    },
     /// Run the example track state machine demo.
     Demo,
 }
@@ -144,6 +149,7 @@ fn run_cli_with(
         Some(CliCommand::Telemetry { cmd }) => commands::telemetry::execute(cmd),
         Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
         Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
+        Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
         Some(CliCommand::Demo) | None => match CliApp::new().demo() {
             Ok(outcome) => {
                 if let Some(msg) = outcome.stdout {

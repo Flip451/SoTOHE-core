@@ -1,266 +1,762 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "5053a841de7f53caf6fd768333b6f46bb330075a30a852cc6920fa9de8d934a7",
+  "corpus_fingerprint": "92801e3fd6bde850814bc921c0b11d027fbcd1b38c6151bb2b0e86e1bf9c0033",
   "fragment_refs": [
     {
-      "path": "apps/cli/src/commands/verify_tests.rs",
-      "content_hash": "14be5a427595d7023ec4974a3744986d965bcf02f1d9627fcbc76d7ae02ec05a"
+      "path": "apps/cli-composition/src/cmd_outcome.rs",
+      "content_hash": "001e8de3be502bf6110f5289a736be534e04ec8b25d8d1c940d168c2caf87d30"
     },
     {
-      "path": "apps/cli/src/commands/verify_tests.rs",
-      "content_hash": "20cacd36a818fe5f4fe9fefa5d8d2a053ae0c0e94f0ec2d86c6d5a20d3e69fea"
+      "path": "apps/cli-composition/src/cmd_outcome.rs",
+      "content_hash": "ce683f35ee9081b5546c3d352430a8465c80349cdc766d4b4c26cd8d47b896a2"
     },
     {
-      "path": "apps/cli/src/commands/verify_tests.rs",
-      "content_hash": "2b3d4987a0549e5c6baced00cd03af1018034eaf9e201ef5b4814f2df3f066e0"
+      "path": "apps/cli-composition/src/lib.rs",
+      "content_hash": "87e1adea4e5c4ac846a77d61308873adfb47275ed4529ddaa2de01855bd8c37b"
     },
     {
-      "path": "apps/cli/src/commands/verify_tests.rs",
-      "content_hash": "edce301cd473ffd06c17a11ce11e068b946be1818e4aadae9ca69ce0cc792d09"
+      "path": "apps/cli-composition/src/lib.rs",
+      "content_hash": "e3a1d5ac23346b02afd916c3025c37d0df296ff0255f979c2e23503cb919bbb5"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "0cbbc5753d1b5de57765c3cdf665b4de22c214dd48e70ca2b7729a40d4e83460"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "044a2a249efce4920e26844023ddefb05400f54f72922b12d428545acf784a04"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "0fcdccdc4f49b19256eb20a21bee1d4bb9d0834b56f7aab81e9d7bb7c36b389e"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "13c98402130488f1c43f9131a3d7889ee9b2c0d0e9195a300a719aa0cd71f13b"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "1d45173c7ac5176384e613b0aadd90f6ecb7e506290b92459dde93833e9f5b45"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "1551c5a9cf4253ba7ee745b8040eacc1331ce639bb5c8f882069b7e92122d6dd"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "298f11a8e7c35a74bfac8cc4288075d33f5b837e92ad84875ca1854d9f42d6bb"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "357f7a3b41c71c9a5061715412e5a5222347b199d4a70561dc57c909f0e2079a"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "37273610756af21d92555abf624ee6b4eccf47c9c0d46d82c5ca0cb45f82920a"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "3afb5f2e35cccac6de08aaa7fa5d668da85e82b14d9ebcf4f6311d9852f0d2fd"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "532eed9adc94e6559a21603422dc0dcd91020b28e3a1ef59a3df4426115dacc7"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "5b8c98723b26fd7acbba24406701573639edd72ece0d6a95aedb943257deb55e"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "5a5c16509ed59213c73884c37fcdda9ba3040015e50cc1eae0076343b4dfebd5"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "6bb2f6b1cb55e52afb16a4d0836894ecb37749c74968a7068a697c6795430528"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "5bbb3675a96d22a917b89f7d8ab6b6c511f4269f783492238ae1b2a95132ff53"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "6f004b12d2b160153d7fb61091ebbf8d05dcdb076248d86c523cd189b0990a11"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "634d22059e48332fa242a48210bb186da521f1179f287d2d38ea4244fbcb420c"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "90bc2c5973dd627422ca785c94cdb56fcc10d4497910cb141fc3b4d76b88962e"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "66328ac7e3cc16c081f64215a2d1252183792ce9edd565d33b82bf819253bea9"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "93692c243adf3d336406aa40e27633772ce4538a2d10e5196dc196c519b38fc0"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "72844af0c350d02711505e1fce6af2896bb54f79ac6f02af8f1a9f5ebd4ba0a3"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "9d26518089f5b7a37be106738d096bb33d98cb1670d87105a67defa9e55ea931"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "743c385634247a87b9658232a1f4c65d991f9c90caab4a1fefd73945b795dcef"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "9dca8bbe81351da6a9dd46978b6b13cfad9c07358c0102fdea523b71394e74b8"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "81f970e2eaaa0d649bca91f38c826cdd08c7c669f8a618342774196b1bfcd725"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "ab70a53201d814ec94ba24856baae79df6aef192400f054ca29b7e9ec56a9f34"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "94f7854038750ea4f5b4235311781a59b781d1f42858f6c7974012355fbe014a"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "bdebcde6ce1b7cfdbe5247a4817e0df432b77888b45dbbe853e75cf4337e10c2"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "abe265870383a33504995d37f078372e067be1fbaf2296b4c07cbad42c0e99cf"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "c2c3a5aafe84ececc8ea82baa96319cd5f801620e0d4e94d63fb9f1f1224f27c"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "b1691340f091009bf86d840e99742af56740722881a0ee83bf9f891bba21a354"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "e2c43769285ac39046b81bad4b1eeb2720d329f59f0442eb40c971b8fb21ff6a"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "b664120b0cabc79be97604d91c714680d89daf5cf85453bf371af8feebf12ebe"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "f1e85509eabc8892ee959e69211bb08a773c8774d4fe124a87723b093510ec07"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "badfaa1abf2c505cb998d45fe8229ca86ae5c6e245a68e9ddef20cc551224e5b"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "fad19dfa2c2cf01eb7b0a859f0d9498d62ad52c617850ce0ffe8993e7f30c94c"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "be35eb1971b5fc77f788ac72db4221e78e88abcaff9a95b3e85212b6c213fc0d"
+      "path": "apps/cli-composition/src/verify.rs",
+      "content_hash": "5ed1585e0ed90b72adaf82f194fe8f8039e92abaa3254359080751155949fa3a"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "cf1a38dc058b50c539576c2f7320c2fc73ecb00e9b602976779000057211dd8e"
+      "path": "apps/cli/src/commands/mod.rs",
+      "content_hash": "36f4c9ee3be0ab87a65d136bc082628d316c3dd24e6b81a1ede333b933fa81de"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "e35f4eac14e2dabaa5417a76c09bbac6984489ba34e3f2d871487e43923be88d"
+      "path": "apps/cli/src/commands/signal/calc_adr_user.rs",
+      "content_hash": "952f959ad5afdacd8c4a82f5d608fe79c021ef7ec6a6fd32a911c47a2405b8a0"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "e538f6c28aa6241a191e795a609459190112a4948400779c26d6e581cccc9da0"
+      "path": "apps/cli/src/commands/signal/calc_adr_user.rs",
+      "content_hash": "a96a70b32beca53a9e91726f527ddf5f605ad69d6baf4bb13f4c6f6e0fd27ff0"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "e5a419357278385e158f16fb038bf9e35d91c081015566dbd839be08175a17b5"
+      "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+      "content_hash": "052cd19a6f2aaf12f26193d3147de2da675cc2be54f12fe92eb0705d104491ee"
     },
     {
-      "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-      "content_hash": "f80b508daca7646bd131966d4e476511ae01df4fdef6ceda975e6c721cd8c6d0"
+      "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+      "content_hash": "4331a1f63c945347e7abe6824ed1f1907cb1542a7373502f6bbbc4fedc13e304"
     },
     {
-      "path": "libs/usecase/src/merge_gate.rs",
-      "content_hash": "4c3b0984fe9c0c66c8669b3390927530eb6be32e878f14f629bb666e4f940d58"
+      "path": "apps/cli/src/commands/signal/calc_impl_catalog.rs",
+      "content_hash": "0656aa1569c8cb17db8afe19a961fdf129e3a45539e96cd2ab72692b2c0400a4"
     },
     {
-      "path": "libs/usecase/src/merge_gate.rs",
-      "content_hash": "c74cde2db05f5dc3761c6990ac6f08bd35561ad38429b4b86dd2651e40496ff2"
+      "path": "apps/cli/src/commands/signal/calc_impl_catalog.rs",
+      "content_hash": "56f012a6098b42b7135cefb8c4ed38e678b220ea4ce0eb265b4a7f1ef23490d3"
     },
     {
-      "path": "libs/usecase/src/merge_gate/chain2_gate.rs",
-      "content_hash": "84efda4bbbeeb6c1ef1d5da74656884059f34b98dac21056a19448dc9b97498e"
+      "path": "apps/cli/src/commands/signal/calc_spec_adr.rs",
+      "content_hash": "225ddcbb8aa07de5ae30f0a8150f9e2a4df5da641b2ad283cec027f43336ce8a"
     },
     {
-      "path": "libs/usecase/src/merge_gate/chain2_gate.rs",
-      "content_hash": "a37a3af13992f3bbe5aa6bec4cac422f2c1fbc296910fecdd5d5e7f1c6b8d9dc"
+      "path": "apps/cli/src/commands/signal/calc_spec_adr.rs",
+      "content_hash": "dfbf82a1d4960d42fbcbc9d25403bef4ae76d478b5221af53253d6d32880558f"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/check_adr_user.rs",
+      "content_hash": "0a90a1f29a6fb66409b66bba10e89c55e61568ce8f3942ec7acc3affe0c69490"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/check_adr_user.rs",
+      "content_hash": "cdd8ae40b75b82c72828f746815d679862f944a89b94872504e68bc488a5e359"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/check_catalog_spec.rs",
+      "content_hash": "755e69e13b194b55d1b8d2a3a9e1062f487bb9eb1d8de7a2cf73e6f46a43d182"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/check_catalog_spec.rs",
+      "content_hash": "f10626aeb1c096f4d874d6fab986b59f65908179a90a69572de3172f5d493cfb"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/check_impl_catalog.rs",
+      "content_hash": "09ea77ba89e6eaa4165c053cc2a148828254e60d9444668159381db170201541"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/check_impl_catalog.rs",
+      "content_hash": "d05c1941b08a81f615919707a086c8834b1f5b9f76cd5c974e35f871bd10fed4"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/check_spec_adr.rs",
+      "content_hash": "31f81b277cdbd5c209594aede6fcf92b61f6d78afd3757d02954a4b1731ee44a"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/check_spec_adr.rs",
+      "content_hash": "e9a164e144357445fc4b8ee6f0e6cccd08d621834fd7d14751c8d45218325d5c"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "157a0bb1b67fea910bedb185b5163f4e0b22a4169113d650444f5f55fa42bc8c"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "16b0ef2251c720c39417016195de386b929c6c582b5da3fdd12d9e34993ffe52"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "270da5f6004e9c0aa97a5c8f13ce00034e88a53c02c971f4b3431bbab1849d30"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "38d1092c13ffe4e1119708a4df5e6cbbfba6c1b8ef3c8a5f4da51f8f09bd4892"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "45445779840896fda553e0d4d61dbe2c97fcb5f711b9e6b9d7a644e822ce5085"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "4568cfa8943660a23c53592a7579367e961eedfe79d2b3ba831cecaf2a5f3c75"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "48b89f8748fd45b08efcf50396d5aad237efc7c7bb35e9f54f5b6d92c905cc81"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "4f7c84b6fb052d89ce6be806fa01690df24bd71ff07c0e5cc6a2b0e4a5c41070"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "5c67a788c30f307aa692f4060cf8d15f2bfe1fc37950020a7f297cfd10292560"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "5e8abbc6baf4d3879734cc6f4b460b7b4eff29711acc87857f6fe67fd8552570"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "60e44ad2e7276dd17bb4c3eccf05033e40c5c508ce317267461aa89cb2639635"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "6199dcf24b257644754c9bd6ef5e8b1b0a55a0b5b6a6f0f1208c4ee54daae88e"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "621be13bb3c1d8f6ce0b75bad93b02194a629a7610067b434cd8a24369321239"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "6e474b35983f0ba67827c5dea0a65378458ffe67158186b00f97685358a5c54e"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "7072afb786ff625ef3d58e6efb17d37da4ecbf4974de54245a1a8fdee41a1dda"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "769fcd7b06e7b7e9b060da4a121152fb551e7d77525e6401c35f011bd2b75e74"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "7fff1d84be861d2823dc7c335a1583bda4c4d10ee56ef0507c17dbe4ccf6496c"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "82ff607092b2d4a2f9c677531c4a6076db107b9ddf82e0744fcfafe25e893c4f"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "8ffd4c2cbb450957f870fb0eee6e1f72c936cb1648e10b1b8b8e1e2bab643eee"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "a9ea7b1a41739bebe78470baeca25cdaa0a6477a6c92493fe843b30822f8ef27"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "addbcdd28f31464c4ad3325fee0d0c764a832ddb01485929e1959256198d933b"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "adf11a9c7d95eab57415f25aa844903023a3d0148410cee64a64a458cae54a85"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "b7a3d65fabcb8d65f6be5add2e1d28fbf72579a4778da243fca6c2cc6d23b974"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "c12b65cb2bdf13884c67ef87c311091a5d7f0922494cd3dd5392b3f70b8f28d3"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "c8834e9bd909d1a79e64b87f0ffaa310355704fc9d9172d530fbb479268c57f9"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "c9697cdcb84f6d251cf882ee612603a63c0d64303f2c40da9e12ea8c1703212e"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "d5a1fa5567c0592ea063b03c23467777811fa094f5de88de5128212129e0ad2c"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "d760877c1f359e8b658aa8b0cef08b35a767dddea07ee0ffde431f00f9836a26"
+    },
+    {
+      "path": "apps/cli/src/commands/signal/mod.rs",
+      "content_hash": "e4d563d7468358d99eb1e84524effd1d0c4021b66b290f3153de5e472635b045"
+    },
+    {
+      "path": "apps/cli/src/main.rs",
+      "content_hash": "49807e180d70cb7468d3e55947e299ef307bc5abd79924be14fdebcf0f86b1b9"
+    },
+    {
+      "path": "apps/cli/src/main.rs",
+      "content_hash": "dd07ef2a8deefa9921a78aebff2ed1b3f9c6aa937a5544aa052d9f27f7436a06"
     }
   ],
   "processed_pair_keys": [
     {
       "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "044a2a249efce4920e26844023ddefb05400f54f72922b12d428545acf784a04"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "6bb2f6b1cb55e52afb16a4d0836894ecb37749c74968a7068a697c6795430528"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "044a2a249efce4920e26844023ddefb05400f54f72922b12d428545acf784a04"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "9d26518089f5b7a37be106738d096bb33d98cb1670d87105a67defa9e55ea931"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "044a2a249efce4920e26844023ddefb05400f54f72922b12d428545acf784a04"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "ab70a53201d814ec94ba24856baae79df6aef192400f054ca29b7e9ec56a9f34"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "357f7a3b41c71c9a5061715412e5a5222347b199d4a70561dc57c909f0e2079a"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "9dca8bbe81351da6a9dd46978b6b13cfad9c07358c0102fdea523b71394e74b8"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "5b8c98723b26fd7acbba24406701573639edd72ece0d6a95aedb943257deb55e"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "bdebcde6ce1b7cfdbe5247a4817e0df432b77888b45dbbe853e75cf4337e10c2"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "6bb2f6b1cb55e52afb16a4d0836894ecb37749c74968a7068a697c6795430528"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "9d26518089f5b7a37be106738d096bb33d98cb1670d87105a67defa9e55ea931"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "6bb2f6b1cb55e52afb16a4d0836894ecb37749c74968a7068a697c6795430528"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "ab70a53201d814ec94ba24856baae79df6aef192400f054ca29b7e9ec56a9f34"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "93692c243adf3d336406aa40e27633772ce4538a2d10e5196dc196c519b38fc0"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "f1e85509eabc8892ee959e69211bb08a773c8774d4fe124a87723b093510ec07"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_adr_user.rs",
+        "content_hash": "952f959ad5afdacd8c4a82f5d608fe79c021ef7ec6a6fd32a911c47a2405b8a0"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/calc_spec_adr.rs",
+        "content_hash": "225ddcbb8aa07de5ae30f0a8150f9e2a4df5da641b2ad283cec027f43336ce8a"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_adr_user.rs",
+        "content_hash": "952f959ad5afdacd8c4a82f5d608fe79c021ef7ec6a6fd32a911c47a2405b8a0"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_adr_user.rs",
+        "content_hash": "cdd8ae40b75b82c72828f746815d679862f944a89b94872504e68bc488a5e359"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_adr_user.rs",
+        "content_hash": "a96a70b32beca53a9e91726f527ddf5f605ad69d6baf4bb13f4c6f6e0fd27ff0"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_adr_user.rs",
+        "content_hash": "0a90a1f29a6fb66409b66bba10e89c55e61568ce8f3942ec7acc3affe0c69490"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+        "content_hash": "052cd19a6f2aaf12f26193d3147de2da675cc2be54f12fe92eb0705d104491ee"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+        "content_hash": "4331a1f63c945347e7abe6824ed1f1907cb1542a7373502f6bbbc4fedc13e304"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+        "content_hash": "052cd19a6f2aaf12f26193d3147de2da675cc2be54f12fe92eb0705d104491ee"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/calc_impl_catalog.rs",
+        "content_hash": "56f012a6098b42b7135cefb8c4ed38e678b220ea4ce0eb265b4a7f1ef23490d3"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+        "content_hash": "052cd19a6f2aaf12f26193d3147de2da675cc2be54f12fe92eb0705d104491ee"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_catalog_spec.rs",
+        "content_hash": "755e69e13b194b55d1b8d2a3a9e1062f487bb9eb1d8de7a2cf73e6f46a43d182"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+        "content_hash": "4331a1f63c945347e7abe6824ed1f1907cb1542a7373502f6bbbc4fedc13e304"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/calc_impl_catalog.rs",
+        "content_hash": "0656aa1569c8cb17db8afe19a961fdf129e3a45539e96cd2ab72692b2c0400a4"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+        "content_hash": "4331a1f63c945347e7abe6824ed1f1907cb1542a7373502f6bbbc4fedc13e304"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/calc_spec_adr.rs",
+        "content_hash": "225ddcbb8aa07de5ae30f0a8150f9e2a4df5da641b2ad283cec027f43336ce8a"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+        "content_hash": "4331a1f63c945347e7abe6824ed1f1907cb1542a7373502f6bbbc4fedc13e304"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_catalog_spec.rs",
+        "content_hash": "f10626aeb1c096f4d874d6fab986b59f65908179a90a69572de3172f5d493cfb"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+        "content_hash": "4331a1f63c945347e7abe6824ed1f1907cb1542a7373502f6bbbc4fedc13e304"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_impl_catalog.rs",
+        "content_hash": "d05c1941b08a81f615919707a086c8834b1f5b9f76cd5c974e35f871bd10fed4"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_impl_catalog.rs",
+        "content_hash": "0656aa1569c8cb17db8afe19a961fdf129e3a45539e96cd2ab72692b2c0400a4"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_catalog_spec.rs",
+        "content_hash": "f10626aeb1c096f4d874d6fab986b59f65908179a90a69572de3172f5d493cfb"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_impl_catalog.rs",
+        "content_hash": "0656aa1569c8cb17db8afe19a961fdf129e3a45539e96cd2ab72692b2c0400a4"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_impl_catalog.rs",
+        "content_hash": "d05c1941b08a81f615919707a086c8834b1f5b9f76cd5c974e35f871bd10fed4"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_impl_catalog.rs",
+        "content_hash": "56f012a6098b42b7135cefb8c4ed38e678b220ea4ce0eb265b4a7f1ef23490d3"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_impl_catalog.rs",
+        "content_hash": "09ea77ba89e6eaa4165c053cc2a148828254e60d9444668159381db170201541"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_spec_adr.rs",
+        "content_hash": "225ddcbb8aa07de5ae30f0a8150f9e2a4df5da641b2ad283cec027f43336ce8a"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_spec_adr.rs",
+        "content_hash": "31f81b277cdbd5c209594aede6fcf92b61f6d78afd3757d02954a4b1731ee44a"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/calc_spec_adr.rs",
+        "content_hash": "dfbf82a1d4960d42fbcbc9d25403bef4ae76d478b5221af53253d6d32880558f"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_spec_adr.rs",
+        "content_hash": "e9a164e144357445fc4b8ee6f0e6cccd08d621834fd7d14751c8d45218325d5c"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/check_adr_user.rs",
+        "content_hash": "0a90a1f29a6fb66409b66bba10e89c55e61568ce8f3942ec7acc3affe0c69490"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_spec_adr.rs",
+        "content_hash": "e9a164e144357445fc4b8ee6f0e6cccd08d621834fd7d14751c8d45218325d5c"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/check_adr_user.rs",
+        "content_hash": "cdd8ae40b75b82c72828f746815d679862f944a89b94872504e68bc488a5e359"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_spec_adr.rs",
+        "content_hash": "31f81b277cdbd5c209594aede6fcf92b61f6d78afd3757d02954a4b1731ee44a"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/check_catalog_spec.rs",
+        "content_hash": "755e69e13b194b55d1b8d2a3a9e1062f487bb9eb1d8de7a2cf73e6f46a43d182"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_impl_catalog.rs",
+        "content_hash": "09ea77ba89e6eaa4165c053cc2a148828254e60d9444668159381db170201541"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/check_catalog_spec.rs",
+        "content_hash": "755e69e13b194b55d1b8d2a3a9e1062f487bb9eb1d8de7a2cf73e6f46a43d182"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_spec_adr.rs",
+        "content_hash": "e9a164e144357445fc4b8ee6f0e6cccd08d621834fd7d14751c8d45218325d5c"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/check_catalog_spec.rs",
+        "content_hash": "f10626aeb1c096f4d874d6fab986b59f65908179a90a69572de3172f5d493cfb"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/check_impl_catalog.rs",
+        "content_hash": "d05c1941b08a81f615919707a086c8834b1f5b9f76cd5c974e35f871bd10fed4"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "270da5f6004e9c0aa97a5c8f13ce00034e88a53c02c971f4b3431bbab1849d30"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "6199dcf24b257644754c9bd6ef5e8b1b0a55a0b5b6a6f0f1208c4ee54daae88e"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "45445779840896fda553e0d4d61dbe2c97fcb5f711b9e6b9d7a644e822ce5085"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "a9ea7b1a41739bebe78470baeca25cdaa0a6477a6c92493fe843b30822f8ef27"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "45445779840896fda553e0d4d61dbe2c97fcb5f711b9e6b9d7a644e822ce5085"
+      },
+      "high": {
         "path": "apps/cli/src/commands/verify_tests.rs",
-        "content_hash": "14be5a427595d7023ec4974a3744986d965bcf02f1d9627fcbc76d7ae02ec05a"
+        "content_hash": "d813d92a6b58483c7f00951aadbd4da63cec449613d7ad4be034a660ae02cd4b"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "45445779840896fda553e0d4d61dbe2c97fcb5f711b9e6b9d7a644e822ce5085"
       },
       "high": {
         "path": "apps/cli/src/commands/verify_tests.rs",
-        "content_hash": "20cacd36a818fe5f4fe9fefa5d8d2a053ae0c0e94f0ec2d86c6d5a20d3e69fea"
+        "content_hash": "f9063a51db7caa1e70f2d1dc8eec4493357c2bd61a62c90eaa6825361b543de4"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_refs.rs",
-        "content_hash": "4db76cb7bb9922cd23133fa7c3972a989233540ab7878f04b473178f97f9c1af"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "4568cfa8943660a23c53592a7579367e961eedfe79d2b3ba831cecaf2a5f3c75"
       },
       "high": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "94f7854038750ea4f5b4235311781a59b781d1f42858f6c7974012355fbe014a"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "621be13bb3c1d8f6ce0b75bad93b02194a629a7610067b434cd8a24369321239"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "0cbbc5753d1b5de57765c3cdf665b4de22c214dd48e70ca2b7729a40d4e83460"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "4568cfa8943660a23c53592a7579367e961eedfe79d2b3ba831cecaf2a5f3c75"
       },
       "high": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "5bbb3675a96d22a917b89f7d8ab6b6c511f4269f783492238ae1b2a95132ff53"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "d760877c1f359e8b658aa8b0cef08b35a767dddea07ee0ffde431f00f9836a26"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "1d45173c7ac5176384e613b0aadd90f6ecb7e506290b92459dde93833e9f5b45"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "4f7c84b6fb052d89ce6be806fa01690df24bd71ff07c0e5cc6a2b0e4a5c41070"
       },
       "high": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "e5a419357278385e158f16fb038bf9e35d91c081015566dbd839be08175a17b5"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "82ff607092b2d4a2f9c677531c4a6076db107b9ddf82e0744fcfafe25e893c4f"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "298f11a8e7c35a74bfac8cc4288075d33f5b837e92ad84875ca1854d9f42d6bb"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "4f7c84b6fb052d89ce6be806fa01690df24bd71ff07c0e5cc6a2b0e4a5c41070"
       },
       "high": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "abe265870383a33504995d37f078372e067be1fbaf2296b4c07cbad42c0e99cf"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "c12b65cb2bdf13884c67ef87c311091a5d7f0922494cd3dd5392b3f70b8f28d3"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "66328ac7e3cc16c081f64215a2d1252183792ce9edd565d33b82bf819253bea9"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "5c67a788c30f307aa692f4060cf8d15f2bfe1fc37950020a7f297cfd10292560"
       },
       "high": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "e538f6c28aa6241a191e795a609459190112a4948400779c26d6e581cccc9da0"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "d5a1fa5567c0592ea063b03c23467777811fa094f5de88de5128212129e0ad2c"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "94f7854038750ea4f5b4235311781a59b781d1f42858f6c7974012355fbe014a"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "5e8abbc6baf4d3879734cc6f4b460b7b4eff29711acc87857f6fe67fd8552570"
       },
       "high": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "ef58743c3cbe73e21dca093a35f298253864975419fe7cdd05f34ff90394b477"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "769fcd7b06e7b7e9b060da4a121152fb551e7d77525e6401c35f011bd2b75e74"
       }
     },
     {
       "low": {
-        "path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-        "content_hash": "b1691340f091009bf86d840e99742af56740722881a0ee83bf9f891bba21a354"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "5e8abbc6baf4d3879734cc6f4b460b7b4eff29711acc87857f6fe67fd8552570"
       },
       "high": {
-        "path": "libs/usecase/src/chain/impl_catalog.rs",
-        "content_hash": "005f1317b933d2ca3f69058e59331495aa143becade30df6da68c796bf92bd76"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "c9697cdcb84f6d251cf882ee612603a63c0d64303f2c40da9e12ea8c1703212e"
       }
     },
     {
       "low": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "4093e33f57b417db6c38cccc6763c2b9e56a97d93b17b4e5b1fa088c51a1721b"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "6199dcf24b257644754c9bd6ef5e8b1b0a55a0b5b6a6f0f1208c4ee54daae88e"
       },
       "high": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "c74cde2db05f5dc3761c6990ac6f08bd35561ad38429b4b86dd2651e40496ff2"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "7072afb786ff625ef3d58e6efb17d37da4ecbf4974de54245a1a8fdee41a1dda"
       }
     },
     {
       "low": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "4c3b0984fe9c0c66c8669b3390927530eb6be32e878f14f629bb666e4f940d58"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "621be13bb3c1d8f6ce0b75bad93b02194a629a7610067b434cd8a24369321239"
       },
       "high": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "df6ccf0696e7e786faa67aac7e378f6d673da4975210c3bf038b1e4224a33b42"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "c8834e9bd909d1a79e64b87f0ffaa310355704fc9d9172d530fbb479268c57f9"
       }
     },
     {
       "low": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "804b8e553f1f51ce94e1905d4db02a7c128fe901885ae1038a187ca6946b39dc"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "769fcd7b06e7b7e9b060da4a121152fb551e7d77525e6401c35f011bd2b75e74"
       },
       "high": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "c74cde2db05f5dc3761c6990ac6f08bd35561ad38429b4b86dd2651e40496ff2"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "c9697cdcb84f6d251cf882ee612603a63c0d64303f2c40da9e12ea8c1703212e"
       }
     },
     {
       "low": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "c74cde2db05f5dc3761c6990ac6f08bd35561ad38429b4b86dd2651e40496ff2"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "7fff1d84be861d2823dc7c335a1583bda4c4d10ee56ef0507c17dbe4ccf6496c"
       },
       "high": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "d13314156ee7cf91489a2f049dc48cf5f281846a344252f75e0626dcee670e30"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "d5a1fa5567c0592ea063b03c23467777811fa094f5de88de5128212129e0ad2c"
       }
     },
     {
       "low": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "c74cde2db05f5dc3761c6990ac6f08bd35561ad38429b4b86dd2651e40496ff2"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "82ff607092b2d4a2f9c677531c4a6076db107b9ddf82e0744fcfafe25e893c4f"
       },
       "high": {
-        "path": "libs/usecase/src/merge_gate.rs",
-        "content_hash": "e61d77d9c65ec5cc189912206cd568df16194ebbf1f94c23a6b4360707b053a0"
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "addbcdd28f31464c4ad3325fee0d0c764a832ddb01485929e1959256198d933b"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "addbcdd28f31464c4ad3325fee0d0c764a832ddb01485929e1959256198d933b"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "c12b65cb2bdf13884c67ef87c311091a5d7f0922494cd3dd5392b3f70b8f28d3"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "c8834e9bd909d1a79e64b87f0ffaa310355704fc9d9172d530fbb479268c57f9"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/signal/mod.rs",
+        "content_hash": "d760877c1f359e8b658aa8b0cef08b35a767dddea07ee0ffde431f00f9836a26"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/main.rs",
+        "content_hash": "49807e180d70cb7468d3e55947e299ef307bc5abd79924be14fdebcf0f86b1b9"
+      },
+      "high": {
+        "path": "apps/cli/src/main.rs",
+        "content_hash": "9ef1017ac308843c62772f0836275e572139618fbc82808349ea185ee93c868c"
       }
     }
   ]

@@ -2,28 +2,7 @@
 
 use std::path::PathBuf;
 
-use crate::{CliApp, CommandOutcome};
-
-/// Render a `VerifyOutcome` into a `CommandOutcome`.
-fn render_outcome(label: &str, outcome: &infrastructure::verify::VerifyOutcome) -> CommandOutcome {
-    let mut lines = vec![format!("--- {label} ---")];
-    if outcome.findings().is_empty() {
-        lines.push("[OK] All checks passed.".to_owned());
-        lines.push(format!("--- {label} PASSED ---"));
-        CommandOutcome::success(Some(lines.join("\n")))
-    } else {
-        for finding in outcome.findings() {
-            lines.push(finding.to_string());
-        }
-        if outcome.has_errors() {
-            lines.push(format!("--- {label} FAILED ---"));
-            CommandOutcome { stdout: Some(lines.join("\n")), stderr: None, exit_code: 1 }
-        } else {
-            lines.push(format!("--- {label} PASSED ---"));
-            CommandOutcome::success(Some(lines.join("\n")))
-        }
-    }
-}
+use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome};
 
 /// Render a skip outcome (non-track branch, AC-16).
 fn render_skip(label: &str, reason: &str) -> CommandOutcome {

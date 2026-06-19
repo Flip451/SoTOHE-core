@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------
 
 mod arch;
+mod cmd_outcome;
 mod conventions;
 mod demo;
 mod domain;
@@ -22,6 +23,7 @@ mod pr;
 mod ref_verify;
 pub mod review_v2;
 mod semantic_dup;
+pub mod signal;
 mod telemetry;
 pub mod track;
 pub mod verify;
@@ -75,6 +77,7 @@ pub use review_v2::{
 pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
 };
+pub use signal::SignalGateName;
 pub use telemetry::TelemetryReportInput;
 pub use track::fixpoint_resolve::FixpointResolveInput;
 
