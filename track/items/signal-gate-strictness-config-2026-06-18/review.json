@@ -1,6 +1,126 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:40:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
+          "at": "2026-06-18T06:43:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Makefile.toml is explicitly outside the harness-policy/T004 modification boundary: the briefing says Makefile migrations belong to T011 and that this config is read by tests only until T006/T011. This diff wires signal-gate config into CI/commit tasks now, giving the config production effects in the config-only task.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 322,
+              "category": "scope_boundary"
+            },
+            {
+              "message": "The new chain ③ task skips a layer whenever `<layer>-type-signals.json` is absent, even if the corresponding `<layer>-types.json` catalogue exists. That bypasses `check-impl-catalog`'s fail-closed missing-signal behavior, so `cargo make ci` can pass after a generated type-signals file is deleted instead of blocking until it is regenerated.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 364,
+              "category": "missing_error_handling"
+            },
+            {
+              "message": "The chain ② task similarly skips missing `<layer>-catalogue-spec-signals.json` files before invoking `signal check-catalog-spec`. With `catalog_spec` strict at the commit gate, a layer with a catalogue but no persisted catalog-spec signals can pass CI instead of failing closed on the missing signal file.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 405,
+              "category": "missing_error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:c1317f86884c1c614442924909a53d924154d94e62d903ad82f59787753cc092",
+          "at": "2026-06-19T05:57:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b19693c0f2f30c1b2d8bffa3e4f1b9a79e5b59b1d3ce1b65f7c41971b9c6b8e",
+          "at": "2026-06-19T06:04:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The pre-review gate now tells review-fix-lead agents to run `bin/sotp signal calc-impl-catalog` and `bin/sotp signal calc-catalog-spec` without arguments. Both new subcommands require `--signals-path` and `--catalog-hash`, so this sequence exits with clap usage errors before `bin/sotp review local` can record a round. The prompt template in `.claude/commands/track/review.md` repeats the same invalid commands, so generated reviewer prompts will inherit the failure. Document the existing per-layer `track-active-gate` wrapper or include the full per-layer argument loop.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 70,
+              "category": "workflow"
+            },
+            {
+              "message": "The native-command example `bin/sotp signal calc-spec-adr` is incomplete: the replacement command requires `--spec-json <SPEC_JSON>`, and running it as documented exits with a missing-argument error. This leaves the dev-environment command reference with an unusable replacement for the removed `bin/sotp track signals` workflow.",
+              "severity": "P1",
+              "file": ".claude/rules/07-dev-environment.md",
+              "line": 82,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:519a02b9c3e0c1a39d71e94b88b65ff67c24b05ad600ae0e602ec77b1654592d",
+          "at": "2026-06-19T09:13:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-review command cannot be invoked as written: `Makefile.toml` marks `track-active-gate` as a private cargo-make task, and `cargo make track-active-gate` exits with `Task track-active-gate is private` unless `--allow-private` is passed. Because this file and `.claude/commands/track/review.md:105` now tell review-fix agents to run that exact command before every reviewer invocation, the Claude review loop fails before recording any canonical review round. Use `cargo make --allow-private track-active-gate`, expose a public wrapper, or keep the native command sequence.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 70,
+              "category": "automation"
+            }
+          ],
+          "hash": "rvw1:sha256:baede752204bfa9065810e2a09b6a5affe0cabae0584feedd92ee77f18103771",
+          "at": "2026-06-19T09:19:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3389396ffb65dcdf75cd8dda853ca933e46bb783098fd7b0fd6e26f8fe6339f6",
+          "at": "2026-06-19T09:34:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The pre-review workflow now tells the review-fix agent to run both signal calculators for every TDDD-active layer and compute `--catalog-hash` from the corresponding `<layer>-types.json`. In this repo all three layers are TDDD-enabled, but many tracks legitimately do not have all three catalogue files yet; the shared `track-active-gate` skips absent catalogues before hashing them. Following this new policy literally will fail before `bin/sotp review local` on Phase <2 or single-layer tracks. Carry over the absent-catalogue skip behavior here, or point agents at the shared gate that already implements it.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 67,
+              "category": "automation"
+            }
+          ],
+          "hash": "rvw1:sha256:c4ee477ed07a60a820a3f39e87bc48931d3bb4a285ea8a167bc9fb3fa0dd7743",
+          "at": "2026-06-19T09:41:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:789ef17541a25b6d0ac214ffe61b0dc7c37f7cce7435e2b4e881ff4c3bc487d2",
+          "at": "2026-06-19T09:47:18Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -67,6 +187,97 @@
           "findings": [],
           "hash": "rvw1:sha256:0dc02409fe6df9bcfe6e06fcffca942e7f2eaf290d9cbe5b42ea95ecb2f576c6",
           "at": "2026-06-19T05:12:48Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T09:53:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T10:16:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_check_gate` treats the resolved strictness as if it were an override when calling the per-chain helpers, but `strict_override=false` means \"load config and resolve again\" in those helpers. For any interim cell, this re-reads config from CWD with `gate=None` and drops the `workspace_root`/selected gate already used by the aggregate command, so `signal check --gate ... --workspace-root ...` can fail or evaluate against the wrong matrix instead of the one loaded at line 459. The aggregate path needs to dispatch with the already-resolved boolean directly, or use a helper that accepts effective strictness without re-resolving.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 474,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:2c7e75c3c38704659c2ebcd2e54fa488b2d62706794dd0119a06675d0dfc4163",
+          "at": "2026-06-19T04:50:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:217ab9f4d73c21bb53140301cfc346583fdcef5a07a81882ab5c9fec1ca15f2f",
+          "at": "2026-06-19T04:56:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_hash` is no longer validated before running the chain checks. This change deleted the `parse_catalogue_hash` helper and now passes user input directly to the infrastructure checks, which only compare the raw string against the stored canonical hash. That makes malformed or empty hashes flow through the gate path as if they were a current catalogue hash, producing stale/missing-file findings instead of the intended hash-parse failure, and violates the boundary requirement that external input be validated via the `ContentHash` domain type. The same pattern is repeated in the aggregate check for chains 2 and 3, so restore validation before dispatching to these checks.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 403,
+              "category": "missing_validation"
+            }
+          ],
+          "hash": "rvw1:sha256:82d77c18399cf67dde6c905f0b588c3f02fd4a6692eee31dd1bf017033f573ab",
+          "at": "2026-06-19T05:58:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_calc_adr_user` still delegates to `AdrUserChain::calc_live`, but that usecase method is the not-yet-wired placeholder and always returns an error. As a result, the new public `sotp signal calc-adr-user` command fails for every invocation instead of performing the live ADR scan that the signal namespace is meant to expose. Wire this path through the same infrastructure-backed ADR scanner used by `signal_check_adr_user` or another real calc helper.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 186,
+              "category": "correctness"
+            },
+            {
+              "message": "`signal_calc_spec_adr` delegates to `SpecAdrChain::calc`, which is also still a placeholder returning `SpecAdrCalcError(\"calc not yet wired\")`. This leaves `sotp signal calc-spec-adr` permanently unable to refresh `spec.json` signals, so the command family cannot recover from the stale-signal failures produced by `signal check-spec-adr`. The composition root should call the existing spec read/evaluate/write path rather than the placeholder usecase method.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 261,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e29c5207570a169314dd8413177119329e260c17cfd5ee3d5e33cb5960ce489f",
+          "at": "2026-06-19T06:04:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69d0df4aa4c9010f9d4129ba7d45bd0c208d90dd8377b8ec1753d2495a003a3f",
+          "at": "2026-06-19T06:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ba4cfc8756e10490ddb80c2afbf0148fbf9f75db0164774239701c95a993910",
+          "at": "2026-06-19T08:02:22Z"
         }
       ]
     },
@@ -876,6 +1087,13 @@
           "findings": [],
           "hash": "rvw1:sha256:b4d3b2fb1efb1c354877f4a01ed0986a14f3543a49d0bdbf7792328409b7450f",
           "at": "2026-06-19T08:52:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e13c102285f828fb5eba8d7249e47c3f80c16c1ea70016028b894ee471f950aa",
+          "at": "2026-06-19T10:35:51Z"
         }
       ]
     },
@@ -1557,126 +1775,13 @@
           "findings": [],
           "hash": "rvw1:sha256:d1bb01a5da4ec76fafe01ac18a2d6d4b4955e37b322985b76750c9459bbbd104",
           "at": "2026-06-19T09:13:28Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:40:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:57d3686cf3899649151f38fac96687038e777b7fb0144168f16ba9110161f00b",
-          "at": "2026-06-18T06:43:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Makefile.toml is explicitly outside the harness-policy/T004 modification boundary: the briefing says Makefile migrations belong to T011 and that this config is read by tests only until T006/T011. This diff wires signal-gate config into CI/commit tasks now, giving the config production effects in the config-only task.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 322,
-              "category": "scope_boundary"
-            },
-            {
-              "message": "The new chain ③ task skips a layer whenever `<layer>-type-signals.json` is absent, even if the corresponding `<layer>-types.json` catalogue exists. That bypasses `check-impl-catalog`'s fail-closed missing-signal behavior, so `cargo make ci` can pass after a generated type-signals file is deleted instead of blocking until it is regenerated.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 364,
-              "category": "missing_error_handling"
-            },
-            {
-              "message": "The chain ② task similarly skips missing `<layer>-catalogue-spec-signals.json` files before invoking `signal check-catalog-spec`. With `catalog_spec` strict at the commit gate, a layer with a catalogue but no persisted catalog-spec signals can pass CI instead of failing closed on the missing signal file.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 405,
-              "category": "missing_error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:c1317f86884c1c614442924909a53d924154d94e62d903ad82f59787753cc092",
-          "at": "2026-06-19T05:57:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b19693c0f2f30c1b2d8bffa3e4f1b9a79e5b59b1d3ce1b65f7c41971b9c6b8e",
-          "at": "2026-06-19T06:04:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The pre-review gate now tells review-fix-lead agents to run `bin/sotp signal calc-impl-catalog` and `bin/sotp signal calc-catalog-spec` without arguments. Both new subcommands require `--signals-path` and `--catalog-hash`, so this sequence exits with clap usage errors before `bin/sotp review local` can record a round. The prompt template in `.claude/commands/track/review.md` repeats the same invalid commands, so generated reviewer prompts will inherit the failure. Document the existing per-layer `track-active-gate` wrapper or include the full per-layer argument loop.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 70,
-              "category": "workflow"
-            },
-            {
-              "message": "The native-command example `bin/sotp signal calc-spec-adr` is incomplete: the replacement command requires `--spec-json <SPEC_JSON>`, and running it as documented exits with a missing-argument error. This leaves the dev-environment command reference with an unusable replacement for the removed `bin/sotp track signals` workflow.",
-              "severity": "P1",
-              "file": ".claude/rules/07-dev-environment.md",
-              "line": 82,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:519a02b9c3e0c1a39d71e94b88b65ff67c24b05ad600ae0e602ec77b1654592d",
-          "at": "2026-06-19T09:13:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new pre-review command cannot be invoked as written: `Makefile.toml` marks `track-active-gate` as a private cargo-make task, and `cargo make track-active-gate` exits with `Task track-active-gate is private` unless `--allow-private` is passed. Because this file and `.claude/commands/track/review.md:105` now tell review-fix agents to run that exact command before every reviewer invocation, the Claude review loop fails before recording any canonical review round. Use `cargo make --allow-private track-active-gate`, expose a public wrapper, or keep the native command sequence.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 70,
-              "category": "automation"
-            }
-          ],
-          "hash": "rvw1:sha256:baede752204bfa9065810e2a09b6a5affe0cabae0584feedd92ee77f18103771",
-          "at": "2026-06-19T09:19:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3389396ffb65dcdf75cd8dda853ca933e46bb783098fd7b0fd6e26f8fe6339f6",
-          "at": "2026-06-19T09:34:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The pre-review workflow now tells the review-fix agent to run both signal calculators for every TDDD-active layer and compute `--catalog-hash` from the corresponding `<layer>-types.json`. In this repo all three layers are TDDD-enabled, but many tracks legitimately do not have all three catalogue files yet; the shared `track-active-gate` skips absent catalogues before hashing them. Following this new policy literally will fail before `bin/sotp review local` on Phase <2 or single-layer tracks. Carry over the absent-catalogue skip behavior here, or point agents at the shared gate that already implements it.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 67,
-              "category": "automation"
-            }
-          ],
-          "hash": "rvw1:sha256:c4ee477ed07a60a820a3f39e87bc48931d3bb4a285ea8a167bc9fb3fa0dd7743",
-          "at": "2026-06-19T09:41:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:789ef17541a25b6d0ac214ffe61b0dc7c37f7cce7435e2b4e881ff4c3bc487d2",
-          "at": "2026-06-19T09:47:18Z"
+          "hash": "rvw1:sha256:a1ace3cf95ef8107f195162b7274b73d727f8691e965eb9a129f0b5747d5f24a",
+          "at": "2026-06-19T10:35:36Z"
         }
       ]
     },
@@ -1854,97 +1959,6 @@
           "findings": [],
           "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
           "at": "2026-06-19T02:11:21Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
-          "at": "2026-06-18T09:53:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
-          "at": "2026-06-18T10:16:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`signal_check_gate` treats the resolved strictness as if it were an override when calling the per-chain helpers, but `strict_override=false` means \"load config and resolve again\" in those helpers. For any interim cell, this re-reads config from CWD with `gate=None` and drops the `workspace_root`/selected gate already used by the aggregate command, so `signal check --gate ... --workspace-root ...` can fail or evaluate against the wrong matrix instead of the one loaded at line 459. The aggregate path needs to dispatch with the already-resolved boolean directly, or use a helper that accepts effective strictness without re-resolving.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 474,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:2c7e75c3c38704659c2ebcd2e54fa488b2d62706794dd0119a06675d0dfc4163",
-          "at": "2026-06-19T04:50:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:217ab9f4d73c21bb53140301cfc346583fdcef5a07a81882ab5c9fec1ca15f2f",
-          "at": "2026-06-19T04:56:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`catalogue_hash` is no longer validated before running the chain checks. This change deleted the `parse_catalogue_hash` helper and now passes user input directly to the infrastructure checks, which only compare the raw string against the stored canonical hash. That makes malformed or empty hashes flow through the gate path as if they were a current catalogue hash, producing stale/missing-file findings instead of the intended hash-parse failure, and violates the boundary requirement that external input be validated via the `ContentHash` domain type. The same pattern is repeated in the aggregate check for chains 2 and 3, so restore validation before dispatching to these checks.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 403,
-              "category": "missing_validation"
-            }
-          ],
-          "hash": "rvw1:sha256:82d77c18399cf67dde6c905f0b588c3f02fd4a6692eee31dd1bf017033f573ab",
-          "at": "2026-06-19T05:58:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`signal_calc_adr_user` still delegates to `AdrUserChain::calc_live`, but that usecase method is the not-yet-wired placeholder and always returns an error. As a result, the new public `sotp signal calc-adr-user` command fails for every invocation instead of performing the live ADR scan that the signal namespace is meant to expose. Wire this path through the same infrastructure-backed ADR scanner used by `signal_check_adr_user` or another real calc helper.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 186,
-              "category": "correctness"
-            },
-            {
-              "message": "`signal_calc_spec_adr` delegates to `SpecAdrChain::calc`, which is also still a placeholder returning `SpecAdrCalcError(\"calc not yet wired\")`. This leaves `sotp signal calc-spec-adr` permanently unable to refresh `spec.json` signals, so the command family cannot recover from the stale-signal failures produced by `signal check-spec-adr`. The composition root should call the existing spec read/evaluate/write path rather than the placeholder usecase method.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 261,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e29c5207570a169314dd8413177119329e260c17cfd5ee3d5e33cb5960ce489f",
-          "at": "2026-06-19T06:04:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69d0df4aa4c9010f9d4129ba7d45bd0c208d90dd8377b8ec1753d2495a003a3f",
-          "at": "2026-06-19T06:11:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9ba4cfc8756e10490ddb80c2afbf0148fbf9f75db0164774239701c95a993910",
-          "at": "2026-06-19T08:02:22Z"
         }
       ]
     },

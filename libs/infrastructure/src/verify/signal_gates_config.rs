@@ -591,4 +591,42 @@ mod tests {
         assert!(msg.contains("merge_gate.adr_user"), "must name the key: {msg}");
         assert!(msg.contains("permissive"), "must name the bad value: {msg}");
     }
+
+    #[test]
+    fn test_parse_failed_display_contains_path_and_reason() {
+        let err = SignalGatesConfigError::ParseFailed {
+            path: PathBuf::from("/harness/config/signal-gates.json"),
+            reason: "unexpected end of JSON input".to_owned(),
+        };
+        let msg = err.to_string();
+        assert!(msg.contains("signal-gates.json"), "must mention signal-gates.json: {msg}");
+        assert!(msg.contains("unexpected end of JSON input"), "must include the reason: {msg}");
+    }
+
+    // ── integration: committed .harness/config/signal-gates.json parses ──────
+
+    #[test]
+    fn test_committed_signal_gates_json_parses_successfully() {
+        // CARGO_MANIFEST_DIR points at libs/infrastructure; go up two levels to the
+        // workspace root where .harness/config/signal-gates.json lives.
+        let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let config_path = manifest_dir.join("../../.harness/config/signal-gates.json");
+        assert!(config_path.exists(), "committed signal-gates.json not found at {:?}", config_path);
+        let result = load_signal_gates_config(config_path);
+        assert!(
+            result.is_ok(),
+            "committed signal-gates.json should parse without error, got: {result:?}"
+        );
+        // The committed default has interim commit-gate for adr_user and impl_catalog,
+        // strict for everything else; all merge-gate cells are strict.
+        let matrix = result.unwrap();
+        assert_eq!(matrix.adr_user.commit_gate, Strictness::Interim);
+        assert_eq!(matrix.spec_adr.commit_gate, Strictness::Strict);
+        assert_eq!(matrix.catalog_spec.commit_gate, Strictness::Strict);
+        assert_eq!(matrix.impl_catalog.commit_gate, Strictness::Interim);
+        assert_eq!(matrix.adr_user.merge_gate, Strictness::Strict);
+        assert_eq!(matrix.spec_adr.merge_gate, Strictness::Strict);
+        assert_eq!(matrix.catalog_spec.merge_gate, Strictness::Strict);
+        assert_eq!(matrix.impl_catalog.merge_gate, Strictness::Strict);
+    }
 }

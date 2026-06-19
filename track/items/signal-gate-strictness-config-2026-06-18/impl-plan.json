@@ -102,12 +102,12 @@
     {
       "id": "T012",
       "description": "D5 / AC-07: Update all remaining internal references to old signal commands. (1) Any `.claude/` hook scripts or agent prompts referencing `track signals` / `track type-signals` / `track catalogue-spec-signals` / `verify spec-states` / `verify adr-signals` / `verify catalogue-spec-signals` → replace with new `signal` namespace equivalents. (2) Update `knowledge/` documentation files and convention files that reference the old commands. (3) Update any `CLAUDE.md` / `README.md` references. (4) Update `track/tech-stack.md` if it references old commands. (5) Verify `architecture-rules.json` and `Makefile.toml` are consistent (no orphaned task references). No alias period. Depends on T011. Estimated diff: ~100 lines.",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T013",
       "description": "D4 / AC-05: Add comprehensive unit tests for `load_signal_gates_config` covering all hard-error scenarios: (1) file not found → `SignalGatesConfigError::FileNotFound`; (2) malformed JSON → `ParseFailed`; (3) `$schema_version` = 0 or 99 → `SchemaVersionUnknown`; (4) missing `commit_gate` object → `MissingKey`; (5) missing individual chain×gate cell → `MissingKey`; (6) invalid strictness string (e.g. `\"permissive\"`) → `InvalidValue`; (7) valid config with recommended defaults → Ok with expected `SignalGateMatrix`; (8) valid config with all-strict → Ok. Also add integration-level test verifying that the committed `.harness/config/signal-gates.json` (T004) parses successfully. Add unit tests for `SignalGatesConfigError::Display` variants (actionable messages). Depends on T003, T004. Estimated diff: ~200 lines.",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {
