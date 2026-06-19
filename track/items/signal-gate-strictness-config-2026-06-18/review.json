@@ -1,6 +1,1080 @@
 {
   "schema_version": 2,
   "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`calc-adr-user` is described as optional here (“薄い validate に留める（または省略）”), but the same ADR later makes the 8-command taxonomy mandatory in AC-01 (`signal {calc,check}-adr-user,...` must exist). Those two requirements conflict, so the command surface is underspecified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 132,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b498632a30fe035573c1deaa100fa4d06b72583636b36e877c99451b8d1ea6e7",
+          "at": "2026-06-17T23:45:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:515fa6a1b83ae895f0d04f536ddb068298e7da96bd019f34a59acb3e97cd95ea",
+          "at": "2026-06-17T23:49:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7 says chain ⓪ implements only `SoTChain` and that calling `calc` for ⓪ is compile-time forbidden, but D1/AC-01 require `signal calc-adr-user` to exist as a no-persist live calculation command. As written, the trait contract and CLI acceptance criteria cannot both be implemented through the stated trait-driven dispatch; clarify whether `calc-adr-user` is outside `PersistedSoTChain` or add a separate no-persist calc contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 309,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:515fa6a1b83ae895f0d04f536ddb068298e7da96bd019f34a59acb3e97cd95ea",
+          "at": "2026-06-17T23:52:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-08 contradicts D7's trait contract. D7 defines three traits and repeatedly states that chain ⓪ `AdrUserChain` must implement `LiveSoTChain` so `signal calc-adr-user` has a typed no-persist `calc_live` path, but the acceptance criteria here require only two traits and say `AdrUserChain` implements `SoTChain` only. If implementers follow AC-08, the planned `calc-adr-user` contract from D1/D7 is dropped, so the plan is internally inconsistent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 385,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:562c34591008e2f34c45b5ea0d22dd0723de5dea70a5d1370c53bf2fd3ef7913",
+          "at": "2026-06-17T23:55:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR keeps `signal render` open as a future namespace option, but the scope briefing says the user explicitly rejected pushing render into the signal namespace. That leaves a rejected API direction alive instead of recording it as rejected, so downstream planning could implement an option this baseline was supposed to rule out.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 141,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a6534aab5bb70797efc217db1f454d0c18c681fec2198d7b0f6f2546d3cc4af2",
+          "at": "2026-06-17T23:58:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7 relies on `PersistedSoTChain: SoTChain` providing the default `SoTChain::check` flow (`load -> check_freshness -> evaluate_gate`), but a Rust subtrait cannot implement a method declared by its supertrait for all implementers. As written, each persisted chain still has to implement `SoTChain::check` separately, so the plan does not actually force freshness checks through the trait surface and the AC-08 compile-time guarantee is not achievable without changing the trait design (for example, a blanket impl or an explicit helper method pattern).",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 295,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:e1480cc877dde05db2c591fa62380d5a521ad1fe2cd46f77a9a0c9926dd02c4d",
+          "at": "2026-06-18T00:01:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c77df19d40e0c48403e20e7eb7c34da34bf792097f2f816501e6b479772c0b08",
+          "at": "2026-06-18T00:06:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 introduces a new separate public Stage2 entrypoint for `signal check-impl-catalog`, but the infrastructure catalogue still only declares `infrastructure::verify::spec_states::verify_from_spec_json` and explicitly says that function is Stage1-only. As written, the plan and the type catalogue disagree about the exposed public surface, so the Stage2 callable is unmodelled in the plan artifacts.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 35,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2ad033bbebfff8679ccaa1d41f48e6b187d7139a9e1ca0afe2c41f7c61b1c56c",
+          "at": "2026-06-18T02:17:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The error contract for invalid strictness values is inconsistent inside the plan. T003 hard-codes an invalid strictness string to `ParseFailed`, but T013 later treats the same case as `ParseFailed` **or** `InvalidValue`, and the infrastructure catalogue already defines `SignalGatesConfigError::InvalidValue`. That leaves the observable failure mode underspecified and makes the earlier module test target disagree with the later one.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 19,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fd84c1f349a2b714310c300fe0a4fea39becbe7d2f5700333d1b72e21517dee4",
+          "at": "2026-06-18T02:24:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_catalogue_spec_signals` is described here as taking `CatalogueSpecSignalsDocument` by value, but the plan/spec require the borrowed form `&CatalogueSpecSignalsDocument` (`plan.md:12`, `spec.md:43`). That leaves the generated contract and the implementation plan disagreeing on the API shape, so downstream work could be generated against the wrong ownership model.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/domain-types.json",
+              "line": 304,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f2e421b18221ea6e36aec11f682533beb2ea073fdacd606a5fc5d105d62e48fc",
+          "at": "2026-06-18T02:32:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 removes the old CLI entrypoints before T011 rewires `Makefile.toml` and CI to the new `signal` commands. That leaves an intermediate state where validation can still invoke deleted commands, so the required between-round `cargo make ci-rust` check can fail until the later task lands. Reorder the Makefile/docs migration ahead of the removals, or merge those steps into one task.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 48,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:5703b42fc01492df8cf12a494d674f44b3704c496a22680bde7f933b6d7a6d6f",
+          "at": "2026-06-18T02:39:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:979e5ddead88d5b205be356a460b2c7b39e2de1838ca76c46fa85b064ea24909",
+          "at": "2026-06-18T02:45:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` is only specified to resolve `SignalGateMatrix::merge_gate.adr_user`, even though the spec says `signal-gates.json` is the chain × gate strictness source of truth and that the merge gate is wired through all four `signal check-* --gate merge` cells. As written, the plan leaves the existing spec-adr/catalog-spec/impl-catalog merge checks hardcoded strict and ignores their config cells, so the declared matrix cannot actually control all four merge-gate chains.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 273,
+              "category": "contradiction"
+            },
+            {
+              "message": "`SpecAdrChain` claims its persistence target is `<track>/<layer>-catalogue-spec-signals.json`, which is the chain ② per-layer artifact, while the same sentence and the spec define chain ① as using `spec.json`'s `signals` field with a self-consistency check. This contradictory catalogue contract can lead the implementation to read or persist the wrong artifact for `check-spec-adr`.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 34,
+              "category": "contradiction"
+            },
+            {
+              "message": "T010 says the no-alias cleanup is \"per CN-06\", but CN-06 is the PersistedSoTChain/LiveSoTChain constraint for chain ⓪, not the no-backward-compat requirement. The relevant no-alias requirement is AC-07 / OS-06, so this semantic cross-reference is wrong and breaks the plan traceability for command removal.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 60,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:979e5ddead88d5b205be356a460b2c7b39e2de1838ca76c46fa85b064ea24909",
+          "at": "2026-06-18T02:50:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan places config loading inside `usecase::merge_gate::check_strict_merge_gate` while the loader is declared as `infrastructure::verify::signal_gates_config::load_signal_gates_config`. That forces a usecase-layer function to depend on infrastructure, violating the stated hexagonal layering. Load the file at the CLI/infrastructure boundary or hide it behind a usecase port, then pass a domain `SignalGateMatrix` into the merge-gate logic.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 36,
+              "category": "architecture_violation"
+            },
+            {
+              "message": "The usecase catalogue says `SpecAdrChain`, `CatalogSpecChain`, and `ImplCatalogChain` obtain `SoTChain` through the `impl<T: PersistedSoTChain> SoTChain for T` blanket impl, but `trait_impls` also declares explicit `domain::SoTChain` impls for those same persisted chains. Following both artifacts would produce conflicting Rust impls; if the entries are only intended as effective impls, the catalogue is semantically misleading. Remove the direct `SoTChain` impl entries for persisted chains or model the blanket impl separately.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 340,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0e42a90a6caabe24f60e7a9c4e92b68ed5dc7e19d4ae9793ccedf7e84bef5870",
+          "at": "2026-06-18T02:57:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackBlobReader::read_adr_verify_report` is declared as requiring a `project_root: PathBuf`, and its docs say it exists to support chain ⓪ evaluation in `check_strict_merge_gate`, but `check_strict_merge_gate` only receives `branch`, `reader`, and `gate_matrix`. The plan therefore has no way for the merge-gate usecase to supply the repo root needed for the ADR directory scan it is required to add, making the chain ⓪ merge-gate task under-specified/infeasible as written.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 237,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-13 requires unit tests for the new commands, the new trait taxonomy, and config loading, and task coverage marks AC-13 as covered by every task. However the CLI task T009, which is the task that adds all 8 `signal` commands plus aggregate dispatch, contains no test requirement at all; T001 only tests gate resolution helpers, and T013 only covers config loading. As written, the implementation plan can satisfy its listed tasks while still missing the command/dispatch tests explicitly required by AC-13.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eab3af54a410107f34e4ba0dc3148d8dd03c271699ee7f32f89cbb01735db165",
+          "at": "2026-06-18T03:03:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e789265575c1c2a59b1fdea6afe6d4e9d9187eabf02fe26a540cbd4b9ced54a1",
+          "at": "2026-06-18T03:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001` explicitly covers the four trait definitions (`ChainIdentity`, `SoTChain`, `LiveSoTChain`, `PersistedSoTChain`), but the generated table still leaves all four of those entries yellow while only the enums/value objects were promoted to blue. That makes the plan artifacts internally inconsistent about what this round actually landed.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/domain-types.md",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0ce975e2e58580dd1bd561a0eb86bc36be10622a604e7d5f683a29c7af8a26f3",
+          "at": "2026-06-18T03:38:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ce975e2e58580dd1bd561a0eb86bc36be10622a604e7d5f683a29c7af8a26f3",
+          "at": "2026-06-18T03:45:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked `in_progress`, but its `commit_hash` field was removed instead of remaining explicitly `null`; the same field was also removed from every still-`todo` task. This makes the plan artifact inconsistent with the task-tracking contract that unresolved/in-progress tasks carry a nullable commit slot to be filled when the task is recorded, and it changes T002-T013 even though their semantic state remains `todo`. Restore `\"commit_hash\": null` for the task entries.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0ce975e2e58580dd1bd561a0eb86bc36be10622a604e7d5f683a29c7af8a26f3",
+          "at": "2026-06-18T03:48:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2af3fd5d9f7af1a2462ab7f522381ce2f90f4f71781281ef89b451178d1399ec",
+          "at": "2026-06-18T03:50:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ff9019d9e4fa20c0d3988163a929a7c6ea7529110b7a9c435bc1066c12f8eb1",
+          "at": "2026-06-18T04:03:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ff9019d9e4fa20c0d3988163a929a7c6ea7529110b7a9c435bc1066c12f8eb1",
+          "at": "2026-06-18T04:08:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8018f0e7590e8fd7bea62ec926dc38e663d547f17378c3e97f39e88d718e6152",
+          "at": "2026-06-18T04:25:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` now omits the `commit_hash` field for T002-T013. The plan-artifact task shape and briefing/checklist expect unresolved or in-progress tasks to retain an explicit nullable commit slot (`commit_hash: null`), with only T001 filled after completion. As written, T002 is in progress and T003-T013 are still todo, but their commit slots were removed, making the artifact inconsistent with the task-recording workflow. Restore `\"commit_hash\": null` for the unresolved task entries.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8018f0e7590e8fd7bea62ec926dc38e663d547f17378c3e97f39e88d718e6152",
+          "at": "2026-06-18T04:28:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cfbeb8ad129a242e87095dee41b9ed8aed5e9fb7799a17b7be12b0aeea7c06b",
+          "at": "2026-06-18T04:31:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4fec36400adc9644fff50875826a8e7ac4ff2d54f1f0b88d3a613e59b737a75",
+          "at": "2026-06-18T06:17:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4fec36400adc9644fff50875826a8e7ac4ff2d54f1f0b88d3a613e59b737a75",
+          "at": "2026-06-18T06:29:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:922a05cec81b59cc9ca4379d9a7f6d3a3edf6f9f15a6b5cfeec4fcd00de6cf3c",
+          "at": "2026-06-18T06:40:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:922a05cec81b59cc9ca4379d9a7f6d3a3edf6f9f15a6b5cfeec4fcd00de6cf3c",
+          "at": "2026-06-18T06:42:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:793842abcdcfe610eb85c7c0438b81ad497c150566287bbae7cd58e763bc83be",
+          "at": "2026-06-18T07:27:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:793842abcdcfe610eb85c7c0438b81ad497c150566287bbae7cd58e763bc83be",
+          "at": "2026-06-18T07:32:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` under-covers AC-14/AC-15: they are only linked to T016/T017, but the Blue transitions still depend on the parser tasks T014/T015 (`QualifiedPath` and `Generic`). As written, the coverage map makes the later catalogue updates look sufficient on their own when they are not.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/task-coverage.json",
+              "line": 55,
+              "category": "contradiction"
+            },
+            {
+              "message": "The blanket-impl where-clause is specified with two incompatible shapes: the ADR/spec prose uses `bound: \"domain::PersistedSoTChain\"`, while T016 uses `rhs: [\"PersistedSoTChain\"]`. The plan never reconciles those representations, so the intended JSON shape for `impl_where_predicates` is ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c78d53199389fc7f6c26586b395ec7ec4416a8fdc1ead9eaa4dc1f2f1ff25049",
+          "at": "2026-06-18T09:15:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-12` / `T015` describe propagating `trait generics + impl_generics` when decoding `methods[].params[].ty` and `methods[].returns`, but the source ADR says the shared context should be `trait generics + method generics` instead. That mismatch leaves method-local generic parameters uncovered and makes the task text inconsistent with its own design reference.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+              "line": 187,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ba68975aafb1746e6e6d522edd0959eef7263ddafc4523b2f1a83892ed5da850",
+          "at": "2026-06-18T09:20:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15aa59a971d4cc3446b78658591ea8b07f987a0c4d20fa0be8d74455e1127b8e",
+          "at": "2026-06-18T09:25:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 says the catalogue-side `Self::Input<'_>` declaration will be parsed into `Type::QualifiedPath`, and T014 repeats that by asking for a `&Self::Input<'_>` unit test. But the D1 implementation target is specifically `syn::TypePath.qself.is_some()`, which is exercised by fully qualified syntax such as `<Self as ChainIdentity>::Input<'_>`, not plain `Self::Input`. This contradicts the later T016 canonical form and can let T014 pass without testing the new QualifiedPath builder for the actual catalogue form that must become Blue.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
+              "line": 79,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:15aa59a971d4cc3446b78658591ea8b07f987a0c4d20fa0be8d74455e1127b8e",
+          "at": "2026-06-18T09:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T006` is still marked `in_progress` even though the newly inserted S8 section states that T014-T017 must all complete before T006 resumes. With T014 only in progress and T015-T017 still todo, the plan's active state contradicts its required execution order and can lead the next implementer to continue T006 before the parser/catalogue Blue path is restored.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 57,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:818a46ea838a022861d6c0eec768ab90ff271dadb565fdd5fa7baec1502b8328",
+          "at": "2026-06-18T09:34:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d37d90dcaf91e5012f659ff5022e14ba04fe53f0749296924287d08ee1b7d229",
+          "at": "2026-06-18T09:38:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The execution-order note says the entire S8 group must complete before T006, but the same artifact now marks T006 as done while T015 is still `in_progress`. That leaves the plan self-contradictory about what has to precede T006 and makes the remaining ordering guidance misleading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 35,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:adae94d20dde67b00eafd22c9fe8b0f92a60631b5af8991225b35860c7ddd669",
+          "at": "2026-06-18T12:08:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0847fa605808832f52863267c785e94e5ef9d9863d84efb9921725d3751a582e",
+          "at": "2026-06-18T12:11:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0847fa605808832f52863267c785e94e5ef9d9863d84efb9921725d3751a582e",
+          "at": "2026-06-18T12:13:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 is internally inconsistent about the canonical QualifiedPath spelling. The ADR/spec say A-side GAT projections must use `<Self>::Assoc<args>` because `<Self as _>::...` is unparseable, but the same section also says `Some(Path{path:\"\"})` normalizes to `_` and that C-side `<Self as _>::...` and A-side `<Self>::...` converge to the same string. No extra rewrite step is specified, so those claims do not all hold together.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
+              "line": 128,
+              "category": "contradiction"
+            },
+            {
+              "message": "The new associated-item schema is described inconsistently across artifacts. The ADR/spec/plan say `AssocTypeDecl.default` and `AssocConstDecl.default` are `Option<String>`, but `domain-types.json` records `AssocTypeDecl.default` as `Option<TypeRef>` and names the const field `default_value`. That is a concrete contract mismatch between the generated plan artifact and the documented schema.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/domain-types.json",
+              "line": 320,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:a0e525273f3ecb7615053b567f460ba941c2607badd3bfec4c203ee7a8e97630",
+          "at": "2026-06-18T15:13:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5205ede3b74b9f9d8f3b6cef78597df40a84d657266905a2eaa819f10a5c4509",
+          "at": "2026-06-18T15:20:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9687c0f6109bd904711d58ec77c80dbd70f2dcc6196fc86501f774470bdff6b4",
+          "at": "2026-06-18T17:00:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-14 still specifies `AssocTypeDecl.name` and `AssocConstDecl.name` as raw `String` fields, and T017 repeats the same schema, but this same artifact set now catalogs `AssocTypeDecl.name` as `TypeName` and `AssocConstDecl.name` as `AssocConstName` in `domain-types.json`. That is a semantic contradiction in the plan artifacts: the spec/plan tell implementers to use primitive strings while the rendered domain catalogue records validated identifier newtypes for the implemented design. Align IN-14/T017/ADR D4 with the validated newtype shape so the plan has one authoritative schema.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+              "line": 221,
+              "category": "contradiction"
+            },
+            {
+              "message": "D1 still describes `<Self as ChainIdentity>::Input<'_>` as the catalogue-side canonical qualified path that will match rustdoc, but D3 later says the catalogue canonical form must be `<Self>::Assoc` because rustdoc Self projections arrive with an empty trait path and explicit `<Self as Trait>::Assoc` will not compare correctly. These are mutually exclusive conventions for the same GAT projection declarations, so the ADR leaves readers with two incompatible implementation rules. Update the D1 text to mark the explicit-trait form as the pre-D3 assumption or align it with the D3 `<Self>::...` convention.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
+              "line": 105,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9687c0f6109bd904711d58ec77c80dbd70f2dcc6196fc86501f774470bdff6b4",
+          "at": "2026-06-18T17:06:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR context still says rustdoc/formatter render `Self::Input` as `<Self as ChainIdentity>::Input`, but the later D3 root-cause section says rustdoc emits an empty trait path and the pre-D3 C-side string was `<Self as >::Input`, with the accepted canonical catalogue path being `<Self>::...` rendered as `<Self as _>::...`. These are conflicting descriptions of the same GAT projection behavior, so the ADR leaves readers with two incompatible formatter contracts.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
+              "line": 36,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AC-18` is mapped only to `T017`, but `AC-18` requires the actual `domain-types.json` assoc item declarations and a Blue `calc-impl-catalog` result. `T017` only adds the schema/codecs; the plan puts the catalogue declarations and signal verification in `T018`/later. As written, task coverage claims AC-18 is satisfied by a task that cannot complete the criterion, leaving the acceptance dependency order inconsistent.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/task-coverage.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4b9e0629fb903ca057232ce3a6756c6337ff4117a70554e75a7ca808cd79d9eb",
+          "at": "2026-06-18T17:15:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bb456fa43b413a1039e0be9d845ca7bfb749d3eebf597e0652d1243c2f2ab85a",
+          "at": "2026-06-18T17:19:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7ec10074450c82913b2cf9a54b93b5e9d75b2377d6454333be8a439f271087a",
+          "at": "2026-06-19T00:12:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The S8 narrative still says T016-T019 are implemented in the worktree but uncommitted and instructs the next operator to commit them in a future order, while the task entries in the same artifact now mark T016-T019 as done with commit hash f3e3b9b5. That leaves the plan asserting both that the work remains uncommitted and that it has already been committed, which can misdirect the next implementation/review step.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 160,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c7ec10074450c82913b2cf9a54b93b5e9d75b2377d6454333be8a439f271087a",
+          "at": "2026-06-19T00:14:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f76046a042525ad76ce9babe40978902c3088a88cd202b126b07871e933f7c3",
+          "at": "2026-06-19T00:17:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdb1a6e51959aacf968f30f1d68a7442699cad536fea8f4ee0b9c7151218966d",
+          "at": "2026-06-19T01:37:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdb1a6e51959aacf968f30f1d68a7442699cad536fea8f4ee0b9c7151218966d",
+          "at": "2026-06-19T01:39:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 still states that there are \"no public API surface changes,\" but the same plan-artifacts change adds two `infrastructure::verify::catalogue_spec_signals::*` functions as `action: \"add\"` FreeFunction entries whose docs say they are exposed for integration tests. That is a semantic contradiction in the plan: reviewers and implementers cannot tell whether T008 is expected to preserve the public API or intentionally add these public helpers. Update the T008 description or the catalogue entries so the public API intent is consistent.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 84,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:77de3c666afa69c7560059bf8d10f43eb380fbc045b8ead109b0b54eb89b0703",
+          "at": "2026-06-19T03:10:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:deccb5f97ec8f9a9363248a445429411b5d2e172dd9c1ca5571a719361f2cdea",
+          "at": "2026-06-19T03:13:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`compute_catalogue_declaration_hash` is documented as part of chain ② `catalogue-spec-signals` stale detection and says callers compare a stored `declaration_hash`, but the same plan defines chain ② (`CatalogSpecChain` / `check_catalog_spec`) as using `entry_hash` freshness while `declaration_hash` belongs to chain ③ (`ImplCatalogChain` / `check_impl_catalog`). That leaves the plan with two conflicting stale-detection contracts for chain ②, so an implementer or test author could validate the catalogue-spec gate against the wrong hash granularity.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/infrastructure-types.json",
+              "line": 318,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:13f34e453ba04d7a03f8d69412a92391bb6c6d7757f932a6120be5bad9d2e908",
+          "at": "2026-06-19T04:09:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1368449952f6f3c5e728622bbde245ab826e7f0f8c4938a79dc983a7e5a263aa",
+          "at": "2026-06-19T04:13:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:900e1628b5c2328f4de39e24dceb5d35d434b6a7d9d0b27544a95c231967db07",
+          "at": "2026-06-19T04:49:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7fc26cc25c13afc6f07d01739ca716c6cf1b0b1bd1bc44cf423edda379c1fc9",
+          "at": "2026-06-19T05:58:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:804db77f63e54054e0d2713897bed8f946bb94b27328e3e2542ec28896e445d6",
+          "at": "2026-06-19T09:00:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1bb01a5da4ec76fafe01ac18a2d6d4b4955e37b322985b76750c9459bbbd104",
+          "at": "2026-06-19T09:13:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1ace3cf95ef8107f195162b7274b73d727f8691e965eb9a129f0b5747d5f24a",
+          "at": "2026-06-19T10:35:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020 directs the new usecase orchestrators to compute the per-layer SHA-256 themselves and says that SHA-256 computation is confined to those usecase functions, but ADR D8-4 assigns catalog SHA-256 calculation to `libs/domain/src/` as an invariant primitive. That leaves the plan internally inconsistent: implementing T020 as written would violate the ADR/AC-21 placement table it claims to satisfy. Align the task/usecase docs with D8-4, or relax D8-4 to allow the usecase layer to own hashing.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 114,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:93fb39373a5f4190109239c95007ae5b9cb7560c07cda485f875712549bf4574",
+          "at": "2026-06-19T12:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020/S9 place the new argless orchestrators, including the per-layer loop and active-track resolution, under `libs/usecase/src/signal/`, and the type catalogue declares them as `usecase::signal::*`. That contradicts the ADR added in the same amendment, whose D8-4 placement table requires per-layer iteration and active-track resolution to live in `libs/usecase/src/chain/`. Following the plan as written would either violate the ADR or produce implementations in a module different from the catalogue, so the plan/ADR/catalogue need one consistent placement before implementation.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 114,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1a46f0bc3f1878695f982cf4c2160b63c5abe07dd151378275bac34ab79e23e5",
+          "at": "2026-06-19T12:40:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020 makes the new usecase orchestrators responsible for active-branch resolution, reading layer configuration, path construction, SHA-256 calculation, and direct infrastructure primitive dispatch while their planned signatures only accept `workspace_root`/`strict`. That contradicts the cited hexagonal convention (`usecase -> domain` only; external I/O and infrastructure access must be behind ports/adapters) and also makes the planned mocked usecase tests infeasible because there is no port or adapter parameter to mock.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 114,
+              "category": "infeasibility"
+            },
+            {
+              "message": "D8-5 classifies `execute_verify_adr_signals_with_strict` as one of the `per-layer primitive`s called from the usecase loop. ADR-user verification is chain ⓪/repo-global, not a TDDD per-layer catalogue primitive, and the calc primitives needed by T020 are not named here. This makes the D8 boundary guidance semantically wrong for implementers wiring the per-layer refactor.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 405,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:cb1742dddf2b64f6560f394528969e3f7eb28feefd8d52639c17c7e2b3b0c76f",
+          "at": "2026-06-19T12:43:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020/D8 asks `libs/usecase` orchestrators to read working-tree files and directly call `libs/infrastructure` calc/check primitives. That contradicts the stated hexagonal boundary: usecase may orchestrate domain/usecase logic, while infrastructure access must be behind adapters/ports built by `apps/cli-composition`. With the proposed signatures taking only `workspace_root`, implementing this plan either violates layer dependencies/usecase purity or fails AC-21’s placement requirement.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 405,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:49034f6e20ad0594f921ae5a9d2903fdd26a3e8037869f50cb2a2e151d13339a",
+          "at": "2026-06-19T12:49:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020's rendered task text still specifies the usecase functions as taking only `workspace_root`/`strict` and says each orchestrator calls the matching infrastructure primitive in its loop. That contradicts ADR D8-5 and `impl-plan.json`, which require infrastructure primitives to be injected via `per_layer_fn` because the usecase layer cannot import infrastructure. An implementer following this rendered plan would violate the intended architecture boundary.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 83,
+              "category": "contradiction"
+            },
+            {
+              "message": "The rendered usecase catalogue lists the new `usecase::signal::*` functions without the required `per_layer_fn: F` dependency-injection parameter, while `usecase-types.json` declares that parameter and ADR D8-5 requires it. This leaves the human-readable type view pointing at signatures that cannot satisfy the approved D8 wiring model.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.md",
+              "line": 35,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:52e788ffe9363ad04d6a2125990b1ff3a0446c72f1ce31832f0e0060cd3bef4f",
+          "at": "2026-06-19T12:55:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020 assigns `result rendering` to `apps/cli-composition/src/signal.rs`, but ADR D8-1/D8-4 put `CommandOutcome` rendering exclusively in `apps/cli/src/commands/signal/`, and D8-2 limits cli-composition to adapter graph construction, infrastructure closure wiring, and the usecase call. As written, the plan gives implementers conflicting layer placement instructions and can violate CN-17/AC-21.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 114,
+              "category": "contradiction"
+            },
+            {
+              "message": "The check orchestrator catalogue types require `per_layer_fn` to accept a fourth `bool` argument, but ADR D8-5 specifies the injected TDDD calc/check primitive shape as `Fn(LayerId, &Path, &str) -> VerifyOutcome`. Implementing the type catalogue will not satisfy the ADR signature, while implementing the ADR leaves these check entries wrong; align D8-5 or the two check function entries.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 315,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5d4eaa627f1dfa8c058b1209ab97cb40109b66c45be38c2d5e8b97c333419995",
+          "at": "2026-06-19T12:59:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020 makes `workspace_root` the boundary for filesystem access and instructs the new usecase orchestrators to read the active-track id/layer config and hash `<layer>-types.json` directly from the working tree. That conflicts with the referenced hexagonal convention/usecase purity rule: usecase may orchestrate domain logic and injected ports/functions, but file/worktree I/O belongs behind an adapter or port. Implementing this literally would either violate the architecture checks or require redesigning the task during implementation.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 114,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:883a5fc1c15b9bd006167679ee12242530ddaa1cf847ac5ea88cdcea8ccdbdc4",
+          "at": "2026-06-19T13:02:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-16 says `signal check --gate commit|merge` must be callable “argless”, and AC-20 repeats that phrasing, but the command shown literally requires `--gate` while the existing gate design also depends on `check-* --gate commit|merge` to resolve strictness. This makes the planned CLI contract contradictory: implementers cannot tell whether the requirement is truly zero arguments or only “no per-layer flags”.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+              "line": 490,
+              "category": "contradiction"
+            },
+            {
+              "message": "`SignalLayerReader` exposes `catalogue_path(layer)` and its docs say the cli-composition adapter constructs the path, but CN-17/AC-21/D8-4 assign per-layer signals/catalogue path construction to domain/usecase and keep cli-composition wiring-only. As written, the type catalogue reintroduces the adapter-side path construction the new constraints are trying to prohibit.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 180,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:b51540e53f314c3e005c90454da5f1252ec9d2ec9745c8f91b7268d9d572a14f",
+          "at": "2026-06-19T13:15:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020 still tells implementers that the cli-composition closure captures path context and even the layer path from the adapter filesystem context, while CN-17/AC-21 assign per-layer signals/catalogue path construction to domain/usecase and limit cli-composition to wiring. This leaves the round-9 architecture issue unresolved: the plan can still be implemented by constructing paths in cli-composition instead of the domain/usecase boundary required by the spec.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 114,
+              "category": "contradiction"
+            },
+            {
+              "message": "D8-2 still shows the injected closure as `|layer_id, path, hash| ...`, which contradicts D8-5 and the type catalogue's `per_layer_fn: Fn(LayerId, &str) -> VerifyOutcome` contract. Because this ADR is the source for T020, the remaining three-argument example preserves the old path-threading design and makes the intended function signature inconsistent across the plan artifacts.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 377,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a1e846d45a55846a38c6c719940cc767b919be7f2495d275b7e792e4570928a6",
+          "at": "2026-06-19T13:21:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-21 still requires the path-construction logic to live in `libs/domain/` or `libs/usecase/`, while the new D8 design explicitly assigns signals-file path construction to infrastructure primitives. Because T020 and the usecase type docs follow the D8 model (`per_layer_fn(layer_id, hash)` and infra constructs the output path), this acceptance criterion would reject the intended implementation or push path construction back into the wrong layer. Update AC-21 to exclude path construction from the domain/usecase-only list or explicitly allow `libs/infrastructure/` for signals-file output paths.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+              "line": 730,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1b024aa0e4a2e13de47576afb817e1f404fa317287d32d4502649c860d7b46be",
+          "at": "2026-06-19T13:31:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-17 still permits per-layer `signals / catalogue` path construction in `domain / usecase or infrastructure`, while D8-4 and AC-21 assign signals-file output path construction specifically to `libs/infrastructure/src/`. This leaves T020 implementers able to put signals path construction in domain/usecase and still satisfy CN-17, contradicting the ADR/AC boundary that this round is meant to make strict.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+              "line": 500,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `SignalLayerReader` contract does not make the stated usecase-owned active-track resolution executable: `active_track_id()` is a reader method, but `catalogue_bytes(layer)` has no `TrackId` parameter for the usecase to pass the resolved ID back. As specified, the adapter must either resolve/cache the active track internally or ignore `active_track_id`, contradicting D8-4/AC-21's placement of active-track resolution in domain/usecase.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 168,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1a65788a18a1b8a35fb1ba4d3697c1f8dfb0f181b3270110bd7ce6c2d004de01",
+          "at": "2026-06-19T13:34:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020/type catalogue gives the check orchestrators a `strict: bool` parameter while their injected `per_layer_fn` is still `Fn(LayerId, &str) -> VerifyOutcome`, and D8-5 says the check closure captures `strict` in cli-composition so the usecase closure signature carries no bool. With the current signature, the usecase has no defined way to apply or pass that `strict` value, and the generated docs even claim it is “passed directly” to a callable that does not accept it. This leaves implementers with two conflicting designs for strictness ownership in `check_impl_catalog` / `check_catalog_spec`; either remove `strict` from the usecase functions and capture it in the closure, or change the closure contract consistently.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 392,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cb2206b8a506fdc7de96c8d14e8a0bce24b836a85c3e457ed7c353b88f5d1ae2",
+          "at": "2026-06-19T13:40:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D8 still embeds the implementation task id `T020` in the ADR text, despite the plan-artifacts briefing requiring D8 to have no track-specific T## references. This makes the long-lived design decision depend on a transient impl-plan task; move the task-specific wording to the impl plan and keep the ADR phrased in stable design terms.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "line": 406,
+              "category": "broken_reference"
+            },
+            {
+              "message": "`SignalLayerReaderError::Io` is declared as a unit variant, but the docs say it wraps filesystem / OS errors. As written, implementers cannot preserve or propagate the underlying IO error with `?` without discarding it; either give `Io` a source payload or change the contract to explicitly describe lossy mapping.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 107,
+              "category": "contradiction"
+            },
+            {
+              "message": "S9 says active-track resolution, layer enumeration, and hash computation are confined to the usecase layer, but ADR D8-4 assigns TDDD layer enumeration to a domain primitive. That leaves T020 with conflicting layer-boundary instructions for where the layer set is owned; align the plan with D8-4 or relax D8-4 explicitly.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "line": 78,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:37debe8e42305aff7b21e5dc0a90c52cc600cc0fe280079659e3b63161085a07",
+          "at": "2026-06-19T14:22:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SignalLayerReader` is documented as implemented in `apps/cli-composition/src/signal.rs`, but that trait owns `active_track_id`, `enabled_layers`, and `catalogue_bytes`, which are the active-track/layer/filesystem responsibilities that CN-17 and ADR D8-2/D8-4 explicitly keep out of cli-composition. This makes the plan point the adapter implementation at a forbidden layer instead of an infrastructure adapter that cli-composition merely wires in.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
+              "line": 185,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bd8ccb3a00b59f24021ec03ff8bf42e33410206240b4668a1ca02944ef9003c3",
+          "at": "2026-06-19T14:29:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020 describes the strictness closure for “check variants” as passing strict to `infra_check_impl_catalog(layer_id, hash, strict)`. That primitive only matches chain ③; `check_catalog_spec` needs the corresponding catalog-spec check primitive called out by ADR D8-5 and the usecase catalogue. As written, the plan either wires chain ② to the impl-catalog checker or leaves that checker unspecified, contradicting AC-20’s requirement that both check commands work correctly.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
+              "line": 114,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "CN-17 allows active-track resolution and TDDD layer enumeration to be placed in either `domain` or `usecase`, but the cited ADR D8-4 placement table is more specific: active-track resolution belongs in `libs/usecase/src/`, while TDDD layer enumeration belongs in `libs/domain/src/`. This makes the contract satisfiable by placements the ADR explicitly disallows, so T020 could pass the new CN/AC while still violating the architecture decision.",
+              "severity": "P1",
+              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+              "line": 500,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c0cc4240ad5bccf78195cae040b4dd5435446418067e59c83ef27765778f0282",
+          "at": "2026-06-19T14:36:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:721b7b49967d3f6277b085d74a756fb76b0ad5b00392d4c08468f7c8c4af8557",
+          "at": "2026-06-19T14:42:06Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T09:53:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
+          "at": "2026-06-18T10:16:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_check_gate` treats the resolved strictness as if it were an override when calling the per-chain helpers, but `strict_override=false` means \"load config and resolve again\" in those helpers. For any interim cell, this re-reads config from CWD with `gate=None` and drops the `workspace_root`/selected gate already used by the aggregate command, so `signal check --gate ... --workspace-root ...` can fail or evaluate against the wrong matrix instead of the one loaded at line 459. The aggregate path needs to dispatch with the already-resolved boolean directly, or use a helper that accepts effective strictness without re-resolving.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 474,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:2c7e75c3c38704659c2ebcd2e54fa488b2d62706794dd0119a06675d0dfc4163",
+          "at": "2026-06-19T04:50:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:217ab9f4d73c21bb53140301cfc346583fdcef5a07a81882ab5c9fec1ca15f2f",
+          "at": "2026-06-19T04:56:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_hash` is no longer validated before running the chain checks. This change deleted the `parse_catalogue_hash` helper and now passes user input directly to the infrastructure checks, which only compare the raw string against the stored canonical hash. That makes malformed or empty hashes flow through the gate path as if they were a current catalogue hash, producing stale/missing-file findings instead of the intended hash-parse failure, and violates the boundary requirement that external input be validated via the `ContentHash` domain type. The same pattern is repeated in the aggregate check for chains 2 and 3, so restore validation before dispatching to these checks.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 403,
+              "category": "missing_validation"
+            }
+          ],
+          "hash": "rvw1:sha256:82d77c18399cf67dde6c905f0b588c3f02fd4a6692eee31dd1bf017033f573ab",
+          "at": "2026-06-19T05:58:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_calc_adr_user` still delegates to `AdrUserChain::calc_live`, but that usecase method is the not-yet-wired placeholder and always returns an error. As a result, the new public `sotp signal calc-adr-user` command fails for every invocation instead of performing the live ADR scan that the signal namespace is meant to expose. Wire this path through the same infrastructure-backed ADR scanner used by `signal_check_adr_user` or another real calc helper.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 186,
+              "category": "correctness"
+            },
+            {
+              "message": "`signal_calc_spec_adr` delegates to `SpecAdrChain::calc`, which is also still a placeholder returning `SpecAdrCalcError(\"calc not yet wired\")`. This leaves `sotp signal calc-spec-adr` permanently unable to refresh `spec.json` signals, so the command family cannot recover from the stale-signal failures produced by `signal check-spec-adr`. The composition root should call the existing spec read/evaluate/write path rather than the placeholder usecase method.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 261,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e29c5207570a169314dd8413177119329e260c17cfd5ee3d5e33cb5960ce489f",
+          "at": "2026-06-19T06:04:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69d0df4aa4c9010f9d4129ba7d45bd0c208d90dd8377b8ec1753d2495a003a3f",
+          "at": "2026-06-19T06:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ba4cfc8756e10490ddb80c2afbf0148fbf9f75db0164774239701c95a993910",
+          "at": "2026-06-19T08:02:22Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -121,6 +1195,139 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
+          "at": "2026-06-18T03:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
+          "at": "2026-06-18T03:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
+          "at": "2026-06-18T04:04:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
+          "at": "2026-06-18T04:08:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
+          "at": "2026-06-18T04:25:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
+          "at": "2026-06-18T04:28:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AssocTypeDecl.name` and `AssocConstDecl.name` are plain `String`s, unlike the rest of `catalogue_v2`'s identifier-bearing fields which use validated newtypes. That lets callers construct invalid associated-item names inside the domain model and defers validation to later layers, which violates the repo's \"illegal states unrepresentable\" rule for a new public API surface.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 48,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ebc91589796efb3fd0a8ba00353feac1e5505be845d297209e5dc2fce2c0d3e9",
+          "at": "2026-06-18T15:11:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AssocConstName` is a new public validation boundary, but this module adds no direct tests for valid construction, invalid-input rejection, or `Display`/`FromStr` round-trips. Because its validation logic is macro-backed and shared only indirectly with the other identifier wrappers, a regression here would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 243,
+              "category": "testing"
+            },
+            {
+              "message": "`TraitEntry` now carries `assoc_types` and `assoc_consts`, but there is no test coverage asserting their default-empty construction or that they participate in `PartialEq` the way the existing `generics` and `where_predicates` fields do. That leaves the new trait-item shape under-tested and makes a wiring regression easy to miss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 150,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:70537a10d0574928eec1a9cc41198cbd64cf0e8df320522c95655b8b4af959b7",
+          "at": "2026-06-18T17:00:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
+          "at": "2026-06-18T17:07:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
+          "at": "2026-06-18T17:13:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
+          "at": "2026-06-18T18:07:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
+          "at": "2026-06-18T18:10:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_trait_entry_with_non_empty_informal_grounds_stores_grounding` still constructs `TraitEntry` inline with all fields instead of using `trait_entry_fixture()` and mutating `informal_grounds`. This leaves a TraitEntry-related test outside the intended DRY refactor and will keep this test coupled to future field additions.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 822,
+              "category": "test-maintenance"
+            }
+          ],
+          "hash": "rvw1:sha256:d3245742fb0ef8e5a5b22c2bfae60a62894e438f5c7666054bfb1ddf5519fea0",
+          "at": "2026-06-19T07:59:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6c32151ac4f0fd961c4294ba46c45e6b8c6175325f15eef50f2572ec7122c9a",
+          "at": "2026-06-19T08:02:17Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -190,94 +1397,180 @@
         }
       ]
     },
-    "cli_composition": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
-          "at": "2026-06-18T09:53:31Z"
+          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
+          "at": "2026-06-18T07:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogSpecChain::check_freshness` only compares the document-level `catalogue_declaration_hash` with the current catalogue hash. The chain ② contract requires the persisted per-entry `CatalogueSpecSignal::entry_hash()` values to be checked against freshly computed entry hashes before `evaluate_gate`; otherwise `SoTChain::check` can accept a signals document with stale, missing, or manually trimmed per-entry signals as long as the aggregate declaration hash still matches. Carry the current entry hashes in `CatalogSpecInput` and fail closed on missing/mismatched entries before delegating to `check_catalogue_spec_signals`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/chain/catalog_spec.rs",
+              "line": 160,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
+          "at": "2026-06-18T07:33:46Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:defbd9050a611042136fac10c91d922696ee4fe6e35a41859304577527577980",
-          "at": "2026-06-18T10:16:42Z"
+          "hash": "rvw1:sha256:9394221141e132d3d8c4372eb3d93650dc3b7218c4ccf6aceb5290341ac7c16b",
+          "at": "2026-06-18T07:49:22Z"
         },
         {
-          "type": "final",
+          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`signal_check_gate` treats the resolved strictness as if it were an override when calling the per-chain helpers, but `strict_override=false` means \"load config and resolve again\" in those helpers. For any interim cell, this re-reads config from CWD with `gate=None` and drops the `workspace_root`/selected gate already used by the aggregate command, so `signal check --gate ... --workspace-root ...` can fail or evaluate against the wrong matrix instead of the one loaded at line 459. The aggregate path needs to dispatch with the already-resolved boolean directly, or use a helper that accepts effective strictness without re-resolving.",
+              "message": "The chain-0 result is only merged at the end of the function, but the early returns here and at the later `stage1.has_errors()` check exit before that merge. Invalid branches or missing/failed `spec.json` therefore drop ADR findings entirely, which contradicts the new requirement that chain ⓪ be accumulated independently of the other stages.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 474,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:2c7e75c3c38704659c2ebcd2e54fa488b2d62706794dd0119a06675d0dfc4163",
-          "at": "2026-06-19T04:50:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:217ab9f4d73c21bb53140301cfc346583fdcef5a07a81882ab5c9fec1ca15f2f",
-          "at": "2026-06-19T04:56:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`catalogue_hash` is no longer validated before running the chain checks. This change deleted the `parse_catalogue_hash` helper and now passes user input directly to the infrastructure checks, which only compare the raw string against the stored canonical hash. That makes malformed or empty hashes flow through the gate path as if they were a current catalogue hash, producing stale/missing-file findings instead of the intended hash-parse failure, and violates the boundary requirement that external input be validated via the `ContentHash` domain type. The same pattern is repeated in the aggregate check for chains 2 and 3, so restore validation before dispatching to these checks.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 403,
-              "category": "missing_validation"
-            }
-          ],
-          "hash": "rvw1:sha256:82d77c18399cf67dde6c905f0b588c3f02fd4a6692eee31dd1bf017033f573ab",
-          "at": "2026-06-19T05:58:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`signal_calc_adr_user` still delegates to `AdrUserChain::calc_live`, but that usecase method is the not-yet-wired placeholder and always returns an error. As a result, the new public `sotp signal calc-adr-user` command fails for every invocation instead of performing the live ADR scan that the signal namespace is meant to expose. Wire this path through the same infrastructure-backed ADR scanner used by `signal_check_adr_user` or another real calc helper.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 186,
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "line": 305,
               "category": "correctness"
             },
             {
-              "message": "`signal_calc_spec_adr` delegates to `SpecAdrChain::calc`, which is also still a placeholder returning `SpecAdrCalcError(\"calc not yet wired\")`. This leaves `sotp signal calc-spec-adr` permanently unable to refresh `spec.json` signals, so the command family cannot recover from the stale-signal failures produced by `signal check-spec-adr`. The composition root should call the existing spec read/evaluate/write path rather than the placeholder usecase method.",
+              "message": "The new `strict=false` arm in `check_chain2_for_layer` is not exercised by any test in this scope, and every existing test now hardcodes `all_strict_matrix()`. That leaves the new warning-mode behavior and the added ADR reader port effectively unverified, so a regression in the non-blocking path could ship unnoticed.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 261,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate/chain2_gate.rs",
+              "line": 275,
+              "category": "test coverage"
             }
           ],
-          "hash": "rvw1:sha256:e29c5207570a169314dd8413177119329e260c17cfd5ee3d5e33cb5960ce489f",
-          "at": "2026-06-19T06:04:11Z"
+          "hash": "rvw1:sha256:ae16c95a27ef368c750b6df6c610cc94671494805594ed1e36b78102a69e83ff",
+          "at": "2026-06-18T09:54:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
+          "at": "2026-06-18T10:18:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` reads the ADR report before calling `validate_branch_ref`, so an untrusted branch string reaches the `TrackBlobReader` port unvalidated. That reintroduces the very ref-safety check this function is supposed to enforce and can make the adapter operate on malicious refs like `..` or `@{...}` before the branch is rejected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "line": 287,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
+          "at": "2026-06-18T10:19:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
+          "at": "2026-06-18T10:31:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Only `catalog_spec` is exercised with a non-strict matrix; the newly matrix-driven `adr_user`, `spec_adr`, and `impl_catalog` paths all run under `all_strict_matrix()` in tests. A swapped ChainId or accidental hardcoded strict value for any of those cells would still pass the current suite. Add focused interim-mode tests for Chain ⓪, Chain ①, and Chain ③ Yellow signals.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 599,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
+          "at": "2026-06-18T10:34:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Chain ⓪ `read_adr_verify_report` error path is untested. The trait documents `FetchError` as fail-closed and this branch turns it into a blocking finding, but the added tests only cover `NotFound` and `Found` ADR reports. A regression that accidentally skipped ADR scan I/O/parse failures would still pass the current suite. Add a test with an otherwise clean gate and `BlobFetchResult::FetchError` from `read_adr_verify_report`, asserting `has_errors()` and the ADR failure message.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 302,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7ce09d370511ec4bdf5d979ea634cb37372db4aa5505f95c6ba4a2048d46b98a",
+          "at": "2026-06-18T10:51:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69d0df4aa4c9010f9d4129ba7d45bd0c208d90dd8377b8ec1753d2495a003a3f",
-          "at": "2026-06-19T06:11:04Z"
+          "hash": "rvw1:sha256:39818e433ede532476eeb14779e80fc977e38d5f445465e469d1a4da49aa69ba",
+          "at": "2026-06-18T11:12:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
+          "at": "2026-06-18T15:10:49Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9ba4cfc8756e10490ddb80c2afbf0148fbf9f75db0164774239701c95a993910",
-          "at": "2026-06-19T08:02:22Z"
+          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
+          "at": "2026-06-18T15:13:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
+          "at": "2026-06-19T01:11:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
+          "at": "2026-06-19T01:14:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
+          "at": "2026-06-19T01:37:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
+          "at": "2026-06-19T01:40:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
+          "at": "2026-06-19T02:08:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
+          "at": "2026-06-19T02:11:21Z"
         }
       ]
     },
@@ -1094,1004 +2387,6 @@
           "findings": [],
           "hash": "rvw1:sha256:e13c102285f828fb5eba8d7249e47c3f80c16c1ea70016028b894ee471f950aa",
           "at": "2026-06-19T10:35:51Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`calc-adr-user` is described as optional here (“薄い validate に留める（または省略）”), but the same ADR later makes the 8-command taxonomy mandatory in AC-01 (`signal {calc,check}-adr-user,...` must exist). Those two requirements conflict, so the command surface is underspecified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
-              "line": 132,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b498632a30fe035573c1deaa100fa4d06b72583636b36e877c99451b8d1ea6e7",
-          "at": "2026-06-17T23:45:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:515fa6a1b83ae895f0d04f536ddb068298e7da96bd019f34a59acb3e97cd95ea",
-          "at": "2026-06-17T23:49:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D7 says chain ⓪ implements only `SoTChain` and that calling `calc` for ⓪ is compile-time forbidden, but D1/AC-01 require `signal calc-adr-user` to exist as a no-persist live calculation command. As written, the trait contract and CLI acceptance criteria cannot both be implemented through the stated trait-driven dispatch; clarify whether `calc-adr-user` is outside `PersistedSoTChain` or add a separate no-persist calc contract.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
-              "line": 309,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:515fa6a1b83ae895f0d04f536ddb068298e7da96bd019f34a59acb3e97cd95ea",
-          "at": "2026-06-17T23:52:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-08 contradicts D7's trait contract. D7 defines three traits and repeatedly states that chain ⓪ `AdrUserChain` must implement `LiveSoTChain` so `signal calc-adr-user` has a typed no-persist `calc_live` path, but the acceptance criteria here require only two traits and say `AdrUserChain` implements `SoTChain` only. If implementers follow AC-08, the planned `calc-adr-user` contract from D1/D7 is dropped, so the plan is internally inconsistent.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
-              "line": 385,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:562c34591008e2f34c45b5ea0d22dd0723de5dea70a5d1370c53bf2fd3ef7913",
-          "at": "2026-06-17T23:55:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The ADR keeps `signal render` open as a future namespace option, but the scope briefing says the user explicitly rejected pushing render into the signal namespace. That leaves a rejected API direction alive instead of recording it as rejected, so downstream planning could implement an option this baseline was supposed to rule out.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
-              "line": 141,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a6534aab5bb70797efc217db1f454d0c18c681fec2198d7b0f6f2546d3cc4af2",
-          "at": "2026-06-17T23:58:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D7 relies on `PersistedSoTChain: SoTChain` providing the default `SoTChain::check` flow (`load -> check_freshness -> evaluate_gate`), but a Rust subtrait cannot implement a method declared by its supertrait for all implementers. As written, each persisted chain still has to implement `SoTChain::check` separately, so the plan does not actually force freshness checks through the trait surface and the AC-08 compile-time guarantee is not achievable without changing the trait design (for example, a blanket impl or an explicit helper method pattern).",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
-              "line": 295,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:e1480cc877dde05db2c591fa62380d5a521ad1fe2cd46f77a9a0c9926dd02c4d",
-          "at": "2026-06-18T00:01:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c77df19d40e0c48403e20e7eb7c34da34bf792097f2f816501e6b479772c0b08",
-          "at": "2026-06-18T00:06:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T007 introduces a new separate public Stage2 entrypoint for `signal check-impl-catalog`, but the infrastructure catalogue still only declares `infrastructure::verify::spec_states::verify_from_spec_json` and explicitly says that function is Stage1-only. As written, the plan and the type catalogue disagree about the exposed public surface, so the Stage2 callable is unmodelled in the plan artifacts.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
-              "line": 35,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2ad033bbebfff8679ccaa1d41f48e6b187d7139a9e1ca0afe2c41f7c61b1c56c",
-          "at": "2026-06-18T02:17:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The error contract for invalid strictness values is inconsistent inside the plan. T003 hard-codes an invalid strictness string to `ParseFailed`, but T013 later treats the same case as `ParseFailed` **or** `InvalidValue`, and the infrastructure catalogue already defines `SignalGatesConfigError::InvalidValue`. That leaves the observable failure mode underspecified and makes the earlier module test target disagree with the later one.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
-              "line": 19,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:fd84c1f349a2b714310c300fe0a4fea39becbe7d2f5700333d1b72e21517dee4",
-          "at": "2026-06-18T02:24:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_catalogue_spec_signals` is described here as taking `CatalogueSpecSignalsDocument` by value, but the plan/spec require the borrowed form `&CatalogueSpecSignalsDocument` (`plan.md:12`, `spec.md:43`). That leaves the generated contract and the implementation plan disagreeing on the API shape, so downstream work could be generated against the wrong ownership model.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/domain-types.json",
-              "line": 304,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f2e421b18221ea6e36aec11f682533beb2ea073fdacd606a5fc5d105d62e48fc",
-          "at": "2026-06-18T02:32:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T010 removes the old CLI entrypoints before T011 rewires `Makefile.toml` and CI to the new `signal` commands. That leaves an intermediate state where validation can still invoke deleted commands, so the required between-round `cargo make ci-rust` check can fail until the later task lands. Reorder the Makefile/docs migration ahead of the removals, or merge those steps into one task.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/plan.md",
-              "line": 48,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:5703b42fc01492df8cf12a494d674f44b3704c496a22680bde7f933b6d7a6d6f",
-          "at": "2026-06-18T02:39:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:979e5ddead88d5b205be356a460b2c7b39e2de1838ca76c46fa85b064ea24909",
-          "at": "2026-06-18T02:45:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_strict_merge_gate` is only specified to resolve `SignalGateMatrix::merge_gate.adr_user`, even though the spec says `signal-gates.json` is the chain × gate strictness source of truth and that the merge gate is wired through all four `signal check-* --gate merge` cells. As written, the plan leaves the existing spec-adr/catalog-spec/impl-catalog merge checks hardcoded strict and ignores their config cells, so the declared matrix cannot actually control all four merge-gate chains.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
-              "line": 273,
-              "category": "contradiction"
-            },
-            {
-              "message": "`SpecAdrChain` claims its persistence target is `<track>/<layer>-catalogue-spec-signals.json`, which is the chain ② per-layer artifact, while the same sentence and the spec define chain ① as using `spec.json`'s `signals` field with a self-consistency check. This contradictory catalogue contract can lead the implementation to read or persist the wrong artifact for `check-spec-adr`.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
-              "line": 34,
-              "category": "contradiction"
-            },
-            {
-              "message": "T010 says the no-alias cleanup is \"per CN-06\", but CN-06 is the PersistedSoTChain/LiveSoTChain constraint for chain ⓪, not the no-backward-compat requirement. The relevant no-alias requirement is AC-07 / OS-06, so this semantic cross-reference is wrong and breaks the plan traceability for command removal.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
-              "line": 60,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:979e5ddead88d5b205be356a460b2c7b39e2de1838ca76c46fa85b064ea24909",
-          "at": "2026-06-18T02:50:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The plan places config loading inside `usecase::merge_gate::check_strict_merge_gate` while the loader is declared as `infrastructure::verify::signal_gates_config::load_signal_gates_config`. That forces a usecase-layer function to depend on infrastructure, violating the stated hexagonal layering. Load the file at the CLI/infrastructure boundary or hide it behind a usecase port, then pass a domain `SignalGateMatrix` into the merge-gate logic.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
-              "line": 36,
-              "category": "architecture_violation"
-            },
-            {
-              "message": "The usecase catalogue says `SpecAdrChain`, `CatalogSpecChain`, and `ImplCatalogChain` obtain `SoTChain` through the `impl<T: PersistedSoTChain> SoTChain for T` blanket impl, but `trait_impls` also declares explicit `domain::SoTChain` impls for those same persisted chains. Following both artifacts would produce conflicting Rust impls; if the entries are only intended as effective impls, the catalogue is semantically misleading. Remove the direct `SoTChain` impl entries for persisted chains or model the blanket impl separately.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
-              "line": 340,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0e42a90a6caabe24f60e7a9c4e92b68ed5dc7e19d4ae9793ccedf7e84bef5870",
-          "at": "2026-06-18T02:57:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackBlobReader::read_adr_verify_report` is declared as requiring a `project_root: PathBuf`, and its docs say it exists to support chain ⓪ evaluation in `check_strict_merge_gate`, but `check_strict_merge_gate` only receives `branch`, `reader`, and `gate_matrix`. The plan therefore has no way for the merge-gate usecase to supply the repo root needed for the ADR directory scan it is required to add, making the chain ⓪ merge-gate task under-specified/infeasible as written.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/usecase-types.json",
-              "line": 237,
-              "category": "infeasibility"
-            },
-            {
-              "message": "AC-13 requires unit tests for the new commands, the new trait taxonomy, and config loading, and task coverage marks AC-13 as covered by every task. However the CLI task T009, which is the task that adds all 8 `signal` commands plus aggregate dispatch, contains no test requirement at all; T001 only tests gate resolution helpers, and T013 only covers config loading. As written, the implementation plan can satisfy its listed tasks while still missing the command/dispatch tests explicitly required by AC-13.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
-              "line": 54,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:eab3af54a410107f34e4ba0dc3148d8dd03c271699ee7f32f89cbb01735db165",
-          "at": "2026-06-18T03:03:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e789265575c1c2a59b1fdea6afe6d4e9d9187eabf02fe26a540cbd4b9ced54a1",
-          "at": "2026-06-18T03:11:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T001` explicitly covers the four trait definitions (`ChainIdentity`, `SoTChain`, `LiveSoTChain`, `PersistedSoTChain`), but the generated table still leaves all four of those entries yellow while only the enums/value objects were promoted to blue. That makes the plan artifacts internally inconsistent about what this round actually landed.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/domain-types.md",
-              "line": 22,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0ce975e2e58580dd1bd561a0eb86bc36be10622a604e7d5f683a29c7af8a26f3",
-          "at": "2026-06-18T03:38:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ce975e2e58580dd1bd561a0eb86bc36be10622a604e7d5f683a29c7af8a26f3",
-          "at": "2026-06-18T03:45:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 is marked `in_progress`, but its `commit_hash` field was removed instead of remaining explicitly `null`; the same field was also removed from every still-`todo` task. This makes the plan artifact inconsistent with the task-tracking contract that unresolved/in-progress tasks carry a nullable commit slot to be filled when the task is recorded, and it changes T002-T013 even though their semantic state remains `todo`. Restore `\"commit_hash\": null` for the task entries.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
-              "line": 7,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0ce975e2e58580dd1bd561a0eb86bc36be10622a604e7d5f683a29c7af8a26f3",
-          "at": "2026-06-18T03:48:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2af3fd5d9f7af1a2462ab7f522381ce2f90f4f71781281ef89b451178d1399ec",
-          "at": "2026-06-18T03:50:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ff9019d9e4fa20c0d3988163a929a7c6ea7529110b7a9c435bc1066c12f8eb1",
-          "at": "2026-06-18T04:03:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ff9019d9e4fa20c0d3988163a929a7c6ea7529110b7a9c435bc1066c12f8eb1",
-          "at": "2026-06-18T04:08:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8018f0e7590e8fd7bea62ec926dc38e663d547f17378c3e97f39e88d718e6152",
-          "at": "2026-06-18T04:25:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`impl-plan.json` now omits the `commit_hash` field for T002-T013. The plan-artifact task shape and briefing/checklist expect unresolved or in-progress tasks to retain an explicit nullable commit slot (`commit_hash: null`), with only T001 filled after completion. As written, T002 is in progress and T003-T013 are still todo, but their commit slots were removed, making the artifact inconsistent with the task-recording workflow. Restore `\"commit_hash\": null` for the unresolved task entries.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
-              "line": 13,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8018f0e7590e8fd7bea62ec926dc38e663d547f17378c3e97f39e88d718e6152",
-          "at": "2026-06-18T04:28:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3cfbeb8ad129a242e87095dee41b9ed8aed5e9fb7799a17b7be12b0aeea7c06b",
-          "at": "2026-06-18T04:31:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4fec36400adc9644fff50875826a8e7ac4ff2d54f1f0b88d3a613e59b737a75",
-          "at": "2026-06-18T06:17:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4fec36400adc9644fff50875826a8e7ac4ff2d54f1f0b88d3a613e59b737a75",
-          "at": "2026-06-18T06:29:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:922a05cec81b59cc9ca4379d9a7f6d3a3edf6f9f15a6b5cfeec4fcd00de6cf3c",
-          "at": "2026-06-18T06:40:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:922a05cec81b59cc9ca4379d9a7f6d3a3edf6f9f15a6b5cfeec4fcd00de6cf3c",
-          "at": "2026-06-18T06:42:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:793842abcdcfe610eb85c7c0438b81ad497c150566287bbae7cd58e763bc83be",
-          "at": "2026-06-18T07:27:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:793842abcdcfe610eb85c7c0438b81ad497c150566287bbae7cd58e763bc83be",
-          "at": "2026-06-18T07:32:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`task-coverage.json` under-covers AC-14/AC-15: they are only linked to T016/T017, but the Blue transitions still depend on the parser tasks T014/T015 (`QualifiedPath` and `Generic`). As written, the coverage map makes the later catalogue updates look sufficient on their own when they are not.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/task-coverage.json",
-              "line": 55,
-              "category": "contradiction"
-            },
-            {
-              "message": "The blanket-impl where-clause is specified with two incompatible shapes: the ADR/spec prose uses `bound: \"domain::PersistedSoTChain\"`, while T016 uses `rhs: [\"PersistedSoTChain\"]`. The plan never reconciles those representations, so the intended JSON shape for `impl_where_predicates` is ambiguous.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
-              "line": 39,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c78d53199389fc7f6c26586b395ec7ec4416a8fdc1ead9eaa4dc1f2f1ff25049",
-          "at": "2026-06-18T09:15:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`IN-12` / `T015` describe propagating `trait generics + impl_generics` when decoding `methods[].params[].ty` and `methods[].returns`, but the source ADR says the shared context should be `trait generics + method generics` instead. That mismatch leaves method-local generic parameters uncovered and makes the task text inconsistent with its own design reference.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-              "line": 187,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ba68975aafb1746e6e6d522edd0959eef7263ddafc4523b2f1a83892ed5da850",
-          "at": "2026-06-18T09:20:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15aa59a971d4cc3446b78658591ea8b07f987a0c4d20fa0be8d74455e1127b8e",
-          "at": "2026-06-18T09:25:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 says the catalogue-side `Self::Input<'_>` declaration will be parsed into `Type::QualifiedPath`, and T014 repeats that by asking for a `&Self::Input<'_>` unit test. But the D1 implementation target is specifically `syn::TypePath.qself.is_some()`, which is exercised by fully qualified syntax such as `<Self as ChainIdentity>::Input<'_>`, not plain `Self::Input`. This contradicts the later T016 canonical form and can let T014 pass without testing the new QualifiedPath builder for the actual catalogue form that must become Blue.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
-              "line": 79,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:15aa59a971d4cc3446b78658591ea8b07f987a0c4d20fa0be8d74455e1127b8e",
-          "at": "2026-06-18T09:29:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T006` is still marked `in_progress` even though the newly inserted S8 section states that T014-T017 must all complete before T006 resumes. With T014 only in progress and T015-T017 still todo, the plan's active state contradicts its required execution order and can lead the next implementer to continue T006 before the parser/catalogue Blue path is restored.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
-              "line": 57,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:818a46ea838a022861d6c0eec768ab90ff271dadb565fdd5fa7baec1502b8328",
-          "at": "2026-06-18T09:34:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d37d90dcaf91e5012f659ff5022e14ba04fe53f0749296924287d08ee1b7d229",
-          "at": "2026-06-18T09:38:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The execution-order note says the entire S8 group must complete before T006, but the same artifact now marks T006 as done while T015 is still `in_progress`. That leaves the plan self-contradictory about what has to precede T006 and makes the remaining ordering guidance misleading.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
-              "line": 35,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:adae94d20dde67b00eafd22c9fe8b0f92a60631b5af8991225b35860c7ddd669",
-          "at": "2026-06-18T12:08:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0847fa605808832f52863267c785e94e5ef9d9863d84efb9921725d3751a582e",
-          "at": "2026-06-18T12:11:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0847fa605808832f52863267c785e94e5ef9d9863d84efb9921725d3751a582e",
-          "at": "2026-06-18T12:13:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 is internally inconsistent about the canonical QualifiedPath spelling. The ADR/spec say A-side GAT projections must use `<Self>::Assoc<args>` because `<Self as _>::...` is unparseable, but the same section also says `Some(Path{path:\"\"})` normalizes to `_` and that C-side `<Self as _>::...` and A-side `<Self>::...` converge to the same string. No extra rewrite step is specified, so those claims do not all hold together.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
-              "line": 128,
-              "category": "contradiction"
-            },
-            {
-              "message": "The new associated-item schema is described inconsistently across artifacts. The ADR/spec/plan say `AssocTypeDecl.default` and `AssocConstDecl.default` are `Option<String>`, but `domain-types.json` records `AssocTypeDecl.default` as `Option<TypeRef>` and names the const field `default_value`. That is a concrete contract mismatch between the generated plan artifact and the documented schema.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/domain-types.json",
-              "line": 320,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:a0e525273f3ecb7615053b567f460ba941c2607badd3bfec4c203ee7a8e97630",
-          "at": "2026-06-18T15:13:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5205ede3b74b9f9d8f3b6cef78597df40a84d657266905a2eaa819f10a5c4509",
-          "at": "2026-06-18T15:20:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9687c0f6109bd904711d58ec77c80dbd70f2dcc6196fc86501f774470bdff6b4",
-          "at": "2026-06-18T17:00:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-14 still specifies `AssocTypeDecl.name` and `AssocConstDecl.name` as raw `String` fields, and T017 repeats the same schema, but this same artifact set now catalogs `AssocTypeDecl.name` as `TypeName` and `AssocConstDecl.name` as `AssocConstName` in `domain-types.json`. That is a semantic contradiction in the plan artifacts: the spec/plan tell implementers to use primitive strings while the rendered domain catalogue records validated identifier newtypes for the implemented design. Align IN-14/T017/ADR D4 with the validated newtype shape so the plan has one authoritative schema.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-              "line": 221,
-              "category": "contradiction"
-            },
-            {
-              "message": "D1 still describes `<Self as ChainIdentity>::Input<'_>` as the catalogue-side canonical qualified path that will match rustdoc, but D3 later says the catalogue canonical form must be `<Self>::Assoc` because rustdoc Self projections arrive with an empty trait path and explicit `<Self as Trait>::Assoc` will not compare correctly. These are mutually exclusive conventions for the same GAT projection declarations, so the ADR leaves readers with two incompatible implementation rules. Update the D1 text to mark the explicit-trait form as the pre-D3 assumption or align it with the D3 `<Self>::...` convention.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
-              "line": 105,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:9687c0f6109bd904711d58ec77c80dbd70f2dcc6196fc86501f774470bdff6b4",
-          "at": "2026-06-18T17:06:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "ADR context still says rustdoc/formatter render `Self::Input` as `<Self as ChainIdentity>::Input`, but the later D3 root-cause section says rustdoc emits an empty trait path and the pre-D3 C-side string was `<Self as >::Input`, with the accepted canonical catalogue path being `<Self>::...` rendered as `<Self as _>::...`. These are conflicting descriptions of the same GAT projection behavior, so the ADR leaves readers with two incompatible formatter contracts.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md",
-              "line": 36,
-              "category": "contradiction"
-            },
-            {
-              "message": "`AC-18` is mapped only to `T017`, but `AC-18` requires the actual `domain-types.json` assoc item declarations and a Blue `calc-impl-catalog` result. `T017` only adds the schema/codecs; the plan puts the catalogue declarations and signal verification in `T018`/later. As written, task coverage claims AC-18 is satisfied by a task that cannot complete the criterion, leaving the acceptance dependency order inconsistent.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/task-coverage.json",
-              "line": 66,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:4b9e0629fb903ca057232ce3a6756c6337ff4117a70554e75a7ca808cd79d9eb",
-          "at": "2026-06-18T17:15:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bb456fa43b413a1039e0be9d845ca7bfb749d3eebf597e0652d1243c2f2ab85a",
-          "at": "2026-06-18T17:19:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7ec10074450c82913b2cf9a54b93b5e9d75b2377d6454333be8a439f271087a",
-          "at": "2026-06-19T00:12:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The S8 narrative still says T016-T019 are implemented in the worktree but uncommitted and instructs the next operator to commit them in a future order, while the task entries in the same artifact now mark T016-T019 as done with commit hash f3e3b9b5. That leaves the plan asserting both that the work remains uncommitted and that it has already been committed, which can misdirect the next implementation/review step.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
-              "line": 160,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c7ec10074450c82913b2cf9a54b93b5e9d75b2377d6454333be8a439f271087a",
-          "at": "2026-06-19T00:14:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7f76046a042525ad76ce9babe40978902c3088a88cd202b126b07871e933f7c3",
-          "at": "2026-06-19T00:17:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cdb1a6e51959aacf968f30f1d68a7442699cad536fea8f4ee0b9c7151218966d",
-          "at": "2026-06-19T01:37:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cdb1a6e51959aacf968f30f1d68a7442699cad536fea8f4ee0b9c7151218966d",
-          "at": "2026-06-19T01:39:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T008 still states that there are \"no public API surface changes,\" but the same plan-artifacts change adds two `infrastructure::verify::catalogue_spec_signals::*` functions as `action: \"add\"` FreeFunction entries whose docs say they are exposed for integration tests. That is a semantic contradiction in the plan: reviewers and implementers cannot tell whether T008 is expected to preserve the public API or intentionally add these public helpers. Update the T008 description or the catalogue entries so the public API intent is consistent.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/impl-plan.json",
-              "line": 84,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:77de3c666afa69c7560059bf8d10f43eb380fbc045b8ead109b0b54eb89b0703",
-          "at": "2026-06-19T03:10:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:deccb5f97ec8f9a9363248a445429411b5d2e172dd9c1ca5571a719361f2cdea",
-          "at": "2026-06-19T03:13:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`compute_catalogue_declaration_hash` is documented as part of chain ② `catalogue-spec-signals` stale detection and says callers compare a stored `declaration_hash`, but the same plan defines chain ② (`CatalogSpecChain` / `check_catalog_spec`) as using `entry_hash` freshness while `declaration_hash` belongs to chain ③ (`ImplCatalogChain` / `check_impl_catalog`). That leaves the plan with two conflicting stale-detection contracts for chain ②, so an implementer or test author could validate the catalogue-spec gate against the wrong hash granularity.",
-              "severity": "P1",
-              "file": "track/items/signal-gate-strictness-config-2026-06-18/infrastructure-types.json",
-              "line": 318,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:13f34e453ba04d7a03f8d69412a92391bb6c6d7757f932a6120be5bad9d2e908",
-          "at": "2026-06-19T04:09:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1368449952f6f3c5e728622bbde245ab826e7f0f8c4938a79dc983a7e5a263aa",
-          "at": "2026-06-19T04:13:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:900e1628b5c2328f4de39e24dceb5d35d434b6a7d9d0b27544a95c231967db07",
-          "at": "2026-06-19T04:49:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7fc26cc25c13afc6f07d01739ca716c6cf1b0b1bd1bc44cf423edda379c1fc9",
-          "at": "2026-06-19T05:58:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:804db77f63e54054e0d2713897bed8f946bb94b27328e3e2542ec28896e445d6",
-          "at": "2026-06-19T09:00:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d1bb01a5da4ec76fafe01ac18a2d6d4b4955e37b322985b76750c9459bbbd104",
-          "at": "2026-06-19T09:13:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1ace3cf95ef8107f195162b7274b73d727f8691e965eb9a129f0b5747d5f24a",
-          "at": "2026-06-19T10:35:36Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
-          "at": "2026-06-18T07:29:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogSpecChain::check_freshness` only compares the document-level `catalogue_declaration_hash` with the current catalogue hash. The chain ② contract requires the persisted per-entry `CatalogueSpecSignal::entry_hash()` values to be checked against freshly computed entry hashes before `evaluate_gate`; otherwise `SoTChain::check` can accept a signals document with stale, missing, or manually trimmed per-entry signals as long as the aggregate declaration hash still matches. Carry the current entry hashes in `CatalogSpecInput` and fail closed on missing/mismatched entries before delegating to `check_catalogue_spec_signals`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/chain/catalog_spec.rs",
-              "line": 160,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
-          "at": "2026-06-18T07:33:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9394221141e132d3d8c4372eb3d93650dc3b7218c4ccf6aceb5290341ac7c16b",
-          "at": "2026-06-18T07:49:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The chain-0 result is only merged at the end of the function, but the early returns here and at the later `stage1.has_errors()` check exit before that merge. Invalid branches or missing/failed `spec.json` therefore drop ADR findings entirely, which contradicts the new requirement that chain ⓪ be accumulated independently of the other stages.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
-              "line": 305,
-              "category": "correctness"
-            },
-            {
-              "message": "The new `strict=false` arm in `check_chain2_for_layer` is not exercised by any test in this scope, and every existing test now hardcodes `all_strict_matrix()`. That leaves the new warning-mode behavior and the added ADR reader port effectively unverified, so a regression in the non-blocking path could ship unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate/chain2_gate.rs",
-              "line": 275,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:ae16c95a27ef368c750b6df6c610cc94671494805594ed1e36b78102a69e83ff",
-          "at": "2026-06-18T09:54:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
-          "at": "2026-06-18T10:18:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_strict_merge_gate` reads the ADR report before calling `validate_branch_ref`, so an untrusted branch string reaches the `TrackBlobReader` port unvalidated. That reintroduces the very ref-safety check this function is supposed to enforce and can make the adapter operate on malicious refs like `..` or `@{...}` before the branch is rejected.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
-              "line": 287,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
-          "at": "2026-06-18T10:19:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
-          "at": "2026-06-18T10:31:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Only `catalog_spec` is exercised with a non-strict matrix; the newly matrix-driven `adr_user`, `spec_adr`, and `impl_catalog` paths all run under `all_strict_matrix()` in tests. A swapped ChainId or accidental hardcoded strict value for any of those cells would still pass the current suite. Add focused interim-mode tests for Chain ⓪, Chain ①, and Chain ③ Yellow signals.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 599,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
-          "at": "2026-06-18T10:34:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Chain ⓪ `read_adr_verify_report` error path is untested. The trait documents `FetchError` as fail-closed and this branch turns it into a blocking finding, but the added tests only cover `NotFound` and `Found` ADR reports. A regression that accidentally skipped ADR scan I/O/parse failures would still pass the current suite. Add a test with an otherwise clean gate and `BlobFetchResult::FetchError` from `read_adr_verify_report`, asserting `has_errors()` and the ADR failure message.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 302,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7ce09d370511ec4bdf5d979ea634cb37372db4aa5505f95c6ba4a2048d46b98a",
-          "at": "2026-06-18T10:51:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39818e433ede532476eeb14779e80fc977e38d5f445465e469d1a4da49aa69ba",
-          "at": "2026-06-18T11:12:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
-          "at": "2026-06-18T15:10:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
-          "at": "2026-06-18T15:13:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
-          "at": "2026-06-19T01:11:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
-          "at": "2026-06-19T01:14:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
-          "at": "2026-06-19T01:37:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
-          "at": "2026-06-19T01:40:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
-          "at": "2026-06-19T02:08:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
-          "at": "2026-06-19T02:11:21Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
-          "at": "2026-06-18T03:39:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:57ea3877a1b11ed4193cec80bd51f1da32e8b4bc4a9e5713697080f1967ef33e",
-          "at": "2026-06-18T03:48:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
-          "at": "2026-06-18T04:04:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1fa725f9ad0b0232b9fd48a47b28032f153255bddefa12eb6796c27bbbe6a95c",
-          "at": "2026-06-18T04:08:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
-          "at": "2026-06-18T04:25:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4955f4429ecf4c4e1ac6c5903e4d079f2f660114a88aaadd8c51322890ec988",
-          "at": "2026-06-18T04:28:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AssocTypeDecl.name` and `AssocConstDecl.name` are plain `String`s, unlike the rest of `catalogue_v2`'s identifier-bearing fields which use validated newtypes. That lets callers construct invalid associated-item names inside the domain model and defers validation to later layers, which violates the repo's \"illegal states unrepresentable\" rule for a new public API surface.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-              "line": 48,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ebc91589796efb3fd0a8ba00353feac1e5505be845d297209e5dc2fce2c0d3e9",
-          "at": "2026-06-18T15:11:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AssocConstName` is a new public validation boundary, but this module adds no direct tests for valid construction, invalid-input rejection, or `Display`/`FromStr` round-trips. Because its validation logic is macro-backed and shared only indirectly with the other identifier wrappers, a regression here would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-              "line": 243,
-              "category": "testing"
-            },
-            {
-              "message": "`TraitEntry` now carries `assoc_types` and `assoc_consts`, but there is no test coverage asserting their default-empty construction or that they participate in `PartialEq` the way the existing `generics` and `where_predicates` fields do. That leaves the new trait-item shape under-tested and makes a wiring regression easy to miss.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/entries.rs",
-              "line": 150,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:70537a10d0574928eec1a9cc41198cbd64cf0e8df320522c95655b8b4af959b7",
-          "at": "2026-06-18T17:00:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
-          "at": "2026-06-18T17:07:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:29d46f69f9e8ba61b0d2a7fa3f1e7d193ec6cd397402a94353f66d99d564821c",
-          "at": "2026-06-18T17:13:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
-          "at": "2026-06-18T18:07:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2afbb93d0464ffe1d2e4780b4863073ffb2794994ec1ff5e6f708b7d788e3070",
-          "at": "2026-06-18T18:10:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_trait_entry_with_non_empty_informal_grounds_stores_grounding` still constructs `TraitEntry` inline with all fields instead of using `trait_entry_fixture()` and mutating `informal_grounds`. This leaves a TraitEntry-related test outside the intended DRY refactor and will keep this test coupled to future field additions.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-              "line": 822,
-              "category": "test-maintenance"
-            }
-          ],
-          "hash": "rvw1:sha256:d3245742fb0ef8e5a5b22c2bfae60a62894e438f5c7666054bfb1ddf5519fea0",
-          "at": "2026-06-19T07:59:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6c32151ac4f0fd961c4294ba46c45e6b8c6175325f15eef50f2572ec7122c9a",
-          "at": "2026-06-19T08:02:17Z"
         }
       ]
     }

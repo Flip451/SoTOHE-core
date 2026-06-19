@@ -484,6 +484,36 @@
           "anchor": "D4"
         }
       ]
+    },
+    {
+      "id": "CN-16",
+      "text": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。gate 選択フラグ（`--gate commit|merge`）や strictness フラグ（`--strict`）はレイヤー指定フラグではないため許容される。ADR D5 が規定する regen シーケンス `signal calc-impl-catalog` → `signal calc-catalog-spec` → `track views sync` はリテラルに per-layer フラグのないベアコールである。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-17",
+      "text": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来のレイヤーセット）は `libs/domain/src/` の domain primitive 責務、catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務でなければならず、CLI コマンドファイル・`apps/cli-composition`・`Makefile.toml` に含んではならない。per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。`apps/cli/src/commands/signal/*.rs` の各コマンドファイルは ≤ 約 30 LOC（引数パース → usecase 呼び出し → 結果レンダリングのみ）でなければならない。`apps/cli-composition/src/signal.rs` はアダプタ構築と usecase 呼び出しのワイヤリングのみを担い、per-layer ループ・hash 算出・パス構築を含んではならない。`Makefile.toml` は per-layer ループおよび hash 算出を含んではならず、`track-active-gate` は bare `bin/sotp signal calc-impl-catalog`・`bin/sotp signal calc-catalog-spec`・`bin/sotp track views sync` の呼び出し（または廃止）に限定される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+          "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+          "anchor": "D8"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/hexagonal-architecture.md",
+          "anchor": "CLI as Composition Root"
+        }
+      ]
     }
   ],
   "acceptance_criteria": [
@@ -684,6 +714,40 @@
           "anchor": "D4"
         }
       ]
+    },
+    {
+      "id": "AC-20",
+      "text": "TDDD 対象レイヤーが存在するトラックブランチから `bin/sotp signal calc-impl-catalog`（per-layer フラグなし）を実行すると、`<layer>-types.json` が存在する全レイヤーについて `<layer>-type-signals.json` が生成または更新され、catalogue が存在しないレイヤーに対しては no-op となる。同様に `bin/sotp signal calc-catalog-spec`（per-layer フラグなし）、`bin/sotp signal check-impl-catalog`（per-layer フラグなし）、`bin/sotp signal check-catalog-spec`（per-layer フラグなし）、および `bin/sotp signal check --gate commit|merge`（per-layer フラグなし; `--gate` は gate 選択フラグであり per-layer フラグではない）が同条件で正常に動作する。いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-21",
+      "text": "ADR §D8-1〜D8-5 を満たす状態: `apps/cli/src/commands/signal/calc_impl_catalog.rs` および同フォルダの兄弟ファイルにループ・SHA-256 算出が存在しない。`Makefile.toml::track-active-gate`（存在する場合）にループおよび hash 算出コードが存在しない。アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙は `libs/domain/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+          "anchor": "D8"
+        }
+      ]
+    },
+    {
+      "id": "AC-22",
+      "text": "ADR §D8-3 を満たす状態: `Makefile.toml` 内の `signal` 名前空間タスクが `for LAYER` ループ・`sha256sum` 呼び出し・パス構築パターンを含まない。`track-active-gate` は完全に削除されているか、または `bin/sotp signal calc-impl-catalog`・`bin/sotp signal calc-catalog-spec`・`bin/sotp track views sync` の 3 行の bare コマンドシーケンスへ縮減されている。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+          "anchor": "D8"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -725,7 +789,7 @@
     }
   ],
   "signals": {
-    "blue": 64,
+    "blue": 69,
     "yellow": 0,
     "red": 0
   }

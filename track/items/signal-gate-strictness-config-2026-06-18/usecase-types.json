@@ -97,6 +97,25 @@
         { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-02" }
       ],
       "informal_grounds": []
+    },
+    "SignalLayerReaderError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Io", "payload": { "kind": "unit" } },
+          { "name": "TrackIdUnresolved", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal",
+      "docs": "Error type for `SignalLayerReader` port methods. `Io` represents a sanitized filesystem / OS failure reported by the local adapter; it is intentionally payload-free and must not expose paths, hostnames, or OS details through the usecase contract. `TrackIdUnresolved` signals that the active-track ID could not be determined (e.g., no active track branch found).",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -119,6 +138,58 @@
       "module_path": "verify_adr_signals",
       "docs": "Carried as reference: baseline-identical, no structural change in this track. Exposed for contract-map edge visibility.",
       "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalLayerReader": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "active_track_id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<domain::TrackId, SignalLayerReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "enabled_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ],
+          "returns": "Result<Vec<domain::tddd::LayerId>, SignalLayerReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "catalogue_bytes",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "layer", "ty": "domain::tddd::LayerId" }
+          ],
+          "returns": "Result<Option<Vec<u8>>, SignalLayerReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "signal",
+      "docs": "Secondary port for the argless signal orchestrator functions (CN-16 / CN-17 / D8). Provides active-track ID (`active_track_id()`), TDDD-enabled layer list (`enabled_layers(track_id)`), and per-layer catalogue file bytes (`catalogue_bytes(track_id, layer)`). The usecase orchestrator calls `active_track_id()` first, then passes the resolved `TrackId` explicitly to `enabled_layers` and `catalogue_bytes` — making active-track resolution a usecase responsibility. The port does NOT return file paths — per D8-4, signals-file path construction is an infrastructure responsibility (infrastructure primitives construct the output path from the layer ID). The usecase function receives bytes from this port, computes SHA-256 hex, and passes `(LayerId, sha256_hex)` to the `per_layer_fn` closure. Declared in `libs/usecase/src/signal/`; implemented by a local filesystem adapter in `libs/infrastructure/src/`. `apps/cli-composition/src/signal.rs` only wires that adapter and the `per_layer_fn` closures into the usecase orchestrator.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-22" }
+      ],
       "informal_grounds": []
     },
     "TrackBlobReader": {
@@ -257,6 +328,98 @@
     }
   },
   "functions": {
+    "usecase::signal::calc_impl_catalog": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "per_layer_fn", "ty": "F" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] },
+        { "name": "F", "bounds": ["Fn(domain::tddd::LayerId, &str) -> domain::verify::VerifyOutcome"] }
+      ],
+      "where_predicates": [],
+      "docs": "Per-layer-argless (no `--signals-path`, `--catalog-hash`, `--layer` flags exposed) orchestrator for `signal calc-impl-catalog` (chain ③). All filesystem access goes through the `reader: &R` port (`SignalLayerReader` trait). Execution: (1) calls `reader.active_track_id()` to resolve the track ID (active-track resolution is a usecase responsibility per D8-4); (2) calls `reader.enabled_layers(track_id)` to enumerate TDDD-enabled layers; (3) for each layer, calls `reader.catalogue_bytes(track_id, layer)` to get bytes and computes SHA-256 hex; (4) calls `per_layer_fn(layer_id, hash_hex)` — the infrastructure primitive constructs the signals-file output path from layer ID. Layers with `None` bytes are no-op. No path is passed through this function. Per CN-16 / CN-17.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::signal::calc_catalog_spec": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "per_layer_fn", "ty": "F" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] },
+        { "name": "F", "bounds": ["Fn(domain::tddd::LayerId, &str) -> domain::verify::VerifyOutcome"] }
+      ],
+      "where_predicates": [],
+      "docs": "Per-layer-argless (no `--signals-path`, `--catalog-hash`, `--layer` flags exposed) orchestrator for `signal calc-catalog-spec` (chain ②). All filesystem access goes through the `reader: &R` port (`SignalLayerReader` trait). Execution: (1) calls `reader.active_track_id()`; (2) calls `reader.enabled_layers(track_id)`; (3) for each layer calls `reader.catalogue_bytes(track_id, layer)` and computes SHA-256 hex; (4) calls `per_layer_fn(layer_id, hash_hex)`. Infrastructure primitive constructs catalogue-spec-signals output path from layer ID. Layers with `None` bytes are no-op. Per CN-16 / CN-17.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::signal::check_impl_catalog": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "per_layer_fn", "ty": "F" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] },
+        { "name": "F", "bounds": ["Fn(domain::tddd::LayerId, &str) -> domain::verify::VerifyOutcome"] }
+      ],
+      "where_predicates": [],
+      "docs": "Per-layer-argless (no `--signals-path`, `--catalog-hash`, `--layer` flags exposed) orchestrator for `signal check-impl-catalog` (chain ③). All filesystem access goes through the `reader: &R` port. Execution: (1) `reader.active_track_id()`; (2) `reader.enabled_layers(track_id)`; (3) per layer: `reader.catalogue_bytes(track_id, layer)` → SHA-256 hex → `per_layer_fn(layer_id, hash_hex)`. Infrastructure primitive constructs signals-file path from layer ID. Strictness is NOT a parameter of this function — the cli-composition closure captures `strict: bool` from the `SignalGateMatrix` at the call site (D8-5) and encodes it in the `per_layer_fn` closure. Per CN-16 / CN-17.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::signal::check_catalog_spec": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "per_layer_fn", "ty": "F" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] },
+        { "name": "F", "bounds": ["Fn(domain::tddd::LayerId, &str) -> domain::verify::VerifyOutcome"] }
+      ],
+      "where_predicates": [],
+      "docs": "Per-layer-argless (no `--signals-path`, `--catalog-hash`, `--layer` flags exposed) orchestrator for `signal check-catalog-spec` (chain ②). All filesystem access goes through the `reader: &R` port. Execution: (1) `reader.active_track_id()`; (2) `reader.enabled_layers(track_id)`; (3) per layer: `reader.catalogue_bytes(track_id, layer)` → SHA-256 hex → `per_layer_fn(layer_id, hash_hex)`. Infrastructure primitive constructs catalogue-spec-signals output path from layer ID. Strictness is NOT a parameter of this function — the cli-composition closure captures `strict: bool` from `SignalGateMatrix` and encodes it in `per_layer_fn` (D8-5). Per CN-16 / CN-17.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" }
+      ],
+      "informal_grounds": []
+    },
     "usecase::merge_gate::check_strict_merge_gate": {
       "action": "modify",
       "role": "UseCaseFunction",
@@ -282,6 +445,21 @@
   },
   "inherent_impls": [],
   "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalLayerReaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SignalLayerReaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "SignalLayerReaderError"
+    },
     {
       "action": "add",
       "trait_ref": "core::fmt::Debug",

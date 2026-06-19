@@ -108,6 +108,12 @@
       "id": "T013",
       "description": "D4 / AC-05: Add comprehensive unit tests for `load_signal_gates_config` covering all hard-error scenarios: (1) file not found → `SignalGatesConfigError::FileNotFound`; (2) malformed JSON → `ParseFailed`; (3) `$schema_version` = 0 or 99 → `SchemaVersionUnknown`; (4) missing `commit_gate` object → `MissingKey`; (5) missing individual chain×gate cell → `MissingKey`; (6) invalid strictness string (e.g. `\"permissive\"`) → `InvalidValue`; (7) valid config with recommended defaults → Ok with expected `SignalGateMatrix`; (8) valid config with all-strict → Ok. Also add integration-level test verifying that the committed `.harness/config/signal-gates.json` (T004) parses successfully. Add unit tests for `SignalGatesConfigError::Display` variants (actionable messages). Depends on T003, T004. Estimated diff: ~200 lines.",
       "status": "done"
+    },
+    {
+      "id": "T020",
+      "description": "CN-16 / CN-17 / D8 ADR-conformance refactor — per-layer-argless usecase orchestrators + CLI thin-wire + Makefile cleanup: (1) Add new port trait `SignalLayerReader` in `libs/usecase/src/signal/` with 3 methods: `active_track_id() -> Result<TrackId, ...>`, `enabled_layers(track_id: TrackId) -> Result<Vec<LayerId>, ...>`, `catalogue_bytes(track_id: TrackId, layer: LayerId) -> Result<Option<Vec<u8>>, ...>`. The usecase function calls `active_track_id()`, then passes the resolved `TrackId` to `enabled_layers` and `catalogue_bytes` — making active-track resolution an explicit usecase-owned step (D8-4). Implement 4 usecase orchestrator functions: `calc_impl_catalog<R, F>(reader: &R, per_layer_fn: F) -> VerifyOutcome where R: SignalLayerReader, F: Fn(LayerId, &str) -> VerifyOutcome`, and similarly for `calc_catalog_spec<R, F>`, `check_impl_catalog<R, F>(reader: &R, per_layer_fn: F)`, `check_catalog_spec<R, F>(reader: &R, per_layer_fn: F)`. All 4 functions have identical signatures (no `strict: bool` parameter in any). Each function: (a) resolves active track ID; (b) obtains the domain-owned enabled layer list through `reader.enabled_layers(track_id)` and iterates it; (c) per layer reads catalogue bytes, computes SHA-256 hex; (d) calls `per_layer_fn(layer_id, sha256_hex)`. Infrastructure primitive constructs signals-file output path from layer ID (D8-4 / D8-5). Strictness is captured in the cli-composition closure — for check variants, cli-composition resolves `strict` from `SignalGateMatrix` and passes it to the chain-specific infrastructure check primitive inside the closure (`check_impl_catalog_from_signals_file` or equivalent for chain ③; `check_catalog_spec_from_signals_file` or equivalent for chain ②). The usecase function itself is agnostic to strictness. CLI commands have no per-layer flags (CN-16). Layers with `None` bytes are skipped. (2) Implement the local filesystem `SignalLayerReader` adapter in `libs/infrastructure/src/`; `apps/cli-composition/src/signal.rs` only wires that adapter and wraps infrastructure primitives as closures: calc closure = `|layer_id, hash| infra_calc(layer_id, hash)`, check closure = `|layer_id, hash| infra_check(layer_id, hash, strict)` (captures `strict` from gate matrix). cli-composition does not construct paths, enumerate layers, or compute hashes — wiring only. (3) Drop `--signals-path` and `--catalog-hash` from 4 CLI command files (per CN-16). Each shrinks to ≤30 LOC. (4) Simplify `Makefile.toml::track-active-gate` per D8-3. (5) Update doc references. (6) Tests: usecase unit tests with mock `SignalLayerReader` and mock `per_layer_fn`. Acceptance: AC-20, AC-21, AC-22. Depends on T009, T011, T012, T013. Estimated diff: ~500–700 lines.",
+      "status": "todo",
+      "commit_hash": null
     }
   ],
   "plan": {
@@ -213,6 +219,19 @@
         ],
         "task_ids": [
           "T013"
+        ]
+      },
+      {
+        "id": "S9",
+        "title": "ADR-Conformance Refactor: Argless Usecase Orchestrators + CLI Thin-Wire + Makefile Cleanup (CN-16 / CN-17 / D8)",
+        "description": [
+          "Implement the `SignalLayerReader` secondary port trait in `libs/usecase/src/signal/` (methods: `active_track_id`, `enabled_layers`, `catalogue_bytes`; no path methods per D8-4). Implement 4 usecase orchestrator functions (`calc_impl_catalog`, `calc_catalog_spec`, `check_impl_catalog`, `check_catalog_spec`) that use the `SignalLayerReader` port for filesystem access and inject infrastructure primitives via `per_layer_fn: Fn(LayerId, &str) -> VerifyOutcome` (where `&str` is SHA-256 hex). Active-track resolution and hash computation are confined to the usecase orchestrator; the TDDD layer set remains domain-owned per D8-4 and is consumed by the usecase through `enabled_layers(track_id)` before iteration — making all four commands callable without per-layer flags from CLI (per CN-16 / CN-17 / D8-4).",
+          "Thin-wire the CLI command files to ≤30 LOC each (per CN-17 / D8-1) by removing `--signals-path` / `--catalog-hash` clap args and delegating all orchestration to the usecase layer.",
+          "Remove the per-layer loop and `sha256sum` calls from `Makefile.toml::track-active-gate`, reducing it to a 3-line bare sequence or deleting it entirely (per AC-22 / D8-3).",
+          "Update any remaining doc references that describe per-layer arg usage."
+        ],
+        "task_ids": [
+          "T020"
         ]
       }
     ]

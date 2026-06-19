@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e83483bb7adff357f4ebf7e9c4fb6b2c1e067c61c27d7307f8e447424687e621",
+  "catalogue_declaration_hash": "19cbb2e401d7fa6aa5da1dd89c32cf6f38a2888e8d410106ad3188eee204d4f3",
   "signals": [
     {
       "type_name": "AdrUserChain",
@@ -18,6 +18,11 @@
       "entry_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef"
     },
     {
+      "type_name": "SignalLayerReaderError",
+      "signal": "blue",
+      "entry_hash": "72e9a24561ac0dcc3f07d2ac32613493651c0a2b4a838d4a6c3e20d3c990d141"
+    },
+    {
       "type_name": "SpecAdrChain",
       "signal": "blue",
       "entry_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f"
@@ -26,6 +31,11 @@
       "type_name": "VerifyAdrSignalsCommand",
       "signal": "blue",
       "entry_hash": "04b52e16c636818996263543bf3ac3a5685c12404531925e59de94e0389884ca"
+    },
+    {
+      "type_name": "SignalLayerReader",
+      "signal": "blue",
+      "entry_hash": "feee9051934802ec6a8a9731885cb74e565e7752ec433702d7221e719694a952"
     },
     {
       "type_name": "TrackBlobReader",
@@ -41,6 +51,26 @@
       "type_name": "usecase::merge_gate::check_strict_merge_gate",
       "signal": "blue",
       "entry_hash": "b51caf58688a1035800469a05e2479e2ebc220fd83b33ed21278b30adc5ab4c3"
+    },
+    {
+      "type_name": "usecase::signal::calc_catalog_spec",
+      "signal": "blue",
+      "entry_hash": "6808c0d6148a50dd4ffe59c251f235ab4e913760b107492bb22b8e16a15e996e"
+    },
+    {
+      "type_name": "usecase::signal::calc_impl_catalog",
+      "signal": "blue",
+      "entry_hash": "f5e12b5e70df0a0e22db9edc4939f88290fc491f14ee3e9f9a945bfbc5a40c15"
+    },
+    {
+      "type_name": "usecase::signal::check_catalog_spec",
+      "signal": "blue",
+      "entry_hash": "5ba369bb7e234784ec4531ffda653db11de7e375003e2e0fd4f0e6ebffd8cea0"
+    },
+    {
+      "type_name": "usecase::signal::check_impl_catalog",
+      "signal": "blue",
+      "entry_hash": "58e63ae4dd2a3fda321a1b296aa851d4d6bd54305d2b2341dae79c42e050a816"
     }
   ]
 }
