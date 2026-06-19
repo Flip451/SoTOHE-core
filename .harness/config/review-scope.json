@@ -2,19 +2,24 @@
   "version": 2,
   "groups": {
     "domain": {
-      "patterns": ["libs/domain/**"]
+      "patterns": ["libs/domain/**"],
+      "briefing_file": ".harness/custom/review-prompts/domain.md"
     },
     "usecase": {
-      "patterns": ["libs/usecase/**"]
+      "patterns": ["libs/usecase/**"],
+      "briefing_file": ".harness/custom/review-prompts/usecase.md"
     },
     "infrastructure": {
-      "patterns": ["libs/infrastructure/**"]
+      "patterns": ["libs/infrastructure/**"],
+      "briefing_file": ".harness/custom/review-prompts/infrastructure.md"
     },
     "cli": {
-      "patterns": ["apps/cli/**"]
+      "patterns": ["apps/cli/**"],
+      "briefing_file": ".harness/custom/review-prompts/cli.md"
     },
     "cli_composition": {
-      "patterns": ["apps/cli-composition/**"]
+      "patterns": ["apps/cli-composition/**"],
+      "briefing_file": ".harness/custom/review-prompts/cli_composition.md"
     },
     "plan-artifacts": {
       "patterns": [
@@ -22,7 +27,7 @@
         "knowledge/adr/**",
         "knowledge/research/**"
       ],
-      "briefing_file": "track/review-prompts/plan-artifacts.md"
+      "briefing_file": ".harness/custom/review-prompts/plan-artifacts.md"
     },
     "harness-policy": {
       "patterns": [
@@ -33,9 +38,9 @@
         "knowledge/conventions/**",
         "AGENTS.md", "CLAUDE.md",
         "README.md",
-        "track/review-scope.json",
         "Makefile.toml"
-      ]
+      ],
+      "briefing_file": ".harness/custom/review-prompts/harness-policy.md"
     }
   },
   "review_operational": [

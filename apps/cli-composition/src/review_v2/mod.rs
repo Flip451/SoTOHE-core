@@ -664,8 +664,10 @@ mod tests {
 
         let track_root = dir.path().join("track");
         fs::create_dir_all(track_root.join("items")).unwrap();
+        let config_dir = dir.path().join(".harness/config");
+        fs::create_dir_all(&config_dir).unwrap();
         fs::write(
-            track_root.join("review-scope.json"),
+            config_dir.join("review-scope.json"),
             r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]}}}"#,
         )
         .unwrap();

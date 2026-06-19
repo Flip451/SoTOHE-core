@@ -48,7 +48,7 @@ pub(crate) fn load_scope_config_only(
         ));
     }
 
-    let scope_json_path = root.join("track/review-scope.json");
+    let scope_json_path = root.join(".harness/config/review-scope.json");
     load_v2_scope_config(&scope_json_path, track_id, &root)
         .map_err(|e| format!("load review-scope.json: {e}"))
 }

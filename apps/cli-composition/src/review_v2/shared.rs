@@ -176,7 +176,7 @@ pub(super) fn build_v2_shared(
     // Use the canonicalized repo root as the trusted_root for symlink guards:
     // `canonicalize()` resolves symlinks and returns the physical path, so
     // `canonical_root` is guaranteed non-symlink and safe as a trusted root.
-    let scope_json_path = canonical_root.join("track/review-scope.json");
+    let scope_json_path = canonical_root.join(".harness/config/review-scope.json");
     let scope_config = load_v2_scope_config(&scope_json_path, track_id, &canonical_root)
         .map_err(|e| format!("load review-scope.json: {e}"))?;
 

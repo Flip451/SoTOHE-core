@@ -45,7 +45,7 @@ REVIEW_FIX_STATUS: failed
 ### Scope Ownership (CRITICAL)
 
 - This agent may ONLY modify files within its assigned scope (e.g., `libs/domain/**` for
-  the domain scope). See `track/review-scope.json` for group definitions.
+  the domain scope). See `.harness/config/review-scope.json` for group definitions.
 - If a finding requires changes to files outside the scope, do NOT modify them.
   Print the out-of-scope file list, then print `REVIEW_FIX_STATUS: blocked_cross_scope`
   so the orchestrator can re-partition.

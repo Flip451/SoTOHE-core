@@ -615,13 +615,13 @@ fn test_briefing_file_for_scope_returns_some_when_configured() {
     let entries = vec![(
         "plan-artifacts".to_owned(),
         vec!["track/items/**".to_owned()],
-        Some("track/review-prompts/plan-artifacts.md".to_owned()),
+        Some(".harness/custom/review-prompts/plan-artifacts.md".to_owned()),
     )];
     let config = ReviewScopeConfig::new(&track_id(), entries, vec![], vec![]).unwrap();
     let scope = ScopeName::Main(MainScopeName::new("plan-artifacts").unwrap());
     assert_eq!(
         config.briefing_file_for_scope(&scope),
-        Some("track/review-prompts/plan-artifacts.md")
+        Some(".harness/custom/review-prompts/plan-artifacts.md")
     );
 }
 

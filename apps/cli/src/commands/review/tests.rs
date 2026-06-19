@@ -92,24 +92,8 @@ impl Drop for CurrentDirGuard {
 /// Required for tests that change cwd to a tempdir and call `run_codex_local`,
 /// because `build_scope_file_list` calls `build_review_v2` which needs git discovery.
 fn setup_test_git_repo(root: &Path) {
-    use std::process::Command;
-
-    Command::new("git").args(["init", "-b", "main"]).current_dir(root).output().unwrap();
-    Command::new("git")
-        .args(["config", "user.email", "test@test.com"])
-        .current_dir(root)
-        .output()
-        .unwrap();
-    Command::new("git").args(["config", "user.name", "Test"]).current_dir(root).output().unwrap();
-
     // Minimal v2 review-scope.json (empty groups — only Other scope exists)
-    let track_dir = root.join("track");
-    fs::create_dir_all(&track_dir).unwrap();
-    fs::write(track_dir.join("review-scope.json"), r#"{"version": 2, "groups": {}}"#).unwrap();
-    fs::create_dir_all(root.join("track/items")).unwrap();
-
-    Command::new("git").args(["add", "."]).current_dir(root).output().unwrap();
-    Command::new("git").args(["commit", "-m", "init"]).current_dir(root).output().unwrap();
+    setup_git_repo_with_scope_json(root, r#"{"version": 2, "groups": {}}"#);
 }
 
 #[cfg(unix)]
@@ -654,16 +638,17 @@ fn run_codex_local_never_passes_full_auto_even_when_profiles_missing() {
 // check-approved: T004 verdict mapping tests
 // ---------------------------------------------------------------------------
 
-/// Writes a review-scope.json with a single "domain" group matching `libs/domain/**`.
+/// Writes a `.harness/config/review-scope.json` with a single "domain" group matching
+/// `libs/domain/**`.
 ///
 /// Includes a `review_operational` exclusion for `items/<track-id>/review.json` so
 /// that the review.json file written by the blocked-path test does not spill into
 /// the `Other` scope and cause the test to pass for the wrong reason.
 fn write_domain_scope_config(root: &Path) {
-    let track_dir = root.join("track");
-    fs::create_dir_all(&track_dir).unwrap();
+    let config_dir = root.join(".harness/config");
+    fs::create_dir_all(&config_dir).unwrap();
     fs::write(
-        track_dir.join("review-scope.json"),
+        config_dir.join("review-scope.json"),
         r#"{
   "version": 2,
   "groups": {"domain": {"patterns": ["libs/domain/**"]}},
@@ -938,7 +923,7 @@ fn build_review_v2_rejects_traversal_items_dir_outside_repo_root() {
 
 use super::codex_local::{append_scope_briefing_reference, is_safe_briefing_path};
 
-/// Sets up a minimal git repo with a custom `track/review-scope.json` content.
+/// Sets up a minimal git repo with a custom `.harness/config/review-scope.json` content.
 ///
 /// Unlike `setup_test_git_repo` (which writes `{"version": 2, "groups": {}}`), this
 /// helper writes arbitrary JSON so tests can configure specific scope/briefing combos.
@@ -952,9 +937,9 @@ fn setup_git_repo_with_scope_json(root: &Path, scope_json: &str) {
         .unwrap();
     Command::new("git").args(["config", "user.name", "Test"]).current_dir(root).output().unwrap();
 
-    let track_dir = root.join("track");
-    fs::create_dir_all(&track_dir).unwrap();
-    fs::write(track_dir.join("review-scope.json"), scope_json).unwrap();
+    let config_dir = root.join(".harness/config");
+    fs::create_dir_all(&config_dir).unwrap();
+    fs::write(config_dir.join("review-scope.json"), scope_json).unwrap();
     fs::create_dir_all(root.join("track/items")).unwrap();
 
     Command::new("git").args(["add", "."]).current_dir(root).output().unwrap();
@@ -966,7 +951,7 @@ fn test_append_scope_briefing_reference_appends_when_configured() {
     // Set up a repo with "plan-artifacts" scope that has a briefing_file configured.
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
-    let scope_json = r#"{"version":2,"groups":{"plan-artifacts":{"patterns":["track/items/**"],"briefing_file":"track/review-prompts/plan-artifacts.md"}}}"#;
+    let scope_json = r#"{"version":2,"groups":{"plan-artifacts":{"patterns":["track/items/**"],"briefing_file":".harness/custom/review-prompts/plan-artifacts.md"}}}"#;
     setup_git_repo_with_scope_json(dir.path(), scope_json);
     let _cwd = CurrentDirGuard::change_to(dir.path());
 
@@ -982,7 +967,7 @@ fn test_append_scope_briefing_reference_appends_when_configured() {
     // Verifies ADR D4 Canonical Block format (heading + Japanese instruction + path bullet).
     let expected_section = "\n\n## Scope-specific severity policy\n\nこのレビューの scope は \
          `plan-artifacts` である。以下の scope 固有 severity policy を **必ず先に Read ツールで読み込み**、\
-         その方針に従って findings を選別すること:\n\n- `track/review-prompts/plan-artifacts.md`";
+         その方針に従って findings を選別すること:\n\n- `.harness/custom/review-prompts/plan-artifacts.md`";
     assert!(
         prompt.ends_with(expected_section),
         "prompt did not end with expected scope briefing section; got: {prompt}"
@@ -1017,7 +1002,7 @@ fn test_append_scope_briefing_reference_noop_for_other_scope() {
     // must never receive a briefing injection (ADR D5).
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
-    let scope_json = r#"{"version":2,"groups":{"plan-artifacts":{"patterns":["track/items/**"],"briefing_file":"track/review-prompts/plan-artifacts.md"}}}"#;
+    let scope_json = r#"{"version":2,"groups":{"plan-artifacts":{"patterns":["track/items/**"],"briefing_file":".harness/custom/review-prompts/plan-artifacts.md"}}}"#;
     setup_git_repo_with_scope_json(dir.path(), scope_json);
     let _cwd = CurrentDirGuard::change_to(dir.path());
 
@@ -1038,7 +1023,7 @@ fn test_append_scope_briefing_reference_noop_for_unknown_main_scope() {
     // A scope name not present in the config must also noop.
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
-    let scope_json = r#"{"version":2,"groups":{"plan-artifacts":{"patterns":["track/items/**"],"briefing_file":"track/review-prompts/plan-artifacts.md"}}}"#;
+    let scope_json = r#"{"version":2,"groups":{"plan-artifacts":{"patterns":["track/items/**"],"briefing_file":".harness/custom/review-prompts/plan-artifacts.md"}}}"#;
     setup_git_repo_with_scope_json(dir.path(), scope_json);
     let _cwd = CurrentDirGuard::change_to(dir.path());
 
@@ -1098,7 +1083,7 @@ fn test_append_scope_briefing_reference_noop_for_empty_path() {
 
 #[test]
 fn test_is_safe_briefing_path_accepts_normal_path() {
-    assert!(is_safe_briefing_path("track/review-prompts/plan-artifacts.md"));
+    assert!(is_safe_briefing_path(".harness/custom/review-prompts/plan-artifacts.md"));
     assert!(is_safe_briefing_path("knowledge/conventions/my-doc.md"));
 }
 
