@@ -534,11 +534,11 @@ mod tests {
         run(&["init", "-b", "main"]);
         run(&["config", "user.email", "test@test.com"]);
         run(&["config", "user.name", "Test"]);
-        let track_dir = root.join("track");
-        std::fs::create_dir_all(&track_dir).unwrap();
+        let config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
         // `infra` scope matches files under `src/`.
         std::fs::write(
-            track_dir.join("review-scope.json"),
+            config_dir.join("review-scope.json"),
             r#"{"version": 2, "groups": {"infra": {"patterns": ["src/**"]}}}"#,
         )
         .unwrap();

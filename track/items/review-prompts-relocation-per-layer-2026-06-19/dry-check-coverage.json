@@ -1,7 +1,201 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "60a11557566afba1d754b7a4cf860a93bffbc689292a2f9487dd4e976b5ba1b8",
-  "fragment_refs": [],
-  "processed_pair_keys": []
+  "corpus_fingerprint": "67da2a951f422b683592ee299d2c66b33e9700d5714c455234256ce5dfabbf5e",
+  "fragment_refs": [
+    {
+      "path": "apps/cli-composition/src/review_v2/mod.rs",
+      "content_hash": "c255b645a1290c57660fd8e8a035e58e7246bc9b4722f9b90209ddce1215230d"
+    },
+    {
+      "path": "apps/cli-composition/src/review_v2/run.rs",
+      "content_hash": "2ffde936d5e97b1d9f5706917f52ef62f1e0f43a0a18cbfa8942ec1f328bdbc7"
+    },
+    {
+      "path": "apps/cli-composition/src/review_v2/scope.rs",
+      "content_hash": "00a43b48a6c915468b2b6456379db1e849dd956de134e781f5a1702ffeb3deb9"
+    },
+    {
+      "path": "apps/cli-composition/src/review_v2/shared.rs",
+      "content_hash": "6bfd0692398c1adb3245e896fd5641e072491a535a96aeda044f354d10037786"
+    },
+    {
+      "path": "apps/cli/src/commands/review/tests.rs",
+      "content_hash": "0c56ed67f7546915e4d720de45c6c73b4acc87334354a63b3b506a7c0fb3bd0a"
+    },
+    {
+      "path": "apps/cli/src/commands/review/tests.rs",
+      "content_hash": "15d8b45dcbefa43ea46b9c159d878f84f9a41bada79eda0d1b7a98bea242641d"
+    },
+    {
+      "path": "apps/cli/src/commands/review/tests.rs",
+      "content_hash": "3969f5bad4ca9510814760e4bd5480daced409e032123f6af897f9cecc331de2"
+    },
+    {
+      "path": "apps/cli/src/commands/review/tests.rs",
+      "content_hash": "5368de41685a58c673e01a255e404ccb9e8f11398e928fb8e35d75bf3eba2df5"
+    },
+    {
+      "path": "apps/cli/src/commands/review/tests.rs",
+      "content_hash": "7c9c2cc00c3904857cd4ec715718e3743077dc6f9bc7713ff40a5c5cd9dd6efc"
+    },
+    {
+      "path": "apps/cli/src/commands/review/tests.rs",
+      "content_hash": "8058527e9347612ab96d2b0169a1a464cfb70a0459bd15e74c474af27367aed6"
+    },
+    {
+      "path": "apps/cli/src/commands/review/tests.rs",
+      "content_hash": "a26b284bef9a0d9bfb055fdbf328a861f577d390fbe0d3d038078c644a8c1b8e"
+    },
+    {
+      "path": "apps/cli/src/commands/review/tests.rs",
+      "content_hash": "d4d34947c5c8c82ef82832e6d83dc15a5a299bb701cefc084d249d75a40e0ccb"
+    },
+    {
+      "path": "apps/cli/src/commands/review/tests.rs",
+      "content_hash": "e5c00f1c1bb96403ffb634502606aa01d5433d98d34735b6e50b2650b824ce13"
+    },
+    {
+      "path": "libs/domain/src/review_v2/tests.rs",
+      "content_hash": "f998b04cef1053f42445aa65efefdce05c217bb0ef811113de94496d18da2602"
+    },
+    {
+      "path": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+      "content_hash": "319bea454932c4d87a01fd0bf21baf952909a12b4065fc6f96b0b792fac8b0db"
+    },
+    {
+      "path": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+      "content_hash": "62838b278e603b097c38ad5d1706071a601b533fe79a1b0b7c4c107700e9fd7a"
+    },
+    {
+      "path": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+      "content_hash": "69bd00736a7da32d00b9e99b5fb8bc7dbf447f2d87bb67abdce87d1ceb513ce0"
+    },
+    {
+      "path": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+      "content_hash": "91d74a3df0860caf31c05b09d4356c1b4e5be2ed944cb4fbb21bf3b0f8599fb2"
+    }
+  ],
+  "processed_pair_keys": [
+    {
+      "low": {
+        "path": "apps/cli-composition/src/review_v2/mod.rs",
+        "content_hash": "6a9d9738ea0283beec8cdb0aa9ae67ec2581b603d0d98de769bfcb3bd4c759f1"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "8058527e9347612ab96d2b0169a1a464cfb70a0459bd15e74c474af27367aed6"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/review_v2/scope.rs",
+        "content_hash": "00a43b48a6c915468b2b6456379db1e849dd956de134e781f5a1702ffeb3deb9"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/review_v2/scope.rs",
+        "content_hash": "83b1fd31d5f3d905c21fae7540fdc5f5cee27bd6aa9001abe59cfb65c255f4b5"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "3969f5bad4ca9510814760e4bd5480daced409e032123f6af897f9cecc331de2"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "5368de41685a58c673e01a255e404ccb9e8f11398e928fb8e35d75bf3eba2df5"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "3969f5bad4ca9510814760e4bd5480daced409e032123f6af897f9cecc331de2"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "b94e44a59db3e6b8574961bb6f3b656306639bc9f673ccd9c98f424b818958f4"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "3969f5bad4ca9510814760e4bd5480daced409e032123f6af897f9cecc331de2"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "e5c00f1c1bb96403ffb634502606aa01d5433d98d34735b6e50b2650b824ce13"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "3fc52d566648f3d0c717b9adecfbcb25f1572e9fdc7686c64e08eaf69689047c"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "8058527e9347612ab96d2b0169a1a464cfb70a0459bd15e74c474af27367aed6"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "5368de41685a58c673e01a255e404ccb9e8f11398e928fb8e35d75bf3eba2df5"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "b94e44a59db3e6b8574961bb6f3b656306639bc9f673ccd9c98f424b818958f4"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "5368de41685a58c673e01a255e404ccb9e8f11398e928fb8e35d75bf3eba2df5"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "e5c00f1c1bb96403ffb634502606aa01d5433d98d34735b6e50b2650b824ce13"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "a26b284bef9a0d9bfb055fdbf328a861f577d390fbe0d3d038078c644a8c1b8e"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "e0a179c941a6469aaef140c72fbf45ede6d9fcc3a9e8cf7c2b0d777dc63d9b57"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "b94e44a59db3e6b8574961bb6f3b656306639bc9f673ccd9c98f424b818958f4"
+      },
+      "high": {
+        "path": "apps/cli/src/commands/review/tests.rs",
+        "content_hash": "e5c00f1c1bb96403ffb634502606aa01d5433d98d34735b6e50b2650b824ce13"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/review_v2/tests.rs",
+        "content_hash": "9744d992e42a0a422ad8c924364a97e7661d75461b53cc05391a6d6eabd79d08"
+      },
+      "high": {
+        "path": "libs/domain/src/review_v2/tests.rs",
+        "content_hash": "f998b04cef1053f42445aa65efefdce05c217bb0ef811113de94496d18da2602"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/review_v2/tests.rs",
+        "content_hash": "bd84e8ca4d3629a53ca6f46b9c1dd073775d56add8f9684c70db07d32ed2ac82"
+      },
+      "high": {
+        "path": "libs/domain/src/review_v2/tests.rs",
+        "content_hash": "f998b04cef1053f42445aa65efefdce05c217bb0ef811113de94496d18da2602"
+      }
+    }
+  ]
 }

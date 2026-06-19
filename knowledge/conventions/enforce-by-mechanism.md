@@ -67,7 +67,7 @@ rule ほど mechanism 化の優先度を上げる。
 - **本 convention 自身の enforcement** は meta-level の自己参照となるため、Rules §3 の fail-closed
   priority order の 5 段階目 (documentation + semantic review) で担保する:
   - convention 変更 (`knowledge/conventions/**`) および harness policy を定義するコマンドファイル
-    (`.claude/commands/**`) は harness-policy scope (`track/review-scope.json`) の review 対象であり、
+    (`.claude/commands/**`) は harness-policy scope (`.harness/config/review-scope.json`) の review 対象であり、
     各 track の review サイクル内で `/track:review` →
     `cargo make track-local-review -- --group harness-policy` 経由で reviewer capability
     (`.harness/config/agent-profiles.json::capabilities.reviewer`) が本 convention への違反を指摘する。
