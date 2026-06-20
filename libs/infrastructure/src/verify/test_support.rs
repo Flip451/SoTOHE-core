@@ -106,6 +106,39 @@ pub fn run_git(root: &Path, args: &[&str]) {
     );
 }
 
+/// Run a git command in `cwd` with a deterministic locale and author identity.
+///
+/// Sets `LANG`/`LC_ALL`/`LANGUAGE` to `"C"` and provides stub
+/// `GIT_AUTHOR_*` / `GIT_COMMITTER_*` identity so that `git commit` succeeds
+/// in environments without a global git config.  Panics on spawn failure or
+/// non-zero exit, printing full stdout and stderr for diagnosis.
+///
+/// Use this helper (instead of [`run_git`]) when the git repo fixture needs
+/// commits, because `git commit` requires a configured author identity.
+#[cfg(test)]
+pub(crate) fn git_with_identity(cwd: &Path, args: &[&str]) {
+    let output = std::process::Command::new("git")
+        .env("LANG", "C")
+        .env("LC_ALL", "C")
+        .env("LANGUAGE", "C")
+        .env("GIT_AUTHOR_NAME", "test")
+        .env("GIT_AUTHOR_EMAIL", "test@example.com")
+        .env("GIT_COMMITTER_NAME", "test")
+        .env("GIT_COMMITTER_EMAIL", "test@example.com")
+        .args(args)
+        .current_dir(cwd)
+        .output()
+        .expect("git command failed to spawn");
+    if !output.status.success() {
+        panic!(
+            "git {:?} failed: stdout={} stderr={}",
+            args,
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+}
+
 /// Run a git command in `root`.
 ///
 /// This feature-gated variant returns a value carrying the result instead of

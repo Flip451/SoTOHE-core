@@ -6,10 +6,11 @@
 //! - `SpecRef.anchor` resolution and hash verification helpers
 //! - Canonical JSON construction and SHA-256 hashing
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 
 use domain::verify::VerifyFinding;
+use domain::{ContentHash, SpecElementId};
 
 use crate::track::symlink_guard;
 
@@ -272,4 +273,44 @@ pub fn canonical_json_sha256(json: &str) -> String {
         out.push_str(&format!("{byte:02x}"));
     }
     out
+}
+
+/// Parse spec.json text and build a map of per-element canonical SHA-256 hashes.
+///
+/// This is the shared pure-text helper for callers that have already fetched the
+/// spec.json content by any means (filesystem read, git-blob fetch, etc.). Both
+/// `catalogue_spec_refs::read_spec_element_hashes` and the
+/// `GitShowTrackBlobReader` `SpecElementHashReader` impl delegate here so the
+/// element-map / hash logic is maintained in one place.
+///
+/// `source` is an arbitrary string used in error messages (e.g. a file path or
+/// git object description) to make failures diagnosable.
+///
+/// # Errors
+///
+/// Returns a human-readable error string when:
+/// - spec.json fails schema validation via `spec::codec::decode`
+/// - spec.json cannot be parsed as JSON
+/// - any element id does not satisfy `SpecElementId::try_new` (fail-closed)
+/// - the canonical hash string produced internally is not valid hex
+pub fn spec_element_hashes_from_text(
+    text: &str,
+    source: &str,
+) -> Result<BTreeMap<SpecElementId, ContentHash>, String> {
+    crate::spec::codec::decode(text)
+        .map_err(|e| format!("{source}: spec.json validation error: {e}"))?;
+    let raw: serde_json::Value = serde_json::from_str(text)
+        .map_err(|e| format!("{source}: spec.json JSON parse error: {e}"))?;
+    let element_map = build_element_map(&raw);
+    let mut out: BTreeMap<SpecElementId, ContentHash> = BTreeMap::new();
+    for (id_str, canonical_json_str) in element_map {
+        let anchor = SpecElementId::try_new(id_str.clone()).map_err(|e| {
+            format!("{source}: spec.json contains element with invalid id '{id_str}': {e}")
+        })?;
+        let hash_hex = canonical_json_sha256(&canonical_json_str);
+        let hash = ContentHash::try_from_hex(hash_hex)
+            .map_err(|e| format!("{source}: internal canonical-hash parse error: {e}"))?;
+        out.insert(anchor, hash);
+    }
+    Ok(out)
 }

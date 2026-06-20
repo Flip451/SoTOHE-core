@@ -23,6 +23,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| GitBlobAdrFileAdapter | secondary_adapter | — | impl Debug, impl Clone, impl AdrFilePort | 🟡 | 🔵 |
 | LocalSignalLayerReaderAdapter | secondary_adapter | — | impl Debug, impl SignalLayerReader | 🟡 | 🔵 |
 
 ## Free Functions

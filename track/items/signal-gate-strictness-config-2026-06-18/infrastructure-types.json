@@ -250,6 +250,35 @@
         { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" }
       ],
       "informal_grounds": []
+    },
+    "GitBlobAdrFileAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "repo_root", "ty": "std::path::PathBuf" },
+            { "name": "branch", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "adr_decision::git_blob_adapter",
+      "docs": "Git-blob adapter that reads ADR markdown files from `origin/<branch>:knowledge/adr/` via `git ls-tree` (directory listing) and `git show` (blob content). The merge-gate counterpart to `FsAdrFileAdapter`: used exclusively by `merge_gate_adapter::read_adr_verify_report` so that chain ⓪ ADR signal evaluation is performed against the PR branch ref rather than the local worktree. Implements `domain::AdrFilePort` — `list_adr_paths` uses `git_ls_tree_dir` (symlinks skipped at listing stage), `read_adr_frontmatter` uses `fetch_blob_safe` (symlinks rejected fail-closed). Branch is validated by the merge-gate adapter before construction.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-06"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-09"
+        }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {},
@@ -913,6 +942,21 @@
       "action": "add",
       "trait_ref": "usecase::signal::SignalLayerReader",
       "for_type": "LocalSignalLayerReaderAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GitBlobAdrFileAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "GitBlobAdrFileAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::AdrFilePort",
+      "for_type": "GitBlobAdrFileAdapter"
     }
   ]
 }

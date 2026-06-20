@@ -729,6 +729,30 @@
         "kind": "pass",
         "citation": "signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
       }
+    },
+    {
+      "claim_hash": "ef1e58689783f37e6678078dad931d07c424c3ba95375ac5e227da0801c146b8",
+      "evidence_hash": "5f186bf753e3b087b8e4162546b8cfa877e056f62ca3386c25783873cc880457",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the evidence only specifies strict/interim handling for check findings, including chain ⓪ `check-adr-user`; it does not motivate or require a Git-blob ADR file adapter, reading ADR markdown from `origin/<branch>:knowledge/adr/`, or evaluating ADR signals against a PR branch ref rather than the local worktree."
+      }
+    },
+    {
+      "claim_hash": "be3e7bae5e984aaab887d39b8522bc9cce7b5375470d61f8f4fefb07527200fd",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）"
+      }
+    },
+    {
+      "claim_hash": "be3e7bae5e984aaab887d39b8522bc9cce7b5375470d61f8f4fefb07527200fd",
+      "evidence_hash": "d89568b8f4a36675ccbefa8d2e705e696e8d9b4e7d22eef71a5d6ed191a3567a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge gate への chain ⓪ 追加は repo-global な ADR ディレクトリ走査を伴う。あるトラックの merge が「無関係な ADR の未エスカレート Yellow」で block される可能性がある（これは設計上のトレードオフとして受け入れる）。"
+      }
     }
   ]
 }

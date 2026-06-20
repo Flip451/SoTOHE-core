@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "83e5c5d4102befdf24477a7f2a9bc56e8bd483681107c9fbf9068774f4bf2558",
+  "catalogue_declaration_hash": "5b373fb611ee5d746194a5290e44cfa5e9ab1067ac062fd8abb1092e6852f74b",
   "signals": [
     {
       "type_name": "GateRowDto",
       "signal": "blue",
       "entry_hash": "835dfe063c53df9db8111d781f30982873554bfbaa52d36f4bf2469515d0a495"
+    },
+    {
+      "type_name": "GitBlobAdrFileAdapter",
+      "signal": "blue",
+      "entry_hash": "be3e7bae5e984aaab887d39b8522bc9cce7b5375470d61f8f4fefb07527200fd"
     },
     {
       "type_name": "LocalSignalLayerReaderAdapter",

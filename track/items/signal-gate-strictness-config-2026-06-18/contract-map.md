@@ -185,6 +185,13 @@ subgraph usecase["usecase"]
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_adr_decision["infrastructure::adr_decision"]
+    direction TB
+  subgraph T51_infrastructure_infrastructure_GitBlobAdrFileAdapter["adr_decision::git_blob_adapter::GitBlobAdrFileAdapter"]
+    direction TB
+    T51_infrastructure_infrastructure_GitBlobAdrFileAdapter__self[GitBlobAdrFileAdapter]
+  end
+  end
   subgraph infrastructure_infrastructure_module_signal_layer_reader["infrastructure::signal_layer_reader"]
     direction TB
   subgraph T59_infrastructure_infrastructure_LocalSignalLayerReaderAdapter["signal_layer_reader::LocalSignalLayerReaderAdapter"]
@@ -341,6 +348,7 @@ class F51_usecase_usecase_usecase__signal__check_impl_catalog function_node
 class T39_usecase_usecase_VerifyAdrSignalsCommand__self command
 class R32_usecase_usecase_VerifyAdrSignals_verify method_node
 class R32_usecase_usecase_VerifyAdrSignals__self app_service
+class T51_infrastructure_infrastructure_GitBlobAdrFileAdapter__self secondary_adapter
 class T59_infrastructure_infrastructure_LocalSignalLayerReaderAdapter__self secondary_adapter
 class T40_infrastructure_infrastructure_GateRowDto__self dto
 class T47_infrastructure_infrastructure_SignalGatesConfig__self dto

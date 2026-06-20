@@ -36,6 +36,7 @@ use crate::track::symlink_guard;
 // per-entry hashes (e.g. `merge_gate_adapter::build_catalogue_entry_hashes`).
 pub(crate) use spec_refs::{
     SpecElementMap, build_element_map, canonical_json, canonical_json_sha256,
+    spec_element_hashes_from_text,
 };
 
 /// Errors specific to the `plan-artifact-refs` verifier.

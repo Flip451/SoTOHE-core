@@ -121,24 +121,11 @@ pub fn read_spec_element_hashes(
 
     let text = std::fs::read_to_string(&spec_path)
         .map_err(|e| format!("cannot read spec.json at '{}': {e}", spec_path.display()))?;
-    // Validate schema first (mirrors `load_spec_element_map` in plan_artifact_refs.rs):
-    // catches duplicate IDs, malformed required fields, and unsupported schema_version before
-    // the element map is built.
-    crate::spec::codec::decode(&text)
-        .map_err(|e| format!("spec.json schema error at '{}': {e}", spec_path.display()))?;
-    let raw: serde_json::Value =
-        serde_json::from_str(&text).map_err(|e| format!("spec.json JSON parse error: {e}"))?;
-    let element_map = crate::verify::plan_artifact_refs::build_element_map(&raw);
-    let mut out: BTreeMap<SpecElementId, ContentHash> = BTreeMap::new();
-    for (id_str, canonical_json) in element_map {
-        let anchor = SpecElementId::try_new(id_str.clone())
-            .map_err(|e| format!("spec.json contains element with invalid id '{id_str}': {e}"))?;
-        let hash_hex = crate::verify::plan_artifact_refs::canonical_json_sha256(&canonical_json);
-        let hash = ContentHash::try_from_hex(hash_hex)
-            .map_err(|e| format!("internal: canonical hash parse error: {e}"))?;
-        out.insert(anchor, hash);
-    }
-    Ok(out)
+
+    crate::verify::plan_artifact_refs::spec_element_hashes_from_text(
+        &text,
+        &spec_path.display().to_string(),
+    )
 }
 
 /// Verify one layer — returns the list of formatted finding strings emitted by
