@@ -75,9 +75,13 @@ fn spec_signal_freshness(spec_doc: &SpecDocument) -> SpecSignalFreshness {
         return SpecSignalFreshness::Fresh;
     };
     let computed = spec_doc.evaluate_signals();
-    // Empty docs have no evaluable signal source; `check_spec_doc_signals`
-    // still rejects all-zero stored counts as unevaluated.
-    if computed.total() == 0 || computed == *stored {
+    // An empty / truncated spec must reject any stored non-zero counts — a
+    // previously-blue `signals` block carried over from a prior revision
+    // would otherwise let `check_spec_doc_signals` pass an unevaluated spec.
+    // Only the all-zero stored case is treated as fresh when computed is
+    // also zero; `check_spec_doc_signals` still rejects all-zero as
+    // unevaluated downstream.
+    if computed == *stored {
         return SpecSignalFreshness::Fresh;
     }
     SpecSignalFreshness::Stale { stored: *stored, computed }
@@ -907,7 +911,18 @@ mod tests {
   "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
-  "scope": { "in_scope": [], "out_of_scope": [] },
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IS-01",
+        "text": "minimal blue requirement",
+        "adr_refs": [
+          { "file": "knowledge/adr/some.md", "anchor": "D1" }
+        ]
+      }
+    ],
+    "out_of_scope": []
+  },
   "signals": { "blue": 1, "yellow": 0, "red": 0 }
 }"#;
 
@@ -915,7 +930,16 @@ mod tests {
   "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
-  "scope": { "in_scope": [], "out_of_scope": [] },
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IS-01",
+        "text": "yellow requirement",
+        "informal_grounds": [{ "kind": "user_directive", "summary": "historical convention" }]
+      }
+    ],
+    "out_of_scope": []
+  },
   "signals": { "blue": 0, "yellow": 1, "red": 0 }
 }"#;
 

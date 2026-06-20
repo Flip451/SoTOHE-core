@@ -1,31 +1,16 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "3b5121ffe1133c22d18db0c383d0bd3e3b5ea5871bfdfd40cb28b69755e3951e",
+  "corpus_fingerprint": "143a4c21086bec44bd7e10dd11db988db103b71966981e07759f0cc144938372",
   "fragment_refs": [
     {
-      "path": "apps/cli-composition/src/signal.rs",
-      "content_hash": "a67cd610a4de59025bfade74c69717d05d48227c3f49a40fbcd684dede71b271"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "81d6059379cf91d50d4186223cc283595bd1f8f03138259153a969984559ec60"
     },
     {
-      "path": "apps/cli-composition/src/signal.rs",
-      "content_hash": "e7b09a0657bdd3f7e4b02514f2fd4fc65633ef61bf59fe06836ee0b919b93481"
-    },
-    {
-      "path": "apps/cli/src/commands/signal/mod.rs",
-      "content_hash": "b92d3c2ab2f032dcf32825cd9d1e00abffc1dea4031e66477fcbf52fb6c99338"
+      "path": "libs/infrastructure/src/verify/spec_states.rs",
+      "content_hash": "e334045a61e0f5b211692765f0e9124313f970b2b77b5e94688f6653ebb894d4"
     }
   ],
-  "processed_pair_keys": [
-    {
-      "low": {
-        "path": "apps/cli-composition/src/signal.rs",
-        "content_hash": "5e5b4b188a469b7abc688af8fa4a235e73909e2a76974c68735ddfda75f14b96"
-      },
-      "high": {
-        "path": "apps/cli-composition/src/signal.rs",
-        "content_hash": "a67cd610a4de59025bfade74c69717d05d48227c3f49a40fbcd684dede71b271"
-      }
-    }
-  ]
+  "processed_pair_keys": []
 }
