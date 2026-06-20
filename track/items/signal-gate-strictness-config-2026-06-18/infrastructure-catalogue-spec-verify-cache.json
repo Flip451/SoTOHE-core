@@ -753,6 +753,54 @@
         "kind": "pass",
         "citation": "merge gate への chain ⓪ 追加は repo-global な ADR ディレクトリ走査を伴う。あるトラックの merge が「無関係な ADR の未エスカレート Yellow」で block される可能性がある（これは設計上のトレードオフとして受け入れる）。"
       }
+    },
+    {
+      "claim_hash": "011c08fb3bd94b61f5026deb29d60bd644ccedb0aabbec651a45ade9e97241f2",
+      "evidence_hash": "5ece55c90d7a4423edd247b4147b70abaf2655596a5e7a59895ce21a58232039",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` の必須化と検証: ファイル不在 / パース不能 / `$schema_version` 不正 / 不正値 / 必須キー（gate オブジェクトまたは chain×gate セル）の欠落はいずれも hard error として全ゲートを停止し、actionable なエラーメッセージを出力する。strict への暗黙フォールバックも fail-open も設けない。"
+      }
+    },
+    {
+      "claim_hash": "011c08fb3bd94b61f5026deb29d60bd644ccedb0aabbec651a45ade9e97241f2",
+      "evidence_hash": "22830ef401d4948b6d91cb208abf946ccd1dace5af25bbe6081203778278c7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` は全 chain × gate の 8 セルを完全に明示する必要があり、暗黙の default を持たない。ファイル不在・パース不能・`$schema_version` 不正・値不正・必須キー欠落のいずれかがあれば全ゲートを hard error で停止する（fail-open も silent strict フォールバックも禁止）。"
+      }
+    },
+    {
+      "claim_hash": "011c08fb3bd94b61f5026deb29d60bd644ccedb0aabbec651a45ade9e97241f2",
+      "evidence_hash": "ecad2c5c70afcb27a0a18fd989a0dc8b2a21a4313dfce10431b7308cdf9a116e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` を削除した状態、パース不能な状態、`$schema_version` 不正な状態、必須キーが欠落した状態のいずれかで commit gate / merge gate を実行すると hard error で停止する。strict への暗黙フォールバックも fail-open も発生しない。"
+      }
+    },
+    {
+      "claim_hash": "bb2d5da897defa18ca0e6fb63950b8a995085098fca2c73db85912fe7b5fd971",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。... 推奨デフォルト config ... を実ファイルとして commit する。"
+      }
+    },
+    {
+      "claim_hash": "bb2d5da897defa18ca0e6fb63950b8a995085098fca2c73db85912fe7b5fd971",
+      "evidence_hash": "5ece55c90d7a4423edd247b4147b70abaf2655596a5e7a59895ce21a58232039",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` の必須化と検証: ファイル不在 / パース不能 / `$schema_version` 不正 / 不正値 / 必須キー（gate オブジェクトまたは chain×gate セル）の欠落はいずれも hard error として全ゲートを停止し、actionable なエラーメッセージを出力する。strict への暗黙フォールバックも fail-open も設けない。"
+      }
+    },
+    {
+      "claim_hash": "bb2d5da897defa18ca0e6fb63950b8a995085098fca2c73db85912fe7b5fd971",
+      "evidence_hash": "ecad2c5c70afcb27a0a18fd989a0dc8b2a21a4313dfce10431b7308cdf9a116e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` を削除した状態、パース不能な状態、`$schema_version` 不正な状態、必須キーが欠落した状態のいずれかで commit gate / merge gate を実行すると hard error で停止する。strict への暗黙フォールバックも fail-open も発生しない。"
+      }
     }
   ]
 }

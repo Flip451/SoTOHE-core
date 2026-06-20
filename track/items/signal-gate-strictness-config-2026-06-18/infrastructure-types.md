@@ -10,7 +10,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SignalGatesConfigError | error_type | — | FileNotFound, ParseFailed, SchemaVersionUnknown, MissingKey, InvalidValue | 🔵 | 🔵 |
+| SignalGatesConfigError | error_type | — | FileNotFound, ParseFailed, SchemaVersionUnknown, MissingKey, InvalidValue, BlobFetchError | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -40,6 +40,7 @@
 | infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals | free_function | modify | fn(items_dir: std::path::PathBuf, track_id: String, workspace_root: std::path::PathBuf, strict: bool) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 | infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check | free_function | modify | fn(items_dir: std::path::PathBuf, workspace_root: std::path::PathBuf, strict: bool) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 | infrastructure::verify::signal_gates_config::load_signal_gates_config | free_function | — | fn(config_path: std::path::PathBuf) -> Result<domain::SignalGateMatrix, SignalGatesConfigError> | 🔵 | 🔵 |
+| infrastructure::verify::signal_gates_config::load_signal_gates_config_from_branch | free_function | — | fn(repo_root: &std::path::Path, branch: &str) -> Result<domain::SignalGateMatrix, SignalGatesConfigError> | 🔵 | 🔵 |
 | infrastructure::verify::spec_states::calc_impl_catalog_for_layer | free_function | — | fn(workspace_root: &std::path::Path, track_id: domain::TrackId, layer_id: domain::tddd::LayerId, catalog_hash_hex: &str) -> domain::verify::VerifyOutcome | 🟡 | 🔵 |
 | infrastructure::verify::spec_states::check_impl_catalog_for_layer | free_function | — | fn(workspace_root: &std::path::Path, track_id: domain::TrackId, layer_id: domain::tddd::LayerId, catalog_hash_hex: &str, strict: bool) -> domain::verify::VerifyOutcome | 🟡 | 🔵 |
 | infrastructure::verify::spec_states::check_impl_catalog_from_signals_file | free_function | — | fn(signals_path: &std::path::Path, catalog_hash_hex: &str, strict: bool) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |

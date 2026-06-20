@@ -134,7 +134,12 @@ impl CliApp {
         let client = SystemGhClient;
         let branch = client.pr_head_branch(&pr).map_err(|e| e.to_string())?;
         let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
-        match repo.output(&["fetch", "origin", &branch]) {
+        // Use an explicit refspec (+refs/heads/<branch>:refs/remotes/origin/<branch>) so that
+        // refs/remotes/origin/<branch> is reliably updated. A bare `git fetch origin <branch>`
+        // only refreshes FETCH_HEAD and does not guarantee that `origin/<branch>` is updated,
+        // which would cause subsequent `git show origin/<branch>:…` reads to see a stale ref.
+        let refspec = format!("+refs/heads/{branch}:refs/remotes/origin/{branch}");
+        match repo.output(&["fetch", "origin", &refspec]) {
             Ok(o) if !o.status.success() => {
                 let stderr = String::from_utf8_lossy(&o.stderr);
                 return Err(format!("git fetch origin/{branch} failed: {stderr}"));
@@ -164,22 +169,22 @@ impl CliApp {
             });
         }
 
-        // Load SignalGateMatrix from `.harness/config/signal-gates.json`.
-        // The config lives in the repo root, resolved from the git repo discovery.
-        // If the file is absent or invalid, block fail-closed so that a missing
-        // config does not silently bypass the gate.
-        let signal_gates_path = repo.root().join(".harness/config/signal-gates.json");
+        // Load SignalGateMatrix from `.harness/config/signal-gates.json` on the PR
+        // branch via `git show origin/<branch>:.harness/config/signal-gates.json`.
+        // Reading from the branch ref (not the local worktree) ensures that the gate
+        // matrix is the one committed on the PR — a locally relaxed config cannot
+        // silently bypass the merge gate.
         let gate_matrix =
-            match infrastructure::verify::signal_gates_config::load_signal_gates_config(
-                signal_gates_path.clone(),
+            match infrastructure::verify::signal_gates_config::load_signal_gates_config_from_branch(
+                repo.root(),
+                &branch,
             ) {
                 Ok(matrix) => matrix,
                 Err(e) => {
                     return Ok(CommandOutcome {
                         stdout: None,
                         stderr: Some(format!(
-                            "[BLOCKED] failed to load signal-gates config from {}: {e}",
-                            signal_gates_path.display()
+                            "[BLOCKED] failed to load signal-gates config from branch '{branch}': {e}"
                         )),
                         exit_code: 1,
                     });

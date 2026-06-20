@@ -23,6 +23,8 @@ use thiserror::Error;
 
 use domain::{ChainGateEntry, SignalGateMatrix, Strictness};
 
+use crate::git_cli::show::{BlobResult, fetch_blob_safe};
+
 // ── DTO types (serde boundary — never exposed to domain) ─────────────────────
 
 /// Deserializable mirror of [`domain::Strictness`] for the serde boundary.
@@ -147,6 +149,18 @@ pub enum SignalGatesConfigError {
         /// The unrecognised value found at that key.
         value: String,
     },
+
+    /// The blob could not be fetched from the given git ref (not-found or command failure).
+    #[error(
+        "signal-gates.json: could not fetch blob from branch '{branch}': {reason} — \
+         ensure the branch is fetched and `.harness/config/signal-gates.json` is committed"
+    )]
+    BlobFetchError {
+        /// Branch ref from which the blob was requested.
+        branch: String,
+        /// Human-readable description of the fetch failure.
+        reason: String,
+    },
 }
 
 // ── Loader ────────────────────────────────────────────────────────────────────
@@ -176,15 +190,79 @@ pub fn load_signal_gates_config(
     let raw = std::fs::read_to_string(&config_path)
         .map_err(|_| SignalGatesConfigError::FileNotFound { path: config_path.clone() })?;
 
-    // Step 2: parse into a serde_json::Value first so we can perform fine-grained
-    // key-presence checks before committing to the typed DTO.
-    let value: serde_json::Value = serde_json::from_str(&raw).map_err(|e| {
-        SignalGatesConfigError::ParseFailed { path: config_path.clone(), reason: e.to_string() }
-    })?;
-    validate_top_level_object(&value, config_path.as_path())?;
+    // Steps 2-5: delegate to the shared parse/validate pipeline.
+    parse_signal_gates_config_str(&raw, &config_path)
+}
+
+/// Load and validate `.harness/config/signal-gates.json` from a git branch via
+/// `git show origin/<branch>:.harness/config/signal-gates.json`.
+///
+/// Applies the same strict validation pipeline as [`load_signal_gates_config`] but
+/// reads the config from the committed blob on the given branch rather than from the
+/// local worktree. This ensures that `pr_wait_and_merge` evaluates the gate matrix
+/// that is committed on the PR branch, preventing a locally relaxed config from
+/// silently bypassing the merge gate.
+///
+/// Uses `fetch_blob_safe` which rejects symlinks and submodules (fail-closed, §D4.3).
+///
+/// # Errors
+///
+/// Returns [`SignalGatesConfigError::BlobFetchError`] when the blob cannot be fetched
+/// (not found on the branch, or git command failure). Remaining variants follow the
+/// same pipeline as [`load_signal_gates_config`].
+pub fn load_signal_gates_config_from_branch(
+    repo_root: &Path,
+    branch: &str,
+) -> Result<SignalGateMatrix, SignalGatesConfigError> {
+    let blob_path = ".harness/config/signal-gates.json";
+    let raw = match fetch_blob_safe(repo_root, branch, blob_path) {
+        BlobResult::Found(bytes) => {
+            String::from_utf8(bytes).map_err(|e| SignalGatesConfigError::BlobFetchError {
+                branch: branch.to_owned(),
+                reason: format!("non-UTF-8 bytes in blob: {e}"),
+            })?
+        }
+        BlobResult::NotFound => {
+            return Err(SignalGatesConfigError::BlobFetchError {
+                branch: branch.to_owned(),
+                reason: format!(
+                    "path '{blob_path}' not found on branch — commit \
+                     `.harness/config/signal-gates.json` before merging"
+                ),
+            });
+        }
+        BlobResult::CommandFailed(msg) => {
+            return Err(SignalGatesConfigError::BlobFetchError {
+                branch: branch.to_owned(),
+                reason: msg,
+            });
+        }
+    };
+
+    // Re-use the same parse/validate pipeline as the file-based loader.
+    // Use a descriptive display path that names the branch for diagnostics.
+    let display_path = PathBuf::from(format!("origin/{branch}:.harness/config/signal-gates.json"));
+    parse_signal_gates_config_str(&raw, &display_path)
+}
+
+/// Parse and validate a signal-gates JSON string (shared logic for both loaders).
+///
+/// `display_path` is embedded in any [`SignalGatesConfigError::ParseFailed`] messages
+/// so diagnostics name the source (file path or a branch-blob descriptor).
+fn parse_signal_gates_config_str(
+    raw: &str,
+    display_path: &Path,
+) -> Result<SignalGateMatrix, SignalGatesConfigError> {
+    // Step 2: parse into a serde_json::Value for fine-grained key-presence checks.
+    let value: serde_json::Value =
+        serde_json::from_str(raw).map_err(|e| SignalGatesConfigError::ParseFailed {
+            path: display_path.to_path_buf(),
+            reason: e.to_string(),
+        })?;
+    validate_top_level_object(&value, display_path)?;
 
     // Step 3: validate $schema_version.
-    let schema_version = extract_schema_version(&value, config_path.as_path())?;
+    let schema_version = extract_schema_version(&value, display_path)?;
     if schema_version != SUPPORTED_SCHEMA_VERSION {
         return Err(SignalGatesConfigError::SchemaVersionUnknown {
             expected: SUPPORTED_SCHEMA_VERSION,
@@ -192,9 +270,9 @@ pub fn load_signal_gates_config(
         });
     }
 
-    // Step 4 & 5: validate all required keys and strictness values, then convert.
-    let commit_gate = extract_gate_row(&value, "commit_gate", config_path.as_path())?;
-    let merge_gate = extract_gate_row(&value, "merge_gate", config_path.as_path())?;
+    // Steps 4 & 5: validate all required keys and strictness values, then convert.
+    let commit_gate = extract_gate_row(&value, "commit_gate", display_path)?;
+    let merge_gate = extract_gate_row(&value, "merge_gate", display_path)?;
 
     Ok(SignalGateMatrix {
         adr_user: ChainGateEntry {
@@ -332,7 +410,7 @@ fn json_type_name(value: &serde_json::Value) -> &'static str {
 // ── Unit tests ────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
     use super::*;
     use std::io::Write;
@@ -628,5 +706,119 @@ mod tests {
         assert_eq!(matrix.spec_adr.merge_gate, Strictness::Strict);
         assert_eq!(matrix.catalog_spec.merge_gate, Strictness::Strict);
         assert_eq!(matrix.impl_catalog.merge_gate, Strictness::Strict);
+    }
+
+    // ── load_signal_gates_config_from_branch ─────────────────────────────────
+
+    /// Helper: create a minimal git repo with a committed `signal-gates.json`
+    /// at `.harness/config/signal-gates.json` on the given branch, set up a
+    /// self-referencing `origin` remote, and return the temp dir.
+    fn setup_git_repo_with_signal_gates(branch: &str, content: &str) -> tempfile::TempDir {
+        use super::super::test_support::git_with_identity;
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        std::process::Command::new("git")
+            .args(["init", "--quiet", &format!("--initial-branch={branch}")])
+            .current_dir(root)
+            .status()
+            .expect("git init failed");
+        std::process::Command::new("git")
+            .args(["config", "user.email", "test@test.com"])
+            .current_dir(root)
+            .status()
+            .ok();
+        std::process::Command::new("git")
+            .args(["config", "user.name", "Test"])
+            .current_dir(root)
+            .status()
+            .ok();
+        let config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(config_dir.join("signal-gates.json"), content).unwrap();
+        git_with_identity(root, &["add", ".harness"]);
+        git_with_identity(root, &["commit", "--quiet", "-m", "initial"]);
+        std::process::Command::new("git")
+            .args(["remote", "add", "origin", root.to_str().unwrap()])
+            .current_dir(root)
+            .status()
+            .ok();
+        std::process::Command::new("git")
+            .args(["fetch", "--quiet", "origin"])
+            .current_dir(root)
+            .status()
+            .ok();
+        dir
+    }
+
+    #[test]
+    fn test_load_signal_gates_config_from_branch_valid_blob_returns_matrix() {
+        let dir = setup_git_repo_with_signal_gates("main", recommended_default_json());
+        let result = load_signal_gates_config_from_branch(dir.path(), "main");
+        let matrix = result.expect("valid blob on main should parse successfully");
+        assert_eq!(matrix.adr_user.commit_gate, Strictness::Interim);
+        assert_eq!(matrix.spec_adr.commit_gate, Strictness::Strict);
+        assert_eq!(matrix.impl_catalog.merge_gate, Strictness::Strict);
+    }
+
+    #[test]
+    fn test_load_signal_gates_config_from_branch_not_found_returns_blob_fetch_error() {
+        // Repo has NO signal-gates.json committed.
+        use super::super::test_support::git_with_identity;
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        std::process::Command::new("git")
+            .args(["init", "--quiet", "--initial-branch=main"])
+            .current_dir(root)
+            .status()
+            .expect("git init failed");
+        std::process::Command::new("git")
+            .args(["config", "user.email", "test@test.com"])
+            .current_dir(root)
+            .status()
+            .ok();
+        std::process::Command::new("git")
+            .args(["config", "user.name", "Test"])
+            .current_dir(root)
+            .status()
+            .ok();
+        std::fs::write(root.join(".gitkeep"), b"").unwrap();
+        git_with_identity(root, &["add", ".gitkeep"]);
+        git_with_identity(root, &["commit", "--quiet", "-m", "initial"]);
+        std::process::Command::new("git")
+            .args(["remote", "add", "origin", root.to_str().unwrap()])
+            .current_dir(root)
+            .status()
+            .ok();
+        std::process::Command::new("git")
+            .args(["fetch", "--quiet", "origin"])
+            .current_dir(root)
+            .status()
+            .ok();
+
+        let result = load_signal_gates_config_from_branch(root, "main");
+        assert!(
+            matches!(result, Err(SignalGatesConfigError::BlobFetchError { .. })),
+            "missing blob must return BlobFetchError, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_load_signal_gates_config_from_branch_malformed_json_returns_parse_failed() {
+        let dir = setup_git_repo_with_signal_gates("main", "{ not valid json !!!");
+        let result = load_signal_gates_config_from_branch(dir.path(), "main");
+        assert!(
+            matches!(result, Err(SignalGatesConfigError::ParseFailed { .. })),
+            "malformed blob must return ParseFailed, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_load_signal_gates_config_from_branch_bad_branch_returns_blob_fetch_error() {
+        let dir = setup_git_repo_with_signal_gates("main", recommended_default_json());
+        let result = load_signal_gates_config_from_branch(dir.path(), "does-not-exist");
+        assert!(
+            matches!(result, Err(SignalGatesConfigError::BlobFetchError { .. })),
+            "nonexistent branch must return BlobFetchError, got: {result:?}"
+        );
     }
 }

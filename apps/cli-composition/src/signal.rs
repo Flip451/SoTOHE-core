@@ -60,6 +60,7 @@ fn signal_check_layer_chain(
     command_label: &str,
     signal_file_name: impl Fn(&TdddLayerBinding) -> String + 'static,
     include_binding: impl Fn(&TdddLayerBinding) -> bool + 'static,
+    fail_on_empty_bindings: bool,
     verifier: impl Fn(&std::path::Path, &str, bool) -> infrastructure::verify::VerifyOutcome + 'static,
     run_usecase: impl Fn(
         &BindingSignalLayerReader,
@@ -77,6 +78,7 @@ fn signal_check_layer_chain(
         command_label,
         signal_file_name,
         include_binding,
+        fail_on_empty_bindings,
         verifier,
         run_usecase,
     )
@@ -89,6 +91,7 @@ fn signal_check_layer_chain_with_strict(
     command_label: &str,
     signal_file_name: impl Fn(&TdddLayerBinding) -> String + 'static,
     include_binding: impl Fn(&TdddLayerBinding) -> bool + 'static,
+    fail_on_empty_bindings: bool,
     verifier: impl Fn(&std::path::Path, &str, bool) -> infrastructure::verify::VerifyOutcome + 'static,
     run_usecase: impl Fn(
         &BindingSignalLayerReader,
@@ -116,6 +119,30 @@ fn signal_check_layer_chain_with_strict(
         LoadTdddLayersError::Parse(err) => format!("{}: {err}", rules_path.display()),
     })?;
     let bindings: Vec<_> = bindings.into_iter().filter(|b| include_binding(b)).collect();
+
+    // Handle empty filtered binding list.
+    if bindings.is_empty() {
+        if fail_on_empty_bindings {
+            // Fail-closed for chain ③ `check-impl-catalog`: silently passing an empty
+            // layer set would allow CI to succeed on a repo where every layer has
+            // `tddd.enabled = false`, violating the same contract enforced by
+            // `verify_type_signals_from_spec_json`.
+            let outcome = infrastructure::verify::VerifyOutcome::from_findings(vec![
+                infrastructure::verify::VerifyFinding::error(format!(
+                    "[BLOCKED] {command_label}: no TDDD-enabled layers for chain ③ check — \
+                     set `tddd.enabled: true` for at least one layer in architecture-rules.json"
+                )),
+            ]);
+            return Ok(crate::cmd_outcome::render_outcome(command_label, &outcome));
+        }
+        // No layers opted in (e.g. chain ② with no catalogue-spec-signal-enabled layers)
+        // — nothing to check; return a clean pass without attempting to resolve the
+        // active track id (which would fail outside a real track branch).
+        return Ok(crate::cmd_outcome::render_outcome(
+            command_label,
+            &infrastructure::verify::VerifyOutcome::pass(),
+        ));
+    }
     let reader = BindingSignalLayerReader {
         inner: LocalSignalLayerReaderAdapter::new(root.clone()),
         bindings: bindings.clone(),
@@ -407,6 +434,9 @@ impl CliApp {
             "signal check-catalog-spec",
             TdddLayerBinding::catalogue_spec_signal_file,
             TdddLayerBinding::catalogue_spec_signal_enabled,
+            // Chain ② may have layers where `catalogue_spec_signal_enabled` is false;
+            // an empty filtered set is not necessarily a misconfiguration for chain ②.
+            false,
             |signals_path, hash_hex, strict| {
                 infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file(
                     signals_path,
@@ -497,6 +527,10 @@ impl CliApp {
             "signal check-impl-catalog",
             TdddLayerBinding::signal_file,
             |_| true,
+            // Chain ③ must fail-closed when the TDDD-enabled layer set is empty.
+            // A repo where every layer has `tddd.enabled = false` (or no tddd blocks)
+            // would otherwise vacuously pass, bypassing the impl-catalog signal gate.
+            true,
             |signals_path, hash_hex, strict| {
                 infrastructure::verify::spec_states::check_impl_catalog_from_signals_file(
                     signals_path,
@@ -613,6 +647,7 @@ impl CliApp {
             "signal check-catalog-spec",
             TdddLayerBinding::catalogue_spec_signal_file,
             TdddLayerBinding::catalogue_spec_signal_enabled,
+            false,
             |signals_path, hash_hex, strict| {
                 infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file(
                     signals_path,
@@ -632,6 +667,7 @@ impl CliApp {
             "signal check-impl-catalog",
             TdddLayerBinding::signal_file,
             |_| true,
+            true,
             |signals_path, hash_hex, strict| {
                 infrastructure::verify::spec_states::check_impl_catalog_from_signals_file(
                     signals_path,
@@ -646,5 +682,140 @@ impl CliApp {
         };
 
         Ok(merge_outcomes(gate_label, vec![chain0, chain1, chain2, chain3]))
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
+mod tests {
+    use super::*;
+
+    /// Minimal `architecture-rules.json` with ALL TDDD layers disabled, so that
+    /// the filtered binding list is empty when `include_binding: |_| true` is applied.
+    const ARCH_RULES_ALL_TDDD_DISABLED: &str = r#"{
+  "version": 2,
+  "module_limits": { "max_lines": 700, "warn_lines": 400, "exclude": [] },
+  "canonical_modules": [],
+  "extra_dirs": [],
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": { "enabled": false }
+    }
+  ]
+}"#;
+
+    /// Minimal `signal-gates.json` (all strict so tests never vacuously pass).
+    const SIGNAL_GATES_ALL_STRICT: &str = r#"{
+  "$schema_version": 1,
+  "commit_gate": {
+    "adr_user": "strict", "spec_adr": "strict",
+    "catalog_spec": "strict", "impl_catalog": "strict"
+  },
+  "merge_gate": {
+    "adr_user": "strict", "spec_adr": "strict",
+    "catalog_spec": "strict", "impl_catalog": "strict"
+  }
+}"#;
+
+    /// Set up a minimal workspace directory containing `architecture-rules.json`,
+    /// `.harness/config/signal-gates.json`, and the `track/items/<track_id>/` tree.
+    ///
+    /// Initialises a git repo so `SystemGitRepo::discover()` succeeds, and sets
+    /// the current branch to `track/<track_id>` so `active_track_id()` resolves.
+    fn setup_workspace(track_id: &str, arch_rules: &str, signal_gates: &str) -> tempfile::TempDir {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+
+        // Git init
+        std::process::Command::new("git")
+            .args(["init", "--quiet", &format!("--initial-branch=track/{track_id}")])
+            .current_dir(root)
+            .status()
+            .expect("git init failed");
+        std::process::Command::new("git")
+            .args(["config", "user.email", "test@test.com"])
+            .current_dir(root)
+            .status()
+            .ok();
+        std::process::Command::new("git")
+            .args(["config", "user.name", "Test"])
+            .current_dir(root)
+            .status()
+            .ok();
+
+        // Write architecture-rules.json and signal-gates.json
+        std::fs::write(root.join("architecture-rules.json"), arch_rules).unwrap();
+        std::fs::create_dir_all(root.join(".harness/config")).unwrap();
+        std::fs::write(root.join(".harness/config/signal-gates.json"), signal_gates).unwrap();
+
+        // Create track/items/<track_id>/ directory
+        std::fs::create_dir_all(root.join("track/items").join(track_id)).unwrap();
+
+        // Initial commit so HEAD exists and git discover works
+        std::process::Command::new("git").args(["add", "."]).current_dir(root).status().ok();
+        std::process::Command::new("git")
+            .env("GIT_AUTHOR_NAME", "test")
+            .env("GIT_AUTHOR_EMAIL", "test@test.com")
+            .env("GIT_COMMITTER_NAME", "test")
+            .env("GIT_COMMITTER_EMAIL", "test@test.com")
+            .args(["commit", "--quiet", "-m", "initial"])
+            .current_dir(root)
+            .status()
+            .ok();
+
+        dir
+    }
+
+    /// When all layers have `tddd.enabled: false`, `signal_check_impl_catalog`
+    /// (chain ③) must fail-closed with a `[BLOCKED]` message.
+    #[test]
+    fn test_signal_check_impl_catalog_empty_bindings_fail_closed() {
+        let track_id = "T999";
+        let dir = setup_workspace(track_id, ARCH_RULES_ALL_TDDD_DISABLED, SIGNAL_GATES_ALL_STRICT);
+
+        let app = CliApp;
+        let result = app.signal_check_impl_catalog(
+            false,
+            Some(SignalGateName::Commit),
+            Some(dir.path().to_path_buf()),
+        );
+
+        let outcome = result.expect("signal_check_impl_catalog should not return Err");
+        assert_ne!(
+            outcome.exit_code, 0,
+            "empty TDDD layer set must produce a non-zero exit: {outcome:?}"
+        );
+        let output = outcome.stdout.as_deref().unwrap_or("").to_owned()
+            + outcome.stderr.as_deref().unwrap_or("");
+        assert!(
+            output.contains("BLOCKED") || output.contains("no TDDD-enabled layers"),
+            "output must mention BLOCKED or no TDDD-enabled layers: {output}"
+        );
+    }
+
+    /// chain ② (`signal_check_catalog_spec`) with all layers disabled passes
+    /// without error — it does not enforce the empty-set contract.
+    #[test]
+    fn test_signal_check_catalog_spec_empty_bindings_passes() {
+        let track_id = "T999";
+        let dir = setup_workspace(track_id, ARCH_RULES_ALL_TDDD_DISABLED, SIGNAL_GATES_ALL_STRICT);
+
+        let app = CliApp;
+        let result = app.signal_check_catalog_spec(
+            false,
+            Some(SignalGateName::Commit),
+            Some(dir.path().to_path_buf()),
+        );
+
+        // chain ② does not fail-closed on an empty set; it should succeed (exit 0)
+        let outcome = result.expect("signal_check_catalog_spec should not return Err");
+        assert_eq!(
+            outcome.exit_code, 0,
+            "chain ② with empty enabled-layer set should pass vacuously: {outcome:?}"
+        );
     }
 }

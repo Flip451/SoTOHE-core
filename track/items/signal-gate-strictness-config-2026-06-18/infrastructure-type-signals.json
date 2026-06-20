@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-20T02:43:49Z",
-  "declaration_hash": "5b373fb611ee5d746194a5290e44cfa5e9ab1067ac062fd8abb1092e6852f74b",
+  "generated_at": "2026-06-20T03:25:25Z",
+  "declaration_hash": "c750a8a6faa825674be347b6966757a1601307d137ec2e11df7c043eed9f294c",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -124,6 +124,12 @@
     },
     {
       "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config_from_branch",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

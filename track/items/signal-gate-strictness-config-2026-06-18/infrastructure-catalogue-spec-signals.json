@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5b373fb611ee5d746194a5290e44cfa5e9ab1067ac062fd8abb1092e6852f74b",
+  "catalogue_declaration_hash": "c750a8a6faa825674be347b6966757a1601307d137ec2e11df7c043eed9f294c",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -25,7 +25,7 @@
     {
       "type_name": "SignalGatesConfigError",
       "signal": "blue",
-      "entry_hash": "331c3de9ab6402503a7739b6621a930039479b2460eda776cefcf5f2e766bec0"
+      "entry_hash": "011c08fb3bd94b61f5026deb29d60bd644ccedb0aabbec651a45ade9e97241f2"
     },
     {
       "type_name": "StrictnessDto",
@@ -81,6 +81,11 @@
       "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config",
       "signal": "blue",
       "entry_hash": "df0c5efdedbd908bd359a844a18af7cb4037af201eae4768377689b8c71827b6"
+    },
+    {
+      "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config_from_branch",
+      "signal": "blue",
+      "entry_hash": "bb2d5da897defa18ca0e6fb63950b8a995085098fca2c73db85912fe7b5fd971"
     },
     {
       "type_name": "infrastructure::verify::spec_states::calc_impl_catalog_for_layer",

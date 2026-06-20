@@ -1,26 +1,152 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "e734213ce41904df59b7b8baefb00e9e2119820bd566a19cb7aae42760f6a8e8",
+  "corpus_fingerprint": "de2c331fbbc9564fb188bf26b64a3a1e73b480a72b0efe18620bf034753e5485",
   "fragment_refs": [
     {
-      "path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
-      "content_hash": "582bd0c895db21ee760f15a0713df45dba68a67bcfa58b17a09bc56281cdd5fa"
+      "path": "apps/cli-composition/src/pr.rs",
+      "content_hash": "c1999cfeb094d1cd9fc910ba265b5f7f4d80f90affc78382658d432e97aaaaaf"
     },
     {
-      "path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
-      "content_hash": "c05b47650d022aeec13dca1049f61a5b44855a29ee49e2f85322411398cef637"
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "0bb8ca4bed0028eeb47764936a8dafdd3d54d2ae7acc7e1341395c2d75b8135d"
+    },
+    {
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "0e22e46cc7f931f04d0e5d3d7775f9e4b7d67ed417600a68e8036b60e0bb57d6"
+    },
+    {
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "6e7d2630775bd5bac7eb5a974ff4cf98efc56773c253abd3e0cb06102b878662"
+    },
+    {
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "a512492d4dd4b620935c9cd771cd45b75f94aa18dd4809bb35729ab78a524027"
+    },
+    {
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "c6915ec165e979b3d73db2d8cdd1d84ffe5c1d2127e5f5b24d397f2cf520c111"
+    },
+    {
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "cc30330858a8ca175dcc8e7c360ad5ab58273912eaea5c71882423de4ef1fc5a"
+    },
+    {
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "fb2799b0d0eeee7e5abdc834ca1902081a9825f4b1f4645ee0f0656dcc28ce67"
+    },
+    {
+      "path": "apps/cli-composition/src/signal.rs",
+      "content_hash": "fe5446bce335c5603304b2242350bc092eb04cdb1831b5b05b90ea7207f64daa"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "0834f9ece04bd50850cbc370e82439312b46fc4dfe9c17e7d78a1da390e1f759"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "13d198b2972f54447b105b348651b2a12ab937e2a81f575207f6bea88183553d"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "3d96c92b7e615dc19d6023579c404765e767ff7f4f46bc1efeffcb5c1ab00c0a"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "46da9fcc555a153d2774609d68f57c381e379a6594fe3c2f1979786fbe83d795"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "60e188c6b87db884745312562a4332c6bc7c1a00d58ddb62bbfac17b99c9ba78"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "71eb6b98c339a90da56d56510207a440a633462e7ba88951a7110dee4e65237b"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "8dabfeee16e4027f4b4536934c059f550874149bb7c779967f9f02c5dc418da8"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "931ce7555f9aaa76758071e6ddbff4a95ae2f498ccd0c8bac8f33b8c23e977d7"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "b105f4084097aad6c9b8ed9d02579678a6fcd17bce4a30afd4bc957fca5a8827"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "cbc5ac4bb701185b01dd95d73f57734c2076894670ad4ec351dbf2446e665a3b"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "d41d6f3765605b46b5f6b2ece4dd7f3d5a71e5d3939783069f448b95bf5f50ad"
+    },
+    {
+      "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+      "content_hash": "d4d78d430438ae52a6d3025b26d587ab696a1e382ccb6da7fe843326acecc473"
     }
   ],
   "processed_pair_keys": [
     {
       "low": {
-        "path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
-        "content_hash": "582bd0c895db21ee760f15a0713df45dba68a67bcfa58b17a09bc56281cdd5fa"
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "0bb8ca4bed0028eeb47764936a8dafdd3d54d2ae7acc7e1341395c2d75b8135d"
       },
       "high": {
-        "path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
-        "content_hash": "b2c98ac888af514469581ccfdb129454bcc8f802605c6db7db941a55c421256e"
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "fe5446bce335c5603304b2242350bc092eb04cdb1831b5b05b90ea7207f64daa"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "0e22e46cc7f931f04d0e5d3d7775f9e4b7d67ed417600a68e8036b60e0bb57d6"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "6e7d2630775bd5bac7eb5a974ff4cf98efc56773c253abd3e0cb06102b878662"
+      }
+    },
+    {
+      "low": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "c6915ec165e979b3d73db2d8cdd1d84ffe5c1d2127e5f5b24d397f2cf520c111"
+      },
+      "high": {
+        "path": "apps/cli-composition/src/signal.rs",
+        "content_hash": "fb2799b0d0eeee7e5abdc834ca1902081a9825f4b1f4645ee0f0656dcc28ce67"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "13d198b2972f54447b105b348651b2a12ab937e2a81f575207f6bea88183553d"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "71eb6b98c339a90da56d56510207a440a633462e7ba88951a7110dee4e65237b"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "46da9fcc555a153d2774609d68f57c381e379a6594fe3c2f1979786fbe83d795"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "cbc5ac4bb701185b01dd95d73f57734c2076894670ad4ec351dbf2446e665a3b"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "b105f4084097aad6c9b8ed9d02579678a6fcd17bce4a30afd4bc957fca5a8827"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/verify/signal_gates_config.rs",
+        "content_hash": "cbc5ac4bb701185b01dd95d73f57734c2076894670ad4ec351dbf2446e665a3b"
       }
     }
   ]

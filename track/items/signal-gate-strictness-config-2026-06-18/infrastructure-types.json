@@ -213,12 +213,28 @@
                 }
               ]
             }
+          },
+          {
+            "name": "BlobFetchError",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "String"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ]
+            }
           }
         ]
       },
       "methods": [],
       "module_path": "verify::signal_gates_config",
-      "docs": "Hard error for signal-gates.json load/validate failures. All variants produce `Finding::error` and halt gate execution per D4. No silent fallback, no implicit default.",
+      "docs": "Hard error for signal-gates.json load/validate failures. All variants produce `Finding::error` and halt gate execution per D4. No silent fallback, no implicit default. `BlobFetchError` covers the branch-blob loader path added for `pr_wait_and_merge`.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -297,6 +313,40 @@
       "generics": [],
       "where_predicates": [],
       "docs": "Load and validate `.harness/config/signal-gates.json` from the given path. Parses `SignalGatesConfig`, validates `$schema_version == 1`, checks all required keys, then converts to `domain::SignalGateMatrix`. Returns `SignalGatesConfigError` on any failure — file-not-found, malformed JSON parse failure, schema mismatch, missing key, or invalid strictness value. No implicit fallback.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-05"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::signal_gates_config::load_signal_gates_config_from_branch": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "repo_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "branch",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<domain::SignalGateMatrix, SignalGatesConfigError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Load and validate `.harness/config/signal-gates.json` from a git branch blob via `git show origin/<branch>:.harness/config/signal-gates.json`. Applies the same strict validation pipeline as `load_signal_gates_config` but reads from the committed blob rather than the local worktree, preventing a locally relaxed config from bypassing the merge gate. Returns `SignalGatesConfigError::BlobFetchError` when the blob cannot be fetched.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
