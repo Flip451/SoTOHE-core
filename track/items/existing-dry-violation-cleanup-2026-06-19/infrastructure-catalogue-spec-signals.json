@@ -1,16 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "686a8562351281e6b126bdbfa13b5544a86a8cdf3a042e5c9b36fe8ff5ce2899",
+  "catalogue_declaration_hash": "7e8806f8170ff6ca7669699d075e00394a303f0af1b815086862a7c310b65436",
   "signals": [
     {
       "type_name": "CodexDryChecker",
       "signal": "blue",
-      "entry_hash": "e80ed914e4a6686efaf5d3ba1d24d681ed683d41135d0e7d10273d4fd0bdb68f"
+      "entry_hash": "218936cc018efb16d61bcbd4588dbcf04b7487d37dcfa25bc988caec572ee2eb"
     },
     {
       "type_name": "CodexReviewer",
       "signal": "blue",
-      "entry_hash": "8ea335f44c6ce36605beac287c3a29420fe0c34bc45ec04f9808f268357dc68f"
+      "entry_hash": "d09fb746000286a50405437f366ec432d0f0481d09f0aa44866a1444e52b1bbe"
+    },
+    {
+      "type_name": "infrastructure::codex_common::tee_stderr_to_file",
+      "signal": "blue",
+      "entry_hash": "23a973621661db08a1c6e72f3de9e966f6b838a41f5aea7c38aed32c96a5b33f"
     },
     {
       "type_name": "infrastructure::dry_check::corpus::sha256_hex",

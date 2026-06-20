@@ -1,8 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-19T17:32:52Z",
-  "declaration_hash": "686a8562351281e6b126bdbfa13b5544a86a8cdf3a042e5c9b36fe8ff5ce2899",
+  "generated_at": "2026-06-20T00:00:48Z",
+  "declaration_hash": "7e8806f8170ff6ca7669699d075e00394a303f0af1b815086862a7c310b65436",
   "signals": [
+    {
+      "type_name": "infrastructure::codex_common::tee_stderr_to_file",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "CodexDryChecker",
       "kind_tag": "secondary_adapter",

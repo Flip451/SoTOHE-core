@@ -97,6 +97,62 @@
         "kind": "pass",
         "citation": "(4) SHA-256→lowercase-hex エンコードを共通モジュールへ抽出する。抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない（CN-02）。"
       }
+    },
+    {
+      "claim_hash": "1780d15b8bdb2fc080da46e1ec5608767b4c27b5d9f531c29a351c5189ca7f7b",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する (1) Codex subprocess 管理（`spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダ）...を共通モジュールへ抽出する。抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない"
+      }
+    },
+    {
+      "claim_hash": "734d7ca4b942e40d3096dce8fe1caa0579d53c5302dde75b763bd5ed29768216",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する (1) Codex subprocess 管理（`spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダ）... 抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない（CN-02）。"
+      }
+    },
+    {
+      "claim_hash": "3d147f880cd8e163fbf61ea9a699e8492a870715e4ba6e32f258b42a9f207bbe",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the evidence requires the extracted common module in the infrastructure crate to be `pub(crate)`, including the shared Codex subprocess helpers such as `tee_stderr_to_file`, but the claim asserts `tee_stderr_to_file is now pub` and exposed for cross-layer reuse via re-export."
+      }
+    },
+    {
+      "claim_hash": "e5b8ecaae0b847fc0b7532deab687eb8e7beb51e812249be9ec837c90d85aebf",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する (1) Codex subprocess 管理（`spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダ）... 抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない（CN-02）。"
+      }
+    },
+    {
+      "claim_hash": "218936cc018efb16d61bcbd4588dbcf04b7487d37dcfa25bc988caec572ee2eb",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する (1) Codex subprocess 管理（`spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダ）と (4) SHA-256→lowercase-hex エンコードを共通モジュールへ抽出する。抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない（CN-02）。"
+      }
+    },
+    {
+      "claim_hash": "d09fb746000286a50405437f366ec432d0f0481d09f0aa44866a1444e52b1bbe",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する (1) Codex subprocess 管理（`spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダ）... を共通モジュールへ抽出する。抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない"
+      }
+    },
+    {
+      "claim_hash": "23a973621661db08a1c6e72f3de9e966f6b838a41f5aea7c38aed32c96a5b33f",
+      "evidence_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で重複する (1) Codex subprocess 管理（`spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダ）を共通モジュールへ抽出する。抽出先は `infrastructure` クレート内の `pub(crate)` 共通モジュールとし、hexagonal の層配置（domain / usecase / infrastructure）を侵さない"
+      }
     }
   ]
 }

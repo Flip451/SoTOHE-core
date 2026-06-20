@@ -42,6 +42,10 @@ subgraph usecase["usecase"]
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_codex_common["infrastructure::codex_common"]
+    direction TB
+  F78_infrastructure_infrastructure_infrastructure__codex_common__tee_stderr_to_file[[tee_stderr_to_file]]
+  end
   subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
     direction TB
   subgraph T45_infrastructure_infrastructure_CodexDryChecker["dry_check::codex_dry_checker::CodexDryChecker"]
@@ -60,6 +64,8 @@ subgraph infrastructure["infrastructure"]
 end
 class T28_domain_domain_NonEmptyString__self value_object
 class T21_domain_domain_TrackId__self value_object
+class F78_infrastructure_infrastructure_infrastructure__codex_common__tee_stderr_to_file free_function
+class F78_infrastructure_infrastructure_infrastructure__codex_common__tee_stderr_to_file function_node
 class T45_infrastructure_infrastructure_CodexDryChecker__self secondary_adapter
 class F75_infrastructure_infrastructure_infrastructure__dry_check__corpus__sha256_hex free_function
 class F75_infrastructure_infrastructure_infrastructure__dry_check__corpus__sha256_hex function_node

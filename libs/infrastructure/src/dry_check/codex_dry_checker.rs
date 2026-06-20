@@ -1,11 +1,11 @@
 //! Codex-backed implementation of the `DryCheckAgentPort` usecase port.
 
+#[cfg(test)]
 use std::ffi::OsString;
-use std::io::{BufRead, BufReader, Write};
 use std::path::{Component, Path, PathBuf};
-use std::process::{Child, Command, Stdio};
+use std::process::Child;
 use std::thread;
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, Instant};
 
 use serde::Deserialize;
 use sha2::Digest;
@@ -19,6 +19,8 @@ use domain::semantic_dup::CodeFragment;
 use usecase::dry_check::{
     DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckJudgeTier,
 };
+
+use crate::codex_common::{codex_bin, runtime_path, spawn_codex};
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -196,11 +198,12 @@ impl CodexDryChecker {
             DryCheckJudgeTier::Final => (&self.final_model, &self.final_reasoning_effort),
         };
 
-        let output_last_message = prepare_runtime_path("dry-check-last-message", "txt")
+        let output_last_message =
+            runtime_path(DRY_CHECK_RUNTIME_DIR, "dry-check-last-message", "txt")
+                .map_err(DryCheckAgentError::Unexpected)?;
+        let output_schema = runtime_path(DRY_CHECK_RUNTIME_DIR, "dry-check-output-schema", "json")
             .map_err(DryCheckAgentError::Unexpected)?;
-        let output_schema = prepare_runtime_path("dry-check-output-schema", "json")
-            .map_err(DryCheckAgentError::Unexpected)?;
-        let session_log = prepare_runtime_path("dry-check-session", "log")
+        let session_log = runtime_path(DRY_CHECK_RUNTIME_DIR, "dry-check-session", "log")
             .map_err(DryCheckAgentError::Unexpected)?;
 
         let _cleanup = AutoCleanup::new([&output_last_message, &output_schema]);
@@ -424,25 +427,6 @@ pub(crate) fn parse_agent_json_and_build_judgment(
 
 // ── Process management ────────────────────────────────────────────────────────
 
-fn prepare_runtime_path(prefix: &str, ext: &str) -> Result<PathBuf, String> {
-    use std::sync::atomic::{AtomicU64, Ordering};
-    static COUNTER: AtomicU64 = AtomicU64::new(0);
-
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|e| format!("failed to compute timestamp: {e}"))?
-        .as_nanos();
-    let seq = COUNTER.fetch_add(1, Ordering::Relaxed);
-    let path = PathBuf::from(DRY_CHECK_RUNTIME_DIR)
-        .join(format!("{prefix}-{}-{timestamp}-{seq}.{ext}", std::process::id()));
-    let parent = path
-        .parent()
-        .ok_or_else(|| format!("runtime path must have a parent directory: {}", path.display()))?;
-    std::fs::create_dir_all(parent)
-        .map_err(|e| format!("failed to create {}: {e}", parent.display()))?;
-    Ok(path)
-}
-
 struct AutoCleanup {
     paths: Vec<PathBuf>,
 }
@@ -459,66 +443,6 @@ impl Drop for AutoCleanup {
             let _ = std::fs::remove_file(path);
         }
     }
-}
-
-fn codex_bin() -> OsString {
-    OsString::from("codex")
-}
-
-fn spawn_codex(
-    bin: &std::ffi::OsStr,
-    args: &[OsString],
-    session_log_path: &Path,
-) -> Result<(Child, Vec<thread::JoinHandle<()>>), String> {
-    let mut command = Command::new(bin);
-    command.args(args).stdin(Stdio::null()).stdout(Stdio::piped());
-
-    let log_file = std::fs::File::create(session_log_path)
-        .map_err(|e| format!("failed to create session log {}: {e}", session_log_path.display()))?;
-    command.stderr(Stdio::piped());
-
-    let mut child =
-        command.spawn().map_err(|e| format!("failed to spawn {}: {e}", bin.to_string_lossy()))?;
-
-    let mut io_handles = Vec::new();
-
-    if let Some(pipe) = child.stderr.take() {
-        io_handles.push(thread::spawn(move || {
-            tee_stderr_to_file(pipe, log_file);
-        }));
-    }
-
-    // Drain stdout to prevent the child from blocking on a full pipe buffer.
-    if let Some(pipe) = child.stdout.take() {
-        io_handles.push(thread::spawn(move || {
-            drain_pipe(pipe);
-        }));
-    }
-
-    Ok((child, io_handles))
-}
-
-fn drain_pipe(pipe: std::process::ChildStdout) {
-    let reader = BufReader::new(pipe);
-    for line in reader.lines() {
-        if line.is_err() {
-            break;
-        }
-    }
-}
-
-fn tee_stderr_to_file(pipe: std::process::ChildStderr, mut log_file: std::fs::File) {
-    let reader = BufReader::new(pipe);
-    for line in reader.lines() {
-        match line {
-            Ok(line) => {
-                let _ = writeln!(log_file, "{line}");
-                eprintln!("{line}");
-            }
-            Err(_) => break,
-        }
-    }
-    let _ = log_file.flush();
 }
 
 fn run_codex_child(

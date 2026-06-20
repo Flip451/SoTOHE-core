@@ -154,6 +154,94 @@
       "rationale": "The two constructors share only a small overlap: both reject blank input after trimming, but the existing `informal_ground_ref` version also enforces a separate no-newline invariant and returns domain-specific errors. That makes the second implementation a distinct domain rule set rather than a duplicate copy of the new helper logic.",
       "recorded_at": "2026-06-19T17:02:18Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli-composition/src/lib.rs",
+      "low_hash": "f1f4a03066d9d8efdae8a2b1a239d243b459fdece1bdaaaed9da8fd449d6f163",
+      "high_path": "libs/infrastructure/src/codex_common.rs",
+      "high_hash": "93b427bcc957d6650d7802a0031ad4895747daef8dd7f8257729191235c15b5d",
+      "changed_path": "libs/infrastructure/src/codex_common.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8777323961257935,
+      "threshold": 0.8500000238418579,
+      "base_commit": "ad56a16f3979ceba739ba7dbd793f8827499634d",
+      "rationale": "The existing code in `apps/cli-composition/src/lib.rs` is only a thin wrapper that forwards to `infrastructure::codex_common::build_codex_read_only_invocation`; it does not reimplement the argument-building logic. The changed fragment centralizes the shared implementation in `libs/infrastructure/src/codex_common.rs`, which removes duplication rather than introducing it.",
+      "recorded_at": "2026-06-19T17:46:45Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli/src/commands/plan/codex_local.rs",
+      "low_hash": "44264b3f2b2d66ddaa595421c1ef219cb513142788c89e2133b0831a5394654d",
+      "high_path": "libs/infrastructure/src/codex_common.rs",
+      "high_hash": "00789f83a15caa9bd3706081d8f2268f0125c594269ed5cf789555f8dab1af76",
+      "changed_path": "libs/infrastructure/src/codex_common.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8660061955451965,
+      "threshold": 0.8500000238418579,
+      "base_commit": "ad56a16f3979ceba739ba7dbd793f8827499634d",
+      "rationale": "The two fragments share some subprocess-spawning boilerplate, but they are not the same logic duplicated in a way that violates DRY. The CLI version intentionally inherits stdout and tees stderr to the terminal, while the infrastructure version deliberately pipes and drains stdout to enforce a fail-closed logging contract and returns a different handle shape. Those behavioral differences make the code context-specific rather than redundant repetition.",
+      "recorded_at": "2026-06-19T17:46:45Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli/src/commands/plan/codex_local.rs",
+      "low_hash": "d6a40f993c97db53dbf98b0b65d6ed3fe50b9615106f3a5a6ad78844a34f852e",
+      "high_path": "libs/infrastructure/src/codex_common.rs",
+      "high_hash": "87c5434e0798a5baa800d43e2caf4853ac2b9471865d605c9f4a3e6b9587f550",
+      "changed_path": "libs/infrastructure/src/codex_common.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8503105640411377,
+      "threshold": 0.8500000238418579,
+      "base_commit": "ad56a16f3979ceba739ba7dbd793f8827499634d",
+      "rationale": "The two fragments share only a small, idiomatic `BufReader::lines()` loop with the same error-break pattern. Their responsibilities differ materially: one drains stdout and discards output, while the other tees stderr to both a file and stderr and then flushes. This is not enough repetition to justify a DRY finding.",
+      "recorded_at": "2026-06-19T17:46:45Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli/src/commands/plan/codex_local.rs",
+      "low_hash": "d6a40f993c97db53dbf98b0b65d6ed3fe50b9615106f3a5a6ad78844a34f852e",
+      "high_path": "libs/infrastructure/src/codex_common.rs",
+      "high_hash": "b11a496697f31ca7403f70fe890cd2cacefdf04cfdf0968d2f5741c301e15dad",
+      "changed_path": "libs/infrastructure/src/codex_common.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Remove the local `tee_stderr_to_file` helper from `apps/cli/src/commands/plan/codex_local.rs` and update its call sites to use `libs/infrastructure/src/codex_common.rs::tee_stderr_to_file` via the appropriate crate import. If visibility prevents this, expose the shared helper at the crate/module boundary used by the CLI rather than keeping a second implementation."
+        }
+      },
+      "similarity_score": 0.9973319172859192,
+      "threshold": 0.8500000238418579,
+      "base_commit": "ad56a16f3979ceba739ba7dbd793f8827499634d",
+      "rationale": "The two fragments duplicate the same stderr teeing implementation line-for-line, including control flow, ignored write/flush errors, and output behavior. Since the changed fragment places this helper in shared infrastructure, the existing CLI-local helper now repeats the same knowledge instead of reusing the shared implementation.",
+      "recorded_at": "2026-06-19T17:46:45Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/codex_common.rs",
+      "low_hash": "87c5434e0798a5baa800d43e2caf4853ac2b9471865d605c9f4a3e6b9587f550",
+      "high_path": "libs/infrastructure/src/codex_common.rs",
+      "high_hash": "b11a496697f31ca7403f70fe890cd2cacefdf04cfdf0968d2f5741c301e15dad",
+      "changed_path": "libs/infrastructure/src/codex_common.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8511092066764832,
+      "threshold": 0.8500000238418579,
+      "base_commit": "ad56a16f3979ceba739ba7dbd793f8827499634d",
+      "rationale": "The fragments share a small idiomatic line-reading loop over a BufReader, but their responsibilities differ: drain_pipe only consumes stdout to avoid blocking, while tee_stderr_to_file mirrors stderr to a file and the parent process stderr. Extracting the shared loop would likely obscure the different side effects for very little duplication reduction.",
+      "recorded_at": "2026-06-19T17:46:45Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "apps/cli/src/commands/plan/codex_local.rs",
+      "low_hash": "7868580ed3680c95280b4ac32fcaed936e4c127c1bc6fcad53a0085c713be2f3",
+      "high_path": "libs/infrastructure/src/codex_common.rs",
+      "high_hash": "00789f83a15caa9bd3706081d8f2268f0125c594269ed5cf789555f8dab1af76",
+      "changed_path": "libs/infrastructure/src/codex_common.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.85835862159729,
+      "threshold": 0.8500000238418579,
+      "base_commit": "ad56a16f3979ceba739ba7dbd793f8827499634d",
+      "rationale": "The two snippets share some process-launch boilerplate, but they are not duplicating the same behavior. The new helper in `codex_common.rs` is intentionally fail-closed: it captures and drains stdout, while `codex_local.rs` inherits stdout and only tees stderr. That semantic difference is material, so this is not a clear DRY violation.",
+      "recorded_at": "2026-06-19T23:24:56Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }

@@ -1,53 +1,35 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
-          "at": "2026-06-19T16:52:06Z"
+          "hash": "rvw1:sha256:f398adb3c64a16286ded2510512df0dba2564cd749b28f3955c0963f94b0814c",
+          "at": "2026-06-19T16:48:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
-          "at": "2026-06-19T16:53:35Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
-          "at": "2026-06-19T15:54:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
-          "at": "2026-06-19T15:57:29Z"
+          "hash": "rvw1:sha256:f398adb3c64a16286ded2510512df0dba2564cd749b28f3955c0963f94b0814c",
+          "at": "2026-06-19T16:51:11Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
-          "at": "2026-06-19T16:20:13Z"
+          "hash": "rvw1:sha256:5d99289181ed00dcedc114f88f8baefbe6202936daeb53b62f984a7c3411bf10",
+          "at": "2026-06-19T23:29:56Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
-          "at": "2026-06-19T16:22:04Z"
+          "hash": "rvw1:sha256:5d99289181ed00dcedc114f88f8baefbe6202936daeb53b62f984a7c3411bf10",
+          "at": "2026-06-19T23:31:01Z"
         }
       ]
     },
@@ -94,6 +76,24 @@
           "findings": [],
           "hash": "rvw1:sha256:fed22981601883d5cdb630a52e29c7f165bf34c2f786058043f8425ac68b7a75",
           "at": "2026-06-19T17:30:39Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ecf4963f06fae0a775dbd8af1a86c3292cee9390ce03b2f0c12467d832b5e6d3",
+          "at": "2026-06-19T23:27:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ecf4963f06fae0a775dbd8af1a86c3292cee9390ce03b2f0c12467d832b5e6d3",
+          "at": "2026-06-19T23:28:31Z"
         }
       ]
     },
@@ -433,24 +433,164 @@
           "findings": [],
           "hash": "rvw1:sha256:6f10c8018f3a51f490e1017665e7e62992408ed092ff9152797adc96c4e27bf3",
           "at": "2026-06-19T17:32:16Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f398adb3c64a16286ded2510512df0dba2564cd749b28f3955c0963f94b0814c",
-          "at": "2026-06-19T16:48:48Z"
+          "hash": "rvw1:sha256:9015343e34f651baa61d03f06f8d60ded78ad5a76d6d5e7b8b75aa6b7953cdc9",
+          "at": "2026-06-19T23:33:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f398adb3c64a16286ded2510512df0dba2564cd749b28f3955c0963f94b0814c",
-          "at": "2026-06-19T16:51:11Z"
+          "hash": "rvw1:sha256:9015343e34f651baa61d03f06f8d60ded78ad5a76d6d5e7b8b75aa6b7953cdc9",
+          "at": "2026-06-19T23:34:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2619f16d483fe48927e79e6cf6deaa0069283c0841d62235f7a712a8299cb0a",
+          "at": "2026-06-19T23:47:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 still describes extracting the subprocess helpers into a `pub(crate)` infrastructure module and updating only the two infrastructure callers, but the infrastructure catalogue now says `tee_stderr_to_file` must be `pub` so it can be re-exported through `cli_composition` and used by the apps/cli planner. Those are conflicting implementation contracts: following T006 as written would keep the helper crate-private and leave out the CLI planner reuse that the catalogue now requires.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a2619f16d483fe48927e79e6cf6deaa0069283c0841d62235f7a712a8299cb0a",
+          "at": "2026-06-19T23:49:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S3's summary is stale: it still says T006 moves `run_codex_child` into a new `codex_subprocess`/`codex_common` module and keeps all code inside infrastructure. That contradicts the updated T006 text below, and the same stale wording is still mirrored in `plan.md:28`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 110,
+              "category": "contradiction"
+            },
+            {
+              "message": "The D3 catalogue docs still say the `run_codex_child` timeout-poll loop remains `pub(crate)` in `codex_common`, but T006 explicitly keeps that loop per-module and only shares `spawn_codex`, `drain_pipe`, `runtime_path`, and `tee_stderr_to_file`. The same stale claim also repeats at lines 30 and 50 in this file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/existing-dry-violation-cleanup-2026-06-19/infrastructure-types.json",
+              "line": 15,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:509ee9abd6ce2c90e548065153a88cecdbfec63342a313878b427fa7655e3be8",
+          "at": "2026-06-19T23:52:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 now says the run_codex_child timeout-poll loop must stay per-module because reviewer and dry-checker behavior differs, but the S3 plan summary still instructs implementers to extract that loop into a shared pub(crate) infrastructure module. This is an internal plan contradiction that can send the implementation in the opposite direction from the task-level design.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 110,
+              "category": "contradiction"
+            },
+            {
+              "message": "The infrastructure catalogue still describes the run_codex_child poll-loop as one of the helpers remaining pub(crate) in codex_common, while T006 explicitly says that loop stays per-module and is not shared. The catalogue should not advertise a shared type/API shape that the implementation plan rejects.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/infrastructure-types.json",
+              "line": 50,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:509ee9abd6ce2c90e548065153a88cecdbfec63342a313878b427fa7655e3be8",
+          "at": "2026-06-19T23:53:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6d8821526b7f9bbdcc460904afdbc455ba4cc113c8e023f7c632d006e655df9",
+          "at": "2026-06-19T23:58:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6d8821526b7f9bbdcc460904afdbc455ba4cc113c8e023f7c632d006e655df9",
+          "at": "2026-06-20T00:00:35Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
+          "at": "2026-06-19T16:52:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
+          "at": "2026-06-19T16:53:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e497afc3259746e8db92109d36b0ba87ade3372aaa177ba1ff2e57df7617868",
+          "at": "2026-06-19T23:31:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e497afc3259746e8db92109d36b0ba87ade3372aaa177ba1ff2e57df7617868",
+          "at": "2026-06-19T23:32:20Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
+          "at": "2026-06-19T15:54:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
+          "at": "2026-06-19T15:57:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
+          "at": "2026-06-19T16:20:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
+          "at": "2026-06-19T16:22:04Z"
         }
       ]
     }

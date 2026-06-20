@@ -12,7 +12,7 @@
       },
       "methods": [],
       "module_path": "dry_check::codex_dry_checker",
-      "docs": "D3: public API unchanged. Internal private subprocess helpers (spawn_codex, run_codex_child timeout-poll loop, drain_pipe, tee_stderr_to_file, prepare_runtime_path, AutoCleanup) are extracted to a shared pub(crate) module, leaving CodexDryChecker's pub surface (new, DryCheckAgentPort impl) identical to baseline.",
+      "docs": "D3: pub surface (new, DryCheckAgentPort impl) is identical to baseline. The shared subprocess helpers spawn_codex, drain_pipe, runtime_path (unified with a base_dir parameter, replacing prepare_runtime_path), and codex_bin are pub(crate) in codex_common; tee_stderr_to_file is pub (see the functions catalogue entry for infrastructure::codex_common::tee_stderr_to_file). run_codex_child and AutoCleanup remain per-module in codex_dry_checker — run_codex_child is NOT shared (CN-03: its return type, output parsing, and kill strategy differ from the reviewer's).",
       "spec_refs": [
         { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "IN-03" }
       ],
@@ -27,7 +27,7 @@
       },
       "methods": [],
       "module_path": "review_v2::codex_reviewer",
-      "docs": "D3: public API unchanged. Internal private subprocess helpers (spawn_codex, run_codex_child timeout-poll loop, drain_pipe, tee_stderr_to_file, runtime_path, AutoManagedArtifacts) are extracted to a shared pub(crate) module, leaving CodexReviewer's pub surface (new, with_scope_label, Reviewer impl) identical to baseline.",
+      "docs": "D3: pub surface (new, with_scope_label, Reviewer impl) is identical to baseline. The shared subprocess helpers spawn_codex, drain_pipe, runtime_path (unified with a base_dir parameter), and codex_bin are pub(crate) in codex_common; tee_stderr_to_file is pub (see the functions catalogue entry for infrastructure::codex_common::tee_stderr_to_file). run_codex_child and AutoManagedArtifacts remain per-module in codex_reviewer — run_codex_child is NOT shared (CN-03: its return type, output parsing, and kill strategy differ from the dry-checker's).",
       "spec_refs": [
         { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "IN-03" }
       ],
@@ -36,6 +36,23 @@
   },
   "traits": {},
   "functions": {
+    "infrastructure::codex_common::tee_stderr_to_file": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "pipe", "ty": "std::process::ChildStderr" },
+        { "name": "log_file", "ty": "std::fs::File" }
+      ],
+      "returns": "()",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Canonical stderr-tee helper extracted under ADR D3. Reads lines from a Codex subprocess ChildStderr, writes each line to the provided File, and echoes it to the process stderr. Now pub so the apps/cli planner can reuse it via cli_composition::tee_stderr_to_file (pub use infrastructure::codex_common::tee_stderr_to_file), eliminating the byte-identical copy in apps/cli/src/commands/plan/codex_local.rs. The other shared helpers (spawn_codex, drain_pipe, runtime_path, codex_bin) remain pub(crate); run_codex_child stays per-module in each adapter and is NOT shared (CN-03). CN-02 keeps the I/O helper in infrastructure (not usecase) where std::fs and std::process I/O is permitted.",
+      "spec_refs": [
+        { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "IN-03" }
+      ],
+      "informal_grounds": []
+    },
     "infrastructure::dry_check::corpus::sha256_hex": {
       "action": "reference",
       "role": "FreeFunction",
