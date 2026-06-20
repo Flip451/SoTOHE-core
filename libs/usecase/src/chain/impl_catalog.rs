@@ -74,7 +74,7 @@ impl<'a> ImplCatalogInput<'a> {
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 #[error(
     "impl-catalog signals are stale: stored declaration_hash={stored}, \
-     current={current} — run `sotp track type-signals` to update"
+     current={current} — run `sotp signal calc-impl-catalog` to update"
 )]
 #[doc(hidden)]
 pub struct ImplCatalogStaleError {

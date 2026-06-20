@@ -378,7 +378,7 @@ pub fn evaluate_requirement_signal(
 ///
 /// # Rules
 ///
-/// - `signals` is `None` → `VerifyFinding::error` (unevaluated; run `sotp track signals` first)
+/// - `signals` is `None` → `VerifyFinding::error` (unevaluated; run `sotp signal calc-spec-adr` first)
 /// - `SignalCounts::total() == 0` → `VerifyFinding::error` (evaluated but empty — treated as unevaluated)
 /// - `signals.red > 0` → `VerifyFinding::error` (red is always an error, regardless of mode)
 /// - `signals.yellow > 0` and `strict = true` → `VerifyFinding::error` (merge gate rejects Yellow)
@@ -396,7 +396,7 @@ pub fn check_spec_doc_signals(doc: &SpecDocument, strict: bool) -> crate::verify
 
     let Some(counts) = doc.signals() else {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(
-            "spec signals not yet evaluated — run `sotp track signals` first".to_owned(),
+            "spec signals not yet evaluated — run `sotp signal calc-spec-adr --spec-json <path/to/spec.json>` first".to_owned(),
         )]);
     };
 

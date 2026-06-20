@@ -45,7 +45,7 @@ pub enum VerifyAdrSignalsError {
 ///
 /// Currently carries no inputs — the ADR directory is fixed by the
 /// adapter implementation injected at the composition root (e.g. CLI
-/// `verify adr-signals` constructs `FsAdrFileAdapter::new("knowledge/adr")`).
+/// `signal check-adr-user` constructs `FsAdrFileAdapter::new("knowledge/adr")`).
 /// Reserved as a unit struct so future flags (e.g. `--strict`) can be
 /// added without breaking callers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

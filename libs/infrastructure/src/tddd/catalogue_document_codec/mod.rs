@@ -255,7 +255,7 @@ impl CatalogueDocumentCodec {
                     to: SCHEMA_VERSION,
                     reason: "role wire format changed from string to discriminated-object in v5; \
                              re-generate the catalogue via the type-designer agent, \
-                             then run `sotp track type-signals`",
+                             then run `sotp signal calc-impl-catalog`",
                 });
             }
             actual => {

@@ -55,7 +55,7 @@ The specialist owns each `<layer>-types.json` and its derived views for this tra
 
 1. captures baselines of the current code state
 2. writes the catalogue files directly (informed by ADR + spec + reconnaissance from the pre-catalogue baseline-graph reads — see the Internal pipeline below)
-3. generates the catalogue → spec signal JSON via `bin/sotp track catalogue-spec-signals` and evaluates the type → spec signal via `bin/sotp track type-signals`, capturing per-layer blue / yellow / red counts
+3. generates the catalogue → spec signal JSON via `bin/sotp signal calc-catalog-spec` and evaluates the type → spec signal via `bin/sotp signal calc-impl-catalog`, capturing per-layer blue / yellow / red counts
 4. regenerates the per-layer rendered views (contract-map md, `<layer>-types.md` via `sync_rendered_views`, plus the baseline-graph reconnaissance views from step 2's pre-work)
 
 The orchestrator receives the per-layer signal counts from step 3 and decides whether Phase 2 passes.
@@ -114,17 +114,19 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
 7. **Write `track/items/<id>/<layer>-types.json`** directly with the drafted content (merging with the existing catalogue when incremental).
 
+   **Precondition for steps 8-9**: both argless signal commands resolve the target track from the current git branch. Before running either command, confirm the current branch is exactly `track/<id>` for the `<id>` being processed. If it is not, stop and report the branch mismatch in `## Open Questions`; running these commands from another branch can regenerate signal files for the wrong track.
+
 8. **Generate `<layer>-catalogue-spec-signals.json`** (catalogue → spec direction, SoT Chain ② pre-commit step):
    ```
-   bin/sotp track catalogue-spec-signals <id> [--layer <layer_id>]
+   bin/sotp signal calc-catalog-spec
    ```
-   Reads the LOCAL `<layer>-types.json` (not the origin blob) so uncommitted catalogue edits are reflected. Emits per-entry signals computed via the informal-priority rule plus the raw-bytes SHA-256 `catalogue_declaration_hash` used by the stale-detection gate.
+   Argless — auto-resolves the active track and all TDDD-enabled layers. Reads the LOCAL `<layer>-types.json` (not the origin blob) so uncommitted catalogue edits are reflected. Writes per-entry signals (informal-priority rule + raw-bytes SHA-256 `catalogue_declaration_hash`) to `<layer>-catalogue-spec-signals.json`. Prints per-layer aggregate counts to stdout in the form `[OK] catalogue-spec-signals: layer=<layer> blue=N yellow=N red=N (total=N)`.
 
-9. **Evaluate the type → spec signal** (rustdoc-based reverse direction, signal counts only):
+9. **Evaluate the impl ↔ catalogue signal** (rustdoc-based reverse direction, chain ③):
    ```
-   bin/sotp track type-signals <id> [--layer <layer_id>]
+   bin/sotp signal calc-impl-catalog
    ```
-   Capture per-layer blue / yellow / red counts. The signal counts (blue / yellow / red) are the primary output surfaced to the orchestrator for phase gate decisions.
+   Argless — auto-resolves the active track and all TDDD-enabled layers. Prints per-layer blue / yellow / red counts to stdout in the form `[type-signals] <layer>: 🔵 N Blue | 🟡 N Yellow | 🔴 N Red`. Capture these counts from stdout — they are the primary signal output surfaced to the orchestrator for phase gate decisions.
 
 10. **Render the contract-map view** (catalogue-driven, runs after the catalogue and signals are stable):
     ```
@@ -147,8 +149,8 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
     - Step 2 (`bin/sotp track baseline-graph`) — produces `<layer>-graph-d1/index.md` (depth=1) AND `<layer>-graph-d2/<cluster>.md` (depth=2) in a single command; Bash exit 0 required
     - Step 3 — no separate command; depth=2 is produced by step 2's `baseline-graph` invocation
     - Step 7 (Write/Edit tool call that wrote `<layer>-types.json`) — the catalogue file must have been written by this capability in this session; a pre-existing file from a prior session is NOT a valid receipt
-    - Step 8 (`bin/sotp track catalogue-spec-signals`) — produces `<layer>-catalogue-spec-signals.json`; Bash exit 0 required
-    - Step 9 (`bin/sotp track type-signals`) — produces `<layer>-type-signals.json`; Bash exit 0 required
+    - Step 8 (`bin/sotp signal calc-catalog-spec`) — produces `<layer>-catalogue-spec-signals.json`; Bash exit 0 required
+    - Step 9 (`bin/sotp signal calc-impl-catalog`) — produces `<layer>-type-signals.json`; Bash exit 0 required
     - Step 10 (`bin/sotp track contract-map`) — produces `contract-map.md`; Bash exit 0 required
     - Step 11 (`bin/sotp track views sync`) — produces `plan.md`, refreshed `contract-map.md`, and `<layer>-types.md`; Bash exit 0 required
 
@@ -172,7 +174,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
     **12b. Signal freshness (count-match for catalogue-spec-signals)** — even with all steps run, a step-9 partial failure (e.g. only some layers processed) can leave a stale `<layer>-catalogue-spec-signals.json` for the remaining layers. To detect this, run:
 
     ```
-    bin/sotp verify catalogue-spec-signals
+    bin/sotp signal check-catalog-spec
     ```
 
     **Precondition**: this command resolves the track from the current git branch. It must be run from the `track/<id>` branch that matches the `<id>` being processed. If the current branch is not `track/<id>`, the command will either SKIP (pass without verifying anything) or verify a different track — both of which are verification failures. A SKIP result must be treated as a failure and the branch must be confirmed before proceeding.
@@ -181,7 +183,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
     On non-zero exit (**at most one retry** — if the mismatch persists after the retry, escalate to `## Open Questions` instead of looping again):
 
-    - Re-run step 8 (`bin/sotp track catalogue-spec-signals <id> [--layer <layer_id>]`) to regenerate the signals file against the current catalogue
+    - Re-run step 8 (`bin/sotp signal calc-catalog-spec`) to regenerate the signals file against the current catalogue
     - Re-run step 11 (`bin/sotp track views sync`) so `<layer>-types.md` reflects the current catalogue too
     - Re-run step 12b to confirm the gate now passes
     - If the gate still exits non-zero after this single retry, do NOT retry again. Record the persistent mismatch as an `## Open Questions` item (include the exact error message and the catalogue / signals entry counts) and surface it to the orchestrator — a repeated mismatch indicates a deeper inconsistency that requires human review, not another automated loop.
@@ -205,7 +207,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
     A missing supertrait / derive impl, or a body-changed entry left as `reference`, fails the gate: self-reject, fix, re-run steps 8–11, and re-confirm. Build this enumeration by reading the written draft (and each entry's `action`) entry-by-entry, not from memory.
 
-Do NOT compose the final output message until 12a (all required steps confirmed exit 0 in this session and all 9 expected paths exist: 7 per-layer paths + `contract-map.md` + `plan.md`), 12b (signal freshness via `verify catalogue-spec-signals` exit 0), and 12c (every convention Review Checklist item confirmed satisfied) all pass. The orchestrator treats a final message without all 11 prior steps' outputs on disk and freshly regenerated as a pipeline failure — the next phase will fail the catalogue-spec gate or `cargo make ci` rather than masking the gap.
+Do NOT compose the final output message until 12a (all required steps confirmed exit 0 in this session and all 9 expected paths exist: 7 per-layer paths + `contract-map.md` + `plan.md`), 12b (signal freshness via `signal check-catalog-spec` exit 0), and 12c (every convention Review Checklist item confirmed satisfied) all pass. The orchestrator treats a final message without all 11 prior steps' outputs on disk and freshly regenerated as a pipeline failure — the next phase will fail the catalogue-spec gate or `cargo make ci` rather than masking the gap.
 
 ### Output (final message to orchestrator)
 
@@ -660,8 +662,8 @@ In addition to the per-layer baseline / graph capture inside the 12-step pipelin
 - `bin/sotp arch tree-full` — workspace tree including non-crate directories
 - `bin/sotp arch members` — workspace member list with layer assignments
 - `bin/sotp arch direct-checks` — direct architecture checks from `architecture-rules.json`
-- `bin/sotp track type-signals` — re-evaluate signals after catalogue edits
-- `bin/sotp track catalogue-spec-signals` — re-evaluate the catalogue → spec signal
+- `bin/sotp signal calc-impl-catalog` — re-evaluate signals after catalogue edits
+- `bin/sotp signal calc-catalog-spec` — re-evaluate the catalogue → spec signal
 
 ## Catalogue Pattern Cookbook (v5)
 
@@ -1102,16 +1104,15 @@ A `reference` entry does NOT need to enumerate all methods for Phase 2 signals �
 
 ## Scope Ownership
 
-- **Writes permitted**: `track/items/<id>/<layer>-types.json` (direct Write via Write/Edit tool, per enabled layer). Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), contract-map (`contract-map.md`), per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`), per-layer type → spec signal JSON (`<layer>-type-signals.json`), and per-layer catalogue view (`<layer>-types.md`) are generated by `bin/sotp` CLI commands or `bin/sotp track views sync` — do NOT write these directly via Write/Edit.
+- **Writes permitted**: `track/items/<id>/<layer>-types.json` (direct Write via Write/Edit tool, per enabled layer). Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), and contract-map (`contract-map.md`) are generated by `bin/sotp` CLI commands. Per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`) is generated by `bin/sotp signal calc-catalog-spec`. Per-layer type → spec signal JSON (`<layer>-type-signals.json`) is generated by `bin/sotp signal calc-impl-catalog`. Per-layer catalogue view (`<layer>-types.md`) is generated by `bin/sotp track views sync`. Do NOT write these files directly via Write/Edit.
 - **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code. `plan.md` must not be edited directly via Write/Edit — it is regenerated as a side effect of `bin/sotp track views sync` (Step 11), which is required by this pipeline.
-- **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp track baseline-capture`, `bin/sotp track baseline-graph`, `bin/sotp track contract-map`, `bin/sotp track catalogue-spec-signals`, `bin/sotp track type-signals`, `bin/sotp track views sync`, `bin/sotp verify catalogue-spec-signals`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
+- **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp track baseline-capture`, `bin/sotp track baseline-graph`, `bin/sotp track contract-map`, `bin/sotp signal calc-catalog-spec`, `bin/sotp signal calc-impl-catalog`, `bin/sotp track views sync`, `bin/sotp signal check-catalog-spec`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep type-designer output deterministic).
 - If architectural clarification is needed (decisions not in the ADR), note it in `## Open Questions` and advise the orchestrator to consult the `adr-editor` agent rather than improvising.
 
 ## Rules
 
-- Use `Read`, `Grep`, `Glob` for exploring catalogues / baselines / code; `Write` / `Edit` for `<layer>-types.json` only; `Bash` only for `bin/sotp` CLI (including `bin/sotp verify catalogue-spec-signals` for step 12b) and `bin/sotp track views sync` (which generates plan.md, contract-map, catalogue-spec-signals JSON, type-signals JSON, and `<layer>-types.md` as side effects)
+- Use `Read`, `Grep`, `Glob` for exploring catalogues / baselines / code; `Write` / `Edit` for `<layer>-types.json` only; `Bash` only for `bin/sotp` CLI (including `bin/sotp signal check-catalog-spec` for step 12b) and `bin/sotp track views sync` (which generates plan.md, contract-map, and `<layer>-types.md` as side effects — signal JSON files are produced by `signal calc-catalog-spec` and `signal calc-impl-catalog`, not by `views sync`)
 - Do not use `Bash(cat/grep/head/tail/sed/awk)` — dedicated tools only
 - Do not run `git` commands
 - Do not modify `spec.json`, `metadata.json`, `impl-plan.json`, `task-coverage.json` directly. Do not edit `plan.md` directly via Write/Edit — it is regenerated by the required `bin/sotp track views sync` (Step 11)
-

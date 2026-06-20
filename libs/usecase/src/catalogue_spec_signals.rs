@@ -106,7 +106,7 @@ pub enum RefreshCatalogueSpecSignalsError {
 
 /// Primary port for the "refresh catalogue-spec signals" use case.
 ///
-/// Executed by `sotp track catalogue-spec-signals` (T013) once per
+/// Executed by `sotp signal calc-catalog-spec` (T013) once per
 /// catalogue-spec-signal-enabled layer. Re-exported via `Interactor` so
 /// the CLI can depend on the trait rather than the concrete struct.
 pub trait RefreshCatalogueSpecSignals: Send + Sync {

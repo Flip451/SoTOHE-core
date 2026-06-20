@@ -17,7 +17,7 @@
 //!
 //! [`check_freshness`] computes `doc.evaluate_signals()` and compares it with
 //! the cached `doc.signals()`.  A mismatch means the spec document was edited
-//! after the last `sotp track signals` run (the signals field is stale).
+//! after the last `sotp signal calc-spec-adr` run (the signals field is stale).
 //!
 //! [`check_freshness`]: SpecAdrChain::check_freshness
 //!
@@ -72,7 +72,7 @@ impl<'a> SpecAdrInput<'a> {
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 #[error(
     "spec-adr signals are stale: cached={cached:?}, fresh={fresh:?} — \
-     run `sotp track signals` to update"
+     run `sotp signal calc-spec-adr --spec-json <path/to/spec.json>` to update"
 )]
 #[doc(hidden)]
 pub struct SpecAdrStaleError {

@@ -432,7 +432,7 @@ fn test_ci_verify_track_id_with_branch_read_error_returns_err() {
 
 // --- four verify subcommands: print_skip output and ExitCode::SUCCESS ---
 
-/// Returns the skip exit code for `verify spec-states` when the branch reader
+/// Returns the skip exit code for `signal check-spec-adr` when the branch reader
 /// returns a non-track branch name.
 #[test]
 fn test_spec_states_skips_on_non_track_branch_via_stub_reader() {

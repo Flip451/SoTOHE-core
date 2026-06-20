@@ -1,4 +1,4 @@
-//! Integration test for the `verify adr-signals` composition path.
+//! Integration test for the `signal check-adr-user` composition path.
 //!
 //! Test 1 from impl-plan T006: exercises the full
 //! `FsAdrFileAdapter` → `Arc<dyn AdrFilePort>` → `VerifyAdrSignalsInteractor`

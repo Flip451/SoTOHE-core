@@ -182,7 +182,7 @@ fn verify_one_layer(
 
     if !catalogue_present {
         // Skip layers whose catalogue file is absent — consistent with the
-        // `sotp track type-signals` lenient CI path.
+        // `sotp signal calc-impl-catalog` lenient CI path.
         return Ok(Vec::new());
     }
 

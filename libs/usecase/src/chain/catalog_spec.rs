@@ -91,25 +91,25 @@ pub enum CatalogSpecStaleError {
     /// from the hash of the current `<layer>-types.json` bytes.
     #[error(
         "catalog-spec signals are stale: stored catalogue_declaration_hash={stored}, \
-         current={current} — run `sotp track catalogue-spec-signals` to update"
+         current={current} — run `sotp signal calc-catalog-spec` to update"
     )]
     CatalogueHash { stored: ContentHash, current: ContentHash },
     /// A persisted signal has no corresponding current entry hash.
     #[error(
         "catalog-spec signals are stale: no current entry hash for signal `{entry_name}` — \
-         run `sotp track catalogue-spec-signals` to update"
+         run `sotp signal calc-catalog-spec` to update"
     )]
     MissingCurrentEntryHash { entry_name: String },
     /// A current catalogue entry has no persisted signal.
     #[error(
         "catalog-spec signals are stale: missing signal for current catalogue entry \
-         `{entry_name}` — run `sotp track catalogue-spec-signals` to update"
+         `{entry_name}` — run `sotp signal calc-catalog-spec` to update"
     )]
     MissingSignal { entry_name: String },
     /// A persisted signal's `entry_hash` differs from the current entry hash.
     #[error(
         "catalog-spec signals are stale: entry_hash mismatch for `{entry_name}`: \
-         stored={stored}, current={current} — run `sotp track catalogue-spec-signals` \
+         stored={stored}, current={current} — run `sotp signal calc-catalog-spec` \
          to update"
     )]
     EntryHash { entry_name: String, stored: ContentHash, current: ContentHash },
@@ -117,7 +117,7 @@ pub enum CatalogSpecStaleError {
     /// entry name.
     #[error(
         "catalog-spec signals are stale: duplicate signal for catalogue entry \
-         `{entry_name}` — run `sotp track catalogue-spec-signals` to update"
+         `{entry_name}` — run `sotp signal calc-catalog-spec` to update"
     )]
     DuplicateSignal { entry_name: String },
 }

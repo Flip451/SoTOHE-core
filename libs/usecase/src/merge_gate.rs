@@ -339,6 +339,24 @@ where
         }
     };
 
+    // 4a. Chain ① self-consistency freshness check: reject stale cached signals
+    //     before evaluating the signal gate. Symmetric to the infrastructure-side
+    //     check in `infrastructure::verify::spec_states::spec_signal_freshness`
+    //     (IN-09). A branch with outdated cached `signals` in spec.json would
+    //     otherwise pass the merge gate based on the stale count.
+    //
+    //     `signals() == None` means the spec has never been evaluated — treat as
+    //     fresh (the downstream `check_spec_doc_signals` will block it anyway).
+    if let Some(stored) = spec_doc.signals() {
+        let computed = spec_doc.evaluate_signals();
+        if computed != *stored {
+            return with_chain0(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "spec.json signals are stale (stored={stored:?}, computed={computed:?}) — \
+                 re-run `bin/sotp signal calc-spec-adr` to refresh before merging"
+            ))]));
+        }
+    }
+
     let spec_adr_strict =
         gate_matrix.resolve(ChainId::SpecAdr, GateKind::Merge) == Strictness::Strict;
     let stage1 = check_spec_doc_signals(&spec_doc, spec_adr_strict);
@@ -575,12 +593,53 @@ where
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::cell::RefCell;
+    use std::path::PathBuf;
 
-    use domain::spec::SpecScope;
+    use domain::plan_ref::{
+        AdrAnchor, AdrRef, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
+        SpecElementId,
+    };
+    use domain::spec::{SpecRequirement, SpecScope};
     use domain::verify::Severity;
     use domain::{ChainGateEntry, ConfidenceSignal, SignalCounts};
 
     use super::*;
+
+    /// Build a `SpecRequirement` with a single ADR ref (Blue signal).
+    fn blue_req(id: &str, text: &str) -> SpecRequirement {
+        SpecRequirement::new(
+            SpecElementId::try_new(id).unwrap(),
+            text,
+            vec![AdrRef::new(
+                PathBuf::from("knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md"),
+                AdrAnchor::try_new("D1").unwrap(),
+            )],
+            vec![],
+            vec![],
+        )
+        .unwrap()
+    }
+
+    /// Build a `SpecRequirement` with an informal ground (Yellow signal).
+    fn yellow_req(id: &str, text: &str) -> SpecRequirement {
+        SpecRequirement::new(
+            SpecElementId::try_new(id).unwrap(),
+            text,
+            vec![],
+            vec![],
+            vec![InformalGroundRef::new(
+                InformalGroundKind::UserDirective,
+                InformalGroundSummary::try_new("historical convention").unwrap(),
+            )],
+        )
+        .unwrap()
+    }
+
+    /// Build a `SpecRequirement` with no provenance references (Red signal).
+    fn red_req(id: &str, text: &str) -> SpecRequirement {
+        SpecRequirement::new(SpecElementId::try_new(id).unwrap(), text, vec![], vec![], vec![])
+            .unwrap()
+    }
 
     /// Returns an all-strict `SignalGateMatrix` for use in tests that do not
     /// specifically test per-chain strictness resolution.  Mirrors the
@@ -877,7 +936,23 @@ mod tests {
     }
 
     fn all_blue_spec() -> SpecDocument {
-        spec_doc_with_signals(Some(SignalCounts::new(5, 0, 0)))
+        // One Blue in-scope requirement (ADR-backed) with a matching stored
+        // count of (1, 0, 0). evaluate_signals() computes (1, 0, 0) as well,
+        // so the freshness check in check_strict_merge_gate passes.
+        let mut doc = SpecDocument::new(
+            "Feature",
+            "1.0",
+            vec![],
+            SpecScope::new(vec![blue_req("IS-01", "minimal blue requirement")], Vec::new()),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            None,
+        )
+        .unwrap();
+        doc.set_signals(SignalCounts::new(1, 0, 0));
+        doc
     }
 
     fn dt_all_blue() -> TypeSignalsDocument {
@@ -1003,11 +1078,67 @@ mod tests {
         );
     }
 
+    /// Build a `SpecDocument` with 3 Blue + 2 Yellow requirements and a matching
+    /// stored count of (3, 2, 0). `evaluate_signals()` computes (3, 2, 0) as well,
+    /// so the freshness check passes and Stage 1 evaluates the Yellow signal properly.
+    fn spec_with_yellow_signals() -> SpecDocument {
+        let mut doc = SpecDocument::new(
+            "Feature",
+            "1.0",
+            vec![],
+            SpecScope::new(
+                vec![
+                    blue_req("IS-01", "blue req 1"),
+                    blue_req("IS-02", "blue req 2"),
+                    blue_req("IS-03", "blue req 3"),
+                    yellow_req("IS-04", "yellow req 1"),
+                    yellow_req("IS-05", "yellow req 2"),
+                ],
+                Vec::new(),
+            ),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            None,
+        )
+        .unwrap();
+        doc.set_signals(SignalCounts::new(3, 2, 0));
+        doc
+    }
+
+    /// Build a `SpecDocument` with 2 Blue + 1 Red requirement and a matching
+    /// stored count of (2, 0, 1). `evaluate_signals()` computes (2, 0, 1) as well,
+    /// so the freshness check passes and Stage 1 evaluates the Red signal properly.
+    fn spec_with_red_signals() -> SpecDocument {
+        let mut doc = SpecDocument::new(
+            "Feature",
+            "1.0",
+            vec![],
+            SpecScope::new(
+                vec![
+                    blue_req("IS-01", "blue req 1"),
+                    blue_req("IS-02", "blue req 2"),
+                    red_req("IS-03", "red req (no provenance)"),
+                ],
+                Vec::new(),
+            ),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            None,
+        )
+        .unwrap();
+        doc.set_signals(SignalCounts::new(2, 0, 1));
+        doc
+    }
+
     #[test]
     fn test_u9_spec_yellow_blocks_in_strict() {
         // U9: spec=Yellow (Stage 1 strict) → BLOCKED
         let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::Found(
-            spec_doc_with_signals(Some(SignalCounts::new(3, 2, 0))),
+            spec_with_yellow_signals(),
         ));
         let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
@@ -1017,7 +1148,7 @@ mod tests {
     #[test]
     fn test_chain1_spec_yellow_warns_when_spec_adr_merge_gate_is_interim() {
         let reader = MockTrackBlobReader::new(
-            BlobFetchResult::Found(spec_doc_with_signals(Some(SignalCounts::new(3, 2, 0)))),
+            BlobFetchResult::Found(spec_with_yellow_signals()),
             BlobFetchResult::NotFound,
         );
         let outcome = check_strict_merge_gate("track/foo", &reader, &spec_adr_interim_matrix());
@@ -1038,7 +1169,7 @@ mod tests {
     fn test_u10_spec_red_blocks() {
         // U10: spec=Red → BLOCKED
         let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::Found(
-            spec_doc_with_signals(Some(SignalCounts::new(2, 0, 1))),
+            spec_with_red_signals(),
         ));
         let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(outcome.has_errors());
@@ -2392,6 +2523,107 @@ mod tests {
                 .iter()
                 .any(|f| f.message().contains("catalogue-spec signals are stale for")),
             "error must mention stale per-entry hash: {outcome:?}"
+        );
+    }
+
+    // ===============================================================
+    // U45 — Chain ① freshness check (stale cached signals in spec.json).
+    //
+    // Constructs a `SpecDocument` whose cached `signals` field does not match
+    // the value that `evaluate_signals()` would produce from the document's
+    // requirements. The merge-gate must short-circuit with an error *before*
+    // the strictness evaluation in `check_spec_doc_signals`, making it
+    // impossible for a PR with stale signals to pass regardless of what the
+    // cached count says.
+    //
+    // Symmetric to the infrastructure-side check in
+    // `infrastructure::verify::spec_states::spec_signal_freshness`.
+    // ===============================================================
+
+    /// Build a `SpecDocument` whose cached `signals` field is deliberately
+    /// inconsistent with its requirements, exercising the stale-signal path.
+    ///
+    /// The requirements produce 1 Blue (one ADR-backed in-scope element),
+    /// but the stored `signals` block claims 5 Blue — a mismatch that the
+    /// freshness check must catch.
+    fn spec_doc_with_stale_signals() -> SpecDocument {
+        use domain::spec::SpecScope;
+        let mut doc = SpecDocument::new(
+            "Feature",
+            "1.0",
+            vec![],
+            SpecScope::new(Vec::new(), Vec::new()),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            None,
+        )
+        .unwrap();
+        // Stored count: 5 Blue, 0 Yellow, 0 Red.
+        // Actual count from requirements: 0 Blue, 0 Yellow, 0 Red (no requirements).
+        // => mismatch triggers the freshness error.
+        doc.set_signals(SignalCounts::new(5, 0, 0));
+        doc
+    }
+
+    #[test]
+    fn test_u45_chain1_stale_cached_signals_block_before_strictness_evaluation() {
+        // U45: spec.json with stale cached signals (stored ≠ computed) must
+        // be rejected *before* `check_spec_doc_signals` evaluates strictness.
+        //
+        // If the freshness check were absent, `check_spec_doc_signals` would
+        // receive the stale Blue count and pass the gate — a security bypass.
+        // This test is falsifiable: removing the freshness block in
+        // `check_strict_merge_gate` would cause `check_spec_doc_signals` to
+        // evaluate the stale Blue count and return a passing outcome, making
+        // the assertion `outcome.has_errors()` fail.
+        let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::Found(
+            spec_doc_with_stale_signals(),
+        ));
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
+        assert!(
+            outcome.has_errors(),
+            "stale cached signals must block the merge gate: {outcome:?}"
+        );
+        // The error must name both the cause and the fix.
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("signals are stale")),
+            "error must mention 'signals are stale': {outcome:?}"
+        );
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("calc-spec-adr")),
+            "error must mention 'calc-spec-adr': {outcome:?}"
+        );
+        // Confirm the error fires before Stage 2 (unreachable_dt would panic
+        // if `read_type_signals` / `read_type_catalogue` were called).
+    }
+
+    #[test]
+    fn test_u46_chain1_none_signals_treated_as_fresh_passes_downstream() {
+        // U46: spec.json with signals=None (never evaluated) must NOT trigger
+        // the freshness error — None is "not yet evaluated" and the downstream
+        // `check_spec_doc_signals` will reject it with its own "no signals"
+        // finding. The freshness check treats None as fresh (consistent with
+        // `infrastructure::verify::spec_states::spec_signal_freshness`).
+        //
+        // Here the spec has no requirements (so evaluate_signals → all zero)
+        // and no stored signals (None). The freshness check passes through, but
+        // `check_spec_doc_signals` blocks because all-zero counts are treated
+        // as unevaluated — confirming Stage 2 was NOT reached (unreachable_dt).
+        let reader = MockTrackBlobReader::with_unreachable_dt(BlobFetchResult::Found(
+            spec_doc_with_signals(None),
+        ));
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
+        assert!(
+            outcome.has_errors(),
+            "spec with no signals must block (unevaluated downstream): {outcome:?}"
+        );
+        // The error must come from check_spec_doc_signals, not the freshness
+        // check (no "signals are stale" message expected).
+        assert!(
+            outcome.findings().iter().all(|f| !f.message().contains("signals are stale")),
+            "freshness error must not fire for signals=None: {outcome:?}"
         );
     }
 

@@ -1,4 +1,4 @@
-//! Catalogue-spec signal gate check (verify catalogue-spec-signals subcommand).
+//! Catalogue-spec signal gate check (signal check-catalog-spec subcommand).
 //!
 //! All domain type handling is internal to this module. The CLI layer calls
 //! `execute_catalogue_spec_signals` passing resolved `PathBuf` arguments and
@@ -547,7 +547,7 @@ fn read_and_decode_catalogue(
     Ok((catalogue_entries, catalogue_text))
 }
 
-/// Execute `verify catalogue-spec-signals` after git-based branch resolution.
+/// Execute `signal check-catalog-spec` after git-based branch resolution.
 ///
 /// Resolves the active track via the shared `ActiveTrackResolveInteractor`
 /// (IN-08 / IN-09: consolidates individual auto-detect implementations onto the

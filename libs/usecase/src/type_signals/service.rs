@@ -1,5 +1,5 @@
 //! `TypeSignalsService` — application service trait and request/error types for
-//! the `sotp track type-signals` use case.
+//! the `sotp signal calc-impl-catalog` use case.
 
 use std::path::PathBuf;
 
@@ -84,7 +84,7 @@ pub enum TypeSignalsError {
     },
 }
 
-/// Application service trait for the `sotp track type-signals` use case.
+/// Application service trait for the `sotp signal calc-impl-catalog` use case.
 ///
 /// The interactor [`crate::type_signals::TypeSignalsInteractor`] implements this
 /// trait by orchestrating:

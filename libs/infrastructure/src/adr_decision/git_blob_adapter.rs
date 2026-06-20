@@ -11,7 +11,7 @@
 //!
 //! | Adapter | Source | Use case |
 //! |---------|--------|----------|
-//! | [`super::FsAdrFileAdapter`] | Local filesystem | `sotp verify adr-signals`, `sotp signal check-adr-user` |
+//! | [`super::FsAdrFileAdapter`] | Local filesystem | `sotp signal check-adr-user`, `sotp signal check-adr-user` |
 //! | [`GitBlobAdrFileAdapter`] | `origin/<branch>:knowledge/adr/` | Merge-gate chain ⓪ (`read_adr_verify_report`) |
 //!
 //! ## Symlink policy

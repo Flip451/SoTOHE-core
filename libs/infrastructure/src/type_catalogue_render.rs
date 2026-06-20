@@ -55,11 +55,11 @@ use entry_details::{v3_function_entry_details, v3_trait_entry_details, v3_type_e
 /// expected to carry a fresh signals file whenever a view is rendered. Any
 /// missing / symlinked / malformed / stale state is a system-level error
 /// the caller should surface fail-closed, typically with the remediation
-/// `sotp track catalogue-spec-signals <track_id>` to regenerate the file.
+/// `sotp signal calc-catalog-spec <track_id>` to regenerate the file.
 #[derive(Debug, Error)]
 pub enum LoadCatalogueSpecSignalsForViewError {
     /// The signals file is absent at the expected path.
-    #[error("catalogue-spec-signals file not found at '{}'. Run `sotp track catalogue-spec-signals <track_id>` to generate it.", path.display())]
+    #[error("catalogue-spec-signals file not found at '{}'. Run `sotp signal calc-catalog-spec <track_id>` to generate it.", path.display())]
     NotFound { path: PathBuf },
 
     /// The signals path exists but is not a regular file (symlink /
@@ -85,7 +85,7 @@ pub enum LoadCatalogueSpecSignalsForViewError {
     },
 
     /// The signals file is stale relative to the on-disk catalogue bytes.
-    #[error("catalogue-spec-signals at '{}' is stale (declared={declared}, actual={actual}). Run `sotp track catalogue-spec-signals <track_id>` to regenerate.", path.display())]
+    #[error("catalogue-spec-signals at '{}' is stale (declared={declared}, actual={actual}). Run `sotp signal calc-catalog-spec <track_id>` to regenerate.", path.display())]
     StaleHash { path: PathBuf, declared: String, actual: String },
 }
 
@@ -93,7 +93,7 @@ pub enum LoadCatalogueSpecSignalsForViewError {
 ///
 /// **Fail-closed**: any missing / symlinked / malformed / stale state is
 /// reported as an error — the caller surfaces it and blocks view rendering.
-/// The remediation is to re-run `sotp track catalogue-spec-signals
+/// The remediation is to re-run `sotp signal calc-catalog-spec
 /// <track_id>` before the next view regeneration. Opt-out layers never
 /// reach this function (callers gate on `catalogue_spec_signal_enabled()`).
 ///

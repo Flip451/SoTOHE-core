@@ -36,7 +36,7 @@ pub enum CatalogueSpecSignalsCodecError {
     /// incompatible change must bump this version through an ADR amendment.
     #[error(
         "unsupported schema_version: expected 1, got {0}. \
-         Re-run `sotp track catalogue-spec-signals` with the current sotp build to \
+         Re-run `sotp signal calc-catalog-spec` with the current sotp build to \
          regenerate the signals file (ADR 2026-04-23-0344 §D2.2 pins schema_version=1)."
     )]
     UnsupportedSchemaVersion(u32),

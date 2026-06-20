@@ -1,4 +1,4 @@
-//! Verify ADR decision signal grounds (`verify adr-signals` subcommand).
+//! Verify ADR decision signal grounds (`signal check-adr-user` subcommand).
 //!
 //! All domain type handling is internal to this module. The CLI layer calls
 //! `execute_verify_adr_signals` and receives a `VerifyOutcome` — no `domain::`
@@ -16,7 +16,7 @@ use usecase::verify_adr_signals::{
 use crate::adr_decision::FsAdrFileAdapter;
 use crate::track::symlink_guard::reject_symlinks_below;
 
-/// Execute the `verify adr-signals` subcommand (non-strict: Yellow → warning).
+/// Execute the `signal check-adr-user` subcommand (non-strict: Yellow → warning).
 ///
 /// Composes [`FsAdrFileAdapter`] with [`VerifyAdrSignalsInteractor`] at the
 /// composition root, runs the verification, and translates the resulting
@@ -38,7 +38,7 @@ pub fn execute_verify_adr_signals(project_root: &Path) -> VerifyOutcome {
 ///
 /// When `strict = true`, Yellow signals promote to error (same as Red).
 /// When `strict = false`, Yellow signals remain warnings (same as the
-/// legacy `verify adr-signals` behavior).
+/// legacy `signal check-adr-user` behavior).
 ///
 /// Used by the `signal check-adr-user --gate commit|merge` command family
 /// to wire chain ⓪ at the composition root while

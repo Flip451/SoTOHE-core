@@ -208,7 +208,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
     if let Some(cached) = doc.signals() {
         if *cached != evaluated {
             findings.push(VerifyFinding::error(format!(
-                "{}: cached signals (blue={} yellow={} red={}) differ from evaluated (blue={} yellow={} red={}). Run `sotp track signals` to update.",
+                "{}: cached signals (blue={} yellow={} red={}) differ from evaluated (blue={} yellow={} red={}). Run `sotp signal calc-spec-adr` to update.",
                 spec_json_path.display(),
                 cached.blue(), cached.yellow(), cached.red(),
                 evaluated.blue(), evaluated.yellow(), evaluated.red()

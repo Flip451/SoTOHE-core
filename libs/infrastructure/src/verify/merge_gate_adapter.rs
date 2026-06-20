@@ -363,7 +363,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
 
     /// Reads `<layer>-catalogue-spec-signals.json` and decodes it via the
     /// T010 codec. Returns `NotFound` when the signals file has not been
-    /// generated yet (no `sotp track catalogue-spec-signals` run on this
+    /// generated yet (no `sotp signal calc-catalog-spec` run on this
     /// branch), `FetchError` on I/O / decode failure.
     fn read_catalogue_spec_signals_document(
         &self,
