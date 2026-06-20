@@ -47,81 +47,35 @@
         }
       ]
     },
-    "cli_composition": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
-          "at": "2026-06-19T16:52:06Z"
+          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
+          "at": "2026-06-19T15:54:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
-          "at": "2026-06-19T16:53:35Z"
+          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
+          "at": "2026-06-19T15:57:29Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9e497afc3259746e8db92109d36b0ba87ade3372aaa177ba1ff2e57df7617868",
-          "at": "2026-06-19T23:31:25Z"
+          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
+          "at": "2026-06-19T16:20:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9e497afc3259746e8db92109d36b0ba87ade3372aaa177ba1ff2e57df7617868",
-          "at": "2026-06-19T23:32:20Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68fd7166a69ab901fc55026c84431a34c1010fa66801ac0ce7e1193666c9ec89",
-          "at": "2026-06-19T17:04:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68fd7166a69ab901fc55026c84431a34c1010fa66801ac0ce7e1193666c9ec89",
-          "at": "2026-06-19T17:04:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:75ba5e29c778ec5842fd6297a4bcbddd56430285a442cde9a11cb5833501ee6e",
-          "at": "2026-06-19T17:15:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:75ba5e29c778ec5842fd6297a4bcbddd56430285a442cde9a11cb5833501ee6e",
-          "at": "2026-06-19T17:17:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fed22981601883d5cdb630a52e29c7f165bf34c2f786058043f8425ac68b7a75",
-          "at": "2026-06-19T17:29:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fed22981601883d5cdb630a52e29c7f165bf34c2f786058043f8425ac68b7a75",
-          "at": "2026-06-19T17:30:39Z"
+          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
+          "at": "2026-06-19T16:22:04Z"
         }
       ]
     },
@@ -693,38 +647,142 @@
           "findings": [],
           "hash": "rvw1:sha256:5b8da47fb9b6585365d1a9d9582b6cf8c9fa2df6687c1f08a4bca9e1eb262092",
           "at": "2026-06-20T02:31:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bf82dc2452885ca95c7cdde41e453820b52ebd13f45c37705349475aac25938",
+          "at": "2026-06-20T02:37:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T013 observations assert that `bin/sotp dry check-approved` is APPROVED for all commits, but the same file later says the deferred D4 test-helper copies remain and that the whole-codebase DRY gate has no accept-list or layer-aware context and therefore judges those retained copies as violations. Those two claims cannot both be true, so the plan artifact does not provide a coherent AC-07/T013 verification record: either the gate is not actually green with the deferred copies, or the deferral/gate limitation narrative is wrong.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/observations.md",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3bf82dc2452885ca95c7cdde41e453820b52ebd13f45c37705349475aac25938",
+          "at": "2026-06-20T02:39:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fab864388e4ef5dbcae8a0dd8e27c01c7f17184e32e197b88e60f62b7cdc97b",
+          "at": "2026-06-20T02:42:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`observations.md` records T013 as already completed: it says the post-remediation verification confirmed the in-scope clusters are resolved and that `check-approved` passed for all commits. However `impl-plan.json` still has T013 at `status: \"in_progress\"` and `plan.md` renders it as `[~]` with only 12/13 resolved. These artifacts now disagree on whether the AC-07 completion task is finished, so the plan state is not semantically coherent.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/observations.md",
+              "line": 5,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4fab864388e4ef5dbcae8a0dd8e27c01c7f17184e32e197b88e60f62b7cdc97b",
+          "at": "2026-06-20T02:43:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:251a498da2d8258c802b225471b2bf90782a8bba92972cdce586727552e24a4b",
+          "at": "2026-06-20T02:45:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:251a498da2d8258c802b225471b2bf90782a8bba92972cdce586727552e24a4b",
+          "at": "2026-06-20T02:48:08Z"
         }
       ]
     },
-    "usecase": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
-          "at": "2026-06-19T15:54:25Z"
+          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
+          "at": "2026-06-19T16:52:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
-          "at": "2026-06-19T15:57:29Z"
+          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
+          "at": "2026-06-19T16:53:35Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
-          "at": "2026-06-19T16:20:13Z"
+          "hash": "rvw1:sha256:9e497afc3259746e8db92109d36b0ba87ade3372aaa177ba1ff2e57df7617868",
+          "at": "2026-06-19T23:31:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
-          "at": "2026-06-19T16:22:04Z"
+          "hash": "rvw1:sha256:9e497afc3259746e8db92109d36b0ba87ade3372aaa177ba1ff2e57df7617868",
+          "at": "2026-06-19T23:32:20Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68fd7166a69ab901fc55026c84431a34c1010fa66801ac0ce7e1193666c9ec89",
+          "at": "2026-06-19T17:04:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68fd7166a69ab901fc55026c84431a34c1010fa66801ac0ce7e1193666c9ec89",
+          "at": "2026-06-19T17:04:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75ba5e29c778ec5842fd6297a4bcbddd56430285a442cde9a11cb5833501ee6e",
+          "at": "2026-06-19T17:15:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75ba5e29c778ec5842fd6297a4bcbddd56430285a442cde9a11cb5833501ee6e",
+          "at": "2026-06-19T17:17:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fed22981601883d5cdb630a52e29c7f165bf34c2f786058043f8425ac68b7a75",
+          "at": "2026-06-19T17:29:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fed22981601883d5cdb630a52e29c7f165bf34c2f786058043f8425ac68b7a75",
+          "at": "2026-06-19T17:30:39Z"
         }
       ]
     }

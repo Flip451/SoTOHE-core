@@ -67,12 +67,13 @@
     {
       "id": "T012",
       "description": "[D4-const-runtime-dir] Consolidate ALL redundant within-layer-reachability-boundary occurrences of the \"tmp/reviewer-runtime\" path literal — both const definitions AND same-layer inline literals — into a single const per boundary, and update those occurrences to reference it. Known occurrence sites span multiple layers (e.g.): infrastructure layer — libs/infrastructure/src/review_v2/codex_reviewer.rs (REVIEW_RUNTIME_DIR), libs/infrastructure/src/review_v2/review_fix_runner/spawn.rs (REVIEW_RUNTIME_DIR), libs/infrastructure/src/dry_check/codex_dry_checker.rs (DRY_CHECK_RUNTIME_DIR), libs/infrastructure/src/review_v2/review_fix_runner/mod.rs, libs/infrastructure/src/ref_verify/process_runner.rs; usecase/cli-composition/cli layers — libs/usecase/src/review_v2/run_review_fix.rs, apps/cli-composition/src/dry_fix_runner.rs, apps/cli-composition/src/review_v2/run_fix.rs, apps/cli-composition/src/dry.rs, apps/cli/src/commands/review/mod.rs. The implementer determines exact const placement and per-boundary grouping that respects architecture-rules.json layer dependencies and keeps cargo make ci (including check-layers) green — this literal spans infrastructure / usecase / cli-composition / cli, so placement is architecturally nontrivial and is an implementation-time decision. Same-literal occurrences across a layer boundary that architecture-rules.json forbids merging are coincidental constants and are retained as-is — not a DRY violation, per AC-05. Do NOT introduce a cli -> infrastructure production dependency. References AC-05/IN-04.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "a71b8875700a09c40af2857001712c09575c1835"
     },
     {
       "id": "T013",
       "description": "[post-remediation] Re-run the DRY violation census (sotp dry or equivalent) after all active cluster tasks are committed, confirm that the IN-SCOPE violation groups (D1, D2, D3, and D4-constants) are no longer present in the census output, and record the updated density metrics. The D4 test-helper sub-cluster is deferred (OS-06 / ADR D4 note, tasks T008-T010 skipped), so the per-boundary/cross-crate test-helper duplicate pairs (e.g. CwdGuard, init_git_repo, stub bindings) are EXPECTED to remain and are NOT counted as unresolved violations for this track (AC-07).",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {
