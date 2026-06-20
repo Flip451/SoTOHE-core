@@ -12386,6 +12386,76 @@
       "rationale": "These fragments are structurally similar because they are both thin adapters over the same `check_signals_file` workflow, but the repeated shape is intentional and minimal. The differing parser, hash accessor, stale-message text, and per-domain validation closure are all domain-specific, so there is no meaningful duplicated business logic that would warrant a DRY finding.",
       "recorded_at": "2026-06-20T03:48:39Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+      "low_hash": "8ec54e31016bd270288c687680168b6ec4c83129a25959b17010c64d1ceeeeda",
+      "high_path": "libs/usecase/src/merge_gate.rs",
+      "high_hash": "c30b51723d0f999ed99abdb239496c1c652d219aabe3d9d610276093f88066f2",
+      "changed_path": "libs/usecase/src/merge_gate.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8623958826065063,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1bc3133bfa58cf746bbdf26bd548a1a39988839d",
+      "rationale": "These fragments are not duplicating the same implementation. The changed fragment is a default trait stub that intentionally returns `NotFound` to let opt-out mocks skip the new port, while the infrastructure fragment is the concrete adapter implementation that performs resolution, fetch, decode, and hash computation. They serve different layers and responsibilities, so this is not a DRY violation.",
+      "recorded_at": "2026-06-20T04:07:51Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/catalogue_spec_refs.rs",
+      "low_hash": "3e74e5784c477fab01bbce3f94c2f56621816f6b2c766d685127d998949d1809",
+      "high_path": "libs/usecase/src/merge_gate.rs",
+      "high_hash": "c30b51723d0f999ed99abdb239496c1c652d219aabe3d9d610276093f88066f2",
+      "changed_path": "libs/usecase/src/merge_gate.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8722600340843201,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1bc3133bfa58cf746bbdf26bd548a1a39988839d",
+      "rationale": "These fragments share the same method shape, but not the same behavior. The `merge_gate.rs` version is an intentional default fallback that returns `NotFound`, while `catalogue_spec_refs.rs` is a real implementation that delegates to `take_catalogue(...)`. This is interface reuse, not redundant logic duplication.",
+      "recorded_at": "2026-06-20T04:07:51Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/merge_gate.rs",
+      "low_hash": "3a606bce8dddab0258991653ea3b14420fd48ebd429aa6496d56f38427c0f341",
+      "high_path": "libs/usecase/src/merge_gate.rs",
+      "high_hash": "3d9a552f665e38044fa3c3d5a0679033ed778e48505b619438d15aaa873d37a1",
+      "changed_path": "libs/usecase/src/merge_gate.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8862462639808655,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1bc3133bfa58cf746bbdf26bd548a1a39988839d",
+      "rationale": "The changed fragment does not introduce a second independent implementation of the same logic relative to the existing code. It keeps the merge-gate orchestration in one place and delegates the per-layer catalogue-spec work to `chain2_gate::check_chain2_for_layer`, so the repeated `BlobFetchResult` handling is just normal control flow, not duplicated functionality across the two fragments.",
+      "recorded_at": "2026-06-20T04:07:51Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/merge_gate.rs",
+      "low_hash": "c30b51723d0f999ed99abdb239496c1c652d219aabe3d9d610276093f88066f2",
+      "high_path": "libs/usecase/src/merge_gate.rs",
+      "high_hash": "c667dafa9bd02f0d3ef257102916c11564163b0ffa34cacf49a4e2898eb560cc",
+      "changed_path": "libs/usecase/src/merge_gate.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8766812086105347,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1bc3133bfa58cf746bbdf26bd548a1a39988839d",
+      "rationale": "These fragments are not redundant copies of the same logic. The changed fragment is a default trait-method stub that intentionally returns `BlobFetchResult::NotFound` to let opt-in mocks and adapters short-circuit safely, while the candidate fragment is a concrete implementation returning `self.catalogue.clone()`. They share a method name and signature, but they serve different layers and behaviors, so this is not a DRY violation.",
+      "recorded_at": "2026-06-20T04:07:51Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/usecase/src/merge_gate.rs",
+      "low_hash": "c30b51723d0f999ed99abdb239496c1c652d219aabe3d9d610276093f88066f2",
+      "high_path": "libs/usecase/src/merge_gate.rs",
+      "high_hash": "fb9de02d16d88532c5b60ea441566761ca9498b423a073a722231e112e1f1e2a",
+      "changed_path": "libs/usecase/src/merge_gate.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8593494296073914,
+      "threshold": 0.8500000238418579,
+      "base_commit": "1bc3133bfa58cf746bbdf26bd548a1a39988839d",
+      "rationale": "These fragments are not redundant implementations of the same behavior. The changed code provides the production default for `read_catalogue_for_spec_ref_check`, intentionally returning `NotFound` so opt-in mocks can skip the path. The existing code is a test-only override that returns a real catalogue fixture. They share a signature, but they serve different roles and do not duplicate the same logic in a way that violates DRY.",
+      "recorded_at": "2026-06-20T04:07:51Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }

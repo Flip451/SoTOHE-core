@@ -57,7 +57,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
                 return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "opted-in layer '{layer_id}' is missing \
                  <layer>-catalogue-spec-signals.json on origin/{branch}. Run \
-                 `sotp track catalogue-spec-signals` and commit the generated file \
+                 `sotp signal calc-catalog-spec` and commit the generated file \
                  so the merge gate can evaluate Chain ②."
                 ))]);
             }

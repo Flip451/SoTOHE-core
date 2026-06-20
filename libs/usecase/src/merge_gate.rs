@@ -141,7 +141,7 @@ pub trait TrackBlobReader {
     /// the given layer on the target branch.
     ///
     /// Returns `NotFound` when the signals file has not been generated yet
-    /// (expected for tracks before `sotp track catalogue-spec-signals` runs
+    /// (expected for tracks before `sotp signal calc-catalog-spec` runs
     /// or for layers whose `catalogue_spec_signal.enabled` flag is false).
     /// Callers (verify / merge-gate) decide whether `NotFound` short-circuits
     /// to a finding or to `pass`.
@@ -194,7 +194,7 @@ pub trait TrackBlobReader {
     /// Returns:
     /// - `Found(doc)` when the signals file exists and decodes successfully.
     /// - `NotFound` when the signals file has not been generated yet (the layer
-    ///   has TDDD enabled but `sotp track type-signals` has not run yet, or the
+    ///   has TDDD enabled but `sotp signal calc-impl-catalog` has not run yet, or the
     ///   file was deleted).
     /// - `FetchError(msg)` on I/O, UTF-8, or JSON decode failure.
     ///
@@ -435,7 +435,7 @@ where
             BlobFetchResult::NotFound => {
                 outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "type-signals file for layer '{layer_id}' not found on origin/{branch} — \
-                     run `sotp track type-signals` and commit the generated file"
+                     run `sotp signal calc-impl-catalog` and commit the generated file"
                 ))]));
                 continue;
             }
@@ -451,7 +451,7 @@ where
         if signals_doc.declaration_hash() != declaration_hash_from_catalogue {
             outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "layer '{layer_id}': type-signals declaration_hash mismatch \
-                 (recorded={}, current={}) — re-run `sotp track type-signals` \
+                 (recorded={}, current={}) — re-run `sotp signal calc-impl-catalog` \
                  and commit the refreshed evaluation result",
                 signals_doc.declaration_hash(),
                 declaration_hash_from_catalogue
@@ -2134,7 +2134,7 @@ mod tests {
     fn test_u40_stage2_catalogue_found_signals_not_found_blocks_fail_closed() {
         // U40: catalogue=Found, signals=NotFound → BLOCKED (fail-closed).
         // When the catalogue is present the layer is enrolled; a missing
-        // signals file means `sotp track type-signals` has not been run, so
+        // signals file means `sotp signal calc-impl-catalog` has not been run, so
         // the gate cannot verify the type-signal state.
         struct Stage2SignalsNotFoundMock;
         impl SpecElementHashReader for Stage2SignalsNotFoundMock {
