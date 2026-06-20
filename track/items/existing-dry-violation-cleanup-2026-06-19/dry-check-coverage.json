@@ -1,35 +1,43 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "b870875d281ba158c0a8da07c2b32232727333f95ea10de8c839c21128e7f992",
+  "corpus_fingerprint": "511db5c553a40523327eb812df368c679ad170f73d6d978d09ce86885b5c5a26",
   "fragment_refs": [
     {
-      "path": "apps/cli/src/commands/mod.rs",
-      "content_hash": "c22d577237691f2f04566735585d738dde441696ab71f89bc9f540911fa79f55"
-    },
-    {
-      "path": "apps/cli/src/commands/plan/codex_local.rs",
-      "content_hash": "6173983794876726631739e913363cc14dde492ef2fda3a2562148420efd211f"
-    },
-    {
-      "path": "apps/cli/src/commands/review/codex_local.rs",
-      "content_hash": "5830623223a54be8978d5421c5ac97bdc5be6b59461526337c37d2e75e49d71c"
+      "path": "libs/infrastructure/src/codex_common.rs",
+      "content_hash": "8069c57025f8eb6ce243de28a86aab77bd29ee59e24b7cca686775e79be216b6"
     },
     {
       "path": "libs/infrastructure/src/codex_common.rs",
-      "content_hash": "ead359c51780e1a15208b86df470f234a55cbfd253d7e866fee31904b610ac3e"
+      "content_hash": "fd4e6a279573a06fdd58e7461d0b454958d7994eda84b76eeeaface4388418af"
     },
     {
       "path": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
-      "content_hash": "5b40c3af4ca417c156ee3ce0a54a7b82b0238663698aaa29129bd8917da0af2a"
+      "content_hash": "6572ba0ac604ac7b65412cbbf7b786652d05af02a91bada62f843d673bb871d3"
     },
     {
-      "path": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
-      "content_hash": "41a3efb30a30dc763aebeffa172a3944b907b61a45c4e29ff20312389a85741b"
+      "path": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+      "content_hash": "8a3759367d1386895eae65dc9d7f82dde45105437b9d6a6ad997c4d8d1c6f700"
+    },
+    {
+      "path": "libs/infrastructure/src/ref_verify/process_runner.rs",
+      "content_hash": "17cc7c3bc63be1e75b6cf3a30d3466aa3ad19dcf4d21b2a1bd2bb124323873ed"
+    },
+    {
+      "path": "libs/infrastructure/src/ref_verify/process_runner.rs",
+      "content_hash": "c5bb63afb995f1024b3742f23b4e76cefee72a8bdd19c803945486188b0dd6e6"
     },
     {
       "path": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
-      "content_hash": "85a4b09cd59043202b5a9f98005a5c6e0a37b74baced597403fa6a9461d6e458"
+      "content_hash": "9e97b1b710c7e9274b6e4179bf1f926619c136df80e035e2c369913ff2e52eaa"
+    },
+    {
+      "path": "libs/infrastructure/src/review_v2/review_fix_runner/mod.rs",
+      "content_hash": "298aa329d59bde3ad94835d1789e2b24dba485d2c2a426d0ff9fd87bb8e1fc6d"
+    },
+    {
+      "path": "libs/infrastructure/src/review_v2/review_fix_runner/spawn.rs",
+      "content_hash": "c9d192df9274205b6758e322097941d532280bd38d7647e8b7494ddd2bea9f32"
     }
   ],
   "processed_pair_keys": []

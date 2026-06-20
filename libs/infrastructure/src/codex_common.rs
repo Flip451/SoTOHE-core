@@ -25,6 +25,14 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 /// share this value (ADR D4 / AC-05).
 pub(crate) const POLL_INTERVAL: Duration = Duration::from_millis(50);
 
+/// Runtime directory used by all infrastructure-layer reviewer and dry-check adapters.
+///
+/// Consolidates the four previously separate `"tmp/reviewer-runtime"` occurrences
+/// (ADR D4 / AC-05 / T012).  Cross-layer usages in `apps/cli` and
+/// `apps/cli-composition` are coincidental constants and remain in their
+/// respective layers (CN-03 minimization; no cross-layer dep may be added).
+pub(crate) const REVIEW_RUNTIME_DIR: &str = "tmp/reviewer-runtime";
+
 /// Build the argument vector for a `codex exec --sandbox read-only` invocation.
 ///
 /// Produces: `exec --model <model> --sandbox read-only --config
@@ -92,9 +100,9 @@ pub(crate) fn codex_bin() -> OsString {
 /// Creates `base_dir` (and any missing ancestors) before returning.
 ///
 /// # Arguments
-/// - `base_dir`: Runtime directory constant (e.g. `REVIEW_RUNTIME_DIR` or
-///   `DRY_CHECK_RUNTIME_DIR`). Callers pass their own constant so T012 can
-///   consolidate the values without touching this function.
+/// - `base_dir`: Runtime directory constant (e.g. `REVIEW_RUNTIME_DIR`).
+///   Callers pass the constant so the function remains independent of the
+///   specific directory choice.
 /// - `prefix`: File-name prefix (e.g. `"codex-last-message"`).
 /// - `ext`: File extension without leading dot (e.g. `"txt"`).
 pub(crate) fn runtime_path(base_dir: &str, prefix: &str, ext: &str) -> Result<PathBuf, String> {

@@ -23,7 +23,9 @@ use usecase::dry_check::{
     DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckJudgeTier,
 };
 
-use crate::codex_common::{POLL_INTERVAL, codex_bin, runtime_path, spawn_codex};
+use crate::codex_common::{
+    POLL_INTERVAL, REVIEW_RUNTIME_DIR, codex_bin, runtime_path, spawn_codex,
+};
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -52,10 +54,6 @@ pub(crate) const DRY_CHECK_OUTPUT_SCHEMA_JSON: &str = r##"{
   "required": ["verdict", "rationale", "refactor_proposal"],
   "additionalProperties": false
 }"##;
-
-// ── Runtime directory ─────────────────────────────────────────────────────────
-
-const DRY_CHECK_RUNTIME_DIR: &str = "tmp/reviewer-runtime";
 
 // ── Private DTO ───────────────────────────────────────────────────────────────
 
@@ -200,12 +198,11 @@ impl CodexDryChecker {
             DryCheckJudgeTier::Final => (&self.final_model, &self.final_reasoning_effort),
         };
 
-        let output_last_message =
-            runtime_path(DRY_CHECK_RUNTIME_DIR, "dry-check-last-message", "txt")
-                .map_err(DryCheckAgentError::Unexpected)?;
-        let output_schema = runtime_path(DRY_CHECK_RUNTIME_DIR, "dry-check-output-schema", "json")
+        let output_last_message = runtime_path(REVIEW_RUNTIME_DIR, "dry-check-last-message", "txt")
             .map_err(DryCheckAgentError::Unexpected)?;
-        let session_log = runtime_path(DRY_CHECK_RUNTIME_DIR, "dry-check-session", "log")
+        let output_schema = runtime_path(REVIEW_RUNTIME_DIR, "dry-check-output-schema", "json")
+            .map_err(DryCheckAgentError::Unexpected)?;
+        let session_log = runtime_path(REVIEW_RUNTIME_DIR, "dry-check-session", "log")
             .map_err(DryCheckAgentError::Unexpected)?;
 
         let _cleanup = AutoCleanup::new([&output_last_message, &output_schema]);

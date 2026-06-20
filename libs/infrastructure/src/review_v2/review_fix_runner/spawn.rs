@@ -7,9 +7,9 @@ use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 use usecase::review_v2::run_review_fix::ReviewFixRunnerError;
 
-use super::session_log::{redact_credentials, write_session_log};
+use crate::codex_common::REVIEW_RUNTIME_DIR;
 
-pub(super) const REVIEW_RUNTIME_DIR: &str = "tmp/reviewer-runtime";
+use super::session_log::{redact_credentials, write_session_log};
 
 pub(super) fn fixer_runtime_path(prefix: &str, ext: &str) -> Result<PathBuf, ReviewFixRunnerError> {
     static COUNTER: AtomicU64 = AtomicU64::new(0);

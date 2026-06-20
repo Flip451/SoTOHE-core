@@ -52,6 +52,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use usecase::ref_verify::RefVerifyError;
 
 use crate::agent_profiles::ResolvedExecution;
+use crate::codex_common::REVIEW_RUNTIME_DIR;
 use crate::ref_verify::AgentExecutionRunner;
 
 /// Codex structured-output JSON schema for [`VerdictResponseDto`].
@@ -556,7 +557,7 @@ fn ref_verify_runtime_path(
         .as_nanos();
     let seq = COUNTER.fetch_add(1, Ordering::Relaxed);
     let path = project_root
-        .join("tmp/reviewer-runtime")
+        .join(REVIEW_RUNTIME_DIR)
         .join(format!("{prefix}-{}-{timestamp}-{seq}.{ext}", std::process::id()));
     let parent = path.parent().ok_or_else(|| {
         ref_verify_runner_error(format!("runtime path has no parent: '{}'", path.display()))
