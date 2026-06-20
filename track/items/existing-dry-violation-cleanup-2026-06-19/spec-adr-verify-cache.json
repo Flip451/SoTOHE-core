@@ -728,6 +728,214 @@
         "kind": "pass",
         "citation": "定数（`POLL_INTERVAL`、`\"tmp/reviewer-runtime\"` など）は、**アーキテクチャ層境界ごとに** 単一の `const` 定義へ集約する — 同一層内の冗長コピー（`const` 定義の重複および同値インラインリテラル）を除去する。`architecture-rules.json` が禁止する層境界をまたぐ同値定数（例: `cli ↛ infrastructure` の `POLL_INTERVAL`）は**偶然の一致定数として保持**し、DRY 違反と見なさない… `cli → infrastructure` 依存は追加しない。"
       }
+    },
+    {
+      "claim_hash": "315a87eb75b837c9f36fa9bf5e37dbc0178d0a4748010d50d6235e1214cfc003",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各クラスタについて「正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認 → 小さく分割してコミット」の手順を踏む。4 クラスタは互いに独立しているため別タスク/別トラックに分割し、1 コミットあたりの diff を小さく保つ"
+      }
+    },
+    {
+      "claim_hash": "bfebe537bde30dab6f85cf8de16ebd315381120224649d4c49ca6ef087d61a15",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各クラスタについて『正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認』」"
+      }
+    },
+    {
+      "claim_hash": "7cad102a541d364a175ddc236120d2c4d3c3c5ec888322c52f1089e266d413d3",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`validate_track_id` / slug 検証ロジックが domain（`libs/domain/src/ids.rs` の `is_valid_track_id`）を正典としながら、usecase 3 モジュール（`catalogue_impl_signals` / `type_signals` / `baseline_capture`）+ CLI 2 箇所 + `apps/cli-composition/src/verify.rs` の `validate_track_id_str` に計 5 つ以上の独立実装として散在している。全コピーを削除し、`TrackId::try_new`（domain）への委譲に置き換える。"
+      }
+    },
+    {
+      "claim_hash": "004faf7eea04e84a8492d8a30ff39d2d06f508748e62ec706029404677eede29",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「フィールドが空・空白のみであってはならない」という不変条件が、既に `NonEmptyString` 型が存在するにもかかわらず domain の 8 箇所以上（`ids.rs` / `plan.rs` / `spec.rs` / `impl_plan.rs` / `review_v2/types.rs` 等）でインライン再実装されている。各箇所を `NonEmptyString` への委譲に置換し、不変条件の単一定義を回復する。"
+      }
+    },
+    {
+      "claim_hash": "6e0e7c51b2e7c4a10dcb12ed624adb374d5104af98d65dd82b26d06255a4fc5e",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で抽出対象とする重複は以下の 2 件に限定する:\n\n- **(1) Codex subprocess 管理**: `spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダが `libs/infrastructure/src/review_v2/codex_reviewer.rs` と `libs/infrastructure/src/dry_check/codex_dry_checker.rs` の間でバイト単位で重複している。`infrastructure` クレート内の `pub(crate)` 共通モジュールへ抽出する。\n\n以下の 2 件は**現状維持**とし、共通抽出の対象外とする:\n\n- **(2) 排他ロック取得パターン**: `FsDryCheckStore::acquire_write_lock`（`DryCheckWriterError`）と `FsReviewStore` のロック（`ReviewWriterError`）は、**異なる domain port を異なるエラー型で実装するポート固有の並行構造**である。\n- **(3) 4-source git-diff union**: `GitDiffGetter` は `Vec<FilePath>`（`BTreeSet` 経由）を返し、`GitDryCheckDiffGetter` は `Vec<DiffFileHunks>`（ハンクレベルの `BTreeMap` 経由）を返す。**異なる domain port で出力型が異なる**ため。\n\n`hexagonal の層配置は尊重`し、共通化が層境界（domain / usecase / infrastructure）を侵さない形にする。"
+      }
+    },
+    {
+      "claim_hash": "8f22989c76dbb624b320964b4bc67cc35033862d894deace4d3487fb97fe9d55",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**定数**（`POLL_INTERVAL`、`\"tmp/reviewer-runtime\"` など）は、**アーキテクチャ層境界ごとに** 単一の `const` 定義へ集約する — 同一層内の冗長コピー（`const` 定義の重複および同値インラインリテラル）を除去する。`architecture-rules.json` が禁止する層境界をまたぐ同値定数（例: `cli ↛ infrastructure` の `POLL_INTERVAL`）は**偶然の一致定数として保持**し、DRY 違反と見なさない"
+      }
+    },
+    {
+      "claim_hash": "95abd862fe566aad6c02ab3a4cf28dd1a1472bd22f262ccbeed725d893c1e3e3",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各クラスタについて「正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認 → 小さく分割してコミット」の手順を踏む。"
+      }
+    },
+    {
+      "claim_hash": "d348e489952825c979c0b53f565a157c7e0a3207708a6963e758b10fff76faa9",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「4 クラスタは互いに独立しているため別タスク/別トラックに分割し」"
+      }
+    },
+    {
+      "claim_hash": "af14f07227b2e68b78f27be3eae4cefd2e65a909f71c32e70f5094b2b9687c9a",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各クラスタについて「正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認 → 小さく分割してコミット」の手順を踏む。"
+      }
+    },
+    {
+      "claim_hash": "8c4d5131f8a44a08ab1748ece84543f92074fa5f040cfd3bb8690dbf36876ef1",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各クラスタについて「正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認 → 小さく分割してコミット」の手順を踏む。4 クラスタは互いに独立しているため別タスク/別トラックに分割し、1 コミットあたりの diff を小さく保つ"
+      }
+    },
+    {
+      "claim_hash": "4d596919b4f3198cc03206f9ceef286a46990edfc235caa6935c1f11376726c9",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各クラスタについて「正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認 → 小さく分割してコミット」の手順を踏む。"
+      }
+    },
+    {
+      "claim_hash": "427d0d7cd6e5af27b2c89d5b2948c52d740b75caf1a8767d9a7ad03537c9abae",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「4 クラスタは互いに独立しているため別タスク/別トラックに分割し、1 コミットあたりの diff を小さく保つ」および「各クラスタについて『正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認 → 小さく分割してコミット』の手順を踏む。」"
+      }
+    },
+    {
+      "claim_hash": "b7ada35b21df7ec57521e9376b8394d5f1edc7b297da1e56bab94b0d20720f1f",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "test-helper サブクラスタ（`CwdGuard` / `init_git_repo` / stub bindings）は、**テストコンパイル境界ごとに** 単一の `#[cfg(test)]` 共通 test-support 定義へ集約する — 境界内の冗長コピーを除去する。> **実装上の注記 — test-helper サブクラスタの保留**: D4 の方針自体は維持する。ただし test-helper サブクラスタ（`CwdGuard` / `init_git_repo` / usecase stub bindings の境界ごと集約、対応タスク T008–T010）は、現時点では着手を見送る。D4 が定めるテストコンパイル境界ごとの `#[cfg(test)]` 単一定義は、境界をまたぐバイト同一コピー（例: `apps/cli` と `libs/infrastructure` の `CurrentDirGuard`）を意図的に残存させる"
+      }
+    },
+    {
+      "claim_hash": "c605750bcab2eae6c732aca30d5ac0fd4c0766e6b6654faa3c8077ed98acdbfb",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各クラスタについて「正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認 → 小さく分割してコミット」の手順を踏む。"
+      }
+    },
+    {
+      "claim_hash": "8da99a9fc3e5845c4b8b66eebe5934d5b79843f2c848cc1e99ac77997e6e6e91",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hexagonal の層配置は尊重し、共通化が層境界（domain / usecase / infrastructure）を侵さない形にする。"
+      }
+    },
+    {
+      "claim_hash": "19e2ccdcbf76bd4cbf14ed2841cee916317ff5df84d21d5c5b648d5b57618b56",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "共通抽出にはポートをまたぐ過剰結合の抽象が必要になり、hexagonal 層境界を侵す。"
+      }
+    },
+    {
+      "claim_hash": "a291257e02ab8a3376b4ddbfa59fb8eb35206e98ae429d9d31dc557dbb51589f",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「4 クラスタは互いに独立しているため別タスク/別トラックに分割し、1 コミットあたりの diff を小さく保つ（レビューコストは diff サイズに対し約 O(N^2) で増大するため、guardrails の small-task-commit 方針に従う）。」"
+      }
+    },
+    {
+      "claim_hash": "ea64605a548e03f7ab96d826135154d016e5fb5700bf6cd62122eda6e384d0b5",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`validate_track_id` / slug 検証ロジックが domain（`libs/domain/src/ids.rs` の `is_valid_track_id`）を正典としながら、usecase 3 モジュール（`catalogue_impl_signals` / `type_signals` / `baseline_capture`）+ CLI 2 箇所 + `apps/cli-composition/src/verify.rs` の `validate_track_id_str` に計 5 つ以上の独立実装として散在している。全コピーを削除し、`TrackId::try_new`（domain）への委譲に置き換える。"
+      }
+    },
+    {
+      "claim_hash": "a892c4915ab3761f157a45b8b745b4717a92cd990d31a9acbcd046619aa4b527",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各箇所を `NonEmptyString` への委譲に置換し、不変条件の単一定義を回復する。」"
+      }
+    },
+    {
+      "claim_hash": "6d17ffba987b655efc258d9594267b5e9d4c6765d5ec5b467ba717654b152317",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`validate_track_id` / slug 検証ロジックが domain（`libs/domain/src/ids.rs` の `is_valid_track_id`）を正典としながら、usecase 3 モジュール（`catalogue_impl_signals` / `type_signals` / `baseline_capture`）+ CLI 2 箇所 + `apps/cli-composition/src/verify.rs` の `validate_track_id_str` に計 5 つ以上の独立実装として散在している。全コピーを削除し、`TrackId::try_new`（domain）への委譲に置き換える。"
+      }
+    },
+    {
+      "claim_hash": "01100da042b7dffb4daf9dfaed806f1037fa064eb269aeb549c092064f141c64",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「フィールドが空・空白のみであってはならない」という不変条件が、既に `NonEmptyString` 型が存在するにもかかわらず domain の 8 箇所以上（`ids.rs` / `plan.rs` / `spec.rs` / `impl_plan.rs` / `review_v2/types.rs` 等）でインライン再実装されている。各箇所を `NonEmptyString` への委譲に置換し、不変条件の単一定義を回復する。"
+      }
+    },
+    {
+      "claim_hash": "5d60988e5d51518e133ffd65938a3b9be13af39208e7631d23751c27b36230fb",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2` と `dry_check` の間で抽出対象とする重複は以下の 2 件に限定する:\n\n- **(1) Codex subprocess 管理**: `spawn_codex` / `drain_pipe` / `tee_stderr_to_file` / ランタイムパスビルダが `libs/infrastructure/src/review_v2/codex_reviewer.rs` と `libs/infrastructure/src/dry_check/codex_dry_checker.rs` の間でバイト単位で重複している。`infrastructure` クレート内の `pub(crate)` 共通モジュールへ抽出する。\n- **(4) SHA-256→lowercase-hex**: `infrastructure::dry_check::corpus::sha256_hex` に正典ヘルパが既に存在する。インラインの `format!` 呼び出し箇所をこの正典ヘルパへ委譲する。\n\n**hexagonal の層配置は尊重**し、共通化が層境界（domain / usecase / infrastructure）を侵さない形にする。\n\n以下の 2 件は**現状維持**とし、共通抽出の対象外とする:\n\n- **(2) 排他ロック取得パターン**: ...\n- **(3) 4-source git-diff union**: ..."
+      }
+    },
+    {
+      "claim_hash": "28ccfc95975e44821b826dfcdd8dee55c36e5deb9104c71d1892b57fa44abc5c",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "定数（`POLL_INTERVAL`、`\"tmp/reviewer-runtime\"` など）は、**アーキテクチャ層境界ごとに** 単一の `const` 定義へ集約する — 同一層内の冗長コピー（`const` 定義の重複および同値インラインリテラル）を除去する。`architecture-rules.json` が禁止する層境界をまたぐ同値定数（例: `cli ↛ infrastructure` の `POLL_INTERVAL`）は**偶然の一致定数として保持**し、DRY 違反と見なさない（D3 のポート固有並行構造の保持と同じ判断）。`cli → infrastructure` 依存は追加しない。"
+      }
+    },
+    {
+      "claim_hash": "0322f064443b47a1aec781616f611eae4c07cdef1ce1b193cef4fe7a11d4b8ed",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各クラスタについて「正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認 → 小さく分割してコミット」の手順を踏む。4 クラスタは互いに独立しているため別タスク/別トラックに分割し、1 コミットあたりの diff を小さく保つ"
+      }
+    },
+    {
+      "claim_hash": "9a50b154057f18dfc86dc0b34061d25b0ba040b8e2ec25bccbb6578d02e3b2c0",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 クラスタは互いに独立しているため別タスク/別トラックに分割し、`cargo make ci` で挙動不変を確認"
+      }
+    },
+    {
+      "claim_hash": "479e92eb3911f8c899a6f09afcea0b505bc7e8e892af3f85f38a64a9e41005b9",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各クラスタについて「正典を決める → コピーを正典へ委譲 → `cargo make ci` で挙動不変を確認 → 小さく分割してコミット」の手順を踏む。4 クラスタは互いに独立しているため別タスク/別トラックに分割し、1 コミットあたりの diff を小さく保つ"
+      }
     }
   ]
 }

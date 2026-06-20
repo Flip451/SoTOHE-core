@@ -2,15 +2,6 @@
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
   "corpus_fingerprint": "07266b7619e9cff4f1b9803815f5f3f19862c74d18f30e63900304a084538720",
-  "fragment_refs": [
-    {
-      "path": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
-      "content_hash": "b3869aabe83fff67d032a97f5b573325e3d45dc32060b9a3a82e979c91ece23f"
-    },
-    {
-      "path": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
-      "content_hash": "ec82923e10b26cc01ad66a40c7d5265d1f5be06fb9550dfbd27d379031e3a0ae"
-    }
-  ],
+  "fragment_refs": [],
   "processed_pair_keys": []
 }
