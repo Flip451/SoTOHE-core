@@ -8,6 +8,9 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use serde::Deserialize;
+// `sha2::Digest` is only needed by the test oracle below (T007 routed production
+// hashing through `crate::dry_check::corpus::sha256_hex`).
+#[cfg(test)]
 use sha2::Digest;
 
 use domain::dry_check::{
@@ -260,8 +263,7 @@ impl DryCheckAgentPort for CodexDryChecker {
 /// implementation. Any error (impossible in practice) maps to
 /// `DryCheckAgentError::Unexpected`.
 fn fragment_ref_from_code_fragment(frag: &CodeFragment) -> Result<FragmentRef, DryCheckAgentError> {
-    let hash_bytes = sha2::Sha256::digest(frag.content().as_bytes());
-    let hash_hex = format!("{hash_bytes:x}");
+    let hash_hex = crate::dry_check::corpus::sha256_hex(frag.content().as_bytes());
 
     let content_hash = FragmentContentHash::new(hash_hex).map_err(|e| {
         DryCheckAgentError::Unexpected(format!("failed to construct content hash: {e}"))

@@ -1,89 +1,16 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "edb81b206be3db1a2a0e0de37e95e932e39042b1a8d7508cb5cad6f5c5f673df",
+  "corpus_fingerprint": "07266b7619e9cff4f1b9803815f5f3f19862c74d18f30e63900304a084538720",
   "fragment_refs": [
     {
-      "path": "apps/cli-composition/src/lib.rs",
-      "content_hash": "5554be4c7ee6c5888f6bdd87461fb1092cd833a50681a1ba79e94e2e1a795c01"
-    },
-    {
-      "path": "apps/cli/src/commands/plan/codex_local.rs",
-      "content_hash": "cf554930d05a1a695c1128717457c10aeed186ca10d63f7361ab40ce38c9cc41"
-    },
-    {
-      "path": "libs/infrastructure/src/codex_common.rs",
-      "content_hash": "00789f83a15caa9bd3706081d8f2268f0125c594269ed5cf789555f8dab1af76"
-    },
-    {
-      "path": "libs/infrastructure/src/codex_common.rs",
-      "content_hash": "82658d756fbf1f9de1947258577f99e78f3b081b97e94b24b8476a8641973101"
-    },
-    {
-      "path": "libs/infrastructure/src/codex_common.rs",
-      "content_hash": "87c5434e0798a5baa800d43e2caf4853ac2b9471865d605c9f4a3e6b9587f550"
-    },
-    {
-      "path": "libs/infrastructure/src/codex_common.rs",
-      "content_hash": "93b427bcc957d6650d7802a0031ad4895747daef8dd7f8257729191235c15b5d"
-    },
-    {
-      "path": "libs/infrastructure/src/codex_common.rs",
-      "content_hash": "9a38d23361b1a78579a8be5f1a68fc309f195a2f751f6d9319167ba08d05bd7a"
-    },
-    {
-      "path": "libs/infrastructure/src/codex_common.rs",
-      "content_hash": "be19fe142433904b2becb1b0893c0fa70f43dc8190f6fe2c78cef869c426319f"
-    },
-    {
-      "path": "libs/infrastructure/src/codex_common.rs",
-      "content_hash": "eb42e6a922ff2491b5186ec327914807ac5248aa2dc12934f00c8ca5f25bfd43"
+      "path": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+      "content_hash": "b3869aabe83fff67d032a97f5b573325e3d45dc32060b9a3a82e979c91ece23f"
     },
     {
       "path": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
-      "content_hash": "b3408e665f5a6c61948b5539a139fe88ad3a8064f32cc37c9ff87def52b41c4c"
-    },
-    {
-      "path": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
-      "content_hash": "ffd0b3425fef1d983527e8b873a8104daa2e6a11a041d16c0753d48aa1a19360"
-    },
-    {
-      "path": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
-      "content_hash": "02ff228fe8ed134f494d7b0494b9c654329b184f7d12ffa36965f2f26eebbcae"
-    },
-    {
-      "path": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
-      "content_hash": "ac15dac83416c3aeea943a47199228910228ff3037502aba2ced077ed234289c"
-    },
-    {
-      "path": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
-      "content_hash": "b01c03e76cd3680016abe67c9c1a6086576950aa1f945bb5f340fe6a51be0eab"
-    },
-    {
-      "path": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
-      "content_hash": "bce15d0dd3ee1ca813266b792a63602d4aa0e963d118bc57a151663de8658e8b"
+      "content_hash": "ec82923e10b26cc01ad66a40c7d5265d1f5be06fb9550dfbd27d379031e3a0ae"
     }
   ],
-  "processed_pair_keys": [
-    {
-      "low": {
-        "path": "apps/cli-composition/src/lib.rs",
-        "content_hash": "f1f4a03066d9d8efdae8a2b1a239d243b459fdece1bdaaaed9da8fd449d6f163"
-      },
-      "high": {
-        "path": "libs/infrastructure/src/codex_common.rs",
-        "content_hash": "93b427bcc957d6650d7802a0031ad4895747daef8dd7f8257729191235c15b5d"
-      }
-    },
-    {
-      "low": {
-        "path": "apps/cli/src/commands/plan/codex_local.rs",
-        "content_hash": "7868580ed3680c95280b4ac32fcaed936e4c127c1bc6fcad53a0085c713be2f3"
-      },
-      "high": {
-        "path": "libs/infrastructure/src/codex_common.rs",
-        "content_hash": "00789f83a15caa9bd3706081d8f2268f0125c594269ed5cf789555f8dab1af76"
-      }
-    }
-  ]
+  "processed_pair_keys": []
 }
