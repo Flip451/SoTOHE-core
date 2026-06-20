@@ -208,9 +208,7 @@ fn run_aggregate_check(
     args: SignalCheckArgs,
 ) -> Result<cli_composition::CommandOutcome, String> {
     let gate: SignalGateName = args.gate.into();
-    let spec_json = args.spec_json.unwrap_or_else(|| PathBuf::from("track/items/spec.json"));
-
-    app.signal_check_gate(args.project_root, spec_json, gate, args.workspace_root)
+    app.signal_check_gate(args.project_root, args.spec_json, gate, args.workspace_root)
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────

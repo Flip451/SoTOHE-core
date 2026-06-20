@@ -509,10 +509,14 @@ impl CliApp {
     }
 
     /// Aggregate gate check: runs all four chains in declared order.
+    ///
+    /// When `spec_json_path` is `None`, resolves it from the active track
+    /// (current git branch `track/<id>` → `track/items/<id>/spec.json` under
+    /// `workspace_root`). Pass `Some(path)` to override.
     pub fn signal_check_gate(
         &self,
         project_root: PathBuf,
-        spec_json_path: PathBuf,
+        spec_json_path: Option<PathBuf>,
         gate: SignalGateName,
         workspace_root: Option<PathBuf>,
     ) -> Result<CommandOutcome, String> {
@@ -521,6 +525,43 @@ impl CliApp {
             Err(outcome) => return Ok(outcome),
         };
         let gate_kind = gate_name_to_kind(gate);
+
+        // Resolve `spec_json_path` from the active track when not supplied.
+        let spec_json_path = match spec_json_path {
+            Some(p) => p,
+            None => {
+                use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+                use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
+                use usecase::signal::SignalLayerReader as _;
+                // Use the git-discovered repo root (matching load_gate_matrix and the
+                // layer checks) rather than CWD, so `sotp signal check` works from any
+                // subdirectory.
+                let ws = match workspace_root.clone() {
+                    Some(root) => root,
+                    None => match SystemGitRepo::discover() {
+                        Ok(repo) => repo.root().to_path_buf(),
+                        Err(e) => {
+                            return Ok(CommandOutcome::failure(Some(format!(
+                                "[BLOCKED] signal check --gate {gate:?}: cannot discover git \
+                                 repository: {e}; pass --workspace-root or --spec-json explicitly"
+                            ))));
+                        }
+                    },
+                };
+                let reader = LocalSignalLayerReaderAdapter::new(ws.clone());
+                match reader.active_track_id() {
+                    Ok(track_id) => {
+                        ws.join("track/items").join(track_id.as_ref()).join("spec.json")
+                    }
+                    Err(e) => {
+                        return Ok(CommandOutcome::failure(Some(format!(
+                            "[BLOCKED] signal check --gate {gate:?}: cannot resolve spec.json from \
+                             active track: {e}; pass --spec-json explicitly"
+                        ))));
+                    }
+                }
+            }
+        };
 
         let gate_label = match gate {
             SignalGateName::Commit => "signal check --gate commit",

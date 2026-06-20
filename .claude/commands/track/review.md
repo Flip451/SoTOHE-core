@@ -101,10 +101,10 @@ Agent prompt minimum content (`provider: claude` path):
 
 - Track id, scope name, briefing path
 - `round_type: fast`, `model: {review-fix-lead.model}` (resolved from `capabilities.review-fix-lead.model`)
-- Pre-review gate (run before the reviewer invocation): per TDDD-active layer,
-  `bin/sotp signal calc-impl-catalog --signals-path <...> --catalog-hash <...>` and
-  `bin/sotp signal calc-catalog-spec --signals-path <...> --catalog-hash <...>`,
-  then `bin/sotp track views sync` — see `.claude/agents/review-fix-lead.md` § Workflow
+- Pre-review gate (run before the reviewer invocation): `bin/sotp signal calc-impl-catalog`
+  and `bin/sotp signal calc-catalog-spec` (both argless — self-resolve the active track and
+  TDDD-enabled layers; absent catalogue layers are skipped automatically), then
+  `bin/sotp track views sync` — see `.claude/agents/review-fix-lead.md` § Workflow
 - Reviewer invocation: `bin/sotp review local --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md`
 The agent self-resolves its modification boundary by running `bin/sotp review files --scope {scope}`
 (see `.claude/agents/review-fix-lead.md` § Scope Ownership). The orchestrator does NOT derive or
