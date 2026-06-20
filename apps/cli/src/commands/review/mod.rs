@@ -4,8 +4,6 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::ExitCode;
-#[cfg(test)]
-use std::time::Duration;
 
 use clap::{ArgGroup, Args, Subcommand};
 #[cfg(test)]
@@ -35,8 +33,6 @@ const DEFAULT_TIMEOUT_SECONDS: u64 = 1800;
 
 #[cfg(test)]
 pub(super) const REVIEW_RUNTIME_DIR: &str = "tmp/reviewer-runtime";
-#[cfg(test)]
-pub(super) const POLL_INTERVAL: Duration = Duration::from_millis(50);
 #[cfg(test)]
 pub(super) const CODEX_BIN_ENV: &str = "SOTP_CODEX_BIN";
 

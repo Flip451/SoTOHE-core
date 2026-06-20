@@ -39,7 +39,7 @@ use usecase::review_workflow::{
     render_review_payload,
 };
 
-const POLL_INTERVAL: Duration = Duration::from_millis(50);
+use crate::codex_common::POLL_INTERVAL;
 
 /// Return type of `spawn_claude`: child process, stderr collector handle, and stdout collector handle.
 ///

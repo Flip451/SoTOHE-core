@@ -15,10 +15,9 @@ use usecase::review_workflow::{
     render_review_payload,
 };
 
-use crate::codex_common::{codex_bin, runtime_path, spawn_codex};
+use crate::codex_common::{POLL_INTERVAL, codex_bin, runtime_path, spawn_codex};
 
 const REVIEW_RUNTIME_DIR: &str = "tmp/reviewer-runtime";
-const POLL_INTERVAL: Duration = Duration::from_millis(50);
 
 /// Codex-backed reviewer implementation for the `Reviewer` usecase port.
 ///

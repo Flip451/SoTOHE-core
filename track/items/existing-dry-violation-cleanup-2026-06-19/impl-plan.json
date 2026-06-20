@@ -61,7 +61,7 @@
     {
       "id": "T011",
       "description": "[D4-const-poll-interval] Consolidate ALL redundant within-layer-reachability-boundary occurrences of POLL_INTERVAL (Duration::from_millis(50)) — both const definitions AND same-layer inline literals — into a single const per boundary, and update those occurrences to reference it. Known occurrence sites include (e.g.): infrastructure layer — libs/infrastructure/src/review_v2/codex_reviewer.rs, libs/infrastructure/src/review_v2/claude_reviewer.rs, libs/infrastructure/src/dry_check/codex_dry_checker.rs; cli layer — apps/cli/src/commands/review/mod.rs, apps/cli/src/commands/plan/mod.rs. The implementer determines the exact const placement (e.g. a shared module inside libs/infrastructure for the infrastructure boundary; a shared cli-internal module for the cli boundary) that respects architecture-rules.json layer dependencies and keeps cargo make ci (including check-layers) green. Same-literal occurrences across a layer boundary that architecture-rules.json forbids merging are coincidental constants and are retained as-is — not a DRY violation, per AC-05. Do NOT introduce a cli -> infrastructure production dependency. References AC-05/IN-04.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T012",

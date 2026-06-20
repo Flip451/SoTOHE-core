@@ -23,7 +23,7 @@ use usecase::dry_check::{
     DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckJudgeTier,
 };
 
-use crate::codex_common::{codex_bin, runtime_path, spawn_codex};
+use crate::codex_common::{POLL_INTERVAL, codex_bin, runtime_path, spawn_codex};
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -56,7 +56,6 @@ pub(crate) const DRY_CHECK_OUTPUT_SCHEMA_JSON: &str = r##"{
 // ── Runtime directory ─────────────────────────────────────────────────────────
 
 const DRY_CHECK_RUNTIME_DIR: &str = "tmp/reviewer-runtime";
-const POLL_INTERVAL: Duration = Duration::from_millis(50);
 
 // ── Private DTO ───────────────────────────────────────────────────────────────
 

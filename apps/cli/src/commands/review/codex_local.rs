@@ -340,7 +340,7 @@ fn poll_child_with_timeout(
                     child.wait().map_err(|e| format!("failed to reap child: {e}"))?;
                     break;
                 }
-                thread::sleep(super::POLL_INTERVAL);
+                thread::sleep(crate::commands::POLL_INTERVAL);
             }
         }
     }

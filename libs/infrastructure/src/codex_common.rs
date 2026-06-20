@@ -17,7 +17,13 @@ use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::thread;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+
+/// Polling interval for subprocess completion checks across all infrastructure adapters.
+///
+/// Both Codex and Claude adapters (`codex_dry_checker`, `codex_reviewer`, `claude_reviewer`)
+/// share this value (ADR D4 / AC-05).
+pub(crate) const POLL_INTERVAL: Duration = Duration::from_millis(50);
 
 /// Build the argument vector for a `codex exec --sandbox read-only` invocation.
 ///

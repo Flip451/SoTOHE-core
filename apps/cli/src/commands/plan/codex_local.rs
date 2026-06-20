@@ -15,7 +15,8 @@ use std::os::unix::process::CommandExt;
 
 use cli_composition::tee_stderr_to_file;
 
-use super::{CodexInvocation, PLAN_RUNTIME_DIR, POLL_INTERVAL, PlanCodexLocalArgs, PlanRunResult};
+use super::{CodexInvocation, PLAN_RUNTIME_DIR, PlanCodexLocalArgs, PlanRunResult};
+use crate::commands::POLL_INTERVAL;
 
 #[cfg(test)]
 use super::CODEX_BIN_ENV;

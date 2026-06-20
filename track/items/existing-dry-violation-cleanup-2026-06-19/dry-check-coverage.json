@@ -1,7 +1,36 @@
 {
   "schema_version": 4,
   "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93",
-  "corpus_fingerprint": "07266b7619e9cff4f1b9803815f5f3f19862c74d18f30e63900304a084538720",
-  "fragment_refs": [],
+  "corpus_fingerprint": "b870875d281ba158c0a8da07c2b32232727333f95ea10de8c839c21128e7f992",
+  "fragment_refs": [
+    {
+      "path": "apps/cli/src/commands/mod.rs",
+      "content_hash": "c22d577237691f2f04566735585d738dde441696ab71f89bc9f540911fa79f55"
+    },
+    {
+      "path": "apps/cli/src/commands/plan/codex_local.rs",
+      "content_hash": "6173983794876726631739e913363cc14dde492ef2fda3a2562148420efd211f"
+    },
+    {
+      "path": "apps/cli/src/commands/review/codex_local.rs",
+      "content_hash": "5830623223a54be8978d5421c5ac97bdc5be6b59461526337c37d2e75e49d71c"
+    },
+    {
+      "path": "libs/infrastructure/src/codex_common.rs",
+      "content_hash": "ead359c51780e1a15208b86df470f234a55cbfd253d7e866fee31904b610ac3e"
+    },
+    {
+      "path": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+      "content_hash": "5b40c3af4ca417c156ee3ce0a54a7b82b0238663698aaa29129bd8917da0af2a"
+    },
+    {
+      "path": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+      "content_hash": "41a3efb30a30dc763aebeffa172a3944b907b61a45c4e29ff20312389a85741b"
+    },
+    {
+      "path": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+      "content_hash": "85a4b09cd59043202b5a9f98005a5c6e0a37b74baced597403fa6a9461d6e458"
+    }
+  ],
   "processed_pair_keys": []
 }
