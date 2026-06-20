@@ -549,7 +549,7 @@ impl CliApp {
     /// `workspace_root`). Pass `Some(path)` to override.
     pub fn signal_check_gate(
         &self,
-        project_root: PathBuf,
+        project_root: Option<PathBuf>,
         spec_json_path: Option<PathBuf>,
         gate: SignalGateName,
         workspace_root: Option<PathBuf>,
@@ -560,32 +560,41 @@ impl CliApp {
         };
         let gate_kind = gate_name_to_kind(gate);
 
+        // Resolve the workspace / git-repo root once. Used as the default for
+        // `project_root` (chain ⓪ ADR scan) AND for spec.json track-id
+        // resolution — both must agree on the same root so a single git
+        // discovery (or explicit `--workspace-root`) drives every chain.
+        let resolved_root: PathBuf = match workspace_root.clone() {
+            Some(root) => root,
+            None => {
+                use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+                match SystemGitRepo::discover() {
+                    Ok(repo) => repo.root().to_path_buf(),
+                    Err(e) => {
+                        return Ok(CommandOutcome::failure(Some(format!(
+                            "[BLOCKED] signal check --gate {gate:?}: cannot discover git \
+                             repository: {e}; pass --workspace-root explicitly"
+                        ))));
+                    }
+                }
+            }
+        };
+
+        // Chain ⓪ project root defaults to the resolved workspace root so
+        // `sotp signal check` from a subdirectory doesn't scan a stray
+        // `<subdir>/knowledge/adr/` tree.
+        let project_root = project_root.unwrap_or_else(|| resolved_root.clone());
+
         // Resolve `spec_json_path` from the active track when not supplied.
         let spec_json_path = match spec_json_path {
             Some(p) => p,
             None => {
-                use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
                 use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
                 use usecase::signal::SignalLayerReader as _;
-                // Use the git-discovered repo root (matching load_gate_matrix and the
-                // layer checks) rather than CWD, so `sotp signal check` works from any
-                // subdirectory.
-                let ws = match workspace_root.clone() {
-                    Some(root) => root,
-                    None => match SystemGitRepo::discover() {
-                        Ok(repo) => repo.root().to_path_buf(),
-                        Err(e) => {
-                            return Ok(CommandOutcome::failure(Some(format!(
-                                "[BLOCKED] signal check --gate {gate:?}: cannot discover git \
-                                 repository: {e}; pass --workspace-root or --spec-json explicitly"
-                            ))));
-                        }
-                    },
-                };
-                let reader = LocalSignalLayerReaderAdapter::new(ws.clone());
+                let reader = LocalSignalLayerReaderAdapter::new(resolved_root.clone());
                 match reader.active_track_id() {
                     Ok(track_id) => {
-                        ws.join("track/items").join(track_id.as_ref()).join("spec.json")
+                        resolved_root.join("track/items").join(track_id.as_ref()).join("spec.json")
                     }
                     Err(e) => {
                         return Ok(CommandOutcome::failure(Some(format!(

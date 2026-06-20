@@ -12372,6 +12372,20 @@
       "rationale": "These are two distinct negative-path tests that exercise different failure modes and assert different error variants. They share a common testing pattern, but not repeated logic that would justify a DRY violation.",
       "recorded_at": "2026-06-20T03:08:59Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+      "low_hash": "c894839c07d303ca0ad6889f7df18d8bd3268854069794a9bf1715e250f2a5b8",
+      "high_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "high_hash": "12f89e104bb8e5badffc99b08b90ab5012af9c435f0db410cd962e72e9d58366",
+      "changed_path": "libs/infrastructure/src/verify/spec_states.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8937715291976929,
+      "threshold": 0.8500000238418579,
+      "base_commit": "e9b90f562c368361d7d7e4e08bf2a9219d1b2c1a",
+      "rationale": "These fragments are structurally similar because they are both thin adapters over the same `check_signals_file` workflow, but the repeated shape is intentional and minimal. The differing parser, hash accessor, stale-message text, and per-domain validation closure are all domain-specific, so there is no meaningful duplicated business logic that would warrant a DRY finding.",
+      "recorded_at": "2026-06-20T03:48:39Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }

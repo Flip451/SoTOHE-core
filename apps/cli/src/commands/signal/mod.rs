@@ -147,8 +147,11 @@ pub struct SignalCheckArgs {
     pub workspace_root: Option<PathBuf>,
 
     /// Project root for chain ⓪ (`knowledge/adr/` scan).
-    #[arg(long, default_value = ".")]
-    pub project_root: PathBuf,
+    /// When omitted, defaults to the resolved workspace / git-repo root so
+    /// `sotp signal check` works from any subdirectory without scanning a
+    /// stray `<subdir>/knowledge/adr/` tree.
+    #[arg(long)]
+    pub project_root: Option<PathBuf>,
 
     /// Path to `spec.json` for chain ① (`spec-adr`).
     /// Typically `track/items/<track-id>/spec.json` relative to the workspace root.

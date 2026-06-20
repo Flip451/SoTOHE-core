@@ -310,7 +310,7 @@ fn evaluate_layer_catalogue(
             if doc.declaration_hash() != current_hash {
                 return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "{}: declaration_hash mismatch (recorded={}, current={}) — \
-                     re-run `sotp track type-signals` to refresh the evaluation result",
+                     re-run `sotp signal calc-impl-catalog` to refresh the evaluation result",
                     signal_path.display(),
                     doc.declaration_hash(),
                     current_hash
@@ -324,7 +324,7 @@ fn evaluate_layer_catalogue(
             // `strict` flag does NOT relax this case. The catalogue has
             // declared types but no evaluation has been persisted.
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{} not found — run `sotp track type-signals` to generate the evaluation result",
+                "{} not found — run `sotp signal calc-impl-catalog` to generate the evaluation result",
                 signal_path.display()
             ))]);
         }
@@ -356,7 +356,7 @@ pub fn check_impl_catalog_from_signals_file(
         signals_path,
         catalog_hash_hex,
         &format!(
-            "{} not found — run `sotp track type-signals` to generate the evaluation result",
+            "{} not found — run `sotp signal calc-impl-catalog` to generate the evaluation result",
             signals_path.display()
         ),
         |text| type_signals_codec::decode(text).map_err(|e| e.to_string()),
