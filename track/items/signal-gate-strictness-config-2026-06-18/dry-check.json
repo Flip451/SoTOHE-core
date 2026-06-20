@@ -12274,6 +12274,20 @@
       "rationale": "These two functions do not duplicate substantive logic; they both delegate to the shared `signal_check_layer_chain` helper and only supply chain-specific parameters, callbacks, and labels. The variation is intentional and domain-driven, so this is not a DRY violation.",
       "recorded_at": "2026-06-20T01:41:08Z",
       "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
+    },
+    {
+      "low_path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+      "low_hash": "582bd0c895db21ee760f15a0713df45dba68a67bcfa58b17a09bc56281cdd5fa",
+      "high_path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+      "high_hash": "b2c98ac888af514469581ccfdb129454bcc8f802605c6db7db941a55c421256e",
+      "changed_path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8556178212165833,
+      "threshold": 0.8500000238418579,
+      "base_commit": "00c7e4719e21440a69bf212600183176c4b06f35",
+      "rationale": "The two fragments test different responsibilities of `build_prompt`: one verifies the pre-review gate commands are prepended, while the other verifies the reviewer invocation and absence of `--model`. They share setup code, but that is normal test scaffolding rather than a DRY violation because the assertions cover distinct behaviors and are not redundant.",
+      "recorded_at": "2026-06-20T02:42:16Z",
+      "config_fingerprint": "438e24714f4c158616ea7afa877edca2069e5e9ed4e585d85c038b8f43d24a93"
     }
   ]
 }
