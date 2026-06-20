@@ -2,9 +2,12 @@
 
 use std::path::{Path, PathBuf};
 
+use crate::signal_layer_chain::{
+    BindingSignalLayerReader, signal_check_layer_chain, signal_check_layer_chain_with_strict,
+};
 use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome};
 use infrastructure::verify::tddd_layers::TdddLayerBinding;
-use usecase::signal::{SignalLayerReader as _, SignalLayerReaderError};
+use usecase::signal::SignalLayerReader as _;
 
 /// Selects the gate context when resolving strictness from `signal-gates.json`.
 ///
@@ -16,166 +19,6 @@ pub enum SignalGateName {
     Commit,
     /// PR merge gate — evaluates using the `merge_gate.*` cells.
     Merge,
-}
-
-struct BindingSignalLayerReader {
-    inner: infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter,
-    bindings: Vec<TdddLayerBinding>,
-}
-
-impl usecase::signal::SignalLayerReader for BindingSignalLayerReader {
-    fn active_track_id(&self) -> Result<domain::TrackId, SignalLayerReaderError> {
-        self.inner.active_track_id()
-    }
-
-    fn enabled_layers(
-        &self,
-        _track_id: domain::TrackId,
-    ) -> Result<Vec<domain::tddd::LayerId>, SignalLayerReaderError> {
-        self.bindings
-            .iter()
-            .map(|b| {
-                domain::tddd::LayerId::try_new(b.layer_id().to_owned())
-                    .map_err(|_| SignalLayerReaderError::Io)
-            })
-            .collect()
-    }
-
-    fn catalogue_bytes(
-        &self,
-        track_id: domain::TrackId,
-        layer: domain::tddd::LayerId,
-    ) -> Result<Option<Vec<u8>>, SignalLayerReaderError> {
-        self.inner.catalogue_bytes(track_id, layer)
-    }
-}
-
-/// Shared body for `signal_check_catalog_spec` and `signal_check_impl_catalog`.
-#[allow(clippy::too_many_arguments, clippy::type_complexity)]
-fn signal_check_layer_chain(
-    strict_override: bool,
-    gate: Option<SignalGateName>,
-    workspace_root: Option<PathBuf>,
-    chain_id: domain::ChainId,
-    command_label: &str,
-    signal_file_name: impl Fn(&TdddLayerBinding) -> String + 'static,
-    include_binding: impl Fn(&TdddLayerBinding) -> bool + 'static,
-    fail_on_empty_bindings: bool,
-    verifier: impl Fn(&std::path::Path, &str, bool) -> infrastructure::verify::VerifyOutcome + 'static,
-    run_usecase: impl Fn(
-        &BindingSignalLayerReader,
-        Box<dyn Fn(domain::tddd::LayerId, &str) -> infrastructure::verify::VerifyOutcome>,
-    ) -> infrastructure::verify::VerifyOutcome,
-) -> Result<CommandOutcome, String> {
-    let strict = match resolve_strict(strict_override, gate, chain_id, workspace_root.as_deref()) {
-        Ok(s) => s,
-        Err(outcome) => return Ok(outcome),
-    };
-
-    signal_check_layer_chain_with_strict(
-        strict,
-        workspace_root,
-        command_label,
-        signal_file_name,
-        include_binding,
-        fail_on_empty_bindings,
-        verifier,
-        run_usecase,
-    )
-}
-
-#[allow(clippy::type_complexity, clippy::too_many_arguments)]
-fn signal_check_layer_chain_with_strict(
-    strict: bool,
-    workspace_root: Option<PathBuf>,
-    command_label: &str,
-    signal_file_name: impl Fn(&TdddLayerBinding) -> String + 'static,
-    include_binding: impl Fn(&TdddLayerBinding) -> bool + 'static,
-    fail_on_empty_bindings: bool,
-    verifier: impl Fn(&std::path::Path, &str, bool) -> infrastructure::verify::VerifyOutcome + 'static,
-    run_usecase: impl Fn(
-        &BindingSignalLayerReader,
-        Box<dyn Fn(domain::tddd::LayerId, &str) -> infrastructure::verify::VerifyOutcome>,
-    ) -> infrastructure::verify::VerifyOutcome,
-) -> Result<CommandOutcome, String> {
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
-    use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
-    use infrastructure::verify::tddd_layers::{
-        LoadTdddLayersError, find_binding, load_tddd_layers,
-    };
-
-    let root = match workspace_root {
-        Some(ref r) => r.clone(),
-        None => {
-            let repo = SystemGitRepo::discover()
-                .map_err(|e| format!("{command_label}: cannot discover git repo: {e}"))?;
-            repo.root().to_path_buf()
-        }
-    };
-    let items_dir = root.join("track").join("items");
-    let rules_path = root.join("architecture-rules.json");
-    let bindings = load_tddd_layers(&rules_path, &root).map_err(|e| match e {
-        LoadTdddLayersError::Io { path, source } => format!("{}: {source}", path.display()),
-        LoadTdddLayersError::Parse(err) => format!("{}: {err}", rules_path.display()),
-    })?;
-    let bindings: Vec<_> = bindings.into_iter().filter(|b| include_binding(b)).collect();
-
-    // Handle empty filtered binding list.
-    if bindings.is_empty() {
-        if fail_on_empty_bindings {
-            // Fail-closed for chain ③ `check-impl-catalog`: silently passing an empty
-            // layer set would allow CI to succeed on a repo where every layer has
-            // `tddd.enabled = false`, violating the same contract enforced by
-            // `verify_type_signals_from_spec_json`.
-            let outcome = infrastructure::verify::VerifyOutcome::from_findings(vec![
-                infrastructure::verify::VerifyFinding::error(format!(
-                    "[BLOCKED] {command_label}: no TDDD-enabled layers for chain ③ check — \
-                     set `tddd.enabled: true` for at least one layer in architecture-rules.json"
-                )),
-            ]);
-            return Ok(crate::cmd_outcome::render_outcome(command_label, &outcome));
-        }
-        // No layers opted in (e.g. chain ② with no catalogue-spec-signal-enabled layers)
-        // — nothing to check; return a clean pass without attempting to resolve the
-        // active track id (which would fail outside a real track branch).
-        return Ok(crate::cmd_outcome::render_outcome(
-            command_label,
-            &infrastructure::verify::VerifyOutcome::pass(),
-        ));
-    }
-    let reader = BindingSignalLayerReader {
-        inner: LocalSignalLayerReaderAdapter::new(root.clone()),
-        bindings: bindings.clone(),
-    };
-
-    let track_id_str = {
-        reader
-            .active_track_id()
-            .map_err(|e| format!("{command_label}: cannot resolve active track id: {e}"))?
-            .to_string()
-    };
-
-    let per_layer_fn: Box<
-        dyn Fn(domain::tddd::LayerId, &str) -> infrastructure::verify::VerifyOutcome,
-    > = {
-        let items_dir = items_dir.clone();
-        let track_id_str = track_id_str.clone();
-        Box::new(move |layer: domain::tddd::LayerId, hash_hex: &str| {
-            let layer_str = layer.as_ref();
-            let Some(binding) = find_binding(&bindings, layer_str) else {
-                return infrastructure::verify::VerifyOutcome::from_findings(vec![
-                    infrastructure::verify::VerifyFinding::error(format!(
-                        "TDDD layer binding for '{layer_str}' not found"
-                    )),
-                ]);
-            };
-            let signals_path = items_dir.join(&track_id_str).join(signal_file_name(binding));
-            verifier(&signals_path, hash_hex, strict)
-        })
-    };
-
-    let outcome = run_usecase(&reader, per_layer_fn);
-    Ok(render_outcome(command_label, &outcome))
 }
 
 fn merge_outcomes(label: &str, outcomes: Vec<CommandOutcome>) -> CommandOutcome {
@@ -227,7 +70,7 @@ fn load_gate_matrix(
         })
 }
 
-fn resolve_strict(
+pub(crate) fn resolve_strict(
     strict_override: bool,
     gate: Option<SignalGateName>,
     chain_id: domain::ChainId,
@@ -246,6 +89,40 @@ fn gate_name_to_kind(gate: SignalGateName) -> domain::GateKind {
         SignalGateName::Commit => domain::GateKind::Commit,
         SignalGateName::Merge => domain::GateKind::Merge,
     }
+}
+
+/// Build the chain ① reader + workspace_root pair and delegate unconditionally
+/// to the usecase orchestrator. cli-composition layer is wire-up only (DI) — the
+/// `Option<PathBuf>` branching lives in [`usecase::signal::resolve_spec_json_path`];
+/// this function never inspects `override_path` to decide its own control flow.
+///
+/// When `workspace_root` is `None`, `SystemGitRepo::discover()` resolves the repo
+/// root from the current working directory.  When `override_path` is `Some`, the
+/// usecase short-circuits and returns it verbatim without consulting the reader or
+/// `workspace_root`.
+fn resolve_spec_json_path(
+    workspace_root: Option<&Path>,
+    override_path: Option<PathBuf>,
+) -> Result<PathBuf, CommandOutcome> {
+    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
+
+    let resolved_root: PathBuf = match workspace_root {
+        Some(root) => root.to_path_buf(),
+        None => SystemGitRepo::discover().map(|repo| repo.root().to_path_buf()).map_err(|e| {
+            CommandOutcome::failure(Some(format!(
+                "[BLOCKED] cannot discover git repository: {e}; \
+                     pass --workspace-root or --spec-json explicitly"
+            )))
+        })?,
+    };
+    let reader = LocalSignalLayerReaderAdapter::new(resolved_root.clone());
+    usecase::signal::resolve_spec_json_path(&reader, &resolved_root, override_path).map_err(|e| {
+        CommandOutcome::failure(Some(format!(
+            "[BLOCKED] cannot resolve spec.json from active track: {e}; \
+             pass --workspace-root or --spec-json explicitly"
+        )))
+    })
 }
 
 impl CliApp {
@@ -284,9 +161,23 @@ impl CliApp {
     }
 
     /// Compute and persist chain ① (spec→ADR) signals to `spec.json`.
-    pub fn signal_calc_spec_adr(&self, spec_json_path: PathBuf) -> Result<CommandOutcome, String> {
+    ///
+    /// When `spec_json_path` is `None`, resolves it from the active track
+    /// (current git branch `track/<id>` → `track/items/<id>/spec.json` under
+    /// `workspace_root`). Pass `Some(path)` to override.
+    pub fn signal_calc_spec_adr(
+        &self,
+        spec_json_path: Option<PathBuf>,
+        workspace_root: Option<PathBuf>,
+    ) -> Result<CommandOutcome, String> {
         use infrastructure::spec::codec as spec_codec;
         use infrastructure::track::atomic_write::atomic_write_file;
+
+        let spec_json_path = match resolve_spec_json_path(workspace_root.as_deref(), spec_json_path)
+        {
+            Ok(p) => p,
+            Err(outcome) => return Ok(outcome),
+        };
 
         let json_content = std::fs::read_to_string(&spec_json_path).map_err(|e| {
             format!("signal calc-spec-adr: cannot read {}: {e}", spec_json_path.display())
@@ -305,9 +196,19 @@ impl CliApp {
     }
 
     /// Evaluate chain ① (spec→ADR) gate.
+    ///
+    /// When `spec_json_path` is `None`, resolves it from the active track
+    /// (current git branch `track/<id>` → `track/items/<id>/spec.json` under
+    /// `workspace_root`). Pass `Some(path)` to override spec.json resolution.
+    ///
+    /// Note: `workspace_root` (or a git-discoverable checkout) is **also** required
+    /// for gate-matrix resolution (`signal-gates.json`) unless `strict_override` is
+    /// `true`.  Passing `--spec-json` alone does not remove the git-discovery
+    /// requirement for the check variant; use `--workspace-root` or `--strict` to
+    /// satisfy both concerns outside a normal checkout.
     pub fn signal_check_spec_adr(
         &self,
-        spec_json_path: PathBuf,
+        spec_json_path: Option<PathBuf>,
         strict_override: bool,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
@@ -319,6 +220,12 @@ impl CliApp {
             workspace_root.as_deref(),
         ) {
             Ok(s) => s,
+            Err(outcome) => return Ok(outcome),
+        };
+
+        let spec_json_path = match resolve_spec_json_path(workspace_root.as_deref(), spec_json_path)
+        {
+            Ok(p) => p,
             Err(outcome) => return Ok(outcome),
         };
 
@@ -586,24 +493,10 @@ impl CliApp {
         let project_root = project_root.unwrap_or_else(|| resolved_root.clone());
 
         // Resolve `spec_json_path` from the active track when not supplied.
-        let spec_json_path = match spec_json_path {
-            Some(p) => p,
-            None => {
-                use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
-                use usecase::signal::SignalLayerReader as _;
-                let reader = LocalSignalLayerReaderAdapter::new(resolved_root.clone());
-                match reader.active_track_id() {
-                    Ok(track_id) => {
-                        resolved_root.join("track/items").join(track_id.as_ref()).join("spec.json")
-                    }
-                    Err(e) => {
-                        return Ok(CommandOutcome::failure(Some(format!(
-                            "[BLOCKED] signal check --gate {gate:?}: cannot resolve spec.json from \
-                             active track: {e}; pass --spec-json explicitly"
-                        ))));
-                    }
-                }
-            }
+        let spec_json_path = match resolve_spec_json_path(workspace_root.as_deref(), spec_json_path)
+        {
+            Ok(p) => p,
+            Err(outcome) => return Ok(outcome),
         };
 
         let gate_label = match gate {

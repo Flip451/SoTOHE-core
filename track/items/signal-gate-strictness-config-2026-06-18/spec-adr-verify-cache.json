@@ -2624,6 +2624,14 @@
         "kind": "pass",
         "citation": "commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）は、それぞれ 4 つの `signal check-* --gate commit|merge` を呼ぶ。利便のため集約コマンド `signal check --gate commit|merge`（4 chain を一括評価し signal-gates.json を解決）も用意する。"
       }
+    },
+    {
+      "claim_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "evidence_hash": "3bb7c78b2d350a1c728b89724a92f35154063b7927b80927ffbe72ddd7c602f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各々が独立した `--strict` を取る / `strict=true` のとき Yellow（`ReviewFindingRef`）も `Finding::error`"
+      }
     }
   ]
 }

@@ -256,7 +256,7 @@
       "role": { "SecondaryAdapter": {} },
       "kind": {
         "kind": "struct",
-        "shape": { "kind": "plain", "fields": [{ "name": "workspace_root", "ty": "std::path::PathBuf" }], "has_stripped_fields": false }
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
       },
       "methods": [],
       "module_path": "signal_layer_reader",
@@ -274,11 +274,8 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "repo_root", "ty": "std::path::PathBuf" },
-            { "name": "branch", "ty": "String" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -369,18 +366,14 @@
       "params": [
         {
           "name": "project_root",
-          "ty": "std::path::PathBuf"
-        },
-        {
-          "name": "strict",
-          "ty": "bool"
+          "ty": "&std::path::Path"
         }
       ],
       "returns": "domain::verify::VerifyOutcome",
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Execute the `signal check-adr-user` path. Modified from baseline to accept a `strict: bool` parameter. When `strict=true`, `ReviewFindingRef` (Yellow) results are promoted to `Finding::error`. `NoGrounds` (Red) is always `Finding::error` regardless of strictness. `Grandfathered` is always skipped.",
+      "docs": "Execute the `signal check-adr-user` path (non-strict mode). Does not accept a `strict` parameter; delegates to `execute_verify_adr_signals_with_strict(project_root, false)`. Yellow signals remain warnings (exit 0). Red signals produce an error finding (exit 1). This is the split from the original single-param design: strict-mode callers use `execute_verify_adr_signals_with_strict` directly.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -685,102 +678,6 @@
       ],
       "informal_grounds": []
     },
-    "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_for_layer": {
-      "action": "add",
-      "role": "FreeFunction",
-      "params": [
-        {
-          "name": "workspace_root",
-          "ty": "&std::path::Path"
-        },
-        {
-          "name": "track_id",
-          "ty": "domain::TrackId"
-        },
-        {
-          "name": "layer_id",
-          "ty": "domain::tddd::LayerId"
-        },
-        {
-          "name": "catalog_hash_hex",
-          "ty": "&str"
-        },
-        {
-          "name": "strict",
-          "ty": "bool"
-        }
-      ],
-      "returns": "domain::verify::VerifyOutcome",
-      "is_async": false,
-      "generics": [],
-      "where_predicates": [],
-      "docs": "D8/T020 per-layer check primitive for chain ② (`check-catalog-spec`). This infrastructure-layer wrapper receives the workspace root, the usecase-resolved TrackId, the usecase-owned layer ID, and pre-computed catalogue SHA-256 hex. It derives the track-scoped `track/items/<track-id>/<layer>-catalogue-spec-signals.json` path inside infrastructure and delegates to `check_catalog_spec_from_signals_file`. CLI command files and cli-composition do not pass `--signals-path` / `--catalog-hash`, resolve the active track, or construct paths.",
-      "spec_refs": [
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-16"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-17"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-20"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-21"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "infrastructure::verify::catalogue_spec_signals::calc_catalog_spec_for_layer": {
-      "action": "add",
-      "role": "FreeFunction",
-      "params": [
-        {
-          "name": "workspace_root",
-          "ty": "&std::path::Path"
-        },
-        {
-          "name": "track_id",
-          "ty": "domain::TrackId"
-        },
-        {
-          "name": "layer_id",
-          "ty": "domain::tddd::LayerId"
-        },
-        {
-          "name": "catalog_hash_hex",
-          "ty": "&str"
-        }
-      ],
-      "returns": "domain::verify::VerifyOutcome",
-      "is_async": false,
-      "generics": [],
-      "where_predicates": [],
-      "docs": "D8/T020 per-layer calc primitive for chain ② (`calc-catalog-spec`). This infrastructure-layer wrapper receives the workspace root, the usecase-resolved TrackId, the usecase-owned layer ID, and pre-computed catalogue SHA-256 hex from the argless usecase orchestrator. It derives the track-scoped layer catalogue and `track/items/<track-id>/<layer>-catalogue-spec-signals.json` output paths inside infrastructure, refreshes the catalogue-spec signal document for exactly that layer, and persists the provided catalogue hash as the document-level freshness hash. CLI command files and cli-composition do not pass per-layer paths or hashes, resolve the active track, enumerate layers, compute hashes, or construct output paths.",
-      "spec_refs": [
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-16"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-17"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-20"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-21"
-        }
-      ],
-      "informal_grounds": []
-    },
     "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file": {
       "action": "add",
       "role": "FreeFunction",
@@ -818,105 +715,55 @@
         }
       ],
       "informal_grounds": []
-    },
-    "infrastructure::verify::spec_states::check_impl_catalog_for_layer": {
-      "action": "add",
-      "role": "FreeFunction",
-      "params": [
-        {
-          "name": "workspace_root",
-          "ty": "&std::path::Path"
-        },
-        {
-          "name": "track_id",
-          "ty": "domain::TrackId"
-        },
-        {
-          "name": "layer_id",
-          "ty": "domain::tddd::LayerId"
-        },
-        {
-          "name": "catalog_hash_hex",
-          "ty": "&str"
-        },
-        {
-          "name": "strict",
-          "ty": "bool"
-        }
-      ],
-      "returns": "domain::verify::VerifyOutcome",
-      "is_async": false,
-      "generics": [],
-      "where_predicates": [],
-      "docs": "D8/T020 per-layer check primitive for chain ③ (`check-impl-catalog`). This infrastructure-layer wrapper receives the workspace root, the usecase-resolved TrackId, the usecase-owned layer ID, and pre-computed catalogue SHA-256 hex. It derives the track-scoped `track/items/<track-id>/<layer>-type-signals.json` path inside infrastructure and delegates to `check_impl_catalog_from_signals_file`. CLI command files and cli-composition do not pass `--signals-path` / `--catalog-hash`, resolve the active track, or construct paths.",
-      "spec_refs": [
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-16"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-17"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-20"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-21"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "infrastructure::verify::spec_states::calc_impl_catalog_for_layer": {
-      "action": "add",
-      "role": "FreeFunction",
-      "params": [
-        {
-          "name": "workspace_root",
-          "ty": "&std::path::Path"
-        },
-        {
-          "name": "track_id",
-          "ty": "domain::TrackId"
-        },
-        {
-          "name": "layer_id",
-          "ty": "domain::tddd::LayerId"
-        },
-        {
-          "name": "catalog_hash_hex",
-          "ty": "&str"
-        }
-      ],
-      "returns": "domain::verify::VerifyOutcome",
-      "is_async": false,
-      "generics": [],
-      "where_predicates": [],
-      "docs": "D8/T020 per-layer calc primitive for chain ③ (`calc-impl-catalog`). This infrastructure-layer wrapper receives the workspace root, the usecase-resolved TrackId, the usecase-owned layer ID, and pre-computed catalogue SHA-256 hex from the argless usecase orchestrator. It derives the track-scoped layer catalogue, baseline, and `track/items/<track-id>/<layer>-type-signals.json` output paths inside infrastructure, evaluates type signals for exactly that layer, and persists the provided catalogue hash as the declaration freshness hash. CLI command files and cli-composition do not pass per-layer paths or hashes, resolve the active track, enumerate layers, compute hashes, or construct output paths.",
-      "spec_refs": [
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-16"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-17"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-20"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-21"
-        }
-      ],
-      "informal_grounds": []
     }
   },
-  "inherent_impls": [],
+  "inherent_impls": [
+    {
+      "type_name": "GitBlobAdrFileAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "repo_root", "ty": "std::path::PathBuf" },
+            { "name": "branch", "ty": "String" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "LocalSignalLayerReaderAdapter",
+      "methods": [
+        {
+          "name": "discover",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<Self, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "workspace_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
   "trait_impls": [
     {
       "action": "add",

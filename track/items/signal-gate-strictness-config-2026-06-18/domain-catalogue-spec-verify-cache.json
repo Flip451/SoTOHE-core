@@ -729,6 +729,14 @@
         "kind": "pass",
         "citation": "`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。"
       }
+    },
+    {
+      "claim_hash": "782af7209396fe43ee23e189dcd8d457d1bf2e50ca14d7fe2be1707ad1f43e3b",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
     }
   ]
 }

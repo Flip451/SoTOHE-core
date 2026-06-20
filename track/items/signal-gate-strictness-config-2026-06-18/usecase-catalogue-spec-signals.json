@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "19cbb2e401d7fa6aa5da1dd89c32cf6f38a2888e8d410106ad3188eee204d4f3",
+  "catalogue_declaration_hash": "67b25e36dc1979db93691225e377c22a3d3dcbb49a463ae4ee02a9d60e25b445",
   "signals": [
     {
       "type_name": "AdrUserChain",
@@ -40,7 +40,7 @@
     {
       "type_name": "TrackBlobReader",
       "signal": "blue",
-      "entry_hash": "77b6763a8f2b20e2cf31d0df4dd8130c08762fba818475027baae08ef2354ff5"
+      "entry_hash": "360f62c00ffeff5c4fe37cc24989d8f12eed0da22ebbbee6f7307320a413d4b1"
     },
     {
       "type_name": "VerifyAdrSignals",
@@ -50,7 +50,7 @@
     {
       "type_name": "usecase::merge_gate::check_strict_merge_gate",
       "signal": "blue",
-      "entry_hash": "b51caf58688a1035800469a05e2479e2ebc220fd83b33ed21278b30adc5ab4c3"
+      "entry_hash": "e8c4468ec950635c0da48ca1e8f25a2bc9d2515f6a1185a781d881f3d5e793a5"
     },
     {
       "type_name": "usecase::signal::calc_catalog_spec",
@@ -71,6 +71,11 @@
       "type_name": "usecase::signal::check_impl_catalog",
       "signal": "blue",
       "entry_hash": "58e63ae4dd2a3fda321a1b296aa851d4d6bd54305d2b2341dae79c42e050a816"
+    },
+    {
+      "type_name": "usecase::signal::resolve_spec_json_path",
+      "signal": "blue",
+      "entry_hash": "d89af22361eb48d7fa1874e52446a2fdcd94c14be948eff87899fecf331990e7"
     }
   ]
 }

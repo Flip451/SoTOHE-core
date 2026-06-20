@@ -200,8 +200,8 @@
           "name": "read_spec_document",
           "receiver": "&self",
           "params": [
-            { "name": "branch", "ty": "String" },
-            { "name": "track_id", "ty": "domain::TrackId" }
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
           ],
           "returns": "BlobFetchResult<domain::spec::SpecDocument>",
           "is_async": false,
@@ -213,22 +213,22 @@
           "name": "read_type_catalogue",
           "receiver": "&self",
           "params": [
-            { "name": "branch", "ty": "String" },
-            { "name": "track_id", "ty": "domain::TrackId" },
-            { "name": "layer", "ty": "domain::tddd::LayerId" }
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "layer_id", "ty": "&str" }
           ],
-          "returns": "BlobFetchResult<Option<String>>",
+          "returns": "BlobFetchResult<(Vec<u8>, String)>",
           "is_async": false,
           "generics": [],
-          "has_default_impl": true,
+          "has_default_impl": false,
           "where_predicates": []
         },
         {
           "name": "read_impl_plan",
           "receiver": "&self",
           "params": [
-            { "name": "branch", "ty": "String" },
-            { "name": "track_id", "ty": "domain::TrackId" }
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
           ],
           "returns": "BlobFetchResult<domain::ImplPlanDocument>",
           "is_async": false,
@@ -240,84 +240,82 @@
           "name": "read_enabled_layers",
           "receiver": "&self",
           "params": [
-            { "name": "branch", "ty": "String" },
-            { "name": "track_id", "ty": "domain::TrackId" }
+            { "name": "_branch", "ty": "&str" }
           ],
-          "returns": "BlobFetchResult<Vec<domain::tddd::LayerId>>",
+          "returns": "BlobFetchResult<Vec<String>>",
           "is_async": false,
           "generics": [],
-          "has_default_impl": false,
+          "has_default_impl": true,
           "where_predicates": []
         },
         {
           "name": "read_catalogue_for_spec_ref_check",
           "receiver": "&self",
           "params": [
-            { "name": "branch", "ty": "String" },
-            { "name": "track_id", "ty": "domain::TrackId" },
-            { "name": "layer", "ty": "domain::tddd::LayerId" }
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
           ],
-          "returns": "BlobFetchResult<String>",
+          "returns": "BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String, std::collections::HashMap<String, domain::ContentHash>)>",
           "is_async": false,
           "generics": [],
-          "has_default_impl": false,
+          "has_default_impl": true,
           "where_predicates": []
         },
         {
           "name": "read_catalogue_spec_signals_document",
           "receiver": "&self",
           "params": [
-            { "name": "branch", "ty": "String" },
-            { "name": "track_id", "ty": "domain::TrackId" },
-            { "name": "layer", "ty": "domain::tddd::LayerId" }
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
           ],
           "returns": "BlobFetchResult<domain::CatalogueSpecSignalsDocument>",
           "is_async": false,
           "generics": [],
-          "has_default_impl": false,
+          "has_default_impl": true,
           "where_predicates": []
         },
         {
           "name": "read_catalogue_spec_signal_opted_in_layers",
           "receiver": "&self",
           "params": [
-            { "name": "branch", "ty": "String" },
-            { "name": "track_id", "ty": "domain::TrackId" }
+            { "name": "_branch", "ty": "&str" }
           ],
-          "returns": "BlobFetchResult<Vec<domain::tddd::LayerId>>",
+          "returns": "BlobFetchResult<Vec<String>>",
           "is_async": false,
           "generics": [],
-          "has_default_impl": false,
+          "has_default_impl": true,
           "where_predicates": []
         },
         {
           "name": "read_type_signals",
           "receiver": "&self",
           "params": [
-            { "name": "branch", "ty": "String" },
-            { "name": "track_id", "ty": "domain::TrackId" },
-            { "name": "layer", "ty": "domain::tddd::LayerId" }
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
           ],
           "returns": "BlobFetchResult<domain::TypeSignalsDocument>",
           "is_async": false,
           "generics": [],
-          "has_default_impl": false,
+          "has_default_impl": true,
           "where_predicates": []
         },
         {
           "name": "read_adr_verify_report",
           "receiver": "&self",
           "params": [
-            { "name": "branch", "ty": "String" }
+            { "name": "_branch", "ty": "String" }
           ],
           "returns": "BlobFetchResult<domain::AdrVerifyReport>",
           "is_async": false,
           "generics": [],
-          "has_default_impl": false,
+          "has_default_impl": true,
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [],
       "module_path": "merge_gate",
       "docs": "Secondary port for reading track-level domain documents for merge gate evaluation. Modified in this track to add `read_adr_verify_report(branch)` supporting chain ⓪ evaluation in `check_strict_merge_gate` for the target branch without exposing filesystem paths to the usecase layer.",
       "spec_refs": [
@@ -420,13 +418,33 @@
       ],
       "informal_grounds": []
     },
+    "usecase::signal::resolve_spec_json_path": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "workspace_root", "ty": "&std::path::Path" },
+        { "name": "override_path", "ty": "Option<std::path::PathBuf>" }
+      ],
+      "returns": "Result<std::path::PathBuf, SignalLayerReaderError>",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] }
+      ],
+      "where_predicates": [],
+      "docs": "Resolve `spec.json` path for chain ① (`spec-adr`) commands. When `override_path` is `Some`, returns it verbatim. Otherwise consults `reader.active_track_id()` and constructs `<workspace_root>/track/items/<track-id>/spec.json`. Centralises the resolution policy so adapter / composition code never branches on `Option<PathBuf>` itself. Active-track resolution is the usecase orchestrator responsibility per CN-17 / ADR §D8.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" }
+      ],
+      "informal_grounds": []
+    },
     "usecase::merge_gate::check_strict_merge_gate": {
       "action": "modify",
       "role": "UseCaseFunction",
       "params": [
-        { "name": "branch", "ty": "String" },
-        { "name": "reader", "ty": "R" },
-        { "name": "gate_matrix", "ty": "domain::SignalGateMatrix" }
+        { "name": "branch", "ty": "&str" },
+        { "name": "reader", "ty": "&R" },
+        { "name": "gate_matrix", "ty": "&domain::SignalGateMatrix" }
       ],
       "returns": "domain::verify::VerifyOutcome",
       "is_async": false,

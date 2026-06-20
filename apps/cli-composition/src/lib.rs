@@ -24,6 +24,7 @@ mod ref_verify;
 pub mod review_v2;
 mod semantic_dup;
 pub mod signal;
+mod signal_layer_chain;
 mod telemetry;
 pub mod track;
 pub mod verify;

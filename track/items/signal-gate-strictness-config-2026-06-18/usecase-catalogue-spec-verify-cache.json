@@ -897,6 +897,62 @@
         "kind": "pass",
         "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙は `libs/domain/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
       }
+    },
+    {
+      "claim_hash": "360f62c00ffeff5c4fe37cc24989d8f12eed0da22ebbbee6f7307320a413d4b1",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）"
+      }
+    },
+    {
+      "claim_hash": "360f62c00ffeff5c4fe37cc24989d8f12eed0da22ebbbee6f7307320a413d4b1",
+      "evidence_hash": "3590a67905d3588a475a75bbaca6b518b204bdbda1836fa0b80d614b13bdc8f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check_strict_merge_gate` が chain ⓪ を評価する。"
+      }
+    },
+    {
+      "claim_hash": "e8c4468ec950635c0da48ca1e8f25a2bc9d2515f6a1185a781d881f3d5e793a5",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit gate（`ci-local`）と merge gate（`check_strict_merge_gate`）をそれぞれ 4 つの `signal check-* --gate commit|merge` に結線する。merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）。"
+      }
+    },
+    {
+      "claim_hash": "e8c4468ec950635c0da48ca1e8f25a2bc9d2515f6a1185a781d881f3d5e793a5",
+      "evidence_hash": "3590a67905d3588a475a75bbaca6b518b204bdbda1836fa0b80d614b13bdc8f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`merge_gate.adr_user: \"strict\"` のとき Yellow（`ReviewFindingRef`）が merge gate で `Finding::error` として block される。`commit_gate.adr_user: \"interim\"` のとき Yellow は `Finding::warning` で通過する。`Red`（`NoGrounds`）は両ゲートで常に `Finding::error`。`Grandfathered` は常に skip。`check_strict_merge_gate` が chain ⓪ を評価する。"
+      }
+    },
+    {
+      "claim_hash": "e8c4468ec950635c0da48ca1e8f25a2bc9d2515f6a1185a781d881f3d5e793a5",
+      "evidence_hash": "1af79b8a47621ccc1cf1f557c76cae6758b4cbc3023d771aad094012fd30b70a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪（adr-user）を commit / merge gate の両方に結線し、merge gate では strict（Yellow も block）とすることで、`review_finding_ref` 止まりの ADR decision が `user_decision_ref` へ昇格しないまま merge されることを防ぐ。"
+      }
+    },
+    {
+      "claim_hash": "d89af22361eb48d7fa1874e52446a2fdcd94c14be948eff87899fecf331990e7",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務"
+      }
+    },
+    {
+      "claim_hash": "04b52e16c636818996263543bf3ac3a5685c12404531925e59de94e0389884ca",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Strict 対応の adr-signal verifier として `execute_verify_adr_signals_with_strict(project_root, strict)` を新設し、既存の `execute_verify_adr_signals(project_root)` は非 strict のショートカットとして `_with_strict(project_root, false)` に delegate する形に保つ。"
+      }
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c750a8a6faa825674be347b6966757a1601307d137ec2e11df7c043eed9f294c",
+  "catalogue_declaration_hash": "3b6bbfd58daec1e6c8384bb5682344082f1bdfb3f9fd8445dbfa3a3c6ea98c84",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -10,12 +10,12 @@
     {
       "type_name": "GitBlobAdrFileAdapter",
       "signal": "blue",
-      "entry_hash": "be3e7bae5e984aaab887d39b8522bc9cce7b5375470d61f8f4fefb07527200fd"
+      "entry_hash": "b221dc1df5175becd9651fbe7146db89b822662fd9bd521880982fc0af49f4ef"
     },
     {
       "type_name": "LocalSignalLayerReaderAdapter",
       "signal": "blue",
-      "entry_hash": "b0ecc57264f7fbe3c0829f177c59fdd87924632f3cf360b8acf7e3461838a6f5"
+      "entry_hash": "edd1fdab8f3f2a94e11648dc12bf29fe54e94aa50b6b358ab8385be5767eb3c7"
     },
     {
       "type_name": "SignalGatesConfig",
@@ -35,22 +35,12 @@
     {
       "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals",
       "signal": "blue",
-      "entry_hash": "67cd7e7a0030c37efed714a40b5a9057ab86316cfea5c1d5543c07ebba812dae"
+      "entry_hash": "938a15c12fce0f14bf193b7f027fe6ab0e614b9720afb2533adb2a283b43ba8f"
     },
     {
       "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict",
       "signal": "blue",
       "entry_hash": "a2fce744db445304aa687191f883a235e237cc2615672d14020f9282e5afd83a"
-    },
-    {
-      "type_name": "infrastructure::verify::catalogue_spec_signals::calc_catalog_spec_for_layer",
-      "signal": "blue",
-      "entry_hash": "e7204de614bcda074a6ad9f4e8a8f9dfbab3d2976f9134d59381ba91b97f8ef0"
-    },
-    {
-      "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_for_layer",
-      "signal": "blue",
-      "entry_hash": "032a2ac72efb7567b209aac68dadf5fcf02c01861eb4cbd76d5bff437fba1e9b"
     },
     {
       "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file",
@@ -86,16 +76,6 @@
       "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config_from_branch",
       "signal": "blue",
       "entry_hash": "bb2d5da897defa18ca0e6fb63950b8a995085098fca2c73db85912fe7b5fd971"
-    },
-    {
-      "type_name": "infrastructure::verify::spec_states::calc_impl_catalog_for_layer",
-      "signal": "blue",
-      "entry_hash": "a465cee78fceb50b5318a1f27e5f3d993f746d14c3bc1d90461ca7c6fd4b304e"
-    },
-    {
-      "type_name": "infrastructure::verify::spec_states::check_impl_catalog_for_layer",
-      "signal": "blue",
-      "entry_hash": "15974546c12a51a71c2ecaa4cf886e6c04eb41b337f25fd204d55c489ec640b0"
     },
     {
       "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file",

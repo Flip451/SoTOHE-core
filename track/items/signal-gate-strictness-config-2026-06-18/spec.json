@@ -104,7 +104,7 @@
       },
       {
         "id": "IN-03",
-        "text": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。`execute_verify_adr_signals` に `strict: bool` 引数を追加して `signal check-adr-user --strict` で Yellow（`ReviewFindingRef`）も block できるようにする。chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。",
+        "text": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。Strict 対応の adr-signal verifier として `execute_verify_adr_signals_with_strict(project_root, strict)` を新設し、既存の `execute_verify_adr_signals(project_root)` は非 strict のショートカットとして `_with_strict(project_root, false)` に delegate する形に保つ。これにより `signal check-adr-user --strict` で Yellow（`ReviewFindingRef`）も block できる。chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",

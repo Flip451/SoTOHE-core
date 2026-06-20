@@ -24,8 +24,31 @@ pub mod port;
 
 pub use port::{SignalLayerReader, SignalLayerReaderError};
 
+use std::path::{Path, PathBuf};
+
 use domain::tddd::LayerId;
 use domain::verify::{VerifyFinding, VerifyOutcome};
+
+/// Resolve `spec.json` path for chain ① (`spec-adr`) commands.
+///
+/// When `override_path` is `Some`, returns it verbatim. Otherwise consults
+/// `reader.active_track_id()` and constructs
+/// `<workspace_root>/track/items/<track-id>/spec.json`.
+///
+/// Centralises the resolution policy so adapter / composition code never
+/// branches on `Option<PathBuf>` itself — they call this orchestrator
+/// unconditionally and pass the resulting `PathBuf` to the chain ① primitives.
+pub fn resolve_spec_json_path<R: SignalLayerReader>(
+    reader: &R,
+    workspace_root: &Path,
+    override_path: Option<PathBuf>,
+) -> Result<PathBuf, SignalLayerReaderError> {
+    if let Some(p) = override_path {
+        return Ok(p);
+    }
+    let track_id = reader.active_track_id()?;
+    Ok(workspace_root.join("track/items").join(track_id.as_ref()).join("spec.json"))
+}
 
 fn merge_layer_outcomes(outcomes: Vec<VerifyOutcome>) -> VerifyOutcome {
     let mut result = VerifyOutcome::pass();
@@ -329,6 +352,40 @@ mod tests {
 
         assert!(outcome.is_ok());
         assert_eq!(calls.borrow().len(), 2);
+    }
+
+    // --- resolve_spec_json_path tests ---
+
+    #[test]
+    fn test_resolve_spec_json_path_override_wins() {
+        // When override_path is Some, the reader is never consulted.
+        let reader = MockReader::new("ignored-track-2026-01-01", &[]).with_track_id_error();
+        let override_path = PathBuf::from("/some/explicit/spec.json");
+        let result =
+            resolve_spec_json_path(&reader, Path::new("/workspace"), Some(override_path.clone()));
+        assert_eq!(result.unwrap(), override_path, "override path must be returned verbatim");
+    }
+
+    #[test]
+    fn test_resolve_spec_json_path_constructs_active_track_path() {
+        // When override_path is None, constructs <workspace_root>/track/items/<track_id>/spec.json.
+        let reader = MockReader::new("my-track-2026-01-01", &[]);
+        let workspace = Path::new("/workspace");
+        let result = resolve_spec_json_path(&reader, workspace, None);
+        let expected = PathBuf::from("/workspace/track/items/my-track-2026-01-01/spec.json");
+        assert_eq!(result.unwrap(), expected);
+    }
+
+    #[test]
+    fn test_resolve_spec_json_path_propagates_reader_error() {
+        // When override_path is None and reader.active_track_id() fails, the error is surfaced.
+        let reader = MockReader::new("t", &[]).with_track_id_error();
+        let result = resolve_spec_json_path(&reader, Path::new("/workspace"), None);
+        assert!(result.is_err(), "expected Err from SignalLayerReaderError::TrackIdUnresolved");
+        assert!(
+            matches!(result.unwrap_err(), SignalLayerReaderError::TrackIdUnresolved),
+            "error variant must be TrackIdUnresolved"
+        );
     }
 
     #[test]

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-20T08:43:51Z",
-  "declaration_hash": "c750a8a6faa825674be347b6966757a1601307d137ec2e11df7c043eed9f294c",
+  "generated_at": "2026-06-20T11:20:21Z",
+  "declaration_hash": "3b6bbfd58daec1e6c8384bb5682344082f1bdfb3f9fd8445dbfa3a3c6ea98c84",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -17,7 +17,7 @@
     {
       "type_name": "GitBlobAdrFileAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "AdrFilePort",
@@ -28,7 +28,7 @@
     {
       "type_name": "LocalSignalLayerReaderAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "SignalLayerReader",
@@ -71,7 +71,7 @@
     {
       "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals",
       "kind_tag": "free_function",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -79,18 +79,6 @@
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
-    },
-    {
-      "type_name": "infrastructure::verify::catalogue_spec_signals::calc_catalog_spec_for_layer",
-      "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
-      "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_for_layer",
-      "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
     },
     {
       "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file",
@@ -133,18 +121,6 @@
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
-    },
-    {
-      "type_name": "infrastructure::verify::spec_states::calc_impl_catalog_for_layer",
-      "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
-      "type_name": "infrastructure::verify::spec_states::check_impl_catalog_for_layer",
-      "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
     },
     {
       "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file",

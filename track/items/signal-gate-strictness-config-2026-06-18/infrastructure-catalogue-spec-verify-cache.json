@@ -801,6 +801,126 @@
         "kind": "pass",
         "citation": "`signal-gates.json` を削除した状態、パース不能な状態、`$schema_version` 不正な状態、必須キーが欠落した状態のいずれかで commit gate / merge gate を実行すると hard error で停止する。strict への暗黙フォールバックも fail-open も発生しない。"
       }
+    },
+    {
+      "claim_hash": "b221dc1df5175becd9651fbe7146db89b822662fd9bd521880982fc0af49f4ef",
+      "evidence_hash": "25efd6bf89a5bc969af7bfe15ada8df6850f603297e4e747c5812febb5a3fb82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge gate に chain ⓪（adr-user）の評価を新たに追加する（repo-global な ADR ディレクトリ走査）"
+      }
+    },
+    {
+      "claim_hash": "b221dc1df5175becd9651fbe7146db89b822662fd9bd521880982fc0af49f4ef",
+      "evidence_hash": "d89568b8f4a36675ccbefa8d2e705e696e8d9b4e7d22eef71a5d6ed191a3567a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge gate への chain ⓪ 追加は repo-global な ADR ディレクトリ走査を伴う。あるトラックの merge が「無関係な ADR の未エスカレート Yellow」で block される可能性がある（これは設計上のトレードオフとして受け入れる）。"
+      }
+    },
+    {
+      "claim_hash": "edd1fdab8f3f2a94e11648dc12bf29fe54e94aa50b6b358ab8385be5767eb3c7",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "edd1fdab8f3f2a94e11648dc12bf29fe54e94aa50b6b358ab8385be5767eb3c7",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来のレイヤーセット）は `libs/domain/src/` の domain primitive 責務、catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務でなければならず、... per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり"
+      }
+    },
+    {
+      "claim_hash": "6c5faffdcbf3439896f414cef4750bcd10236e7d5f07ff5b67332fd418c26e3b",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "execute_verify_adr_signals に `strict: bool` 引数を追加して `signal check-adr-user --strict` で Yellow（`ReviewFindingRef`）も block できるようにする。"
+      }
+    },
+    {
+      "claim_hash": "6c5faffdcbf3439896f414cef4750bcd10236e7d5f07ff5b67332fd418c26e3b",
+      "evidence_hash": "7238d93d78e0c057cc543c4fb5de9c48bcdcdb7d36a29fc210afe91437dcf10e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal check-adr-user --strict` が Yellow（`ReviewFindingRef`）を `Finding::error` とし、`--strict` なし（または `--gate` で interim に解決）では `Finding::warning` となる。"
+      }
+    },
+    {
+      "claim_hash": "6c5faffdcbf3439896f414cef4750bcd10236e7d5f07ff5b67332fd418c26e3b",
+      "evidence_hash": "5f186bf753e3b087b8e4162546b8cfa877e056f62ca3386c25783873cc880457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `check-*` の Yellow 扱い: `strict=true`（または `--gate` が strict セルに解決）→ `Finding::error`、`strict=false`（または `--gate` が interim セルに解決）→ `Finding::warning`。D2 は chain ⓪（`check-adr-user`）について `NoGrounds→error`、`Grandfathered→skip`、`ReviewFindingRef→strict 依存` を明示し"
+      }
+    },
+    {
+      "claim_hash": "938a15c12fce0f14bf193b7f027fe6ab0e614b9720afb2533adb2a283b43ba8f",
+      "evidence_hash": "7238d93d78e0c057cc543c4fb5de9c48bcdcdb7d36a29fc210afe91437dcf10e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal check-adr-user --strict` が Yellow（`ReviewFindingRef`）を `Finding::error` とし、`--strict` なし（または `--gate` で interim に解決）では `Finding::warning` となる。"
+      }
+    },
+    {
+      "claim_hash": "938a15c12fce0f14bf193b7f027fe6ab0e614b9720afb2533adb2a283b43ba8f",
+      "evidence_hash": "5f186bf753e3b087b8e4162546b8cfa877e056f62ca3386c25783873cc880457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `check-*` の Yellow 扱い: `strict=true`（または `--gate` が strict セルに解決）→ `Finding::error`、`strict=false`（または `--gate` が interim セルに解決）→ `Finding::warning`。"
+      }
+    },
+    {
+      "claim_hash": "938a15c12fce0f14bf193b7f027fe6ab0e614b9720afb2533adb2a283b43ba8f",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the evidence explicitly requires adding a `strict: bool` argument to `execute_verify_adr_signals`, while the catalogue entry says `execute_verify_adr_signals` does not accept a `strict` parameter and always delegates with `false`."
+      }
+    },
+    {
+      "claim_hash": "938a15c12fce0f14bf193b7f027fe6ab0e614b9720afb2533adb2a283b43ba8f",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Strict 対応の adr-signal verifier として `execute_verify_adr_signals_with_strict(project_root, strict)` を新設し、既存の `execute_verify_adr_signals(project_root)` は非 strict のショートカットとして `_with_strict(project_root, false)` に delegate する形に保つ。これにより `signal check-adr-user --strict` で Yellow（`ReviewFindingRef`）も block できる。"
+      }
+    },
+    {
+      "claim_hash": "cdbecf26371d4f0cf806c7f1587af1c88f15f9c01586e3561915f777dfe6572d",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "b7ab0cc07305def79e230c43d41751b7088408e115a2a2a820f326f5f0ad0c01",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "fc6cfad4ba7517fb1ebfb541596109afdc368ea5ffafaddaf75a544218f813f4",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。"
+      }
+    },
+    {
+      "claim_hash": "05fd3609d5a1aa4d8c4fa5f45d5617899cbd1cdb5069980f5fe38bcf55d87fce",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
     }
   ]
 }
