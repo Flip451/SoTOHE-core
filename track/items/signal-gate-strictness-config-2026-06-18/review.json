@@ -266,118 +266,245 @@
         }
       ]
     },
-    "other": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a5095cd589fb12f254275fd68be0e8b1b35c76a6af651994dc9b8004d218cba",
-          "at": "2026-06-19T17:09:12Z"
-        }
-      ]
-    },
-    "cli": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
-          "at": "2026-06-19T02:08:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
-          "at": "2026-06-19T02:10:22Z"
+          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
+          "at": "2026-06-18T07:29:56Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`#[arg(long)]` on `catalogue_hash` exposes the public flag as `--catalogue-hash`, but T009 and this module's own CLI-surface rule require the new `signal` UI to use `catalog` spelling. The same field appears in the catalog-spec and impl-catalog calc/check adapters, and the parser tests now lock in the wrong flag, so documented invocations using `--catalog-hash` will be rejected.",
+              "message": "`CatalogSpecChain::check_freshness` only compares the document-level `catalogue_declaration_hash` with the current catalogue hash. The chain ② contract requires the persisted per-entry `CatalogueSpecSignal::entry_hash()` values to be checked against freshly computed entry hashes before `evaluate_gate`; otherwise `SoTChain::check` can accept a signals document with stale, missing, or manually trimmed per-entry signals as long as the aggregate declaration hash still matches. Carry the current entry hashes in `CatalogSpecInput` and fail closed on missing/mismatched entries before delegating to `check_catalogue_spec_signals`.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
-              "line": 16,
-              "category": "correctness"
-            },
-            {
-              "message": "The aggregate `signal check` parser allows the catalog hash inputs to be omitted by defaulting both hashes to `\"\"`, but `run_aggregate_check` always forwards those values into chain ②/③ checks, where they are parsed as SHA-256 content hashes. As a result, the advertised `sotp signal check --gate commit|merge` path fails before evaluating all four chains unless callers manually provide both hashes, so AC-04's aggregate gate is not actually runnable with the default arguments tested here.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/signal/mod.rs",
-              "line": 137,
-              "category": "correctness"
-            },
-            {
-              "message": "The fallback `spec_json` path for the aggregate check is `track/items/spec.json`, but track specs in this repository live under `track/items/<track-id>/spec.json` or as `spec.json` within a track directory. With `--spec-json` omitted, the aggregate check points chain ① at a non-existent file, so the no-extra-args aggregate command cannot work from the normal repo layout.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/signal/mod.rs",
-              "line": 200,
+              "file": "libs/usecase/src/chain/catalog_spec.rs",
+              "line": 160,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:b2f064d4458171950a8276a6743229e18e726c2d45c653583ea936556bec1bfb",
-          "at": "2026-06-19T04:52:34Z"
+          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
+          "at": "2026-06-18T07:33:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9394221141e132d3d8c4372eb3d93650dc3b7218c4ccf6aceb5290341ac7c16b",
+          "at": "2026-06-18T07:49:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The chain-0 result is only merged at the end of the function, but the early returns here and at the later `stage1.has_errors()` check exit before that merge. Invalid branches or missing/failed `spec.json` therefore drop ADR findings entirely, which contradicts the new requirement that chain ⓪ be accumulated independently of the other stages.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "line": 305,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `strict=false` arm in `check_chain2_for_layer` is not exercised by any test in this scope, and every existing test now hardcodes `all_strict_matrix()`. That leaves the new warning-mode behavior and the added ADR reader port effectively unverified, so a regression in the non-blocking path could ship unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate/chain2_gate.rs",
+              "line": 275,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:ae16c95a27ef368c750b6df6c610cc94671494805594ed1e36b78102a69e83ff",
+          "at": "2026-06-18T09:54:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
+          "at": "2026-06-18T10:18:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` reads the ADR report before calling `validate_branch_ref`, so an untrusted branch string reaches the `TrackBlobReader` port unvalidated. That reintroduces the very ref-safety check this function is supposed to enforce and can make the adapter operate on malicious refs like `..` or `@{...}` before the branch is rejected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "line": 287,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
+          "at": "2026-06-18T10:19:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
+          "at": "2026-06-18T10:31:35Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`signal check --gate commit|merge` is specified as the aggregate command, with fallback paths when optional args are absent, but the parser now requires `--spec-json`, `--catalog-spec-hash`, and `--impl-catalog-hash` before dispatch. This means the advertised aggregate gate invocation is rejected by clap and cannot run all four chains unless callers know and provide extra arguments, breaking the aggregate gate surface described by the spec/briefing.",
+              "message": "Only `catalog_spec` is exercised with a non-strict matrix; the newly matrix-driven `adr_user`, `spec_adr`, and `impl_catalog` paths all run under `all_strict_matrix()` in tests. A swapped ChainId or accidental hardcoded strict value for any of those cells would still pass the current suite. Add focused interim-mode tests for Chain ⓪, Chain ①, and Chain ③ Yellow signals.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/signal/mod.rs",
-              "line": 131,
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 599,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
+          "at": "2026-06-18T10:34:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Chain ⓪ `read_adr_verify_report` error path is untested. The trait documents `FetchError` as fail-closed and this branch turns it into a blocking finding, but the added tests only cover `NotFound` and `Found` ADR reports. A regression that accidentally skipped ADR scan I/O/parse failures would still pass the current suite. Add a test with an otherwise clean gate and `BlobFetchResult::FetchError` from `read_adr_verify_report`, asserting `has_errors()` and the ADR failure message.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 302,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7ce09d370511ec4bdf5d979ea634cb37372db4aa5505f95c6ba4a2048d46b98a",
+          "at": "2026-06-18T10:51:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39818e433ede532476eeb14779e80fc977e38d5f445465e469d1a4da49aa69ba",
+          "at": "2026-06-18T11:12:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
+          "at": "2026-06-18T15:10:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
+          "at": "2026-06-18T15:13:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
+          "at": "2026-06-19T01:11:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
+          "at": "2026-06-19T01:14:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
+          "at": "2026-06-19T01:37:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
+          "at": "2026-06-19T01:40:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
+          "at": "2026-06-19T02:08:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
+          "at": "2026-06-19T02:11:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new signal orchestrators expose reader-error handling as part of their public contract, but the tests only cover `active_track_id` failure; there is no error-case coverage for `enabled_layers` or `catalogue_bytes` failures. Add tests that exercise those I/O paths, including the per-layer read-error branch that should emit an error finding while continuing other layers.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal/mod.rs",
+              "line": 53,
+              "category": "missing_tests"
+            }
+          ],
+          "hash": "rvw1:sha256:b0256a85d2ec349188322b643604d2b867a4c520b58dfb24cd5574245d7e97fd",
+          "at": "2026-06-19T16:42:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30f8b3bd730f1172b0477f3b8b6ce751bcc1f6e6e7ce5aa9a868ba83cc3fec54",
+          "at": "2026-06-19T16:48:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2523f3c62ece2d512c88450f531f2eb7381f4deda02f83a5e286fd8a603a62ff",
+          "at": "2026-06-19T17:48:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a34405dea36bb72d54ae19605035fe87f191a3ca089fcd242901d881da62981",
+          "at": "2026-06-20T04:07:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stale-spec remediation now tells users to run `sotp signal calc-spec-adr`, but that subcommand requires `--spec-json <path>` (`CalcSpecAdrArgs::spec_json`). Following this error message will fail at argument parsing, leaving a `check-spec-adr` stale-signal failure without a working recovery command. Include the required `--spec-json` argument in the emitted message.",
+              "severity": "P1",
+              "file": "libs/usecase/src/chain/spec_adr.rs",
+              "line": 75,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:81cd6a40453c1b8f075bb16830e9db08d92cef1ac0c692fba5c47fddc145a158",
-          "at": "2026-06-19T04:58:59Z"
+          "hash": "rvw1:sha256:e6f5911d6fdba16ebf01ca94c6f8db1be951ecfafb0415df0441c2ee1548ea0d",
+          "at": "2026-06-20T05:35:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0dc02409fe6df9bcfe6e06fcffca942e7f2eaf290d9cbe5b42ea95ecb2f576c6",
-          "at": "2026-06-19T05:12:48Z"
+          "hash": "rvw1:sha256:924ff0921d05919c5222b2b36e10001255158b7dc3a4f356f3486ac42c6eff54",
+          "at": "2026-06-20T05:38:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8341501ec6a41525a79715c6ea0924fc234467f9202b3ee72a9b98e8cb0c38c7",
-          "at": "2026-06-19T16:40:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ccc404a77702edd0e9e1791791673871396550867e612cbedb53102c4f91c5e",
-          "at": "2026-06-19T23:30:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3ddc27a1240080f726b9ea0a2060bace460fcc92bb37366b4334821f2dd1e72",
-          "at": "2026-06-20T01:45:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b20a1b7da7e125931010538ab05561bb29be79b63a9a18e2de5ddb4176cc6d22",
-          "at": "2026-06-20T03:50:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:504ee84a8bd22da6ece256462571c683903a9f6ed269eff7927bcfaa6d44d083",
-          "at": "2026-06-20T04:32:52Z"
+          "hash": "rvw1:sha256:425077940ee129ea1d7f2b970cae2d63040cd8f73e98352ea72b616afa42587c",
+          "at": "2026-06-20T06:13:48Z"
         }
       ]
     },
@@ -644,6 +771,13 @@
           "findings": [],
           "hash": "rvw1:sha256:ff968e0e91889aaf08d055491b5020468617df6c4869cb47cf11d70854014f8e",
           "at": "2026-06-20T05:30:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7655ce26d31077ab18e99a614af7ace12cc55572ed26764d9cf0e60eda8094c",
+          "at": "2026-06-20T08:40:23Z"
         }
       ]
     },
@@ -1665,6 +1799,121 @@
           "findings": [],
           "hash": "rvw1:sha256:e9773c4c0cddd1ee1c38cb3e6c8a8ffce0f59a9976b42800bdcf204bdbb6986c",
           "at": "2026-06-20T05:32:50Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a5095cd589fb12f254275fd68be0e8b1b35c76a6af651994dc9b8004d218cba",
+          "at": "2026-06-19T17:09:12Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
+          "at": "2026-06-19T02:08:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbc8f60ce8feced84eff901f9d6a4223c87c8f4e1568696519f342a72d49031e",
+          "at": "2026-06-19T02:10:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`#[arg(long)]` on `catalogue_hash` exposes the public flag as `--catalogue-hash`, but T009 and this module's own CLI-surface rule require the new `signal` UI to use `catalog` spelling. The same field appears in the catalog-spec and impl-catalog calc/check adapters, and the parser tests now lock in the wrong flag, so documented invocations using `--catalog-hash` will be rejected.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/calc_catalog_spec.rs",
+              "line": 16,
+              "category": "correctness"
+            },
+            {
+              "message": "The aggregate `signal check` parser allows the catalog hash inputs to be omitted by defaulting both hashes to `\"\"`, but `run_aggregate_check` always forwards those values into chain ②/③ checks, where they are parsed as SHA-256 content hashes. As a result, the advertised `sotp signal check --gate commit|merge` path fails before evaluating all four chains unless callers manually provide both hashes, so AC-04's aggregate gate is not actually runnable with the default arguments tested here.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/mod.rs",
+              "line": 137,
+              "category": "correctness"
+            },
+            {
+              "message": "The fallback `spec_json` path for the aggregate check is `track/items/spec.json`, but track specs in this repository live under `track/items/<track-id>/spec.json` or as `spec.json` within a track directory. With `--spec-json` omitted, the aggregate check points chain ① at a non-existent file, so the no-extra-args aggregate command cannot work from the normal repo layout.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/mod.rs",
+              "line": 200,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b2f064d4458171950a8276a6743229e18e726c2d45c653583ea936556bec1bfb",
+          "at": "2026-06-19T04:52:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal check --gate commit|merge` is specified as the aggregate command, with fallback paths when optional args are absent, but the parser now requires `--spec-json`, `--catalog-spec-hash`, and `--impl-catalog-hash` before dispatch. This means the advertised aggregate gate invocation is rejected by clap and cannot run all four chains unless callers know and provide extra arguments, breaking the aggregate gate surface described by the spec/briefing.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/mod.rs",
+              "line": 131,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:81cd6a40453c1b8f075bb16830e9db08d92cef1ac0c692fba5c47fddc145a158",
+          "at": "2026-06-19T04:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0dc02409fe6df9bcfe6e06fcffca942e7f2eaf290d9cbe5b42ea95ecb2f576c6",
+          "at": "2026-06-19T05:12:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8341501ec6a41525a79715c6ea0924fc234467f9202b3ee72a9b98e8cb0c38c7",
+          "at": "2026-06-19T16:40:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ccc404a77702edd0e9e1791791673871396550867e612cbedb53102c4f91c5e",
+          "at": "2026-06-19T23:30:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3ddc27a1240080f726b9ea0a2060bace460fcc92bb37366b4334821f2dd1e72",
+          "at": "2026-06-20T01:45:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20a1b7da7e125931010538ab05561bb29be79b63a9a18e2de5ddb4176cc6d22",
+          "at": "2026-06-20T03:50:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:504ee84a8bd22da6ece256462571c683903a9f6ed269eff7927bcfaa6d44d083",
+          "at": "2026-06-20T04:32:52Z"
         }
       ]
     },
@@ -2937,248 +3186,6 @@
           "findings": [],
           "hash": "rvw1:sha256:43def9e451a7d4282a4f05b622c0aaf33f0ca71c8e581a3af8156b501a2362ec",
           "at": "2026-06-20T03:23:57Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
-          "at": "2026-06-18T07:29:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogSpecChain::check_freshness` only compares the document-level `catalogue_declaration_hash` with the current catalogue hash. The chain ② contract requires the persisted per-entry `CatalogueSpecSignal::entry_hash()` values to be checked against freshly computed entry hashes before `evaluate_gate`; otherwise `SoTChain::check` can accept a signals document with stale, missing, or manually trimmed per-entry signals as long as the aggregate declaration hash still matches. Carry the current entry hashes in `CatalogSpecInput` and fail closed on missing/mismatched entries before delegating to `check_catalogue_spec_signals`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/chain/catalog_spec.rs",
-              "line": 160,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6de0c44f372a6d65b2e69c83ae3e4245f8085b8781a7cd8b36524b8c0177f9f2",
-          "at": "2026-06-18T07:33:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9394221141e132d3d8c4372eb3d93650dc3b7218c4ccf6aceb5290341ac7c16b",
-          "at": "2026-06-18T07:49:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The chain-0 result is only merged at the end of the function, but the early returns here and at the later `stage1.has_errors()` check exit before that merge. Invalid branches or missing/failed `spec.json` therefore drop ADR findings entirely, which contradicts the new requirement that chain ⓪ be accumulated independently of the other stages.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
-              "line": 305,
-              "category": "correctness"
-            },
-            {
-              "message": "The new `strict=false` arm in `check_chain2_for_layer` is not exercised by any test in this scope, and every existing test now hardcodes `all_strict_matrix()`. That leaves the new warning-mode behavior and the added ADR reader port effectively unverified, so a regression in the non-blocking path could ship unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate/chain2_gate.rs",
-              "line": 275,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:ae16c95a27ef368c750b6df6c610cc94671494805594ed1e36b78102a69e83ff",
-          "at": "2026-06-18T09:54:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
-          "at": "2026-06-18T10:18:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_strict_merge_gate` reads the ADR report before calling `validate_branch_ref`, so an untrusted branch string reaches the `TrackBlobReader` port unvalidated. That reintroduces the very ref-safety check this function is supposed to enforce and can make the adapter operate on malicious refs like `..` or `@{...}` before the branch is rejected.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
-              "line": 287,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:b1b05175f55c2062691934aaaf66360576cff56156f92993a475751bb259cf07",
-          "at": "2026-06-18T10:19:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
-          "at": "2026-06-18T10:31:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Only `catalog_spec` is exercised with a non-strict matrix; the newly matrix-driven `adr_user`, `spec_adr`, and `impl_catalog` paths all run under `all_strict_matrix()` in tests. A swapped ChainId or accidental hardcoded strict value for any of those cells would still pass the current suite. Add focused interim-mode tests for Chain ⓪, Chain ①, and Chain ③ Yellow signals.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 599,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:652232f5ac798e12a51f574f13c7e63bfadb1c81168505b43d1b240553236cf8",
-          "at": "2026-06-18T10:34:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Chain ⓪ `read_adr_verify_report` error path is untested. The trait documents `FetchError` as fail-closed and this branch turns it into a blocking finding, but the added tests only cover `NotFound` and `Found` ADR reports. A regression that accidentally skipped ADR scan I/O/parse failures would still pass the current suite. Add a test with an otherwise clean gate and `BlobFetchResult::FetchError` from `read_adr_verify_report`, asserting `has_errors()` and the ADR failure message.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 302,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7ce09d370511ec4bdf5d979ea634cb37372db4aa5505f95c6ba4a2048d46b98a",
-          "at": "2026-06-18T10:51:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39818e433ede532476eeb14779e80fc977e38d5f445465e469d1a4da49aa69ba",
-          "at": "2026-06-18T11:12:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
-          "at": "2026-06-18T15:10:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a826d349a38f07a1b289ddb3a199d578c2c70068caa62fddf0e309d50577f681",
-          "at": "2026-06-18T15:13:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
-          "at": "2026-06-19T01:11:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7930e718404db831b7a70145dbfd7bb29f2c8ee8856b06b0d0f784fe85522caa",
-          "at": "2026-06-19T01:14:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
-          "at": "2026-06-19T01:37:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:723d571acf4455320a9f8213efedff1b708fb1849d4c44926ba5c28a65dec324",
-          "at": "2026-06-19T01:40:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
-          "at": "2026-06-19T02:08:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a86b34eadad4d9c57591b48572570cbe6f36fee3e06a4d1b3128d3ec36cf2e4c",
-          "at": "2026-06-19T02:11:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new signal orchestrators expose reader-error handling as part of their public contract, but the tests only cover `active_track_id` failure; there is no error-case coverage for `enabled_layers` or `catalogue_bytes` failures. Add tests that exercise those I/O paths, including the per-layer read-error branch that should emit an error finding while continuing other layers.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal/mod.rs",
-              "line": 53,
-              "category": "missing_tests"
-            }
-          ],
-          "hash": "rvw1:sha256:b0256a85d2ec349188322b643604d2b867a4c520b58dfb24cd5574245d7e97fd",
-          "at": "2026-06-19T16:42:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30f8b3bd730f1172b0477f3b8b6ce751bcc1f6e6e7ce5aa9a868ba83cc3fec54",
-          "at": "2026-06-19T16:48:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2523f3c62ece2d512c88450f531f2eb7381f4deda02f83a5e286fd8a603a62ff",
-          "at": "2026-06-19T17:48:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a34405dea36bb72d54ae19605035fe87f191a3ca089fcd242901d881da62981",
-          "at": "2026-06-20T04:07:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The stale-spec remediation now tells users to run `sotp signal calc-spec-adr`, but that subcommand requires `--spec-json <path>` (`CalcSpecAdrArgs::spec_json`). Following this error message will fail at argument parsing, leaving a `check-spec-adr` stale-signal failure without a working recovery command. Include the required `--spec-json` argument in the emitted message.",
-              "severity": "P1",
-              "file": "libs/usecase/src/chain/spec_adr.rs",
-              "line": 75,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e6f5911d6fdba16ebf01ca94c6f8db1be951ecfafb0415df0441c2ee1548ea0d",
-          "at": "2026-06-20T05:35:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:924ff0921d05919c5222b2b36e10001255158b7dc3a4f356f3486ac42c6eff54",
-          "at": "2026-06-20T05:38:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:425077940ee129ea1d7f2b970cae2d63040cd8f73e98352ea72b616afa42587c",
-          "at": "2026-06-20T06:13:48Z"
         }
       ]
     },
