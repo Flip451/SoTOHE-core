@@ -1,4 +1,4 @@
-//! Loads `track/review-scope.json` into the v2 `ReviewScopeConfig`.
+//! Loads `.harness/config/review-scope.json` into the v2 `ReviewScopeConfig`.
 //!
 //! v2 ignores `planning_only` and `normalize` fields from the JSON file.
 //! Only `groups`, `review_operational`, and `other_track` are consumed.
@@ -383,7 +383,7 @@ mod tests {
                 "groups": {
                     "plan-artifacts": {
                         "patterns": ["track/items/**"],
-                        "briefing_file": "track/review-prompts/plan-artifacts.md"
+                        "briefing_file": ".harness/custom/review-prompts/plan-artifacts.md"
                     }
                 }
             }"#,
@@ -396,7 +396,7 @@ mod tests {
         );
         assert_eq!(
             config.briefing_file_for_scope(&scope),
-            Some("track/review-prompts/plan-artifacts.md")
+            Some(".harness/custom/review-prompts/plan-artifacts.md")
         );
     }
 
@@ -436,7 +436,7 @@ mod tests {
                 "groups": {
                     "plan-artifacts": {
                         "patterns": ["track/items/**"],
-                        "briefng_file": "track/review-prompts/plan-artifacts.md"
+                        "briefng_file": ".harness/custom/review-prompts/plan-artifacts.md"
                     }
                 }
             }"#,
@@ -454,12 +454,12 @@ mod tests {
     fn test_load_rejects_symlink_briefing_file() {
         // Attack model: PR author commits review-scope.json with a briefing_file
         // path that is a symlink to a workspace-external secret
-        // (e.g. track/review-prompts/policy.md -> /etc/passwd). The loader must
+        // (e.g. .harness/custom/review-prompts/policy.md -> /etc/passwd). The loader must
         // reject the scope config at load time so the CLI never gets a path that
         // the reviewer's Read tool could follow outside the workspace.
         let dir = tempfile::tempdir().unwrap();
         // Create an in-repo symlink whose target is outside the trusted root.
-        let briefing_dir = dir.path().join("track/review-prompts");
+        let briefing_dir = dir.path().join(".harness/custom/review-prompts");
         std::fs::create_dir_all(&briefing_dir).unwrap();
         let symlink_path = briefing_dir.join("policy.md");
         let outside = tempfile::tempdir().unwrap();
@@ -474,7 +474,7 @@ mod tests {
                 "groups": {
                     "plan-artifacts": {
                         "patterns": ["track/items/**"],
-                        "briefing_file": "track/review-prompts/policy.md"
+                        "briefing_file": ".harness/custom/review-prompts/policy.md"
                     }
                 }
             }"#,

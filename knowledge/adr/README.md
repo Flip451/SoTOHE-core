@@ -147,6 +147,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [運用ドキュメント断捨離方針 — SoT 一本化と narrative 重複の解消](2026-04-27-0554-doc-reorganization.md) | — | 2026-04-27 |
 | [運用ドキュメント再編（統合版）— ルート文書一本化・track/workflow.md 分散・工学規約の conventions 移管](2026-06-15-0025-operational-docs-restructure-unified.md) | — | 2026-06-15 |
+| [knowledge/strategy ディレクトリの整理方針](2026-06-17-1321-knowledge-strategy-cleanup.md) | — | 2026-06-17 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 
@@ -210,3 +211,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [scope 分類ロジックの CLI 公開 (classify / files)](2026-04-29-1547-review-scope-lookup-commands.md) | — | 2026-04-29 |
 | [PR レビュー結果を解釈せず最新ラウンドのコメントを agent に渡す](2026-05-29-0526-pr-review-comment-passthrough.md) | — | 2026-05-29 |
 | [review fixer がスコープ境界を自己解決する — `--scope-files` 廃止](2026-06-01-2300-review-fixer-self-resolve-scope-files.md) | — | 2026-06-01 |
+| [レイヤー別 reviewer briefing prompt の導入と review-prompts ディレクトリの再配置](2026-06-18-1406-review-prompts-relocation-per-layer-briefings.md) | — | 2026-06-18 |

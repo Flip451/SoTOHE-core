@@ -1,0 +1,1085 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "a18431fcce7532044d60888e442c8ee03904c2d4d66c9d30f99a832faaaa1389",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。これにより `review-scope.json` の全 named scope が `briefing_file` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "a18431fcce7532044d60888e442c8ee03904c2d4d66c9d30f99a832faaaa1389",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 `plan-artifacts.md` の「What to report / What NOT to report」構成を踏襲し、各層の severity 観点を盛り込む"
+      }
+    },
+    {
+      "claim_hash": "84d6af55eb8e2a72488ecd70fd069c9c6e7f21d56a31430666a1337b53d6d3d3",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「review-prompts は利用者所有領域であり、framework methodology から物理的に分離するため、新設する利用者所有ゾーン `.harness/custom/`（D6）の配下 `review-prompts/` に置く。`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し」"
+      }
+    },
+    {
+      "claim_hash": "84d6af55eb8e2a72488ecd70fd069c9c6e7f21d56a31430666a1337b53d6d3d3",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review-scope.json` を `.harness/config/` に移設し、`briefing_file` を repoint する。`root.join(\"track/review-scope.json\")` のハードコードを `.harness/config/review-scope.json` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "84d6af55eb8e2a72488ecd70fd069c9c6e7f21d56a31430666a1337b53d6d3d3",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "c30caa9f52eae2246df0df170feccc2a5f1a67dc50f3f601c8bb855df11be906",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/**` を「利用者が所有しカスタマイズする」ゾーンとして新設する。... テンプレート配布更新では `custom/**` を**上書きしない**（never-clobber。利用者のカスタムが温存される）。"
+      }
+    },
+    {
+      "claim_hash": "c334d41d8f01c8765fdcfa0ce64dbc3d0584408a23ebcd88c810ed53eae4864f",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「track/review-prompts/*.md を .harness/custom/review-prompts/*.md へ移し（`plan-artifacts.md` を移設し、D3 の各層 briefing をここに新設する）」"
+      }
+    },
+    {
+      "claim_hash": "bd2386eee4d79760d165d3baf1753da578ead97dd0ba3a4be4f639aeb3325dea",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。"
+      }
+    },
+    {
+      "claim_hash": "bd2386eee4d79760d165d3baf1753da578ead97dd0ba3a4be4f639aeb3325dea",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 `plan-artifacts.md` の「What to report / What NOT to report」構成を踏襲し、各層の severity 観点を盛り込む"
+      }
+    },
+    {
+      "claim_hash": "aeb577d86a5dec9a4c155a308c4da25fbf838384a32fe63091eca247a1691590",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-scope.json を `.harness/config/` に移設し、briefing_file を repoint する"
+      }
+    },
+    {
+      "claim_hash": "3b8f02cc892e26ae354fa8e37132defe1844447e52d634b5e9c152899e8bd02c",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/review_v2/scope.rs` の `root.join(\"track/review-scope.json\")` ハードコードを `.harness/config/review-scope.json` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "93c711eb9a949f94721b4faa5b25baf5c1bf0d12d2b50bd5bd07d9c55052405a",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "harness-policy scope の patterns にある明示の `track/review-scope.json` エントリは、移設先 `.harness/config/review-scope.json` が既存の `.harness/**` パターンで自動的に harness-policy に分類されるため削除する（冗長解消）。"
+      }
+    },
+    {
+      "claim_hash": "b86fe603f90ce7bb02916801b73bae7e675744e30dece50fb7fc6997f17e79d8",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "d97a3f4a89e7d38615a243aa33eba0609f8492567770c3ee20e8496ccc791a41",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "cf875859dd7bf9b96fb1d6ad0ed04a326efb4bca7dddda57ae308f7761117461",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し」"
+      }
+    },
+    {
+      "claim_hash": "cf875859dd7bf9b96fb1d6ad0ed04a326efb4bca7dddda57ae308f7761117461",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照を同時更新"
+      }
+    },
+    {
+      "claim_hash": "dfe5c476012e2de86f72584dc34b2aeb0b3907ebcae7406e9228c02336375af4",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-scope.json を `.harness/config/` に移設し、briefing_file を repoint する"
+      }
+    },
+    {
+      "claim_hash": "5c581cb19bfd859ee40df9655125083e4854e4750da029a682df2e16ec80337c",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "8ec4c9a5354641ecc9f516263f902ae5fdf9de47115ec417fed2cb46186338cc",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「custom/ 配下の内容を CI で hard-fail enforce しない」"
+      }
+    },
+    {
+      "claim_hash": "ff49decc26cec538bbead92595367232ad9367561599c2d63a763bba973ec236",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/**` を「利用者が所有しカスタマイズする」ゾーンとして新設する。`responsibility-boundary.md` に従い:\n- SoTOHE は dogfood 済みのデフォルト（自身の層に対する severity policy）を `.harness/custom/` に**直接同梱**する（利用者は in-place で編集する。reviewer は初期からデフォルト policy を得る）。\n- テンプレート配布更新では `custom/**` を**上書きしない**（never-clobber。利用者のカスタムが温存される）。"
+      }
+    },
+    {
+      "claim_hash": "8e844410868eef3c0932aa66c536cfefc8b7586115f6de09a51bedd704c41f64",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）"
+      }
+    },
+    {
+      "claim_hash": "733b2d5fd2d195b74eea83d85e78ec2b173471497d0d27edf16516a1e2326237",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "4529df2d97838b7d61bee9ddc690705c28ac9d035295faea0fae19521b98c639",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。"
+      }
+    },
+    {
+      "claim_hash": "e52b2d190839bd75bbaddb0a7cd396e212ae788aa35747783d90542428b6ec73",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D5: clean move（旧 path fallback なし）で移行する\n\n旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "167a2a21637966d37f8392ccca0f3cae6772f0a206248e842142aae1dc427e6b",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`custom/` 配下の内容を CI で hard-fail enforce しない（提供 + docs のみ。利用者所有領域）"
+      }
+    },
+    {
+      "claim_hash": "1ec314fdbebe0c811af92153d2eb9eebe667209561d12ca547805f4e7bd4d1ac",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 `plan-artifacts.md` の「What to report / What NOT to report」構成を踏襲し... reviewer が「報告する / 無視する」を判断できる粒度で明文化する。convention 本文との重複は層固有観点に絞って最小化する。"
+      }
+    },
+    {
+      "claim_hash": "a505daed24ce89257949a5c2aa862877e3b4ef775de63cbf6687f000065dac54",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない"
+      }
+    },
+    {
+      "claim_hash": "dddeb9599ffbf2256a069f285e3e39be40d5a119ae3898e714f0761429c3b0fc",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）"
+      }
+    },
+    {
+      "claim_hash": "10835cdf11de98d10e537936ceeb8fc05bd46b5653b42c2bcb18e0c3e8a6e7f9",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 配線 `review-scope.json` は構造化 JSON wiring で loader を持ち、`agent-profiles.json` と同類である。よって利用者所有ゾーン `custom/` ではなく、`agent-profiles.json` と並べて `.harness/config/` に置き、「review / 実行系 capability configure の SSoT」を揃える（デフォルト提供が要れば後で `samples/` 方式を足せる）。"
+      }
+    },
+    {
+      "claim_hash": "aa758ded4567da54fa4c0b796d137b2da9c37cfc4b87759dcf900d735e46f7a6",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し（`plan-artifacts.md` を移設し"
+      }
+    },
+    {
+      "claim_hash": "0773e0b3465530680c2d53fe8abae64fda66dc8eccf03f16b4e09c369b9e2138",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する"
+      }
+    },
+    {
+      "claim_hash": "80990067bad778bdd9b08a6bbd5999c0429fc269570b78a5f4100c5043138bb3",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存 `plan-artifacts.md` の「What to report / What NOT to report」構成を踏襲し、各層の severity 観点を盛り込む」"
+      }
+    },
+    {
+      "claim_hash": "0c5827853ff8145fd1a2cd3f50334735fd71ea71750cdff39d6a1432724e08b7",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 配線 `review-scope.json` は構造化 JSON wiring で loader を持ち、`agent-profiles.json` と同類である。よって利用者所有ゾーン `custom/` ではなく、`agent-profiles.json` と並べて `.harness/config/` に置き、「review / 実行系 capability configure の SSoT」を揃える。各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える"
+      }
+    },
+    {
+      "claim_hash": "0c5827853ff8145fd1a2cd3f50334735fd71ea71750cdff39d6a1432724e08b7",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "これにより `review-scope.json` の全 named scope が `briefing_file` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "ac80d00902236716b4a8a27615e58f6c04481378d5eb0cf2ec52f419b04f805d",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "9ab255c49f8182016151874c63c7a51ccee72369b0f7ccb76394c58e6d0dc599",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "dfe3c2fdafb5135ba60f459a1664e427a28d74b74ac88d163784e41f98f2b967",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「review-scope.json を `.harness/config/` に移設し、briefing_file を repoint する」および「`apps/cli-composition/src/review_v2/scope.rs` の `root.join(\"track/review-scope.json\")` ハードコードを `.harness/config/review-scope.json` に更新する。」"
+      }
+    },
+    {
+      "claim_hash": "bb597341241db0a79df1693f78b26158ebd7b24759b76f3c1b377a587d51724d",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「harness-policy scope の `patterns` にある明示の `track/review-scope.json` エントリは…削除する」"
+      }
+    },
+    {
+      "claim_hash": "dd21b1fd9ea40491447e54fc677c74677f45db7d1e5423736823f18b9601a553",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "2b390d114cde81b3deb30f2c68ae5a87a6f9c38f70203af19de38ee366ea5e62",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "3528853dc4893da750f1229f52d5c87055380a63bbb8c9acac5239b49e39e532",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「最終レイアウト:\n\n```\n.harness/\n├── custom/\n│   └── review-prompts/\n│       ├── plan-artifacts.md\n│       ├── domain.md\n│       ├── usecase.md\n│       ├── infrastructure.md\n│       ├── cli.md\n│       ├── cli_composition.md\n│       └── harness-policy.md\n...\n├── config/\n│   ├── agent-profiles.json\n│   ├── review-scope.json」"
+      }
+    },
+    {
+      "claim_hash": "3528853dc4893da750f1229f52d5c87055380a63bbb8c9acac5239b49e39e532",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/**` を「利用者が所有しカスタマイズする」ゾーンとして新設する。"
+      }
+    },
+    {
+      "claim_hash": "b38c96b449bddd7ddc87d4b292b57a2e088b3a35d90e74a324c7282cf1f320c8",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。これにより `review-scope.json` の全 named scope が `briefing_file` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "b38c96b449bddd7ddc87d4b292b57a2e088b3a35d90e74a324c7282cf1f320c8",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える"
+      }
+    },
+    {
+      "claim_hash": "5cfd19a4eb4a88115351f9dde29b65d461137c28d85c061f1d5fd1a30694f639",
+      "evidence_hash": "c91cf78e5df8ca9d92c9cbfe53c87a1c40331691fb1814494c688d36eedc080f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction — the evidence decides that the migration commit will update all references to the old paths, including docs (\"移行 commit で全参照 ... docs ... を同時更新\"), while the claim excludes updating old-path references that remain in merged past ADRs."
+      }
+    },
+    {
+      "claim_hash": "a18431fcce7532044d60888e442c8ee03904c2d4d66c9d30f99a832faaaa1389",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する"
+      }
+    },
+    {
+      "claim_hash": "a18431fcce7532044d60888e442c8ee03904c2d4d66c9d30f99a832faaaa1389",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各 briefing は plan-artifacts 同形 + 層固有観点で書く」"
+      }
+    },
+    {
+      "claim_hash": "84d6af55eb8e2a72488ecd70fd069c9c6e7f21d56a31430666a1337b53d6d3d3",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し（`plan-artifacts.md` を移設し、D3 の各層 briefing をここに新設する）。"
+      }
+    },
+    {
+      "claim_hash": "84d6af55eb8e2a72488ecd70fd069c9c6e7f21d56a31430666a1337b53d6d3d3",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「track/ から移設; briefing_file → `.harness/custom/review-prompts/<scope>.md`」「`root.join(\"track/review-scope.json\")` ハードコードを `.harness/config/review-scope.json` に更新する」"
+      }
+    },
+    {
+      "claim_hash": "84d6af55eb8e2a72488ecd70fd069c9c6e7f21d56a31430666a1337b53d6d3d3",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。」"
+      }
+    },
+    {
+      "claim_hash": "c30caa9f52eae2246df0df170feccc2a5f1a67dc50f3f601c8bb855df11be906",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/**` を「利用者が所有しカスタマイズする」ゾーンとして新設する。... テンプレート配布更新では `custom/**` を**上書きしない**（never-clobber。利用者のカスタムが温存される）。"
+      }
+    },
+    {
+      "claim_hash": "c334d41d8f01c8765fdcfa0ce64dbc3d0584408a23ebcd88c810ed53eae4864f",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し（`plan-artifacts.md` を移設し、D3 の各層 briefing をここに新設する）"
+      }
+    },
+    {
+      "claim_hash": "bd2386eee4d79760d165d3baf1753da578ead97dd0ba3a4be4f639aeb3325dea",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。"
+      }
+    },
+    {
+      "claim_hash": "bd2386eee4d79760d165d3baf1753da578ead97dd0ba3a4be4f639aeb3325dea",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 `plan-artifacts.md` の「What to report / What NOT to report」構成を踏襲し、各層の severity 観点を盛り込む"
+      }
+    },
+    {
+      "claim_hash": "aeb577d86a5dec9a4c155a308c4da25fbf838384a32fe63091eca247a1691590",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-scope.json を `.harness/config/` に移設し、各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える"
+      }
+    },
+    {
+      "claim_hash": "3b8f02cc892e26ae354fa8e37132defe1844447e52d634b5e9c152899e8bd02c",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/review_v2/scope.rs` の `root.join(\"track/review-scope.json\")` ハードコードを `.harness/config/review-scope.json` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "93c711eb9a949f94721b4faa5b25baf5c1bf0d12d2b50bd5bd07d9c55052405a",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/review-scope.json` エントリは、移設先 `.harness/config/review-scope.json` が既存の `.harness/**` パターンで自動的に harness-policy に分類されるため削除する"
+      }
+    },
+    {
+      "claim_hash": "b86fe603f90ce7bb02916801b73bae7e675744e30dece50fb7fc6997f17e79d8",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "d97a3f4a89e7d38615a243aa33eba0609f8492567770c3ee20e8496ccc791a41",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新"
+      }
+    },
+    {
+      "claim_hash": "cf875859dd7bf9b96fb1d6ad0ed04a326efb4bca7dddda57ae308f7761117461",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し"
+      }
+    },
+    {
+      "claim_hash": "cf875859dd7bf9b96fb1d6ad0ed04a326efb4bca7dddda57ae308f7761117461",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し」"
+      }
+    },
+    {
+      "claim_hash": "dfe5c476012e2de86f72584dc34b2aeb0b3907ebcae7406e9228c02336375af4",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "5c581cb19bfd859ee40df9655125083e4854e4750da029a682df2e16ec80337c",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "8ec4c9a5354641ecc9f516263f902ae5fdf9de47115ec417fed2cb46186338cc",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`custom/` 配下の内容を CI で hard-fail enforce しない（提供 + docs のみ。利用者所有領域）"
+      }
+    },
+    {
+      "claim_hash": "ff49decc26cec538bbead92595367232ad9367561599c2d63a763bba973ec236",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/**` を「利用者が所有しカスタマイズする」ゾーンとして新設する。テンプレート配布更新では `custom/**` を**上書きしない**（never-clobber。利用者のカスタムが温存される）。"
+      }
+    },
+    {
+      "claim_hash": "8e844410868eef3c0932aa66c536cfefc8b7586115f6de09a51bedd704c41f64",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。」"
+      }
+    },
+    {
+      "claim_hash": "733b2d5fd2d195b74eea83d85e78ec2b173471497d0d27edf16516a1e2326237",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "4529df2d97838b7d61bee9ddc690705c28ac9d035295faea0fae19521b98c639",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。これにより `review-scope.json` の全 named scope が `briefing_file` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "345c682c4e5f13292934aca095dfb61710d7d0a46efb84ce25dcc146e1824fa8",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "過去に merge 済みの ADR 本文中の旧 path 参照は historical record として改変せず、更新対象から除外する。"
+      }
+    },
+    {
+      "claim_hash": "e52b2d190839bd75bbaddb0a7cd396e212ae788aa35747783d90542428b6ec73",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し"
+      }
+    },
+    {
+      "claim_hash": "167a2a21637966d37f8392ccca0f3cae6772f0a206248e842142aae1dc427e6b",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/**` を「利用者が所有しカスタマイズする」ゾーンとして新設する。`responsibility-boundary.md` に従い: ... - `custom/` 配下の内容を CI で hard-fail enforce しない（提供 + docs のみ。利用者所有領域）。"
+      }
+    },
+    {
+      "claim_hash": "1ec314fdbebe0c811af92153d2eb9eebe667209561d12ca547805f4e7bd4d1ac",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 `plan-artifacts.md` の「What to report / What NOT to report」構成を踏襲し、各層のseverity観点を盛り込む。各層の着眼点のうち review で効かせたい境界を、reviewer が「報告する / 無視する」を判断できる粒度で明文化する。convention 本文との重複は層固有観点に絞って最小化する。"
+      }
+    },
+    {
+      "claim_hash": "a505daed24ce89257949a5c2aa862877e3b4ef775de63cbf6687f000065dac54",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない"
+      }
+    },
+    {
+      "claim_hash": "dddeb9599ffbf2256a069f285e3e39be40d5a119ae3898e714f0761429c3b0fc",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "10835cdf11de98d10e537936ceeb8fc05bd46b5653b42c2bcb18e0c3e8a6e7f9",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 配線 `review-scope.json` は構造化 JSON wiring で loader を持ち、`agent-profiles.json` と同類である。よって利用者所有ゾーン `custom/` ではなく、`agent-profiles.json` と並べて `.harness/config/` に置き、「review / 実行系 capability configure の SSoT」を揃える（デフォルト提供が要れば後で `samples/` 方式を足せる）。"
+      }
+    },
+    {
+      "claim_hash": "aa758ded4567da54fa4c0b796d137b2da9c37cfc4b87759dcf900d735e46f7a6",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し（`plan-artifacts.md` を移設し、D3 の各層 briefing をここに新設する）"
+      }
+    },
+    {
+      "claim_hash": "0773e0b3465530680c2d53fe8abae64fda66dc8eccf03f16b4e09c369b9e2138",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する"
+      }
+    },
+    {
+      "claim_hash": "80990067bad778bdd9b08a6bbd5999c0429fc269570b78a5f4100c5043138bb3",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 `plan-artifacts.md` の「What to report / What NOT to report」構成を踏襲し、各層の severity 観点を盛り込む"
+      }
+    },
+    {
+      "claim_hash": "0c5827853ff8145fd1a2cd3f50334735fd71ea71750cdff39d6a1432724e08b7",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-scope.json を `.harness/config/` に移設し、briefing_file を repoint する"
+      }
+    },
+    {
+      "claim_hash": "0c5827853ff8145fd1a2cd3f50334735fd71ea71750cdff39d6a1432724e08b7",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review-scope.json` の全 named scope が `briefing_file` を持つ"
+      }
+    },
+    {
+      "claim_hash": "ac80d00902236716b4a8a27615e58f6c04481378d5eb0cf2ec52f419b04f805d",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "9ab255c49f8182016151874c63c7a51ccee72369b0f7ccb76394c58e6d0dc599",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "dfe3c2fdafb5135ba60f459a1664e427a28d74b74ac88d163784e41f98f2b967",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "root.join(\"track/review-scope.json\") ハードコードを `.harness/config/review-scope.json` に更新する"
+      }
+    },
+    {
+      "claim_hash": "bb597341241db0a79df1693f78b26158ebd7b24759b76f3c1b377a587d51724d",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「harness-policy」scope の `patterns` にある明示の `track/review-scope.json` エントリは、移設先 `.harness/config/review-scope.json` が既存の `.harness/**` パターンで自動的に harness-policy に分類されるため削除する（冗長解消）。"
+      }
+    },
+    {
+      "claim_hash": "dd21b1fd9ea40491447e54fc677c74677f45db7d1e5423736823f18b9601a553",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新"
+      }
+    },
+    {
+      "claim_hash": "2b390d114cde81b3deb30f2c68ae5a87a6f9c38f70203af19de38ee366ea5e62",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。これは fail-closed / lenient path 排除の既存方針に沿う。"
+      }
+    },
+    {
+      "claim_hash": "3528853dc4893da750f1229f52d5c87055380a63bbb8c9acac5239b49e39e532",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "最終レイアウト:\n\n```text\n.harness/\n├── custom/                         # 利用者所有ゾーン (D6; template 更新で never-clobber)\n│   └── review-prompts/\n│       ├── plan-artifacts.md       (track/review-prompts/ から移設)\n│       ├── domain.md\n│       ├── usecase.md\n│       ├── infrastructure.md\n│       ├── cli.md\n│       ├── cli_composition.md\n│       └── harness-policy.md\n...\n├── config/\n│   ├── agent-profiles.json         (利用者所有; samples/ あり)\n│   ├── review-scope.json           (track/ から移設; briefing_file → .harness/custom/review-prompts/<scope>.md)\n```"
+      }
+    },
+    {
+      "claim_hash": "3528853dc4893da750f1229f52d5c87055380a63bbb8c9acac5239b49e39e532",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/**` を「利用者が所有しカスタマイズする」ゾーンとして新設する。"
+      }
+    },
+    {
+      "claim_hash": "b38c96b449bddd7ddc87d4b292b57a2e088b3a35d90e74a324c7282cf1f320c8",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。これにより `review-scope.json` の全 named scope が `briefing_file` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "b38c96b449bddd7ddc87d4b292b57a2e088b3a35d90e74a324c7282cf1f320c8",
+      "evidence_hash": "da47b8dd7dca6f2c85ca2752d3c5f9f845b6e5639d7735ee1ec415077a44ec9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "a18431fcce7532044d60888e442c8ee03904c2d4d66c9d30f99a832faaaa1389",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。これにより `review-scope.json` の全 named scope が `briefing_file` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "a18431fcce7532044d60888e442c8ee03904c2d4d66c9d30f99a832faaaa1389",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各層の severity 観点を盛り込む」「reviewer が『報告する / 無視する』を判断できる粒度で明文化する」"
+      }
+    },
+    {
+      "claim_hash": "84d6af55eb8e2a72488ecd70fd069c9c6e7f21d56a31430666a1337b53d6d3d3",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「review-prompts は利用者所有領域であり、framework methodology から物理的に分離するため、新設する利用者所有ゾーン `.harness/custom/`（D6）の配下 `review-prompts/` に置く。`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し」"
+      }
+    },
+    {
+      "claim_hash": "84d6af55eb8e2a72488ecd70fd069c9c6e7f21d56a31430666a1337b53d6d3d3",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える... `apps/cli-composition/src/review_v2/scope.rs` の `root.join(\"track/review-scope.json\")` ハードコードを `.harness/config/review-scope.json` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "84d6af55eb8e2a72488ecd70fd069c9c6e7f21d56a31430666a1337b53d6d3d3",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照を同時更新"
+      }
+    },
+    {
+      "claim_hash": "c30caa9f52eae2246df0df170feccc2a5f1a67dc50f3f601c8bb855df11be906",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/**` を「利用者が所有しカスタマイズする」ゾーンとして新設する。... テンプレート配布更新では `custom/**` を**上書きしない**（never-clobber。利用者のカスタムが温存される）。"
+      }
+    },
+    {
+      "claim_hash": "c334d41d8f01c8765fdcfa0ce64dbc3d0584408a23ebcd88c810ed53eae4864f",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し（`plan-artifacts.md` を移設"
+      }
+    },
+    {
+      "claim_hash": "bd2386eee4d79760d165d3baf1753da578ead97dd0ba3a4be4f639aeb3325dea",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）"
+      }
+    },
+    {
+      "claim_hash": "bd2386eee4d79760d165d3baf1753da578ead97dd0ba3a4be4f639aeb3325dea",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各 briefing は plan-artifacts 同形 + 層固有観点で書く」"
+      }
+    },
+    {
+      "claim_hash": "aeb577d86a5dec9a4c155a308c4da25fbf838384a32fe63091eca247a1691590",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-scope.json を `.harness/config/` に移設し、各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える"
+      }
+    },
+    {
+      "claim_hash": "3b8f02cc892e26ae354fa8e37132defe1844447e52d634b5e9c152899e8bd02c",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`root.join(\"track/review-scope.json\")` ハードコードを `.harness/config/review-scope.json` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "93c711eb9a949f94721b4faa5b25baf5c1bf0d12d2b50bd5bd07d9c55052405a",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "harness-policy scope の `patterns` にある明示の `track/review-scope.json` エントリは、移設先 `.harness/config/review-scope.json` が既存の `.harness/**` パターンで自動的に harness-policy に分類されるため削除する"
+      }
+    },
+    {
+      "claim_hash": "b86fe603f90ce7bb02916801b73bae7e675744e30dece50fb7fc6997f17e79d8",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、...空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "d97a3f4a89e7d38615a243aa33eba0609f8492567770c3ee20e8496ccc791a41",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "docs / tests）を同時更新"
+      }
+    },
+    {
+      "claim_hash": "cf875859dd7bf9b96fb1d6ad0ed04a326efb4bca7dddda57ae308f7761117461",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「review-prompts は利用者所有領域であり、framework methodology から物理的に分離するため、新設する利用者所有ゾーン `.harness/custom/`（D6）の配下 `review-prompts/` に置く。`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し」"
+      }
+    },
+    {
+      "claim_hash": "cf875859dd7bf9b96fb1d6ad0ed04a326efb4bca7dddda57ae308f7761117461",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。」"
+      }
+    },
+    {
+      "claim_hash": "dfe5c476012e2de86f72584dc34b2aeb0b3907ebcae7406e9228c02336375af4",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D2: review-scope.json を `.harness/config/` に移設し、briefing_file を repoint する。各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "5c581cb19bfd859ee40df9655125083e4854e4750da029a682df2e16ec80337c",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "8ec4c9a5354641ecc9f516263f902ae5fdf9de47115ec417fed2cb46186338cc",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`custom/` 配下の内容を CI で hard-fail enforce しない（提供 + docs のみ。利用者所有領域）。`briefing_file` の参照先存在チェックもこの CI 非強制境界に含め、broken path は既存通り reviewer runtime の Read 失敗に委ねる。」"
+      }
+    },
+    {
+      "claim_hash": "ff49decc26cec538bbead92595367232ad9367561599c2d63a763bba973ec236",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoTOHE は dogfood 済みのデフォルト（自身の層に対する severity policy）を `.harness/custom/` に**直接同梱**する（利用者は in-place で編集する。reviewer は初期からデフォルト policy を得る）。\n- テンプレート配布更新では `custom/**` を**上書きしない**（never-clobber。利用者のカスタムが温存される）。\n- `custom/` 配下の内容を CI で hard-fail enforce しない（提供 + docs のみ。利用者所有領域）。"
+      }
+    },
+    {
+      "claim_hash": "8e844410868eef3c0932aa66c536cfefc8b7586115f6de09a51bedd704c41f64",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    },
+    {
+      "claim_hash": "733b2d5fd2d195b74eea83d85e78ec2b173471497d0d27edf16516a1e2326237",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）"
+      }
+    },
+    {
+      "claim_hash": "4529df2d97838b7d61bee9ddc690705c28ac9d035295faea0fae19521b98c639",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。これにより `review-scope.json` の全 named scope が `briefing_file` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "345c682c4e5f13292934aca095dfb61710d7d0a46efb84ce25dcc146e1824fa8",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "過去に merge 済みの ADR 本文中の旧 path 参照は historical record として改変せず、更新対象から除外する。"
+      }
+    },
+    {
+      "claim_hash": "e52b2d190839bd75bbaddb0a7cd396e212ae788aa35747783d90542428b6ec73",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し」"
+      }
+    },
+    {
+      "claim_hash": "167a2a21637966d37f8392ccca0f3cae6772f0a206248e842142aae1dc427e6b",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`custom/` 配下の内容を CI で hard-fail enforce しない（提供 + docs のみ。利用者所有領域）。"
+      }
+    },
+    {
+      "claim_hash": "1ec314fdbebe0c811af92153d2eb9eebe667209561d12ca547805f4e7bd4d1ac",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存 `plan-artifacts.md` の『What to report / What NOT to report』構成を踏襲し、各層の severity 観点を盛り込む... 各層の着眼点のうち review で効かせたい境界を、reviewer が『報告する / 無視する』を判断できる粒度で明文化する。convention 本文との重複は層固有観点に絞って最小化する。」"
+      }
+    },
+    {
+      "claim_hash": "a505daed24ce89257949a5c2aa862877e3b4ef775de63cbf6687f000065dac54",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）"
+      }
+    },
+    {
+      "claim_hash": "dddeb9599ffbf2256a069f285e3e39be40d5a119ae3898e714f0761429c3b0fc",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace-relative path string のまま維持し、loader の解決規則は変更しない"
+      }
+    },
+    {
+      "claim_hash": "10835cdf11de98d10e537936ceeb8fc05bd46b5653b42c2bcb18e0c3e8a6e7f9",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「scope 配線 `review-scope.json` は構造化 JSON wiring で loader を持ち、`agent-profiles.json` と同類である。よって... `.harness/config/` に置き...（デフォルト提供が要れば後で `samples/` 方式を足せる）」"
+      }
+    },
+    {
+      "claim_hash": "aa758ded4567da54fa4c0b796d137b2da9c37cfc4b87759dcf900d735e46f7a6",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/review-prompts/*.md` を `.harness/custom/review-prompts/*.md` へ移し（`plan-artifacts.md` を移設し、D3 の各層 briefing をここに新設する）。"
+      }
+    },
+    {
+      "claim_hash": "0773e0b3465530680c2d53fe8abae64fda66dc8eccf03f16b4e09c369b9e2138",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する"
+      }
+    },
+    {
+      "claim_hash": "80990067bad778bdd9b08a6bbd5999c0429fc269570b78a5f4100c5043138bb3",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「What to report / What NOT to report」構成を踏襲し、各層の severity 観点を盛り込む"
+      }
+    },
+    {
+      "claim_hash": "0c5827853ff8145fd1a2cd3f50334735fd71ea71750cdff39d6a1432724e08b7",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「review-scope.json を `.harness/config/` に移設し、briefing_file を repoint する」…「各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える」…「`review-scope.json`           (track/ から移設; briefing_file → .harness/custom/review-prompts/<scope>.md)」"
+      }
+    },
+    {
+      "claim_hash": "0c5827853ff8145fd1a2cd3f50334735fd71ea71750cdff39d6a1432724e08b7",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。これにより `review-scope.json` の全 named scope が `briefing_file` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "ac80d00902236716b4a8a27615e58f6c04481378d5eb0cf2ec52f419b04f805d",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "9ab255c49f8182016151874c63c7a51ccee72369b0f7ccb76394c58e6d0dc599",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「空になった `track/review-prompts/` を削除する」"
+      }
+    },
+    {
+      "claim_hash": "dfe3c2fdafb5135ba60f459a1664e427a28d74b74ac88d163784e41f98f2b967",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/review_v2/scope.rs` の `root.join(\"track/review-scope.json\")` ハードコードを `.harness/config/review-scope.json` に更新する。"
+      }
+    },
+    {
+      "claim_hash": "bb597341241db0a79df1693f78b26158ebd7b24759b76f3c1b377a587d51724d",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「harness-policy scope の `patterns` にある明示の `track/review-scope.json` エントリは、移設先 `.harness/config/review-scope.json` が既存の `.harness/**` パターンで自動的に harness-policy に分類されるため削除する（冗長解消）。」"
+      }
+    },
+    {
+      "claim_hash": "dd21b1fd9ea40491447e54fc677c74677f45db7d1e5423736823f18b9601a553",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し"
+      }
+    },
+    {
+      "claim_hash": "2b390d114cde81b3deb30f2c68ae5a87a6f9c38f70203af19de38ee366ea5e62",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 path（`track/review-scope.json` / `track/review-prompts/`）への fallback は設けず、移行 commit で全参照（review-scope.json 値 / scope.rs ハードコード path / harness-policy patterns / docs / tests）を同時更新し、空になった `track/review-prompts/` を削除する。"
+      }
+    },
+    {
+      "claim_hash": "3528853dc4893da750f1229f52d5c87055380a63bbb8c9acac5239b49e39e532",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 配線 `review-scope.json` は ... `agent-profiles.json` と並べて `.harness/config/` に置き\n\n最終レイアウト:\n```text\n.harness/\n├── custom/\n│   └── review-prompts/\n│       ├── plan-artifacts.md\n│       ├── domain.md\n│       ├── usecase.md\n│       ├── infrastructure.md\n│       ├── cli.md\n│       ├── cli_composition.md\n│       └── harness-policy.md\n...\n├── config/\n│   ├── agent-profiles.json\n│   ├── review-scope.json\n```"
+      }
+    },
+    {
+      "claim_hash": "3528853dc4893da750f1229f52d5c87055380a63bbb8c9acac5239b49e39e532",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/**` を「利用者が所有しカスタマイズする」ゾーンとして新設する。"
+      }
+    },
+    {
+      "claim_hash": "b38c96b449bddd7ddc87d4b292b57a2e088b3a35d90e74a324c7282cf1f320c8",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain` / `usecase` / `infrastructure` / `cli` / `cli_composition` の各アーキテクチャ層に severity policy briefing を 1 枚ずつ新設し、`harness-policy` scope にも 1 枚新設する（`plan-artifacts` は既存を移設）。これにより `review-scope.json` の全 named scope が `briefing_file` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "b38c96b449bddd7ddc87d4b292b57a2e088b3a35d90e74a324c7282cf1f320c8",
+      "evidence_hash": "94902f9374ba8862a821bbf71ace53e558ac7a207f731fd0a4aa8773fe2e3061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `briefing_file` 値は `.harness/custom/review-prompts/<scope>.md` に書き換える（workspace-relative path 文字列のまま維持し、loader の解決規則は変更しない）。"
+      }
+    }
+  ]
+}

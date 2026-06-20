@@ -38,7 +38,7 @@ Report one of the following statuses:
   for your assigned `<scope>`. Those files are the ones you may modify. The orchestrator does NOT
   pass a scope file list. If the command returns an empty list or
   fails, make no edits and return `failed` with the reason.
-- This agent may ONLY modify files within that self-resolved boundary. See `track/review-scope.json`
+- This agent may ONLY modify files within that self-resolved boundary. See `.harness/config/review-scope.json`
   for the group glob definitions the command applies.
 - If a finding requires changes to files outside the boundary, do NOT modify them.
   Return `blocked_cross_scope` with the file list so the orchestrator can re-partition.
@@ -56,7 +56,7 @@ Do not skip this step even if the briefing path appears to be a known file.
 Always read it fresh — the policy file may have been updated since the last
 review session. The CLI composer (`bin/sotp review local`) appends this
 section automatically for any scope whose `briefing_file` is configured in
-`track/review-scope.json`; treat the appended reference as an authoritative
+`.harness/config/review-scope.json`; treat the appended reference as an authoritative
 severity filter for this round.
 
 ## Workflow

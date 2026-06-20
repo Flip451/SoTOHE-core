@@ -14,7 +14,7 @@ Execution:
 - Read the current track's `spec.md`, `plan.md`, and `metadata.json` before implementation.
 - If no materialized active track is found on a `track/<id>` branch, stop immediately and report the situation. Do not transition tasks, do not write implementation code.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy tracks without `spec.json`) before writing code.
-- For exact type signatures, trait definitions, module trees, and Mermaid diagrams, prefer `## Canonical Blocks` in `plan.md` and `knowledge/DESIGN.md` over surrounding prose.
+- For exact type signatures, trait definitions, module trees, and Mermaid diagrams, prefer `## Canonical Blocks` in `plan.md` over surrounding prose.
 - **ADR pre-check**: If `spec.md` or `plan.md` references an ADR (`knowledge/adr/*.md`), read the ADR and verify that the target task's description is consistent with the ADR's design (layer placement, error types, behavioral contracts). If discrepancies are found, fix the plan (`metadata.json`, then `bin/sotp track views sync`) before writing code. ADR is the SSoT for design decisions — do not override ADR layer placement or omit ADR-specified types.
 - Identify the target task(s) from the approved plan. If `$ARGUMENTS` is provided, map it to the relevant plan scope.
 - Use `bin/sotp track transition <task_id> in_progress` to mark selected tasks as `in_progress` in `metadata.json` and auto-render `plan.md` + `registry.md`. The active track is resolved from the current branch; pass `--track-id <id>` explicitly only when targeting a different track. Do NOT edit `plan.md` directly — it is a read-only view rendered from metadata.json (SSoT).

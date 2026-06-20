@@ -42,6 +42,12 @@ impl SymlinkGuardPort for FsSymlinkGuard {
     /// components are skipped. Components that cannot be stat'd are silently
     /// skipped — only confirmed symlinks trigger an error.
     ///
+    /// This method intentionally stays separate from the below-`trusted_root`
+    /// helper: that helper assumes the caller has already vetted the root and
+    /// only checks descendants, while this port method must establish its own
+    /// absolute boundary and scan from the filesystem root for callers that do
+    /// not have a trusted root to pass in.
+    ///
     /// ## Trust model — accepted deviation
     ///
     /// `current_dir()` (POSIX `getcwd()`) returns the *physical* absolute path,
@@ -54,9 +60,9 @@ impl SymlinkGuardPort for FsSymlinkGuard {
     /// CWD can also override `$PWD`, set custom `LD_PRELOAD`, or redirect I/O
     /// via many other mechanisms — symlink-in-CWD is one of dozens of such
     /// vectors. A robust CWD-symlink detector would need either (a)
-    /// `O_NOFOLLOW` + inode verification (tracked under `TDDD-BUG-06` in
-    /// `knowledge/strategy/TODO.md`) or (b) a higher-layer trusted-root
-    /// contract (composition root passes a vetted absolute path).
+    /// `O_NOFOLLOW` + inode verification (future hardening) or (b) a
+    /// higher-layer trusted-root contract (composition root passes a vetted
+    /// absolute path).
     ///
     /// # Errors
     ///
@@ -75,6 +81,9 @@ impl SymlinkGuardPort for FsSymlinkGuard {
             cwd.join(path)
         };
 
+        // This traversal stays local to the port adapter because callers do not
+        // provide a vetted `trusted_root`; the shared below-root helper has a
+        // different boundary contract.
         // Collect all ancestors from root down to the absolutized path (inclusive).
         let mut components: Vec<&Path> = absolute_path.ancestors().collect();
         // `ancestors()` yields leaf → root; reverse to root → leaf.
@@ -127,8 +136,7 @@ impl SymlinkGuardPort for FsSymlinkGuard {
     /// sites only pass paths derived from validated trusted catalogue/baseline
     /// filenames (no NUL bytes), and both outcomes are "reject". Giving the shared
     /// helper a structured error type that distinguishes "symlink found" from
-    /// "stat failed" is part of the `symlink_guard` consolidation follow-up
-    /// (`knowledge/strategy/TODO.md` `TDDD-BUG-06`).
+    /// "stat failed" is part of the `symlink_guard` consolidation follow-up.
     fn reject_symlinks_below(
         &self,
         path: &Path,

@@ -17,7 +17,7 @@ Arguments: none. The current `track/<id>` branch determines the review target.
   in `## Related Conventions (Required Reading)` — check both `spec.md` and `plan.md` (legacy
   tracks may carry this section in `plan.md` instead of `spec.md`).
 - For exact type signatures / module trees / Mermaid diagrams, treat `## Canonical Blocks` in
-  `plan.md` and `knowledge/DESIGN.md` as the source of truth.
+  `plan.md` as the source of truth.
 
 ## Step 1: Resolve dispatch capabilities
 
@@ -73,7 +73,7 @@ Constraints:
 
 - The CLI auto-injects scope file list and severity policy. Do NOT hand-author the
   `## Scope-specific severity policy` section: scopes with `briefing_file` configured in
-  `track/review-scope.json` (e.g., `plan-artifacts` → `track/review-prompts/plan-artifacts.md`)
+  `.harness/config/review-scope.json` (e.g., `plan-artifacts` → `.harness/custom/review-prompts/plan-artifacts.md`)
   receive the policy reference automatically via `sotp review local`.
 
 ## Step 4: Launch review-fix-lead fixers (parallel, fast round)

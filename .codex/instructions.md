@@ -23,7 +23,6 @@ Read these first:
 - current `track/items/<id>/<layer>-types.json`, if present
 - current `track/items/<id>/impl-plan.json` and `track/items/<id>/task-coverage.json`, if present
 - current `track/items/<id>/spec.md` and `track/items/<id>/plan.md`, if present
-- `knowledge/DESIGN.md`
 - `.claude/rules/`
 - `.codex/rules/default.rules` (the Codex-specific command-policy surface — read it when running as the Codex root host)
 - `architecture-rules.json`

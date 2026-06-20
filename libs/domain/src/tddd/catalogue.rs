@@ -7,8 +7,7 @@
 //! Historical note (T001): this file used to hold all three responsibilities in
 //! a single 2088-line module under the name `DomainType*`. The split and the
 //! rename were performed together in the TDDD-01 track (see ADR
-//! `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` D3 and DM-06 in
-//! `knowledge/strategy/TODO.md`).
+//! `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` D3).
 //!
 //! ## T008 partial — V1 type migration (MethodDeclaration / ParamDeclaration)
 //!
