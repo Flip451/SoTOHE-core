@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "dry-gate-opt-in-2026-06-21",
+  "title": "DRY ゲートを利用者設定で切り替え可能にし、既定を無効（opt-in）とする",
+  "branch": "track/dry-gate-opt-in-2026-06-21",
+  "created_at": "2026-06-21T05:05:33Z",
+  "updated_at": "2026-06-21T05:05:33Z"
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3298b20fde228935d18bdceb07272c13f0b2dd99ffa7a81c76c0cbbae6f58dc",
+          "at": "2026-06-21T05:12:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 says ADR 2026-06-02-0716 D7 is only partially superseded: the blocking/no-bypass behavior remains valid when the gate is enabled, and the back-reference says the same. This consequence, however, says D7 needs a status update. Updating D7's status would imply the decision itself is superseded rather than partially amended, which conflicts with the stated design intent. Narrow this to cross-reference/follow-up wording rather than a D7 status update.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+              "line": 86,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f3298b20fde228935d18bdceb07272c13f0b2dd99ffa7a81c76c0cbbae6f58dc",
+          "at": "2026-06-21T05:15:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:956ea7df8cd1e739e1213e269b779c935697427f04a5d2feb0d6b1661a253e70",
+          "at": "2026-06-21T05:20:52Z"
+        }
+      ]
+    }
+  }
+}
