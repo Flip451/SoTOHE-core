@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984",
+      "evidence_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin に直接 I/O（`std::fs` / `serde_json` / `chrono::Utc::now()` 相当のシステムコール）を持ってはならない。telemetry 永続化を含む全 I/O は infrastructure adapter + driver 経由にする。"
+      }
+    },
+    {
+      "claim_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` に `std::fs` / `serde_json` / `chrono::Utc::now()` を使った直接 I/O が存在しない。cli-bin-business-logic カテゴリ（audit: `main.rs:247-294`）の 1 件が解消されており、telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており、LazyBranchReader が除去されている"
+      }
+    },
+    {
+      "claim_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "43ddb7f3c0d172da5850a38c24814f1872030afd7b37b9da42105ef730d6ee3f",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "43ddb7f3c0d172da5850a38c24814f1872030afd7b37b9da42105ef730d6ee3f",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。null-object stub は infrastructure companion stub にするか、infra 非依存なら usecase 提供の test-double にする。"
+      }
+    },
+    {
+      "claim_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。null-object stub は infrastructure companion stub にするか、infra 非依存なら usecase 提供の test-double にする。"
+      }
+    },
+    {
+      "claim_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter-outside-infrastructure カテゴリ（audit: 7 件）が解消されている。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。null-object stub は infrastructure companion stub にするか、infra 非依存なら usecase 提供の test-double にする。"
+      }
+    },
+    {
+      "claim_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "86276795afd992d4b412289b4464f1dae27c9d3f86cf0471d04cd883799cf3b0",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する"
+      }
+    },
+    {
+      "claim_hash": "86276795afd992d4b412289b4464f1dae27c9d3f86cf0471d04cd883799cf3b0",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "86276795afd992d4b412289b4464f1dae27c9d3f86cf0471d04cd883799cf3b0",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。`"
+      }
+    },
+    {
+      "claim_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "86276795afd992d4b412289b4464f1dae27c9d3f86cf0471d04cd883799cf3b0",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    }
+  ]
+}

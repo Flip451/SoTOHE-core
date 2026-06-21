@@ -83,6 +83,258 @@
           "findings": [],
           "hash": "rvw1:sha256:b8731614575f908305f035930e91c92ac98050cc65642fdbbc759b2b81b92b88",
           "at": "2026-06-21T17:06:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T014` creates and wires `cli_driver` while explicitly deferring the `architecture-rules.json` flip to `T021`, but CN-06 requires the crate creation and architecture-rules update to land in the same commit. As written, the staged rollout cannot satisfy its own gate, so the plan needs either a single atomic task/commit here or a relaxed constraint.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-composition-split-presentation-layer-2026-06-21/plan.md",
+              "line": 60,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7dbd30a08001b33b94362e72a2a25453d10691cd8a97264a2b6a96cdca929c36",
+          "at": "2026-06-21T17:42:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsArchivedTrackTelemetryAdapter` is described as having both the telemetry file path and clock source injected as private fields, but the paired task definition hardcodes `new(telemetry_dir: PathBuf) -> Self` and still calls `chrono::Utc::now()` directly. That leaves the telemetry abstraction internally inconsistent about whether time is injected or sourced directly, so the adapter contract is not coherent as written.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/infrastructure-types.json",
+              "line": 145,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:31bb3065e61d8b147f689faeb21f5e4fb401af9d720fa0fb54cfa4dc51ea409f",
+          "at": "2026-06-21T17:51:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005`-`T008` add delegation shims in `cli_composition`, but `T021` only removes render helpers and shims pointing to infrastructure adapters. Nothing deletes the D4 usecase-delegation shims, so the final state can still contain `cli_composition` invoke calls and miss `AC-03`/`CN-02`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-composition-split-presentation-layer-2026-06-21/plan.md",
+              "line": 77,
+              "category": "contradiction"
+            },
+            {
+              "message": "`T009` requires `apps/cli/Cargo.toml` to stop listing `chrono`/`serde_json` immediately after that commit, but `S8`/`T021` says the Cargo/deny/architecture dependency-graph changes happen atomically in the final flip. As written, the manifest edit is either unscheduled or split across commits. ",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-composition-split-presentation-layer-2026-06-21/plan.md",
+              "line": 37,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:94ab1dc6decadeb7b95d42a21bbd4941d31d588a38ca02e5f5a31c5cd5c80399",
+          "at": "2026-06-21T17:56:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` requires `SignalGateInteractor::new()` to take injected ports, but the type catalogue models `SignalGateInteractor` as a zero-argument constructor and simultaneously says it holds injected ports as private fields. That is a direct contradiction: as written, the application service cannot satisfy the DI requirement without another catalog edit.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-composition-split-presentation-layer-2026-06-21/plan.md",
+              "line": 28,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1fc9b1004323827f2a7ad32c149b2750e02681ad2b294cfeb9a812ed485db812",
+          "at": "2026-06-21T18:03:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85b23e267ac8d4430459ca65144a179c5bdb12ccfd584e3b72b971da471f5fcc",
+          "at": "2026-06-21T18:10:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 specifies `FsArchivedTrackTelemetryAdapter` as a unit struct while also requiring `new(telemetry_dir: PathBuf) -> Self` and `emit` to write telemetry to that configured location. A unit struct cannot retain the injected telemetry directory; the type catalogue also describes the directory as injected into the adapter, so the implementation plan is internally contradictory and would leave the D8 telemetry extraction unimplementable as written.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:85b23e267ac8d4430459ca65144a179c5bdb12ccfd584e3b72b971da471f5fcc",
+          "at": "2026-06-21T18:15:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 requires `pub struct CliApp;` to be absent, and task-coverage marks AC-04 as covered only by T013, but T013 explicitly allows a remaining `CliApp` compatibility shim when usages are not gone. That leaves the plan able to declare AC-04 covered while the forbidden type still exists; make T013 unconditionally remove the shim or move/extend AC-04 coverage to the final flip task that actually verifies removal.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/impl-plan.json",
+              "line": 78,
+              "category": "contradiction"
+            },
+            {
+              "message": "The D8 telemetry path is catalogued only as `ArchivedTrackTelemetryPort`, a SecondaryPort, while T009 says the archived-track path delegates persistence directly to the infrastructure adapter. There is no usecase ApplicationService/Interactor for the driver to invoke, which conflicts with the ADR/spec model that `cli_driver` invokes use cases while secondary adapters remain behind usecase services. Add a telemetry application service or otherwise make the plan explicit that the driver is not calling a secondary port directly.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 497,
+              "category": "architecture-contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1fce529309fe00304126f9ccc7db1fe6d0968af5be68ddefa4eef91086480ee6",
+          "at": "2026-06-21T18:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 requires routing the archived-track path through `cli_driver` and testing driver dispatch to the telemetry service, but the same plan does not stage the telemetry driver until T016 and explicitly defers live `cli_driver` wiring/imports to T021. As written, this makes T009 unexecutable without either violating the later atomic cutover constraint or referencing a driver path that does not exist yet. Defer the driver-dispatch part to T016/T021, or move T009 after the driver exists.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/impl-plan.json",
+              "line": 54,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f0e65d544319d303bfa715c693e5037eb2f53320a49c0efe5c164aa5ba47b863",
+          "at": "2026-06-21T18:30:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The usecase catalogue only defines SignalGate, SpecAdrSignal, and ArchivedTrackTelemetry application services/interactors, while the implementation plan also requires T007/T008 to extract diff-fragment, dry_check/dry_write, fixpoint dry-gate branching, and PR polling into usecase functions/application services. Because `functions` is empty and no additional application-service entries exist for those planned D4 extractions, the type catalogue and implementation plan disagree about the public usecase surface needed to satisfy IN-07/AC-07.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 591,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f05e2398b32bd74f47df40baf0afed1d2ca07a1665e079d7f340721020cb9ff6",
+          "at": "2026-06-21T18:37:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99da2aeb38532762d179d39abcc5fa10844b9da1b190b687c9b4b0ec7a43579b",
+          "at": "2026-06-21T18:46:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OS-03` is mapped to `T022`, but `T022` only updates `.harness/custom/review-prompts/*` and never touches `knowledge/conventions/hexagonal-architecture.md` (see `impl-plan.json:131-132`). The spec entry at `spec.md:46` says the convention-doc edit is deferred to a separate post-implementation task, so the task-coverage claim that all 4 out-of-scope items are covered is incorrect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-composition-split-presentation-layer-2026-06-21/task-coverage.json",
+              "line": 20,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c3f8c9540ef5eb566c23c13f19eee9ae0376ef907e572143c1bcd9634f1b607c",
+          "at": "2026-06-21T19:13:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c9d10cb026844dc1385b3758669d182d8c087edea36638c24dc840bf2c515d6",
+          "at": "2026-06-21T19:19:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-01 is the out-of-scope boundary for downstream 1420 work, but its `adr_refs` point directly at ADR 1420 D1-D3 instead of the 1328 decision that defines this track boundary. That makes the 1328 plan artifact trace to downstream requirements as if they were source decisions for this track, contradicting the intended 1328-only provenance/no-1420-leakage for spec elements.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+              "line": 190,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2c9d10cb026844dc1385b3758669d182d8c087edea36638c24dc840bf2c515d6",
+          "at": "2026-06-21T19:25:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 tells implementers to add `D4OrchestrationError` as part of `usecase::dry_check::fragment_pipeline`, but the type catalogue defines that same type with `module_path: \"d4_orchestration\"` and the contract map renders it under `usecase::d4_orchestration`. This leaves two competing owning modules for a shared T007/T008 error type, so the implementation can follow the task text and drift from the catalogue. Align the task text or catalogue to a single module path.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/impl-plan.json",
+              "line": 42,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:48741172d96e3635c5a60f728d2f70b9e935f52e4892799a7fd7afbee888535a",
+          "at": "2026-06-21T19:31:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OS-03` is now mapped to an empty task list, leaving one of the four out-of-scope spec elements without any implementation-plan coverage. The Phase 3 task-coverage artifact is supposed to provide a reverse mapping for every spec element, so this contradicts the plan artifact coverage contract and will leave the rendered spec with no task anchor for that item.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/task-coverage.json",
+              "line": 20,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:298fb4eb0486310f7a8fe4c7f0ed1d74d69601e3e86e6e4db3fba9421e9f0d03",
+          "at": "2026-06-21T19:36:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The final flip section says AC-09 confirms “all 7 adapters relocated,” but the spec’s AC-09 and the D7 task breakdown define the intended end state as six adapters relocated to infrastructure and `LazyBranchReader` removed via UFCS/SystemGitRepo cleanup. Leaving T021 with the “all 7 relocated” condition contradicts the detailed acceptance criteria and can send implementers to relocate `LazyBranchReader` even though the plan elsewhere says it must be eliminated.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/impl-plan.json",
+              "line": 212,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bf8b58ea7bccdf6d9108bb9ef97fbc870172be82cc551362ffb176471a6e1580",
+          "at": "2026-06-21T19:40:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-04 says all seven port-implementing adapters are moved to `libs/infrastructure`, but the detailed scope and acceptance criteria later say `LazyBranchReader` is removed instead while only the other six adapters are relocated. This leaves the top-level goal contradicting the implementation plan and can misdirect implementers toward creating a forbidden/obsolete infrastructure adapter for `LazyBranchReader`.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+              "line": 42,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7d137bf146b5bf764413cda018fa5c4772adb54cf1d800ba5c93db0a18402d20",
+          "at": "2026-06-21T19:44:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01321d192c505db5cb74aac561d51d7f2698108cecd71ee1847979d41ee03e92",
+          "at": "2026-06-21T19:49:52Z"
         }
       ]
     }

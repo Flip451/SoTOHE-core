@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "D8 telemetry usecase service + infrastructure adapter: Add `usecase::telemetry` module with `ArchivedTrackTelemetryCommand`, `ArchivedTrackTelemetryError`, `ArchivedTrackTelemetryPort` secondary port, `ArchivedTrackTelemetryService` application-service trait, and `ArchivedTrackTelemetryInteractor` implementing the service. The interactor holds an injected `Arc<dyn ArchivedTrackTelemetryPort>` and delegates persistence through that port so cli_driver invokes a usecase service, not an infrastructure adapter. Add `infrastructure::telemetry::archived_track::FsArchivedTrackTelemetryAdapter` struct implementing `ArchivedTrackTelemetryPort` using `std::fs`, `serde_json`, and `chrono::Utc::now()`; constructor `new(telemetry_dir: PathBuf) -> Self` stores `telemetry_dir` in a private field used by `emit`. Re-export the usecase service/port types and infrastructure adapter from their respective crate roots. Unit tests: service delegates to the port; adapter `emit` writes a well-formed JSONL line; `Io` variant propagates on fs failure; `Serialize` variant propagates on serialization failure. This is a prerequisite for D8 cli-bin I/O removal (T009). Estimated diff: ~220 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "D7 adapter relocation Group A (high priority, re-export shim): Relocate `FsReviewGateStateAdapter` and `FsRefVerifyGateStateAdapter` from `apps/cli-composition/src/track/fixpoint_resolve.rs` to `libs/infrastructure/src/track/gate_state.rs`. Add `impl ReviewGateStatePort for FsReviewGateStateAdapter` and `impl RefVerifyGateStatePort for FsRefVerifyGateStateAdapter`. In `cli_composition`, replace the struct definitions with `pub(crate) use infrastructure::track::gate_state::{FsReviewGateStateAdapter, FsRefVerifyGateStateAdapter}` re-export shims so that existing wiring in `cli_composition` compiles without change. Unit tests for each adapter (happy path + fs error). Estimated diff: ~200 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "D7 adapter relocation Group B (medium priority, re-export shim): Relocate `RecordingDryAgent` from `apps/cli-composition/src/dry/tier_telemetry.rs` and `NullInsertIndexProxy` (plus `PersistentIndexLock`) from `apps/cli-composition/src/dry/persistent_index.rs` to `libs/infrastructure/src/dry_check/recording_agent.rs` and `libs/infrastructure/src/semantic_dup/null_insert_proxy.rs` respectively. `NullInsertIndexProxy::new()` takes the `LanceDbSemanticIndexAdapter` and `PersistentIndexLock` as private fields. Add shim re-exports in `cli_composition` so that the composition wiring continues to compile. Unit/integration tests: `RecordingDryAgent` delegates `judge()` to inner and records telemetry; `NullInsertIndexProxy` suppresses insert but delegates search/delete. Estimated diff: ~250 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "D7 adapter relocation Group C (low priority + LazyBranchReader elimination, re-export shim): Relocate `NoopSemanticIndexPort` from `apps/cli-composition/src/semantic_dup/measure_quality.rs` to `libs/infrastructure/src/semantic_dup/noop_adapter.rs` and `NoOpDryApprovalService` from `apps/cli-composition/src/track/fixpoint_resolve.rs` to `libs/infrastructure/src/dry_check/noop_approval.rs`. Add re-export shims in `cli_composition`. Remove `LazyBranchReader` from `apps/cli-composition/src/track/mod.rs` (lines 101-113) and resolve the UFCS ambiguity at the call site by using a concrete `infrastructure::git_cli::SystemGitRepo` reference instead of the trait-object detour. Verify that `infrastructure::git_cli::SystemGitRepo` already `impl BranchReaderPort`; add the impl if missing. CI must stay green after this commit. Estimated diff: ~180 lines (including removals).",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "D4 orchestration to usecase — SignalGate application service: Add `usecase::signal_gate` module with `SignalGateCommand`, `SignalGateOutput`, `SignalChainOutput`, `SignalGateError`, `SignalGateService` trait, and `SignalGateInteractor` struct (implementing `SignalGateService`). `SignalGateInteractor::new()` takes the injected `SignalLayerReader` port and `SignalGateMatrix` strictness source. The interactor sequences the 4 SoT chains (adr-user, spec-adr, catalog-spec, impl-catalog), resolves strictness per gate matrix, and aggregates results into `SignalGateOutput`. This extracts the multi-step orchestration currently in `apps/cli-composition/src/signal.rs:437-567` (`signal_check_gate`). After adding the interactor, add a re-export shim in `cli_composition::signal` that delegates to the new usecase service. Unit tests: `run_gate` sequences all 4 chains; failed chain propagates to `SignalGateError::ChainExecutionFailed`; `passed` field reflects aggregate result. Estimated diff: ~280 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "D4 orchestration to usecase — SpecAdrSignal application service + FsSpecFileWriterAdapter: Add `usecase::spec_adr_signal` module with `SpecAdrSignalCommand`, `SpecAdrSignalOutput`, `SpecAdrSignalError`, `SpecFileWriterPort` trait (read_spec_json / write_spec_json), `SpecAdrSignalService` trait, and `SpecAdrSignalInteractor` implementing `SpecAdrSignalService`. The interactor runs the read→decode→evaluate→set→write cycle currently in `apps/cli-composition/src/signal.rs:167-194` (`signal_calc_spec_adr`). Add `infrastructure::spec::writer::FsSpecFileWriterAdapter` implementing `SpecFileWriterPort` using `std::fs::read_to_string` and `atomic_write_file`. Wire a re-export shim in `cli_composition::signal` delegating `signal_calc_spec_adr` to the new interactor. Unit tests: `calc_and_persist` calls read/decode/evaluate/write in order; `SpecAdrSignalError::Read` propagates on fs failure; `Write` propagates on atomic-write failure. Estimated diff: ~260 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "D4 orchestration to usecase — diff-fragment pipeline and dry_check_approved: Add `usecase::dry_check::fragment_pipeline` with `DryFragmentPipelineCommand`, `DryFragmentPipelineOutput`, `DryFragmentPipelineService`, and `DryFragmentPipelineInteractor`, using the shared `usecase::d4_orchestration::D4OrchestrationError` error type. Extract `build_current_fragment_refs` (lines 214-291 of `apps/cli-composition/src/track/fixpoint_resolve.rs`) and the fragment-ref derivation loop in `dry_check_approved` (lines 560-592 of `apps/cli-composition/src/dry.rs`) into that usecase application service. The diff-fragment pipeline (git hunk listing → fragment extraction → path normalization → changed-path filter → overlap → ref derivation) and the metrics aggregation logic in `dry_write` (records_before / records_after / records_appended) are multi-step business sequences owned by the interactor. Update `cli_composition` call sites to delegate to `DryFragmentPipelineService`. Keep re-export/delegation shims in `cli_composition` for now so CI stays green. Unit tests for the extracted pipeline with mocked ports. Estimated diff: ~350 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "D4 orchestration to usecase — fixpoint_resolve dry-gate conditional and PR polling loop: Add `FixpointDryGateCommand`, `FixpointDryGateOutput`, `FixpointDryGateService`, and `FixpointDryGateInteractor` in `usecase::fixpoint_resolve`; add `PrReviewPollingCommand`, `PrReviewPollingOutput`, `PrReviewPollingService`, and `PrReviewPollingInteractor` in `usecase::pr_review`; both services share `usecase::d4_orchestration::D4OrchestrationError`. Extract the large `if usecase_dry_config.enabled { ... } else { ... }` block in `CliApp::fixpoint_resolve` (lines 428-518 of `apps/cli-composition/src/track/fixpoint_resolve.rs`) to `FixpointDryGateService`, which owns the dry-gate branching, CWD guard, corpus-root manifest branching, and `DryCheckApprovalInteractor` construction. Extract the PR review polling loop (lines 248-396 of `apps/cli-composition/src/pr/poll.rs`) to `PrReviewPollingService`. For both extractions, replace `cli_composition` sites with delegation to the new usecase services plus temporary delegation shims. Unit tests: dry-gate enabled/disabled paths; polling loop exits on review found; timeout path; retry path. Estimated diff: ~400 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "D8 cli-bin I/O removal: Remove `emit_archived_track_subcommand` (lines 247-294 of `apps/cli/src/main.rs`) direct `std::fs` / `serde_json` / `chrono::Utc::now()` I/O from the cli bin. Wire `FsArchivedTrackTelemetryAdapter` (from T001) into `ArchivedTrackTelemetryInteractor` through `cli_composition`, and add a temporary composition shim so the existing bin path delegates to `ArchivedTrackTelemetryService` while telemetry persistence remains behind the secondary port. Do not introduce `cli_driver` imports, dependencies, or live driver dispatch in this task; the staged `TelemetryDriver` lands in T016 and the live archived-track driver dispatch cutover happens in T021. The bin is left with only parse + dispatch + emit. Do not edit `apps/cli/Cargo.toml` in this task; if `chrono` / `serde_json` become unused direct dependencies, remove them in T021 with the final Cargo dependency-graph update. Tests: integration-level test that `emit_archived_track_subcommand` path no longer references `std::fs` inline and that the temporary composition shim reaches the telemetry service rather than the adapter directly. Estimated diff: ~180 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T010",
+      "description": "D2 typed CompositionError introduction: Add `pub enum CompositionError` in `apps/cli-composition/src/lib.rs` (or `apps/cli-composition/src/error.rs`) covering the construction/wiring failure categories (e.g. `ConfigLoad(String)`, `AdapterInit(String)`, `WiringFailed(String)`) with `Display + Error` impls. Change all public `CliApp` method signatures from `Result<CommandOutcome, String>` to `Result<CommandOutcome, CompositionError>`. Convert all internal `Err(format!(...))` / `.map_err(|e| format!(...))` error-string sites to typed `CompositionError` variants. Update the `apps/cli/src/main.rs` call sites to handle `CompositionError` (pattern-match or `.to_string()` for the exit path). The 51 methods across 27 files all return the typed error; no `String`-returning public method remains. Estimated diff: ~400 lines (signature changes + variant conversions).",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T011",
+      "description": "D2 CliApp god-facade dissolution — Group 1 (track, arch, domain, file, conventions, demo): Introduce per-context `CompositionRoot` structs for the track, arch, domain, file, conventions, and demo command families. Each `CompositionRoot` struct holds the injected adapters its command family needs (replacing the stateless `CliApp` unit struct for those families). Keep the existing `CliApp` facade in `lib.rs` as a compatibility layer for now (it will forward to the per-context roots). Migrate the `impl CliApp` blocks for the above families to `impl TrackCompositionRoot`, `impl ArchCompositionRoot`, etc. These structs have actual fields (injected adapter `Arc<dyn Port>` or concrete types). Update the wiring in `apps/cli/src/main.rs` to construct the per-context roots and call their methods. CI must stay green. Estimated diff: ~350 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T012",
+      "description": "D2 CliApp god-facade dissolution — Group 2 (guard, hook, git, verify, ref_verify, signal, telemetry): Introduce `GuardCompositionRoot`, `HookCompositionRoot`, `GitCompositionRoot`, `VerifyCompositionRoot`, `RefVerifyCompositionRoot`, `SignalCompositionRoot`, `TelemetryCompositionRoot`. Each holds its injected ports and implements the corresponding command handler methods. Remove the corresponding `impl CliApp` blocks and forward calls from the remaining `CliApp` compatibility shim. Update `apps/cli/src/main.rs` wiring. CI must stay green. Estimated diff: ~400 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T013",
+      "description": "D2 CliApp god-facade dissolution — Group 3 (dry, dry_fix_runner, pr, review_v2, semantic_dup): Introduce `DryCompositionRoot`, `PrCompositionRoot`, `ReviewCompositionRoot`, `SemanticDupCompositionRoot`. Each holds injected adapters. Remove corresponding `impl CliApp` blocks. After this task, `CliApp` should have no remaining `impl` blocks carrying command logic — only the compatibility shim forwarding to per-context roots, or removed entirely if all call sites have been updated. Remove `pub struct CliApp;` from `lib.rs` if all usages are gone. Update `apps/cli/src/main.rs` wiring to construct per-context roots directly. CI must stay green. Estimated diff: ~450 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T014",
+      "description": "D3 cli-driver source staging + guard and hook command families: Stage `apps/cli-driver/src/lib.rs`, the `CommandOutcome` relocation target, the `render` module, and `GuardDriver` / `HookDriver` source under `apps/cli-driver/src/` without creating `apps/cli-driver/Cargo.toml` and without adding workspace members, dependency edges, architecture rules, or live wiring. The staged drivers hold injected use-case interactors and expose `handle(input) -> CommandOutcome`; staged render code mirrors the helpers currently in `apps/cli-composition/src/guard.rs` (lines 42-47 JSON formatting) and `apps/cli-composition/src/hook.rs` (lines 241-248 JSON formatting). Leave `cli_composition` and `apps/cli` as the live command path in this commit. T021 materializes the crate manifest, workspace member, dependency graph, and live wiring atomically per CN-06. Estimated diff: ~260 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T015",
+      "description": "D3 cli-driver staging — git, arch, domain, file, conventions, demo command families: Stage `GitDriver`, `ArchDriver`, `DomainDriver`, `FileDriver`, `ConventionsDriver`, and `DemoDriver` source in `apps/cli-driver/src/`. Each staged driver holds the injected use-case or composition-facing service and has a `handle(input) -> CommandOutcome` method. Stage the corresponding render logic from `cli_composition` (git.rs lines 179-201, domain.rs lines 51-55, etc.) into `cli_driver::render` sub-modules, but do not update `cli_composition`, `apps/cli`, workspace membership, or dependency wiring before T021. Estimated diff: ~320 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T016",
+      "description": "D3 cli-driver staging — verify, ref_verify, signal, telemetry command families: Stage `VerifyDriver`, `RefVerifyDriver`, `SignalDriver`, and `TelemetryDriver` source in `apps/cli-driver/src/`. Stage render helpers from `cli_composition` (verify.rs lines 8-11 render_skip, ref_verify.rs lines 135-158 / 264-269 bracketed status formatting, signal.rs lines 23-47 merge_outcomes, cmd_outcome.rs lines 12-33 render_outcome, signal_layer_chain.rs render helpers) into `cli_driver::render`. Leave live `cli_composition` wiring and `apps/cli` dispatch unchanged until the atomic cutover in T021. Estimated diff: ~320 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T017",
+      "description": "D3 cli-driver staging — track command family: Stage `TrackDriver` source in `apps/cli-driver/src/`. Stage render helpers from `cli_composition/src/track/mod.rs` (lines 117-130 `sync_views_to_stdout`, lines 226-231 transition format, lines 263/292/318-325/425-430/460-465/490-495/599 task-status and branch format lines) and `track/ops.rs` (lines 177-192 JSON task payload, lines 215-217 JSON hand-built string) into `cli_driver::render::track`. Do not update `cli_composition::TrackCompositionRoot` or `apps/cli` track dispatch until T021. Estimated diff: ~280 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T018",
+      "description": "D3 cli-driver staging — pr, review_v2 command families: Stage `PrDriver` and `ReviewDriver` source in `apps/cli-driver/src/`. Stage render helpers from `cli_composition` (pr.rs lines 101-116/160-203/277-280/385-389 format banners, pr/poll.rs lines 514-547 `format_review_summary`, review_v2/results.rs lines 24-244 `render_review_results_str` ~220-line rendering engine, review_v2/mod.rs lines 424-452 `review_check_approved` message assembly) into `cli_driver::render::pr` and `cli_driver::render::review`. Leave live pr/review roots unchanged until T021. Estimated diff: ~380 lines. (This is the largest staged render family; the review results renderer alone is ~220 lines.)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T019",
+      "description": "D3 cli-driver staging — dry, semantic_dup command families: Stage `DryDriver` and `SemanticDupDriver` source in `apps/cli-driver/src/`. Stage render helpers from `cli_composition` (dry.rs lines 437-492 `dry_results` per-record formatter, measure_quality.rs lines 92-106 `dup_index_measure_quality` JSON assembly) into `cli_driver::render::dry` and `cli_driver::render::semantic_dup`. After this task, every targeted render family has a staged cli_driver counterpart; AC-06 becomes live when T021 flips wiring and removes the original `cli_composition` render helpers. Estimated diff: ~280 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T020",
+      "description": "D5 thin-bin preparation: Isolate `apps/cli/src/main.rs` dispatch so the final flip can swap from composition method calls to `driver.handle(input)` without leaving direct `usecase::` or `domain::` imports. Remove direct imports that are already made unnecessary by earlier tasks, but do not add a `cli_driver` dependency or import before T021. The final import/dependency replacement and `driver.handle(input)` cutover happen in T021 together with the crate manifest and architecture-rule flip. Estimated diff: ~160 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T021",
+      "description": "D1/D6 Final flip commit (atomic SSoT update and live cutover): (1) Create `apps/cli-driver/Cargo.toml` for the staged source tree (crate name `cli_driver`, depends on `usecase` only) and add `apps/cli-driver` to `Cargo.toml` workspace members. (2) Add `cli_driver` layer entry to `architecture-rules.json` (`crate: cli_driver, path: apps/cli-driver, may_depend_on: [usecase], tddd.enabled: false`). (3) Update `cli_composition.may_depend_on` and `cli.may_depend_on` to add `cli_driver`. (4) Update `deny.toml`, `apps/cli/Cargo.toml`, and `apps/cli-composition/Cargo.toml` to reflect the new layer boundary; remove stale `chrono` / `serde_json` direct deps from `apps/cli/Cargo.toml` if T009 made them unused. (5) Cut over live wiring: `cli_composition` builds the staged drivers, `apps/cli` calls `driver.handle(input)`, archived-track telemetry dispatch moves from the temporary T009 composition shim to `TelemetryDriver` calling `ArchivedTrackTelemetryService`, and direct bin imports of `usecase` / `domain` are absent. (6) Remove original `cli_composition` render helpers, temporary D4 delegation shims from T005-T008, the temporary D8 telemetry composition shim from T009, and all remaining re-export shims pointing to `infrastructure` adapter types. (7) Confirm `pub struct CliApp;` is absent from `lib.rs` (AC-04). (8) Confirm `Result<CommandOutcome, String>` is absent from all `cli_composition` public methods (AC-05). (9) Verify `cargo make check-layers` and `cargo make deny` pass. This is the only commit that modifies the architecture/Cargo dependency graph; crate manifest, workspace membership, dependency edges, and architecture rules land together per CN-06. Estimated diff: ~450 lines.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T022",
+      "description": "D6(h) reviewer severity policy: Create `.harness/custom/review-prompts/cli_driver.md` (new file) with primary adapter review rules (categories: adapter performs DI / business logic in adapter / non-CommandOutcome return / handle not delegating to single use case). Update `.harness/custom/review-prompts/cli_composition.md` to pure-DI composition root rules (categories: invoke leak / render leak / Result<_, String> / CliApp god-facade residue / adapter defined here). Update `.harness/custom/review-prompts/cli.md` to thin-bin rules (categories: bin business logic / direct I/O / usecase/domain import / driver coordinate in bin). Each file references ADR D2/D3/D5/D7/D8 review anchors as applicable. Estimated diff: ~120 lines.",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "D8 Prep: Telemetry Usecase Service + Infrastructure Adapter",
+        "description": [
+          "Establish the usecase telemetry service (`ArchivedTrackTelemetryService` / `ArchivedTrackTelemetryInteractor`), its secondary port `ArchivedTrackTelemetryPort`, and the infrastructure adapter `FsArchivedTrackTelemetryAdapter` that abstracts `std::fs` / `serde_json` / `chrono::Utc::now()` I/O. This must be done before the cli-bin I/O removal (T009) and before cli-driver migration, as the telemetry path is a D8 prerequisite."
+        ],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "S2",
+        "title": "D7 Adapter Cleanup: 6 Relocations + LazyBranchReader Elimination (re-export shim)",
+        "description": [
+          "Resolve the 7 adapter-outside-infrastructure findings in three priority groups. Six port-implementing adapter structs move from `apps/cli-composition` to `libs/infrastructure`; `LazyBranchReader` is eliminated by resolving the UFCS ambiguity and using the existing infrastructure `SystemGitRepo` path. Each relocation group adds a `pub(crate) use infrastructure::...` re-export shim in `cli_composition` so that existing wiring continues to compile. The shims are removed in the final flip commit (T021).",
+          "Group A (T002, high): FsReviewGateStateAdapter + FsRefVerifyGateStateAdapter.",
+          "Group B (T003, medium): RecordingDryAgent + NullInsertIndexProxy (+ PersistentIndexLock prerequisite).",
+          "Group C (T004, low + LazyBranchReader elimination): NoopSemanticIndexPort + NoOpDryApprovalService + LazyBranchReader removal + UFCS resolution at call site."
+        ],
+        "task_ids": ["T002", "T003", "T004"]
+      },
+      {
+        "id": "S3",
+        "title": "D4 Orchestration to usecase: Application Services and Pipeline Extraction",
+        "description": [
+          "Extract multi-step orchestration and business sequencing logic from `cli_composition` into usecase application services. Four tasks cover: (1) SignalGate chain-sequencing interactor, (2) SpecAdrSignal read-evaluate-write interactor + FsSpecFileWriterAdapter, (3) diff-fragment pipeline and dry_check_approved fragment-ref derivation, (4) fixpoint_resolve dry-gate conditional + PR polling loop.",
+          "Each extraction may add a temporary delegation shim in `cli_composition` so the command path stays compilable. T021 removes those D4 shims during the final live cutover. CN-07 is enforced: driving adapters must not carry multi-step orchestration."
+        ],
+        "task_ids": ["T005", "T006", "T007", "T008"]
+      },
+      {
+        "id": "S4",
+        "title": "D8 cli-bin I/O Removal: Thin-bin Telemetry Path",
+        "description": [
+          "Remove `emit_archived_track_subcommand` direct I/O from `apps/cli/src/main.rs` (lines 247-294). Wire `FsArchivedTrackTelemetryAdapter` behind `ArchivedTrackTelemetryService` through a temporary `cli_composition` shim so the archived-track subcommand delegates to usecase without direct adapter access. Live `TelemetryDriver` dispatch is deferred to T021 after T016 stages the driver source. Cargo manifest cleanup for stale `chrono` / `serde_json` direct deps is deferred to T021 with the final dependency-graph update. Depends on T001."
+        ],
+        "task_ids": ["T009"]
+      },
+      {
+        "id": "S5",
+        "title": "D2 typed CompositionError + CliApp God-Facade Dissolution",
+        "description": [
+          "Introduce typed `CompositionError` (T010) and convert all 51 public `CliApp` methods from `Result<CommandOutcome, String>` to `Result<CommandOutcome, CompositionError>`.",
+          "Dissolve the `CliApp` god-facade into bounded-context per-context `CompositionRoot` structs in three groups by command family (T011: track/arch/domain/file/conventions/demo; T012: guard/hook/git/verify/ref_verify/signal/telemetry; T013: dry/pr/review_v2/semantic_dup). Each `CompositionRoot` holds injected adapter fields. `pub struct CliApp;` is removed once all families are migrated."
+        ],
+        "task_ids": ["T010", "T011", "T012", "T013"]
+      },
+      {
+        "id": "S6",
+        "title": "D3 cli-driver Source Staging + invoke+render Migration Prep (command family by family)",
+        "description": [
+          "Stage `apps/cli-driver/src` source by command family without creating the crate manifest, workspace member, dependency edges, architecture rules, or live wiring before the final flip. This keeps every intermediate commit CI-green while preserving CN-06's requirement that the crate manifest and architecture/Cargo dependency graph land atomically in T021.",
+          "T014: source scaffold + guard + hook.",
+          "T015: git, arch, domain, file, conventions, demo.",
+          "T016: verify, ref_verify, signal, telemetry.",
+          "T017: track.",
+          "T018: pr, review_v2 (largest: ~220-line review results renderer).",
+          "T019: dry, semantic_dup (last staged render family).",
+          "After T019, all cli_driver render targets are staged; AC-06 becomes live when T021 cuts over wiring and removes the original cli_composition render helpers."
+        ],
+        "task_ids": ["T014", "T015", "T016", "T017", "T018", "T019"]
+      },
+      {
+        "id": "S7",
+        "title": "D5 Thin-bin: Remove usecase/domain imports from apps/cli",
+        "description": [
+          "Prepare `apps/cli/src/main.rs` for the final thin-bin cutover. Do not add `cli_driver` imports or dependencies before T021; the final import/dependency replacement and `driver.handle(input)` dispatch happen atomically with the crate manifest and architecture-rule flip. AC-08 is satisfied at T021."
+        ],
+        "task_ids": ["T020"]
+      },
+      {
+        "id": "S8",
+        "title": "D1/D6 Final Flip Commit: architecture-rules.json + deny.toml + shim removal",
+        "description": [
+          "Atomic commit materializing the staged `cli_driver` source as a crate: create its Cargo manifest, add the workspace member, update `architecture-rules.json`, update Cargo/deny dependency policy, cut over live composition/bin wiring, remove stale cli direct deps from D8 if unused, and remove the old render helpers plus adapter re-export, D4 delegation, and temporary D8 telemetry shims. Verify `cargo make check-layers` + `cargo make deny` pass. Confirm AC-03 (no invoke/delegation residue in cli_composition), AC-04 (`CliApp` absent), AC-05 (no `Result<_, String>`), AC-06 (render helpers removed from cli_composition), AC-08 (thin bin imports only cli_composition/cli_driver), AC-09 (six adapters relocated and LazyBranchReader removed via UFCS/SystemGitRepo cleanup), and AC-12 (arch-rules updated). This is the only commit touching the architecture/Cargo dependency graph."
+        ],
+        "task_ids": ["T021"]
+      },
+      {
+        "id": "S9",
+        "title": "D6(h) Reviewer Severity Policy Update",
+        "description": [
+          "Finalize the `.harness/custom/review-prompts/` files to match the new 3-layer architecture: new `cli_driver.md` for primary adapter rules, updated `cli_composition.md` for pure-DI rules, updated `cli.md` for thin-bin rules. Satisfies AC-11 and completes the D6(h) requirement."
+        ],
+        "task_ids": ["T022"]
+      }
+    ]
+  }
+}

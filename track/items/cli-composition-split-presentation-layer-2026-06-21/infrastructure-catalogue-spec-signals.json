@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "4af94046228f4abf4d15a4f672927009acb340f679f6879e877867495f0a6bb5",
+  "signals": [
+    {
+      "type_name": "FsArchivedTrackTelemetryAdapter",
+      "signal": "blue",
+      "entry_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984"
+    },
+    {
+      "type_name": "FsRefVerifyGateStateAdapter",
+      "signal": "blue",
+      "entry_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1"
+    },
+    {
+      "type_name": "FsReviewGateStateAdapter",
+      "signal": "blue",
+      "entry_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88"
+    },
+    {
+      "type_name": "FsSpecFileWriterAdapter",
+      "signal": "blue",
+      "entry_hash": "43ddb7f3c0d172da5850a38c24814f1872030afd7b37b9da42105ef730d6ee3f"
+    },
+    {
+      "type_name": "NoOpDryApprovalService",
+      "signal": "blue",
+      "entry_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b"
+    },
+    {
+      "type_name": "NoopSemanticIndexPort",
+      "signal": "blue",
+      "entry_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e"
+    },
+    {
+      "type_name": "NullInsertIndexProxy",
+      "signal": "blue",
+      "entry_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e"
+    },
+    {
+      "type_name": "RecordingDryAgent",
+      "signal": "blue",
+      "entry_hash": "86276795afd992d4b412289b4464f1dae27c9d3f86cf0471d04cd883799cf3b0"
+    }
+  ]
+}

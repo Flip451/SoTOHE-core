@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-21T19:50:36Z",
+  "declaration_hash": "a8d5d116c633d56d61cc2418f3c4cfd1d53104b095bf3498fbb9728275b5d131",
+  "signals": [
+    {
+      "type_name": "ArchivedTrackTelemetryCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ArchivedTrackTelemetryError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ArchivedTrackTelemetryInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ArchivedTrackTelemetryService"
+      ]
+    },
+    {
+      "type_name": "ArchivedTrackTelemetryPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ArchivedTrackTelemetryService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "D4OrchestrationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "DryFragmentPipelineCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "DryFragmentPipelineInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "DryFragmentPipelineService"
+      ]
+    },
+    {
+      "type_name": "DryFragmentPipelineOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "DryFragmentPipelineService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FixpointDryGateCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FixpointDryGateInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "FixpointDryGateService"
+      ]
+    },
+    {
+      "type_name": "FixpointDryGateOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FixpointDryGateService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PrReviewPollingCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PrReviewPollingInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "PrReviewPollingService"
+      ]
+    },
+    {
+      "type_name": "PrReviewPollingOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PrReviewPollingService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalChainOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalGateCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalGateError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalGateInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "SignalGateService"
+      ]
+    },
+    {
+      "type_name": "SignalGateOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalGateService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SpecAdrSignalCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SpecAdrSignalError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SpecAdrSignalInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "SpecAdrSignalService"
+      ]
+    },
+    {
+      "type_name": "SpecAdrSignalOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SpecAdrSignalService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SpecFileWriterPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryCheckAgentPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryCheckApprovalService",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyGateStatePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewGateStatePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SemanticIndexPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

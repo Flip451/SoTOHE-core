@@ -1,0 +1,283 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "FsReviewGateStateAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "track::gate_state",
+      "docs": "Filesystem adapter implementing ReviewGateStatePort. Reads review gate approval state from the items_dir using the existing review-v2 approval infrastructure. Relocated from cli_composition::track::fixpoint_resolve per ADR 1328 D7.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "FsRefVerifyGateStateAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "track::gate_state",
+      "docs": "Filesystem adapter implementing RefVerifyGateStatePort. Reads ref-verify gate approval state from the items_dir. Relocated from cli_composition::track::fixpoint_resolve per ADR 1328 D7.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "RecordingDryAgent": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::recording_agent",
+      "docs": "Telemetry-wrapping decorator adapter implementing DryCheckAgentPort. Wraps an inner DryCheckAgentPort, intercepts judge() calls to record telemetry events, then delegates to the inner agent. All fields are private (inner agent + telemetry writer). Relocated from cli_composition::dry::tier_telemetry per ADR 1328 D7.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "NullInsertIndexProxy": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup::null_insert_proxy",
+      "docs": "Null-insert proxy adapter implementing SemanticIndexPort. Wraps a LanceDbSemanticIndexAdapter (inner private field) and suppresses insert/insert_batch calls while delegating search and delete_by_source_path. Also holds a PersistentIndexLock private field for LanceDB state management. Relocated from cli_composition::dry::persistent_index per ADR 1328 D7.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "NoopSemanticIndexPort": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup::noop_adapter",
+      "docs": "Null-object adapter implementing SemanticIndexPort. All methods are no-ops: insert/insert_batch return Ok(()), search returns Ok(vec![]), delete_by_source_path returns Ok(()). Companion stub for production wiring when semantic index is disabled. Relocated from cli_composition::semantic_dup::measure_quality per ADR 1328 D7.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "NoOpDryApprovalService": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::noop_approval",
+      "docs": "Null-object adapter implementing DryCheckApprovalService. Returns DryCheckApprovalVerdict::Approved unconditionally. Used when dry-check is disabled at composition time. Relocated from cli_composition::track::fixpoint_resolve per ADR 1328 D7.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "FsArchivedTrackTelemetryAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::archived_track",
+      "docs": "Infrastructure adapter implementing ArchivedTrackTelemetryPort. Uses std::fs, serde_json, and chrono::Utc::now() to persist a telemetry event when an archived-track subcommand is dispatched. The telemetry directory is injected via new(telemetry_dir: std::path::PathBuf); timestamp capture stays inside this infrastructure adapter. Extracted from apps/cli/src/main.rs:247-294 per ADR 1328 D8.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-08" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+      ],
+      "informal_grounds": []
+    },
+    "FsSpecFileWriterAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "spec::writer",
+      "docs": "Infrastructure adapter implementing usecase::spec_adr_signal::SpecFileWriterPort. Uses std::fs::read_to_string and infrastructure::track::atomic_write::atomic_write_file to read and atomically write spec.json files. Stateless unit struct; all file paths are passed per-call.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "FsReviewGateStateAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "items_dir", "ty": "std::path::PathBuf" }],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyGateStateAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "items_dir", "ty": "std::path::PathBuf" }],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "RecordingDryAgent",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "inner", "ty": "std::sync::Arc<dyn usecase::dry_check::ports::DryCheckAgentPort>" },
+            { "name": "telemetry_writer", "ty": "std::sync::Arc<TelemetryWriter>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "FsArchivedTrackTelemetryAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "telemetry_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "usecase::fixpoint_resolve::ReviewGateStatePort",
+      "for_type": "FsReviewGateStateAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::fixpoint_resolve::RefVerifyGateStatePort",
+      "for_type": "FsRefVerifyGateStateAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::dry_check::ports::DryCheckAgentPort",
+      "for_type": "RecordingDryAgent"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::semantic_dup::ports::SemanticIndexPort",
+      "for_type": "NullInsertIndexProxy"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::semantic_dup::ports::SemanticIndexPort",
+      "for_type": "NoopSemanticIndexPort"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::dry_check::services::DryCheckApprovalService",
+      "for_type": "NoOpDryApprovalService"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::telemetry::ArchivedTrackTelemetryPort",
+      "for_type": "FsArchivedTrackTelemetryAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::spec_adr_signal::SpecFileWriterPort",
+      "for_type": "FsSpecFileWriterAdapter"
+    }
+  ]
+}

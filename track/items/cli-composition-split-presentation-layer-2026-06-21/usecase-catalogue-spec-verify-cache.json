@@ -1,0 +1,694 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "54fce6fcdf9c1e5ea6d23ca01f9059691bdf3ac85aa411df40067fe5bf79f9cd",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "54fce6fcdf9c1e5ea6d23ca01f9059691bdf3ac85aa411df40067fe5bf79f9cd",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "de104ceeeef608fe3ecd4750a5d3b4fe3505af27091bc2b46b3fcf880a173765",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "de104ceeeef608fe3ecd4750a5d3b4fe3505af27091bc2b46b3fcf880a173765",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` に `std::fs` / `serde_json` / `chrono::Utc::now()` を使った直接 I/O が存在しない。cli-bin-business-logic カテゴリ（audit: `main.rs:247-294`）の 1 件が解消されており、telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "c2bb1949dede04ea097b94bdc0eef576b6460ab68635b2560fb649b8d09b7988",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "c2bb1949dede04ea097b94bdc0eef576b6460ab68635b2560fb649b8d09b7988",
+      "evidence_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化を含む全 I/O は infrastructure adapter + driver 経由にする。"
+      }
+    },
+    {
+      "claim_hash": "c2bb1949dede04ea097b94bdc0eef576b6460ab68635b2560fb649b8d09b7988",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` に `std::fs` / `serde_json` / `chrono::Utc::now()` を使った直接 I/O が存在しない。cli-bin-business-logic カテゴリ（audit: `main.rs:247-294`）の 1 件が解消されており、telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "0c8d486901cac67352006a3ee9798698bec97dbcbf009288bfd33029b98447aa",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "0c8d486901cac67352006a3ee9798698bec97dbcbf009288bfd33029b98447aa",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "0c8d486901cac67352006a3ee9798698bec97dbcbf009288bfd33029b98447aa",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "8b31630e9925847ced1701a50a00ce14b72716e2bf7a8f1b1297c9b4112db215",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "8b31630e9925847ced1701a50a00ce14b72716e2bf7a8f1b1297c9b4112db215",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "1079dec0f453b49c472b41a4f9a2728b9220bf808255d403f65e84125db43a48",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "1079dec0f453b49c472b41a4f9a2728b9220bf808255d403f65e84125db43a48",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "1079dec0f453b49c472b41a4f9a2728b9220bf808255d403f65e84125db43a48",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "776cd29d0f47323f853a53dca7d83deb90a230d3a123a80c007d9bc5b26d9a86",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "776cd29d0f47323f853a53dca7d83deb90a230d3a123a80c007d9bc5b26d9a86",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "1821d006e0eae3f2d7b28161253b7567dd070d57ed13adcd5c55503159e3cf89",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "1821d006e0eae3f2d7b28161253b7567dd070d57ed13adcd5c55503159e3cf89",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "7e6c6878f1eeb33a5e2d920a38e18ea8397f7a4d0bd02f3faf3b4ac58865465d",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "7e6c6878f1eeb33a5e2d920a38e18ea8397f7a4d0bd02f3faf3b4ac58865465d",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "7e6c6878f1eeb33a5e2d920a38e18ea8397f7a4d0bd02f3faf3b4ac58865465d",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "fe990c48036dde9a4ed816daad7fa511f7e320bb66d4f2a009ccba34045b0bfd",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "fe990c48036dde9a4ed816daad7fa511f7e320bb66d4f2a009ccba34045b0bfd",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "62a9c9cb9d58932972d64e495728b22c06b511859a8cf057af7aa5497c544b66",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "62a9c9cb9d58932972d64e495728b22c06b511859a8cf057af7aa5497c544b66",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "abecbb4ad47142dab26ecdd27f2e0f4a9559080df813227ca43c4f725226e88b",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "abecbb4ad47142dab26ecdd27f2e0f4a9559080df813227ca43c4f725226e88b",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "abecbb4ad47142dab26ecdd27f2e0f4a9559080df813227ca43c4f725226e88b",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "67b9140c8277a006b0fec65bc59be4b765ec8a056a544187607215b552a8022d",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "67b9140c8277a006b0fec65bc59be4b765ec8a056a544187607215b552a8022d",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "3fa572ea86eecec90605a43de50a4d911dfabc185896a5993a8f4913601df194",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "02310d6b879013e2856e4b469bcc33b3450de6e705640bc83c0ddc33cda3ef1c",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "02310d6b879013e2856e4b469bcc33b3450de6e705640bc83c0ddc33cda3ef1c",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "cc15c431dd49bda9ccf5cb25b74d214c508efc385f033fbdf670ff5cded835fc",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "839527c65a19fe39b28ae3fe423b95c9069528225e86104897cf866c1a7bd9a3",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "839527c65a19fe39b28ae3fe423b95c9069528225e86104897cf866c1a7bd9a3",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "6a293495b7b8a3defcf6d395bdfeef0949295b5afa1292a2646f1bae35cd8ef4",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "6a293495b7b8a3defcf6d395bdfeef0949295b5afa1292a2646f1bae35cd8ef4",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。」"
+      }
+    },
+    {
+      "claim_hash": "20fc02d760fdc65f065f6665fc42fbc750202e776d2864e25b663fe443279e98",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "20fc02d760fdc65f065f6665fc42fbc750202e776d2864e25b663fe443279e98",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "c6e6b60fcebe8d6dab2ef129777ab62d22c14d6bc80f8d1f97444df3a537f87e",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "debda9b920e6646c43271e166006f515a394f47cca32467b7ac347335827624a",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "debda9b920e6646c43271e166006f515a394f47cca32467b7ac347335827624a",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "f7c7515d5ce502de70c0e07d6323a06fe1fd8e6e00e049051db905556d2fb83d",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "f7c7515d5ce502de70c0e07d6323a06fe1fd8e6e00e049051db905556d2fb83d",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "4e2215f7a105d7db8f60041663e9242040643915914287c9088a3233519741f6",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "4e2215f7a105d7db8f60041663e9242040643915914287c9088a3233519741f6",
+      "evidence_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin に直接 I/O（`std::fs` / `serde_json` / `chrono::Utc::now()` 相当のシステムコール）を持ってはならない。telemetry 永続化を含む全 I/O は infrastructure adapter + driver 経由にする。"
+      }
+    },
+    {
+      "claim_hash": "4e2215f7a105d7db8f60041663e9242040643915914287c9088a3233519741f6",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` に `std::fs` / `serde_json` / `chrono::Utc::now()` を使った直接 I/O が存在しない。cli-bin-business-logic カテゴリ（audit: `main.rs:247-294`）の 1 件が解消されており、telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "a6a478790f1b56e24c34580a89c59b6abb65eb50138d10f4d1f3931b98b0990d",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "a6a478790f1b56e24c34580a89c59b6abb65eb50138d10f4d1f3931b98b0990d",
+      "evidence_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化を含む全 I/O は infrastructure adapter + driver 経由にする。"
+      }
+    },
+    {
+      "claim_hash": "a6a478790f1b56e24c34580a89c59b6abb65eb50138d10f4d1f3931b98b0990d",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "e77ed2174a5742dbb6b1d0ea721bfa7cfc6e9441c68bece10b502ea215f2c8ed",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。ただし `LazyBranchReader` は UFCS 回避用の二重 adapter であり、呼び出し側の trait 曖昧性解消で除去して infrastructure の `SystemGitRepo` 実装に一本化する。"
+      }
+    },
+    {
+      "claim_hash": "e77ed2174a5742dbb6b1d0ea721bfa7cfc6e9441c68bece10b502ea215f2c8ed",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "LazyBranchReader が除去されている（UFCS 曖昧性が呼び出し側で解消されている）"
+      }
+    },
+    {
+      "claim_hash": "e19260cbf2a946c19b2979e2622931521d1ac0fcede1396549d97053e329235a",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "e19260cbf2a946c19b2979e2622931521d1ac0fcede1396549d97053e329235a",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter-outside-infrastructure カテゴリ（audit: 7 件）が解消されている。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており、LazyBranchReader が除去されている（UFCS 曖昧性が呼び出し側で解消されている）。"
+      }
+    },
+    {
+      "claim_hash": "8a1fd698f9de9c648e14dd1b52adff9ceceef2c4e3ef8302d26898a45dc6f9ab",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "8a1fd698f9de9c648e14dd1b52adff9ceceef2c4e3ef8302d26898a45dc6f9ab",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "f62ca0cf910e05b9ed86b05045b55f00df5e081ba89cd13f920b977317dc30eb",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "f62ca0cf910e05b9ed86b05045b55f00df5e081ba89cd13f920b977317dc30eb",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。"
+      }
+    },
+    {
+      "claim_hash": "f62ca0cf910e05b9ed86b05045b55f00df5e081ba89cd13f920b977317dc30eb",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "333484f73cb9ec2c294eab3779d52efbcad8a3dc39fe4217c3f7d1fc38b979c3",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "333484f73cb9ec2c294eab3779d52efbcad8a3dc39fe4217c3f7d1fc38b979c3",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "333484f73cb9ec2c294eab3779d52efbcad8a3dc39fe4217c3f7d1fc38b979c3",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "786a571d30ce27b6311119345afeeba2022f453abc19af719f51b68a9d59446b",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "786a571d30ce27b6311119345afeeba2022f453abc19af719f51b68a9d59446b",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "786a571d30ce27b6311119345afeeba2022f453abc19af719f51b68a9d59446b",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "552554e2dd4a506cb228d15477a15bc170c5a79e7cbb222aa946c37fe102adfe",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "552554e2dd4a506cb228d15477a15bc170c5a79e7cbb222aa946c37fe102adfe",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "9e0920b0a8172e0c1c436c17a723fbe32974c89b1945d153b875252e7eb20c01",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "9e0920b0a8172e0c1c436c17a723fbe32974c89b1945d153b875252e7eb20c01",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており、LazyBranchReader が除去されている（UFCS 曖昧性が呼び出し側で解消されている）。"
+      }
+    },
+    {
+      "claim_hash": "24e708a7aeca444fa5797f741297ff8da2b1babb66d95ce4a71a8ba07603f86c",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "24e708a7aeca444fa5797f741297ff8da2b1babb66d95ce4a71a8ba07603f86c",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "64b45db0268678415ff9a57387437f125b23b0d1e163543c2dfc35b1cb1bc687",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "64b45db0268678415ff9a57387437f125b23b0d1e163543c2dfc35b1cb1bc687",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "64b45db0268678415ff9a57387437f125b23b0d1e163543c2dfc35b1cb1bc687",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "d262d761e411e5590d912b265a6956d383290c41d8b1160eaeaab1a160f193d6",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "d262d761e411e5590d912b265a6956d383290c41d8b1160eaeaab1a160f193d6",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。"
+      }
+    },
+    {
+      "claim_hash": "d262d761e411e5590d912b265a6956d383290c41d8b1160eaeaab1a160f193d6",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "25a0f09ba876faced54f85bc881bba9c2715476c383b06ba6a203083bd7606c2",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "e77ed2174a5742dbb6b1d0ea721bfa7cfc6e9441c68bece10b502ea215f2c8ed",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`LazyBranchReader` は UFCS 回避用の二重 adapter であり、呼び出し側の trait 曖昧性解消で除去して infrastructure の `SystemGitRepo` 実装に一本化する。"
+      }
+    },
+    {
+      "claim_hash": "e19260cbf2a946c19b2979e2622931521d1ac0fcede1396549d97053e329235a",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "8a1fd698f9de9c648e14dd1b52adff9ceceef2c4e3ef8302d26898a45dc6f9ab",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "552554e2dd4a506cb228d15477a15bc170c5a79e7cbb222aa946c37fe102adfe",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "9e0920b0a8172e0c1c436c17a723fbe32974c89b1945d153b875252e7eb20c01",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "24e708a7aeca444fa5797f741297ff8da2b1babb66d95ce4a71a8ba07603f86c",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    }
+  ]
+}
