@@ -1,0 +1,941 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "SignalGatesConfig": {
+      "action": "add",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "schema_version",
+              "ty": "u32"
+            },
+            {
+              "name": "commit_gate",
+              "ty": "GateRowDto"
+            },
+            {
+              "name": "merge_gate",
+              "ty": "GateRowDto"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "verify::signal_gates_config",
+      "docs": "Serde DTO for `.harness/config/signal-gates.json`. Deserializes the on-disk config and validates `$schema_version == 1`. Converts to the domain `SignalGateMatrix` after validation. All fields are required; missing keys are reported as `SignalGatesConfigError::MissingKey` per CN-01/D4.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-01"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "GateRowDto": {
+      "action": "add",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "adr_user",
+              "ty": "StrictnessDto"
+            },
+            {
+              "name": "spec_adr",
+              "ty": "StrictnessDto"
+            },
+            {
+              "name": "catalog_spec",
+              "ty": "StrictnessDto"
+            },
+            {
+              "name": "impl_catalog",
+              "ty": "StrictnessDto"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "verify::signal_gates_config",
+      "docs": "Serde DTO for one gate row (commit_gate or merge_gate) in signal-gates.json. Each field corresponds to one chain's strictness cell. Converts to a `domain::ChainGateEntry` pair.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-01"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "StrictnessDto": {
+      "action": "add",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Strict",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Interim",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify::signal_gates_config",
+      "docs": "Deserializable mirror of `domain::Strictness` for signal-gates.json serde boundary. Variants map directly to `domain::Strictness`; unknown strictness strings are reported by loader validation as `SignalGatesConfigError::InvalidValue`. Domain serde-free constraint is preserved by keeping this type in infrastructure.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "OS-05"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SignalGatesConfigError": {
+      "action": "add",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FileNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ParseFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SchemaVersionUnknown",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "expected",
+                  "ty": "u32"
+                },
+                {
+                  "name": "actual",
+                  "ty": "u32"
+                }
+              ]
+            }
+          },
+          {
+            "name": "MissingKey",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "key",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "InvalidValue",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "key",
+                  "ty": "String"
+                },
+                {
+                  "name": "value",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "BlobFetchError",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "String"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify::signal_gates_config",
+      "docs": "Hard error for signal-gates.json load/validate failures. All variants produce `Finding::error` and halt gate execution per D4. No silent fallback, no implicit default. `BlobFetchError` covers the branch-blob loader path added for `pr_wait_and_merge`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-01"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-05"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "LocalSignalLayerReaderAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "signal_layer_reader",
+      "docs": "Local filesystem adapter implementing `usecase::signal::SignalLayerReader`. Provides local I/O behind the usecase-owned orchestration flow: the usecase asks for the active track through the port, obtains the infrastructure-loaded TDDD layer set through the port as domain `LayerId` values, and requests per-layer catalogue bytes from `track/items/<track-id>/<catalogue-file>`, where `catalogue-file` is the configured `tddd.catalogue_file` and defaults to `<layer>-types.json` when omitted. This adapter owns the filesystem-backed `architecture-rules.json` read/validation for layer enumeration, but not per-layer iteration, catalogue SHA-256 calculation, or signals output path construction; those remain in the usecase/infrastructure responsibilities defined by D8.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" }
+      ],
+      "informal_grounds": []
+    },
+    "GitBlobAdrFileAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "adr_decision::git_blob_adapter",
+      "docs": "Git-blob adapter that reads ADR markdown files from `origin/<branch>:knowledge/adr/` via `git ls-tree` (directory listing) and `git show` (blob content). The merge-gate counterpart to `FsAdrFileAdapter`: used exclusively by `merge_gate_adapter::read_adr_verify_report` so that chain ⓪ ADR signal evaluation is performed against the PR branch ref rather than the local worktree. Implements `domain::AdrFilePort` — `list_adr_paths` uses `git_ls_tree_dir` (symlinks skipped at listing stage), `read_adr_frontmatter` uses `fetch_blob_safe` (symlinks rejected fail-closed). Branch is validated by the merge-gate adapter before construction.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-06"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-09"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::verify::tddd_layers::catalogue_spec_signals_path": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "binding",
+          "ty": "&infrastructure::verify::tddd_layers::TdddLayerBinding"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&str"
+        }
+      ],
+      "returns": "std::path::PathBuf",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Returns the absolute path to a layer's catalogue-spec signals file: `<workspace_root>/track/items/<track_id>/<layer_id>-catalogue-spec-signals.json`. Keeps the `track/items/<track_id>/<file>` layout behind the infrastructure boundary so cli-composition / cli stay wire-up-only per ADR `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md` §D8-2.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::tddd_layers::impl_catalog_signals_path": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "binding",
+          "ty": "&infrastructure::verify::tddd_layers::TdddLayerBinding"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&str"
+        }
+      ],
+      "returns": "std::path::PathBuf",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Returns the absolute path to a layer's impl-catalog (`signal_file`) signals file: `<workspace_root>/track/items/<track_id>/<binding.signal_file()>`. Same purpose as `catalogue_spec_signals_path` but for chain ③ (impl ↔ catalog) signals. Per ADR §D8-2.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::tddd_layers::load_tddd_layers_from_workspace": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<Vec<infrastructure::verify::tddd_layers::TdddLayerBinding>, infrastructure::verify::tddd_layers::LoadTdddLayersError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Infrastructure I/O helper for adapter wiring: materializes the already-configured TDDD layer bindings from `<workspace_root>/architecture-rules.json` using the existing symlink-guarded parser. This function does not own layer-set semantics, active-track orchestration, or per-layer iteration; it only hides the on-disk `architecture-rules.json` filename behind the infrastructure boundary so usecase orchestration can depend on the `SignalLayerReader` port per CN-17.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::signal_gates_config::load_signal_gates_config": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "config_path",
+          "ty": "std::path::PathBuf"
+        }
+      ],
+      "returns": "Result<domain::SignalGateMatrix, SignalGatesConfigError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Load and validate `.harness/config/signal-gates.json` from the given path. Parses `SignalGatesConfig`, validates `$schema_version == 1`, checks all required keys, then converts to `domain::SignalGateMatrix`. Returns `SignalGatesConfigError` on any failure — file-not-found, malformed JSON parse failure, schema mismatch, missing key, or invalid strictness value. No implicit fallback.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-05"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::signal_gates_config::load_signal_gates_config_from_branch": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "repo_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "branch",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<domain::SignalGateMatrix, SignalGatesConfigError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Load and validate `.harness/config/signal-gates.json` from a git branch blob via `git show origin/<branch>:.harness/config/signal-gates.json`. Applies the same strict validation pipeline as `load_signal_gates_config` but reads from the committed blob rather than the local worktree, preventing a locally relaxed config from bypassing the merge gate. Returns `SignalGatesConfigError::BlobFetchError` when the blob cannot be fetched.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-05"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::adr_signals::execute_verify_adr_signals": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute the `signal check-adr-user` path (non-strict mode). Does not accept a `strict` parameter; delegates to `execute_verify_adr_signals_with_strict(project_root, false)`. Yellow signals remain warnings (exit 0). Red signals produce an error finding (exit 1). This is the split from the original single-param design: strict-mode callers use `execute_verify_adr_signals_with_strict` directly.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-02"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "catalogue_bytes",
+          "ty": "&[u8]"
+        }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "SHA-256 helper used by chain ② (`check-catalog-spec`) stale detection (CN-04). Computes the catalogue-file-level hash over the raw catalogue bytes; callers compare this value against the stored `catalogue_declaration_hash` field in `catalogue-spec-signals.json` to detect a stale whole-catalogue signal document before evaluating Red/Yellow judgments.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::compute_catalogue_entry_hash": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "catalogue_json",
+          "ty": "&str"
+        },
+        {
+          "name": "section",
+          "ty": "&str"
+        },
+        {
+          "name": "entry_key",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<String, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "SHA-256 helper used by chain ② (`check-catalog-spec`) stale detection (CN-04). Computes the per-entry hash for the given section and entry key from a catalogue JSON string; callers compare this value against the stored `entry_hash` per signal entry in `catalogue-spec-signals.json` to detect per-entry staleness before evaluating Red/Yellow judgments.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "std::path::PathBuf"
+        },
+        {
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "std::path::PathBuf"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute the `signal check-catalog-spec` path. Modified to delegate Red/Yellow evaluation to `domain::check_catalogue_spec_signals` (extracted domain pure function from D2) instead of inline logic. Signature is unchanged from baseline — `strict` was already present.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "std::path::PathBuf"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "std::path::PathBuf"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute the `signal check-catalog-spec` path resolving track from current git branch. Modified to delegate Red/Yellow evaluation to `domain::check_catalogue_spec_signals`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-05"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::verify_from_spec_json": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "spec_json_path",
+          "ty": "std::path::PathBuf"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        },
+        {
+          "name": "trusted_root",
+          "ty": "std::path::PathBuf"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Modified to perform Stage1 only (chain ① `check-spec-adr`) with its own `strict` parameter, with the self-consistency freshness check added. Stage2 (chain ③ `check-impl-catalog`) is separated out and has its own independent `strict` per D2.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::verify_type_signals_from_spec_json": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "spec_json_path",
+          "ty": "std::path::PathBuf"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        },
+        {
+          "name": "trusted_root",
+          "ty": "std::path::PathBuf"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Public Stage2 entrypoint for chain ③ `signal check-impl-catalog`. Loads the type-signals document for the spec track, validates declaration_hash freshness against the current catalogue bytes, then delegates to `domain::check_type_signals(&doc, strict)`. Kept separate from `verify_from_spec_json` so chain ① and chain ③ have independent strictness.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-02"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-08"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute the `signal check-adr-user` gate with explicit strictness. When `strict=true`, Yellow signals (ReviewFindingRef) promote to error (same as Red). When `strict=false`, Yellow signals remain warnings (same as the legacy `verify adr-signals` behavior). Used by the `signal check-adr-user --gate commit|merge` command family to wire chain ⓪ at the composition root.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-02"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "signals_path",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "catalog_hash_hex",
+          "ty": "&str"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Evaluate chain ② (`check-catalog-spec`) gate for a single layer from an explicit signals file path and pre-computed `catalog_hash_hex` (SHA-256 of the catalogue file bytes). This T011 public primitive is retained as a low-level file evaluator for infrastructure-owned path resolution; it is not a CLI/Makefile entrypoint and is not called through removed `--signals-path` / `--catalog-hash` flags. D8/T020 argless CLI wiring must inject an infrastructure-layer per-layer wrapper/equivalent that derives the signals-file path from the layer context before delegating here. Missing or decode-error signals file is fail-closed; `catalogue_declaration_hash` mismatch is a stale error; Red is always error; Yellow is error when `strict=true`, warning when `strict=false`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "signals_path",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "catalog_hash_hex",
+          "ty": "&str"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Evaluate chain ③ (`check-impl-catalog`) gate for a single layer from an explicit signals file path and pre-computed `catalog_hash_hex` (SHA-256 of the catalogue file bytes). This T011 public primitive is retained as a low-level file evaluator for infrastructure-owned path resolution; it is not a CLI/Makefile entrypoint and is not called through removed `--signals-path` / `--catalog-hash` flags. D8/T020 argless CLI wiring must inject an infrastructure-layer per-layer wrapper/equivalent that derives the signals-file path from the layer context before delegating here. Missing or decode-error signals file is fail-closed; `declaration_hash` mismatch is a stale error; Red is always error; Yellow is error when `strict=true`, warning when `strict=false`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-07"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "GitBlobAdrFileAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "repo_root", "ty": "std::path::PathBuf" },
+            { "name": "branch", "ty": "String" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "LocalSignalLayerReaderAdapter",
+      "methods": [
+        {
+          "name": "discover",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<Self, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "workspace_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalGatesConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SignalGatesConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "SignalGatesConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GateRowDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "GateRowDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "GateRowDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "StrictnessDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "StrictnessDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "StrictnessDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<StrictnessDto>",
+      "for_type": "domain::Strictness"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalGatesConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SignalGatesConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "SignalGatesConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LocalSignalLayerReaderAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::signal::SignalLayerReader",
+      "for_type": "LocalSignalLayerReaderAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GitBlobAdrFileAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "GitBlobAdrFileAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::AdrFilePort",
+      "for_type": "GitBlobAdrFileAdapter"
+    }
+  ]
+}

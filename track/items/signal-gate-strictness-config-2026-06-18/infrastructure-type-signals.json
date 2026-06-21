@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-21T04:03:35Z",
+  "declaration_hash": "f934bc0d7d770d02da1a0ff237129c8da6115faa4c2b749cae667734e85312dc",
+  "signals": [
+    {
+      "type_name": "GateRowDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "GitBlobAdrFileAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AdrFilePort",
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "LocalSignalLayerReaderAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SignalLayerReader",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "SignalGatesConfig",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "SignalGatesConfigError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "StrictnessDto",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::check_catalog_spec_from_signals_file",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_entry_hash",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::signal_gates_config::load_signal_gates_config_from_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_type_signals_from_spec_json",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::catalogue_spec_signals_path",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::impl_catalog_signals_path",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_from_workspace",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "Strictness",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<StrictnessDto>"
+      ]
+    }
+  ]
+}

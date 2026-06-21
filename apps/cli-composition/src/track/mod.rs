@@ -625,48 +625,6 @@ impl CliApp {
             dst_dir.display()
         ))))
     }
-    /// Evaluate spec.md source tags and store results in metadata.json spec_signals.
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_signals(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-    ) -> Result<CommandOutcome, String> {
-        use infrastructure::spec::codec as spec_codec;
-        use infrastructure::track::atomic_write::atomic_write_file;
-        let effective_track_id =
-            resolve_track_id(track_id, &items_dir).map_err(|e| e.to_string())?;
-        validate_track_id_str(&effective_track_id)?;
-        let track_dir = items_dir.join(&effective_track_id);
-        let spec_json_path = track_dir.join("spec.json");
-        if spec_json_path.is_file() {
-            let json_content = std::fs::read_to_string(&spec_json_path)
-                .map_err(|e| format!("cannot read {}: {e}", spec_json_path.display()))?;
-            let mut doc = spec_codec::decode(&json_content)
-                .map_err(|e| format!("spec.json decode error: {e}"))?;
-            let counts = doc.evaluate_signals();
-            doc.set_signals(counts);
-            let encoded =
-                spec_codec::encode(&doc).map_err(|e| format!("spec.json encode error: {e}"))?;
-            atomic_write_file(&spec_json_path, format!("{encoded}\n").as_bytes())
-                .map_err(|e| format!("cannot write {}: {e}", spec_json_path.display()))?;
-            let rendered_spec = infrastructure::spec::render::render_spec(&doc);
-            let spec_md_path = track_dir.join("spec.md");
-            atomic_write_file(&spec_md_path, rendered_spec.as_bytes())
-                .map_err(|e| format!("cannot write {}: {e}", spec_md_path.display()))?;
-            let total = counts.total();
-            let msg = format!(
-                "[OK] Signals (spec.json): blue={} yellow={} red={} (total={total})",
-                counts.blue(),
-                counts.yellow(),
-                counts.red()
-            );
-            Ok(CommandOutcome::success(Some(msg)))
-        } else {
-            ops::execute_signals_legacy(&track_dir)
-        }
-    }
 }
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]

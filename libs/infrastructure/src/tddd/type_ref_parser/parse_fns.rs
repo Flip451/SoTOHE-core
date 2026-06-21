@@ -36,6 +36,42 @@ where
     F: Fn(&str) -> Option<Id>,
     G: FnMut(String) -> u32,
 {
+    parse_type_ref_with_generics(
+        type_ref_str,
+        resolve_local,
+        std_crate_id,
+        external_crate_ids,
+        emit_external_crate,
+        &[],
+    )
+}
+
+/// Parses a `TypeRef` string and converts it to `rustdoc_types::Type`, recognising
+/// impl-block generic type parameter names.
+///
+/// Identical to [`parse_type_ref`] except that `generic_params` lists the names of
+/// type parameters declared on an `impl` block (e.g. `&["T", "U"]`). Any
+/// single-segment identifier that matches an entry in `generic_params` is encoded as
+/// `Type::Generic(name)` instead of falling through to the unresolved-marker path.
+///
+/// This implements ADR 2026-06-18-0822 D2: `for_type: "T"` with
+/// `impl_generics: [{name: "T", ...}]` should produce `Type::Generic("T")`.
+///
+/// # Errors
+///
+/// Returns an error string if `syn` fails to parse `type_ref_str`.
+pub(crate) fn parse_type_ref_with_generics<F, G>(
+    type_ref_str: &str,
+    resolve_local: &F,
+    std_crate_id: u32,
+    external_crate_ids: &HashMap<String, u32>,
+    emit_external_crate: &mut G,
+    generic_params: &[&str],
+) -> Result<Type, String>
+where
+    F: Fn(&str) -> Option<Id>,
+    G: FnMut(String) -> u32,
+{
     let syn_type: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("syn parse error for `{type_ref_str}`: {e}"))?;
 
@@ -43,7 +79,8 @@ where
     // pass the registered std crate_id), but Path.id always uses UNRESOLVED_CRATE_ID
     // for external types since item ids are not available at A-codec time.
     let _ = std_crate_id;
-    let mut ctx = ParseCtx { resolve_local, external_crate_ids, emit_external_crate };
+    let mut ctx =
+        ParseCtx { resolve_local, external_crate_ids, emit_external_crate, generic_params };
 
     Ok(ctx.convert_type(&syn_type))
 }
@@ -83,7 +120,8 @@ where
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
 
     let _ = std_crate_id; // kept for API symmetry with parse_type_ref
-    let mut ctx = ParseCtx { resolve_local, external_crate_ids, emit_external_crate };
+    let mut ctx =
+        ParseCtx { resolve_local, external_crate_ids, emit_external_crate, generic_params: &[] };
 
     match syn_bound {
         // `syn::Lifetime.ident` is the identifier part WITHOUT the leading apostrophe

@@ -20,6 +20,7 @@ use crate::tddd::{
     type_signals_codec,
 };
 use crate::track::symlink_guard::reject_symlinks_below;
+use crate::verify::catalogue_spec_signals::CatalogueVerifyContext;
 use crate::verify::tddd_layers::TdddLayerBinding;
 
 /// Detect whether any TDDD-enabled layer with `catalogue_spec_signal` opt-in
@@ -120,24 +121,11 @@ pub fn read_spec_element_hashes(
 
     let text = std::fs::read_to_string(&spec_path)
         .map_err(|e| format!("cannot read spec.json at '{}': {e}", spec_path.display()))?;
-    // Validate schema first (mirrors `load_spec_element_map` in plan_artifact_refs.rs):
-    // catches duplicate IDs, malformed required fields, and unsupported schema_version before
-    // the element map is built.
-    crate::spec::codec::decode(&text)
-        .map_err(|e| format!("spec.json schema error at '{}': {e}", spec_path.display()))?;
-    let raw: serde_json::Value =
-        serde_json::from_str(&text).map_err(|e| format!("spec.json JSON parse error: {e}"))?;
-    let element_map = crate::verify::plan_artifact_refs::build_element_map(&raw);
-    let mut out: BTreeMap<SpecElementId, ContentHash> = BTreeMap::new();
-    for (id_str, canonical_json) in element_map {
-        let anchor = SpecElementId::try_new(id_str.clone())
-            .map_err(|e| format!("spec.json contains element with invalid id '{id_str}': {e}"))?;
-        let hash_hex = crate::verify::plan_artifact_refs::canonical_json_sha256(&canonical_json);
-        let hash = ContentHash::try_from_hex(hash_hex)
-            .map_err(|e| format!("internal: canonical hash parse error: {e}"))?;
-        out.insert(anchor, hash);
-    }
-    Ok(out)
+
+    crate::verify::plan_artifact_refs::spec_element_hashes_from_text(
+        &text,
+        &spec_path.display().to_string(),
+    )
 }
 
 /// Verify one layer — returns the list of formatted finding strings emitted by
@@ -194,7 +182,7 @@ fn verify_one_layer(
 
     if !catalogue_present {
         // Skip layers whose catalogue file is absent — consistent with the
-        // `sotp track type-signals` lenient CI path.
+        // `sotp signal calc-impl-catalog` lenient CI path.
         return Ok(Vec::new());
     }
 
@@ -354,67 +342,12 @@ pub fn execute_verify_catalogue_spec_refs(
     skip_stale: bool,
     formatted_findings: &mut Vec<String>,
 ) -> Result<bool, String> {
-    // Security: guard `items_dir` itself before using it as the trusted root.
-    // Mirrors `execute_catalogue_spec_signals` (catalogue_spec_signals.rs).
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(format!(
-                "symlink guard: refusing to follow symlink at items_dir: {}",
-                items_dir.display()
-            ));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(format!(
-                "symlink guard: cannot stat items_dir {}: {e}",
-                items_dir.display()
-            ));
-        }
-    }
-
-    // Security: guard `workspace_root` against symlinks at the leaf.
-    match workspace_root.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(format!(
-                "symlink guard: refusing to follow symlink at workspace_root: {}",
-                workspace_root.display()
-            ));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(format!(
-                "symlink guard: cannot stat workspace_root {}: {e}",
-                workspace_root.display()
-            ));
-        }
-    }
-
-    // Security: validate track_id via domain::TrackId before joining onto items_dir.
-    // `Path::join` resolves `..`, `/`, and multi-segment paths (`foo/bar`) at the OS
-    // level. Using the domain type enforces the slug rules (single-segment, no `..`,
-    // no path separators) and makes this function safe when called directly without
-    // upstream CLI validation.
-    let valid_track_id = domain::TrackId::try_new(&track_id)
-        .map_err(|e| format!("invalid track_id '{track_id}': {e}"))?;
-
-    // Fail-closed existence guard for the track directory.
-    let track_dir = items_dir.join(valid_track_id.as_ref());
-    if !track_dir.exists() {
-        return Err(format!(
-            "track directory does not exist: {} (check the track_id)",
-            track_dir.display()
-        ));
-    }
-
-    // Binary-gate fail-closed: load TDDD layer bindings from architecture-rules.json.
-    let rules_path = workspace_root.join("architecture-rules.json");
-    let bindings = crate::verify::tddd_layers::load_tddd_layers(&rules_path, &workspace_root)
-        .map_err(|e| {
-            format!("cannot load architecture-rules.json at '{}': {e}", rules_path.display())
-        })?;
-    if bindings.is_empty() {
-        return Err("no tddd.enabled layers found in architecture-rules.json".to_owned());
-    }
+    // Shared preflight: symlink guards, canonical containment, TrackId validation,
+    // track_dir validation, and architecture-rules loading.
+    // Uses the stricter `CatalogueVerifyContext` policy (canonical containment +
+    // track_dir symlink/non-directory checks) in place of the previous manual guards.
+    let ctx = CatalogueVerifyContext::prepare(items_dir, &track_id, workspace_root)?;
+    let CatalogueVerifyContext { items_dir, track_dir, bindings } = ctx;
 
     // ADR D2.3: silent PASS when no enabled layer's catalogue file exists.
     if !any_enabled_catalogue_present(&bindings, &track_dir, &items_dir)

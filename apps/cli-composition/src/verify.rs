@@ -2,28 +2,7 @@
 
 use std::path::PathBuf;
 
-use crate::{CliApp, CommandOutcome};
-
-/// Render a `VerifyOutcome` into a `CommandOutcome`.
-fn render_outcome(label: &str, outcome: &infrastructure::verify::VerifyOutcome) -> CommandOutcome {
-    let mut lines = vec![format!("--- {label} ---")];
-    if outcome.findings().is_empty() {
-        lines.push("[OK] All checks passed.".to_owned());
-        lines.push(format!("--- {label} PASSED ---"));
-        CommandOutcome::success(Some(lines.join("\n")))
-    } else {
-        for finding in outcome.findings() {
-            lines.push(finding.to_string());
-        }
-        if outcome.has_errors() {
-            lines.push(format!("--- {label} FAILED ---"));
-            CommandOutcome { stdout: Some(lines.join("\n")), stderr: None, exit_code: 1 }
-        } else {
-            lines.push(format!("--- {label} PASSED ---"));
-            CommandOutcome::success(Some(lines.join("\n")))
-        }
-    }
-}
+use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome};
 
 /// Render a skip outcome (non-track branch, AC-16).
 fn render_skip(label: &str, reason: &str) -> CommandOutcome {
@@ -72,73 +51,6 @@ fn resolve_ci_verify_track_id_with_reader(
             | TrackResolutionError::NoBranch,
         )) => Ok(None),
         Err(e) => Err(e.to_string()),
-    }
-}
-
-/// Build the `spec.md` path from a resolved track ID, with presence checking.
-///
-/// Returns:
-/// - `Ok(Some(spec_md_path))` when at least one of `spec.json` or `spec.md` exists under
-///   `track/items/<track_id>/`. The returned path is always `spec.md`; the downstream
-///   `infrastructure::verify::spec_states::verify` prefers the sibling `spec.json` when
-///   present and falls back to reading `spec.md`, so passing the `spec.md` path is correct
-///   as long as at least one of the two exists.
-/// - `Ok(None)` (skip-signal) when the track artifact directory exists but **neither**
-///   `spec.json` **nor** `spec.md` exists — the spec artifacts have not yet been generated
-///   (Phase 0). Callers should render a SKIP outcome.
-/// - `Err(msg)` for infrastructure failures (fail-closed).
-fn build_spec_path_from_track_id(track_id: &str) -> Result<Option<PathBuf>, String> {
-    use infrastructure::git_cli::GitRepository as _;
-    let repo = infrastructure::git_cli::SystemGitRepo::discover()
-        .map_err(|e| format!("cannot discover git repository: {e}"))?;
-    let repo_root = repo.root().to_path_buf();
-    let track_dir = repo_root.join("track/items").join(track_id);
-    require_track_artifact_dir(track_id, &track_dir)?;
-    let spec_json_path = track_dir.join("spec.json");
-    let spec_md_path = track_dir.join("spec.md");
-    if spec_artifact_entry_exists(&spec_json_path)? || spec_artifact_entry_exists(&spec_md_path)? {
-        Ok(Some(spec_md_path))
-    } else {
-        // Neither spec artifact exists yet (Phase 0) — return skip-signal.
-        Ok(None)
-    }
-}
-
-fn require_track_artifact_dir(track_id: &str, track_dir: &std::path::Path) -> Result<(), String> {
-    match std::fs::symlink_metadata(track_dir) {
-        Ok(metadata) if metadata.file_type().is_symlink() => Err(format!(
-            "track artifact directory {} for track '{track_id}' is a symlink",
-            track_dir.display()
-        )),
-        Ok(metadata) if metadata.is_dir() => Ok(()),
-        Ok(_) => Err(format!(
-            "track artifact path {} for track '{track_id}' is not a directory",
-            track_dir.display()
-        )),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Err(format!(
-            "track artifact directory {} for track '{track_id}' does not exist",
-            track_dir.display()
-        )),
-        Err(e) => Err(format!(
-            "failed to inspect track artifact directory {} for track '{track_id}': {e}",
-            track_dir.display()
-        )),
-    }
-}
-
-fn spec_artifact_entry_exists(path: &std::path::Path) -> Result<bool, String> {
-    match std::fs::symlink_metadata(path) {
-        Ok(metadata) if metadata.file_type().is_symlink() => Err(format!(
-            "spec artifact {} is a symlink; refusing to skip spec-state verification",
-            path.display()
-        )),
-        Ok(metadata) if metadata.is_file() => Ok(true),
-        Ok(_) => Err(format!(
-            "spec artifact {} is not a regular file; refusing to skip spec-state verification",
-            path.display()
-        )),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
-        Err(e) => Err(format!("failed to inspect spec artifact {}: {e}", path.display())),
     }
 }
 
@@ -367,58 +279,6 @@ impl CliApp {
         Ok(render_outcome("verify spec signals", &outcome))
     }
 
-    /// Check spec.md contains a Domain States section with table data rows.
-    ///
-    /// When `spec_path` is `None`, resolves from the active track branch (AC-16: skip on
-    /// non-track branches).
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_spec_states(
-        &self,
-        spec_path: Option<PathBuf>,
-        strict: bool,
-    ) -> Result<CommandOutcome, String> {
-        use infrastructure::verify::VerifyFinding;
-
-        let resolved_path = match spec_path {
-            Some(p) => p,
-            None => match resolve_ci_verify_track_id()? {
-                None => {
-                    return Ok(render_skip(
-                        "verify spec states",
-                        "not on a track branch; skipping",
-                    ));
-                }
-                Some(track_id) => match build_spec_path_from_track_id(&track_id)? {
-                    Some(path) => path,
-                    None => {
-                        return Ok(render_skip(
-                            "verify spec states",
-                            "spec artifacts not yet generated (Phase 0); skipping",
-                        ));
-                    }
-                },
-            },
-        };
-
-        let outcome =
-            match infrastructure::verify::trusted_root::resolve_trusted_root(&resolved_path) {
-                Ok(trusted_root) => infrastructure::verify::spec_states::verify(
-                    &resolved_path,
-                    strict,
-                    &trusted_root,
-                ),
-                Err(e) => infrastructure::verify::VerifyOutcome::from_findings(vec![
-                    VerifyFinding::error(format!(
-                        "cannot resolve trusted_root for {}: {e}",
-                        resolved_path.display()
-                    )),
-                ]),
-            };
-        Ok(render_outcome("verify spec states", &outcome))
-    }
-
     /// Validate structured-ref fields per ADR 2026-04-19-1242.
     ///
     /// When `track_dir` is `None`, resolves from the active track branch (AC-16: skip on
@@ -490,49 +350,6 @@ impl CliApp {
         execute_catalogue_spec_refs(items_dir, resolved_track_id, workspace_root, skip_stale)
     }
 
-    /// Check catalogue-spec signal gate results for each tddd-enabled layer.
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_catalogue_spec_signals(
-        &self,
-        items_dir: PathBuf,
-        workspace_root: PathBuf,
-        strict: bool,
-    ) -> Result<CommandOutcome, String> {
-        // AC-16: check for non-track branch at the composition layer before delegating
-        // to infrastructure (which has its own track resolution).
-        //
-        // Uses resolve_ci_verify_track_id() (CWD-anchored) to match the behaviour of
-        // execute_catalogue_spec_signals_check(), which also discovers the git repo from
-        // the process CWD via SystemGitRepo::discover().
-        // Using the workspace_root-anchored variant here while the check resolves from
-        // CWD would create a mismatch when --workspace-root differs from CWD.
-        match resolve_ci_verify_track_id()? {
-            None => {
-                Ok(render_skip("verify catalogue-spec signals", "not on a track branch; skipping"))
-            }
-            Some(_) => {
-                let outcome = infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check(
-                    items_dir,
-                    workspace_root,
-                    strict,
-                );
-                Ok(render_outcome("verify catalogue-spec signals", &outcome))
-            }
-        }
-    }
-
-    /// Verify ADR decision signal grounds across knowledge/adr/.
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_adr_signals(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
-        let outcome =
-            infrastructure::verify::adr_signals::execute_verify_adr_signals(&project_root);
-        Ok(render_outcome("verify adr signals", &outcome))
-    }
-
     // -----------------------------------------------------------------------
     // CI verify helpers — exposed so apps/cli can avoid direct infra imports
     // -----------------------------------------------------------------------
@@ -567,44 +384,14 @@ impl CliApp {
     pub fn verify_resolve_active_track_dir(&self) -> Option<PathBuf> {
         resolve_active_track_dir()
     }
-
-    /// Build the spec.md path from a resolved track ID.
-    ///
-    /// Returns `Ok(path)` when at least one of `spec.json` or `spec.md` exists.
-    /// Returns `Err` when neither spec artifact exists (Phase 0) or on infrastructure failure.
-    /// Use `verify_spec_states` for the track-resolution path that emits a SKIP outcome
-    /// instead of an error when spec artifacts are absent.
-    ///
-    /// # Errors
-    /// Returns a human-readable error string when neither spec artifact exists or on
-    /// infrastructure failure.
-    pub fn verify_build_spec_path_from_track_id(&self, track_id: &str) -> Result<PathBuf, String> {
-        match build_spec_path_from_track_id(track_id)? {
-            Some(path) => Ok(path),
-            None => Err(format!(
-                "spec artifacts not found for track '{track_id}': \
-                 neither spec.json nor spec.md exists under track/items/{track_id}/"
-            )),
-        }
-    }
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use super::*;
+    use infrastructure::verify::test_support::run_git;
 
-    fn run_git(root: &std::path::Path, args: &[&str]) {
-        let output =
-            std::process::Command::new("git").args(args).current_dir(root).output().unwrap();
-        assert!(
-            output.status.success(),
-            "git command failed: git {}\nstdout:\n{}\nstderr:\n{}",
-            args.join(" "),
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
-        );
-    }
+    use super::*;
 
     #[test]
     fn test_verify_hooks_path_with_githooks_configured_returns_success() {
@@ -635,93 +422,5 @@ mod tests {
         assert!(stdout.contains("core.hooksPath is not set to .githooks"));
         assert!(stdout.contains("--- verify hooks path FAILED ---"));
         assert!(outcome.stderr.is_none());
-    }
-
-    #[test]
-    fn test_spec_artifact_entry_exists_missing_path_returns_false() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("missing-spec.json");
-
-        assert!(!spec_artifact_entry_exists(&path).unwrap());
-    }
-
-    #[test]
-    fn test_spec_artifact_entry_exists_existing_file_returns_true() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("spec.json");
-        std::fs::write(&path, "{}").unwrap();
-
-        assert!(spec_artifact_entry_exists(&path).unwrap());
-    }
-
-    #[test]
-    fn test_spec_artifact_entry_exists_directory_fails_closed() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("spec.json");
-        std::fs::create_dir(&path).unwrap();
-
-        let message = spec_artifact_entry_exists(&path).unwrap_err();
-
-        assert!(
-            message.contains("is not a regular file"),
-            "artifact directories must fail closed, got: {message}"
-        );
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn test_spec_artifact_entry_exists_dangling_symlink_fails_closed() {
-        let dir = tempfile::tempdir().unwrap();
-        let target = dir.path().join("missing-spec.json");
-        let link = dir.path().join("spec.json");
-        std::os::unix::fs::symlink(&target, &link).unwrap();
-
-        let message = spec_artifact_entry_exists(&link).unwrap_err();
-
-        assert!(
-            message.contains("is a symlink"),
-            "dangling artifact symlinks must fail closed, got: {message}"
-        );
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn test_spec_artifact_entry_exists_not_directory_error_fails_closed() {
-        let dir = tempfile::tempdir().unwrap();
-        let not_dir = dir.path().join("not-dir");
-        std::fs::write(&not_dir, "not a directory").unwrap();
-        let path = not_dir.join("spec.json");
-        let raw_error = std::fs::symlink_metadata(&path).unwrap_err();
-        assert_eq!(
-            raw_error.kind(),
-            std::io::ErrorKind::NotADirectory,
-            "test setup must trigger a metadata error, not an absent artifact"
-        );
-
-        let message = spec_artifact_entry_exists(&path).unwrap_err();
-
-        assert!(
-            message.contains("failed to inspect spec artifact"),
-            "metadata errors must fail closed, got: {message}"
-        );
-    }
-
-    #[test]
-    fn test_require_track_artifact_dir_missing_dir_fails_closed() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("missing-track");
-
-        let message = require_track_artifact_dir("missing-track", &track_dir).unwrap_err();
-        assert!(
-            message.contains("does not exist"),
-            "missing track artifact directory must fail closed, got: {message}"
-        );
-    }
-
-    #[test]
-    fn test_require_track_artifact_dir_empty_dir_allows_phase0_skip() {
-        let dir = tempfile::tempdir().unwrap();
-
-        require_track_artifact_dir("phase0-track", dir.path()).unwrap();
     }
 }

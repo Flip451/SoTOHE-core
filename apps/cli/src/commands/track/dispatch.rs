@@ -7,8 +7,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use super::{
-    TrackCommand, archive, branch_ops, fixpoint_resolve, resolve, set_commit_hash, signals,
-    state_ops, tddd, transition, views,
+    TrackCommand, archive, branch_ops, fixpoint_resolve, resolve, set_commit_hash, state_ops, tddd,
+    transition, views,
 };
 use crate::commands::track::{
     resolve_track_id, resolve_track_id_for_write, resolve_track_id_from_root,
@@ -94,16 +94,6 @@ fn dispatch_track_cmd(cmd: TrackCommand) -> Result<ExitCode, crate::CliError> {
         TrackCommand::TaskCounts { items_dir, track_id } => resolve_track_id(track_id, &items_dir)
             .map_err(CliError::Message)
             .and_then(|tid| state_ops::execute_task_counts(items_dir, tid)),
-        TrackCommand::Signals { items_dir, track_id } => {
-            resolve_track_id_for_write(track_id, &items_dir)
-                .map_err(CliError::Message)
-                .and_then(|tid| signals::execute_signals(items_dir, tid))
-        }
-        TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
-            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
-                .map_err(CliError::Message);
-            resolved.and_then(|tid| tddd::signals::execute_type_signals(tid, workspace_root, layer))
-        }
         TrackCommand::TypeGraph {
             items_dir,
             track_id,
@@ -152,18 +142,6 @@ fn dispatch_track_cmd(cmd: TrackCommand) -> Result<ExitCode, crate::CliError> {
                     tid,
                     workspace_root,
                     source_workspace,
-                    layer,
-                )
-            })
-        }
-        TrackCommand::CatalogueSpecSignals { items_dir, track_id, workspace_root, layer } => {
-            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
-                .map_err(CliError::Message);
-            resolved.and_then(|tid| {
-                tddd::catalogue_spec_signals::execute_catalogue_spec_signals(
-                    items_dir,
-                    tid,
-                    workspace_root,
                     layer,
                 )
             })

@@ -21,6 +21,13 @@ pub(super) struct ParseCtx<'a, F, G> {
     pub(super) resolve_local: &'a F,
     pub(super) external_crate_ids: &'a HashMap<String, u32>,
     pub(super) emit_external_crate: &'a mut G,
+    /// Impl-block generic type parameter names (e.g. `["T", "U"]`).
+    ///
+    /// When a single-segment type name matches one of these names, it is encoded
+    /// as `Type::Generic(name)` instead of falling through to the unresolved-marker
+    /// path. This implements ADR 2026-06-18-0822 D2: `for_type: "T"` with
+    /// `impl_generics: [{name: "T", ...}]` should produce `Type::Generic("T")`.
+    pub(super) generic_params: &'a [&'a str],
 }
 
 impl<'a, F, G> ParseCtx<'a, F, G>
@@ -57,9 +64,42 @@ where
             return unresolved_type("<empty_path>");
         }
 
-        // Qualified path (`<T as Trait>::Assoc`) — encode as unresolved marker.
-        if type_path.qself.is_some() {
-            return unresolved_type("<qualified_path>");
+        // Qualified path (`<T as Trait>::Assoc`) — build a full `Type::QualifiedPath`.
+        //
+        // ADR 2026-06-18-0822 D1 needs this faithful `QualifiedPath` shape so
+        // GAT projections compare against rustdoc instead of collapsing to an
+        // unresolved marker. `syn::QSelf.position` is the index into
+        // `type_path.path.segments` that marks the boundary between the trait
+        // prefix and the associated-item name:
+        //   - `segments[..position]` → trait path (may be empty when position == 0)
+        //   - `segments[position]`   → associated item name + its generic args
+        if let Some(qself) = type_path.qself.as_ref() {
+            // 1. Recursively convert the self type.
+            let self_type = Box::new(self.convert_type(&qself.ty));
+
+            // 2. Build the trait path from the prefix segments (before `position`).
+            //    When position == 0 there is no trait prefix, so trait_ is None.
+            let trait_ = if qself.position == 0 {
+                None
+            } else {
+                // Reconstruct a `syn::Path` from the prefix segments and resolve it.
+                let prefix_segs: syn::punctuated::Punctuated<syn::PathSegment, syn::Token![::]> =
+                    type_path.path.segments.iter().take(qself.position).cloned().collect();
+                let trait_syn_path = syn::Path { leading_colon: None, segments: prefix_segs };
+                Some(self.resolve_trait_bound_path(&trait_syn_path))
+            };
+
+            // 3. The associated-item segment (at `position`): name + generic args.
+            let Some(assoc_seg) = segments.get(qself.position).copied() else {
+                return unresolved_type("<qualified_path_missing_assoc>");
+            };
+            if segments.len() != qself.position.saturating_add(1) {
+                return unresolved_type("<qualified_path_trailing_segments>");
+            }
+            let name = assoc_seg.ident.to_string();
+            let args = self.convert_generic_args(&assoc_seg.arguments);
+
+            return Type::QualifiedPath { name, self_type, trait_, args: args.map(Box::new) };
         }
 
         // Multi-segment: first segment is a crate name prefix.
@@ -96,6 +136,20 @@ where
                 id: local_id,
                 args: generic_args.map(Box::new),
             });
+        }
+
+        // 3.5. Impl-block generic type parameter? (ADR 2026-06-18-0822 D2)
+        //
+        // If the name matches one of the caller-supplied `generic_params` names, it
+        // represents a type variable (e.g. `T` in `impl<T> Trait for T`). Encode it
+        // as `Type::Generic(name)` so that the A-codec representation matches the
+        // `Type::Generic` variant that rustdoc emits for generic type parameters.
+        //
+        // This step is placed AFTER `resolve_local` so that a catalogue type that
+        // happens to share a name with a generic parameter keeps its local-catalogue
+        // identity rather than being downgraded to a generic placeholder.
+        if self.generic_params.iter().any(|g| *g == name) {
+            return Type::Generic(name);
         }
 
         // 4. `Self` keyword — represents the implementing type. Encoded as a

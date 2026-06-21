@@ -1,0 +1,15 @@
+{
+  "$schema_version": 1,
+  "commit_gate": {
+    "adr_user":     "strict",
+    "spec_adr":     "strict",
+    "catalog_spec": "strict",
+    "impl_catalog": "interim"
+  },
+  "merge_gate": {
+    "adr_user":     "strict",
+    "spec_adr":     "strict",
+    "catalog_spec": "strict",
+    "impl_catalog": "strict"
+  }
+}

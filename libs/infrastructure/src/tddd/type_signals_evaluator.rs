@@ -224,7 +224,7 @@ pub fn execute_type_signals_for_layer(
                     "catalogue '{}' uses schema_version {from} which requires migration to \
                      schema_version {to}: {reason}. \
                      Migrate the catalogue using the type-designer agent before running \
-                     `sotp track type-signals`.",
+                     `sotp signal calc-impl-catalog`.",
                     catalogue_path.display()
                 ));
             }
@@ -233,7 +233,7 @@ pub fn execute_type_signals_for_layer(
                     "catalogue '{}' uses schema_version {actual} — \
                      SignalEvaluatorV2 requires a v5 catalogue (schema_version=5). \
                      Migrate the catalogue using the type-designer agent before running \
-                     `sotp track type-signals`.",
+                     `sotp signal calc-impl-catalog`.",
                     catalogue_path.display()
                 ));
             }

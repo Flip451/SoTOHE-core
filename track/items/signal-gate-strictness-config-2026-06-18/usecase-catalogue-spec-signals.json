@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "23cb3e9d8672a5a570739a2f99e49618e554a246a5529de01be521feecafb5e5",
+  "signals": [
+    {
+      "type_name": "AdrUserChain",
+      "signal": "blue",
+      "entry_hash": "0fb53afd8b6e0bfe44daf16809e40e8a8caf4c0025702312852e3ffd5024fc94"
+    },
+    {
+      "type_name": "CatalogSpecChain",
+      "signal": "blue",
+      "entry_hash": "b793e9a68dc946ccc195422dc11bcf33a0ffb3b6f8d33a9ff4b123a630267580"
+    },
+    {
+      "type_name": "ImplCatalogChain",
+      "signal": "blue",
+      "entry_hash": "a231d46dbe97a51f7fd29507b704c82b1c9d3b7888ab0e9d99c505c9a15ea1bc"
+    },
+    {
+      "type_name": "SignalLayerReaderError",
+      "signal": "blue",
+      "entry_hash": "72e9a24561ac0dcc3f07d2ac32613493651c0a2b4a838d4a6c3e20d3c990d141"
+    },
+    {
+      "type_name": "SpecAdrChain",
+      "signal": "blue",
+      "entry_hash": "8640eb9ea885b1ba2f976872710414568ff2053be73ff08560bf63c05edc3081"
+    },
+    {
+      "type_name": "VerifyAdrSignalsCommand",
+      "signal": "blue",
+      "entry_hash": "04b52e16c636818996263543bf3ac3a5685c12404531925e59de94e0389884ca"
+    },
+    {
+      "type_name": "LiveSoTChain",
+      "signal": "blue",
+      "entry_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf"
+    },
+    {
+      "type_name": "LoadablePersistedChain",
+      "signal": "blue",
+      "entry_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200"
+    },
+    {
+      "type_name": "PersistedSoTChain",
+      "signal": "blue",
+      "entry_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a"
+    },
+    {
+      "type_name": "SignalLayerReader",
+      "signal": "blue",
+      "entry_hash": "cb96b162245bcde9cfec1a456abc8b79c0edd26af9c0de0eb619b63744626255"
+    },
+    {
+      "type_name": "SoTChain",
+      "signal": "blue",
+      "entry_hash": "4ec82db7fc9e8ec813850a98c04a647add2d3d529ff045ecf5730bfd8b566806"
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "signal": "blue",
+      "entry_hash": "360f62c00ffeff5c4fe37cc24989d8f12eed0da22ebbbee6f7307320a413d4b1"
+    },
+    {
+      "type_name": "VerifyAdrSignals",
+      "signal": "blue",
+      "entry_hash": "539b81926089c0dd9e01bb6c4d34b22edc4990fdac00ed4caac2b918ce2d5174"
+    },
+    {
+      "type_name": "usecase::merge_gate::check_strict_merge_gate",
+      "signal": "blue",
+      "entry_hash": "e8c4468ec950635c0da48ca1e8f25a2bc9d2515f6a1185a781d881f3d5e793a5"
+    },
+    {
+      "type_name": "usecase::signal::calc_catalog_spec",
+      "signal": "blue",
+      "entry_hash": "bcd3e44aa2f5fc26b840f9177792e39cc4edaba5540d1f5f820786840a9258ef"
+    },
+    {
+      "type_name": "usecase::signal::calc_impl_catalog",
+      "signal": "blue",
+      "entry_hash": "45565cfdab6429b183d9800c6b0426e07e9a6af7dc911229772be49c72dfb684"
+    },
+    {
+      "type_name": "usecase::signal::check_catalog_spec",
+      "signal": "blue",
+      "entry_hash": "e0646ef58650bc66850764f4c60965b3d970b928b77f2a7389a6f60e77279fda"
+    },
+    {
+      "type_name": "usecase::signal::check_impl_catalog",
+      "signal": "blue",
+      "entry_hash": "bff4b7635b996e23a8ee7732484a7e46ec5a7c8fd66f3c3c36ad41436c47484e"
+    },
+    {
+      "type_name": "usecase::signal::resolve_spec_json_path",
+      "signal": "blue",
+      "entry_hash": "d89af22361eb48d7fa1874e52446a2fdcd94c14be948eff87899fecf331990e7"
+    }
+  ]
+}

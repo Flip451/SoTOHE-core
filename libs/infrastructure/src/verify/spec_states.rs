@@ -4,104 +4,112 @@
 //! reads the sibling `domain-types.json` and verifies its entries.
 //! Otherwise falls back to the markdown table scan (legacy path).
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-use domain::check_type_signals;
-use domain::spec::check_spec_doc_signals;
+use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::verify::{VerifyFinding, VerifyOutcome};
+use domain::{SignalCounts, Strictness, check_type_signals};
 
 use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard;
 
 use super::frontmatter::parse_yaml_frontmatter;
+use super::path_safety::check_signals_file;
 use super::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
 
-/// Verifies spec.json Stage 1 signals and (if present) Stage 2 domain type signals.
+/// Verifies spec.json Stage 1 signals (chain ① `check-spec-adr`).
 ///
-/// This is a thin wrapper around the shared domain-layer pure functions
-/// `check_spec_doc_signals` and `check_type_signals`. It reads the
-/// files from the filesystem, rejects symlinks via `reject_symlinks_below`
-/// (D4.3), decodes the JSON, and delegates the actual rule evaluation to
-/// the domain layer.
+/// Reads `spec.json`, rejects symlinks (D4.3), decodes JSON, runs a self-consistency
+/// freshness check against `evaluate_signals()` (IN-09), and delegates the actual
+/// signal-gate rules to `check_spec_doc_signals`. Stage 2 (chain ③) is performed by
+/// `verify_type_signals_from_spec_json`.
 ///
-/// Stage 2 (`domain-types.json`) is **opt-in**: when the file is absent,
-/// Stage 2 is skipped entirely (TDDD not active for this track, per ADR §D2.1).
-/// The same opt-in semantics apply to both the CI path and the merge gate.
-///
-/// The `strict` parameter controls Yellow handling:
-/// - `true`: declared Yellow → `VerifyFinding::error` (merge gate)
-/// - `false`: declared Yellow → `VerifyFinding::warning` (CI interim mode — D8.6)
-///
-/// Red, None, all-zero, empty entries, and coverage-gap conditions always
-/// return `VerifyFinding::error` regardless of `strict`.
-///
-/// The `trusted_root` parameter anchors the symlink guard (`reject_symlinks_below`):
-/// the guard walks ancestors of `spec_json_path` only until it reaches
-/// `trusted_root`, then stops. Callers must pass an absolute path to the
-/// repository root (e.g. `SystemGitRepo::discover()?.root()`) so that
-/// host-level symlinks above the repo (for example `/var` on macOS) are NOT
-/// walked and the gate behavior is environment-independent. Tests may pass
-/// a tempdir root.
+/// `strict=true` promotes Yellow → error (merge gate); `false` → warning (D8.6).
+/// `trusted_root` anchors the symlink guard to the repo root (pass the git root).
 ///
 /// # Errors
 ///
-/// Returns findings when:
-/// - `spec.json` is a symlink or lives under a symlink'd directory (fail-closed).
-/// - `spec.json` cannot be read or decoded.
-/// - Stage 1 signal-gate rules are violated.
-/// - `domain-types.json` exists but cannot be read or decoded.
-/// - `domain-types.json` exists and Stage 2 signal-gate rules are violated.
-///
-/// Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
-/// §D2, §D2.1, §D4.3, §D8.6.
+/// Returns findings on symlinks, read/decode errors, stale signals, or gate violations.
 pub fn verify_from_spec_json(
-    spec_json_path: &Path,
+    spec_json_path: PathBuf,
     strict: bool,
-    trusted_root: &Path,
+    trusted_root: PathBuf,
 ) -> VerifyOutcome {
-    // D4.3 CI path: reject symlinks at spec_json_path or any ancestor below
-    // the trusted_root before reading. The caller is responsible for supplying
-    // an absolute `trusted_root` anchored at the repo root so host-level
-    // symlinks (e.g. `/var` on macOS) above the repo are NOT walked.
-    match symlink_guard::reject_symlinks_below(spec_json_path, trusted_root) {
-        Ok(true) => {}
-        Ok(false) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "cannot read {}: file not found",
-                spec_json_path.display()
-            ))]);
-        }
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{}: {e}",
-                spec_json_path.display()
-            ))]);
-        }
+    let spec_json_path = spec_json_path.as_path();
+    let trusted_root = trusted_root.as_path();
+
+    let spec_doc = match load_spec_doc(spec_json_path, trusted_root) {
+        Ok(doc) => doc,
+        Err(finding) => return VerifyOutcome::from_findings(vec![finding]),
+    };
+
+    if let Some(finding) = spec_signal_freshness(&spec_doc).to_finding(spec_json_path) {
+        return VerifyOutcome::from_findings(vec![finding]);
     }
 
-    let spec_json = match std::fs::read_to_string(spec_json_path) {
-        Ok(s) => s,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "cannot read {}: {e}",
-                spec_json_path.display()
-            ))]);
-        }
-    };
-    let spec_doc = match crate::spec::codec::decode(&spec_json) {
-        Ok(d) => d,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{}: spec.json decode error: {e}",
-                spec_json_path.display()
-            ))]);
-        }
-    };
-
     // Stage 1: delegate to the shared domain-layer pure function.
-    let stage1 = check_spec_doc_signals(&spec_doc, strict);
-    if stage1.has_errors() {
-        return stage1;
+    let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
+    check_spec_doc_signals(&spec_doc, strictness)
+}
+
+enum SpecSignalFreshness {
+    Fresh,
+    Stale { stored: SignalCounts, computed: SignalCounts },
+}
+
+impl SpecSignalFreshness {
+    fn to_finding(&self, spec_json_path: &Path) -> Option<VerifyFinding> {
+        let SpecSignalFreshness::Stale { stored, computed } = self else {
+            return None;
+        };
+
+        Some(VerifyFinding::error(format!(
+            "{}: spec signals are stale (stored={stored:?}, computed={computed:?}) — \
+             re-run `sotp signal calc-spec-adr` to refresh",
+            spec_json_path.display(),
+        )))
+    }
+}
+
+fn spec_signal_freshness(spec_doc: &SpecDocument) -> SpecSignalFreshness {
+    let Some(stored) = spec_doc.signals() else {
+        return SpecSignalFreshness::Fresh;
+    };
+    let computed = spec_doc.evaluate_signals();
+    // An empty / truncated spec must reject any stored non-zero counts — a
+    // previously-blue `signals` block carried over from a prior revision
+    // would otherwise let `check_spec_doc_signals` pass an unevaluated spec.
+    // Only the all-zero stored case is treated as fresh when computed is
+    // also zero; `check_spec_doc_signals` still rejects all-zero as
+    // unevaluated downstream.
+    if computed == *stored {
+        return SpecSignalFreshness::Fresh;
+    }
+    SpecSignalFreshness::Stale { stored: *stored, computed }
+}
+
+/// Verifies Stage 2 type signals (chain ③ `check-impl-catalog`) for the spec
+/// track identified by `spec_json_path`.
+///
+/// Reads `architecture-rules.json` from `trusted_root`, enumerates every
+/// `tddd.enabled` layer, and runs the signal gate. Layers without a catalogue
+/// are skipped (opt-in, ADR §D2.1). All findings are AND-aggregated.
+///
+/// `strict=true` promotes Yellow → error (merge gate); `false` → warning (D8.6).
+///
+/// # Errors
+///
+/// Returns findings on symlinks, read/decode errors, or gate violations.
+pub fn verify_type_signals_from_spec_json(
+    spec_json_path: PathBuf,
+    strict: bool,
+    trusted_root: PathBuf,
+) -> VerifyOutcome {
+    let spec_json_path = spec_json_path.as_path();
+    let trusted_root = trusted_root.as_path();
+
+    if let Err(finding) = load_spec_doc(spec_json_path, trusted_root) {
+        return VerifyOutcome::from_findings(vec![finding]);
     }
 
     // Stage 2 multi-layer loop: read architecture-rules.json from the trusted
@@ -110,9 +118,7 @@ pub fn verify_from_spec_json(
     let bindings = match load_tddd_layers(trusted_root) {
         Ok(bindings) => bindings,
         Err(finding) => {
-            let mut outcome = stage1;
-            outcome.merge(VerifyOutcome::from_findings(vec![finding]));
-            return outcome;
+            return VerifyOutcome::from_findings(vec![finding]);
         }
     };
 
@@ -123,11 +129,44 @@ pub fn verify_from_spec_json(
         _ => Path::new("."),
     };
 
-    let mut outcome = stage1;
+    let mut outcome = VerifyOutcome::pass();
     for binding in &bindings {
         outcome.merge(evaluate_layer_catalogue(binding, dir, trusted_root, strict));
     }
     outcome
+}
+
+fn load_spec_doc(
+    spec_json_path: &Path,
+    trusted_root: &Path,
+) -> Result<SpecDocument, VerifyFinding> {
+    // D4.3 CI path: reject symlinks at spec_json_path or any ancestor below
+    // the trusted_root before reading. The caller is responsible for supplying
+    // an absolute `trusted_root` anchored at the repo root so host-level
+    // symlinks (e.g. `/var` on macOS) above the repo are NOT walked.
+    match symlink_guard::reject_symlinks_below(spec_json_path, trusted_root) {
+        Ok(true) => {}
+        Ok(false) => {
+            return Err(VerifyFinding::error(format!(
+                "cannot read {}: file not found",
+                spec_json_path.display()
+            )));
+        }
+        Err(e) => {
+            return Err(VerifyFinding::error(format!("{}: {e}", spec_json_path.display())));
+        }
+    }
+
+    let spec_json = std::fs::read_to_string(spec_json_path).map_err(|e| {
+        VerifyFinding::error(format!("cannot read {}: {e}", spec_json_path.display()))
+    })?;
+    match crate::spec::codec::decode(&spec_json) {
+        Ok(d) => Ok(d),
+        Err(e) => Err(VerifyFinding::error(format!(
+            "{}: spec.json decode error: {e}",
+            spec_json_path.display()
+        ))),
+    }
 }
 
 /// Loads `architecture-rules.json` from `trusted_root` and returns the list
@@ -272,7 +311,7 @@ fn evaluate_layer_catalogue(
             if doc.declaration_hash() != current_hash {
                 return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "{}: declaration_hash mismatch (recorded={}, current={}) — \
-                     re-run `sotp track type-signals` to refresh the evaluation result",
+                     re-run `sotp signal calc-impl-catalog` to refresh the evaluation result",
                     signal_path.display(),
                     doc.declaration_hash(),
                     current_hash
@@ -286,7 +325,7 @@ fn evaluate_layer_catalogue(
             // `strict` flag does NOT relax this case. The catalogue has
             // declared types but no evaluation has been persisted.
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{} not found — run `sotp track type-signals` to generate the evaluation result",
+                "{} not found — run `sotp signal calc-impl-catalog` to generate the evaluation result",
                 signal_path.display()
             ))]);
         }
@@ -298,15 +337,58 @@ fn evaluate_layer_catalogue(
         }
     };
 
-    check_type_signals(&signals_doc, strict)
+    let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
+    check_type_signals(&signals_doc, strictness)
+}
+
+/// Evaluate chain ③ (`check-impl-catalog`) gate for a single layer with explicit paths.
+///
+/// Called by `signal check-impl-catalog --signals-path P --catalog-hash H --gate commit|merge`.
+/// Performs symlink guards, `declaration_hash` freshness, and the Red/Yellow/Blue domain gate.
+///
+/// # Errors
+///
+/// Returns a `VerifyOutcome` with error findings on I/O, decode, or gate failures.
+pub fn check_impl_catalog_from_signals_file(
+    signals_path: &Path,
+    catalog_hash_hex: &str,
+    strict: bool,
+) -> VerifyOutcome {
+    check_signals_file(
+        signals_path,
+        catalog_hash_hex,
+        &format!(
+            "{} not found — run `sotp signal calc-impl-catalog` to generate the evaluation result",
+            signals_path.display()
+        ),
+        |text| type_signals_codec::decode(text).map_err(|e| e.to_string()),
+        |doc| doc.declaration_hash().to_owned(),
+        |recorded, current, path| {
+            format!(
+                "{}: declaration_hash mismatch (recorded={}, current={}) — \
+                 re-run `sotp signal calc-impl-catalog` to refresh the evaluation result",
+                path.display(),
+                recorded,
+                current
+            )
+        },
+        |doc, _normalized_signals, _workspace_root| {
+            let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
+            check_type_signals(&doc, strictness)
+        },
+    )
 }
 
 /// Verifies that `spec.md` contains a `## Domain States` section with a markdown table
 /// that has at least one data row (beyond the header and separator rows).
 ///
 /// When a sibling `spec.json` exists next to `spec_path`, delegates to
-/// `verify_from_spec_json` (passing through `trusted_root`). Otherwise falls
-/// back to the markdown table scan.
+/// `verify_from_spec_json` (Stage 1, chain ①) and then
+/// `verify_type_signals_from_spec_json` (Stage 2, chain ③), merging the
+/// results. Both stages use the same `strict` parameter here because this
+/// combined entrypoint does not yet receive per-chain strictness. Independent
+/// per-chain strictness is wired in T009-T011 via `signal check-spec-adr` and
+/// `signal check-impl-catalog`. Otherwise falls back to the markdown table scan.
 ///
 /// See [`verify_from_spec_json`] for the `trusted_root` contract.
 ///
@@ -318,173 +400,161 @@ fn evaluate_layer_catalogue(
 /// - The section exists but contains no markdown table.
 /// - The table has no data rows (header + separator only).
 pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutcome {
-    // Delegate to spec.json path when a sibling spec.json exists.
-    if let Some(spec_json_path) = sibling_spec_json(spec_path) {
-        if spec_json_path.is_file() {
-            return verify_from_spec_json(&spec_json_path, strict, trusted_root);
-        }
+    if let Some(outcome) = verify_sibling_json_stages(spec_path, strict, trusted_root) {
+        return outcome;
     }
 
-    // Legacy markdown-based flow.
-    let content = match std::fs::read_to_string(spec_path) {
-        Ok(c) => c,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "cannot read {}: {e}",
-                spec_path.display()
-            ))]);
-        }
-    };
+    // Shared legacy markdown prelude: read the file and guard against generated v2 content.
+    let content =
+        match read_legacy_spec_markdown_with_label(spec_path, "states", Some(trusted_root)) {
+            Ok(c) => c,
+            Err(outcome) => return outcome,
+        };
+    super::spec_states_legacy_markdown::verify_domain_states_markdown(spec_path, &content)
+}
 
-    let lines: Vec<&str> = content.lines().collect();
-
-    // Determine where the body starts (skip YAML frontmatter if present).
-    let body_start = match parse_yaml_frontmatter(&content) {
-        Some(fm) => fm.body_start,
-        None => 0,
-    };
-
-    let body_lines = lines.get(body_start..).unwrap_or_default();
-
-    // Locate the `## Domain States` heading, skipping fenced code blocks.
-    let mut section_start: Option<usize> = None;
-    let mut heading_fence: Option<(char, usize)> = None;
-    for (i, line) in body_lines.iter().enumerate() {
-        let trimmed = line.trim();
-        // Track fenced code blocks
-        if let Some((fc, fc_len)) = heading_fence {
-            let run = trimmed.len() - trimmed.trim_start_matches(fc).len();
-            if run >= fc_len && trimmed.chars().all(|c| c == fc) {
-                heading_fence = None;
-            }
-            continue;
-        }
-        let backtick_count = trimmed.len() - trimmed.trim_start_matches('`').len();
-        let tilde_count = trimmed.len() - trimmed.trim_start_matches('~').len();
-        if backtick_count >= 3 {
-            heading_fence = Some(('`', backtick_count));
-            continue;
-        }
-        if tilde_count >= 3 {
-            heading_fence = Some(('~', tilde_count));
-            continue;
-        }
-        if line.trim_end() == "## Domain States" {
-            section_start = Some(i);
-            break;
-        }
+fn verify_sibling_json_stages(
+    spec_path: &Path,
+    strict: bool,
+    trusted_root: &Path,
+) -> Option<VerifyOutcome> {
+    let spec_json_path = sibling_spec_json(spec_path)?;
+    if !spec_json_path.is_file() {
+        return None;
     }
 
-    let Some(section_idx) = section_start else {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{}: missing '## Domain States' section",
+    let mut outcome =
+        verify_from_spec_json(spec_json_path.clone(), strict, trusted_root.to_path_buf());
+    merge_unique_findings(
+        &mut outcome,
+        verify_type_signals_from_spec_json(spec_json_path, strict, trusted_root.to_path_buf()),
+    );
+    Some(outcome)
+}
+
+fn merge_unique_findings(outcome: &mut VerifyOutcome, other: VerifyOutcome) {
+    for finding in other.findings() {
+        let duplicate = outcome.findings().iter().any(|existing| {
+            existing.severity() == finding.severity() && existing.message() == finding.message()
+        });
+        if !duplicate {
+            outcome.add(finding.clone());
+        }
+    }
+}
+
+/// Read a `spec.md` file and guard against generated v2 content.
+///
+/// Shared prelude for legacy markdown verifiers (`spec_signals`, `spec_attribution`,
+/// `spec_states`).
+///
+/// Returns `Ok(content)` when the file is a readable, non-empty legacy markdown spec.
+///
+/// Returns `Err(outcome)` early when:
+/// - The file cannot be read.
+/// - The file is empty or contains only whitespace — a blank spec.md is not a valid
+///   legacy specification and likely indicates a generation or checkout error.
+/// - The file starts with the generated-v2 header (`<!-- Generated from spec.json`),
+///   indicating that `spec.json` is absent — verification cannot proceed without it.
+///
+/// `verifier_label` is embedded in the generated-header error message (e.g.
+/// `"signal"`, `"attribution"`, `"states"`) so users know which check triggered the
+/// error.
+pub(crate) fn read_legacy_spec_markdown_with_label(
+    spec_path: &Path,
+    verifier_label: &str,
+    trusted_root: Option<&Path>,
+) -> Result<String, VerifyOutcome> {
+    let guarded_spec_path = super::spec_states_legacy_markdown::guard_legacy_spec_markdown_path(
+        spec_path,
+        trusted_root,
+    )?;
+
+    let content = std::fs::read_to_string(&guarded_spec_path).map_err(|e| {
+        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "cannot read {}: {e}",
             spec_path.display()
-        ))]);
-    };
+        ))])
+    })?;
+    if content.trim().is_empty() {
+        return Err(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{}: spec.md is empty — a blank spec cannot be verified for {}",
+            spec_path.display(),
+            verifier_label
+        ))]));
+    }
+    if content.starts_with("<!-- Generated from spec.json") {
+        return Err(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{}: generated v2 spec.md requires a sibling spec.json for {} verification \
+             (spec.json is absent — restore it or re-generate spec.md from spec.json)",
+            spec_path.display(),
+            verifier_label
+        ))]));
+    }
+    Ok(content)
+}
 
-    // Collect table lines from the section body, skipping fenced code blocks
-    // and stopping at the next ## or # heading (outside a fence).
-    let mut table_lines: Vec<&str> = Vec::new();
-    let mut body_fence: Option<(char, usize)> = None;
-    for line in body_lines.iter().skip(section_idx + 1) {
-        let trimmed = line.trim();
+pub(crate) fn visible_markdown_body_lines(content: &str) -> Vec<&str> {
+    let body_start = parse_yaml_frontmatter(content).map_or(0, |fm| fm.body_start);
+    let mut active_fence = None;
+    content
+        .lines()
+        .skip(body_start)
+        .filter(|line| markdown_line_is_visible(line, &mut active_fence))
+        .collect()
+}
 
-        // Track fenced code blocks
-        if let Some((fc, fc_len)) = body_fence {
-            let run = trimmed.len() - trimmed.trim_start_matches(fc).len();
-            if run >= fc_len && trimmed.chars().all(|c| c == fc) {
-                body_fence = None;
-            }
-            continue;
-        }
-        let backtick_count = trimmed.len() - trimmed.trim_start_matches('`').len();
-        let tilde_count = trimmed.len() - trimmed.trim_start_matches('~').len();
-        if backtick_count >= 3 {
-            body_fence = Some(('`', backtick_count));
-            continue;
-        }
-        if tilde_count >= 3 {
-            body_fence = Some(('~', tilde_count));
-            continue;
-        }
+#[derive(Clone, Copy)]
+pub(crate) struct MarkdownFence {
+    marker: char,
+    len: usize,
+}
 
-        // Stop at the next same-or-higher-level heading (## or #) outside fences.
-        let t = line.trim_end();
-        if t.starts_with("## ") || t == "##" || t.starts_with("# ") || t == "#" {
-            break;
-        }
-
-        if line.trim_start().starts_with('|') {
-            table_lines.push(line);
-        }
+impl MarkdownFence {
+    pub(crate) fn opening(trimmed: &str) -> Option<Self> {
+        ['`', '~'].into_iter().find_map(|marker| {
+            let len = leading_marker_count(trimmed, marker);
+            (len >= 3).then_some(Self { marker, len })
+        })
     }
 
-    if table_lines.is_empty() {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{}: '## Domain States' section has no markdown table",
-            spec_path.display()
-        ))]);
+    pub(crate) fn closes(self, trimmed: &str) -> bool {
+        leading_marker_count(trimmed, self.marker) >= self.len
+            && trimmed.chars().all(|c| c == self.marker)
     }
+}
 
-    // A valid table needs header row, separator row (`|---|`), and at least one data row.
-    // We detect the separator row as a `|`-prefixed line containing only `-`, `|`, ` `, `:`.
-    let sep_idx = table_lines.iter().position(|l| is_table_separator(l));
-
-    let Some(sep_pos) = sep_idx else {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{}: '## Domain States' table has no separator row (header-only table)",
-            spec_path.display()
-        ))]);
-    };
-
-    // Separator must be preceded by at least one header row.
-    if sep_pos == 0 {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{}: '## Domain States' table has no header row before separator",
-            spec_path.display()
-        ))]);
+pub(crate) fn markdown_line_is_visible(
+    line: &str,
+    active_fence: &mut Option<MarkdownFence>,
+) -> bool {
+    let trimmed = line.trim();
+    if let Some(fence) = *active_fence {
+        if fence.closes(trimmed) {
+            *active_fence = None;
+        }
+        return false;
     }
-
-    // Data rows come after the separator (excluding additional separator rows).
-    let data_rows: Vec<&str> =
-        table_lines.iter().skip(sep_pos + 1).copied().filter(|l| !is_table_separator(l)).collect();
-
-    if data_rows.is_empty() {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{}: '## Domain States' table has no data rows (header + separator only)",
-            spec_path.display()
-        ))]);
+    if let Some(fence) = MarkdownFence::opening(trimmed) {
+        *active_fence = Some(fence);
+        return false;
     }
+    true
+}
 
-    VerifyOutcome::pass()
+fn leading_marker_count(trimmed: &str, marker: char) -> usize {
+    trimmed.chars().take_while(|c| *c == marker).count()
 }
 
 /// Derives the sibling `spec.json` path from a `spec.md` path by replacing
 /// the filename component.
 ///
 /// Returns `None` when the path has no parent directory.
-fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
+pub(crate) fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
     spec_md_path
         .parent()
         .map(|dir| if dir.as_os_str().is_empty() { Path::new(".") } else { dir })
         .map(|dir| dir.join("spec.json"))
-}
-
-/// Returns `true` when `line` is a markdown table separator row.
-///
-/// A separator row consists solely of `|`, `-`, `:`, and space characters
-/// and starts with `|`.
-fn is_table_separator(line: &str) -> bool {
-    let trimmed = line.trim();
-    if !trimmed.starts_with('|') {
-        return false;
-    }
-    // Must contain at least one `-` to distinguish from a header row.
-    if !trimmed.contains('-') {
-        return false;
-    }
-    // All characters must be `|`, `-`, `:`, or space.
-    trimmed.chars().all(|c| matches!(c, '|' | '-' | ':' | ' '))
 }
 
 #[cfg(test)]
@@ -697,34 +767,71 @@ mod tests {
 
     // --- verify_from_spec_json() tests ---
 
-    /// Writes a minimal `architecture-rules.json` with only `domain` TDDD-enabled
-    /// into the given tmp dir. All `verify_from_spec_json` tests that expect
-    /// Stage 2 evaluation must call this helper so that the multi-layer loop
-    /// finds exactly one enabled layer pointing at `domain-types.json`.
-    fn write_minimal_arch_rules(dir: &Path) {
+    /// Writes the smallest `architecture-rules.json` fixture needed by
+    /// `parse_tddd_layers`: one enabled `domain` layer pointing at
+    /// `domain-types.json`.
+    fn write_domain_tddd_rules(dir: &Path) {
         let content = r#"{
-  "version": 2,
   "layers": [
     {
       "crate": "domain",
-      "path": "libs/domain",
-      "may_depend_on": [],
-      "deny_reason": "",
-      "tddd": {
-        "enabled": true,
-        "catalogue_file": "domain-types.json"
-      }
+      "tddd": { "enabled": true, "catalogue_file": "domain-types.json" }
     }
   ]
 }"#;
         std::fs::write(dir.join("architecture-rules.json"), content).unwrap();
     }
 
+    fn verify_stage2_fixture<F>(strict: bool, populate: F) -> VerifyOutcome
+    where
+        F: FnOnce(&Path),
+    {
+        let dir = tempfile::tempdir().unwrap();
+        write_domain_tddd_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        populate(dir.path());
+        verify_type_signals_from_spec_json(spec_json_path, strict, dir.path().to_path_buf())
+    }
+
+    fn verify_stage2_domain_types(
+        domain_types_json: &str,
+        strict: bool,
+        write_signal_file: bool,
+    ) -> VerifyOutcome {
+        verify_stage2_fixture(strict, |dir| {
+            std::fs::write(dir.join("domain-types.json"), domain_types_json).unwrap();
+            if write_signal_file {
+                write_matching_signal_file(dir, "domain-types.json", "domain-type-signals.json");
+            }
+        })
+    }
+
+    fn verify_stage2_stale_hash(strict: bool) -> VerifyOutcome {
+        verify_stage2_fixture(strict, |dir| {
+            std::fs::write(dir.join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+                .unwrap();
+            std::fs::write(dir.join("domain-type-signals.json"), DOMAIN_TYPE_SIGNALS_STALE_HASH)
+                .unwrap();
+        })
+    }
+
     const SPEC_JSON_MINIMAL: &str = r#"{
   "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
-  "scope": { "in_scope": [], "out_of_scope": [] },
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IS-01",
+        "text": "minimal blue requirement",
+        "adr_refs": [
+          { "file": "knowledge/adr/some.md", "anchor": "D1" }
+        ]
+      }
+    ],
+    "out_of_scope": []
+  },
   "signals": { "blue": 1, "yellow": 0, "red": 0 }
 }"#;
 
@@ -732,7 +839,16 @@ mod tests {
   "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
-  "scope": { "in_scope": [], "out_of_scope": [] },
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IS-01",
+        "text": "yellow requirement",
+        "informal_grounds": [{ "kind": "user_directive", "summary": "historical convention" }]
+      }
+    ],
+    "out_of_scope": []
+  },
   "signals": { "blue": 0, "yellow": 1, "red": 0 }
 }"#;
 
@@ -769,41 +885,30 @@ mod tests {
 }"#;
 
     #[test]
-    fn test_verify_from_spec_json_with_valid_domain_types_and_blue_signals_passes() {
-        let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
-        let spec_json_path = dir.path().join("spec.json");
-        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
-        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
-            .unwrap();
-        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
-        assert!(
-            !outcome.has_errors(),
-            "domain-types.json with blue signals should pass: {outcome:?}"
-        );
-    }
-
-    #[test]
-    fn test_verify_from_spec_json_with_no_signals_returns_error() {
-        let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
-        let spec_json_path = dir.path().join("spec.json");
-        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
-        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ONE_ENTRY).unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
-        assert!(outcome.has_errors(), "missing signals must be an error: {outcome:?}");
+    fn test_verify_from_spec_json_with_invalid_domain_type_shapes_return_error() {
+        for (fixture, message) in [
+            (DOMAIN_TYPES_WITH_ONE_ENTRY, "missing signals must be an error"),
+            (DOMAIN_TYPES_EMPTY_ENTRIES, "empty entries must be an error"),
+        ] {
+            let outcome = verify_stage2_domain_types(fixture, false, false);
+            assert!(outcome.has_errors(), "{message}: {outcome:?}");
+        }
     }
 
     #[test]
     fn test_verify_from_spec_json_with_missing_domain_types_passes_in_interim_mode() {
-        // ADR §D2.1: domain-types.json absent = TDDD opt-out. Stage 2 is skipped.
+        // Stage 2 (chain ③): ADR §D2.1: domain-types.json absent = TDDD opt-out.
+        // Stage 2 is skipped entirely.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         // No domain-types.json — TDDD not active
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(
             !outcome.has_errors(),
             "missing domain-types.json must pass (Stage 2 skip): {outcome:?}"
@@ -812,40 +917,20 @@ mod tests {
 
     #[test]
     fn test_verify_from_spec_json_with_missing_domain_types_passes_in_strict_mode() {
-        // Same opt-out behavior in strict mode — NotFound is always skipped.
+        // Stage 2 (chain ③): same opt-out behavior in strict mode.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            true,
+            dir.path().to_path_buf(),
+        );
         assert!(
             !outcome.has_errors(),
             "missing domain-types.json must pass even in strict mode: {outcome:?}"
         );
-    }
-
-    #[test]
-    fn test_verify_from_spec_json_with_empty_entries_returns_error() {
-        let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
-        let spec_json_path = dir.path().join("spec.json");
-        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
-        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_EMPTY_ENTRIES).unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
-        assert!(outcome.has_errors(), "empty entries must be an error: {outcome:?}");
-    }
-
-    #[test]
-    fn test_verify_from_spec_json_with_all_blue_signals_passes() {
-        let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
-        let spec_json_path = dir.path().join("spec.json");
-        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
-        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
-            .unwrap();
-        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
-        assert!(!outcome.has_errors(), "all-blue signals should pass: {outcome:?}");
     }
 
     const DOMAIN_TYPES_WITH_YELLOW_SIGNAL: &str = r#"{
@@ -860,14 +945,19 @@ mod tests {
 
     #[test]
     fn test_verify_from_spec_json_with_yellow_signal_passes_in_default_mode() {
+        // Stage 2 (chain ③): Yellow type signal passes in interim mode.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_YELLOW_SIGNAL)
             .unwrap();
         write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(
             !outcome.has_errors(),
             "yellow signal must pass in default (interim) mode: {outcome:?}"
@@ -876,14 +966,19 @@ mod tests {
 
     #[test]
     fn test_verify_from_spec_json_with_yellow_signal_fails_in_strict_mode() {
+        // Stage 2 (chain ③): Yellow type signal fails in strict mode.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_YELLOW_SIGNAL)
             .unwrap();
         write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            true,
+            dir.path().to_path_buf(),
+        );
         assert!(
             outcome.has_errors(),
             "yellow signal must fail in strict (merge) mode: {outcome:?}"
@@ -895,13 +990,14 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_spec_yellow_signals_passes_in_default_mode() {
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_WITH_YELLOW_SIGNALS).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
         write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome =
+            verify_from_spec_json(spec_json_path.clone(), false, dir.path().to_path_buf());
         assert!(
             !outcome.has_errors(),
             "spec.json with yellow signals must pass Stage 1 in default (interim) mode: {outcome:?}"
@@ -911,13 +1007,13 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_spec_yellow_signals_fails_in_strict_mode() {
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_WITH_YELLOW_SIGNALS).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
         write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
+        let outcome = verify_from_spec_json(spec_json_path.clone(), true, dir.path().to_path_buf());
         assert!(
             outcome.has_errors(),
             "spec.json with yellow signals must fail Stage 1 in strict (merge) mode: {outcome:?}"
@@ -937,8 +1033,9 @@ mod tests {
 
     #[test]
     fn test_verify_from_spec_json_with_undeclared_red_signal_returns_error() {
+        // Stage 2 (chain ③): undeclared Red type signal must block.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(
@@ -947,7 +1044,11 @@ mod tests {
         )
         .unwrap();
         write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(
             outcome.has_errors(),
             "undeclared reverse Red signal must block spec-states (single gate per ADR): {outcome:?}"
@@ -956,30 +1057,64 @@ mod tests {
 
     #[test]
     fn test_verify_from_spec_json_with_red_signal_returns_error() {
+        // Stage 2 (chain ③): Red type signal must be an error.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_RED_SIGNAL).unwrap();
         write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(outcome.has_errors(), "red signal must be an error: {outcome:?}");
     }
 
     #[test]
-    fn test_verify_from_spec_json_with_invalid_json_returns_error() {
+    fn test_verify_type_signals_from_spec_json_with_invalid_spec_json_returns_error() {
+        // Stage 2 (chain ③): spec.json shares the same fail-closed read/decode
+        // preamble as Stage 1, even though type-signal evaluation only needs the
+        // track directory after that validation succeeds.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, "not valid json").unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
+        assert!(outcome.has_errors(), "invalid spec.json must be an error: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("spec.json decode error")),
+            "finding must mention spec.json decode error: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_invalid_json_returns_error() {
+        // Stage 2 (chain ③): invalid domain-types.json is fail-closed.
+        let dir = tempfile::tempdir().unwrap();
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), "not valid json").unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(outcome.has_errors(), "invalid JSON must be an error: {outcome:?}");
     }
 
     #[test]
     fn test_verify_from_spec_json_with_custom_catalogue_override_red_signal_blocks() {
-        // Verify that when `architecture-rules.json` uses a non-default
+        // Stage 2 (chain ③): when `architecture-rules.json` uses a non-default
         // `tddd.catalogue_file` override (here: "custom-types.json"), Stage 2
         // still correctly evaluates the overridden file and blocks on a Red signal.
         //
@@ -1009,7 +1144,11 @@ mod tests {
         // Write the catalogue under the override name with a Red signal so Stage 2 fails.
         std::fs::write(dir.path().join("custom-types.json"), DOMAIN_TYPES_WITH_RED_SIGNAL).unwrap();
         write_matching_signal_file(dir.path(), "custom-types.json", "custom-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(outcome.has_errors(), "red signal must be an error: {outcome:?}");
         // The error mentions the type name (TrackId) from the Red signal.
         assert!(
@@ -1031,7 +1170,7 @@ mod tests {
     #[test]
     fn test_verify_delegates_to_spec_json_when_sibling_exists() {
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         // Write a minimal spec.json and a valid domain-types.json
         std::fs::write(dir.path().join("spec.json"), SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
@@ -1051,6 +1190,73 @@ mod tests {
     }
 
     #[test]
+    fn test_verify_with_stage1_error_and_stage2_error_merges_findings() {
+        let dir = tempfile::tempdir().unwrap();
+        write_domain_tddd_rules(dir.path());
+        let stale_spec = r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IS-01",
+        "text": "some requirement",
+        "adr_refs": [
+          { "file": "knowledge/adr/some.md", "anchor": "D1" }
+        ]
+      }
+    ],
+    "out_of_scope": []
+  },
+  "signals": { "blue": 0, "yellow": 0, "red": 1 }
+}"#;
+        std::fs::write(dir.path().join("spec.json"), stale_spec).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        std::fs::write(dir.path().join("spec.md"), "# Overview\n").unwrap();
+
+        let outcome = verify(&dir.path().join("spec.md"), false, dir.path());
+
+        assert_eq!(
+            outcome.error_count(),
+            2,
+            "combined spec.json verification must report both stage errors: {outcome:?}"
+        );
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("stale")),
+            "Stage 1 stale finding must be retained: {outcome:?}"
+        );
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("domain-type-signals.json")
+                && f.message().contains("not found")),
+            "Stage 2 missing signal-file finding must be retained: {outcome:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_verify_with_spec_json_symlink_reports_shared_preamble_once() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("real-spec.json");
+        std::fs::write(&target, SPEC_JSON_MINIMAL).unwrap();
+        std::os::unix::fs::symlink(&target, dir.path().join("spec.json")).unwrap();
+        std::fs::write(dir.path().join("spec.md"), "# Overview\n").unwrap();
+
+        let outcome = verify(&dir.path().join("spec.md"), false, dir.path());
+
+        assert_eq!(
+            outcome.error_count(),
+            1,
+            "shared spec.json symlink guard failure must not be double-counted: {outcome:?}"
+        );
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("symlink")),
+            "finding must mention symlink: {outcome:?}"
+        );
+    }
+
+    #[test]
     fn test_verify_falls_back_to_markdown_when_no_spec_json() {
         let dir = tempfile::tempdir().unwrap();
         // No spec.json — use legacy markdown path
@@ -1066,6 +1272,28 @@ mod tests {
         );
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn test_verify_rejects_legacy_spec_md_symlink() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("real-spec.md");
+        std::fs::write(
+            &target,
+            "## Domain States\n\n| State | Desc |\n|-------|------|\n| Ready | ok |\n",
+        )
+        .unwrap();
+        let link = dir.path().join("spec.md");
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        let outcome = verify(&link, false, dir.path());
+
+        assert!(outcome.has_errors(), "legacy spec.md symlink must be rejected: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("symlink")),
+            "finding must mention symlink: {outcome:?}"
+        );
+    }
+
     // --- D4.3 symlink rejection (S1–S5) ---
 
     #[cfg(unix)]
@@ -1078,7 +1306,7 @@ mod tests {
         let link = dir.path().join("spec.json");
         std::os::unix::fs::symlink(&target, &link).unwrap();
 
-        let outcome = verify_from_spec_json(&link, false, dir.path());
+        let outcome = verify_from_spec_json(link.clone(), false, dir.path().to_path_buf());
         assert!(outcome.has_errors(), "symlink spec.json must be rejected: {outcome:?}");
         assert!(
             outcome.findings().iter().any(|f| f.message().contains("symlink")),
@@ -1099,7 +1327,7 @@ mod tests {
 
         // Compose a path that goes through the symlinked parent directory.
         let spec_via_link = link_sub.join("spec.json");
-        let outcome = verify_from_spec_json(&spec_via_link, false, dir.path());
+        let outcome = verify_from_spec_json(spec_via_link.clone(), false, dir.path().to_path_buf());
         assert!(outcome.has_errors(), "parent symlink must be rejected: {outcome:?}");
     }
 
@@ -1107,8 +1335,9 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_rejects_domain_types_symlink() {
         // S3: spec.json is a regular file but domain-types.json is a symlink — BLOCKED
+        // (Stage 2 / chain ③ rejects the symlink catalogue via verify_type_signals_from_spec_json).
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
 
@@ -1124,37 +1353,50 @@ mod tests {
             "domain-type-signals.json",
         );
 
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(outcome.has_errors(), "symlink domain-types.json must be rejected: {outcome:?}");
     }
 
     #[test]
     fn test_verify_from_spec_json_regular_files_pass() {
-        // S5 (control): both files are regular, Stage 1 and Stage 2 both pass.
+        // S5 (control): both files are regular, Stage 2 (chain ③) passes.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
         write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(!outcome.has_errors(), "regular files must pass: {outcome:?}");
     }
 
     // --- ADR 2026-04-18-1400 §D5 signal-file evaluation ---
 
-    #[test]
-    fn test_signal_file_missing_returns_error_in_interim_mode() {
-        // Missing signal file is fail-closed in the CI interim path per ADR §D5.
+    fn verify_missing_signal_file(strict: bool) -> VerifyOutcome {
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         // Declaration file present, signal file intentionally absent.
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+
+        verify_type_signals_from_spec_json(spec_json_path, strict, dir.path().to_path_buf())
+    }
+
+    #[test]
+    fn test_signal_file_missing_returns_error_in_interim_mode() {
+        // Stage 2 (chain ③): missing signal file is fail-closed per ADR §D5.
+        let outcome = verify_missing_signal_file(false);
         assert!(outcome.has_errors(), "missing signal file must be fail-closed: {outcome:?}");
         assert!(
             outcome.findings().iter().any(|f| f.message().contains("domain-type-signals.json")
@@ -1165,15 +1407,8 @@ mod tests {
 
     #[test]
     fn test_signal_file_missing_returns_error_in_strict_mode() {
-        // Symmetric with the interim case: missing signal file is error in both
-        // CI and merge gate (strict=true) paths per ADR §D5.
-        let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
-        let spec_json_path = dir.path().join("spec.json");
-        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
-        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
-            .unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
+        // Stage 2 (chain ③): missing signal file is error in strict mode per ADR §D5.
+        let outcome = verify_missing_signal_file(true);
         assert!(outcome.has_errors(), "missing signal file must block merge gate: {outcome:?}");
     }
 
@@ -1187,52 +1422,39 @@ mod tests {
 }"#;
 
     #[test]
-    fn test_signal_file_stale_hash_returns_error_in_interim_mode() {
-        // Stale (declaration_hash mismatch) is fail-closed in CI per ADR §D5,
-        // symmetric with the merge gate. The `strict` flag does NOT relax it.
-        let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
-        let spec_json_path = dir.path().join("spec.json");
-        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
-        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
-            .unwrap();
-        std::fs::write(dir.path().join("domain-type-signals.json"), DOMAIN_TYPE_SIGNALS_STALE_HASH)
-            .unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
-        assert!(outcome.has_errors(), "stale signal file must be fail-closed: {outcome:?}");
-        assert!(
-            outcome.findings().iter().any(|f| f.message().contains("declaration_hash mismatch")),
-            "finding must mention declaration_hash mismatch: {outcome:?}"
-        );
-    }
-
-    #[test]
-    fn test_signal_file_stale_hash_returns_error_in_strict_mode() {
-        // Symmetric: stale is error in both CI (strict=false) and merge gate
-        // (strict=true) per ADR §D5.
-        let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
-        let spec_json_path = dir.path().join("spec.json");
-        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
-        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
-            .unwrap();
-        std::fs::write(dir.path().join("domain-type-signals.json"), DOMAIN_TYPE_SIGNALS_STALE_HASH)
-            .unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
-        assert!(outcome.has_errors(), "stale signal file must block merge gate: {outcome:?}");
+    fn test_signal_file_stale_hash_returns_error_in_both_modes() {
+        // Stage 2 (chain ③): stale declaration_hash is fail-closed per ADR §D5.
+        for strict in [false, true] {
+            let outcome = verify_stage2_stale_hash(strict);
+            assert!(
+                outcome.has_errors(),
+                "stale signal file must be an error (strict={strict}): {outcome:?}"
+            );
+            assert!(
+                outcome
+                    .findings()
+                    .iter()
+                    .any(|f| f.message().contains("declaration_hash mismatch")),
+                "finding must mention declaration_hash mismatch (strict={strict}): {outcome:?}"
+            );
+        }
     }
 
     #[test]
     fn test_signal_file_decode_error_returns_error() {
-        // Malformed signal file JSON is fail-closed per ADR §D7 decode-error row.
+        // Stage 2 (chain ③): malformed signal file JSON is fail-closed per ADR §D7.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
         std::fs::write(dir.path().join("domain-type-signals.json"), "{not valid json").unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(outcome.has_errors(), "decode error must be fail-closed: {outcome:?}");
         assert!(
             outcome
@@ -1245,10 +1467,9 @@ mod tests {
 
     #[test]
     fn test_signal_file_wrong_schema_version_returns_error() {
-        // schema_version != 1 hits the codec's UnsupportedSchemaVersion branch,
-        // which bubbles up as a decode error from evaluate_layer_catalogue.
+        // Stage 2 (chain ③): schema_version != 1 is a decode error per ADR §D7.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
@@ -1260,17 +1481,20 @@ mod tests {
           "signals": []
         }"#;
         std::fs::write(dir.path().join("domain-type-signals.json"), future_schema).unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(outcome.has_errors(), "unknown schema_version must be fail-closed: {outcome:?}");
     }
 
     #[cfg(unix)]
     #[test]
     fn test_signal_file_symlink_returns_error() {
-        // Symlink at the signal-file path is fail-closed per ADR §D7. Uses the
-        // existing `reject_symlinks_below` guard (no new symlink detection code).
+        // Stage 2 (chain ③): symlink signal file is fail-closed per ADR §D7.
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
@@ -1286,17 +1510,21 @@ mod tests {
         std::fs::remove_file(dir.path().join("domain-type-signals.json")).ok();
         std::os::unix::fs::symlink(&real, dir.path().join("domain-type-signals.json")).unwrap();
 
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(outcome.has_errors(), "symlink signal file must be rejected: {outcome:?}");
     }
 
     #[test]
     fn test_signal_file_matching_hash_and_all_blue_passes_in_both_modes() {
-        // Control: a fresh signal file with matching hash + all Blue signals
+        // Stage 2 (chain ③): fresh signal file with matching hash + all Blue signals
         // passes both CI (strict=false) and merge gate (strict=true) paths.
         for strict in [false, true] {
             let dir = tempfile::tempdir().unwrap();
-            write_minimal_arch_rules(dir.path());
+            write_domain_tddd_rules(dir.path());
             let spec_json_path = dir.path().join("spec.json");
             std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
             std::fs::write(
@@ -1305,7 +1533,11 @@ mod tests {
             )
             .unwrap();
             write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
-            let outcome = verify_from_spec_json(&spec_json_path, strict, dir.path());
+            let outcome = verify_type_signals_from_spec_json(
+                spec_json_path.clone(),
+                strict,
+                dir.path().to_path_buf(),
+            );
             assert!(
                 !outcome.has_errors(),
                 "matching signal file with Blue entries must pass (strict={strict}): {outcome:?}"
@@ -1315,13 +1547,11 @@ mod tests {
 
     #[test]
     fn test_signal_file_overrides_inline_declaration_signals() {
-        // When the signal file carries Blue signals but the declaration file
-        // has stale Red inline signals, the evaluation result reflects the
-        // signal file (Blue → pass). This proves the signal file is the
-        // authoritative evaluation source (ADR §D1: authored declaration vs
-        // generated evaluation result).
+        // Stage 2 (chain ③): when the signal file carries Blue signals but the
+        // declaration file has stale Red inline signals, the evaluation result
+        // reflects the signal file (Blue → pass).
         let dir = tempfile::tempdir().unwrap();
-        write_minimal_arch_rules(dir.path());
+        write_domain_tddd_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
 
@@ -1349,10 +1579,181 @@ mod tests {
         );
         std::fs::write(dir.path().join("domain-type-signals.json"), blue_signal_file).unwrap();
 
-        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        let outcome = verify_type_signals_from_spec_json(
+            spec_json_path.clone(),
+            false,
+            dir.path().to_path_buf(),
+        );
         assert!(
             !outcome.has_errors(),
             "signal file (Blue) must override inline declaration signals (Red): {outcome:?}"
+        );
+    }
+
+    // --- Stage 1 self-consistency freshness check (IN-09) ---
+
+    #[test]
+    fn test_verify_from_spec_json_stage1_freshness_stale_returns_error() {
+        // Stage 1 (chain ①): stored signals differ from computed → stale error (CN-04).
+        // Use a spec.json with actual requirements so evaluate_signals() is non-zero.
+        let dir = tempfile::tempdir().unwrap();
+        // spec.json with one in_scope entry (signal: blue) but stored as red=1.
+        let spec_stale = r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IS-01",
+        "text": "some requirement",
+        "adr_refs": [
+          { "file": "knowledge/adr/some.md", "anchor": "D1" }
+        ]
+      }
+    ],
+    "out_of_scope": []
+  },
+  "signals": { "blue": 0, "yellow": 0, "red": 1 }
+}"#;
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, spec_stale).unwrap();
+        let outcome =
+            verify_from_spec_json(spec_json_path.clone(), false, dir.path().to_path_buf());
+        assert!(outcome.has_errors(), "stale Stage 1 signals must be an error: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("stale")),
+            "finding must mention stale: {outcome:?}"
+        );
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("calc-spec-adr")),
+            "finding must suggest calc-spec-adr: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_stage1_freshness_consistent_passes() {
+        // Stage 1 (chain ①): stored signals match computed → no stale error.
+        // Use a spec.json where evaluate_signals() matches the stored counts.
+        let dir = tempfile::tempdir().unwrap();
+        // One blue in_scope entry → evaluate_signals() = blue:1, yellow:0, red:0.
+        // Stored signals also blue:1 → consistent.
+        let spec_consistent = r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IS-01",
+        "text": "some requirement",
+        "adr_refs": [
+          { "file": "knowledge/adr/some.md", "anchor": "D1" }
+        ]
+      }
+    ],
+    "out_of_scope": []
+  },
+  "signals": { "blue": 1, "yellow": 0, "red": 0 }
+}"#;
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, spec_consistent).unwrap();
+        let outcome =
+            verify_from_spec_json(spec_json_path.clone(), false, dir.path().to_path_buf());
+        assert!(
+            !outcome.has_errors(),
+            "consistent Stage 1 signals must pass in interim mode: {outcome:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Tests for check_impl_catalog_from_signals_file (T011 explicit-path gate)
+    // -----------------------------------------------------------------------
+
+    use crate::verify::test_support::git_init;
+
+    /// Minimal catalogue bytes for a type-signals fixture.
+    const MINIMAL_CATALOGUE_JSON: &str = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"plain"}},"docs":"A value object."}},"traits":{},"functions":{}}"#;
+
+    /// Build a fresh `<layer>-type-signals.json` JSON string whose
+    /// `declaration_hash` matches the given catalogue bytes.
+    fn build_fresh_type_signals(catalogue_bytes: &[u8], signal: &str) -> String {
+        let hash = crate::tddd::type_signals_codec::declaration_hash(catalogue_bytes);
+        // `TypeSignalDto` requires `kind_tag`, `signal`, and `found_type` fields
+        // (deny_unknown_fields; missing fields fail decoding).
+        format!(
+            r#"{{"schema_version":1,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
+        )
+    }
+
+    /// Set up a minimal git repo containing catalogue + type-signals files.
+    ///
+    /// Returns `(TempDir, signals_path)`.
+    fn setup_type_signals_git_repo(signal: &str) -> (tempfile::TempDir, PathBuf) {
+        let dir = tempfile::tempdir().unwrap();
+        git_init(dir.path());
+        let catalogue_bytes = MINIMAL_CATALOGUE_JSON.as_bytes();
+        std::fs::write(dir.path().join("domain-types.json"), catalogue_bytes).unwrap();
+        let signals_json = build_fresh_type_signals(catalogue_bytes, signal);
+        let signals_path = dir.path().join("domain-type-signals.json");
+        std::fs::write(&signals_path, signals_json).unwrap();
+        (dir, signals_path)
+    }
+
+    #[test]
+    fn test_check_impl_catalog_blue_signal_non_strict_passes() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let catalog_hash =
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes());
+
+        let outcome = check_impl_catalog_from_signals_file(&signals_path, &catalog_hash, false);
+
+        assert!(
+            !outcome.has_errors(),
+            "blue signal with correct hash must pass (non-strict): {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_impl_catalog_stale_hash_returns_error() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let stale_hash = "0000000000000000000000000000000000000000000000000000000000000000";
+
+        let outcome = check_impl_catalog_from_signals_file(&signals_path, stale_hash, false);
+
+        let has_mismatch =
+            outcome.findings().iter().any(|f| f.message().contains("declaration_hash mismatch"));
+        assert!(
+            has_mismatch,
+            "stale catalog_hash must produce a declaration_hash mismatch error: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_impl_catalog_signals_file_not_found_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        git_init(dir.path());
+        let missing_path = dir.path().join("domain-type-signals.json");
+        let any_hash = "0000000000000000000000000000000000000000000000000000000000000000";
+
+        let outcome = check_impl_catalog_from_signals_file(&missing_path, any_hash, false);
+
+        assert!(outcome.has_errors(), "missing signals file must return an error: {outcome:?}");
+    }
+
+    #[test]
+    fn test_check_impl_catalog_yellow_strict_returns_error() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("yellow");
+        let catalog_hash =
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes());
+
+        let outcome = check_impl_catalog_from_signals_file(&signals_path, &catalog_hash, true);
+
+        let has_error =
+            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
+        assert!(
+            has_error,
+            "yellow signal with strict=true must produce an error finding: {outcome:?}"
         );
     }
 }

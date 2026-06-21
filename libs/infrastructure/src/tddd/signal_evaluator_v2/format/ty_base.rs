@@ -292,12 +292,19 @@ pub(crate) fn format_qualified_path_with(
     self_type: &Type,
     trait_: Option<&rustdoc_types::Path>,
     args: Option<&GenericArgs>,
-    fmt_type: impl Fn(&Type) -> String,
-    fmt_args: impl Fn(&GenericArgs) -> String,
+    mut fmt_type: impl FnMut(&Type) -> String,
+    mut fmt_args: impl FnMut(&GenericArgs) -> String,
 ) -> String {
     let trait_str = trait_
         .map(|p| {
             let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
+            // Normalize an empty-path trait (rustdoc encodes Self-projection's resolved-but-
+            // unnamed trait as `Path { path: "", .. }`) to the same token as `None` so that
+            // `<Self as >::Input<'_>` (C-side) and `<Self as _>::Input<'_>` (A-side, trait:
+            // None) compare as equal.
+            if short.is_empty() {
+                return "_".to_string();
+            }
             let trait_args_str = p
                 .args
                 .as_deref()
@@ -656,30 +663,14 @@ pub(crate) fn format_type_common_arms(
             format!("{abi}{constness}{unsafety}fn({}{})->{ret}", params.join(","), variadic)
         }
         Type::Pat { type_: inner, .. } => fmt_rec(inner),
-        Type::QualifiedPath { name, self_type, trait_, args } => {
-            let trait_str = trait_
-                .as_ref()
-                .map(|p| {
-                    let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
-                    let trait_args_str = p
-                        .args
-                        .as_deref()
-                        .map(|a| {
-                            let s = fmt_generic_args(a);
-                            if s.is_empty() { String::new() } else { format!("<{s}>") }
-                        })
-                        .unwrap_or_default();
-                    format!("{short}{trait_args_str}")
-                })
-                .unwrap_or_else(|| "_".to_string());
-            let self_str = fmt_rec(self_type);
-            let args_str = args.as_deref().map_or_else(String::new, fmt_generic_args);
-            if args_str.is_empty() {
-                format!("<{self_str} as {trait_str}>::{name}")
-            } else {
-                format!("<{self_str} as {trait_str}>::{name}<{args_str}>")
-            }
-        }
+        Type::QualifiedPath { name, self_type, trait_, args } => format_qualified_path_with(
+            name,
+            self_type,
+            trait_.as_ref(),
+            args.as_deref(),
+            &mut fmt_rec,
+            fmt_generic_args,
+        ),
         _ => "_".to_string(),
     }
 }

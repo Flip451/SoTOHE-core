@@ -123,6 +123,68 @@ impl TdddLayerBinding {
     }
 }
 
+/// Returns the absolute path to this layer's catalogue-spec signals file
+/// inside the given track:
+/// `<workspace_root>/track/items/<track_id>/<layer_id>-catalogue-spec-signals.json`.
+///
+/// Takes `workspace_root` directly (not pre-computed `items_dir`) so the entire
+/// `track/items/<track_id>/<file>` layout stays behind the infrastructure boundary —
+/// raw track-id strings are validated via [`domain::TrackId`] before path construction.
+///
+/// Free function (not a method) so it does not extend the `TdddLayerBinding`
+/// public API surface scanned by TDDD type-signals — the existing catalogue
+/// entry stays untouched. Per ADR
+/// `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md` §D8-2.
+#[must_use]
+pub fn catalogue_spec_signals_path(
+    binding: &TdddLayerBinding,
+    workspace_root: &Path,
+    track_id: &str,
+) -> PathBuf {
+    track_items_dir(workspace_root, track_id).join(binding.catalogue_spec_signal_file())
+}
+
+/// Returns the absolute path to this layer's impl-catalog (`signal_file`)
+/// signals file inside the given track:
+/// `<workspace_root>/track/items/<track_id>/<signal_file()>`.
+///
+/// Same purpose as [`catalogue_spec_signals_path`] but for chain ③
+/// (impl ↔ catalog) signals.
+#[must_use]
+pub fn impl_catalog_signals_path(
+    binding: &TdddLayerBinding,
+    workspace_root: &Path,
+    track_id: &str,
+) -> PathBuf {
+    track_items_dir(workspace_root, track_id).join(binding.signal_file())
+}
+
+fn track_items_dir(workspace_root: &Path, track_id: &str) -> PathBuf {
+    match domain::TrackId::try_new(track_id.to_owned()) {
+        Ok(valid_track_id) => {
+            let track_id_component: &str = valid_track_id.as_ref();
+            workspace_root.join("track").join("items").join(track_id_component)
+        }
+        Err(_) => invalid_track_items_dir(workspace_root),
+    }
+}
+
+fn invalid_track_items_dir(workspace_root: &Path) -> PathBuf {
+    workspace_root.join("track").join("items").join(".invalid-track-id")
+}
+
+/// Loads TDDD layer bindings from `<workspace_root>/architecture-rules.json`.
+///
+/// Wraps [`load_tddd_layers`] so callers only hold `workspace_root` and never
+/// need to know the `architecture-rules.json` filename — the convention stays
+/// behind the infrastructure boundary. Per ADR §D8-2.
+pub fn load_tddd_layers_from_workspace(
+    workspace_root: &Path,
+) -> Result<Vec<TdddLayerBinding>, LoadTdddLayersError> {
+    let rules_path = workspace_root.join("architecture-rules.json");
+    load_tddd_layers(&rules_path, workspace_root)
+}
+
 /// Error returned by [`parse_tddd_layers`].
 #[derive(Debug, thiserror::Error)]
 pub enum TdddLayerParseError {
@@ -589,6 +651,56 @@ mod tests {
         // Regression guard: the two signal files must not collide.
         let binding = binding_with_layer_id("domain", "domain-types.json");
         assert_ne!(binding.catalogue_spec_signal_file(), binding.signal_file());
+    }
+
+    #[test]
+    fn test_catalogue_spec_signals_path_uses_validated_track_id_under_workspace() {
+        let binding = binding_with_layer_id("domain", "domain-types.json");
+        let workspace_root = PathBuf::from("/workspace");
+
+        let path = catalogue_spec_signals_path(&binding, &workspace_root, "safe-track-2026");
+
+        assert_eq!(
+            path,
+            PathBuf::from(
+                "/workspace/track/items/safe-track-2026/domain-catalogue-spec-signals.json"
+            )
+        );
+    }
+
+    #[test]
+    fn test_impl_catalog_signals_path_uses_validated_track_id_under_workspace() {
+        let binding = binding_with_layer_id("domain", "domain-types.json");
+        let workspace_root = PathBuf::from("/workspace");
+
+        let path = impl_catalog_signals_path(&binding, &workspace_root, "safe-track-2026");
+
+        assert_eq!(
+            path,
+            PathBuf::from("/workspace/track/items/safe-track-2026/domain-type-signals.json")
+        );
+    }
+
+    #[test]
+    fn test_signal_path_helpers_reject_raw_track_id_escape_before_construction() {
+        assert!(domain::TrackId::try_new("../escape").is_err());
+        assert!(domain::TrackId::try_new("/tmp/escape").is_err());
+
+        let binding = binding_with_layer_id("domain", "domain-types.json");
+        let workspace_root = PathBuf::from("/workspace");
+        let items_dir = workspace_root.join("track").join("items");
+
+        let parent_escape = catalogue_spec_signals_path(&binding, &workspace_root, "../escape");
+        assert_eq!(
+            parent_escape,
+            items_dir.join(".invalid-track-id").join("domain-catalogue-spec-signals.json")
+        );
+
+        let absolute_escape = impl_catalog_signals_path(&binding, &workspace_root, "/tmp/escape");
+        assert_eq!(
+            absolute_escape,
+            items_dir.join(".invalid-track-id").join("domain-type-signals.json")
+        );
     }
 
     #[test]

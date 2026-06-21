@@ -1,4 +1,4 @@
-//! Verify ADR decision signal grounds (`verify adr-signals` subcommand).
+//! Verify ADR decision signal grounds (`signal check-adr-user` subcommand).
 //!
 //! All domain type handling is internal to this module. The CLI layer calls
 //! `execute_verify_adr_signals` and receives a `VerifyOutcome` — no `domain::`
@@ -16,7 +16,7 @@ use usecase::verify_adr_signals::{
 use crate::adr_decision::FsAdrFileAdapter;
 use crate::track::symlink_guard::reject_symlinks_below;
 
-/// Execute the `verify adr-signals` subcommand.
+/// Execute the `signal check-adr-user` subcommand (non-strict: Yellow → warning).
 ///
 /// Composes [`FsAdrFileAdapter`] with [`VerifyAdrSignalsInteractor`] at the
 /// composition root, runs the verification, and translates the resulting
@@ -31,6 +31,24 @@ use crate::track::symlink_guard::reject_symlinks_below;
 /// Returns a `VerifyOutcome` with an error finding when the interactor fails
 /// (e.g., directory listing failure, I/O error).
 pub fn execute_verify_adr_signals(project_root: &Path) -> VerifyOutcome {
+    execute_verify_adr_signals_with_strict(project_root, false)
+}
+
+/// Execute the `signal check-adr-user` gate with explicit strictness.
+///
+/// When `strict = true`, Yellow signals promote to error (same as Red).
+/// When `strict = false`, Yellow signals remain warnings (same as the
+/// legacy `signal check-adr-user` behavior).
+///
+/// Used by the `signal check-adr-user --gate commit|merge` command family
+/// to wire chain ⓪ at the composition root while
+/// `usecase::chain::AdrUserChain::calc_live` remains a placeholder.
+///
+/// # Errors
+///
+/// Returns a `VerifyOutcome` with an error finding when the interactor fails
+/// (e.g., directory listing failure, I/O error).
+pub fn execute_verify_adr_signals_with_strict(project_root: &Path, strict: bool) -> VerifyOutcome {
     // Security: guard `project_root` itself before using it as the symlink-guard trusted root.
     // `reject_symlinks_below` only inspects descendants — a symlinked root would bypass it.
     match project_root.symlink_metadata() {
@@ -103,8 +121,87 @@ pub fn execute_verify_adr_signals(project_root: &Path) -> VerifyOutcome {
     }
 
     if report.yellow_count() >= 1 {
+        if strict {
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(summary)]);
+        }
         return VerifyOutcome::from_findings(vec![VerifyFinding::warning(summary)]);
     }
 
     VerifyOutcome::from_findings(vec![VerifyFinding::new(Severity::Info, summary)])
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    use crate::verify::test_support::write_minimal_adr;
+
+    fn setup_project_dir() -> tempfile::TempDir {
+        let tmp = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(tmp.path().join("knowledge/adr")).unwrap();
+        tmp
+    }
+
+    #[test]
+    fn test_execute_verify_adr_signals_with_strict_yellow_strict_returns_error() {
+        let tmp = setup_project_dir();
+        write_minimal_adr(
+            &tmp.path().join("knowledge/adr"),
+            "2026-01-01-test.md",
+            "review_finding_ref",
+            "RF-1",
+        );
+
+        let outcome = execute_verify_adr_signals_with_strict(tmp.path(), true);
+
+        let has_error = outcome.findings().iter().any(|f| f.severity() == Severity::Error);
+        assert!(
+            has_error,
+            "yellow signal with strict=true must produce an error finding: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_execute_verify_adr_signals_with_strict_yellow_non_strict_produces_warning_not_error() {
+        let tmp = setup_project_dir();
+        write_minimal_adr(
+            &tmp.path().join("knowledge/adr"),
+            "2026-01-01-test.md",
+            "review_finding_ref",
+            "RF-1",
+        );
+
+        let outcome = execute_verify_adr_signals_with_strict(tmp.path(), false);
+
+        assert!(
+            !outcome.has_errors(),
+            "yellow signal with strict=false must not produce an error: {outcome:?}"
+        );
+        let has_warning = outcome.findings().iter().any(|f| f.severity() == Severity::Warning);
+        assert!(has_warning, "yellow signal with strict=false must produce a warning: {outcome:?}");
+    }
+
+    #[test]
+    fn test_execute_verify_adr_signals_with_strict_blue_signal_passes_in_both_modes() {
+        let tmp = setup_project_dir();
+        write_minimal_adr(
+            &tmp.path().join("knowledge/adr"),
+            "2026-01-01-test.md",
+            "user_decision_ref",
+            "chat:2026-01-01",
+        );
+
+        let outcome_strict = execute_verify_adr_signals_with_strict(tmp.path(), true);
+        let outcome_interim = execute_verify_adr_signals_with_strict(tmp.path(), false);
+
+        assert!(
+            !outcome_strict.has_errors(),
+            "blue signal with strict=true must not produce an error: {outcome_strict:?}"
+        );
+        assert!(
+            !outcome_interim.has_errors(),
+            "blue signal with strict=false must not produce an error: {outcome_interim:?}"
+        );
+    }
 }

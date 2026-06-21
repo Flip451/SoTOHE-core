@@ -38,6 +38,8 @@ mod encoder_state_core;
 mod encoder_state_fn_trait_codec;
 #[path = "catalogue_to_extended_crate_codec/encoder_state_type_codec.rs"]
 mod encoder_state_type_codec;
+#[path = "catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs"]
+mod encoder_state_type_ref_parsing;
 #[path = "catalogue_to_extended_crate_codec/helpers.rs"]
 mod helpers;
 

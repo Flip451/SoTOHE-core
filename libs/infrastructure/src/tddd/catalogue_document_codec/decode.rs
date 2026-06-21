@@ -1,7 +1,5 @@
 //! DTO → domain conversions for [`CatalogueDocument`].
-//!
-//! All public-to-module functions convert a DTO type into the corresponding domain type.
-//! Validation at this boundary ensures only valid domain values propagate downstream.
+//! Validates all fields at the DTO boundary before constructing domain values.
 
 use std::collections::HashSet;
 use std::str::FromStr;
@@ -10,31 +8,30 @@ use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{
     StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions,
 };
-use domain::tddd::catalogue_v2::entries::{
-    FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
-};
+use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::identifiers::{FieldName, VariantName};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    BoundOp, CatalogueDocument, CrateName, FunctionPath, FunctionRole, ItemAction,
-    MethodDeclaration, MethodGenericParam, MethodName, ModulePath, ParamDeclaration, ParamName,
-    SelfReceiver, TraitImplDeclV2, TraitName, TypeName, TypeRef, WherePredicateDecl,
+    BoundOp, CatalogueDocument, CrateName, FunctionPath, ItemAction, MethodDeclaration,
+    MethodGenericParam, MethodName, ModulePath, ParamDeclaration, ParamName, SelfReceiver,
+    TraitImplDeclV2, TraitName, TypeName, TypeRef, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_dtos};
 
 use super::CatalogueDocumentCodecError;
-use super::validate::validate_bound_str;
-// Re-export validate_type_ref_str and validate_trait_ref_is_path so that encode.rs
-// can continue to reference them as `super::decode::validate_*`.
+use super::decode_assoc::{assoc_const_decl_from_dto, assoc_type_decl_from_dto};
+use super::decode_impls::{
+    function_entry_from_dto, inherent_impl_from_dto, validate_trait_item_names,
+};
 use super::decode_roles::{contract_role_from_dto, data_role_from_dto};
 use super::dto::{
-    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
-    MethodDeclarationDto, MethodGenericParamDto, ParamDto, StructShapeDto, TraitEntryDto,
-    TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
-    WherePredicateDeclDto,
+    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, MethodDeclarationDto, MethodGenericParamDto,
+    ParamDto, StructShapeDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto,
+    TypestateMarkerDto, VariantDeclDto, VariantPayloadDto, WherePredicateDeclDto,
 };
-pub(super) use super::validate::{validate_trait_ref_is_path, validate_type_ref_str};
+use super::validate::validate_bound_str;
+pub(super) use super::validate::{validate_trait_ref_is_path, validate_type_ref_str}; // re-exported for encode.rs
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
@@ -309,7 +306,7 @@ fn variant_payload_from_dto(
 
 /// Convert a Vec of `MethodGenericParamDto` (shared by Method and Function entries)
 /// into validated `MethodGenericParam` values, rejecting duplicate names.
-fn method_generics_from_dtos(
+pub(super) fn method_generics_from_dtos(
     entry_name: &str,
     dtos: Vec<MethodGenericParamDto>,
 ) -> Result<Vec<MethodGenericParam>, CatalogueDocumentCodecError> {
@@ -366,7 +363,7 @@ fn method_generics_from_dtos(
 /// rejected because `where T:` (no bound after the colon) is syntactically invalid in Rust
 /// and would produce a `WherePredicate::BoundPredicate { bounds: vec![] }` in the extended
 /// crate representation.  For `BoundOp::Equal` predicates an empty `rhs` is also rejected.
-fn where_predicates_from_dtos(
+pub(super) fn where_predicates_from_dtos(
     entry_name: &str,
     dtos: Vec<WherePredicateDeclDto>,
 ) -> Result<Vec<WherePredicateDecl>, CatalogueDocumentCodecError> {
@@ -473,7 +470,7 @@ pub(super) fn method_decl_from_dto(
     Ok(decl)
 }
 
-fn param_decl_from_dto(
+pub(super) fn param_decl_from_dto(
     entry_name: &str,
     dto: ParamDto,
 ) -> Result<ParamDeclaration, CatalogueDocumentCodecError> {
@@ -579,6 +576,20 @@ pub(super) fn trait_entry_from_dto(
     let generics = method_generics_from_dtos(name, dto.generics)?;
     let where_predicates = where_predicates_from_dtos(name, dto.where_predicates)?;
 
+    let assoc_types = dto
+        .assoc_types
+        .into_iter()
+        .enumerate()
+        .map(|(idx, d)| assoc_type_decl_from_dto(name, idx, d))
+        .collect::<Result<Vec<_>, _>>()?;
+    let assoc_consts = dto
+        .assoc_consts
+        .into_iter()
+        .enumerate()
+        .map(|(idx, d)| assoc_const_decl_from_dto(name, idx, d))
+        .collect::<Result<Vec<_>, _>>()?;
+    validate_trait_item_names(name, &methods, &assoc_types, &assoc_consts)?;
+
     let spec_refs = spec_refs_from_dtos(&dto.spec_refs).map_err(|e| {
         CatalogueDocumentCodecError::InvalidEntry {
             entry_name: name.to_owned(),
@@ -596,6 +607,8 @@ pub(super) fn trait_entry_from_dto(
         action,
         role,
         methods,
+        assoc_types,
+        assoc_consts,
         supertrait_bounds,
         generics,
         where_predicates,
@@ -606,83 +619,5 @@ pub(super) fn trait_entry_from_dto(
     })
 }
 
-pub(super) fn inherent_impl_from_dto(
-    dto: InherentImplDeclDto,
-) -> Result<InherentImplDeclV2, CatalogueDocumentCodecError> {
-    let err = |name: &str, reason: String| CatalogueDocumentCodecError::InvalidEntry {
-        entry_name: name.to_owned(),
-        reason,
-    };
-
-    // Keep a str reference alive for the error context closures below.
-    let type_name_str = dto.type_name.as_str();
-
-    let type_name = TypeName::new(type_name_str)
-        .map_err(|e| err(type_name_str, format!("invalid type_name: {e}")))?;
-
-    let impl_generics = method_generics_from_dtos(type_name_str, dto.impl_generics)?;
-    let impl_where_predicates =
-        where_predicates_from_dtos(type_name_str, dto.impl_where_predicates)?;
-
-    let methods = dto
-        .methods
-        .into_iter()
-        .map(|m| method_decl_from_dto(type_name_str, m))
-        .collect::<Result<Vec<_>, _>>()?;
-
-    Ok(InherentImplDeclV2 { type_name, impl_generics, impl_where_predicates, methods })
-}
-
-pub(super) fn function_entry_from_dto(
-    name: &str,
-    dto: FunctionEntryDto,
-) -> Result<FunctionEntry, CatalogueDocumentCodecError> {
-    let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
-        entry_name: name.to_owned(),
-        reason,
-    };
-
-    let action = ItemAction::from_str(&dto.action)
-        .map_err(|e| err(format!("invalid action '{}': {e}", dto.action)))?;
-
-    let role = FunctionRole::from_str(&dto.role)
-        .map_err(|e| err(format!("invalid function role '{}': {e}", dto.role)))?;
-
-    let params = dto
-        .params
-        .into_iter()
-        .map(|p| param_decl_from_dto(name, p))
-        .collect::<Result<Vec<_>, _>>()?;
-
-    let returns = TypeRef::new(dto.returns.clone())
-        .map_err(|e| err(format!("invalid returns type '{}': {e}", dto.returns)))?;
-
-    let generics = method_generics_from_dtos(name, dto.generics)?;
-    let where_predicates = where_predicates_from_dtos(name, dto.where_predicates)?;
-
-    let spec_refs = spec_refs_from_dtos(&dto.spec_refs).map_err(|e| {
-        CatalogueDocumentCodecError::InvalidEntry {
-            entry_name: name.to_owned(),
-            reason: format!("{}: {}", e.field, e.reason),
-        }
-    })?;
-    let informal_grounds = informal_grounds_from_dtos(&dto.informal_grounds).map_err(|e| {
-        CatalogueDocumentCodecError::InvalidEntry {
-            entry_name: name.to_owned(),
-            reason: format!("{}: {}", e.field, e.reason),
-        }
-    })?;
-
-    Ok(FunctionEntry {
-        action,
-        role,
-        params,
-        returns,
-        is_async: dto.is_async,
-        generics,
-        where_predicates,
-        docs: dto.docs,
-        spec_refs,
-        informal_grounds,
-    })
-}
+// validate_trait_item_names, inherent_impl_from_dto, and function_entry_from_dto are in
+// decode_impls.rs (extracted to keep this module under the 700-line size budget).

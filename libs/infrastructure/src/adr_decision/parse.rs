@@ -64,7 +64,7 @@ pub fn parse_adr_frontmatter(content: &str) -> Result<AdrFrontMatter, AdrFrontMa
 /// `knowledge/conventions/adr.md` constrains `decisions[].id` to be unique
 /// within one ADR; without this check, references such as
 /// `superseded_by: <adr>.md#D1` are ambiguous and lifecycle traceability
-/// breaks while `verify adr-signals` still passes.
+/// breaks while `signal check-adr-user` still passes.
 fn check_decision_ids_unique(decisions: &[AdrDecisionDto]) -> Result<(), AdrFrontMatterCodecError> {
     let mut seen = std::collections::HashSet::with_capacity(decisions.len());
     for decision in decisions {

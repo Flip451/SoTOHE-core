@@ -55,8 +55,8 @@ pub(super) fn build_prompt(
     let scope = prompt_path_string(Path::new(scope), "scope")?;
     let round_type = prompt_path_string(Path::new(&command.round_type), "round_type")?;
     let reviewer_invocation = format!(
-        "bin/sotp track type-signals && \
-         bin/sotp track catalogue-spec-signals && \
+        "bin/sotp signal calc-impl-catalog && \
+         bin/sotp signal calc-catalog-spec && \
          bin/sotp track views sync && \
          bin/sotp review local --round-type {} \
          --group {} --track-id {} --briefing-file {}",
@@ -130,12 +130,12 @@ mod tests {
         let prompt = build_prompt("infrastructure", &briefing, &make_command()).unwrap();
 
         assert!(
-            prompt.contains("bin/sotp track type-signals"),
-            "must run type-signals as part of the pre-review gate"
+            prompt.contains("bin/sotp signal calc-impl-catalog"),
+            "must run signal calc-impl-catalog as part of the pre-review gate"
         );
         assert!(
-            prompt.contains("bin/sotp track catalogue-spec-signals"),
-            "must run catalogue-spec-signals as part of the pre-review gate"
+            prompt.contains("bin/sotp signal calc-catalog-spec"),
+            "must run signal calc-catalog-spec as part of the pre-review gate"
         );
         assert!(
             prompt.contains("bin/sotp track views sync"),

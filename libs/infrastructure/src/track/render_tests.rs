@@ -2331,7 +2331,7 @@ fn sync_rendered_views_errors_on_stale_cat_spec_signals() {
     // Fail-closed: a stale `catalogue_declaration_hash` in the signals
     // file indicates the catalogue changed without regenerating signals.
     // View rendering aborts and the caller is expected to run
-    // `sotp track catalogue-spec-signals <track_id>` before retrying.
+    // `sotp signal calc-catalog-spec <track_id>` before retrying.
 
     // Stale: hash does NOT match on-disk catalogue.
     let stale_hash = "0".repeat(64);
@@ -2356,7 +2356,7 @@ fn sync_rendered_views_errors_on_stale_cat_spec_signals() {
 fn sync_rendered_views_errors_on_malformed_cat_spec_signals() {
     // Fail-closed: an unparseable signals file is a system-state error,
     // not a silent fallback. The view renderer propagates the decode
-    // failure and the caller re-runs `sotp track catalogue-spec-signals`.
+    // failure and the caller re-runs `sotp signal calc-catalog-spec`.
     let (dir, _track_dir) = setup_track_with_explicit_cat_spec_signals("{ this is not valid json ");
 
     let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
@@ -2368,14 +2368,14 @@ fn sync_rendered_views_errors_on_malformed_cat_spec_signals() {
 fn sync_rendered_views_errors_on_missing_cat_spec_signals_when_opt_in() {
     // Fail-closed: when opt-in is enabled but the signals file has never
     // been generated, view rendering must error and direct the user to
-    // `sotp track catalogue-spec-signals <track_id>`.
+    // `sotp signal calc-catalog-spec <track_id>`.
     let (dir, _track_dir) = setup_track_repo_base(MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN);
     // No signals file written — the base helper does not write one.
 
     let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
     let msg = err.to_string();
     assert!(msg.contains("not found"), "not-found error expected, got: {msg}");
-    assert!(msg.contains("sotp track catalogue-spec-signals"), "remediation missing: {msg}");
+    assert!(msg.contains("sotp signal calc-catalog-spec"), "remediation missing: {msg}");
 }
 
 // ---------------------------------------------------------------------------

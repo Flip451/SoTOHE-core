@@ -12,7 +12,7 @@ rustup show
 rustup component add rustfmt clippy
 
 # ホスト側 protoc（TDDD type-signals 用）
-# `bin/sotp track type-signals`（commit gate の track-active-gate が呼ぶ）は
+# `bin/sotp signal calc-impl-catalog`（commit gate の track-active-gate が呼ぶ）は
 # ホスト上で `cargo rustdoc` を実行する。TDDD 対象 crate（infrastructure 等）が protoc を要求する依存
 # （例: lancedb → lance-encoding）を持つ場合、Docker イメージだけでなくホストにも protoc が必要。
 # Debian/Ubuntu: sudo apt-get install -y protobuf-compiler
@@ -79,7 +79,7 @@ bin/sotp review results
 bin/sotp review check-approved
 bin/sotp review local --round-type fast --group <scope> --track-id <track-id> --briefing-file tmp/reviewer-runtime/briefing-<scope>.md
 bin/sotp dry fix-local --track-id <track-id> --briefing-file tmp/reviewer-runtime/dry-fix-briefing.md
-bin/sotp track signals
+bin/sotp signal calc-spec-adr --spec-json <SPEC_JSON>
 bin/sotp arch tree
 bin/sotp arch tree-full
 bin/sotp arch members

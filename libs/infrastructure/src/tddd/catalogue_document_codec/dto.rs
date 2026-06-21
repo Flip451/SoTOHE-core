@@ -341,6 +341,41 @@ pub(super) enum VariantPayloadDto {
 }
 
 // ---------------------------------------------------------------------------
+// TraitEntry DTO — associated type / const sub-types
+// ---------------------------------------------------------------------------
+
+/// Wire format for `AssocTypeDecl` (associated type declaration in a trait).
+///
+/// Backward-compatible: `TraitEntryDto.assoc_types` defaults to empty.
+/// `deny_unknown_fields` is intentionally absent here to allow the parent struct
+/// to control schema strictness; the sub-DTO itself uses it for safety.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct AssocTypeDeclDto {
+    pub(super) name: String,
+    /// Trait bounds on the associated type (e.g. `["Send"]` for `type Foo: Send`).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) bounds: Vec<String>,
+    /// Optional default type (e.g. `"Vec<u8>"` for `type Foo = Vec<u8>`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub(super) default: Option<String>,
+}
+
+/// Wire format for `AssocConstDecl` (associated constant declaration in a trait).
+///
+/// Backward-compatible: `TraitEntryDto.assoc_consts` defaults to empty.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct AssocConstDeclDto {
+    pub(super) name: String,
+    /// The type of the associated constant (e.g. `"ChainId"`).
+    pub(super) ty: String,
+    /// Optional default value expression (e.g. `"42"` for `const N: usize = 42`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub(super) default_value: Option<String>,
+}
+
+// ---------------------------------------------------------------------------
 // TraitEntry DTO
 // ---------------------------------------------------------------------------
 
@@ -352,6 +387,12 @@ pub(super) struct TraitEntryDto {
     pub(super) role: ContractRoleDto,
     #[serde(default)]
     pub(super) methods: Vec<MethodDeclarationDto>,
+    /// Associated type declarations in this trait. Default empty for backward compatibility.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) assoc_types: Vec<AssocTypeDeclDto>,
+    /// Associated constant declarations in this trait. Default empty for backward compatibility.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) assoc_consts: Vec<AssocConstDeclDto>,
     /// Supertrait bounds (e.g. `["Send", "Sync"]` for `trait Foo: Send + Sync`).
     /// Default empty for backward compatibility with catalogues that predate this field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]

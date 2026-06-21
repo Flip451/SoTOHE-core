@@ -237,36 +237,3 @@ impl CliApp {
         interactor.resolve_active_track().ok()
     }
 }
-
-/// Evaluate signals from a legacy `spec.md` file (schema version < 4).
-///
-/// # Errors
-/// Returns `Err` when reading or parsing the spec file fails.
-pub(super) fn execute_signals_legacy(track_dir: &Path) -> Result<crate::CommandOutcome, String> {
-    use infrastructure::verify::frontmatter::parse_yaml_frontmatter;
-    use infrastructure::verify::spec_signals::evaluate;
-
-    let spec_path = track_dir.join("spec.md");
-    let content = std::fs::read_to_string(&spec_path)
-        .map_err(|e| format!("cannot read {}: {e}", spec_path.display()))?;
-
-    let fm = parse_yaml_frontmatter(&content)
-        .ok_or_else(|| format!("{}: missing or invalid YAML frontmatter", spec_path.display()))?;
-
-    // Extract body (post-frontmatter section) and evaluate signals.
-    let lines: Vec<&str> = content.lines().collect();
-    let body_lines = lines.get(fm.body_start..).unwrap_or_default();
-    let body = body_lines.join("\n");
-    let counts = evaluate(&body);
-
-    // Spec signals are not persisted in metadata.json for schema_version >= 4;
-    // they are computed on demand.
-    let total = counts.total();
-    let msg = format!(
-        "[OK] Signals (legacy): blue={} yellow={} red={} (total={total})",
-        counts.blue(),
-        counts.yellow(),
-        counts.red()
-    );
-    Ok(crate::CommandOutcome::success(Some(msg)))
-}

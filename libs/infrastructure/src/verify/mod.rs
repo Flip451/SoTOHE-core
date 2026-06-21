@@ -25,14 +25,20 @@ pub mod latest_track;
 pub mod layers;
 pub mod merge_gate_adapter;
 pub mod module_size;
+pub(crate) mod path_safety;
 pub mod plan_artifact_refs;
+pub mod signal_gates_config;
 pub mod spec_attribution;
 pub mod spec_frontmatter;
 pub mod spec_signals;
 pub mod spec_states;
+pub(crate) mod spec_states_legacy_markdown;
 pub(crate) mod syn_helpers;
 pub mod tddd_layers;
 pub mod tech_stack;
 pub mod trusted_root;
 pub mod usecase_purity;
 pub mod view_freshness;
+
+#[cfg(any(test, feature = "test-helpers"))]
+pub mod test_support;

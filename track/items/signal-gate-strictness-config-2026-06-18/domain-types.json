@@ -1,0 +1,1035 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ChainId": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AdrUser",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecAdr",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CatalogSpec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ImplCatalog",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "chain",
+      "docs": "Discriminant identifying one of the four SoT Chain signal evaluation chains. Used as the `ID` associated constant of `ChainIdentity`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "GO-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-10"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-09"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "Strictness": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Strict",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Interim",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "chain",
+      "docs": "Two-valued strictness discriminant for gate evaluation. `Strict`: Yellow signals are treated as `Finding::error`. `Interim`: Yellow signals are treated as `Finding::warning` only. Red signals always produce `Finding::error` regardless of strictness.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "OS-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "GateKind": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Commit",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Merge",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "chain",
+      "docs": "Discriminant for the two gate invocation contexts. Used as the key axis when resolving a `Strictness` value from `SignalGateMatrix`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ChainGateEntry": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "commit_gate",
+              "ty": "Strictness"
+            },
+            {
+              "name": "merge_gate",
+              "ty": "Strictness"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "resolve",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "gate",
+              "ty": "GateKind"
+            }
+          ],
+          "returns": "Strictness",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "chain",
+      "docs": "Per-chain gate configuration row: one `Strictness` value per `GateKind`. The two fields directly correspond to the two cells in the signal-gates.json per-chain object.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-01"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SignalGateMatrix": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "adr_user",
+              "ty": "ChainGateEntry"
+            },
+            {
+              "name": "spec_adr",
+              "ty": "ChainGateEntry"
+            },
+            {
+              "name": "catalog_spec",
+              "ty": "ChainGateEntry"
+            },
+            {
+              "name": "impl_catalog",
+              "ty": "ChainGateEntry"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "resolve",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "chain",
+              "ty": "ChainId"
+            },
+            {
+              "name": "gate",
+              "ty": "GateKind"
+            }
+          ],
+          "returns": "Strictness",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "chain",
+      "docs": "Complete 4-chain × 2-gate strictness matrix. Each field holds the per-chain `ChainGateEntry` (commit + merge strictness). This is the domain model of the `signal-gates.json` body after schema validation. No implicit defaults: every cell is present.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "GO-02"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-01"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-04"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TraitEntry": {
+      "action": "modify",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "action", "ty": "ItemAction" },
+            { "name": "role", "ty": "ContractRole" },
+            { "name": "methods", "ty": "Vec<MethodDeclaration>" },
+            { "name": "assoc_types", "ty": "Vec<AssocTypeDecl>" },
+            { "name": "assoc_consts", "ty": "Vec<AssocConstDecl>" },
+            { "name": "supertrait_bounds", "ty": "Vec<TypeRef>" },
+            { "name": "generics", "ty": "Vec<MethodGenericParam>" },
+            { "name": "where_predicates", "ty": "Vec<WherePredicateDecl>" },
+            { "name": "module_path", "ty": "ModulePath" },
+            { "name": "docs", "ty": "Option<String>" },
+            { "name": "spec_refs", "ty": "Vec<SpecRef>" },
+            { "name": "informal_grounds", "ty": "Vec<InformalGroundRef>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::entries",
+      "docs": "Entry in CatalogueDocument::traits BTreeMap. Extended with assoc_types and assoc_consts fields to support associated type/const declarations in traits.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-15"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AssocConstName": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "s", "ty": "impl Into<String>" }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "docs": "Validated name for an associated constant in a trait (e.g. ID in const ID: ChainId). Generated via identifier_newtype! macro. Distinct from TypeName (associated type names) and MethodName (method names) to make illegal names unrepresentable (prefer-type-safe-abstractions).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AssocTypeDecl": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "name", "ty": "TypeName" },
+            { "name": "bounds", "ty": "Vec<TypeRef>" },
+            { "name": "default", "ty": "Option<TypeRef>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::entries",
+      "docs": "Declaration of an associated type item in a trait. Used in TraitEntry::assoc_types to declare associated types so that the A-side item count matches the C-side rustdoc item count. name field uses TypeName (reuses existing validated newtype; an associated type name is a type identifier).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-15"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RustExpressionError": {
+      "action": "add",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Empty", "payload": { "kind": "unit" } },
+          { "name": "WhitespaceBoundary", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "docs": "Error type returned by RustExpression::try_new. Variants: Empty (string was empty), WhitespaceBoundary (string has leading or trailing whitespace).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RustExpression": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "s", "ty": "impl Into<String>" }
+          ],
+          "returns": "Result<Self, RustExpressionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "docs": "Newtype wrapping String for validated Rust expression strings. Used as the type of AssocConstDecl::default_value to encode the Rust expression contract in the type system (prefer-type-safe-abstractions § Newtype). Validation: non-empty, no leading/trailing whitespace. Full Rust syntax parsing is deferred to the infrastructure codec layer (syn::parse_str::<syn::Expr>).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AssocConstDecl": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "name", "ty": "AssocConstName" },
+            { "name": "ty", "ty": "TypeRef" },
+            { "name": "default_value", "ty": "Option<RustExpression>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::entries",
+      "docs": "Declaration of an associated constant item in a trait. Used in TraitEntry::assoc_consts to declare associated constants so that the A-side item count matches the C-side rustdoc item count. name field uses AssocConstName (dedicated validated newtype for const identifiers). default_value uses RustExpression (validated newtype for Rust expression strings, prefer-type-safe-abstractions § Newtype).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-15"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "ChainIdentity": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [],
+      "assoc_consts": [
+        {
+          "name": "ID",
+          "ty": "ChainId"
+        }
+      ],
+      "assoc_types": [
+        {
+          "name": "Input"
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "chain",
+      "docs": "Marker trait shared by all four SoT Chain types. Carries the `ID: ChainId` associated constant and the `Input<'a>` associated type (the input data structure the chain reads). Implementing this trait declares a new chain to the harness.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "GO-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-10"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-09"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-18"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PersistedSoTChainGate": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "evaluate_gate",
+          "receiver": null,
+          "params": [
+            {
+              "name": "persisted",
+              "ty": "&<Self>::Persisted"
+            },
+            {
+              "name": "strictness",
+              "ty": "Strictness"
+            }
+          ],
+          "returns": "VerifyOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "calc_error",
+          "receiver": null,
+          "params": [
+            {
+              "name": "error",
+              "ty": "<Self>::CalcError"
+            }
+          ],
+          "returns": "VerifyOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "stale_error",
+          "receiver": null,
+          "params": [
+            {
+              "name": "error",
+              "ty": "<Self>::StaleError"
+            }
+          ],
+          "returns": "VerifyOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "assoc_types": [
+        {
+          "name": "Persisted"
+        },
+        {
+          "name": "CalcError"
+        },
+        {
+          "name": "StaleError"
+        }
+      ],
+      "supertrait_bounds": [
+        "ChainIdentity"
+      ],
+      "module_path": "chain",
+      "docs": "Pure gate contract for chains ①②③ that persist their computed signal documents. Carries only the pure, value-level concerns: associated types `Persisted`, `CalcError`, `StaleError`; `evaluate_gate` (delegates to domain pure function); `calc_error` / `stale_error` (error-to-VerifyOutcome converters). The impure I/O methods live in `LoadablePersistedChain`. Chain ⓪ does not implement this trait.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "GO-04"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-10"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-18"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-14"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "domain::chain::check_catalogue_spec_signals": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "doc",
+          "ty": "&CatalogueSpecSignalsDocument"
+        },
+        {
+          "name": "strictness",
+          "ty": "Strictness"
+        }
+      ],
+      "returns": "VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pure domain function for chain ② (catalogue-spec) Red/Yellow gate evaluation. Symmetric with `check_spec_doc_signals` (chain ①) and `check_type_signals` (chain ③). Extracted from the two inline duplicate implementations per D2/CN-05. Yellow signals produce `Finding::error` when `Strictness::Strict`, `Finding::warning` when `Strictness::Interim`; Red signals always produce `Finding::error`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "domain::spec::check_spec_doc_signals": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "doc",
+          "ty": "&SpecDocument"
+        },
+        {
+          "name": "strictness",
+          "ty": "Strictness"
+        }
+      ],
+      "returns": "VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pure domain function for chain ① (spec-adr) Red/Yellow gate evaluation. Yellow signals produce `Finding::error` when `Strictness::Strict`, `Finding::warning` when `Strictness::Interim`; Red signals always produce `Finding::error`. Signature updated from `bool` to `Strictness` per Finding #1 (Enum-first).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "domain::tddd::consistency::check_type_signals": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "signals_doc",
+          "ty": "&TypeSignalsDocument"
+        },
+        {
+          "name": "strictness",
+          "ty": "Strictness"
+        }
+      ],
+      "returns": "VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pure domain function for chain ③ (impl-catalog) Red/Yellow gate evaluation. Yellow signals produce `Finding::error` when `Strictness::Strict`, `Finding::warning` when `Strictness::Interim`; Red signals always produce `Finding::error`. Signature updated from `bool` to `Strictness` per Finding #1 (Enum-first).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ChainId"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ChainId"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "ChainId"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ChainId"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ChainId"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "ChainId"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "Strictness"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "Strictness"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "Strictness"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "Strictness"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "Strictness"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GateKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "GateKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "GateKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "GateKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "GateKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ChainGateEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ChainGateEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ChainGateEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ChainGateEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalGateMatrix"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SignalGateMatrix"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "SignalGateMatrix"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "SignalGateMatrix"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TraitEntry"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TraitEntry"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TraitEntry"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TraitEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AssocTypeDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "AssocTypeDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "AssocTypeDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "AssocTypeDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialOrd",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Ord",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AssocConstDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "AssocConstDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "AssocConstDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "AssocConstDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialOrd",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Ord",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::str::traits::FromStr",
+      "for_type": "AssocConstName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::AsRef<str>",
+      "for_type": "AssocConstName"
+    }
+  ]
+}

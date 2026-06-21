@@ -281,7 +281,7 @@ impl CliApp {
             }
 
             // Absent catalogue file for a layer must be silently skipped
-            // (AC-01/AC-02). The `sotp track type-signals` step already skips
+            // (AC-01/AC-02). The `sotp signal calc-impl-catalog` step already skips
             // absent catalogues unconditionally; this step does the same so that
             // the full `track-active-gate` chain (type-signals → catalogue-spec-signals
             // → views sync) succeeds at Phase 0/1 before any catalogue exists.
@@ -298,7 +298,7 @@ impl CliApp {
                 }
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                     // Catalogue absent — remove any stale signals file so that the
-                    // later `verify catalogue-spec-signals` does not find a signals
+                    // later `signal check-catalog-spec` does not find a signals
                     // file without its backing catalogue (which would be an error).
                     // If the signals file is also absent that is fine — nothing to do.
                     let stale_signals_path = track_dir
@@ -676,8 +676,8 @@ mod tests {
 
     /// AC-01/AC-02: `catalogue-spec-signals` gate at Phase 0 (no catalogue file) succeeds.
     ///
-    /// The gate (`track-active-gate`) calls `sotp track catalogue-spec-signals` after
-    /// `sotp track type-signals`. When no catalogue exists, both commands
+    /// The gate (`track-active-gate`) calls `sotp signal calc-catalog-spec` after
+    /// `sotp signal calc-impl-catalog`. When no catalogue exists, both commands
     /// must exit zero so the full gate chain succeeds at Phase 0/1.
     #[test]
     fn test_track_catalogue_spec_signals_absent_catalogue_returns_ok() {
@@ -785,7 +785,7 @@ mod tests {
     /// If a catalogue was removed/renamed but a previously-generated
     /// `<layer>-catalogue-spec-signals.json` is still present, the
     /// absent-catalogue arm must delete it so that the later
-    /// `verify catalogue-spec-signals` does not find signals without
+    /// `signal check-catalog-spec` does not find signals without
     /// a backing catalogue (which would be an error).
     #[test]
     fn test_track_catalogue_spec_signals_absent_catalogue_removes_stale_signals_file() {
