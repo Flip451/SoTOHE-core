@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4af94046228f4abf4d15a4f672927009acb340f679f6879e877867495f0a6bb5",
+  "catalogue_declaration_hash": "88ddfb5096c440de5405fe9704416df03cbcc1c486dd764fd4d54cc6b68d1f7b",
   "signals": [
     {
       "type_name": "FsArchivedTrackTelemetryAdapter",
@@ -10,12 +10,12 @@
     {
       "type_name": "FsRefVerifyGateStateAdapter",
       "signal": "blue",
-      "entry_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1"
+      "entry_hash": "991eaf65f978403f13f6d86b8db7373e0e7c71610273c271e4314976915a1204"
     },
     {
       "type_name": "FsReviewGateStateAdapter",
       "signal": "blue",
-      "entry_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88"
+      "entry_hash": "454a9f9032ba0868ce9f320c4ed376c9ef2723ff1665519ec3cd4d7516fa82c4"
     },
     {
       "type_name": "FsSpecFileWriterAdapter",

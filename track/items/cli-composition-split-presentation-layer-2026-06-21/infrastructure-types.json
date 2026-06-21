@@ -10,10 +10,8 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "items_dir", "ty": "std::path::PathBuf" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -33,10 +31,8 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "items_dir", "ty": "std::path::PathBuf" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],

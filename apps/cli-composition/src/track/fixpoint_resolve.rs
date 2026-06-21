@@ -21,16 +21,14 @@ use usecase::dry_check::{
 };
 use usecase::fixpoint_resolve::{
     FixpointResolveCommand, FixpointResolveInteractor, FixpointResolveService as _,
-    RefVerifyGateStatePort, RefVerifyGateStatus, ReviewGateStatePort, ReviewGateStatus,
+    RefVerifyGateStatePort, ReviewGateStatePort,
 };
-use usecase::review_v2::ReviewApprovalDecision;
-
 // Domain / usecase types used internally by this composition module and
 // its in-crate unit tests. They are intentionally NOT re-exported through
 // the `cli_composition` public surface — `apps/cli` consumes only DTOs and
 // primitives across the CN-02 boundary, so the format-shape contract and
 // the domain-validation contract are tested here, not in `apps/cli`.
-use domain::track_phase::{FixpointStep, ReviewScopeSet};
+use domain::track_phase::FixpointStep;
 use usecase::fixpoint_resolve::{FixpointCurrentBranch, FixpointResolveError};
 
 use crate::{CliApp, CommandOutcome};
@@ -74,96 +72,14 @@ pub struct FixpointResolveInput {
     pub items_dir: PathBuf,
 }
 
-// ── FsReviewGateStateAdapter ──────────────────────────────────────────────────
-
-/// Implements [`ReviewGateStatePort`] by delegating to the existing
-/// `check_approved_str` helper (same logic as `sotp review check-approved`).
-///
-/// Uses only the public API of the review subsystem — no internal `review.json`
-/// parsing (CN-02).
-struct FsReviewGateStateAdapter {
-    items_dir: PathBuf,
-}
-
-impl ReviewGateStatePort for FsReviewGateStateAdapter {
-    /// Query the current review gate status for `track_id`.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`FixpointResolveError::GateQueryFailed`] when the review store
-    /// cannot be read or the evaluation fails.
-    fn review_status(&self, track_id: &TrackId) -> Result<ReviewGateStatus, FixpointResolveError> {
-        let output =
-            crate::review_v2::approved::check_approved_str(track_id.as_ref(), &self.items_dir)
-                .map_err(|e| FixpointResolveError::GateQueryFailed {
-                    gate: "review".to_owned(),
-                    message: e.to_string(),
-                })?;
-
-        match output.decision {
-            ReviewApprovalDecision::Approved | ReviewApprovalDecision::ApprovedWithBypass => {
-                Ok(ReviewGateStatus::Approved)
-            }
-            ReviewApprovalDecision::Blocked => {
-                let mut set = BTreeSet::new();
-                for s in &output.blocked_scopes {
-                    set.insert(s.clone());
-                }
-                let scopes = ReviewScopeSet::try_new(set).map_err(|e| {
-                    FixpointResolveError::GateQueryFailed {
-                        gate: "review".to_owned(),
-                        message: format!("review scope set construction failed: {e}"),
-                    }
-                })?;
-                Ok(ReviewGateStatus::NeedsReview { scopes })
-            }
-        }
-    }
-}
-
-// ── FsRefVerifyGateStateAdapter ───────────────────────────────────────────────
-
-/// Implements [`RefVerifyGateStatePort`] by delegating to the existing
-/// `ref_verify_check_approved` composition logic (same logic as `sotp ref-verify
-/// check-approved`).
-///
-/// Uses only the public gate API — no cache-file internals (CN-02).
-struct FsRefVerifyGateStateAdapter {
-    items_dir: PathBuf,
-}
-
-impl RefVerifyGateStatePort for FsRefVerifyGateStateAdapter {
-    /// Query the current ref-verify gate status for `track_id`.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`FixpointResolveError::GateQueryFailed`] when the cache read
-    /// fails.  A wrong-branch error from ref-verify is mapped to
-    /// `GateQueryFailed` as well — the CLI composition layer is responsible for
-    /// ensuring the branch matches before calling this adapter.
-    fn ref_verify_status(
-        &self,
-        track_id: &TrackId,
-    ) -> Result<RefVerifyGateStatus, FixpointResolveError> {
-        use crate::RefVerifyCheckApprovedInput;
-
-        let outcome = CliApp::new()
-            .ref_verify_check_approved(RefVerifyCheckApprovedInput {
-                track_id: track_id.as_ref().to_owned(),
-                items_dir: self.items_dir.clone(),
-            })
-            .map_err(|e| FixpointResolveError::GateQueryFailed {
-                gate: "ref_verify".to_owned(),
-                message: e,
-            })?;
-
-        if outcome.exit_code == 0 {
-            Ok(RefVerifyGateStatus::Approved)
-        } else {
-            Ok(RefVerifyGateStatus::Blocked)
-        }
-    }
-}
+// ── Gate-state adapters (re-exported from infrastructure) ────────────────────
+//
+// Both adapter structs were relocated to `libs/infrastructure/src/track/gate_state.rs`
+// per ADR 1328 D7 (port-impl adapters belong in libs/infrastructure).
+// This re-export shim keeps existing wiring call sites unchanged.
+pub(crate) use infrastructure::track::gate_state::{
+    FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter,
+};
 
 // ── Dry-gate fragment helpers ─────────────────────────────────────────────────
 
@@ -520,11 +436,10 @@ impl CliApp {
         // ── Build review and ref-verify gate adapters ─────────────────────────
         // Use the canonical (absolute, validated) items_dir so that these adapters
         // resolve track artifacts correctly regardless of the caller's CWD.
-        let review_state =
-            Arc::new(FsReviewGateStateAdapter { items_dir: canonical_items_dir.clone() })
-                as Arc<dyn ReviewGateStatePort>;
+        let review_state = Arc::new(FsReviewGateStateAdapter::new(canonical_items_dir.clone()))
+            as Arc<dyn ReviewGateStatePort>;
         let ref_verify_results =
-            Arc::new(FsRefVerifyGateStateAdapter { items_dir: canonical_items_dir.clone() })
+            Arc::new(FsRefVerifyGateStateAdapter::new(canonical_items_dir.clone()))
                 as Arc<dyn RefVerifyGateStatePort>;
 
         // ── Construct and run the interactor ──────────────────────────────────
@@ -553,6 +468,10 @@ mod tests {
     use std::process::Command;
 
     use super::*;
+
+    // Status types used in test assertions — no longer re-exported from the
+    // parent module's use list after the adapter relocation, so imported directly.
+    use domain::track_phase::ReviewScopeSet;
 
     // ── format_fixpoint_step tests ────────────────────────────────────────────
     //
@@ -873,68 +792,10 @@ mod tests {
         );
     }
 
-    // ── FsReviewGateStateAdapter unit tests ───────────────────────────────────
-
-    /// `FsReviewGateStateAdapter::review_status` must return `Err(GateQueryFailed)`
-    /// when the underlying `check_approved_str` fails (no `review-scope.json`).
-    ///
-    /// This exercises the error-mapping path in the adapter.  The `run-rfp`,
-    /// `run-ref-verify`, and `commit` step variants are exercised at the usecase
-    /// layer (`libs/usecase/src/fixpoint_resolve.rs`) using stub adapters, so the
-    /// composition layer tests focus on adapter wiring correctness.
-    #[test]
-    fn test_fs_review_gate_state_adapter_returns_gate_query_failed_when_no_scope_config() {
-        let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        use domain::TrackId;
-
-        let (dir, items_dir) = seed_track_repo("my-track-2026");
-
-        // `review-scope.json` is absent in the isolated repo — `check_approved_str`
-        // will fail to load the scope config and return an error.
-        let adapter = FsReviewGateStateAdapter { items_dir };
-        let track_id = TrackId::try_new("my-track-2026".to_owned()).unwrap();
-        let result = adapter.review_status(&track_id);
-
-        drop(dir);
-
-        assert!(result.is_err(), "expected Err when review-scope.json is absent");
-        assert!(
-            matches!(result.unwrap_err(), FixpointResolveError::GateQueryFailed { .. }),
-            "error must be GateQueryFailed"
-        );
-    }
-
-    // ── FsRefVerifyGateStateAdapter unit tests ────────────────────────────────
-
-    /// `FsRefVerifyGateStateAdapter::ref_verify_status` must return
-    /// `Ok(RefVerifyGateStatus::Approved)` when there are no production ref-verify
-    /// pairs (no `spec.json` in the track dir → zero Chain-1 pairs).
-    ///
-    /// Uses an isolated temp git repo on `track/my-track-2026` (via `seed_track_repo`)
-    /// so that the branch check inside `ref_verify_check_approved` passes without
-    /// relying on the host checkout state.  The track dir has no `spec.json`
-    /// (zero Chain-1 pairs), so the gate returns `Approved`.
-    ///
-    /// Exercises the `RefVerifyGateStatus::Approved` path in the adapter.
-    #[test]
-    fn test_fs_ref_verify_gate_state_adapter_returns_approved_when_no_production_pairs() {
-        let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        use domain::TrackId;
-
-        let track_id_str = "my-track-2026";
-        // seed_track_repo creates an isolated git repo on `track/<id>` with the
-        // track dir already present.  No spec.json → zero Chain-1 pairs → Approved.
-        let (dir, items_dir) = seed_track_repo(track_id_str);
-
-        let adapter = FsRefVerifyGateStateAdapter { items_dir };
-        let track_id = TrackId::try_new(track_id_str.to_owned()).unwrap();
-        let result = adapter.ref_verify_status(&track_id);
-
-        drop(dir);
-
-        assert!(
-            matches!(result, Ok(RefVerifyGateStatus::Approved)),
-            "expected Ok(Approved) when no production pairs, got: {result:?}"
-        );
-    }
+    // ── FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter unit tests ─────
+    // The adapters were relocated to `libs/infrastructure/src/track/gate_state.rs`
+    // in T002 (D7 adapter relocation). Their unit tests now live alongside the
+    // struct definitions in that infrastructure module. This module retains only
+    // the wiring path tests (see above) to verify the re-export shim resolves
+    // correctly and the adapters compose into FixpointResolveInteractor.
 }

@@ -84,6 +84,292 @@
       "rationale": "These snippets share the same constructor shape, but the repetition is only a trivial `Self { port }` initializer for different types (`ArchivedTrackTelemetryPort` vs `AdrFilePort`). This is conventional boilerplate rather than harmful duplication, and abstracting it would add indirection without reducing meaningful maintenance cost.",
       "recorded_at": "2026-06-21T20:20:00Z",
       "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/review_v2/null_reviewer.rs",
+      "low_hash": "16911852312cb41882c7eed951c1fd99d51b498d0d698120cc90e5ae95bc9064",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "16911852312cb41882c7eed951c1fd99d51b498d0d698120cc90e5ae95bc9064",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 1.0,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The two fragments only match on the `impl Reviewer for NullReviewer` declaration, which is a common trait implementation header rather than substantive duplicated logic. With no repeated method bodies or behavior shown, this is not enough to establish a DRY violation.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/review_v2/null_reviewer.rs",
+      "low_hash": "9479c90a62de227ecc4fb8692ea16a7d2353cd8d985a89914722d674cc80f990",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "e64afa89562efd1b357540cac69996892a3302c33ed77a89f0afc44baa367775",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9008749723434448,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "These fragments are similar because they are required trait-method stubs for a null implementation, but they encode different methods with different return types (`Verdict` vs `FastVerdict`) and method-specific error messages. The repeated `Err(ReviewerError::Unexpected(...))` shape is small boilerplate rather than duplicated domain logic or duplicated change-prone knowledge.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/review_v2/null_reviewer.rs",
+      "low_hash": "e64afa89562efd1b357540cac69996892a3302c33ed77a89f0afc44baa367775",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "e64afa89562efd1b357540cac69996892a3302c33ed77a89f0afc44baa367775",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Define a single reusable `NullReviewer` implementation in a shared production module, preferably `libs/infrastructure/src/review_v2/null_reviewer.rs` exported as `infrastructure::review_v2::NullReviewer`, and update both the infrastructure gate-state adapter and CLI composition status/check-approved wiring to use that shared type."
+        }
+      },
+      "similarity_score": 1.0,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The fragments are identical production implementations of the same `Reviewer::review` sentinel behavior for a `NullReviewer` with the same type purpose and error message. This duplicates the invariant that status/check-approved paths must never invoke actual review, and changes to that behavior would need to be kept in sync across `libs/infrastructure` and `apps/cli-composition`.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "low_hash": "0283dc68bfd252aa699df90acf860e59792c92c1b0d05520c9d66206e6375680",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "794e43d98cf50fb3cb3303cdd72179063e40a4f7f033e7a9c67ce815d138d295",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.8813480138778687,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The fragments are near-identical test setup helpers that encode the same git repository seeding procedure, so they are duplicated knowledge. However, both copies live in test code in separate crate/module contexts, and the helper is small, self-contained, and tied to local test fixtures. For only two occurrences, forcing a shared test-support abstraction would likely add cross-crate coupling or scaffolding disproportionate to the maintenance risk.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "low_hash": "8baf7cf6b37e6973686701fe3e5ded5a5a1ca0c78b09fbb310b8ecf03c47f9e8",
+      "high_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "high_hash": "a401a9822318b7a2c4928ec1bb0f5cf6b37d476af863b69b546b9401047f80e8",
+      "changed_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8716018199920654,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The two fragments share a small amount of test scaffolding, but they verify different adapter behaviors and the overlap is limited to standard setup code (`process_env_lock`, `seed_track_repo`, `TrackId::try_new`, and teardown). This is normal test duplication, not a meaningful DRY violation.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "low_hash": "8baf7cf6b37e6973686701fe3e5ded5a5a1ca0c78b09fbb310b8ecf03c47f9e8",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "89a08b48bcf6f3a434b89a2abfc4483881ec9d6d4ebc97de279388893a526711",
+      "changed_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.944491982460022,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The fragments share a common test skeleton, but they exercise different preconditions and different gate logic: the existing test seeds `architecture-rules.json` to eliminate Chain-2 pairs, while the changed test relies on the absence of `spec.json` to eliminate Chain-1 pairs and also adds the process-env lock. The overlap is limited to standard test scaffolding and the same final assertion, which is reasonable duplication for adjacent integration-style tests.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "low_hash": "9abdc0c94d87bbc58acb3856cc471e1f75a73e50726c88e45273a5c4269b5d81",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "ba450a0c2a385aaf94383da0a746d4806f15d57a9085491767c49be5db9e0d0a",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.981866419315338,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The fragments are intentionally duplicated test-fixture helpers: a small local `run_git` wrapper plus adjacent setup documentation for independent test modules in different crates. Although the code is textually identical, extracting it would introduce cross-crate test-support coupling for a narrow helper and would not meaningfully reduce production maintenance risk.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "low_hash": "a401a9822318b7a2c4928ec1bb0f5cf6b37d476af863b69b546b9401047f80e8",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "605748a87c569be7d3c740cbd6de8d63b4118822e3d8cc6a14bd006901d11045",
+      "changed_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared test helper for the no-scope-config review gate case, for example `assert_review_gate_returns_gate_query_failed_when_no_scope_config(seed_track_repo_fn)` or a crate-local reusable fixture/assertion helper, and have both test modules call it. If both crates intentionally need independent coverage, keep only thin wrapper tests with crate-specific setup and move the common arrange/act/assert sequence into the helper."
+        }
+      },
+      "similarity_score": 0.939604640007019,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The changed fragment duplicates the existing test almost verbatim: same test name, same isolated repo setup, same `FsReviewGateStateAdapter::new(items_dir)` path, same `TrackId`, same `review_status` call, same explicit `drop(dir)`, and the same two assertions for `GateQueryFailed`. The only material differences are an environment lock and comment wording, which do not change the tested behavior. This creates duplicated test logic that will need to be maintained in two modules if the adapter contract, setup helper, or error shape changes.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "low_hash": "a401a9822318b7a2c4928ec1bb0f5cf6b37d476af863b69b546b9401047f80e8",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "89a08b48bcf6f3a434b89a2abfc4483881ec9d6d4ebc97de279388893a526711",
+      "changed_path": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8788902759552002,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The two fragments share only small test-scaffolding patterns (repo seeding, `TrackId` creation, adapter invocation, and cleanup). The actual behaviors under test are different: one checks a missing `review-scope.json` error path, the other checks the approved path when there are no production pairs. This is ordinary test setup reuse-by-copy, not a substantive DRY violation that creates a maintenance or correctness risk.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli-composition/src/track/mod.rs",
+      "low_hash": "b7cb2c799e8a7c6377e5e33ab91bd23908e9768d9c43cf58ddf8eaf4ec517b12",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "bf0ce92ce4548217e463b36085e86cf83f8c5cdc532352c62561dd3e4a3694ce",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a single shared helper, for example `resolve_project_root_from_items_dir(items_dir: &Path, label: &str) -> Result<PathBuf, String>`, in a lower-level/shared track module used by both call sites. Let callers pass the error label such as `\"--items-dir\"` or `\"items_dir\"` so the user-facing message remains context-specific while the path validation and root resolution logic stays canonical."
+        }
+      },
+      "similarity_score": 0.8738635778427124,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The changed function duplicates the existing `resolve_project_root` logic almost exactly: it derives `items`, `track`, and project-root components from the same path shape, applies the same empty-root handling, and only differs in function name and error-message wording. This is shared path-contract logic and should not live independently in both CLI composition and infrastructure because future changes to the accepted layout or edge-case handling can drift.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli/src/commands/track/mod.rs",
+      "low_hash": "b6817c3a4936d9a9656fdc9b71dba2bd271de0491800d37f73a0975bbad41ddc",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "ba450a0c2a385aaf94383da0a746d4806f15d57a9085491767c49be5db9e0d0a",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Move the helper into shared test support, for example a workspace test utility crate/module such as `libs/test-support` with `run_git(path: &Path, args: &[&str])`, and have both test modules call that helper instead of maintaining local copies."
+        }
+      },
+      "similarity_score": 0.869825541973114,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "These fragments duplicate the same git-test helper: both build a `git` command in a given directory, set the same deterministic author/committer environment variables, execute it, and assert success with the same failure message. The only behavioral difference is `expect(\"git must run\")` versus `unwrap()`, which is not enough to make the logic distinct.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "apps/cli/src/commands/track/validate.rs",
+      "low_hash": "de5e965e240aa268f5075eea2877759f4d37f2514c44f5a732b789800d10e00d",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "bf0ce92ce4548217e463b36085e86cf83f8c5cdc532352c62561dd3e4a3694ce",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the shared resolver into a common module accessible to both call sites, preferably in the infrastructure/library layer if that is the lower-level owner of track path semantics. Give it a neutral signature such as `resolve_project_root_from_items_dir(items_dir: &Path, context_label: &str) -> Result<PathBuf, String>` or return a typed error so callers can format CLI-specific messages without duplicating the path validation and empty-root normalization."
+        }
+      },
+      "similarity_score": 0.8840728402137756,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "Both fragments implement the same path-shape validation and normalization logic for resolving '<project-root>/track/items' to the project root, including the same special case for bare relative 'track/items' mapping an empty parent path to '.'. The only meaningful differences are naming, qualification style, comments, and CLI-specific wording in the error message. Because the changed library code duplicates existing behavior rather than reusing a shared resolver, future fixes to path handling can diverge between CLI validation and infrastructure gate-state logic.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/domain/src/lib.rs",
+      "low_hash": "813e70774b0b7801b96d06afa6eded55a9ac85cca2618c4fc39db78cda2ceebf",
+      "high_path": "libs/infrastructure/src/lib.rs",
+      "high_hash": "243edfd9a4967dd9d518b970e0d990f526ebda7ff581629def5a58302895bbe4",
+      "changed_path": "libs/infrastructure/src/lib.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9077487587928772,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The infrastructure crate is only declaring module boundaries and re-exporting adapters; it is not repeating the domain implementation. The overlapping names (`adr_decision`, `dry_check`, `review_v2`, `spec`, `semantic_dup`, `tddd`, `verify`) reflect a layered architecture where infrastructure provides concrete ports/adapters around shared concepts, not duplicated logic in the DRY sense.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/infrastructure/src/lib.rs",
+      "low_hash": "243edfd9a4967dd9d518b970e0d990f526ebda7ff581629def5a58302895bbe4",
+      "high_path": "libs/usecase/src/lib.rs",
+      "high_hash": "11417b0831a47ff4d25ef103c422782303ee8072cc460135657f48a51f61bde4",
+      "changed_path": "libs/infrastructure/src/lib.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8702555298805237,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The two fragments are separate crate root module lists for different layers (`infrastructure` vs `usecase`). They share the same Rust boilerplate pattern, but that is not DRY-relevant duplication of behavior or logic. Each file is responsible for exposing a distinct set of modules and re-exports for its own layer, so the similarity is intentional and does not indicate a maintainability problem by itself.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+      "low_hash": "bb43a4cb975f34163887a07f4b475fb02c4e99e44d4a5d3aeefb1585ecaa7dac",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "16911852312cb41882c7eed951c1fd99d51b498d0d698120cc90e5ae95bc9064",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.856089174747467,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The shared text is only the trait-implementation header `impl Reviewer for ...`, which is a normal Rust pattern for two different concrete types. There is no duplicated behavior shown here, so this does not by itself indicate a DRY problem.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/infrastructure/src/track/gate_state.rs",
+      "low_hash": "270885c4615d39943d08f08fc42c8e799c3085f56151788e6dc7c72b0eba58fd",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "3e48247f9dce70d81f0c36a2dfa64970f585c593f0f674354afa11773aa251d7",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9346607327461244,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "This is only a duplicated doc comment on two separate adapter impls. That kind of repetition is usually intentional because each public type needs its own local API documentation, and there is no duplicated behavior or logic here.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/infrastructure/src/track/gate_state.rs",
+      "low_hash": "59d33cedd7f8b1e5ec53c4c3a0c54aba8af2c3bd8437f3227cdb2913c6714d07",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "605748a87c569be7d3c740cbd6de8d63b4118822e3d8cc6a14bd006901d11045",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8628542423248291,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The fragments exercise different behaviors and failure modes: the changed test asserts `GateQueryFailed` when `.harness/config/review-scope.json` is missing, while the existing test asserts `Approved` when the diff is empty and scope config is present. They share only ordinary test setup patterns around constructing `FsReviewGateStateAdapter` and track IDs, which is not meaningful duplication for DRY purposes.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/infrastructure/src/track/gate_state.rs",
+      "low_hash": "788521e8151485ce55be43846e982599de287b14436a5789a5ab00e1334ccf22",
+      "high_path": "libs/infrastructure/src/track/gate_state.rs",
+      "high_hash": "e7ff98536d45d001aec812c7ef95a4722a732921c5deedf0ddff8040a3c19bba",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9341484308242798,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "These tests are intentionally exercising two different public APIs (`FsRefVerifyGateStateAdapter::ref_verify_status` and `FsReviewGateStateAdapter::review_status`) with the same invalid-input scenario. The overlap is limited to a small, conventional test setup and does not indicate a harmful DRY problem in the sense used for code review.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/infrastructure/src/track/gate_state.rs",
+      "low_hash": "e64afa89562efd1b357540cac69996892a3302c33ed77a89f0afc44baa367775",
+      "high_path": "libs/usecase/src/review_v2/tests.rs",
+      "high_hash": "97f12a0c459a316fd89d08244f9953a33039158a9a106a055bf3426ca4db9f3a",
+      "changed_path": "libs/infrastructure/src/track/gate_state.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8619978427886963,
+      "threshold": 0.8500000238418579,
+      "base_commit": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b",
+      "rationale": "The two fragments both implement a `review` method, but they do not duplicate the same behavior or logic. One is a production null-reviewer that always returns an error, while the other is a test double that returns a stored verdict and a mock log. This is shared interface shape, not repeated implementation.",
+      "recorded_at": "2026-06-21T21:11:05Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
     }
   ]
 }

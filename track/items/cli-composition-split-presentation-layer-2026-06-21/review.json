@@ -1,6 +1,230 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
+          "at": "2026-06-21T20:24:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
+          "at": "2026-06-21T20:27:29Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e28ac3318e04d63783ef38ac9844dcfcabdb086c275834c6e22dc028ded27673",
+          "at": "2026-06-21T21:14:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
+          "at": "2026-06-21T22:23:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
+          "at": "2026-06-21T22:50:04Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
+          "at": "2026-06-21T20:24:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`emit` creates and opens the telemetry path with plain `create_dir_all`/`OpenOptions::open`, so a symlinked `telemetry_dir` component or pre-existing `telemetry.jsonl` symlink is followed instead of being rejected. This adapter is the infrastructure I/O boundary for the injected telemetry path; when it is wired to archived-track logs, a symlink under the trusted archive tree can redirect appends outside that tree instead of failing closed. Match the existing CN-04/scope_config_loader symlink-rejection pattern, or use a trusted-root guard plus no-follow open before writing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/telemetry/archived_track.rs",
+              "line": 71,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
+          "at": "2026-06-21T20:28:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:668de97b8087e893c5e23aa36e429b42930dfa0f04faa423cca7db5ad910e637",
+          "at": "2026-06-21T20:33:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Path containment is never enforced after deriving `canonical_root`, so a crafted `items_dir` like `../other/track/items` can escape the intended trusted root before `review.json` / `.commit_hash` are opened. `reject_symlinks_below` only rejects symlinks; it does not replace the `canonical_path.starts_with(&canonical_root)` check used in `scope_config_loader.rs`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 140,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The same trusted-root gap exists in the ref-verify adapter: `items_dir_abs` is built and used without proving it stays under `canonical_root`, so `RefVerifyScopeResolver` / `RefVerifyCacheAdapter` can be pointed at an escaped directory tree via a relative `items_dir`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 256,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:0f1a35db3eb162277c4fae5eee11eb1e95c1a296b5452a8dcad082e6bfa6ec5b",
+          "at": "2026-06-21T21:18:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review_status` no longer verifies that `track/items/<track-id>` exists before reading `review.json` and `.commit_hash`. Because both stores treat missing files as empty/`None`, a missing or mistyped track directory can now fall through to `Approved`/`ApprovedWithBypass` instead of failing like the original `build_v2_shared` path. Restore the `track_dir.is_dir()` guard here.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/gate_state.rs",
+              "line": 189,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ac6220eb2ec2d785f648c20a5ba128b011a823316a0b108ec16ce21388658616",
+          "at": "2026-06-21T21:32:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_gate_path_context()` anchors git discovery to `items_dir` itself for absolute paths. If that path sits under a nested checkout, `SystemGitRepo::discover_from(items_dir)` can select the nested repo as the trusted root, so these adapters read `review-scope.json`, `review.json`, `.commit_hash`, and ref-verify caches from the wrong repository instead of the caller's repo root. Anchor discovery to the caller's repo root first, as the composition layer did.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/gate_state.rs",
+              "line": 73,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:75c803204d2cc74b0e8372a5a34ced427392c0e8d9fbca90576d41fc91ced3f2",
+          "at": "2026-06-21T21:40:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_gate_path_context()` anchors git discovery on `SystemGitRepo::discover()` from the process cwd, so the gate adapters no longer root `.commit_hash` ancestry checks in the validated `items_dir`/`canonical_root`. If the command runs from another repo, or from outside a repo, `FsCommitHashStore::read()` can consult the wrong repository or fail for a valid project. The previous implementation wrapped the same read in `with_repo_cwd(&canonical_root, ...)` to keep this I/O bounded to the trusted root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 76,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`items_dir_abs.canonicalize()` follows a symlinked `items_dir` root, but this helper never rejects that root with a `symlink_metadata().file_type().is_symlink()` check. Other infrastructure adapters explicitly refuse to use a symlinked `items_dir` before treating it as the trusted anchor, because `reject_symlinks_below()` only protects descendants. As written, a symlinked `items_dir` can become the gate's trust root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 82,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:18b5345fc1ebaeadb023d8da62c995f55a712f1d3433a26bcd4ffb39bc37163f",
+          "at": "2026-06-21T21:56:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_gate_path_context` only rejects a symlink when the leaf `items_dir` path itself is a symlink. A symlinked ancestor (for example `track/` under the caller repo) can still redirect the canonicalized path into a different subtree, and the adapter will then treat that subtree as the project root. This should reject symlinks along the full path below the caller's trusted root, matching the repo's existing `reject_symlinks_below` boundary checks.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 129,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:941015692849ca0b15a9f4f0337c9303badca3b3b1cf7dfad9513c20b2d5a204",
+          "at": "2026-06-21T22:05:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `absolute items_dir` branch stops anchoring to the current repo: any absolute path outside the caller repo is accepted as long as its derived project root is a git root. That means the adapter can be pointed at a different repository instead of failing closed under the caller's trusted root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 182,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:8ec9e0a04c972e33e34eb7665ee04f263066b7e1f1ddf4d423eaeb73bca7a241",
+          "at": "2026-06-21T22:14:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_symlinks_below()` is only applied when `items_dir_abs.starts_with(&canonical_repo_root)`, so an absolute `items_dir` that reaches the repo through a symlink outside the repo can bypass the symlink check and still be accepted after `canonicalize()`. The repo’s own loader pattern (`scope_config_loader.rs`) rejects symlinks on the original path unconditionally before trusting the result.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 128,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:f5de8c29505eb33bf25a378c783a3e901980c3eeded215ab07fc201b57489290",
+          "at": "2026-06-21T22:26:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsReviewGateStateAdapter::review_status` only re-anchors the `.commit_hash` lookup; the subsequent `ReviewCycle::evaluate_approval` still runs with the caller's ambient CWD, but `GitDiffGetter` and `SystemReviewHasher` discover the repo from that CWD. In nested-checkout or subdirectory invocations this can make the adapter read diff/hash data from the wrong repository instead of the validated `canonical_root`. Anchor the whole evaluation on `canonical_root` (the way `build_v2_shared` does) before calling `evaluate_approval`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 290,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:3c0afa449397cafd508087919cebbe157cf02506cf0d09ede2f7b641dffe8968",
+          "at": "2026-06-21T22:37:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80b9e6a0f5b73ec2f0d31392fc0861388d44780d13ac818d8fc43a3e140d31f8",
+          "at": "2026-06-21T22:47:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80b9e6a0f5b73ec2f0d31392fc0861388d44780d13ac818d8fc43a3e140d31f8",
+          "at": "2026-06-21T22:52:19Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -349,57 +573,42 @@
           "findings": [],
           "hash": "rvw1:sha256:e7733921f805c5bd1e61afcdd77d5c2212bd662ac6388b968e6993a63ae3d9f5",
           "at": "2026-06-21T20:28:47Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
-          "at": "2026-06-21T20:24:23Z"
+          "hash": "rvw1:sha256:8f3dd76a2d415dfb61ef21736f4a22e06e930211397816fcce64695e0d10d8ef",
+          "at": "2026-06-21T21:14:42Z"
         },
         {
-          "type": "final",
+          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`emit` creates and opens the telemetry path with plain `create_dir_all`/`OpenOptions::open`, so a symlinked `telemetry_dir` component or pre-existing `telemetry.jsonl` symlink is followed instead of being rejected. This adapter is the infrastructure I/O boundary for the injected telemetry path; when it is wired to archived-track logs, a symlink under the trusted archive tree can redirect appends outside that tree instead of failing closed. Match the existing CN-04/scope_config_loader symlink-rejection pattern, or use a trusted-root guard plus no-follow open before writing.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/telemetry/archived_track.rs",
-              "line": 71,
-              "category": "symlink not rejected at boundary"
+              "message": "This delta is no longer limited to the T002 catalogue/signal normalization described in the briefing: `impl-plan.json` advances task bookkeeping (`T001` -> `done`, `T002` -> `in_progress`) and `plan.md` increments the resolved count to `1/22`. The brief explicitly said this scope should not change `impl-plan.json`, so the artifact set now includes out-of-scope plan-state updates rather than only the adapter-catalogue/signal edits.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
-          "at": "2026-06-21T20:28:23Z"
+          "hash": "rvw1:sha256:8f3dd76a2d415dfb61ef21736f4a22e06e930211397816fcce64695e0d10d8ef",
+          "at": "2026-06-21T22:23:57Z"
         },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:668de97b8087e893c5e23aa36e429b42930dfa0f04faa423cca7db5ad910e637",
-          "at": "2026-06-21T20:33:13Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
-          "at": "2026-06-21T20:24:20Z"
+          "hash": "rvw1:sha256:9197f2b235fd8c0982f4ff2775eadbca53f8630b3d8eeba45daafa46c849866f",
+          "at": "2026-06-21T22:26:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
-          "at": "2026-06-21T20:27:29Z"
+          "hash": "rvw1:sha256:9197f2b235fd8c0982f4ff2775eadbca53f8630b3d8eeba45daafa46c849866f",
+          "at": "2026-06-21T22:49:58Z"
         }
       ]
     }

@@ -28,6 +28,7 @@ pub mod telemetry;
 pub mod track;
 pub use telemetry::archived_track::FsArchivedTrackTelemetryAdapter;
 pub use track::fs_symlink_guard::FsSymlinkGuard;
+pub use track::gate_state::{FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter};
 pub mod type_catalogue_render;
 pub mod verify;
 
