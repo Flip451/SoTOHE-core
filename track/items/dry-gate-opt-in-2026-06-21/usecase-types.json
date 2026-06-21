@@ -1,0 +1,173 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "DryCheckConfig": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "known_bad_injection_rate_percent", "ty": "DryCheckPercent" },
+            { "name": "known_bad_detection_threshold_percent", "ty": "DryCheckPercent" },
+            { "name": "max_parallelism", "ty": "DryCheckParallelism" },
+            { "name": "enabled", "ty": "bool" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::config",
+      "docs": "Usecase-layer configuration for the dry-check capability. `enabled` (bool) governs whether the DRY gate runs at all; it is a truly-opaque two-state flag with no domain invariant beyond boolean — the composition layer reads it from the infrastructure DTO and passes it through. All other fields are validated newtypes. Populated by the composition layer at adapter-construction time (D2 / IN-05 / CN-06).",
+      "spec_refs": [
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovalInteractor": {
+      "action": "modify",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::approval_interactor",
+      "docs": "Interactor implementing the read-only DryCheckApprovalService. After this track, holds a DryCheckConfig in addition to reader, coverage, current_config_fingerprint, and current_corpus_fingerprint. When dry_config.enabled is false, check_approved returns Approved immediately without executing staleness or all-resolved checks (D2 / IN-02 / CN-02).",
+      "spec_refs": [
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-02" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-06" }
+      ],
+      "informal_grounds": []
+    },
+    "FixpointResolveInteractor": {
+      "action": "modify",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "fixpoint_resolve",
+      "docs": "Interactor implementing FixpointResolveService. After this track, holds a DryCheckConfig in addition to dry_approval, review_state, and ref_verify_results. When dry_config.enabled is false, the dry gate is treated as Approved and resolve() skips RunDfp (D2 / IN-03 / CN-03).",
+      "spec_refs": [
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-06" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "DryCheckConfig",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "known_bad_injection_rate_percent", "ty": "DryCheckPercent" },
+            { "name": "known_bad_detection_threshold_percent", "ty": "DryCheckPercent" },
+            { "name": "max_parallelism", "ty": "DryCheckParallelism" },
+            { "name": "enabled", "ty": "bool" }
+          ],
+          "returns": "DryCheckConfig",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a DryCheckConfig from validated newtype components plus the enabled flag."
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckApprovalInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "dry_config", "ty": "DryCheckConfig" },
+            { "name": "reader", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" },
+            { "name": "coverage", "ty": "std::sync::Arc<dyn DryCheckCoveragePort>" },
+            { "name": "current_config_fingerprint", "ty": "domain::dry_check::DryCheckConfigFingerprint" },
+            { "name": "current_corpus_fingerprint", "ty": "domain::dry_check::DryCheckCorpusFingerprint" }
+          ],
+          "returns": "DryCheckApprovalInteractor",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new DryCheckApprovalInteractor. dry_config.enabled controls whether the gate short-circuits to Approved."
+        }
+      ]
+    },
+    {
+      "type_name": "FixpointResolveInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "dry_config", "ty": "DryCheckConfig" },
+            { "name": "dry_approval", "ty": "std::sync::Arc<dyn DryCheckApprovalService + Send + Sync>" },
+            { "name": "review_state", "ty": "std::sync::Arc<dyn ReviewGateStatePort>" },
+            { "name": "ref_verify_results", "ty": "std::sync::Arc<dyn RefVerifyGateStatePort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new FixpointResolveInteractor. dry_config.enabled controls whether the dry gate is skipped."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "DryCheckApprovalService",
+      "for_type": "DryCheckApprovalInteractor"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "FixpointResolveService",
+      "for_type": "FixpointResolveInteractor"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckConfig"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckConfig"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DryCheckConfig"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DryCheckConfig"
+    }
+  ]
+}

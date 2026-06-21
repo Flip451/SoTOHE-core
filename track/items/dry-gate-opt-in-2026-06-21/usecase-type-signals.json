@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-21T13:10:46Z",
+  "declaration_hash": "586274ddb692571149efee904be605fafbcea1fe109a9583ee84227ffd93217f",
+  "signals": [
+    {
+      "type_name": "DryCheckApprovalInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckApprovalService"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfig",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FixpointResolveInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FixpointResolveService"
+      ]
+    }
+  ]
+}

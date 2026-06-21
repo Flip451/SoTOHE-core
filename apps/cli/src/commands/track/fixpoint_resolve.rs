@@ -156,82 +156,107 @@ mod tests {
     /// Happy-path: `execute_fixpoint_resolve` returns `ExitCode::SUCCESS` and
     /// writes the step to stdout when `CliApp::fixpoint_resolve` succeeds.
     ///
-    /// Uses a temp fixture tree under `target/` (inside the workspace git repo)
-    /// with a `.commit_hash` pointing at HEAD and no `dry-check-coverage.json`,
-    /// so the dry gate returns Blocked → step = `RunDfp` → stdout `"run-dfp"`.
-    /// This confirms that `execute_fixpoint_resolve` correctly emits stdout and
-    /// returns `ExitCode::SUCCESS` (exit_code 0).
+    /// Uses an isolated temp git repository (not the workspace) with
+    /// `enabled: true` in `.harness/config/dry-check.json` and no
+    /// `dry-check-coverage.json`, so the dry gate returns Blocked → step = `RunDfp`.
+    ///
+    /// CWD is temporarily changed to the temp repo root (via `run_in_dir`) so that
+    /// `SystemGitRepo::discover()` picks up the isolated repo and reads the fixture
+    /// config rather than the workspace config (which may have `enabled: false`).
     #[test]
     fn test_execute_fixpoint_resolve_dry_blocked_returns_success_exit_code() {
-        use std::process::ExitCode;
+        use std::process::{Command, ExitCode};
 
-        use cli_composition::CliApp;
+        use crate::commands::track::test_support::{process_env_lock, run_in_dir};
 
-        // Locate the workspace root (repo root for tests).
-        let mut workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        workspace_root.pop(); // apps/cli → apps
-        workspace_root.pop(); // apps → workspace root
+        let _guard = process_env_lock().lock().unwrap();
 
-        // Create a temp fixture tree under target/ that satisfies resolve_project_root.
-        let base = workspace_root.join("target").join("fixpoint-resolve-cli-tests");
-        std::fs::create_dir_all(&base).unwrap();
-        let temp_fixture = tempfile::Builder::new()
-            .prefix("fixture-")
-            .tempdir_in(&base)
-            .expect("fixture temp dir must be created");
+        // Create a self-contained git repo with the full structure needed.
+        let dir = tempfile::tempdir().expect("tempdir must be created");
+        let root = dir.path();
+
+        fn run_git(path: &std::path::Path, args: &[&str]) {
+            let status = Command::new("git")
+                .args(args)
+                .current_dir(path)
+                .env("GIT_AUTHOR_NAME", "Test")
+                .env("GIT_AUTHOR_EMAIL", "test@test.com")
+                .env("GIT_COMMITTER_NAME", "Test")
+                .env("GIT_COMMITTER_EMAIL", "test@test.com")
+                .status()
+                .unwrap();
+            assert!(status.success(), "git {args:?} failed with {status}");
+        }
+
+        run_git(root, &["init", "-q"]);
+        run_git(root, &["config", "commit.gpgsign", "false"]);
+        run_git(root, &["checkout", "-B", "main"]);
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        run_git(root, &["add", "."]);
+        run_git(root, &["commit", "--no-gpg-sign", "-m", "init"]);
+
         let track_id_str = "dfp-cli-track-2026";
-        let items_dir = temp_fixture.path().join("track").join("items");
+        run_git(root, &["checkout", "-b", &format!("track/{track_id_str}")]);
+
+        let items_dir = root.join("track").join("items");
         let track_dir = items_dir.join(track_id_str);
         std::fs::create_dir_all(&track_dir).unwrap();
 
-        // Write the workspace HEAD SHA to .commit_hash.
-        let head_sha = std::process::Command::new("git")
+        // Write HEAD SHA to .commit_hash so diff-base resolution succeeds.
+        let head_sha_output = Command::new("git")
             .args(["rev-parse", "HEAD"])
-            .current_dir(&workspace_root)
+            .current_dir(root)
             .output()
             .expect("git rev-parse HEAD must succeed");
-        let head_sha = String::from_utf8_lossy(&head_sha.stdout).trim().to_owned();
+        let head_sha = String::from_utf8_lossy(&head_sha_output.stdout).trim().to_owned();
         std::fs::write(track_dir.join(".commit_hash"), &head_sha).unwrap();
 
-        // Write a minimal valid dry-check.json so the composition layer can load
-        // the config fingerprint (added by the config-fingerprint fix).
-        let harness_config_dir = temp_fixture.path().join(".harness").join("config");
+        // Write `.harness/config/dry-check.json` with `enabled: true` so the dry gate
+        // runs (rather than bypassing via the enabled=false short-circuit).
+        let harness_config_dir = root.join(".harness").join("config");
         std::fs::create_dir_all(&harness_config_dir).unwrap();
         std::fs::write(
             harness_config_dir.join("dry-check.json"),
             r#"{
-  "schema_version": 3,
+  "schema_version": 4,
+  "enabled": true,
   "threshold": 0.85,
   "max_parallelism": 4,
-  "fast_reasoning_effort": "medium",
-  "final_reasoning_effort": "high",
   "known_bad_injection_rate_percent": 10,
   "known_bad_detection_threshold_percent": 90
 }"#,
         )
         .unwrap();
 
-        // Call the composition directly (same as execute_fixpoint_resolve does).
-        let outcome = CliApp::new()
-            .fixpoint_resolve(cli_composition::FixpointResolveInput {
+        // Switch CWD to the temp repo so `SystemGitRepo::discover()` finds this repo.
+        // No dry-check-coverage.json → dry gate Blocked → step = "run-dfp".
+        let (outcome, exit) = run_in_dir(root, || {
+            let outcome = cli_composition::CliApp::new()
+                .fixpoint_resolve(cli_composition::FixpointResolveInput {
+                    track_id: track_id_str.to_owned(),
+                    current_branch: format!("track/{track_id_str}"),
+                    items_dir: items_dir.clone(),
+                })
+                .expect("fixpoint-resolve with enabled=true + missing coverage must succeed");
+
+            let exit = super::execute_fixpoint_resolve(super::FixpointResolveArgs {
                 track_id: track_id_str.to_owned(),
                 current_branch: format!("track/{track_id_str}"),
                 items_dir: items_dir.clone(),
             })
-            .expect("fixpoint-resolve with missing coverage must succeed");
+            .expect("execute_fixpoint_resolve must return Ok(ExitCode)");
 
-        // Verify the outcome that execute_fixpoint_resolve would emit.
+            (outcome, exit)
+        });
+
+        drop(dir);
+
         assert_eq!(outcome.exit_code, 0);
-        assert_eq!(outcome.stdout.as_deref(), Some("run-dfp"));
-
-        // Now verify that execute_fixpoint_resolve returns ExitCode::SUCCESS.
-        let exit = super::execute_fixpoint_resolve(super::FixpointResolveArgs {
-            track_id: track_id_str.to_owned(),
-            current_branch: format!("track/{track_id_str}"),
-            items_dir,
-        })
-        .expect("execute_fixpoint_resolve must return Ok(ExitCode)");
-
-        assert_eq!(exit, ExitCode::SUCCESS);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some("run-dfp"),
+            "enabled=true + missing coverage must yield run-dfp"
+        );
+        assert_eq!(exit, ExitCode::SUCCESS, "execute_fixpoint_resolve must return SUCCESS");
     }
 }

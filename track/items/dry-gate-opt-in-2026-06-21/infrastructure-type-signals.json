@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-21T13:10:50Z",
+  "declaration_hash": "8acecc8cf87d55680acd05f04128ff4b4d106b760e7fd7198e9ceee6f492dea9",
+  "signals": [
+    {
+      "type_name": "CapabilityConfigDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfig",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfigError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    }
+  ]
+}

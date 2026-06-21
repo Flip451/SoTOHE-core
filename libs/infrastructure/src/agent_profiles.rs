@@ -119,6 +119,12 @@ pub struct CapabilityConfigDto {
     fast_model: Option<String>,
     /// Optional path to the prompt template for this capability.
     prompt_template_path: Option<String>,
+    /// Optional reasoning effort for the fast-round dry-checker (D4 / IN-08).
+    /// `None` means no override; the composition root supplies a built-in default.
+    fast_reasoning_effort: Option<String>,
+    /// Optional reasoning effort for the final-round dry-checker (D4 / IN-08).
+    /// `None` means no override; the composition root supplies a built-in default.
+    final_reasoning_effort: Option<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -287,6 +293,24 @@ impl CapabilityConfigDto {
     #[must_use]
     pub fn prompt_template_path(&self) -> Option<&str> {
         self.prompt_template_path.as_deref()
+    }
+
+    /// The fast-round reasoning effort for this capability, if set (D4 / IN-08).
+    ///
+    /// `None` when absent — the composition root supplies a built-in default.
+    /// Value validation is the responsibility of the composition root (OS-06).
+    #[must_use]
+    pub fn fast_reasoning_effort(&self) -> Option<&str> {
+        self.fast_reasoning_effort.as_deref()
+    }
+
+    /// The final-round reasoning effort for this capability, if set (D4 / IN-08).
+    ///
+    /// `None` when absent — the composition root supplies a built-in default.
+    /// Value validation is the responsibility of the composition root (OS-06).
+    #[must_use]
+    pub fn final_reasoning_effort(&self) -> Option<&str> {
+        self.final_reasoning_effort.as_deref()
     }
 }
 
@@ -682,7 +706,8 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // T011 tests: dry-checker capability with fast_model (D4 / IN-04).
+    // T011 / T013 / T015 tests: dry-checker capability with fast_model and
+    // reasoning_effort fields (D4 / IN-04 / IN-08).
     // -----------------------------------------------------------------------
 
     const DRY_CHECKER_CONFIG: &str = r#"{
@@ -694,7 +719,9 @@ mod tests {
             "dry-checker": {
                 "provider": "codex",
                 "model": "gpt-5.5",
-                "fast_model": "gpt-5.4-mini"
+                "fast_model": "gpt-5.4-mini",
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high"
             }
         }
     }"#;
@@ -719,6 +746,67 @@ mod tests {
         let final_exec = profiles.resolve_execution("dry-checker", RoundType::Final).unwrap();
         assert_eq!(final_exec.provider, "codex");
         assert_eq!(final_exec.model.as_deref(), Some("gpt-5.5"));
+    }
+
+    // ── D4 / T013 / T015: CapabilityConfigDto reasoning_effort accessors ──
+
+    #[test]
+    fn test_dry_checker_capability_dto_fast_reasoning_effort_accessor() {
+        // Verify that the new fast_reasoning_effort accessor returns the configured value.
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), DRY_CHECKER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let capability = profiles.resolve_capability("dry-checker").unwrap();
+        assert_eq!(
+            capability.fast_reasoning_effort(),
+            Some("medium"),
+            "fast_reasoning_effort accessor must return the configured value"
+        );
+    }
+
+    #[test]
+    fn test_dry_checker_capability_dto_final_reasoning_effort_accessor() {
+        // Verify that the new final_reasoning_effort accessor returns the configured value.
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), DRY_CHECKER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let capability = profiles.resolve_capability("dry-checker").unwrap();
+        assert_eq!(
+            capability.final_reasoning_effort(),
+            Some("high"),
+            "final_reasoning_effort accessor must return the configured value"
+        );
+    }
+
+    #[test]
+    fn test_capability_dto_reasoning_effort_returns_none_when_absent() {
+        // When reasoning_effort fields are absent from the capability, accessors return None.
+        let json = r#"{
+            "schema_version": 1,
+            "providers": { "codex": { "label": "Codex CLI" } },
+            "capabilities": {
+                "dry-checker": {
+                    "provider": "codex",
+                    "model": "gpt-5.5",
+                    "fast_model": "gpt-5.4-mini"
+                }
+            }
+        }"#;
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), json);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let capability = profiles.resolve_capability("dry-checker").unwrap();
+        assert!(
+            capability.fast_reasoning_effort().is_none(),
+            "fast_reasoning_effort must be None when the field is absent"
+        );
+        assert!(
+            capability.final_reasoning_effort().is_none(),
+            "final_reasoning_effort must be None when the field is absent"
+        );
     }
 
     // -----------------------------------------------------------------------

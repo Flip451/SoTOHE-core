@@ -31,6 +31,7 @@ use usecase::dry_check::{
 use crate::{CliApp, CommandOutcome};
 
 mod corpus_root;
+mod dry_checker_config;
 mod manifest;
 mod persistent_index;
 mod shared;
@@ -43,6 +44,8 @@ use corpus_root::{
     compute_dry_corpus_fingerprint_from_fragments, compute_dry_corpus_fingerprint_from_root,
     write_dry_corpus_root_manifest,
 };
+pub(crate) use dry_checker_config::build_usecase_dry_check_config_pub;
+use dry_checker_config::{build_usecase_dry_check_config, resolve_dry_checker_config};
 use persistent_index::open_persistent_index_with_corpus;
 #[cfg(test)]
 use shared::git_diff_path_key;
@@ -207,23 +210,13 @@ fn resolve_dry_write_telemetry_writer(
 
 /// Resolve the config fingerprint to store in the coverage manifest for `dry write`.
 ///
-/// The fingerprint controls whether `dry check-approved` can match this manifest.
-/// `dry check-approved` always calls `infra_config.fingerprint()` (file-config threshold),
-/// so the stored fingerprint must be chosen accordingly:
-///
-/// - If `effective_threshold <= file_threshold` (stricter or equal): use `fingerprint()`
-///   (file-config threshold). The manifest covers at least as many pairs as the file config
-///   requires, so approval is safe.
-/// - If `effective_threshold > file_threshold` (more permissive override): use
-///   `fingerprint_with_threshold(effective_threshold)`. The manifest was built under a looser
-///   threshold and may be missing pairs in the `[file_threshold, effective_threshold)` range.
-///   `dry check-approved` will see a fingerprint mismatch and correctly block approval.
+/// Stricter or equal override: use `fingerprint()` (file-config threshold) so
+/// `dry check-approved` can match. Looser override: use `fingerprint_with_threshold(override)`
+/// so `dry check-approved` sees a mismatch and correctly blocks approval.
 fn resolve_write_config_fingerprint(
     infra_config: &infrastructure::dry_check::DryCheckConfig,
     effective_threshold: domain::semantic_dup::SimilarityThreshold,
 ) -> domain::dry_check::DryCheckConfigFingerprint {
-    // Higher threshold value = more permissive (fewer pairs detected).
-    // Only use the override fingerprint when the override is MORE permissive than the file config.
     if effective_threshold.value() > infra_config.threshold().value() {
         infra_config.fingerprint_with_threshold(effective_threshold)
     } else {
@@ -255,14 +248,24 @@ impl CliApp {
         let track_id = parse_dry_track_id(&input.track_id)?;
         let telemetry_writer =
             resolve_dry_write_telemetry_writer(&input.items_dir, track_id.as_ref());
-
-        let (fast_model, effective_model) =
-            resolve_dry_checker_models(&root, &input.capability_name, input.model.clone())?;
+        let dry_checker_config = if input.model.is_none() {
+            Some(resolve_dry_checker_config(&root, &input.capability_name, None)?)
+        } else {
+            None
+        };
 
         // Locate per-track directory.
         let items_dir_abs =
             resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
+
+        let (fast_model, effective_model, fast_reasoning_effort, final_reasoning_effort) =
+            match dry_checker_config {
+                Some(config) => config,
+                None => {
+                    resolve_dry_checker_config(&root, &input.capability_name, input.model.clone())?
+                }
+            };
 
         let commit_hash_path = track_dir.join(".commit_hash");
         let dry_check_json_path = track_dir.join("dry-check.json");
@@ -318,9 +321,9 @@ impl CliApp {
             .len();
         let (agent, tiered_recorder) = RecordingDryAgent::new(CodexDryChecker::new(
             fast_model.clone(),
-            infra_config.fast_reasoning_effort().to_owned(),
+            fast_reasoning_effort,
             effective_model.clone(),
-            infra_config.final_reasoning_effort().to_owned(),
+            final_reasoning_effort,
             input.capability_name.clone(),
         ));
         let agent = Arc::new(agent);
@@ -518,12 +521,29 @@ impl CliApp {
             root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
         let track_id = parse_dry_track_id(&input.track_id)?;
 
+        // Validate items_dir containment before loading config so that security /
+        // input-validation errors are always raised regardless of `enabled`.
         let items_dir_abs = resolve_existing_dir_under_repo(
             &input.items_dir,
             &root,
             &canonical_repo_root,
             "items_dir",
         )?;
+
+        // T006 CLI composition early-return: load config and short-circuit when
+        // `enabled` is false — avoids all diff/corpus/embedding work.
+        let config_path = root.join(".harness/config/dry-check.json");
+        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
+            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+        let usecase_dry_config = build_usecase_dry_check_config(&infra_config)?;
+
+        if !usecase_dry_config.enabled {
+            // Gate is disabled: return Approved immediately without resolving diff base,
+            // computing corpus fingerprints, building fragment refs, or constructing
+            // coverage/store adapters (operational fast path for enabled=false).
+            let verdict = domain::dry_check::DryCheckApprovalVerdict::Approved;
+            return Ok(dry_check_approved_outcome(verdict));
+        }
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
         let commit_hash_path = track_dir.join(".commit_hash");
@@ -570,10 +590,6 @@ impl CliApp {
             current_fragment_refs.insert(fragment_ref);
         }
 
-        // Load config to compute the current fingerprint for the gate comparison.
-        let config_path = root.join(".harness/config/dry-check.json");
-        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
-            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
         let current_config_fingerprint = infra_config.fingerprint();
 
         // Construct adapters: reader + coverage port — no embedding, no index.
@@ -582,8 +598,9 @@ impl CliApp {
         let coverage =
             Arc::new(FsDryCheckCoverageAdapter::new(dry_check_coverage_path, canonical_repo_root));
 
-        // D5 read-only interactor.
+        // D5 read-only interactor — pass the usecase config as the first argument.
         let interactor = DryCheckApprovalInteractor::new(
+            usecase_dry_config,
             store,
             coverage,
             current_config_fingerprint,
@@ -611,46 +628,6 @@ impl CliApp {
 
         Ok(dry_check_approved_outcome(verdict))
     }
-}
-
-/// Lift infra `DryCheckConfig` fields (max_parallelism + known-bad percents) into the validated
-/// usecase newtypes (D3 / D4 / T011). All values come from `.harness/config/dry-check.json` v3.
-fn build_usecase_dry_check_config(
-    infra_config: &infrastructure::dry_check::DryCheckConfig,
-) -> Result<usecase::dry_check::DryCheckConfig, String> {
-    use usecase::dry_check::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
-    let percent =
-        |v: u8| DryCheckPercent::try_new(v).map_err(|e| format!("invalid known-bad percent: {e}"));
-    Ok(DryCheckConfig::new(
-        percent(infra_config.known_bad_injection_rate_percent())?,
-        percent(infra_config.known_bad_detection_threshold_percent())?,
-        DryCheckParallelism::try_new(infra_config.max_parallelism())
-            .map_err(|e| format!("invalid max_parallelism: {e}"))?,
-    ))
-}
-
-/// Resolve `(fast_model, final_model)` for the `dry-checker` capability (D4 / T012).
-/// Explicit `--model` overrides both. Otherwise read `RoundType::Final` and `Fast` from
-/// `agent-profiles.json`, falling back fast → final when no `fast_model` is configured.
-fn resolve_dry_checker_models(
-    root: &std::path::Path,
-    capability_name: &str,
-    explicit_model: Option<String>,
-) -> Result<(String, String), String> {
-    use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
-    if let Some(m) = explicit_model {
-        return Ok((m.clone(), m));
-    }
-    let profiles = AgentProfiles::load(&root.join(AGENT_PROFILES_PATH))
-        .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
-    let resolve = |rt| profiles.resolve_execution(capability_name, rt).and_then(|r| r.model);
-    let final_model = resolve(RoundType::Final).ok_or_else(|| {
-        format!(
-            "[ERROR] no model specified: pass --model or set model in \
-             agent-profiles.json '{capability_name}' capability"
-        )
-    })?;
-    Ok((resolve(RoundType::Fast).unwrap_or_else(|| final_model.clone()), final_model))
 }
 
 /// `GateEval` telemetry fields for the `"dry"` gate (T007 / IN-07 / CN-10):
@@ -2047,14 +2024,45 @@ exit 0
 
     #[test]
     fn test_dry_check_approved_invalid_base_commit_returns_error() {
-        let dir = temp_items_dir_under_repo();
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let repo = tempfile::tempdir().unwrap();
+        let root = repo.path();
+
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        let harness_config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 4,
+  "enabled": true,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
+
+        let items_dir = root.join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
         let track_id = "dry-check-approved-invalid-base";
-        std::fs::create_dir_all(dir.path().join(track_id)).unwrap();
+        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(root).unwrap();
 
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some("not-a-hash".to_owned()),
-            items_dir: dir.path().to_path_buf(),
+            items_dir: items_dir.clone(),
         });
 
         let message = result.unwrap_err();
@@ -2102,12 +2110,43 @@ exit 0
         // `db_path` (T005 removes those fields). A missing track dir is
         // tolerated up to the diff acquisition step, which then fails on
         // the synthetic base-commit hash.
-        let dir = temp_items_dir_under_repo();
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let repo = tempfile::tempdir().unwrap();
+        let root = repo.path();
+
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        let harness_config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 4,
+  "enabled": true,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
+
+        let items_dir = root.join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(root).unwrap();
 
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "dry-check-approved-missing-track-advances".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            items_dir: dir.path().to_path_buf(),
+            items_dir: items_dir.clone(),
         });
 
         let message = result.unwrap_err();
@@ -2166,14 +2205,45 @@ exit 0
 
     #[test]
     fn test_dry_check_approved_threshold_none_loads_config_then_reaches_diff_step() {
-        let dir = temp_items_dir_under_repo();
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let repo = tempfile::tempdir().unwrap();
+        let root = repo.path();
+
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        let harness_config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 4,
+  "enabled": true,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
+
+        let items_dir = root.join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
         let track_id = "dry-check-approved-threshold-none";
-        std::fs::create_dir_all(dir.path().join(track_id)).unwrap();
+        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(root).unwrap();
 
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            items_dir: dir.path().to_path_buf(),
+            items_dir: items_dir.clone(),
         });
 
         let message = result.unwrap_err();
@@ -2231,13 +2301,13 @@ exit 0
 
     // ── dry_write: model resolution ──────────────────────────────────────────
 
-    /// When an explicit `model: Some(...)` is provided, `dry_write` must use it
-    /// and NOT attempt to load agent-profiles.json at all.  The test verifies this
-    /// by passing a valid track_id and an invalid items_dir (so the call fails at
-    /// the items_dir check, after model resolution but before any agent is spawned).
+    /// When an explicit `model: Some(...)` is provided, `dry_write` must validate
+    /// `items_dir` before loading agent-profiles.json. The test verifies this by
+    /// passing a valid track_id and an invalid items_dir (so the call fails at the
+    /// items_dir check before any agent is spawned).
     /// The error message must NOT contain an agent-profiles/model error.
     #[test]
-    fn test_dry_write_explicit_model_bypasses_agent_profiles_resolution() {
+    fn test_dry_write_explicit_model_validates_items_dir_before_agent_profiles_resolution() {
         let dir = tempfile::tempdir().unwrap();
         // Use a known-valid commit hash so base_commit does not fail first.
         let result = CliApp::new().dry_write(DryWriteInput {
@@ -2260,7 +2330,7 @@ exit 0
         );
         assert!(
             !message.contains("agent-profiles"),
-            "explicit model must skip agent-profiles loading entirely, got: {message}"
+            "items_dir validation must happen before agent-profiles loading, got: {message}"
         );
     }
 
@@ -3292,11 +3362,10 @@ exit 0
         std::fs::write(
             harness_config_dir.join("dry-check.json"),
             r#"{
-  "schema_version": 3,
+  "schema_version": 4,
+  "enabled": true,
   "threshold": 0.85,
   "max_parallelism": 4,
-  "fast_reasoning_effort": "medium",
-  "final_reasoning_effort": "high",
   "known_bad_injection_rate_percent": 10,
   "known_bad_detection_threshold_percent": 90
 }"#,
@@ -3516,7 +3585,8 @@ exit 0
         );
     }
 
-    // ── T016 smoke tests: build_usecase_dry_check_config + resolve_dry_checker_models ──
+    // ── T016 smoke tests: build_usecase_dry_check_config + resolve_dry_checker_config ──
+    // Tests moved to apps/cli-composition/src/dry/dry_checker_config.rs.
 
     /// Builds an infra `DryCheckConfig` from JSON content and a temp file.
     fn load_infra_dry_check_config_from_json(
@@ -3529,131 +3599,6 @@ exit 0
         // Keep dir alive through the function — config has no reference to the file.
         drop(dir);
         config
-    }
-
-    /// Verify that `build_usecase_dry_check_config` propagates `max_parallelism`
-    /// from the infra config to the usecase config newtype.
-    #[test]
-    fn test_dry_write_passes_max_parallelism_to_usecase_config() {
-        let infra_config = load_infra_dry_check_config_from_json(
-            r#"{
-                "schema_version": 3,
-                "threshold": 0.85,
-                "max_parallelism": 7,
-                "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high",
-                "known_bad_injection_rate_percent": 10,
-                "known_bad_detection_threshold_percent": 90
-            }"#,
-        );
-        assert_eq!(infra_config.max_parallelism(), 7, "infra config must expose max_parallelism=7");
-
-        let usecase_config = build_usecase_dry_check_config(&infra_config).unwrap();
-        assert_eq!(
-            usecase_config.max_parallelism.as_usize(),
-            7,
-            "build_usecase_dry_check_config must propagate max_parallelism to the usecase newtype"
-        );
-    }
-
-    /// Verify that `build_usecase_dry_check_config` propagates the known-bad calibration
-    /// percent fields from the infra config to the usecase config newtypes.
-    #[test]
-    fn test_dry_write_passes_known_bad_calibration_to_usecase_config() {
-        let infra_config = load_infra_dry_check_config_from_json(
-            r#"{
-                "schema_version": 3,
-                "threshold": 0.85,
-                "max_parallelism": 4,
-                "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high",
-                "known_bad_injection_rate_percent": 20,
-                "known_bad_detection_threshold_percent": 80
-            }"#,
-        );
-        assert_eq!(infra_config.known_bad_injection_rate_percent(), 20);
-        assert_eq!(infra_config.known_bad_detection_threshold_percent(), 80);
-
-        let usecase_config = build_usecase_dry_check_config(&infra_config).unwrap();
-        assert_eq!(
-            usecase_config.known_bad_injection_rate_percent.as_u8(),
-            20,
-            "build_usecase_dry_check_config must propagate known_bad_injection_rate_percent"
-        );
-        assert_eq!(
-            usecase_config.known_bad_detection_threshold_percent.as_u8(),
-            80,
-            "build_usecase_dry_check_config must propagate known_bad_detection_threshold_percent"
-        );
-    }
-
-    /// Verify that `resolve_dry_checker_models` returns fast and final models from a
-    /// test `agent-profiles.json` with both `fast_model` and `model` defined.
-    #[test]
-    fn test_resolve_dry_checker_models_returns_fast_and_final_from_agent_profiles() {
-        let dir = tempfile::tempdir().unwrap();
-
-        // Write a minimal agent-profiles.json with separate fast_model / model for dry-checker.
-        std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
-        std::fs::write(
-            dir.path().join(".harness/config/agent-profiles.json"),
-            r#"{
-  "schema_version": 1,
-  "providers": { "codex": { "label": "Codex" } },
-  "capabilities": {
-    "dry-checker": {
-      "provider": "codex",
-      "model": "final-model-v1",
-      "fast_model": "fast-model-v1"
-    }
-  }
-}"#,
-        )
-        .unwrap();
-
-        let (fast_model, final_model) =
-            resolve_dry_checker_models(dir.path(), "dry-checker", None).unwrap();
-
-        assert_eq!(
-            fast_model, "fast-model-v1",
-            "fast_model must come from the fast_model field in agent-profiles.json"
-        );
-        assert_eq!(
-            final_model, "final-model-v1",
-            "final_model must come from the model field in agent-profiles.json"
-        );
-    }
-
-    /// Verify that `resolve_dry_checker_models` falls back fast_model → final_model
-    /// when no separate `fast_model` field is configured.
-    #[test]
-    fn test_resolve_dry_checker_models_fast_falls_back_to_final_when_not_set() {
-        let dir = tempfile::tempdir().unwrap();
-
-        std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
-        std::fs::write(
-            dir.path().join(".harness/config/agent-profiles.json"),
-            r#"{
-  "schema_version": 1,
-  "providers": { "codex": { "label": "Codex" } },
-  "capabilities": {
-    "dry-checker": {
-      "provider": "codex",
-      "model": "only-final-model-v1"
-    }
-  }
-}"#,
-        )
-        .unwrap();
-
-        let (fast_model, final_model) =
-            resolve_dry_checker_models(dir.path(), "dry-checker", None).unwrap();
-
-        assert_eq!(
-            fast_model, "only-final-model-v1",
-            "fast_model must fall back to final_model when fast_model is not configured"
-        );
-        assert_eq!(final_model, "only-final-model-v1", "final_model must be the model field");
     }
 
     /// Verify that `FsDryCheckCoverageAdapter` write/read round-trip works correctly.
@@ -3792,11 +3737,9 @@ exit 0
         // File config threshold = 0.85.
         let infra_config = load_infra_dry_check_config_from_json(
             r#"{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 4,
-                "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high",
                 "known_bad_injection_rate_percent": 10,
                 "known_bad_detection_threshold_percent": 90
             }"#,
@@ -3826,11 +3769,9 @@ exit 0
         // File config threshold = 0.85.
         let infra_config = load_infra_dry_check_config_from_json(
             r#"{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 4,
-                "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high",
                 "known_bad_injection_rate_percent": 10,
                 "known_bad_detection_threshold_percent": 90
             }"#,

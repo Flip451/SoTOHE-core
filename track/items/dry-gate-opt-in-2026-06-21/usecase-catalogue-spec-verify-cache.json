@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "a259af56062cc31012727165227c38462d76cda5f153927e29b0929a1381127e",
+      "evidence_hash": "66eb111bd995d18072a96419ae772a1acbf512c19cf48ea759be5ba64d1dbd9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit ゲートの `sotp dry check-approved`（`DryCheckApprovalService::check_approved`）が `dry-check.json` の `enabled` を読み、`false` のとき `DryCheckApprovalVerdict::Approved` を即座に返す（staleness チェック・all-resolved チェックを実行しない）。"
+      }
+    },
+    {
+      "claim_hash": "a259af56062cc31012727165227c38462d76cda5f153927e29b0929a1381127e",
+      "evidence_hash": "d4651791b6e904f77316203fcdb756a7539e2a2f704865420d5dbe3d26af51a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`enabled: false` のとき `DryCheckApprovalService::check_approved` は coverage manifest の読み込み・staleness チェック・all-resolved チェックを実行せず、即座に `Approved` を返す。"
+      }
+    },
+    {
+      "claim_hash": "a259af56062cc31012727165227c38462d76cda5f153927e29b0929a1381127e",
+      "evidence_hash": "bad1e2d2d43f7d1dba6c04457068caea5018b48b574ee52814d73e33b2d40e6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`enabled` の読み取りは `DryCheckConfig`（usecase 層）を通じて行う。インフラ層の `DryCheckConfigDto` が `enabled` を保持し、composition root が DTO から `DryCheckConfig` を構築する際に伝播する。`DryCheckApprovalInteractor` および `FixpointResolveInteractor` は `enabled` を `DryCheckConfig` 経由で受け取り、infrastructure の設定ファイルを直接参照しない。"
+      }
+    },
+    {
+      "claim_hash": "b0b9a1f37409d763d66becf8629f1ee498fc69077c78c78b5c7827481c8f6c5e",
+      "evidence_hash": "439d7ad70d59eb56e979c79667afa73f07b2a4db54253240d5177efa026489aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の `DryCheckConfig` に `enabled: bool` フィールドを追加し、composition root が DTO から `DryCheckConfig` を生成する際に `enabled` を伝播する。"
+      }
+    },
+    {
+      "claim_hash": "cecac8feb63b9484e7dfc8b9180353d7e01573cd1e5c75504f2fc83e43661cb4",
+      "evidence_hash": "85c71c7c2781f26bd15ff0d1d8849973a41a61fa0e587a04ea5130e44895bdf1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DFP 起動判定の `fixpoint_resolve`（`FixpointResolveInteractor`）が `dry-check.json` の `enabled` を読み、`false` のとき dry gate 評価を「通過（RunDfp を返さない）」として扱う。`enabled: false` の状態での fixpoint 解決は dry gate を常時 Approved と見なして review gate・ref-verify gate の評価に進む。"
+      }
+    },
+    {
+      "claim_hash": "cecac8feb63b9484e7dfc8b9180353d7e01573cd1e5c75504f2fc83e43661cb4",
+      "evidence_hash": "9aabb8ebd5faa588c93b06f0e8210192d1c7bd7cf32fa11ca206248bc40bee07",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`enabled: false` のとき `FixpointResolveInteractor` は dry gate の評価を「常時 Approved」として扱い、`FixpointStep::RunDfp` を返さない。review gate・ref-verify gate の評価は通常どおり行う。"
+      }
+    },
+    {
+      "claim_hash": "cecac8feb63b9484e7dfc8b9180353d7e01573cd1e5c75504f2fc83e43661cb4",
+      "evidence_hash": "bad1e2d2d43f7d1dba6c04457068caea5018b48b574ee52814d73e33b2d40e6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DryCheckApprovalInteractor` および `FixpointResolveInteractor` は `enabled` を `DryCheckConfig` 経由で受け取り、infrastructure の設定ファイルを直接参照しない。"
+      }
+    }
+  ]
+}

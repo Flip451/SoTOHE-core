@@ -1,0 +1,299 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "DryCheckConfig": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::config",
+      "docs": "Infrastructure-layer loaded configuration for the dry-check gate. Reads `.harness/config/dry-check.json` via `load(path)`. Internal representation has all-private fields; the public API is accessors only. After this track: schema_version 4 exclusively (CN-05), `enabled: bool` accessor added (D2/IN-05), and `fast_reasoning_effort()` / `final_reasoning_effort()` accessors removed (D4/IN-09). The private serde DTO (`DryCheckConfigDto`) is internal to this module and is not catalogued.",
+      "spec_refs": [
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-08" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckConfigError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Io", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }, { "name": "source", "ty": "std::io::Error" }] } },
+          { "name": "Parse", "payload": { "kind": "tuple", "fields": ["serde_json::Error"] } },
+          { "name": "UnsupportedSchemaVersion", "payload": { "kind": "struct", "fields": [{ "name": "found", "ty": "u32" }, { "name": "expected", "ty": "u32" }] } },
+          { "name": "InvalidThreshold", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidParallelism", "payload": { "kind": "tuple", "fields": ["usize"] } },
+          { "name": "InvalidPercent", "payload": { "kind": "struct", "fields": [{ "name": "field", "ty": "String" }, { "name": "value", "ty": "u8" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check::config",
+      "docs": "Error variants from DryCheckConfig::load. After D4: `InvalidReasoningEffort` variant is removed because reasoning effort validation moves to agent-profiles.json / composition root. `InvalidPercent` and other variants remain.",
+      "spec_refs": [
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "CapabilityConfigDto": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "docs": "Serde DTO for a single capability entry in `.harness/config/agent-profiles.json`. After D4: `fast_reasoning_effort` and `final_reasoning_effort` fields are added to hold the reasoning effort for the fast-round and final-round dry-checker. Both fields are `Option<String>` (absent = no override; caller uses a built-in default). All string fields are untyped in this DTO — value validation is the responsibility of the composition root (OS-06/IN-08). The `String` type for capability-level strings is justified as unvalidated Dto accessor values per infrastructure Dto convention (R9: not raw primitive for a domain concept; these are tool configuration strings with no cross-domain identity).",
+      "spec_refs": [
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "DryCheckConfig",
+      "methods": [
+        {
+          "name": "load",
+          "receiver": null,
+          "params": [
+            { "name": "path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<DryCheckConfig, DryCheckConfigError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Load dry-check configuration from a JSON file. After D4: accepts schema_version 4 only (rejects all others with UnsupportedSchemaVersion). Parses `enabled` boolean (default false when absent). Does NOT parse or validate `fast_reasoning_effort` / `final_reasoning_effort` — those fields are now in agent-profiles.json."
+        },
+        {
+          "name": "enabled",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns whether the DRY gate is enabled. Added by D2/IN-05."
+        },
+        {
+          "name": "threshold",
+          "receiver": "&self",
+          "params": [],
+          "returns": "domain::semantic_dup::SimilarityThreshold",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the similarity threshold from the loaded configuration."
+        },
+        {
+          "name": "max_parallelism",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the raw max_parallelism usize from the loaded JSON. Returns a raw primitive because this is the infrastructure Dto layer; the composition root lifts it into the validated DryCheckParallelism newtype (R9: raw primitive justified as unvalidated Dto accessor)."
+        },
+        {
+          "name": "known_bad_injection_rate_percent",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the raw known_bad_injection_rate_percent u8 from the loaded JSON. Raw primitive: infrastructure Dto accessor; composition root lifts it into DryCheckPercent (R9: Dto layer unvalidated value)."
+        },
+        {
+          "name": "known_bad_detection_threshold_percent",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the raw known_bad_detection_threshold_percent u8 from the loaded JSON. Raw primitive: infrastructure Dto accessor; composition root lifts it into DryCheckPercent (R9: Dto layer unvalidated value)."
+        },
+        {
+          "name": "fingerprint_with_threshold",
+          "receiver": "&self",
+          "params": [
+            { "name": "effective_threshold", "ty": "domain::semantic_dup::SimilarityThreshold" }
+          ],
+          "returns": "domain::dry_check::DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Compute a SHA-256 fingerprint using the given effective threshold in place of self.threshold. After D4: encoding excludes fast_reasoning_effort / final_reasoning_effort (CN-08/IN-10)."
+        },
+        {
+          "name": "fingerprint",
+          "receiver": "&self",
+          "params": [],
+          "returns": "domain::dry_check::DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Compute a SHA-256 fingerprint using self.threshold as the effective threshold."
+        }
+      ]
+    },
+    {
+      "type_name": "CapabilityConfigDto",
+      "methods": [
+        {
+          "name": "provider",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "The provider name."
+        },
+        {
+          "name": "model",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "The default model name, if set."
+        },
+        {
+          "name": "fast_provider",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "The fast-round provider override, if set."
+        },
+        {
+          "name": "fast_model",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "The fast-round model override, if set."
+        },
+        {
+          "name": "prompt_template_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "The prompt template path for this capability, if set."
+        },
+        {
+          "name": "fast_reasoning_effort",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "The fast-round reasoning effort for this capability, if set. Added by D4/IN-08. Unvalidated string; value validation is performed by the composition root (OS-06)."
+        },
+        {
+          "name": "final_reasoning_effort",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "The final-round reasoning effort for this capability, if set. Added by D4/IN-08. Unvalidated string; value validation is performed by the composition root (OS-06)."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckConfig"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckConfigError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckConfigError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckConfigError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CapabilityConfigDto"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CapabilityConfigDto"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::convert::From<serde_json::Error>",
+      "for_type": "DryCheckConfigError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "CapabilityConfigDto"
+    }
+  ]
+}

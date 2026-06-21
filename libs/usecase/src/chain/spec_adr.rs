@@ -52,7 +52,6 @@ use domain::{
 ///
 /// Constructing a `SpecAdrInput` does not perform any I/O.  The path is used
 /// by `calc` and `load`, which are placeholders until T007 lands.
-#[doc(hidden)]
 #[derive(Debug, Clone, Copy)]
 pub struct SpecAdrInput<'a> {
     /// Path to the track's `spec.json` file.
@@ -76,7 +75,6 @@ impl<'a> SpecAdrInput<'a> {
     "spec-adr signals are stale: cached={cached:?}, fresh={fresh:?} — \
      run `sotp signal calc-spec-adr --spec-json <path/to/spec.json>` to update"
 )]
-#[doc(hidden)]
 pub struct SpecAdrStaleError {
     /// Signal counts currently stored in the document's `signals` field.
     pub cached: SignalCounts,
@@ -91,7 +89,6 @@ pub struct SpecAdrStaleError {
 /// carrying the underlying I/O or parse failure.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 #[error("spec-adr calc/load not yet wired — see T007: {0}")]
-#[doc(hidden)]
 pub struct SpecAdrCalcError(pub String);
 
 // ── Chain ① struct ───────────────────────────────────────────────────────────

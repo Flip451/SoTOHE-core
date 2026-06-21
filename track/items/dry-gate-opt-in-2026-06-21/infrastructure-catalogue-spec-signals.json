@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "8acecc8cf87d55680acd05f04128ff4b4d106b760e7fd7198e9ceee6f492dea9",
+  "signals": [
+    {
+      "type_name": "CapabilityConfigDto",
+      "signal": "blue",
+      "entry_hash": "abf5a4e445542574190982d2fa1f1d6152203bb2a767f4fcc69eac702098797d"
+    },
+    {
+      "type_name": "DryCheckConfig",
+      "signal": "blue",
+      "entry_hash": "72c6e783d8c0ffdb11a80343f5989dcdafe5dde296e165b24d9146975dcdbc1b"
+    },
+    {
+      "type_name": "DryCheckConfigError",
+      "signal": "blue",
+      "entry_hash": "f639e9de3310a4c9ac7675570b726835c518e338a51e389ed90c2767f8f2eb1a"
+    }
+  ]
+}

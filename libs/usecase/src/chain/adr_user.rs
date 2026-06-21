@@ -127,7 +127,6 @@ impl LiveSoTChain for AdrUserChain {
 ///
 /// Grandfathered decisions are intentionally excluded from both error and
 /// warning evaluation — they are informational only (back-fill debt).
-#[doc(hidden)]
 #[must_use]
 pub fn adr_report_to_outcome(report: &AdrVerifyReport, strictness: Strictness) -> VerifyOutcome {
     if report.red_count() >= 1 {

@@ -77,8 +77,13 @@ impl DryCheckPercent {
 /// Populated by the composition layer from the infrastructure DTO at
 /// adapter-construction time (T010 / T012). All fields are domain-validated
 /// newtypes — composition is the only place where raw integers are seen.
+/// `enabled` governs whether the DRY gate runs at all (D2 / IN-05 / CN-06);
+/// it is a plain boolean passed through from the infrastructure config.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DryCheckConfig {
+    /// D2 (IN-05 / CN-06): whether the DRY gate is active. When `false`, the
+    /// gate short-circuits to Approved without running any checks.
+    pub enabled: bool,
     /// D4 (CN-06): how often known-bad probes are mixed into the fast tier.
     pub known_bad_injection_rate_percent: DryCheckPercent,
     /// D4 (CN-06): minimum probe detection rate for fast tier to be trusted.
@@ -88,7 +93,7 @@ pub struct DryCheckConfig {
 }
 
 impl DryCheckConfig {
-    /// Construct a [`DryCheckConfig`] from validated newtype components.
+    /// Construct a [`DryCheckConfig`] from validated newtype components plus the enabled flag.
     ///
     /// Construction is total (each field is already validated by its
     /// newtype), so this is a plain constructor — composition uses it after
@@ -98,8 +103,10 @@ impl DryCheckConfig {
         known_bad_injection_rate_percent: DryCheckPercent,
         known_bad_detection_threshold_percent: DryCheckPercent,
         max_parallelism: DryCheckParallelism,
+        enabled: bool,
     ) -> DryCheckConfig {
         DryCheckConfig {
+            enabled,
             known_bad_injection_rate_percent,
             known_bad_detection_threshold_percent,
             max_parallelism,
@@ -167,7 +174,8 @@ mod tests {
         let injection = DryCheckPercent::try_new(10).unwrap();
         let threshold = DryCheckPercent::try_new(90).unwrap();
         let parallelism = DryCheckParallelism::try_new(4).unwrap();
-        let config = DryCheckConfig::new(injection, threshold, parallelism);
+        let config = DryCheckConfig::new(injection, threshold, parallelism, false);
+        assert!(!config.enabled);
         assert_eq!(config.known_bad_injection_rate_percent, injection);
         assert_eq!(config.known_bad_detection_threshold_percent, threshold);
         assert_eq!(config.max_parallelism, parallelism);

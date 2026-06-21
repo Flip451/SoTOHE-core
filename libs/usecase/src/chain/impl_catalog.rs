@@ -47,7 +47,6 @@ use domain::{
 /// Carries the path to the `<layer>-type-signals.json` file and the SHA-256
 /// hex digest of the current `<layer>-types.json` bytes (pre-computed by the
 /// infrastructure caller).
-#[doc(hidden)]
 #[derive(Debug, Clone, Copy)]
 pub struct ImplCatalogInput<'a> {
     /// Path to the `<layer>-type-signals.json` file.
@@ -77,7 +76,6 @@ impl<'a> ImplCatalogInput<'a> {
     "impl-catalog signals are stale: stored declaration_hash={stored}, \
      current={current} — run `sotp signal calc-impl-catalog` to update"
 )]
-#[doc(hidden)]
 pub struct ImplCatalogStaleError {
     /// Hash stored in the document's `declaration_hash` field.
     pub stored: String,
@@ -90,7 +88,6 @@ pub struct ImplCatalogStaleError {
 /// Placeholder until T007.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 #[error("impl-catalog calc/load not yet wired — see T007: {0}")]
-#[doc(hidden)]
 pub struct ImplCatalogCalcError(pub String);
 
 // ── Chain ③ struct ───────────────────────────────────────────────────────────

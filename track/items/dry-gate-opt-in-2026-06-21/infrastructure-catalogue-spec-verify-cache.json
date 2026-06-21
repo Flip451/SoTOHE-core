@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "92aa3b04e12ac5ed923801295209062dbc2aafa5d16c88516a8963e2d0ae3e7c",
+      "evidence_hash": "49ae2d15e1434e2e3dd60b54f2322423db9b072006c06a10224aea4b7232a857",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/dry-check.json` のスキーマに boolean キー `enabled` を追加する。`schema_version` を 3 から 4 に上げる。schema_version 4 のファイルで `enabled` キーが省略された場合は `false`（gate off）として扱う（opt-in の既定 OFF を schema レベルで表現する）。"
+      }
+    },
+    {
+      "claim_hash": "92aa3b04e12ac5ed923801295209062dbc2aafa5d16c88516a8963e2d0ae3e7c",
+      "evidence_hash": "439d7ad70d59eb56e979c79667afa73f07b2a4db54253240d5177efa026489aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "インフラ層の `dry-check.json` 読み込み DTO（`DryCheckConfigDto`）に `enabled: bool` フィールドを追加し、schema_version 4 の codec として実装する。usecase 層の `DryCheckConfig` に `enabled: bool` フィールドを追加し、composition root が DTO から `DryCheckConfig` を生成する際に `enabled` を伝播する。"
+      }
+    },
+    {
+      "claim_hash": "92aa3b04e12ac5ed923801295209062dbc2aafa5d16c88516a8963e2d0ae3e7c",
+      "evidence_hash": "a9d5edf5eb90193b7649ba17bf64244c4a97d05e079a2e6236d5f0756989162c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実際の `.harness/config/dry-check.json` を schema_version 4 に更新し、`enabled: false` を既定値として追記する。既存フィールド（`threshold`、`max_parallelism`、`fast_reasoning_effort`、`final_reasoning_effort`、`known_bad_injection_rate_percent`、`known_bad_detection_threshold_percent`）はそのまま維持する。"
+      }
+    },
+    {
+      "claim_hash": "92aa3b04e12ac5ed923801295209062dbc2aafa5d16c88516a8963e2d0ae3e7c",
+      "evidence_hash": "230c2056321b01537134631de1363c46086b3ace989a981bd68459767a6983ba",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`schema_version` が 4 以外の `dry-check.json` を読み込んだ場合は旧スキーマとして hard error とする。`enabled` フィールドを持たない旧 schema_version 3 ファイルは無効であり、明示的な schema_version 4 への更新を利用者に求める。"
+      }
+    },
+    {
+      "claim_hash": "a50e223a4ac98c4195adb1557b33a55e2c14b1293bf93b8d060953275316b904",
+      "evidence_hash": "230c2056321b01537134631de1363c46086b3ace989a981bd68459767a6983ba",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`schema_version` が 4 以外の `dry-check.json` を読み込んだ場合は旧スキーマとして hard error とする。`enabled` フィールドを持たない旧 schema_version 3 ファイルは無効であり、明示的な schema_version 4 への更新を利用者に求める。"
+      }
+    },
+    {
+      "claim_hash": "92aa3b04e12ac5ed923801295209062dbc2aafa5d16c88516a8963e2d0ae3e7c",
+      "evidence_hash": "b302cbef00bd6d0c79805f8d3fc801ac1b08e7c22bb0a5f9d5b8d797a346b9e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/dry-check.json` のスキーマに boolean キー `enabled` を追加する。`schema_version` は 3 から 4 に上げる。schema_version 4 のファイルで `enabled` キーが省略された場合は `false`（gate off）として扱う。"
+      }
+    },
+    {
+      "claim_hash": "92aa3b04e12ac5ed923801295209062dbc2aafa5d16c88516a8963e2d0ae3e7c",
+      "evidence_hash": "180950e692b563f6b263fa99fb77336e7eebb88d402f336c118e3da173486805",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実際の `.harness/config/dry-check.json` を schema_version 4 の最終形に更新し、`enabled: false` を含む。D2 の `enabled` 追加と D4 の reasoning_effort 削除は 1 回の schema 更新として v4 内に統合する（中間 schema を作らない）。"
+      }
+    },
+    {
+      "claim_hash": "92aa3b04e12ac5ed923801295209062dbc2aafa5d16c88516a8963e2d0ae3e7c",
+      "evidence_hash": "a36705a143141bbb59e6670d962fe9849a63f276f62b09fb27b3d75a1fe27220",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`schema_version` が 4 以外の `dry-check.json` を読み込んだ場合は旧スキーマとして hard error とする。D2 と D4 を統合した schema_version 4 が唯一サポートされるバージョンであり、schema_version 4 以外のファイルは無効として明示的な migration を利用者に求める。"
+      }
+    },
+    {
+      "claim_hash": "a50e223a4ac98c4195adb1557b33a55e2c14b1293bf93b8d060953275316b904",
+      "evidence_hash": "a36705a143141bbb59e6670d962fe9849a63f276f62b09fb27b3d75a1fe27220",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`schema_version` が 4 以外の `dry-check.json` を読み込んだ場合は旧スキーマとして hard error とする。D2 と D4 を統合した schema_version 4 が唯一サポートされるバージョンであり、schema_version 4 以外のファイルは無効として明示的な migration を利用者に求める。なお reasoning_effort フィールドが残ったままの古い v4 ファイルを投入すると、loader の `deny_unknown_fields` により Parse エラーが発生する（migration 要求の手段）。"
+      }
+    },
+    {
+      "claim_hash": "eb333b402b8a06ac72e8edce92b5eba97c6bd39071c6acfcc6f42ca0844e1496",
+      "evidence_hash": "a068aaed39995e638bd3b4029594ad2c3e533f04ff34255a1393c027482c8553",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/agent-profiles.json` の `capabilities.dry-checker` オブジェクトに `fast_reasoning_effort` と `final_reasoning_effort` の 2 フィールドを追加する。キー名は `dry-check.json` での旧名称をそのまま踏襲する。これら 2 フィールドは dry-checker capability が使う推論強度の設定であり、`model` / `fast_model` と同じカテゴリに属する。"
+      }
+    },
+    {
+      "claim_hash": "eb333b402b8a06ac72e8edce92b5eba97c6bd39071c6acfcc6f42ca0844e1496",
+      "evidence_hash": "83aa75c66a7f3ea552f34322931c75c3bff4ebe97c18e87d21beef24991bf7fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reasoning effort の設定（`fast_reasoning_effort` / `final_reasoning_effort`）は `agent-profiles.json` の `capabilities.dry-checker` から composition root が直接読み取り、`CodexDryChecker` に渡す。usecase 層・domain 層は reasoning effort を保持しない。`DryCheckConfig`（usecase 層）に reasoning effort フィールドは追加しない。"
+      }
+    },
+    {
+      "claim_hash": "72c6e783d8c0ffdb11a80343f5989dcdafe5dde296e165b24d9146975dcdbc1b",
+      "evidence_hash": "b302cbef00bd6d0c79805f8d3fc801ac1b08e7c22bb0a5f9d5b8d797a346b9e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/dry-check.json` のスキーマに boolean キー `enabled` を追加する。`schema_version` は 3 から 4 に上げる（D2 決定）。schema_version 4 のファイルで `enabled` キーが省略された場合は `false`（gate off）として扱う（opt-in の既定 OFF を schema レベルで表現する）。"
+      }
+    },
+    {
+      "claim_hash": "72c6e783d8c0ffdb11a80343f5989dcdafe5dde296e165b24d9146975dcdbc1b",
+      "evidence_hash": "439d7ad70d59eb56e979c79667afa73f07b2a4db54253240d5177efa026489aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "インフラ層の `dry-check.json` 読み込み DTO（`DryCheckConfigDto`）に `enabled: bool` フィールドを追加し、schema_version 4 の codec として実装する。usecase 層の `DryCheckConfig` に `enabled: bool` フィールドを追加し、composition root が DTO から `DryCheckConfig` を生成する際に `enabled` を伝播する。"
+      }
+    },
+    {
+      "claim_hash": "72c6e783d8c0ffdb11a80343f5989dcdafe5dde296e165b24d9146975dcdbc1b",
+      "evidence_hash": "180950e692b563f6b263fa99fb77336e7eebb88d402f336c118e3da173486805",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実際の `.harness/config/dry-check.json` を schema_version 4 の最終形に更新し、`enabled: false` を含む。`fast_reasoning_effort` と `final_reasoning_effort` の 2 フィールドは D4 により削除する。D2 の `enabled` 追加と D4 の reasoning_effort 削除は 1 回の schema 更新として v4 内に統合する（中間 schema を作らない）。残存フィールドは `enabled`・`threshold`・`max_parallelism`・`known_bad_injection_rate_percent`・`known_bad_detection_threshold_percent` となる。"
+      }
+    },
+    {
+      "claim_hash": "72c6e783d8c0ffdb11a80343f5989dcdafe5dde296e165b24d9146975dcdbc1b",
+      "evidence_hash": "979d592c28848b2c029f0eb355779c58c86fdd138e131fc71d6daf5b9c8b5365",
+      "verdict": {
+        "kind": "pass",
+        "citation": "インフラ層の `DryCheckConfigDto` から `fast_reasoning_effort` / `final_reasoning_effort` フィールドを削除し、schema_version 4 の codec を再実装する。`DryCheckConfig`（インフラ側）の `fast_reasoning_effort()` / `final_reasoning_effort()` accessors を削除する。"
+      }
+    },
+    {
+      "claim_hash": "72c6e783d8c0ffdb11a80343f5989dcdafe5dde296e165b24d9146975dcdbc1b",
+      "evidence_hash": "a36705a143141bbb59e6670d962fe9849a63f276f62b09fb27b3d75a1fe27220",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`schema_version` が 4 以外の `dry-check.json` を読み込んだ場合は旧スキーマとして hard error とする。D2 と D4 を統合した schema_version 4 が唯一サポートされるバージョンであり、schema_version 4 以外のファイルは無効として明示的な migration を利用者に求める。"
+      }
+    },
+    {
+      "claim_hash": "72c6e783d8c0ffdb11a80343f5989dcdafe5dde296e165b24d9146975dcdbc1b",
+      "evidence_hash": "68ea271e88003b3f14d8703a50cbec8ecf5b28a4dc5ec1376beef88bed961b59",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DryCheckConfig::fingerprint` の canonical encoding から `fast_reasoning_effort` / `final_reasoning_effort` を除外する。"
+      }
+    },
+    {
+      "claim_hash": "f639e9de3310a4c9ac7675570b726835c518e338a51e389ed90c2767f8f2eb1a",
+      "evidence_hash": "979d592c28848b2c029f0eb355779c58c86fdd138e131fc71d6daf5b9c8b5365",
+      "verdict": {
+        "kind": "pass",
+        "citation": "インフラ層の `DryCheckConfigDto` から `fast_reasoning_effort` / `final_reasoning_effort` フィールドを削除し、schema_version 4 の codec を再実装する。`DryCheckConfig`（インフラ側）の `fast_reasoning_effort()` / `final_reasoning_effort()` accessors を削除する。composition root（`dry.rs`）の reasoning effort 取得先を `DryCheckConfig` から `AgentProfiles` に切り替える。"
+      }
+    },
+    {
+      "claim_hash": "f639e9de3310a4c9ac7675570b726835c518e338a51e389ed90c2767f8f2eb1a",
+      "evidence_hash": "a36705a143141bbb59e6670d962fe9849a63f276f62b09fb27b3d75a1fe27220",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`schema_version` が 4 以外の `dry-check.json` を読み込んだ場合は旧スキーマとして hard error とする。D2 と D4 を統合した schema_version 4 が唯一サポートされるバージョンであり、schema_version 4 以外のファイルは無効として明示的な migration を利用者に求める。なお reasoning_effort フィールドが残ったままの古い v4 ファイルを投入すると、loader の `deny_unknown_fields` により Parse エラーが発生する（migration 要求の手段）。"
+      }
+    },
+    {
+      "claim_hash": "abf5a4e445542574190982d2fa1f1d6152203bb2a767f4fcc69eac702098797d",
+      "evidence_hash": "a068aaed39995e638bd3b4029594ad2c3e533f04ff34255a1393c027482c8553",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/agent-profiles.json` の `capabilities.dry-checker` オブジェクトに `fast_reasoning_effort` と `final_reasoning_effort` の 2 フィールドを追加する。"
+      }
+    },
+    {
+      "claim_hash": "abf5a4e445542574190982d2fa1f1d6152203bb2a767f4fcc69eac702098797d",
+      "evidence_hash": "83aa75c66a7f3ea552f34322931c75c3bff4ebe97c18e87d21beef24991bf7fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reasoning effort の設定（`fast_reasoning_effort` / `final_reasoning_effort`）は `agent-profiles.json` の `capabilities.dry-checker` から composition root が直接読み取り、`CodexDryChecker` に渡す。usecase 層・domain 層は reasoning effort を保持しない。`DryCheckConfig`（usecase 層）に reasoning effort フィールドは追加しない。"
+      }
+    }
+  ]
+}
