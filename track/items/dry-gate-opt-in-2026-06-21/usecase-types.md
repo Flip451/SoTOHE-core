@@ -4,12 +4,12 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckConfig | value_object | modify | — | 🟡 | 🔵 |
+| DryCheckConfig | value_object | modify | — | 🔵 | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckApprovalInteractor | interactor | modify | — | 🟡 | 🔵 |
+| DryCheckApprovalInteractor | interactor | modify | — | 🔵 | 🔵 |
 | FixpointResolveInteractor | interactor | modify | — | 🟡 | 🔵 |
 

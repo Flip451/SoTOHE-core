@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-21T09:09:40Z",
+  "generated_at": "2026-06-21T09:57:52Z",
   "declaration_hash": "31fdc9aa360c0a837d8c2823c5a1ee2631fa2014438b8b810aec80b11d8a7852",
   "signals": [
     {
       "type_name": "DryCheckApprovalInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "DryCheckApprovalService"
@@ -15,7 +15,7 @@
     {
       "type_name": "DryCheckConfig",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

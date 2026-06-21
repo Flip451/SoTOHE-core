@@ -518,12 +518,29 @@ impl CliApp {
             root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
         let track_id = parse_dry_track_id(&input.track_id)?;
 
+        // Validate items_dir containment before loading config so that security /
+        // input-validation errors are always raised regardless of `enabled`.
         let items_dir_abs = resolve_existing_dir_under_repo(
             &input.items_dir,
             &root,
             &canonical_repo_root,
             "items_dir",
         )?;
+
+        // T006 CLI composition early-return: load config and short-circuit when
+        // `enabled` is false — avoids all diff/corpus/embedding work.
+        let config_path = root.join(".harness/config/dry-check.json");
+        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
+            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+        let usecase_dry_config = build_usecase_dry_check_config(&infra_config)?;
+
+        if !usecase_dry_config.enabled {
+            // Gate is disabled: return Approved immediately without resolving diff base,
+            // computing corpus fingerprints, building fragment refs, or constructing
+            // coverage/store adapters (operational fast path for enabled=false).
+            let verdict = domain::dry_check::DryCheckApprovalVerdict::Approved;
+            return Ok(dry_check_approved_outcome(verdict));
+        }
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
         let commit_hash_path = track_dir.join(".commit_hash");
@@ -570,10 +587,6 @@ impl CliApp {
             current_fragment_refs.insert(fragment_ref);
         }
 
-        // Load config to compute the current fingerprint for the gate comparison.
-        let config_path = root.join(".harness/config/dry-check.json");
-        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
-            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
         let current_config_fingerprint = infra_config.fingerprint();
 
         // Construct adapters: reader + coverage port — no embedding, no index.
@@ -582,8 +595,9 @@ impl CliApp {
         let coverage =
             Arc::new(FsDryCheckCoverageAdapter::new(dry_check_coverage_path, canonical_repo_root));
 
-        // D5 read-only interactor.
+        // D5 read-only interactor — pass the usecase config as the first argument.
         let interactor = DryCheckApprovalInteractor::new(
+            usecase_dry_config,
             store,
             coverage,
             current_config_fingerprint,
@@ -613,8 +627,21 @@ impl CliApp {
     }
 }
 
-/// Lift infra `DryCheckConfig` fields (max_parallelism + known-bad percents) into the validated
-/// usecase newtypes (D3 / D4 / T011). All values come from `.harness/config/dry-check.json` v4.
+/// Lift infra `DryCheckConfig` fields (enabled + max_parallelism + known-bad percents) into the
+/// validated usecase newtypes (D2 / D3 / D4 / T004 / T011). All values come from
+/// `.harness/config/dry-check.json` v4.
+///
+/// Exposed as `pub(crate)` so that `apps/cli-composition/src/track/fixpoint_resolve.rs`
+/// (T008) can call the same lifting logic without duplicating it.
+pub(crate) fn build_usecase_dry_check_config_pub(
+    infra_config: &infrastructure::dry_check::DryCheckConfig,
+) -> Result<usecase::dry_check::DryCheckConfig, String> {
+    build_usecase_dry_check_config(infra_config)
+}
+
+/// Lift infra `DryCheckConfig` fields (enabled + max_parallelism + known-bad percents) into the
+/// validated usecase newtypes (D2 / D3 / D4 / T004 / T011). All values come from
+/// `.harness/config/dry-check.json` v4.
 fn build_usecase_dry_check_config(
     infra_config: &infrastructure::dry_check::DryCheckConfig,
 ) -> Result<usecase::dry_check::DryCheckConfig, String> {
@@ -626,6 +653,7 @@ fn build_usecase_dry_check_config(
         percent(infra_config.known_bad_detection_threshold_percent())?,
         DryCheckParallelism::try_new(infra_config.max_parallelism())
             .map_err(|e| format!("invalid max_parallelism: {e}"))?,
+        infra_config.enabled(),
     ))
 }
 
@@ -2047,14 +2075,47 @@ exit 0
 
     #[test]
     fn test_dry_check_approved_invalid_base_commit_returns_error() {
-        let dir = temp_items_dir_under_repo();
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let repo = tempfile::tempdir().unwrap();
+        let root = repo.path();
+
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        let harness_config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 4,
+  "enabled": true,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "fast_reasoning_effort": "medium",
+  "final_reasoning_effort": "high",
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
+
+        let items_dir = root.join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
         let track_id = "dry-check-approved-invalid-base";
-        std::fs::create_dir_all(dir.path().join(track_id)).unwrap();
+        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(root).unwrap();
 
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some("not-a-hash".to_owned()),
-            items_dir: dir.path().to_path_buf(),
+            items_dir: items_dir.clone(),
         });
 
         let message = result.unwrap_err();
@@ -2102,12 +2163,45 @@ exit 0
         // `db_path` (T005 removes those fields). A missing track dir is
         // tolerated up to the diff acquisition step, which then fails on
         // the synthetic base-commit hash.
-        let dir = temp_items_dir_under_repo();
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let repo = tempfile::tempdir().unwrap();
+        let root = repo.path();
+
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        let harness_config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 4,
+  "enabled": true,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "fast_reasoning_effort": "medium",
+  "final_reasoning_effort": "high",
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
+
+        let items_dir = root.join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(root).unwrap();
 
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "dry-check-approved-missing-track-advances".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            items_dir: dir.path().to_path_buf(),
+            items_dir: items_dir.clone(),
         });
 
         let message = result.unwrap_err();
@@ -2166,14 +2260,47 @@ exit 0
 
     #[test]
     fn test_dry_check_approved_threshold_none_loads_config_then_reaches_diff_step() {
-        let dir = temp_items_dir_under_repo();
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let repo = tempfile::tempdir().unwrap();
+        let root = repo.path();
+
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        let harness_config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 4,
+  "enabled": true,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "fast_reasoning_effort": "medium",
+  "final_reasoning_effort": "high",
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
+
+        let items_dir = root.join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
         let track_id = "dry-check-approved-threshold-none";
-        std::fs::create_dir_all(dir.path().join(track_id)).unwrap();
+        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(root).unwrap();
 
         let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
-            items_dir: dir.path().to_path_buf(),
+            items_dir: items_dir.clone(),
         });
 
         let message = result.unwrap_err();
@@ -3293,7 +3420,7 @@ exit 0
             harness_config_dir.join("dry-check.json"),
             r#"{
   "schema_version": 4,
-  "enabled": false,
+  "enabled": true,
   "threshold": 0.85,
   "max_parallelism": 4,
   "fast_reasoning_effort": "medium",

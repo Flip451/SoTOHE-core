@@ -14,7 +14,7 @@ use domain::dry_check::{DryCheckApprovalVerdict, FragmentRef};
 use domain::track_phase::{FixpointStep, ReviewScopeSet};
 use thiserror::Error;
 
-use crate::dry_check::DryCheckApprovalService;
+use crate::dry_check::{DryCheckApprovalService, DryCheckConfig};
 
 // ── FixpointCurrentBranch ─────────────────────────────────────────────────────
 
@@ -235,15 +235,20 @@ pub trait FixpointResolveService: Send + Sync {
 
 /// Implements [`FixpointResolveService`].
 ///
-/// Holds injected port dependencies (dry approval port, review state port,
-/// ref-verify result port) as private `Arc<dyn Port>` fields.
+/// Holds a [`DryCheckConfig`] (gate-enable flag) and injected port dependencies
+/// (dry approval port, review state port, ref-verify result port) as private
+/// `Arc<dyn Port>` fields.
 /// Queries each gate's public API only — no direct access to `dry-check.json`,
 /// `review.json`, or ref-verify cache internals (CN-02).
+///
+/// When `dry_config.enabled` is `false`, the dry gate call in `resolve` is
+/// skipped entirely and treated as `Approved` (D2 / IN-05 / CN-06).
 ///
 /// The branch-against-track consistency check (`TrackNotActive`) is the
 /// responsibility of the CLI composition layer (T015) and is performed before
 /// this interactor is called.
 pub struct FixpointResolveInteractor {
+    dry_config: DryCheckConfig,
     dry_approval: Arc<dyn DryCheckApprovalService + Send + Sync>,
     review_state: Arc<dyn ReviewGateStatePort>,
     ref_verify_results: Arc<dyn RefVerifyGateStatePort>,
@@ -254,17 +259,21 @@ impl FixpointResolveInteractor {
     ///
     /// # Parameters
     ///
+    /// - `dry_config`: usecase config including the `enabled` gate flag. When
+    ///   `enabled` is `false`, `resolve` skips the dry gate and proceeds directly
+    ///   to the review and ref-verify gate evaluation (D2 / IN-05 / CN-06).
     /// - `dry_approval`: pure-read dry gate via [`DryCheckApprovalService::check_approved`].
     /// - `review_state`: review gate status via [`ReviewGateStatePort::review_status`].
     /// - `ref_verify_results`: ref-verify gate status via
     ///   [`RefVerifyGateStatePort::ref_verify_status`].
     #[must_use]
     pub fn new(
+        dry_config: DryCheckConfig,
         dry_approval: Arc<dyn DryCheckApprovalService + Send + Sync>,
         review_state: Arc<dyn ReviewGateStatePort>,
         ref_verify_results: Arc<dyn RefVerifyGateStatePort>,
     ) -> Self {
-        Self { dry_approval, review_state, ref_verify_results }
+        Self { dry_config, dry_approval, review_state, ref_verify_results }
     }
 }
 
@@ -293,16 +302,23 @@ impl FixpointResolveService for FixpointResolveInteractor {
     /// the error detail.
     fn resolve(&self, cmd: &FixpointResolveCommand) -> Result<FixpointStep, FixpointResolveError> {
         // ── Step 1–2: Dry gate. ───────────────────────────────────────────────
-        let dry_verdict = self
-            .dry_approval
-            .check_approved(&cmd.track_id, &cmd.current_fragment_refs)
-            .map_err(|e| FixpointResolveError::GateQueryFailed {
-                gate: "dry".to_owned(),
-                message: e.to_string(),
-            })?;
+        //
+        // When `dry_config.enabled` is `false`, skip the dry gate entirely and
+        // treat it as Approved (D2 / IN-05 / CN-06). The `dry_approval` port is
+        // not called; this is the interactor-side bypass that complements the
+        // CLI composition early-return (T006).
+        if self.dry_config.enabled {
+            let dry_verdict = self
+                .dry_approval
+                .check_approved(&cmd.track_id, &cmd.current_fragment_refs)
+                .map_err(|e| FixpointResolveError::GateQueryFailed {
+                    gate: "dry".to_owned(),
+                    message: e.to_string(),
+                })?;
 
-        if matches!(dry_verdict, DryCheckApprovalVerdict::Blocked { .. }) {
-            return Ok(FixpointStep::RunDfp);
+            if matches!(dry_verdict, DryCheckApprovalVerdict::Blocked { .. }) {
+                return Ok(FixpointStep::RunDfp);
+            }
         }
 
         // ── Step 3–4: Review gate. ────────────────────────────────────────────
@@ -346,7 +362,9 @@ mod tests {
     use domain::dry_check::DryCheckApprovalVerdict;
     use domain::track_phase::ReviewScopeSet;
 
-    use crate::dry_check::DryCheckCycleError;
+    use crate::dry_check::{
+        DryCheckConfig, DryCheckCycleError, DryCheckParallelism, DryCheckPercent,
+    };
 
     use super::*;
 
@@ -416,12 +434,23 @@ mod tests {
         }
     }
 
+    /// Build a [`DryCheckConfig`] with the given `enabled` flag and reasonable defaults.
+    fn test_dry_check_config(enabled: bool) -> DryCheckConfig {
+        DryCheckConfig::new(
+            DryCheckPercent::try_new(10).unwrap(),
+            DryCheckPercent::try_new(90).unwrap(),
+            DryCheckParallelism::try_new(4).unwrap(),
+            enabled,
+        )
+    }
+
     fn make_interactor(
         dry_verdict: DryCheckApprovalVerdict,
         review: Result<ReviewGateStatus, FixpointResolveError>,
         ref_verify: Result<RefVerifyGateStatus, FixpointResolveError>,
     ) -> FixpointResolveInteractor {
         FixpointResolveInteractor::new(
+            test_dry_check_config(true),
             Arc::new(StubDryApproval { verdict: dry_verdict, fail: false }),
             Arc::new(StubReviewGate { status: review }),
             Arc::new(StubRefVerifyGate { status: ref_verify }),
@@ -433,6 +462,7 @@ mod tests {
         ref_verify: Result<RefVerifyGateStatus, FixpointResolveError>,
     ) -> FixpointResolveInteractor {
         FixpointResolveInteractor::new(
+            test_dry_check_config(true),
             Arc::new(StubDryApproval { verdict: DryCheckApprovalVerdict::Approved, fail: true }),
             Arc::new(StubReviewGate { status: review }),
             Arc::new(StubRefVerifyGate { status: ref_verify }),
@@ -557,6 +587,103 @@ mod tests {
         assert!(
             matches!(&err, FixpointResolveError::GateQueryFailed { gate, .. } if gate == "ref_verify"),
             "expected GateQueryFailed for 'ref_verify' but got {err:?}"
+        );
+    }
+
+    // ── T011: enabled=false dry gate bypass ───────────────────────────────────
+
+    /// When `dry_config.enabled` is `false` and the dry stub would return `Blocked`,
+    /// the dry gate must be bypassed entirely and the step must reflect the review
+    /// and ref-verify gate states instead.
+    ///
+    /// Sub-case: review Approved, ref-verify Approved → `Commit`.
+    #[test]
+    fn interactor_resolve_dry_disabled_with_blocked_dry_returns_commit_when_all_other_gates_green()
+    {
+        // dry stub would return Blocked, but enabled=false means it is never called.
+        let interactor = FixpointResolveInteractor::new(
+            test_dry_check_config(false),
+            Arc::new(StubDryApproval {
+                verdict: DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 5 },
+                fail: false,
+            }),
+            Arc::new(StubReviewGate { status: Ok(ReviewGateStatus::Approved) }),
+            Arc::new(StubRefVerifyGate { status: Ok(RefVerifyGateStatus::Approved) }),
+        );
+        let step = interactor.resolve(&make_cmd()).unwrap();
+        assert_eq!(
+            step,
+            FixpointStep::Commit,
+            "enabled=false must bypass dry gate; all other gates green → Commit"
+        );
+    }
+
+    /// When `dry_config.enabled` is `false` and review needs review, the step must
+    /// be `RunRfp` (dry gate bypassed, review gate takes over).
+    #[test]
+    fn interactor_resolve_dry_disabled_with_blocked_dry_returns_run_rfp_when_review_needs_review() {
+        let mut scope_set = BTreeSet::new();
+        scope_set.insert("code".to_owned());
+        let scopes = ReviewScopeSet::try_new(scope_set).unwrap();
+
+        let interactor = FixpointResolveInteractor::new(
+            test_dry_check_config(false),
+            Arc::new(StubDryApproval {
+                verdict: DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 3 },
+                fail: false,
+            }),
+            Arc::new(StubReviewGate {
+                status: Ok(ReviewGateStatus::NeedsReview { scopes: scopes.clone() }),
+            }),
+            Arc::new(StubRefVerifyGate { status: Ok(RefVerifyGateStatus::Approved) }),
+        );
+        let step = interactor.resolve(&make_cmd()).unwrap();
+        assert_eq!(
+            step,
+            FixpointStep::RunRfp { scopes },
+            "enabled=false must bypass dry gate; review NeedsReview → RunRfp"
+        );
+    }
+
+    /// When `dry_config.enabled` is `false`, review Approved, and ref-verify Blocked,
+    /// the step must be `RunRefVerify`.
+    #[test]
+    fn interactor_resolve_dry_disabled_returns_run_ref_verify_when_ref_verify_blocked() {
+        let interactor = FixpointResolveInteractor::new(
+            test_dry_check_config(false),
+            Arc::new(StubDryApproval {
+                verdict: DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 },
+                fail: false,
+            }),
+            Arc::new(StubReviewGate { status: Ok(ReviewGateStatus::Approved) }),
+            Arc::new(StubRefVerifyGate { status: Ok(RefVerifyGateStatus::Blocked) }),
+        );
+        let step = interactor.resolve(&make_cmd()).unwrap();
+        assert_eq!(
+            step,
+            FixpointStep::RunRefVerify,
+            "enabled=false must bypass dry gate; ref-verify Blocked → RunRefVerify"
+        );
+    }
+
+    /// When `dry_config.enabled` is `true` and the dry stub returns `Blocked`,
+    /// the step must be `RunDfp` (unchanged behavior).
+    #[test]
+    fn interactor_resolve_dry_enabled_with_blocked_dry_returns_run_dfp() {
+        let interactor = FixpointResolveInteractor::new(
+            test_dry_check_config(true),
+            Arc::new(StubDryApproval {
+                verdict: DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 2 },
+                fail: false,
+            }),
+            Arc::new(StubReviewGate { status: Ok(ReviewGateStatus::Approved) }),
+            Arc::new(StubRefVerifyGate { status: Ok(RefVerifyGateStatus::Approved) }),
+        );
+        let step = interactor.resolve(&make_cmd()).unwrap();
+        assert_eq!(
+            step,
+            FixpointStep::RunDfp,
+            "enabled=true with dry Blocked must return RunDfp (unchanged behavior)"
         );
     }
 }

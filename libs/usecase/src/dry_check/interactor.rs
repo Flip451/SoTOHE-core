@@ -892,6 +892,7 @@ mod tests {
             DryCheckPercent::try_new(10).unwrap(),
             DryCheckPercent::try_new(90).unwrap(),
             DryCheckParallelism::try_new(parallelism).unwrap(),
+            false,
         )
     }
 
@@ -2331,6 +2332,7 @@ mod tests {
             DryCheckPercent::try_new(100).unwrap(),
             DryCheckPercent::try_new(90).unwrap(),
             DryCheckParallelism::try_new(1).unwrap(),
+            false,
         );
 
         let writer = Arc::new(StubWriter::default());
@@ -2612,6 +2614,7 @@ mod tests {
             DryCheckPercent::try_new(100).unwrap(),
             DryCheckPercent::try_new(50).unwrap(),
             DryCheckParallelism::try_new(1).unwrap(),
+            false,
         );
         let interactor =
             make_interactor_with_config(embed, index, agent, Arc::clone(&writer), config);
@@ -2878,6 +2881,7 @@ mod tests {
             DryCheckPercent::try_new(100).unwrap(),
             DryCheckPercent::try_new(50).unwrap(),
             DryCheckParallelism::try_new(1).unwrap(),
+            false,
         );
         let interactor =
             make_interactor_with_config(embed, index, agent, Arc::clone(&writer), config);

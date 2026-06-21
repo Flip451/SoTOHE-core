@@ -14,6 +14,7 @@ use domain::dry_check::{
     DryCheckReader, DryCheckRecord, DryCheckVerdict, FragmentRef,
 };
 
+use super::config::DryCheckConfig;
 use super::errors::DryCheckCycleError;
 use super::ports::DryCheckCoveragePort;
 use super::services::DryCheckApprovalService;
@@ -29,16 +30,22 @@ fn is_fail_closed_corpus_fingerprint(fingerprint: &DryCheckCorpusFingerprint) ->
 
 /// Interactor implementing the D5 read-only [`DryCheckApprovalService`].
 ///
-/// Holds only a [`DryCheckReader`] (for verdict history), a
-/// [`DryCheckCoveragePort`] (for the coverage manifest), and the
-/// `current_config_fingerprint` (SHA-256 fingerprint of the current
-/// `dry-check.json` settings). The implementation performs hash matching,
-/// config-fingerprint comparison, and verdict scanning — no embedding / index
-/// ports.
+/// Holds a [`DryCheckConfig`] (gate-enable flag and calibration settings), a
+/// [`DryCheckReader`] (for verdict history), a [`DryCheckCoveragePort`] (for
+/// the coverage manifest), and the `current_config_fingerprint` (SHA-256
+/// fingerprint of the current `dry-check.json` settings). The implementation
+/// performs hash matching, config-fingerprint comparison, and verdict scanning
+/// — no embedding / index ports.
+///
+/// When `dry_config.enabled` is `false`,
+/// [`DryCheckApprovalService::check_approved`] returns
+/// `Approved` immediately without touching coverage or reader ports (D2 /
+/// IN-05 / CN-06 service-boundary safety net).
 ///
 /// The constructor return type is written as `DryCheckApprovalInteractor` (not
 /// `Self`) so the type-signal evaluator's exact-string match succeeds.
 pub struct DryCheckApprovalInteractor {
+    dry_config: DryCheckConfig,
     reader: Arc<dyn DryCheckReader>,
     coverage: Arc<dyn DryCheckCoveragePort>,
     current_config_fingerprint: DryCheckConfigFingerprint,
@@ -50,6 +57,9 @@ impl DryCheckApprovalInteractor {
     ///
     /// # Parameters
     ///
+    /// - `dry_config`: usecase config including the `enabled` gate flag. When
+    ///   `enabled` is `false`, `check_approved` returns `Approved` immediately
+    ///   without touching coverage or reader ports (service-boundary safety net).
     /// - `reader`: port for reading the dry-check history (`DryCheckRecord`s).
     /// - `coverage`: port for reading the D5 coverage manifest.
     /// - `current_config_fingerprint`: fingerprint of the current
@@ -63,12 +73,14 @@ impl DryCheckApprovalInteractor {
     ///   `dry write` run → return `Blocked`.
     #[must_use]
     pub fn new(
+        dry_config: DryCheckConfig,
         reader: Arc<dyn DryCheckReader>,
         coverage: Arc<dyn DryCheckCoveragePort>,
         current_config_fingerprint: DryCheckConfigFingerprint,
         current_corpus_fingerprint: DryCheckCorpusFingerprint,
     ) -> DryCheckApprovalInteractor {
         DryCheckApprovalInteractor {
+            dry_config,
             reader,
             coverage,
             current_config_fingerprint,
@@ -80,12 +92,20 @@ impl DryCheckApprovalInteractor {
 impl DryCheckApprovalService for DryCheckApprovalInteractor {
     /// Evaluate the dry-check gate for the current diff scope (pure-read).
     ///
-    /// See [`DryCheckApprovalService::check_approved`] for the algorithm.
+    /// When `dry_config.enabled` is `false`, returns `Approved` immediately
+    /// without touching coverage or reader ports (D2 / IN-05 / CN-06).
+    ///
+    /// See [`DryCheckApprovalService::check_approved`] for the full algorithm.
     fn check_approved(
         &self,
         track_id: &TrackId,
         current_fragment_refs: &BTreeSet<FragmentRef>,
     ) -> Result<DryCheckApprovalVerdict, DryCheckCycleError> {
+        // ── Step 0: Gate disabled → Approved immediately (service-boundary safety net). ──
+        if !self.dry_config.enabled {
+            return Ok(DryCheckApprovalVerdict::Approved);
+        }
+
         // ── Step 1: Read coverage manifest (CN-08 fail-closed when missing). ──
         let coverage_record = match self.coverage.read_coverage(track_id)? {
             Some(record) => record,
@@ -238,6 +258,7 @@ mod tests {
         RefactorProposal,
     };
 
+    use crate::dry_check::config::{DryCheckParallelism, DryCheckPercent};
     use crate::dry_check::shared::test_mocks::{
         make_dry_check_record_for_tests, make_fragment_ref_for_tests,
     };
@@ -328,6 +349,17 @@ mod tests {
     /// [`make_dry_check_record_for_tests`] directly.
     const DEFAULT_RECORDED_AT: &str = "2026-06-13T00:00:00Z";
 
+    /// Build a [`DryCheckConfig`] with the given `enabled` flag and reasonable
+    /// defaults for the calibration fields.
+    fn test_dry_check_config(enabled: bool) -> DryCheckConfig {
+        DryCheckConfig::new(
+            DryCheckPercent::try_new(10).unwrap(),
+            DryCheckPercent::try_new(90).unwrap(),
+            DryCheckParallelism::try_new(4).unwrap(),
+            enabled,
+        )
+    }
+
     fn make_interactor(
         coverage: StubCoverage,
         records: Vec<DryCheckRecord>,
@@ -341,6 +373,7 @@ mod tests {
         current_corpus_fingerprint: DryCheckCorpusFingerprint,
     ) -> DryCheckApprovalInteractor {
         DryCheckApprovalInteractor::new(
+            test_dry_check_config(true),
             Arc::new(StubReader { records }),
             Arc::new(coverage),
             test_fingerprint(),
@@ -559,6 +592,7 @@ mod tests {
         let a = make_fragment_ref_for_tests("src/a.rs", 'a');
         let coverage = coverage_with(vec![a.clone()]);
         let interactor = DryCheckApprovalInteractor::new(
+            test_dry_check_config(true),
             Arc::new(ErrorReader),
             Arc::new(coverage),
             test_fingerprint(),
@@ -574,6 +608,7 @@ mod tests {
     fn test_check_approved_coverage_error_propagated() {
         let a = make_fragment_ref_for_tests("src/a.rs", 'a');
         let interactor = DryCheckApprovalInteractor::new(
+            test_dry_check_config(true),
             Arc::new(StubReader { records: vec![] }),
             Arc::new(ErrorCoverage),
             test_fingerprint(),
@@ -663,6 +698,7 @@ mod tests {
             DEFAULT_RECORDED_AT,
         );
         let interactor = DryCheckApprovalInteractor::new(
+            test_dry_check_config(true),
             Arc::new(StubReader { records: vec![stale_record] }),
             Arc::new(coverage),
             current_fingerprint,
@@ -696,6 +732,7 @@ mod tests {
             DEFAULT_RECORDED_AT,
         );
         let interactor = DryCheckApprovalInteractor::new(
+            test_dry_check_config(true),
             Arc::new(StubReader { records: vec![violation_record] }),
             Arc::new(coverage),
             current_fingerprint,
@@ -844,6 +881,81 @@ mod tests {
             result,
             DryCheckApprovalVerdict::Approved,
             "stale Violation whose pair_key is absent from processed_pair_keys must not block"
+        );
+    }
+
+    // ── T010: enabled=false short-circuits to Approved immediately ────────────
+
+    /// When `dry_config.enabled` is `false`, `check_approved` must return
+    /// `Approved` immediately without consulting the coverage port or reader.
+    ///
+    /// Verified by passing an `ErrorCoverage` port: if the port were consulted,
+    /// the call would return `Err(CoveragePort(...))` rather than `Ok(Approved)`.
+    #[test]
+    fn test_check_approved_disabled_returns_approved_without_touching_ports() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        // ErrorCoverage will fail if consulted — gate must not reach it.
+        let interactor = DryCheckApprovalInteractor::new(
+            test_dry_check_config(false),
+            Arc::new(StubReader { records: vec![] }),
+            Arc::new(ErrorCoverage),
+            test_fingerprint(),
+            test_corpus_fingerprint(),
+        );
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert_eq!(
+            result,
+            DryCheckApprovalVerdict::Approved,
+            "enabled=false must return Approved immediately without touching ports"
+        );
+    }
+
+    /// When `dry_config.enabled` is `true`, the full gate logic runs unchanged.
+    /// Specifically, a missing coverage manifest must still return `Blocked`.
+    #[test]
+    fn test_check_approved_enabled_true_missing_coverage_returns_blocked() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let interactor = DryCheckApprovalInteractor::new(
+            test_dry_check_config(true),
+            Arc::new(StubReader { records: vec![] }),
+            Arc::new(StubCoverage { record: None }),
+            test_fingerprint(),
+            test_corpus_fingerprint(),
+        );
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a])).unwrap();
+        assert!(
+            matches!(result, DryCheckApprovalVerdict::Blocked { .. }),
+            "enabled=true with missing coverage must return Blocked, got: {result:?}"
+        );
+    }
+
+    /// When `dry_config.enabled` is `true` and a Violation is present for
+    /// current fragments, the gate must return `Blocked` (unchanged behavior).
+    #[test]
+    fn test_check_approved_enabled_true_with_violation_returns_blocked() {
+        let a = make_fragment_ref_for_tests("src/a.rs", 'a');
+        let b = make_fragment_ref_for_tests("src/b.rs", 'b');
+        let pair_key = DryCheckPairKey::new(a.clone(), b.clone()).unwrap();
+        let coverage = coverage_with_pairs(vec![a.clone(), b.clone()], vec![pair_key]);
+        let proposal = RefactorProposal::new("Extract helper.").unwrap();
+        let record = make_dry_check_record_for_tests(
+            a.clone(),
+            b.clone(),
+            DryCheckVerdict::Violation { refactor_proposal: proposal },
+            DEFAULT_RECORDED_AT,
+        );
+        let interactor = DryCheckApprovalInteractor::new(
+            test_dry_check_config(true),
+            Arc::new(StubReader { records: vec![record] }),
+            Arc::new(coverage),
+            test_fingerprint(),
+            test_corpus_fingerprint(),
+        );
+        let result = interactor.check_approved(&make_track(), &current_refs(vec![a, b])).unwrap();
+        assert_eq!(
+            result,
+            DryCheckApprovalVerdict::Blocked { unresolved_pair_count: 1 },
+            "enabled=true with Violation must return Blocked (unchanged behavior)"
         );
     }
 }
