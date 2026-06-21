@@ -153,6 +153,22 @@
         "kind": "pass",
         "citation": "`schema_version` が 4 以外の `dry-check.json` を読み込んだ場合は旧スキーマとして hard error とする。D2 と D4 を統合した schema_version 4 が唯一サポートされるバージョンであり、schema_version 4 以外のファイルは無効として明示的な migration を利用者に求める。なお reasoning_effort フィールドが残ったままの古い v4 ファイルを投入すると、loader の `deny_unknown_fields` により Parse エラーが発生する（migration 要求の手段）。"
       }
+    },
+    {
+      "claim_hash": "abf5a4e445542574190982d2fa1f1d6152203bb2a767f4fcc69eac702098797d",
+      "evidence_hash": "a068aaed39995e638bd3b4029594ad2c3e533f04ff34255a1393c027482c8553",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/agent-profiles.json` の `capabilities.dry-checker` オブジェクトに `fast_reasoning_effort` と `final_reasoning_effort` の 2 フィールドを追加する。"
+      }
+    },
+    {
+      "claim_hash": "abf5a4e445542574190982d2fa1f1d6152203bb2a767f4fcc69eac702098797d",
+      "evidence_hash": "83aa75c66a7f3ea552f34322931c75c3bff4ebe97c18e87d21beef24991bf7fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reasoning effort の設定（`fast_reasoning_effort` / `final_reasoning_effort`）は `agent-profiles.json` の `capabilities.dry-checker` から composition root が直接読み取り、`CodexDryChecker` に渡す。usecase 層・domain 層は reasoning effort を保持しない。`DryCheckConfig`（usecase 層）に reasoning effort フィールドは追加しない。"
+      }
     }
   ]
 }

@@ -167,106 +167,20 @@
           "findings": [],
           "hash": "rvw1:sha256:63d91b624d33043f2b72bcf475dde0c7620501032645ceb3a3acdfc48dfe0004",
           "at": "2026-06-21T12:25:24Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
-          "at": "2026-06-21T08:37:38Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
-          "at": "2026-06-21T08:37:49Z"
+          "hash": "rvw1:sha256:4f16802d256aafe8fba37974fd68bd031e7909a74983e08500c45841186ce43b",
+          "at": "2026-06-21T13:07:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
-          "at": "2026-06-21T08:40:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22c8255741c411861032c43cd03e6bdad33215f8825f540fc7fe8c90e0f997b1",
-          "at": "2026-06-21T09:51:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22c8255741c411861032c43cd03e6bdad33215f8825f540fc7fe8c90e0f997b1",
-          "at": "2026-06-21T09:55:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e08265d1e26b0c73807fb4b0128af78aed9f5be5bf0bf40c26beb318ce3fbfe3",
-          "at": "2026-06-21T11:40:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e08265d1e26b0c73807fb4b0128af78aed9f5be5bf0bf40c26beb318ce3fbfe3",
-          "at": "2026-06-21T11:42:47Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `enabled` is not included in the canonical fingerprint, so two configs that differ only by opt-in state hash to the same `DryCheckConfigFingerprint`. `fingerprint_with_threshold` still encodes only `threshold`, `max_parallelism`, the reasoning-effort fields, and the known-bad percents ([config.rs:256-290]). Since `enabled` now changes whether the DRY gate is active, this omits a semantics-affecting field and can let stale coverage records survive an enable/disable flip without invalidation.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/config.rs",
-              "line": 256,
-              "category": "fingerprint or hash drift"
-            }
-          ],
-          "hash": "rvw1:sha256:f0e525d62ea5b5d515da749cf81f61b196c2daf336dc4e748eded2b3db442df8",
-          "at": "2026-06-21T08:37:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c09883a01ea59c4c9f107d16b1ac9e752bb9113f282803a3c60ea0a2e858fe1",
-          "at": "2026-06-21T08:40:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c09883a01ea59c4c9f107d16b1ac9e752bb9113f282803a3c60ea0a2e858fe1",
-          "at": "2026-06-21T08:42:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:461c2efdcfed4eb9e0307adb765f6e30f7fbfb0ca0cd9c0d8b39fac7d8e6a960",
-          "at": "2026-06-21T11:42:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:461c2efdcfed4eb9e0307adb765f6e30f7fbfb0ca0cd9c0d8b39fac7d8e6a960",
-          "at": "2026-06-21T11:44:29Z"
+          "hash": "rvw1:sha256:4f16802d256aafe8fba37974fd68bd031e7909a74983e08500c45841186ce43b",
+          "at": "2026-06-21T13:09:48Z"
         }
       ]
     },
@@ -372,6 +286,106 @@
           "findings": [],
           "hash": "rvw1:sha256:4556dd459a8259ce636a1a6dac00a0a5539d7a760df9aba1be564575e1cf8434",
           "at": "2026-06-21T12:19:03Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
+          "at": "2026-06-21T08:37:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
+          "at": "2026-06-21T08:37:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
+          "at": "2026-06-21T08:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22c8255741c411861032c43cd03e6bdad33215f8825f540fc7fe8c90e0f997b1",
+          "at": "2026-06-21T09:51:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22c8255741c411861032c43cd03e6bdad33215f8825f540fc7fe8c90e0f997b1",
+          "at": "2026-06-21T09:55:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e08265d1e26b0c73807fb4b0128af78aed9f5be5bf0bf40c26beb318ce3fbfe3",
+          "at": "2026-06-21T11:40:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e08265d1e26b0c73807fb4b0128af78aed9f5be5bf0bf40c26beb318ce3fbfe3",
+          "at": "2026-06-21T11:42:47Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `enabled` is not included in the canonical fingerprint, so two configs that differ only by opt-in state hash to the same `DryCheckConfigFingerprint`. `fingerprint_with_threshold` still encodes only `threshold`, `max_parallelism`, the reasoning-effort fields, and the known-bad percents ([config.rs:256-290]). Since `enabled` now changes whether the DRY gate is active, this omits a semantics-affecting field and can let stale coverage records survive an enable/disable flip without invalidation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/config.rs",
+              "line": 256,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:f0e525d62ea5b5d515da749cf81f61b196c2daf336dc4e748eded2b3db442df8",
+          "at": "2026-06-21T08:37:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c09883a01ea59c4c9f107d16b1ac9e752bb9113f282803a3c60ea0a2e858fe1",
+          "at": "2026-06-21T08:40:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c09883a01ea59c4c9f107d16b1ac9e752bb9113f282803a3c60ea0a2e858fe1",
+          "at": "2026-06-21T08:42:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:461c2efdcfed4eb9e0307adb765f6e30f7fbfb0ca0cd9c0d8b39fac7d8e6a960",
+          "at": "2026-06-21T11:42:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:461c2efdcfed4eb9e0307adb765f6e30f7fbfb0ca0cd9c0d8b39fac7d8e6a960",
+          "at": "2026-06-21T11:44:29Z"
         }
       ]
     },

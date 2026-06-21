@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c5dec8908c836f94316850f37b76800ac957b8ad313c137ecb68608c9e2f3c51",
+  "catalogue_declaration_hash": "8acecc8cf87d55680acd05f04128ff4b4d106b760e7fd7198e9ceee6f492dea9",
   "signals": [
     {
       "type_name": "CapabilityConfigDto",
       "signal": "blue",
-      "entry_hash": "eb333b402b8a06ac72e8edce92b5eba97c6bd39071c6acfcc6f42ca0844e1496"
+      "entry_hash": "abf5a4e445542574190982d2fa1f1d6152203bb2a767f4fcc69eac702098797d"
     },
     {
       "type_name": "DryCheckConfig",

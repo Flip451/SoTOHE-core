@@ -128,7 +128,7 @@
             { "name": "review_state", "ty": "std::sync::Arc<dyn ReviewGateStatePort>" },
             { "name": "ref_verify_results", "ty": "std::sync::Arc<dyn RefVerifyGateStatePort>" }
           ],
-          "returns": "FixpointResolveInteractor",
+          "returns": "Self",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,

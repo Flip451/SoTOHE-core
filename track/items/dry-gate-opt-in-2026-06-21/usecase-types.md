@@ -11,5 +11,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | DryCheckApprovalInteractor | interactor | modify | — | 🔵 | 🔵 |
-| FixpointResolveInteractor | interactor | modify | — | 🟡 | 🔵 |
+| FixpointResolveInteractor | interactor | modify | — | 🔵 | 🔵 |
 

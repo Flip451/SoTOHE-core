@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-21T12:26:18Z",
-  "declaration_hash": "c5dec8908c836f94316850f37b76800ac957b8ad313c137ecb68608c9e2f3c51",
+  "generated_at": "2026-06-21T13:10:50Z",
+  "declaration_hash": "8acecc8cf87d55680acd05f04128ff4b4d106b760e7fd7198e9ceee6f492dea9",
   "signals": [
     {
       "type_name": "CapabilityConfigDto",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

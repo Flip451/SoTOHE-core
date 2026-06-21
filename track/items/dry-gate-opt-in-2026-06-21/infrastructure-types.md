@@ -10,6 +10,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityConfigDto | dto | modify | — | 🟡 | 🔵 |
+| CapabilityConfigDto | dto | modify | — | 🔵 | 🔵 |
 | DryCheckConfig | dto | modify | — | 🔵 | 🔵 |
 

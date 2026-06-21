@@ -57,16 +57,8 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "provider", "ty": "String" },
-            { "name": "model", "ty": "Option<String>" },
-            { "name": "fast_provider", "ty": "Option<String>" },
-            { "name": "fast_model", "ty": "Option<String>" },
-            { "name": "prompt_template_path", "ty": "Option<String>" },
-            { "name": "fast_reasoning_effort", "ty": "Option<String>" },
-            { "name": "final_reasoning_effort", "ty": "Option<String>" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
