@@ -1,0 +1,362 @@
+[
+  {
+    "category": "presentation-in-composition-root",
+    "file": "apps/cli-composition/src/cmd_outcome.rs",
+    "line": "12-33",
+    "rule": "ADR 2026-06-21-1328: cli_composition must be pure DI wiring; all rendering must move to `cli_driver` primary adapter render module. ADR 2026-05-27-0110: CliApp facade must be thin.",
+    "description": "The `render_outcome` helper is a pure presentation function that assembles user-facing stdout banner strings (`--- {label} ---`, `--- {label} PASSED ---`, `--- {label} FAILED ---`) and joins them into a formatted block. This module is imported and called in at least 15 sites across cli-composition (signal.rs, verify.rs, signal_layer_chain.rs). Rendering belongs in the new `cli_driver` primary adapter render module mandated by ADR 2026-06-21-1328, not in the composition root.",
+    "evidence": "pub(crate) fn render_outcome(...) { let mut lines = vec![format!(\"--- {label} ---\")]; ... lines.push(format!(\"--- {label} PASSED ---\")); CommandOutcome::success(Some(lines.join(\"\\n\"))) }",
+    "severity": "high",
+    "verify_note": "render_outcome at lines 12-33 exactly matches the claimed code — it assembles stdout banner strings inside cli-composition and is called from signal.rs, signal_layer_chain.rs, and verify.rs (3 call sites, not 15 as claimed), confirming a real ADR 2026-06-21-1328 presentation-in-composition-root violation."
+  },
+  {
+    "category": "presentation-in-composition-root",
+    "file": "apps/cli-composition/src/signal.rs",
+    "line": "23-47",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module.",
+    "description": "The `merge_outcomes` function assembles aggregated user-facing output text from multiple `CommandOutcome` values — it reads `.stdout`/`.stderr` strings, merges them, and appends a `--- {label} PASSED ---` / `--- {label} FAILED ---` banner using `format!`. This is pure presentation logic inside the composition root. It is called from `signal_check_gate` (line ~543) to produce the combined gate output.",
+    "evidence": "fn merge_outcomes(label: &str, outcomes: Vec<CommandOutcome>) -> CommandOutcome { let mut all_lines: Vec<String> = vec![format!(\"--- {label} ---\")]; ... let summary = if any_failure { format!(\"--- {label} FAILED ---\") } else { format!(\"--- {label} PASSED ---\") }; all_lines.push(summary); CommandOutcome { stdout: Some(all_lines.join(\"\\n\")), ... } }",
+    "severity": "high",
+    "verify_note": "Lines 23-47 of apps/cli-composition/src/signal.rs confirm the `merge_outcomes` function assembles banner-formatted user-facing text (--- {label} ---, PASSED/FAILED suffixes) and merges stdout/stderr strings — pure presentation logic inside the composition root, not under #[cfg(test)] or any documented exception."
+  },
+  {
+    "category": "presentation-in-composition-root",
+    "file": "apps/cli-composition/src/verify.rs",
+    "line": "8-11",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module.",
+    "description": "The private `render_skip` function constructs a multi-line user-visible skip banner (`--- {label} ---\\n[SKIP] {reason}\\n--- {label} SKIPPED ---`) using `format!` and places it in `CommandOutcome.stdout`. This is a rendering helper that should not exist in the composition root.",
+    "evidence": "fn render_skip(label: &str, reason: &str) -> CommandOutcome { let stdout = format!(\"--- {label} ---\\n[SKIP] {reason}\\n--- {label} SKIPPED ---\"); CommandOutcome::success(Some(stdout)) }",
+    "severity": "high",
+    "verify_note": "Lines 8-11 of apps/cli-composition/src/verify.rs contain the production function `render_skip` that formats a multi-line user-visible skip banner (`--- {label} ---\\n[SKIP] {reason}\\n--- {label} SKIPPED ---`) and places it in `CommandOutcome.stdout`; this is rendering logic in the composition root, exactly as claimed."
+  },
+  {
+    "category": "presentation-in-composition-root",
+    "file": "apps/cli-composition/src/review_v2/results.rs",
+    "line": "24-244",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module; CliApp god-facade dissolved into per-context composers.",
+    "description": "The `render_review_results_str` function is a ~220-line rendering engine that assembles the entire human-readable review results report: per-scope state indicators (`[+]`/`[-]`/`[.]`), round history, findings blocks (severity, location, category), history list, and an approval summary line. It uses `writeln!`, `format!`, and local rendering helpers `state_line_suffix`, `render_findings_block`, and `select_rounds_inner`. This is substantial rendering responsibility embedded in cli-composition.",
+    "evidence": "pub(crate) fn render_review_results_str(...) -> Result<String, String> { ... let _ = writeln!(out, \"Review results (v2 scope-based):\"); ... let _ = writeln!(out, \"  {indicator} {scope}: {state}{suffix}\"); ... let _ = writeln!(out, \"Summary: {approved_count} approved, ...\"); }",
+    "severity": "high",
+    "verify_note": "Lines 24-244 contain a real ~220-line rendering function `render_review_results_str` with `writeln!`-based report assembly, three local rendering helpers, and scope indicator/findings/history/summary output — substantive presentation logic in cli-composition, not test code or a documented exception, violating ADR 2026-06-21-1328."
+  },
+  {
+    "category": "presentation-in-composition-root",
+    "file": "apps/cli-composition/src/pr/poll.rs",
+    "line": "514-547",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module.",
+    "description": "The `format_review_summary` function (called from `pr.rs:394`) assembles the full user-facing PR review result text block including header, PR number, review ID, state, inline comment count, review body, and numbered findings list. It is pure presentation logic (multiple `format!` calls, `.join(\"\\n\")`) embedded inside the composition root's `pr/poll.rs` module.",
+    "evidence": "pub(super) fn format_review_summary(pr: &str, result: &usecase::pr_review::PrReviewResult) -> String { let mut lines = Vec::new(); lines.push(format!(\"PR: #{pr}\")); lines.push(format!(\"Review ID: {}\", result.review_id)); ... lines.push(format!(\"  {}. {}: {}\", i + 1, location, f.body)); lines.join(\"\\n\") }",
+    "severity": "high",
+    "verify_note": "format_review_summary at lines 514-547 is confirmed: pure text-formatting presentation logic (format! calls, .join(\"\\n\"), user-facing labels) inside cli-composition, not test code, no documented exception."
+  },
+  {
+    "category": "json-output-assembly-in-composition-root",
+    "file": "apps/cli-composition/src/guard.rs",
+    "line": "42-47",
+    "rule": "ADR 2026-06-21-1328: cli_composition must be pure DI wiring; output formatting belongs in `cli_driver` render module.",
+    "description": "The `guard_check` method assembles the JSON verdict payload `{\"decision\": ..., \"reason\": ...}` using `serde_json::json!` directly inside the composer method body, then converts it to a string for `CommandOutcome.stdout`. Formatting the output envelope is a presentation responsibility and should not live in the DI wiring layer.",
+    "evidence": "let json = serde_json::json!({ \"decision\": decision_str, \"reason\": reason, }); let stdout = json.to_string(); Ok(CommandOutcome { stdout: Some(stdout), ... })",
+    "severity": "high",
+    "verify_note": "Lines 42-47 of apps/cli-composition/src/guard.rs confirm the exact code: serde_json::json! assembles the {\"decision\",\"reason\"} envelope and converts it to a string for CommandOutcome.stdout inside the CliApp composer method — presentation logic in the composition root, a real violation of ADR 2026-06-21-1328."
+  },
+  {
+    "category": "json-output-assembly-in-composition-root",
+    "file": "apps/cli-composition/src/hook.rs",
+    "line": "241-248",
+    "rule": "ADR 2026-06-21-1328: cli_composition must be pure DI wiring; output formatting belongs in `cli_driver` render module.",
+    "description": "The `hook_dispatch_user_prompt_submit` method constructs a `hookSpecificOutput` JSON envelope using `serde_json::json!` and serialises it to string for `CommandOutcome.stdout`. Assembling the wire protocol JSON for Claude Code's hook response belongs in a `cli_driver` primary adapter render module, not in the composition root.",
+    "evidence": "let stdout = usecase::skill_compliance::check_compliance_render(&prompt).map(|ctx| { serde_json::json!({ \"hookSpecificOutput\": { \"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": ctx, } }).to_string() });",
+    "severity": "high",
+    "verify_note": "Lines 241-248 of apps/cli-composition/src/hook.rs confirm the serde_json::json! call that assembles the hookSpecificOutput envelope and serialises it to string — production code, no cfg(test), no documented exception."
+  },
+  {
+    "category": "json-output-assembly-in-composition-root",
+    "file": "apps/cli-composition/src/track/ops.rs",
+    "line": "177-192",
+    "rule": "ADR 2026-06-21-1328: cli_composition must be pure DI wiring; output formatting belongs in `cli_driver` render module. ADR 2026-05-27-0110: CliApp must not carry multi-step orchestration.",
+    "description": "Both `track_next_task_resolved` (ops.rs:177,184) and the parallel variant in `track/mod.rs` (mod.rs:520,526) assemble the task status JSON payload `{\"task_id\": ..., \"description\": ..., \"status\": ...}` using `serde_json::json!` inside the composer method body, then call `.to_string()` to place it in `CommandOutcome.stdout`. This is a total of 4 `serde_json::json!` call sites (2 in ops.rs, 2 in mod.rs) for the same pattern, all inside the composition root. Additionally, `track_task_counts_resolved` (ops.rs:215-217) hand-builds a JSON string using a raw `format!` with embedded `{{...}}` braces.",
+    "evidence": "serde_json::json!({ \"task_id\": task.task_id, \"description\": task.description, \"status\": task_status, }) ... Ok(CommandOutcome::success(Some(payload.to_string())))\n\nAlso: let json = format!(r#\"{{\"total\":{total},\"todo\":{},...}}\", counts.todo, ...);",
+    "severity": "high",
+    "verify_note": "Confirmed: ops.rs lines 177-192 use serde_json::json! to assemble task-status JSON payloads and ops.rs lines 215-217 hand-build JSON via format!, all in non-test production code in the composition root, violating ADR 2026-06-21-1328 which requires output formatting to live in `cli_driver` render module."
+  },
+  {
+    "category": "json-output-assembly-in-composition-root",
+    "file": "apps/cli-composition/src/semantic_dup/measure_quality.rs",
+    "line": "92-106",
+    "rule": "ADR 2026-06-21-1328: cli_composition must be pure DI wiring; output formatting belongs in `cli_driver` render module.",
+    "description": "The `dup_index_measure_quality` method assembles the metrics JSON output object (mean_cosine, cosine_std_dev, cosine_percentiles, above_threshold_rate) using `serde_json::json!` and serialises it with `serde_json::to_string_pretty` inside the composer method body, then places it in `CommandOutcome.stdout`.",
+    "evidence": "let json = serde_json::to_string_pretty(&serde_json::json!({ \"mean_cosine\": metrics.mean_cosine, \"cosine_std_dev\": metrics.cosine_std_dev, \"cosine_percentiles\": { ... }, \"above_threshold_rate\": metrics.above_threshold_rate, })) .map_err(|e| format!(\"failed to serialize metrics to JSON: {e}\"))?; Ok(CommandOutcome::success(Some(json)))",
+    "severity": "high",
+    "verify_note": "Lines 92-108 in apps/cli-composition/src/semantic_dup/measure_quality.rs contain exactly the claimed serde_json::json! assembly and serde_json::to_string_pretty serialisation inside the composer method body (production code, not under #[cfg(test)]), confirming a real output-formatting violation in the composition root."
+  },
+  {
+    "category": "multi-step-orchestration",
+    "file": "apps/cli-composition/src/review_v2/mod.rs",
+    "line": "424-452",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module; ADR 2026-05-27-0110: cli_composition must not carry presentation/output-formatting.",
+    "description": "The `review_check_approved` composer method constructs user-visible approval/block/warn messages using `format!` directly and places them in `CommandOutcome.stderr`. Three distinct message templates are built here: `[OK] Review is approved...`, `[WARN] No review.json found...`, and a `[BLOCKED] Review not approved. Required scopes:\\n{display.join(\"\\n\")}` block. This is presentation logic inside a DI wiring method.",
+    "evidence": "format!(\"[WARN] No review.json found. Allowing commit for PR-based review ({count} scope(s)).\")\nformat!(\"[BLOCKED] Review not approved. Required scopes:\\n{}\", display.join(\"\\n\"))\nOk(CommandOutcome { stdout: None, stderr: Some(msg), exit_code })",
+    "severity": "high",
+    "verify_note": "Lines 424-452 confirm the exact violation: `review_check_approved` builds `[OK]`/`[WARN]`/`[BLOCKED]` user-visible strings via `format!` inside the cli_composition layer and returns them in `CommandOutcome.stderr`, which is presentation logic prohibited by ADR 2026-06-21-1328 and ADR 2026-05-27-0110."
+  },
+  {
+    "category": "pre-formatted-stdout-stderr-in-composer-methods",
+    "file": "apps/cli-composition/src/git.rs",
+    "line": "179-201",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module.",
+    "description": "The `git_switch_and_pull` composer method assembles a multi-line user-facing status report by pushing `format!(\"Switching to {branch}...\")`, `format!(\"Pulling latest from origin/{branch}...\")`, `format!(\"[OK] On {branch}, up to date.\")`, and a fixed `\"[WARN] Pull failed...\"` string into a `Vec<String>`, then joins them with `\"\\n\"` for `CommandOutcome.stdout`. This is output rendering inside the composition root.",
+    "evidence": "stdout_lines.push(format!(\"Switching to {branch}...\")); ... stdout_lines.push(format!(\"[OK] On {branch}, up to date.\")); Ok(CommandOutcome::success(Some(stdout_lines.join(\"\\n\"))))",
+    "severity": "medium",
+    "verify_note": "Lines 179-201 confirm the violation: git_switch_and_pull builds human-readable status strings (\"Switching to {branch}...\", \"[OK] On {branch}, up to date.\", \"[WARN] Pull failed...\") inside the composition root and joins them as stdout, which is presentation rendering that ADR 2026-06-21-1328 requires to live in a `cli_driver` primary adapter render module."
+  },
+  {
+    "category": "pre-formatted-stdout-stderr-in-composer-methods",
+    "file": "apps/cli-composition/src/pr.rs",
+    "line": "101-116, 160-203, 277-280, 385-389",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module; ADR 2026-05-27-0110: CliApp must not carry presentation.",
+    "description": "Multiple `CliApp` methods in `pr.rs` assemble user-facing formatted output directly. Representative sites: `pr_status` (lines 101-116) builds `format!(\"PR: {url}\")` + check result strings and joins them; `pr_wait_and_merge` (lines 160-203) builds `[BLOCKED]` finding lines and joins them, and constructs a `[BLOCKED] failed to load signal-gates config` inline; `pr_trigger_review` (lines 277-280) formats a `[OK] Posted '@codex review'...\\nTRIGGER_TIMESTAMP=...` multi-line string; `pr_pr_review` (lines 385-389) formats a `=== PR Review Result: PASS ===` multi-line banner. These are ~10 distinct output-building format sites across the pr.rs composer.",
+    "evidence": "let mut lines = vec![format!(\"PR: {url}\")]; lines.push(format!(\"[FAIL] Failed checks: {}\", names.join(\", \"))); Ok(CommandOutcome { stdout: Some(lines.join(\"\\n\")), ... })\n\nlet stdout = format!(\"[OK] Posted '@codex review' on PR #{pr} at {created_at}\\nTRIGGER_TIMESTAMP={created_at}\");\n\nlet stdout = format!(\"\\n=== PR Review Result: PASS ===\\nPR: #{pr_number}\\nZero findings detected...\");",
+    "severity": "high",
+    "verify_note": "Confirmed: lines 101-116, 160-203, 277-280, 385-389 all contain user-facing formatted string assembly (format! calls building \"[OK]\", \"[FAIL]\", \"[BLOCKED]\", \"[PENDING]\", \"=== PR Review Result ===\" banners) returned as CommandOutcome::stdout/stderr directly inside CliApp composer methods, with no `cli_driver` render delegation."
+  },
+  {
+    "category": "pre-formatted-stdout-stderr-in-composer-methods",
+    "file": "apps/cli-composition/src/track/mod.rs",
+    "line": "226-231, 263, 292, 318-325, 372-377, 425-430, 460-465, 490-495, 599",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module.",
+    "description": "Multiple `CliApp` track composer methods build user-facing text via `format!` and `.join(\"\\n\")` before placing it in `CommandOutcome.stdout`. Across 9 call sites in `track/mod.rs` alone: `track_transition` (lines 226-231) formats `\"[OK] {task_id}: transitioned to {target_status} (track status: {derived_status})\"` and extends with `sync_views_to_stdout` lines; `track_branch_create` (line 263) formats `\"[OK] Branch...created\"`; `track_branch_switch` (line 292) formats `\"[OK] Switched to branch: {branch_name}\"`; `track_resolve` (lines 318-325) formats 3 info lines + optional blocker line and joins them; and others. The helper `sync_views_to_stdout` (lines 117-130) itself produces user-facing `[OK] Rendered: {path}` and `warning: operation persisted but sync-views failed: {err}` strings.",
+    "evidence": "let mut lines = vec![format!(\"[OK] {}: transitioned to {} (track status: {})\", task_id, target_status, output.derived_status)]; lines.extend(sync_views_to_stdout(...)); Ok(CommandOutcome::success(Some(lines.join(\"\\n\"))))\n\nfn sync_views_to_stdout(...) -> Vec<String> { ... format!(\"[OK] Rendered: {}\", ...) ... vec![format!(\"warning: operation persisted but sync-views failed: {err}\")] }",
+    "severity": "high",
+    "verify_note": "Production code confirmed at all cited lines: `sync_views_to_stdout` (117-130), `track_transition` (226-231), `track_branch_create` (263-265), `track_branch_switch` (292), `track_resolve` (317-325), `track_add_task` (425-430), `track_set_override` (460-465), `track_clear_override` (492-495), and `track_archive` (599-603) all build user-facing formatted strings with `format!`/`.join(\"\\n\")` inside `CliApp` composer methods, violating ADR 2026-06-21-1328 which requires rendering to move to a `cli_driver` primary adapter render module."
+  },
+  {
+    "category": "pre-formatted-stdout-stderr-in-composer-methods",
+    "file": "apps/cli-composition/src/domain.rs",
+    "line": "51-55",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module.",
+    "description": "The `domain_export_schema` composer method constructs the user-facing confirmation message `\"[OK] Schema written to {path}\"` using `format!` and places it directly in `CommandOutcome.stderr`. This user-visible string should be assembled by the `cli_driver` primary adapter render module.",
+    "evidence": "Ok(CommandOutcome { stdout: None, stderr: Some(format!(\"[OK] Schema written to {}\", path.display())), exit_code: 0, })",
+    "severity": "medium",
+    "verify_note": "Lines 51-55 contain exactly the cited code: the `domain_export_schema` method constructs `format!(\"[OK] Schema written to {}\", path.display())` and places it in `CommandOutcome.stderr` — this is production code, not a test or documented exception, and directly violates ADR 2026-06-21-1328's requirement that rendering move to the `cli_driver` primary adapter render module."
+  },
+  {
+    "category": "pre-formatted-stdout-stderr-in-composer-methods",
+    "file": "apps/cli-composition/src/ref_verify.rs",
+    "line": "135-158, 264-269",
+    "rule": "ADR 2026-06-21-1328: rendering must move to `cli_driver` primary adapter render module.",
+    "description": "The `ref_verify_run` method (lines 135-158) constructs three distinct user-visible stderr messages using `format!`: the `[OK] Semantic reference verification passed` success string, a `[BLOCKED] Semantic review confirmed {pair_count} production failure(s)...` block, and a `[ESCALATE] Human review required for {pair_count} unresolved pair(s)...` block. The `ref_verify_check_approved` method (lines 264-269) similarly formats a `[BLOCKED] ref-verify check-approved failed: {n} pair(s) without Pass cache:\\n{missing_or_non_pass.join(\"\\n\")}` error message. These are rendering decisions embedded in composer methods.",
+    "evidence": "stderr: Some(format!(\"[BLOCKED] Semantic review confirmed {pair_count} production failure(s). Resolve the failures before committing.\"))\nstderr: Some(format!(\"[BLOCKED] ref-verify check-approved failed: {} pair(s) without Pass cache:\\n{}\", missing_or_non_pass.len(), missing_or_non_pass.join(\"\\n\")))",
+    "severity": "high",
+    "verify_note": "Lines 135-158 and 264-273 in /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/ref_verify.rs contain user-visible bracketed status strings ([OK], [BLOCKED], [ESCALATE]) formatted directly in composer methods, not delegated to a `cli_driver` primary adapter render module, exactly as claimed; these are production code paths, not test code."
+  },
+  {
+    "category": "pre-formatted-stdout-stderr-in-composer-methods",
+    "file": "apps/cli-composition/src/signal.rs",
+    "line": "437-567",
+    "rule": "ADR 2026-06-21-1328: cli_composition must not carry multi-step orchestration; orchestration belongs in usecase. ADR 2026-05-27-0110: CliApp facade must be THIN.",
+    "description": "CliApp::signal_check_gate manually sequences four signal chains (⓪ ADR-user, ① spec-ADR, ② catalog-spec, ③ impl-catalog), resolves strictness for each from the gate matrix, calls each chain's infrastructure verifier inline, and then aggregates results via merge_outcomes. This is pure multi-step orchestration logic (the kind described in the hexagonal-architecture ADR as belonging in usecase): it decides which checks run, in what order, with what parameters, and how failures are aggregated. None of this is DI wiring. The aggregate gate pattern (run all four checks, collect outcomes, merge) is business sequencing and must live in a usecase interactor.",
+    "evidence": "let chain0 = { ... infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict(...) }; let chain1 = { ... infrastructure::verify::spec_states::verify_from_spec_json(...) }; let chain2 = match signal_check_layer_chain_with_strict(...); let chain3 = match signal_check_layer_chain_with_strict(...); Ok(merge_outcomes(gate_label, vec![chain0, chain1, chain2, chain3]))",
+    "severity": "high",
+    "verify_note": "signal_check_gate (lines 437-567) in cli-composition sequences four infrastructure verifier calls, resolves per-chain strictness from a gate matrix, and aggregates results via merge_outcomes — confirmed multi-step orchestration logic that belongs in a usecase interactor, not in the composition root."
+  },
+  {
+    "category": "pre-formatted-stdout-stderr-in-composer-methods",
+    "file": "apps/cli-composition/src/signal.rs",
+    "line": "167-194",
+    "rule": "ADR 2026-06-21-1328: multi-step I/O sequences (read → decode → mutate → re-encode → write) belong in usecase.",
+    "description": "signal_calc_spec_adr performs a multi-step sequence entirely in cli_composition: (1) reads spec.json from the filesystem via std::fs::read_to_string, (2) decodes it via spec_codec::decode, (3) calls doc.evaluate_signals() which runs business logic, (4) calls doc.set_signals(), (5) re-encodes, and (6) writes back atomically. Steps 2-5 are business logic steps that belong in a usecase interactor; cli_composition should only wire the codec/store adapters and call a single interactor method.",
+    "evidence": "let json_content = std::fs::read_to_string(&spec_json_path)...; let mut doc = spec_codec::decode(&json_content)...; let counts = doc.evaluate_signals(); doc.set_signals(counts); let encoded = spec_codec::encode(&doc)...; atomic_write_file(&spec_json_path, format!(\"{encoded}\\n\").as_bytes())...",
+    "severity": "medium",
+    "verify_note": "Lines 167-194 contain exactly the cited multi-step I/O + business-logic sequence (fs::read_to_string → spec_codec::decode → doc.evaluate_signals() → doc.set_signals() → spec_codec::encode → atomic_write_file) in production cli-composition code, not test code; no documented exception found."
+  },
+  {
+    "category": "multi-step-orchestration",
+    "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+    "line": "214-291",
+    "rule": "ADR 2026-06-21-1328: multi-step diff-fragment computation sequences belong in usecase.",
+    "description": "build_current_fragment_refs is a private helper inside cli_composition that manually sequences: (1) CWD mutation for git discovery, (2) list_changed_hunks via infrastructure, (3) extract_code_fragments via infrastructure, (4) path normalization loop over raw fragments, (5) changed-path filtering, (6) fragments_overlapping_hunks domain call, and (7) fragment_ref derivation loop. This entire pipeline—choosing which fragments are relevant, normalizing paths, filtering by changed hunks, deriving refs—is multi-step business logic that belongs in a usecase interactor.",
+    "evidence": "fn build_current_fragment_refs(...) { let getter = GitDryCheckDiffGetter; let changed_hunks_result = getter.list_changed_hunks(base); ... let raw_fragments = extract_code_fragments(canonical_root)...; let mut normalized: Vec<CodeFragment> = ...; for frag in raw_fragments { ... normalized.push(rebuilt); } let changed_paths = ...; let candidates = normalized.iter().filter(...).cloned().collect(); let diff_fragments = fragments_overlapping_hunks(&candidates, &changed_hunks); let mut refs = BTreeSet::new(); for fragment in &diff_fragments { ... refs.insert(r); } Ok(refs) }",
+    "severity": "medium",
+    "verify_note": "Lines 214-291 contain a real production (non-test) private function that sequences CWD mutation, two infrastructure calls, path normalization, changed-path filtering, a domain call, and ref derivation — all multi-step business logic that ADR 2026-06-21-1328 requires to live in a usecase interactor, not in cli_composition."
+  },
+  {
+    "category": "multi-step-orchestration",
+    "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+    "line": "428-518",
+    "rule": "ADR 2026-05-27-0110 / 2026-06-21-1328: cli_composition must not carry conditional multi-branch orchestration logic beyond DI wiring.",
+    "description": "Inside CliApp::fixpoint_resolve, the large if usecase_dry_config.enabled { ... } else { ... } block at lines 428-518 manually orchestrates: diff-base resolution (with its own CWD guard), corpus-root manifest branching on symlink_metadata result, workspace-root selection between two code paths, build_current_fragment_refs invocation, and final adapter construction. This is multi-step conditional orchestration that belongs in a usecase interactor; cli_composition should call one interactor method. The dry-gate enabled/disabled branching and all corpus-fingerprint conditional logic is business sequencing.",
+    "evidence": "let (current_fragment_refs, dry_approval): (...) = if usecase_dry_config.enabled { let original_cwd = std::env::current_dir()...; std::env::set_current_dir(&repo_root)...; let base_result = resolve_dry_diff_base_for_track(...); ... let (approval_workspace_root, current_corpus_fingerprint) = match std::fs::symlink_metadata(&corpus_root_manifest_path) { Err(e) if ... => ..., _ => { ... } }; let refs = build_current_fragment_refs(...)?; ... } else { (BTreeSet::new(), Arc::new(NoOpDryApprovalService) ...) };",
+    "severity": "medium",
+    "verify_note": "Lines 428-518 in CliApp::fixpoint_resolve contain a large if/else block that manually manages a CWD guard, calls resolve_dry_diff_base_for_track, branches on std::fs::symlink_metadata result for corpus-root manifest, selects between two workspace-root code paths, calls build_current_fragment_refs, and constructs the DryCheckApprovalInteractor — all multi-step conditional orchestration in the composition crate rather than a usecase interactor, confirming the ADR 2026-05-27-0110 / 2026-06-21-1328 violation."
+  },
+  {
+    "category": "multi-step-orchestration",
+    "file": "apps/cli-composition/src/dry.rs",
+    "line": "318-425",
+    "rule": "ADR 2026-06-21-1328: presentation/output-formatting and business aggregation beyond adapter wiring belong outside cli_composition.",
+    "description": "After interactor.run_dry_check returns, CliApp::dry_write reads the store again (store_for_summary.read_records after write) to compute records_before/records_after/records_appended, and then builds summary metrics (pairs_checked, diff_fragments_processed). This post-execution data aggregation and metrics derivation (saturating_sub, derived counts) is business logic, not DI wiring. The interactor should return these metrics. Additionally, the records_before read before calling run_dry_check is similarly a cross-cutting metric-tracking step.",
+    "evidence": "let records_before = store_for_summary.read_records()...; ... let dry_result = interactor.run_dry_check(...); ... let records_after = store_for_summary.read_records()...; let records_appended = records_after.saturating_sub(records_before); let pairs_checked = records_appended; Ok(dry_write_outcome(&findings, pairs_checked, records_appended, diff_fragments_processed))",
+    "severity": "low",
+    "verify_note": "Lines 318-425 of apps/cli-composition/src/dry.rs confirm the violation: production code reads the store before and after calling interactor.run_dry_check, then computes records_appended via saturating_sub and derives pairs_checked — metric aggregation that belongs in the interactor's return value, not in the composition layer."
+  },
+  {
+    "category": "multi-step-orchestration",
+    "file": "apps/cli-composition/src/dry.rs",
+    "line": "560-592",
+    "rule": "ADR 2026-06-21-1328: looping over domain objects to build derived state belongs in usecase.",
+    "description": "CliApp::dry_check_approved manually iterates over diff_fragments to build a BTreeSet<FragmentRef> via fragment_ref_of, which is domain logic (deriving canonical refs from fragments). This loop, which directly executes a usecase-owned function (fragment_ref_of imported from usecase::dry_check), is business sequencing that belongs in a usecase interactor rather than in cli_composition.",
+    "evidence": "let mut current_fragment_refs: BTreeSet<domain::dry_check::FragmentRef> = BTreeSet::new(); for fragment in &diff_fragments { let fragment_ref = fragment_ref_of(fragment)...; current_fragment_refs.insert(fragment_ref); }",
+    "severity": "low",
+    "verify_note": "Lines 586-591 in production code (before the test module at line 648) confirm the loop: `for fragment in &diff_fragments { let fragment_ref = fragment_ref_of(fragment)...; current_fragment_refs.insert(fragment_ref); }` — `fragment_ref_of` is imported from `usecase` (line 28) and the iteration builds a `BTreeSet<domain::dry_check::FragmentRef>` directly in cli_composition's `dry_check_approved` method, which is the orchestration ADR 2026-06-21-1328 says belongs in a usecase interactor."
+  },
+  {
+    "category": "multi-step-orchestration",
+    "file": "apps/cli-composition/src/dry.rs",
+    "line": "437-492",
+    "rule": "ADR 2026-06-21-1328: presentation-formatting (rendering output records) belongs in the `cli_driver` primary adapter render module, not in cli_composition.",
+    "description": "CliApp::dry_results manually formats each DryCheckRecord into display strings with rich field-level rendering (pair key, changed path, verdict label, score/threshold/base, rationale, recorded_at). This is output-formatting/presentation logic. Per ADR 2026-06-21-1328, rendering belongs in the `cli_driver` primary adapter render module. cli_composition should wire the driver/usecase boundary, not transform output DTOs to strings.",
+    "evidence": "for record in &results.records { lines.push(format!(\"  pair: [{} ({})] <-> [{} ({})]\", ..., record.pair_key().low().path(), ...)); lines.push(format!(\"  changed_path (display-only): {}\", ...)); let verdict_str = match record.verdict() { DryCheckVerdict::NotAViolation => ..., DryCheckVerdict::Accepted => ..., DryCheckVerdict::Violation { refactor_proposal } => ... }; lines.push(format!(\"  verdict: {verdict_str}\")); ... }",
+    "severity": "medium",
+    "verify_note": "Lines 462-492 confirm rich field-level presentation formatting (pair keys, verdict labels, score/threshold/base, rationale, recorded_at) assembled into display strings inside CliApp::dry_results in cli_composition, with no cfg(test) guard or documented exception — a genuine ADR 2026-06-21-1328 violation."
+  },
+  {
+    "category": "stringly-typed-error-boundary",
+    "file": "apps/cli-composition/src",
+    "line": "domain.rs:24, dry.rs:240, verify.rs:115, git.rs:15, ref_verify.rs:89 (representative; 51 public CliApp methods total, plus dozens of private helpers across all files)",
+    "rule": "ADR 2026-05-27-0110 D2 / ADR 2026-06-21-1328 D2: cli_composition public method error type must be a typed CompositionError, not String",
+    "description": "The audited 51-method CliApp public surface in cli-composition uses stringly typed composition boundaries such as Result<CommandOutcome, String>, Result<Option<String>, String>, or Result<PathBuf, String>. No typed CompositionError exists anywhere in the source tree — it appears only in ADR prose. ADR 2026-05-27-0110 D2 explicitly required Result<_, CompositionError> on the public facade, and ADR 2026-06-21-1328 diagnoses this as a drift and mandates introduction of the typed error. The stringly-typed boundary forces callers (the cli bin) to interpret opaque error strings instead of pattern-matching typed variants, making error handling fragile and unauditable.",
+    "evidence": "pub fn domain_export_schema(&self, ...) -> Result<CommandOutcome, String>\npub fn dry_write(&self, ...) -> Result<CommandOutcome, String>\npub fn verify_tech_stack(&self, ...) -> Result<CommandOutcome, String>\npub fn ref_verify_run(&self, ...) -> Result<CommandOutcome, String>\npub fn git_add_all(&self) -> Result<CommandOutcome, String>",
+    "severity": "high",
+    "verify_note": "Confirmed at all cited lines: every public CliApp method returns Result<CommandOutcome, String> (e.g., domain.rs:24, git.rs:15, dry.rs:240, verify.rs:115), and CompositionError does not exist anywhere in the source tree — only in ADR prose."
+  },
+  {
+    "category": "god-facade",
+    "file": "apps/cli-composition/src/lib.rs",
+    "line": "160 (pub struct CliApp;), plus impl CliApp blocks across 27 files",
+    "rule": "ADR 2026-05-27-0110: CliApp facade must be THIN; ADR 2026-06-21-1328: CliApp god-facade to be dissolved into per-context composers",
+    "description": "CliApp is declared as a unit struct (pub struct CliApp;) with no fields, meaning it holds no state and performs no dependency injection — it acts as a flat namespace. Its implementation is spread across 27 impl CliApp blocks in 27 different source files covering 20 distinct command families (verify, dry, track, pr, review_v2, signal, git, arch, hook, semantic_dup, etc.). The struct exposes 51 public methods taking &self. ADR 2026-05-27-0110 intended a thin facade; ADR 2026-06-21-1328 explicitly names this a god-facade anti-pattern and calls for dissolving it into per-context composer structs. The single unit-struct accumulating all command dispatch with no injected dependencies makes it impossible to scope, test, or replace individual command families independently.",
+    "evidence": "pub struct CliApp;  // lib.rs:160, no fields\n// 27 impl CliApp blocks across: arch.rs, conventions.rs, demo.rs, domain.rs, dry.rs, dry_fix_runner.rs, file.rs, git.rs, guard.rs, hook.rs, lib.rs, pr.rs, ref_verify.rs, review_v2/mod.rs, semantic_dup/build.rs, semantic_dup/check.rs, semantic_dup/find_similar.rs, semantic_dup/measure_quality.rs, signal.rs, telemetry.rs, track/fixpoint_resolve.rs, track/mod.rs, track/ops.rs, track/resolution.rs, track/set_commit_hash.rs, track/tddd.rs, verify.rs\n// 51 public methods total; verify.rs alone has 15",
+    "severity": "high",
+    "verify_note": "pub struct CliApp; confirmed at lib.rs:160 with no fields, and impl CliApp blocks verified across exactly 27 files covering all cited command families — the god-facade anti-pattern named in ADR 2026-06-21-1328 is real and present."
+  },
+  {
+    "category": "cli-bin-business-logic",
+    "file": "apps/cli/src/main.rs",
+    "line": "247-294",
+    "rule": "ADR 2026-05-27-0110 D3 / ADR 2026-06-21-1328 D5/D8: cli bin must parse, dispatch, and emit only; all non-parse logic must be delegated.",
+    "description": "The production function `emit_archived_track_subcommand` (lines 247-294) performs file I/O (`std::fs::create_dir_all`, `std::fs::OpenOptions`), JSON serialization (`serde_json::json!`, `serde_json::to_vec`), and wall-clock access (`chrono::Utc::now()`) directly in the cli binary. This telemetry path should be delegated to an infrastructure adapter wired by cli_composition and invoked through `cli_driver` per ADR 2026-06-21-1328 D8. The cli bin should only dispatch to the driver and emit the `CommandOutcome`.",
+    "evidence": "let event = serde_json::json!({ ... \"timestamp\": chrono::Utc::now().to_rfc3339() }); std::fs::create_dir_all(parent); std::fs::OpenOptions::new().append(true).create(true).open(&path)",
+    "severity": "high",
+    "verify_note": "Production function `emit_archived_track_subcommand` at lines 247-294 of apps/cli/src/main.rs contains file I/O (`std::fs::create_dir_all`, `std::fs::OpenOptions`), JSON serialization (`serde_json::json!`, `serde_json::to_vec`), and wall-clock access (`chrono::Utc::now()`) directly in the cli binary, violating the thin-bin requirement carried by ADR 2026-05-27-0110 D3 and ADR 2026-06-21-1328 D5/D8."
+  },
+  {
+    "category": "cli-composition-god-facade",
+    "file": "apps/cli-composition/src/lib.rs",
+    "line": "160-167",
+    "rule": "ADR 2026-05-27-0110 D2 (god-object avoidance) + ADR 2026-06-21-1328: CliApp god-facade must be dissolved into per-context composers.",
+    "description": "`CliApp` is a stateless unit struct with 51 public methods spread across 27 impl files (arch.rs, conventions.rs, demo.rs, domain.rs, dry.rs, file.rs, git.rs, guard.rs, hook.rs, pr.rs, ref_verify.rs, review_v2/mod.rs, semantic_dup/mod.rs, signal/mod.rs, telemetry.rs, track/ops.rs, track/mod.rs, verify.rs, etc.). ADR 2026-05-27-0110 D2 required 'god-object にならないよう' delegation; ADR 2026-06-21-1328 uses this same 51 public methods / 27 files baseline and declares the spirit violated. The required fix is dissolution into bounded-context per-context composers.",
+    "evidence": "pub struct CliApp; — 51 public methods across 27 files including review_v2/mod.rs (1297 lines), review_v2/run.rs (1044 lines), track/ops.rs, pr.rs, git.rs, hook.rs, etc.",
+    "severity": "high",
+    "verify_note": "`pub struct CliApp;` is confirmed at lib.rs:160 with 27 `impl CliApp` blocks across 27 files contributing 51 public methods, exactly matching the god-facade pattern prohibited by ADR 2026-05-27-0110 D2 and ADR 2026-06-21-1328."
+  },
+  {
+    "category": "cli-composition-presentation-leak",
+    "file": "apps/cli-composition/src/pr.rs",
+    "line": "38, 67, 73, 84, 209-235",
+    "rule": "ADR 2026-06-21-1328 D1: presentation/output-formatting must NOT live in cli_composition; it belongs in the new `cli_driver` primary adapter.",
+    "description": "cli_composition production code contains direct output emission (`println!`/`eprintln!`) and JSON response formatting at 14+ call sites across: pr.rs (lines 38, 67, 73, 84, 209, 218, 225, 226, 230, 234), pr/poll.rs (lines 60, 248, 289, 295, 317, 351, 385, 391, 396, 430, 445, 582, 600, 602, 616), track/set_commit_hash.rs (lines 29, 33, 34), track/fixpoint_resolve.rs (lines 240, 450, 472), dry/shared.rs (lines 76, 81), review_v2/run_fix.rs (line 41), review_v2/shared.rs (lines 248, 262). The `render_outcome` helper in cmd_outcome.rs also formats verification output. ADR 2026-06-21-1328 D1/D3 requires all presentation formatting to move into `cli_driver` primary adapters.",
+    "evidence": "println!(\"Pushing {} to origin...\", ctx.branch); eprintln!(\"[ERROR] {err}\"); render_outcome() in cmd_outcome.rs; serde_json::json!({}) formatting at guard.rs:42, track/ops.rs:177-184, hook.rs:241, ref_verify.rs:341-405",
+    "severity": "high",
+    "verify_note": "Production code in apps/cli-composition/src/pr.rs contains println!/eprintln! output-formatting calls at lines 38, 67, 73, 84, 209-235, directly violating ADR 2026-06-21-1328 D1 which forbids presentation logic in cli_composition."
+  },
+  {
+    "category": "cli-composition-stringly-typed-error",
+    "file": "apps/cli-composition/src/arch.rs",
+    "line": "12, 22, 31, 40, 49",
+    "rule": "ADR 2026-05-27-0110 D2 specified Result<_, CompositionError>; ADR 2026-06-21-1328 documents this as drift and mandates introducing typed CompositionError.",
+    "description": "All public CliApp methods across 20+ files return `Result<CommandOutcome, String>` (stringly-typed error) instead of the specified `Result<CommandOutcome, CompositionError>`. ADR 2026-06-21-1328 explicitly calls this out: 'エラーの drift: 全コマンドメソッドが Result<CommandOutcome, String> を返す。typed から stringly-typed へ drift している'. Approximately 255 lines of production code produce `Err(format!(...))` or `.map_err(|e| format!(...))` error strings. Representative locations: arch.rs lines 12/22/31/40/49, git.rs (9 occurrences), track/ops.rs (5 occurrences), review_v2/scope.rs (6 occurrences), guard.rs, dry/corpus_root.rs, etc.",
+    "evidence": "pub fn arch_tree(&self, project_root: &Path) -> Result<CommandOutcome, String>; pub fn git_add_all(&self) -> Result<CommandOutcome, String>; .map_err(|e| format!(\"atomic write failed: {e}\"))",
+    "severity": "high",
+    "verify_note": "arch.rs lines 12/22/31/40/49 confirm all four public CliApp methods return `Result<CommandOutcome, String>` (stringly-typed), exactly matching the drift described in ADR 2026-06-21-1328; no test guard or documented exception present."
+  },
+  {
+    "category": "cli-composition-orchestration-leak",
+    "file": "apps/cli-composition/src/pr/poll.rs",
+    "line": "248-396",
+    "rule": "ADR 2026-06-21-1328 D4: multi-step orchestration/business logic must NOT live in cli_composition; it belongs in usecase application services.",
+    "description": "cli_composition carries multi-step application orchestration that ADR 2026-06-21-1328 D4 says belongs in usecase: (1) the PR review polling loop in pr/poll.rs (lines 248-396) with retry/timeout/fallback logic; (2) `merge_outcomes` and signal layer chain composition in signal_layer_chain.rs; (3) the `dry_fix_runner.rs` (600 lines) multi-step fix cycle; (4) `review_v2/run.rs` (1044 lines) review cycle orchestration with `with_repo_cwd` CWD management. These are application-level step-integration concerns that should live in usecase, not the DI wiring layer.",
+    "evidence": "eprintln!(\"Polling for Codex review on PR #{pr} (interval={interval}s, timeout={timeout}s)...\"); loop { ... thread::sleep(Duration::from_secs(delay_seconds)); } — in poll.rs:248-396; dry_fix_runner.rs 600-line fix cycle",
+    "severity": "medium",
+    "verify_note": "Lines 248-398 of /home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/pr/poll.rs contain a real multi-step PR review polling loop with retry/timeout/fallback logic (eprintln!, loop, sleep, deadline tracking, recovery path) — genuine application orchestration that ADR 2026-06-21-1328 D4 requires to live in the usecase layer, not the composition/DI-wiring layer."
+  },
+  {
+    "category": "adapter-outside-infrastructure",
+    "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+    "line": "84-122",
+    "rule": "hexagonal-architecture.md Adapter Rules: 定義場所 = infrastructure のみ",
+    "description": "FsReviewGateStateAdapter implements usecase::fixpoint_resolve::ReviewGateStatePort directly in the cli_composition layer. This struct reads filesystem review state (delegates to crate::review_v2::approved::check_approved_str which itself performs file IO). Adapters that implement port traits — especially those touching the filesystem — belong exclusively in libs/infrastructure. No corresponding implementation exists in infrastructure.",
+    "evidence": "struct FsReviewGateStateAdapter { items_dir: PathBuf }\nimpl ReviewGateStatePort for FsReviewGateStateAdapter { fn review_status(...) }",
+    "severity": "high",
+    "verify_note": "Lines 84-122 confirm: `FsReviewGateStateAdapter` implements `ReviewGateStatePort` directly in `apps/cli-composition`, performs filesystem IO via `crate::review_v2::approved::check_approved_str`, is not under `#[cfg(test)]`, and no equivalent implementation exists in `libs/infrastructure`."
+  },
+  {
+    "category": "adapter-outside-infrastructure",
+    "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+    "line": "131-165",
+    "rule": "hexagonal-architecture.md Adapter Rules: 定義場所 = infrastructure のみ",
+    "description": "FsRefVerifyGateStateAdapter implements usecase::fixpoint_resolve::RefVerifyGateStatePort inside cli_composition. It queries ref-verify gate state by calling CliApp::ref_verify_check_approved, which ultimately reads cached ref-verify results from the filesystem. Adapter structs implementing port traits must reside in libs/infrastructure. No infrastructure implementation of this port exists.",
+    "evidence": "struct FsRefVerifyGateStateAdapter { items_dir: PathBuf }\nimpl RefVerifyGateStatePort for FsRefVerifyGateStateAdapter { fn ref_verify_status(...) }",
+    "severity": "high",
+    "verify_note": "Lines 131-165 confirm production-code struct FsRefVerifyGateStateAdapter implementing RefVerifyGateStatePort inside apps/cli-composition, not inside libs/infrastructure; it is not test-gated (#[cfg(test)] begins at line 548)."
+  },
+  {
+    "category": "adapter-outside-infrastructure",
+    "file": "apps/cli-composition/src/track/mod.rs",
+    "line": "101-113",
+    "rule": "hexagonal-architecture.md Adapter Rules: 定義場所 = infrastructure のみ",
+    "description": "LazyBranchReader implements usecase::track_resolution::BranchReaderPort in cli_composition by wrapping infrastructure::git_cli::SystemGitRepo. This is a redundant adapter: SystemGitRepo already implements BranchReaderPort directly in libs/infrastructure/src/git_cli/mod.rs (line 244). Having a second impl in cli_composition duplicates adapter logic outside the designated infrastructure layer.",
+    "evidence": "struct LazyBranchReader { project_root: PathBuf }\nimpl BranchReaderPort for LazyBranchReader { fn current_branch(&self) -> ... { let repo = infrastructure::git_cli::SystemGitRepo::discover_from(...); ... } }",
+    "severity": "medium",
+    "verify_note": "LazyBranchReader implementing BranchReaderPort is confirmed at lines 101-113 in apps/cli-composition/src/track/mod.rs; it is not test code, has no documented exception, and exists solely to work around UFCS trait disambiguation (per comment at line 110), making it a genuine redundant adapter outside the infrastructure layer — though the severity is medium rather than high because it delegates entirely to the already-correct infrastructure impl with zero new adapter logic."
+  },
+  {
+    "category": "adapter-outside-infrastructure",
+    "file": "apps/cli-composition/src/dry/tier_telemetry.rs",
+    "line": "115-198",
+    "rule": "hexagonal-architecture.md Adapter Rules: 定義場所 = infrastructure のみ",
+    "description": "RecordingDryAgent is a generic decorator struct that implements usecase::dry_check::DryCheckAgentPort (an infrastructure port for Codex subprocess agent calls). Placing a DryCheckAgentPort implementation — even a telemetry-wrapping decorator — in cli_composition violates the rule that all port-trait impls (adapters) belong in libs/infrastructure. This is production code (no #[cfg(test)] guard); its pub(super) visibility confirms it is wired at runtime.",
+    "evidence": "pub(super) struct RecordingDryAgent<A> { inner: A, ... }\nimpl<A: DryCheckAgentPort> DryCheckAgentPort for RecordingDryAgent<A> { fn judge(...) }",
+    "severity": "medium",
+    "verify_note": "Lines 115-198 of apps/cli-composition/src/dry/tier_telemetry.rs contain a production (no #[cfg(test)] guard) DryCheckAgentPort implementation — RecordingDryAgent<A> — confirming the violation; hexagonal-architecture.md line 38 places adapters in infrastructure only, and ADR 2026-06-21-1328 restricts cli-composition to DI wiring."
+  },
+  {
+    "category": "adapter-outside-infrastructure",
+    "file": "apps/cli-composition/src/dry/persistent_index.rs",
+    "line": "278-316",
+    "rule": "hexagonal-architecture.md Adapter Rules: 定義場所 = infrastructure のみ",
+    "description": "NullInsertIndexProxy implements usecase::semantic_dup::SemanticIndexPort inside cli_composition. It wraps LanceDbSemanticIndexAdapter (the real infrastructure adapter) and suppresses insert/insert_batch while delegating search and delete to the inner adapter. This is a port-implementing decorator struct that manages filesystem-level LanceDB state (via PersistentIndexLock), and must live in libs/infrastructure.",
+    "evidence": "pub(super) struct NullInsertIndexProxy { inner: Arc<LanceDbSemanticIndexAdapter>, _cache_lock: PersistentIndexLock }\nimpl SemanticIndexPort for NullInsertIndexProxy { fn insert(...) { Ok(()) } fn search(...) { self.inner.search(...) } }",
+    "severity": "medium",
+    "verify_note": "NullInsertIndexProxy is confirmed at lines 278-316 in production code (not cfg(test)), implementing SemanticIndexPort inside cli-composition — a port-implementing decorator adapter that belongs in libs/infrastructure."
+  },
+  {
+    "category": "adapter-outside-infrastructure",
+    "file": "apps/cli-composition/src/semantic_dup/measure_quality.rs",
+    "line": "23-52",
+    "rule": "hexagonal-architecture.md Adapter Rules: 定義場所 = infrastructure のみ",
+    "description": "NoopSemanticIndexPort implements usecase::semantic_dup::SemanticIndexPort as a null-object adapter in cli_composition. Null-object adapters (stubs used at the DI wiring level, not in #[cfg(test)]) satisfy port contracts and belong in libs/infrastructure as companion stubs alongside the real infrastructure adapters.",
+    "evidence": "struct NoopSemanticIndexPort;\nimpl SemanticIndexPort for NoopSemanticIndexPort { fn insert(...) { Ok(()) } fn search(...) { Ok(Vec::new()) } }",
+    "severity": "low",
+    "verify_note": "NoopSemanticIndexPort is defined at production scope (lines 23-52, outside #[cfg(test)]) in apps/cli-composition and wired via Arc::new at line 84, confirming a null-object adapter implementing a usecase port lives outside libs/infrastructure as the rule requires."
+  },
+  {
+    "category": "adapter-outside-infrastructure",
+    "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+    "line": "49-59",
+    "rule": "hexagonal-architecture.md Adapter Rules: 定義場所 = infrastructure のみ",
+    "description": "NoOpDryApprovalService implements usecase::dry_check::DryCheckApprovalService (a usecase application-service port) in cli_composition. Even though it is a no-op stub needed for DI wiring when dry-check is disabled, any struct that implements a port trait is an adapter per hexagonal-architecture.md and should reside in libs/infrastructure (or alternatively be provided as a test-double from usecase if it requires no infrastructure access).",
+    "evidence": "struct NoOpDryApprovalService;\nimpl DryCheckApprovalService for NoOpDryApprovalService { fn check_approved(...) -> Result<DryCheckApprovalVerdict, ...> { Ok(DryCheckApprovalVerdict::Approved) } }",
+    "severity": "low",
+    "verify_note": "NoOpDryApprovalService (lines 49-59) is confirmed present in production code (not under #[cfg(test)]) and implements the usecase port DryCheckApprovalService inside apps/cli-composition instead of libs/infrastructure, constituting a real adapter-outside-infrastructure violation."
+  }
+]

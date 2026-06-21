@@ -1,0 +1,8 @@
+{
+  "branch": "track/cli-composition-split-presentation-layer-2026-06-21",
+  "created_at": "2026-06-21T16:17:00Z",
+  "id": "cli-composition-split-presentation-layer-2026-06-21",
+  "schema_version": 5,
+  "title": "CLI delivery 側の責務分離 — composition root と primary adapter への分解",
+  "updated_at": "2026-06-21T16:17:00Z"
+}

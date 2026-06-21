@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ed4e3fe15718ee39d7d8b03e68f373a16bf63b3f49bb75e8374dcac9e899986",
+          "at": "2026-06-21T16:26:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The audit bundle still encodes ADR 1328 as requiring a separate `cli-presentation` layer/crate for rendering, and the same assumption is repeated in the README remediation text. That contradicts the ADR added in this PR, which explicitly rejects the `cli-presentation`/4-layer split and places render inside the new `cli_driver` primary adapter. Because this bundle is cited as the evidence/remediation base for the track, following it would steer the implementation toward an architecture the governing ADR rejects; update the findings/remediation wording to move rendering out of `cli_composition` into `cli_driver`, not `cli-presentation`.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-06-21-1420-layer-violation-check/findings.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7ed4e3fe15718ee39d7d8b03e68f373a16bf63b3f49bb75e8374dcac9e899986",
+          "at": "2026-06-21T16:30:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The audit bundle is internally inconsistent about the category for `dry_results`: the README lists `apps/cli-composition/src/dry.rs:437-492` under `pre-formatted-stdout-stderr-in-composer-methods` and describes it as presentation/rendering work, but the source JSON records the same finding as `multi-step-orchestration` even though its own description also says it is output-formatting/presentation logic. This makes the category counts/remediation mapping unreliable for the plan artifact: downstream readers cannot tell whether this finding is part of the render migration or orchestration migration.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-06-21-1420-layer-violation-check/findings.json",
+              "line": 213,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan artifacts give conflicting `CliApp` public-method counts for the same god-facade evidence. ADR 1328 uses `51 メソッド/27 ファイル` as the baseline, while the audit README says approximately 140 public methods and the JSON contains both `50 pub fn methods total` and `140+ pub fn methods`. Because this count is cited as evidence for D2/D6(e) decomposition scope, leaving all four values in the plan makes the evidence base self-contradictory and undermines sizing for the `CliApp` dissolution work.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-06-21-1420-layer-violation-check/findings.json",
+              "line": 237,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2247272a746ed57dc1e98d2aceaf68e7212d8f37b372ac1d170b6a46ca018434",
+          "at": "2026-06-21T16:48:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The audit JSON has two category assignments swapped relative to the findings' own semantics and the README: `signal_check_gate` is labeled `pre-formatted-stdout-stderr-in-composer-methods` even though its rule/description and README section classify it as multi-step orchestration, while `dry_results` is labeled `multi-step-orchestration` even though its rule/description and README classify it as presentation formatting. This leaves the audit bundle internally contradictory while preserving the category counts, so ADR 1328's D1/D3/D4 evidence map can point readers at the wrong remediation bucket. Align these JSON categories with the README/description semantics.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-06-21-1420-layer-violation-check/findings.json",
+              "line": 153,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cba2db0c0d477cdb3254c3c0a5bf73e4f1c7b754739f181437bb3c003da5320b",
+          "at": "2026-06-21T16:58:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 says `PrimaryAdapter` gets a `NoRoleInMethodSignature` check to keep domain/usecase role types out of public method signatures, and D3 separately lists `UseCase`, `Interactor`, `Command`, `Query`, and `ApplicationService` as forbidden in CLI layers. The rule specified here only forbids `Entity`, `AggregateRoot`, `ValueObject`, `Repository`, and `SecondaryPort`, so a `cli_driver` public method could still expose usecase command/query/interactor types without this signature rule firing. The lint plan does not enforce its own boundary-purity requirement unless those usecase roles are included or the decision is narrowed consistently.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+              "line": 72,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6a82ec7cdca7988b2981c4da696e11fab19338d55f31ffdd77c5fe75312f3bb3",
+          "at": "2026-06-21T17:02:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8731614575f908305f035930e91c92ac98050cc65642fdbbc759b2b81b92b88",
+          "at": "2026-06-21T17:06:32Z"
+        }
+      ]
+    }
+  }
+}
