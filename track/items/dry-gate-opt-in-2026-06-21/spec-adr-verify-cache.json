@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "38ebe156e307fccae393e5caa0916e3d3c6299d53001a9390de0bd952fbe2ae5",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DRY ゲート（`sotp dry check-approved` による commit ブロックと DFP 修正ループ）を、無条件必須から利用者設定で有効/無効を切り替えられるようにする。既定は無効（OFF）とし、ゲートを使いたい利用者が明示的に有効化する opt-in 運用とする。"
+      }
+    },
+    {
+      "claim_hash": "0685756d3103f98411c9852996daf052b5ad0208c527f6058603934175f96a14",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`enabled: false` のとき DRY ゲートは走らず（検出も DFP 修正ループも実行しない）、ゲート評価は通過として扱い commit をブロックしない。… 無効化は DRY ゲートの 2 つの評価点 ― commit ゲートの `sotp dry check-approved` と、full-cycle の DFP 起動を判定する `fixpoint_resolve` …― が `enabled` を読み、`false` のとき「通過 / DFP 不要」を返すことで実現する。これにより commit メッセージゲート（`track-commit-message`）など上位の Makefile 配線は変更しない。」"
+      }
+    },
+    {
+      "claim_hash": "789dc5ce02e892b7e89e14e483e38c8be8e2abda6d66077142612d3bb053e20b",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定で有効化したときの DRY ゲートは従来どおり blocking であり、個別の違反を場当たり的に握りつぶす抜け道は設けない。"
+      }
+    },
+    {
+      "claim_hash": "f63f5290dbd00ce3392e8ac1997646528da16cde77c88bf90589ac87d84cde89",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。既定は `enabled: false`。キー追加に伴い `dry-check.json` の `schema_version` は 3 から 4 へ上げる"
+      }
+    },
+    {
+      "claim_hash": "66eb111bd995d18072a96419ae772a1acbf512c19cf48ea759be5ba64d1dbd9f",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "無効化は DRY ゲートの 2 つの評価点 ― commit ゲートの `sotp dry check-approved` と、full-cycle の DFP 起動を判定する `fixpoint_resolve`（`sotp track fixpoint-resolve`）― が `enabled` を読み、`false` のとき「通過 / DFP 不要」を返すことで実現する。"
+      }
+    },
+    {
+      "claim_hash": "85c71c7c2781f26bd15ff0d1d8849973a41a61fa0e587a04ea5130e44895bdf1",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "無効化は DRY ゲートの 2 つの評価点 ― commit ゲートの `sotp dry check-approved` と、full-cycle の DFP 起動を判定する `fixpoint_resolve`（`sotp track fixpoint-resolve`）― が `enabled` を読み、`false` のとき「通過 / DFP 不要」を返すことで実現する。"
+      }
+    },
+    {
+      "claim_hash": "ca6468ef4c60fd6d752de5f126fb2af1bd56801e01338693bc00849c2cd91109",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "適用範囲はリポジトリ全体の単一設定とし、トラック単位・違反単位の上書きは設けない。"
+      }
+    },
+    {
+      "claim_hash": "439d7ad70d59eb56e979c79667afa73f07b2a4db54253240d5177efa026489aa",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。既定は `enabled: false`。... キー追加に伴い `dry-check.json` の `schema_version` は 3 から 4 へ上げる"
+      }
+    },
+    {
+      "claim_hash": "a9d5edf5eb90193b7649ba17bf64244c4a97d05e079a2e6236d5f0756989162c",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。既定は `enabled: false`。"
+      }
+    },
+    {
+      "claim_hash": "343ccab5041ec9d142ec58fc73440a1017a1210426de0a72257792f82b752fe7",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が置き換えるのは D7 の「ゲートは無条件で必須」という側面のみで"
+      }
+    },
+    {
+      "claim_hash": "928462914391e0fedab9ec8ab44152fc48818db6f5e7f72ea3dda2a7b13a86ca",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chose:既定OFF/boolean/グローバル"
+      }
+    },
+    {
+      "claim_hash": "2b2c19bf97d5696db71a5636eb292b1942e432b79952387487eac791a2068ddd",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "適用範囲はリポジトリ全体の単一設定とし、トラック単位・違反単位の上書きは設けない。"
+      }
+    },
+    {
+      "claim_hash": "5694475b5b2f9749760f4cd7cf054febeb6a2a35ee97e3cdc63f34976ad7cd40",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "evaluated:[A:完全撤去, B:advisory既定3値, C:CLI bypassフラグ, D:opt-out既定ON, E:細粒度] chose:既定OFF/boolean/グローバル\n\nDRY ゲート（`sotp dry check-approved` による commit ブロックと DFP 修正ループ）を、無条件必須から利用者設定で有効/無効を切り替えられるようにする。既定は無効（OFF）"
+      }
+    },
+    {
+      "claim_hash": "b2c6d9c9027407ec766654af44d501900365536a2aa10a5bfb2f907983d27a21",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「設定で有効化したときの DRY ゲートは従来どおり blocking であり」"
+      }
+    },
+    {
+      "claim_hash": "2fb338194178b8bdd780a5f9558259a545050912d90aaae060cd41da6da1ee28",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "これにより commit メッセージゲート（`track-commit-message`）など上位の Makefile 配線は変更しない。"
+      }
+    },
+    {
+      "claim_hash": "d4651791b6e904f77316203fcdb756a7539e2a2f704865420d5dbe3d26af51a0",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`enabled: false` のとき DRY ゲートは走らず（検出も DFP 修正ループも実行しない）、ゲート評価は通過として扱い commit をブロックしない。"
+      }
+    },
+    {
+      "claim_hash": "9aabb8ebd5faa588c93b06f0e8210192d1c7bd7cf32fa11ca206248bc40bee07",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "無効化は DRY ゲートの 2 つの評価点 ― commit ゲートの `sotp dry check-approved` と、full-cycle の DFP 起動を判定する `fixpoint_resolve`（`sotp track fixpoint-resolve`）― が `enabled` を読み、`false` のとき「通過 / DFP 不要」を返すことで実現する。これにより commit メッセージゲート（`track-commit-message`）など上位の Makefile 配線は変更しない。"
+      }
+    },
+    {
+      "claim_hash": "1613a8788100733529e2b7d8a8d856660bb2ad22186f79fd24e9a209a7368a17",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「有効時にはそのまま維持する。個別の違反を場当たり的に握りつぶす抜け道は設けない。」"
+      }
+    },
+    {
+      "claim_hash": "230c2056321b01537134631de1363c46086b3ace989a981bd68459767a6983ba",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キー追加に伴い `dry-check.json` の `schema_version` は 3 から 4 へ上げる"
+      }
+    },
+    {
+      "claim_hash": "bad1e2d2d43f7d1dba6c04457068caea5018b48b574ee52814d73e33b2d40e6b",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効/無効の切り替えは、既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。…無効化は DRY ゲートの 2 つの評価点 ― commit ゲートの `sotp dry check-approved` と、full-cycle の DFP 起動を判定する `fixpoint_resolve`（`sotp track fixpoint-resolve`）― が `enabled` を読み、`false` のとき「通過 / DFP 不要」を返すことで実現する。"
+      }
+    },
+    {
+      "claim_hash": "5248f7aade450e810c205e8587abe1500fa91dc240a8adb8d3980ea82b75287e",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。既定は `enabled: false`。」および「キー追加に伴い `dry-check.json` の `schema_version` は 3 から 4 へ上げる」"
+      }
+    },
+    {
+      "claim_hash": "774b615d9af409680428e321a56a2d11601c2300db87831644a30204f0a1aea6",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`false` のとき「通過 / DFP 不要」を返す"
+      }
+    },
+    {
+      "claim_hash": "eae12fab369d9c32413e53a7439ac3bfa86469c38e2f5bb04d4bc3099ad207a2",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「enabled: false のとき DRY ゲートは走らず（検出も DFP 修正ループも実行しない）、ゲート評価は通過として扱い commit をブロックしない。」"
+      }
+    },
+    {
+      "claim_hash": "d996824847a102b1ffcd7b29294f76a4b1fd0666e058cacb78310151a81744f0",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「設定で有効化したときの DRY ゲートは従来どおり blocking であり」「genuine な違反への人間による許容の抜け道は無い」"
+      }
+    },
+    {
+      "claim_hash": "804b2723d4fdca1c0d6fa4cececa053eb957c5cfcc246a46c8ef95a4ab08e386",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「有効/無効の切り替えは、既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。既定は `enabled: false`。… 無効化は DRY ゲートの 2 つの評価点 ― commit ゲートの `sotp dry check-approved` と、full-cycle の DFP 起動を判定する `fixpoint_resolve`（`sotp track fixpoint-resolve`）― が `enabled` を読み、`false` のとき「通過 / DFP 不要」を返すことで実現する。」"
+      }
+    },
+    {
+      "claim_hash": "e8c94700f208025816e310ea55202139366c7d347c1d621521f3dbcbdd500ec0",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効/無効の切り替えは、既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。既定は `enabled: false`。`enabled: false` のとき DRY ゲートは走らず（検出も DFP 修正ループも実行しない）、ゲート評価は通過として扱い commit をブロックしない。`enabled: true` のとき従来どおり blocking gate として走る。"
+      }
+    },
+    {
+      "claim_hash": "748c27ee254abe005973f0e73a1bcad16980100640e848cb75e05efedd655348",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR が置き換えるのは D7 の「ゲートは無条件で必須」という側面のみで、ゲートを走らせるか否かが利用者設定になった点において D7 を部分的に supersede する。"
+      }
+    },
+    {
+      "claim_hash": "61eb4b9ac9d9917a6229f585b68f3c32264e5ef3424ee7aff30adf42f70f30a9",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim requires `enabled` to be present and forbids any implicit `enabled: false` fallback, while the ADR decision states `既定は enabled: false`, establishing default-off behavior rather than schema-invalid hard error on an omitted key."
+      }
+    },
+    {
+      "claim_hash": "055dbc703679c838f16c8762eb43f77c64a5c26a495e4514566143dbbd291e95",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効/無効の切り替えは、既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。既定は `enabled: false`。 ... キー追加に伴い `dry-check.json` の `schema_version` は 3 から 4 へ上げる"
+      }
+    },
+    {
+      "claim_hash": "49ae2d15e1434e2e3dd60b54f2322423db9b072006c06a10224aea4b7232a857",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効/無効の切り替えは、既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。既定は `enabled: false`。"
+      }
+    },
+    {
+      "claim_hash": "6c9243030b54b043cb46fd76158a8ee172cc45194318b26b110fa96afe83f3ed",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既定は `enabled: false`。`enabled: false` のとき DRY ゲートは走らず（検出も DFP 修正ループも実行しない）、ゲート評価は通過として扱い commit をブロックしない。"
+      }
+    },
+    {
+      "claim_hash": "a9bddfcdedb6e6693745b6829a9712da6b3e329eafe705659125fa44cb28f050",
+      "evidence_hash": "d32a8892ad82e14e3767f09d0a8d13dc6eb89b7c68119b9474bb9bd1e8c6723d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効/無効の切り替えは、既存の DRY ゲート設定ファイル `.harness/config/dry-check.json`（現 `schema_version: 3`）に boolean キー `enabled` を追加して表現する。既定は `enabled: false`。... キー追加に伴い `dry-check.json` の `schema_version` は 3 から 4 へ上げる"
+      }
+    }
+  ]
+}

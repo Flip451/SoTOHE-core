@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "8ed81ef173839f28c8083b8f3e3b513be3b100000d9bc27af0850d6e2cbb5508",
+  "signals": [
+    {
+      "type_name": "DryCheckConfig",
+      "signal": "blue",
+      "entry_hash": "92aa3b04e12ac5ed923801295209062dbc2aafa5d16c88516a8963e2d0ae3e7c"
+    },
+    {
+      "type_name": "DryCheckConfigError",
+      "signal": "blue",
+      "entry_hash": "a50e223a4ac98c4195adb1557b33a55e2c14b1293bf93b8d060953275316b904"
+    }
+  ]
+}

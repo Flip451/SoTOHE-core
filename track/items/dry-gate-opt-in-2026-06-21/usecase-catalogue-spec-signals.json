@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "31fdc9aa360c0a837d8c2823c5a1ee2631fa2014438b8b810aec80b11d8a7852",
+  "signals": [
+    {
+      "type_name": "DryCheckApprovalInteractor",
+      "signal": "blue",
+      "entry_hash": "a259af56062cc31012727165227c38462d76cda5f153927e29b0929a1381127e"
+    },
+    {
+      "type_name": "DryCheckConfig",
+      "signal": "blue",
+      "entry_hash": "b0b9a1f37409d763d66becf8629f1ee498fc69077c78c78b5c7827481c8f6c5e"
+    },
+    {
+      "type_name": "FixpointResolveInteractor",
+      "signal": "blue",
+      "entry_hash": "cecac8feb63b9484e7dfc8b9180353d7e01573cd1e5c75504f2fc83e43661cb4"
+    }
+  ]
+}

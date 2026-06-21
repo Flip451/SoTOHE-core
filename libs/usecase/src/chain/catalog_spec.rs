@@ -51,7 +51,6 @@ use domain::{
 /// the SHA-256 hex string of the current `<layer>-types.json` bytes, and the
 /// current per-entry hashes (pre-computed by the infrastructure caller — never
 /// computed here).
-#[doc(hidden)]
 #[derive(Debug, Clone, Copy)]
 pub struct CatalogSpecInput<'a> {
     /// Path to the `<layer>-catalogue-spec-signals.json` file.
@@ -86,7 +85,6 @@ impl<'a> CatalogSpecInput<'a> {
 /// Error produced by [`CatalogSpecChain::check_freshness`] when the stored
 /// catalogue hash diverges from the current catalogue bytes hash.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
-#[doc(hidden)]
 pub enum CatalogSpecStaleError {
     /// Hash stored in the document's `catalogue_declaration_hash` field differs
     /// from the hash of the current `<layer>-types.json` bytes.
@@ -128,7 +126,6 @@ pub enum CatalogSpecStaleError {
 /// Placeholder until T008.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 #[error("catalog-spec calc/load not yet wired — see T008: {0}")]
-#[doc(hidden)]
 pub struct CatalogSpecCalcError(pub String);
 
 // ── Chain ② struct ───────────────────────────────────────────────────────────

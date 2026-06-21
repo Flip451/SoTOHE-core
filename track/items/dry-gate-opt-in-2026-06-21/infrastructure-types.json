@@ -1,0 +1,197 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "DryCheckConfig": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::config",
+      "docs": "Infrastructure-layer loaded configuration for the dry-check gate. Reads `.harness/config/dry-check.json` via `load(path)`. Internal representation has all-private fields; the public API is accessors only. After this track: schema_version acceptance changes from 3 to 4 exclusively (CN-05), and an `enabled: bool` field is added with a corresponding `enabled()` accessor. The private serde DTO (`DryCheckConfigDto`) is internal to this module and is not catalogued.",
+      "spec_refs": [
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckConfigError": {
+      "action": "reference",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Io", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }, { "name": "source", "ty": "std::io::Error" }] } },
+          { "name": "Parse", "payload": { "kind": "tuple", "fields": ["serde_json::Error"] } },
+          { "name": "UnsupportedSchemaVersion", "payload": { "kind": "struct", "fields": [{ "name": "found", "ty": "u32" }, { "name": "expected", "ty": "u32" }] } },
+          { "name": "InvalidThreshold", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidParallelism", "payload": { "kind": "tuple", "fields": ["usize"] } },
+          { "name": "InvalidReasoningEffort", "payload": { "kind": "struct", "fields": [{ "name": "field", "ty": "String" }, { "name": "value", "ty": "String" }] } },
+          { "name": "InvalidPercent", "payload": { "kind": "struct", "fields": [{ "name": "field", "ty": "String" }, { "name": "value", "ty": "u8" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check::config",
+      "docs": "Error variants from DryCheckConfig::load. No variant changes in this track; referenced because the load() signature is being modified to accept schema_version 4.",
+      "spec_refs": [
+        { "file": "track/items/dry-gate-opt-in-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "DryCheckConfig",
+      "methods": [
+        {
+          "name": "load",
+          "receiver": null,
+          "params": [
+            { "name": "path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<DryCheckConfig, DryCheckConfigError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Load dry-check configuration from a JSON file. After this track, accepts schema_version 4 only (rejects schema_version 3 and any other value with UnsupportedSchemaVersion). Also parses the `enabled` boolean field (defaulting to false when absent)."
+        },
+        {
+          "name": "enabled",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns whether the DRY gate is enabled. New accessor added by this track."
+        },
+        {
+          "name": "threshold",
+          "receiver": "&self",
+          "params": [],
+          "returns": "domain::semantic_dup::SimilarityThreshold",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the similarity threshold from the loaded configuration."
+        },
+        {
+          "name": "max_parallelism",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the raw max_parallelism usize from the loaded JSON. Returns a raw primitive because this is the infrastructure Dto layer; the composition root lifts it into the validated DryCheckParallelism newtype (R9: raw primitive justified as unvalidated Dto accessor)."
+        },
+        {
+          "name": "fast_reasoning_effort",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the reasoning effort for the fast-round DRY checker."
+        },
+        {
+          "name": "final_reasoning_effort",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the reasoning effort for the final-round DRY checker."
+        },
+        {
+          "name": "known_bad_injection_rate_percent",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the raw known_bad_injection_rate_percent u8 from the loaded JSON. Raw primitive: infrastructure Dto accessor; composition root lifts it into DryCheckPercent (R9: Dto layer unvalidated value)."
+        },
+        {
+          "name": "known_bad_detection_threshold_percent",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the raw known_bad_detection_threshold_percent u8 from the loaded JSON. Raw primitive: infrastructure Dto accessor; composition root lifts it into DryCheckPercent (R9: Dto layer unvalidated value)."
+        },
+        {
+          "name": "fingerprint_with_threshold",
+          "receiver": "&self",
+          "params": [
+            { "name": "effective_threshold", "ty": "domain::semantic_dup::SimilarityThreshold" }
+          ],
+          "returns": "domain::dry_check::DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Compute a SHA-256 fingerprint using the given effective threshold in place of self.threshold."
+        },
+        {
+          "name": "fingerprint",
+          "receiver": "&self",
+          "params": [],
+          "returns": "domain::dry_check::DryCheckConfigFingerprint",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Compute a SHA-256 fingerprint using self.threshold as the effective threshold."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckConfig"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckConfigError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckConfigError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckConfigError"
+    }
+  ]
+}

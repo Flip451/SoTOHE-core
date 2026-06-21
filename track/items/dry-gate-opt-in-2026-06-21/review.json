@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:059e15e88057ca5c608f0b8df2b0c26454227b0085027da4ca7be771f11458fc",
+          "at": "2026-06-21T07:32:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:059e15e88057ca5c608f0b8df2b0c26454227b0085027da4ca7be771f11458fc",
+          "at": "2026-06-21T07:35:22Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -31,6 +49,79 @@
           "findings": [],
           "hash": "rvw1:sha256:956ea7df8cd1e739e1213e269b779c935697427f04a5d2feb0d6b1661a253e70",
           "at": "2026-06-21T05:20:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35e1af381198d66e09364b4213ba5589e8c9886822935c62cc07d0168354d89a",
+          "at": "2026-06-21T07:35:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 and T002 split the schema migration into two ordered tasks: T001 makes schema_version 3 a hard error, while T002 updates the actual dry-check config to schema_version 4. Because CN-05 requires non-v4 configs to fail hard, the intermediate state after T001 is unexecutable until T002 lands. Make the loader switch and config migration atomic, or explicitly combine them into one task/commit.",
+              "severity": "P1",
+              "file": "track/items/dry-gate-opt-in-2026-06-21/plan.md",
+              "line": 18,
+              "category": "infeasibility"
+            },
+            {
+              "message": "CN-04 covers enabled=true behavior for both DryCheckApprovalService::check_approved and FixpointResolveInteractor, but the coverage map lists only T005/T006. Those tasks cover the approval interactor and wiring, while the FixpointResolveInteractor preservation path is in T007/T008 and tested by T011. As written, the generated coverage/spec task list can miss the fixpoint half of CN-04.",
+              "severity": "P1",
+              "file": "track/items/dry-gate-opt-in-2026-06-21/task-coverage.json",
+              "line": 23,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:35e1af381198d66e09364b4213ba5589e8c9886822935c62cc07d0168354d89a",
+          "at": "2026-06-21T07:41:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 is a CLI-level acceptance criterion for `sotp dry check-approved` with `enabled: true`, but its task coverage omits T006, the composition task that wires the CLI path to pass `DryCheckConfig` into `DryCheckApprovalInteractor::new`. This means the plan can mark the acceptance criterion covered by the interactor change and tests while the actual command entry point remains unwired, unlike the analogous `enabled: false` AC-03 coverage that includes T006. Add T006 to AC-04 coverage so the enabled=true CLI behavior is covered end to end.",
+              "severity": "P1",
+              "file": "track/items/dry-gate-opt-in-2026-06-21/task-coverage.json",
+              "line": 31,
+              "category": "task_coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:6acafd85315de7191985b7f99b6f3c01ac52c4a55a257c88d13af70ad3c9afe0",
+          "at": "2026-06-21T07:46:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The implementation plan places the disabled-gate short-circuit inside `DryCheckApprovalInteractor::check_approved` and `FixpointResolveInteractor::resolve`, after the callers have already had to build dry fragment refs/fingerprints to call those APIs. That still runs DRY diff/corpus preparation with `enabled: false`, contradicting GO-02/CN-02's requirement that DRY detection/gate work not execute. The plan needs a composition-level early check or a lazy/optional refs interface before dry fragment construction.",
+              "severity": "P1",
+              "file": "track/items/dry-gate-opt-in-2026-06-21/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-04 covers both `DryCheckApprovalService::check_approved` and `FixpointResolveInteractor` preserving enabled=true behavior, but the coverage map includes only T011 for the Fixpoint side and omits T010, the task that tests DryCheckApproval enabled=true coverage-absent and violation behavior. This makes the constraint coverage incomplete and inconsistent with AC-04, which correctly maps T010.",
+              "severity": "P1",
+              "file": "track/items/dry-gate-opt-in-2026-06-21/task-coverage.json",
+              "line": 23,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:e8608c63d08b4d0f547643b86113845917e21b6673b18098dd85ce9442053bdd",
+          "at": "2026-06-21T07:50:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24a3866f35fd937f61853dec32d746a186635a064fd66d208947ba264514436b",
+          "at": "2026-06-21T07:54:58Z"
         }
       ]
     }
