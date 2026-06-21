@@ -19,6 +19,100 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
+          "at": "2026-06-21T08:37:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
+          "at": "2026-06-21T08:37:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
+          "at": "2026-06-21T08:40:26Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4a14cdfb63b3dca3d847289cb56dbe447949b097b97422f16bc6737fa1315c5",
+          "at": "2026-06-21T08:36:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4a14cdfb63b3dca3d847289cb56dbe447949b097b97422f16bc6737fa1315c5",
+          "at": "2026-06-21T08:39:49Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f815c60775ea802c474fc21d2c4f286a2999f092c3cac19af07fabf9a7ad9e9",
+          "at": "2026-06-21T08:37:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f815c60775ea802c474fc21d2c4f286a2999f092c3cac19af07fabf9a7ad9e9",
+          "at": "2026-06-21T08:40:15Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `enabled` is not included in the canonical fingerprint, so two configs that differ only by opt-in state hash to the same `DryCheckConfigFingerprint`. `fingerprint_with_threshold` still encodes only `threshold`, `max_parallelism`, the reasoning-effort fields, and the known-bad percents ([config.rs:256-290]). Since `enabled` now changes whether the DRY gate is active, this omits a semantics-affecting field and can let stale coverage records survive an enable/disable flip without invalidation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/config.rs",
+              "line": 256,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:f0e525d62ea5b5d515da749cf81f61b196c2daf336dc4e748eded2b3db442df8",
+          "at": "2026-06-21T08:37:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c09883a01ea59c4c9f107d16b1ac9e752bb9113f282803a3c60ea0a2e858fe1",
+          "at": "2026-06-21T08:40:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c09883a01ea59c4c9f107d16b1ac9e752bb9113f282803a3c60ea0a2e858fe1",
+          "at": "2026-06-21T08:42:57Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -122,6 +216,20 @@
           "findings": [],
           "hash": "rvw1:sha256:24a3866f35fd937f61853dec32d746a186635a064fd66d208947ba264514436b",
           "at": "2026-06-21T07:54:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fbeb2f6fe4d21091ef6d73e4ccd1738a3b87afc167a65b9ecaee9d1c66faa",
+          "at": "2026-06-21T08:36:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fbeb2f6fe4d21091ef6d73e4ccd1738a3b87afc167a65b9ecaee9d1c66faa",
+          "at": "2026-06-21T08:39:19Z"
         }
       ]
     }

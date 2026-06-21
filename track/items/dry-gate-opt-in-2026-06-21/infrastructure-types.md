@@ -10,5 +10,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckConfig | dto | modify | — | 🟡 | 🔵 |
+| DryCheckConfig | dto | modify | — | 🔵 | 🔵 |
 

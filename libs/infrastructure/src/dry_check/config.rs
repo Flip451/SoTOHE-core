@@ -75,9 +75,14 @@ struct SchemaVersionEnvelope {
 struct DryCheckConfigDto {
     #[allow(dead_code)]
     schema_version: u32,
+    /// Whether the DRY gate is enabled (IN-01 / IN-05). Defaults to `false` when
+    /// the field is omitted, so existing configs without the key are treated as
+    /// opt-out (the safe direction: no accidental gate enforcement).
+    #[serde(default)]
+    enabled: bool,
     threshold: f32,
     /// D3 (T008): bounded judge fan-out parallelism. Defaults to
-    /// [`DEFAULT_MAX_PARALLELISM`] when the field is omitted in a v3 config.
+    /// [`DEFAULT_MAX_PARALLELISM`] when the field is omitted.
     #[serde(default = "default_max_parallelism")]
     max_parallelism: usize,
     /// D4 (T011): reasoning effort for the fast-round DRY checker.
@@ -92,7 +97,7 @@ struct DryCheckConfigDto {
     known_bad_detection_threshold_percent: u8,
 }
 
-/// Default `max_parallelism` when the field is omitted in a v3 config.
+/// Default `max_parallelism` when the field is omitted.
 ///
 /// D3 / CN-04: nonzero — chosen as 4 to match the worker-pool sweet spot for
 /// the Codex provider's typical per-account concurrency budget.
@@ -133,11 +138,11 @@ fn validate_percent(field: &str, value: u8) -> Result<(), DryCheckConfigError> {
 /// Loaded `.harness/config/dry-check.json` configuration.
 ///
 /// Private serde DTO internals; public API is [`load()`](DryCheckConfig::load) +
-/// [`threshold()`](DryCheckConfig::threshold). Following
-/// [`AgentProfiles::load`](crate::agent_profiles::AgentProfiles::load) pattern
-/// (CN-07 / D9).
+/// accessors. Following [`AgentProfiles::load`](crate::agent_profiles::AgentProfiles::load)
+/// pattern (CN-07 / D9).
 #[derive(Debug)]
 pub struct DryCheckConfig {
+    enabled: bool,
     threshold: domain::semantic_dup::SimilarityThreshold,
     max_parallelism: usize,
     fast_reasoning_effort: String,
@@ -158,7 +163,7 @@ impl DryCheckConfig {
     ///
     /// - [`DryCheckConfigError::Io`] if the file cannot be read.
     /// - [`DryCheckConfigError::Parse`] if the JSON is invalid.
-    /// - [`DryCheckConfigError::UnsupportedSchemaVersion`] if `schema_version` is not `3`.
+    /// - [`DryCheckConfigError::UnsupportedSchemaVersion`] if `schema_version` is not `4`.
     /// - [`DryCheckConfigError::InvalidThreshold`] if `threshold` is outside `[0.0, 1.0]`.
     /// - [`DryCheckConfigError::InvalidParallelism`] if `max_parallelism` is zero.
     /// - [`DryCheckConfigError::InvalidReasoningEffort`] if `fast_reasoning_effort` or
@@ -166,7 +171,7 @@ impl DryCheckConfig {
     /// - [`DryCheckConfigError::InvalidPercent`] if `known_bad_injection_rate_percent` or
     ///   `known_bad_detection_threshold_percent` is outside `1..=100`.
     pub fn load(path: &Path) -> Result<DryCheckConfig, DryCheckConfigError> {
-        const SUPPORTED_SCHEMA_VERSION: u32 = 3;
+        const SUPPORTED_SCHEMA_VERSION: u32 = 4;
 
         let content = std::fs::read_to_string(path)
             .map_err(|e| DryCheckConfigError::Io { path: path.display().to_string(), source: e })?;
@@ -200,6 +205,7 @@ impl DryCheckConfig {
         )?;
 
         Ok(DryCheckConfig {
+            enabled: dto.enabled,
             threshold,
             max_parallelism: dto.max_parallelism,
             fast_reasoning_effort: dto.fast_reasoning_effort,
@@ -207,6 +213,14 @@ impl DryCheckConfig {
             known_bad_injection_rate_percent: dto.known_bad_injection_rate_percent,
             known_bad_detection_threshold_percent: dto.known_bad_detection_threshold_percent,
         })
+    }
+
+    /// Returns whether the DRY gate is enabled (IN-01 / IN-05 / IN-06).
+    ///
+    /// Defaults to `false` when the `enabled` key is absent from the config file,
+    /// so callers that have not opted in are unaffected by the gate.
+    pub fn enabled(&self) -> bool {
+        self.enabled
     }
 
     /// Returns the similarity threshold from the loaded configuration.
@@ -256,6 +270,7 @@ impl DryCheckConfig {
     /// and the two bit patterns must map to the same fingerprint.
     ///
     /// Fields included (all that affect which pairs are judged or how they are judged):
+    /// - `enabled`
     /// - `threshold`
     /// - `max_parallelism`
     /// - `fast_reasoning_effort`
@@ -267,7 +282,8 @@ impl DryCheckConfig {
         effective_threshold: domain::semantic_dup::SimilarityThreshold,
     ) -> domain::dry_check::DryCheckConfigFingerprint {
         let canonical = format!(
-            "threshold={}\nmax_parallelism={}\nfast_reasoning_effort={}\nfinal_reasoning_effort={}\nknown_bad_injection_rate_percent={}\nknown_bad_detection_threshold_percent={}",
+            "enabled={}\nthreshold={}\nmax_parallelism={}\nfast_reasoning_effort={}\nfinal_reasoning_effort={}\nknown_bad_injection_rate_percent={}\nknown_bad_detection_threshold_percent={}",
+            self.enabled,
             (effective_threshold.value() + 0.0_f32).to_bits(),
             self.max_parallelism,
             self.fast_reasoning_effort,
@@ -318,7 +334,7 @@ mod tests {
     }
 
     const VALID_CONFIG: &str = r#"{
-        "schema_version": 3,
+        "schema_version": 4,
         "threshold": 0.85,
         "max_parallelism": 4,
         "fast_reasoning_effort": "medium",
@@ -336,13 +352,13 @@ mod tests {
         assert!((t.value() - 0.85_f32).abs() < f32::EPSILON);
     }
 
-    /// Builds the JSON body for a minimal v3 config with the given reasoning efforts.
+    /// Builds the JSON body for a minimal v4 config with the given reasoning efforts.
     ///
     /// Used by both valid-effort and invalid-effort tests so the fixture shape is defined once.
     fn config_json_with_reasoning_efforts(fast_effort: &str, final_effort: &str) -> String {
         format!(
             r#"{{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": 0.85,
                 "fast_reasoning_effort": "{fast_effort}",
                 "final_reasoning_effort": "{final_effort}",
@@ -352,13 +368,13 @@ mod tests {
         )
     }
 
-    /// Builds the JSON body for a minimal v3 config with the given `threshold`.
+    /// Builds the JSON body for a minimal v4 config with the given `threshold`.
     ///
     /// Used by both success and error-path tests so the fixture shape is defined once.
     fn config_json_with_threshold(threshold: f32) -> String {
         format!(
             r#"{{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": {threshold},
                 "fast_reasoning_effort": "medium",
                 "final_reasoning_effort": "high",
@@ -411,7 +427,7 @@ mod tests {
         let path = write_json(dir.path(), "dry-check.json", content);
         let err = DryCheckConfig::load(&path).unwrap_err();
         assert!(
-            matches!(err, DryCheckConfigError::UnsupportedSchemaVersion { found: 99, expected: 3 }),
+            matches!(err, DryCheckConfigError::UnsupportedSchemaVersion { found: 99, expected: 4 }),
             "expected UnsupportedSchemaVersion, got: {err}"
         );
     }
@@ -425,7 +441,7 @@ mod tests {
         let path = write_json(dir.path(), "dry-check.json", content);
         let err = DryCheckConfig::load(&path).unwrap_err();
         assert!(
-            matches!(err, DryCheckConfigError::UnsupportedSchemaVersion { found: 1, expected: 3 }),
+            matches!(err, DryCheckConfigError::UnsupportedSchemaVersion { found: 1, expected: 4 }),
             "expected UnsupportedSchemaVersion, got: {err}"
         );
     }
@@ -438,8 +454,29 @@ mod tests {
         let path = write_json(dir.path(), "dry-check.json", content);
         let err = DryCheckConfig::load(&path).unwrap_err();
         assert!(
-            matches!(err, DryCheckConfigError::UnsupportedSchemaVersion { found: 2, expected: 3 }),
+            matches!(err, DryCheckConfigError::UnsupportedSchemaVersion { found: 2, expected: 4 }),
             "expected UnsupportedSchemaVersion, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_load_with_schema_version_three_returns_unsupported() {
+        // v3 configs are no longer accepted; schema_version 4 is the only supported version.
+        let dir = tempfile::tempdir().unwrap();
+        let content = r#"{
+            "schema_version": 3,
+            "threshold": 0.85,
+            "max_parallelism": 4,
+            "fast_reasoning_effort": "medium",
+            "final_reasoning_effort": "high",
+            "known_bad_injection_rate_percent": 10,
+            "known_bad_detection_threshold_percent": 90
+        }"#;
+        let path = write_json(dir.path(), "dry-check.json", content);
+        let err = DryCheckConfig::load(&path).unwrap_err();
+        assert!(
+            matches!(err, DryCheckConfigError::UnsupportedSchemaVersion { found: 3, expected: 4 }),
+            "expected UnsupportedSchemaVersion for schema_version 3, got: {err}"
         );
     }
 
@@ -449,16 +486,71 @@ mod tests {
         // not a Parse error from deny_unknown_fields.
         let dir = tempfile::tempdir().unwrap();
         let content = r#"{
-            "schema_version": 4,
+            "schema_version": 5,
             "threshold": 0.85,
             "new_future_field": "should not cause parse error"
         }"#;
         let path = write_json(dir.path(), "dry-check.json", content);
         let err = DryCheckConfig::load(&path).unwrap_err();
         assert!(
-            matches!(err, DryCheckConfigError::UnsupportedSchemaVersion { found: 4, .. }),
+            matches!(err, DryCheckConfigError::UnsupportedSchemaVersion { found: 5, .. }),
             "expected UnsupportedSchemaVersion, got: {err}"
         );
+    }
+
+    // ── enabled field tests (IN-01 / IN-05 / IN-06) ────────────────────────────
+
+    #[test]
+    fn test_load_v4_without_enabled_field_defaults_to_false() {
+        // `enabled` key absent → serde default → false (opt-out by default).
+        let dir = tempfile::tempdir().unwrap();
+        let content = r#"{
+            "schema_version": 4,
+            "threshold": 0.85,
+            "fast_reasoning_effort": "medium",
+            "final_reasoning_effort": "high",
+            "known_bad_injection_rate_percent": 10,
+            "known_bad_detection_threshold_percent": 90
+        }"#;
+        let path = write_json(dir.path(), "dry-check.json", content);
+        let config = DryCheckConfig::load(&path).unwrap();
+        assert!(!config.enabled(), "enabled must default to false when the key is absent");
+    }
+
+    #[test]
+    fn test_load_v4_with_enabled_false_returns_false() {
+        // Explicit `"enabled": false` — same as the shipped `.harness/config/dry-check.json`.
+        let dir = tempfile::tempdir().unwrap();
+        let content = r#"{
+            "schema_version": 4,
+            "enabled": false,
+            "threshold": 0.85,
+            "fast_reasoning_effort": "medium",
+            "final_reasoning_effort": "high",
+            "known_bad_injection_rate_percent": 10,
+            "known_bad_detection_threshold_percent": 90
+        }"#;
+        let path = write_json(dir.path(), "dry-check.json", content);
+        let config = DryCheckConfig::load(&path).unwrap();
+        assert!(!config.enabled(), "enabled must be false when explicitly set to false");
+    }
+
+    #[test]
+    fn test_load_v4_with_enabled_true_returns_true() {
+        // Explicit `"enabled": true` — consumer opt-in.
+        let dir = tempfile::tempdir().unwrap();
+        let content = r#"{
+            "schema_version": 4,
+            "enabled": true,
+            "threshold": 0.85,
+            "fast_reasoning_effort": "medium",
+            "final_reasoning_effort": "high",
+            "known_bad_injection_rate_percent": 10,
+            "known_bad_detection_threshold_percent": 90
+        }"#;
+        let path = write_json(dir.path(), "dry-check.json", content);
+        let config = DryCheckConfig::load(&path).unwrap();
+        assert!(config.enabled(), "enabled must be true when explicitly set to true");
     }
 
     // ── D3 (T008) max_parallelism tests ────────────────────────────────────────
@@ -467,7 +559,7 @@ mod tests {
     fn test_load_with_valid_max_parallelism_returns_expected_value() {
         let dir = tempfile::tempdir().unwrap();
         let content = r#"{
-            "schema_version": 3,
+            "schema_version": 4,
             "threshold": 0.85,
             "max_parallelism": 8,
             "fast_reasoning_effort": "medium",
@@ -481,11 +573,11 @@ mod tests {
     }
 
     #[test]
-    fn test_load_v3_without_max_parallelism_field_uses_nonzero_default() {
+    fn test_load_v4_without_max_parallelism_field_uses_nonzero_default() {
         // Field omitted → serde default; the default must be nonzero (CN-04).
         let dir = tempfile::tempdir().unwrap();
         let content = r#"{
-            "schema_version": 3,
+            "schema_version": 4,
             "threshold": 0.85,
             "fast_reasoning_effort": "medium",
             "final_reasoning_effort": "high",
@@ -501,7 +593,7 @@ mod tests {
     fn test_load_with_zero_max_parallelism_returns_invalid_parallelism() {
         let dir = tempfile::tempdir().unwrap();
         let content = r#"{
-            "schema_version": 3,
+            "schema_version": 4,
             "threshold": 0.85,
             "max_parallelism": 0,
             "fast_reasoning_effort": "medium",
@@ -544,7 +636,7 @@ mod tests {
     // ── D4 (T011) reasoning_effort tests ───────────────────────────────────────
 
     #[test]
-    fn test_load_v3_with_valid_reasoning_efforts_succeeds() {
+    fn test_load_v4_with_valid_reasoning_efforts_succeeds() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), "dry-check.json", VALID_CONFIG);
         let config = DryCheckConfig::load(&path).unwrap();
@@ -597,7 +689,7 @@ mod tests {
         for invalid_value in [0u8, 101u8] {
             let content = format!(
                 r#"{{
-                    "schema_version": 3,
+                    "schema_version": 4,
                     "threshold": 0.85,
                     "fast_reasoning_effort": "medium",
                     "final_reasoning_effort": "high",
@@ -623,7 +715,7 @@ mod tests {
     fn test_load_with_zero_detection_threshold_returns_invalid_percent() {
         let dir = tempfile::tempdir().unwrap();
         let content = r#"{
-            "schema_version": 3,
+            "schema_version": 4,
             "threshold": 0.85,
             "fast_reasoning_effort": "medium",
             "final_reasoning_effort": "high",
@@ -649,7 +741,7 @@ mod tests {
             let dir = tempfile::tempdir().unwrap();
             let content = format!(
                 r#"{{
-                    "schema_version": 3,
+                    "schema_version": 4,
                     "threshold": 0.85,
                     "fast_reasoning_effort": "medium",
                     "final_reasoning_effort": "high",
@@ -691,11 +783,30 @@ mod tests {
     }
 
     #[test]
+    fn test_fingerprint_changes_when_enabled_changes() {
+        let disabled = load_from_str(VALID_CONFIG).fingerprint(); // enabled defaults to false
+        let enabled = load_from_str(
+            r#"{
+                "schema_version": 4,
+                "enabled": true,
+                "threshold": 0.85,
+                "max_parallelism": 4,
+                "fast_reasoning_effort": "medium",
+                "final_reasoning_effort": "high",
+                "known_bad_injection_rate_percent": 10,
+                "known_bad_detection_threshold_percent": 90
+            }"#,
+        )
+        .fingerprint();
+        assert_ne!(disabled, enabled, "fingerprint must differ when enabled changes");
+    }
+
+    #[test]
     fn test_fingerprint_changes_when_max_parallelism_changes() {
         let cfg_4 = load_from_str(VALID_CONFIG).fingerprint(); // max_parallelism 4
         let cfg_8 = load_from_str(
             r#"{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 8,
                 "fast_reasoning_effort": "medium",
@@ -724,7 +835,7 @@ mod tests {
         let cfg_10_90 = load_from_str(VALID_CONFIG).fingerprint(); // injection 10, threshold 90
         let cfg_20_80 = load_from_str(
             r#"{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 4,
                 "fast_reasoning_effort": "medium",

@@ -614,7 +614,7 @@ impl CliApp {
 }
 
 /// Lift infra `DryCheckConfig` fields (max_parallelism + known-bad percents) into the validated
-/// usecase newtypes (D3 / D4 / T011). All values come from `.harness/config/dry-check.json` v3.
+/// usecase newtypes (D3 / D4 / T011). All values come from `.harness/config/dry-check.json` v4.
 fn build_usecase_dry_check_config(
     infra_config: &infrastructure::dry_check::DryCheckConfig,
 ) -> Result<usecase::dry_check::DryCheckConfig, String> {
@@ -3292,7 +3292,8 @@ exit 0
         std::fs::write(
             harness_config_dir.join("dry-check.json"),
             r#"{
-  "schema_version": 3,
+  "schema_version": 4,
+  "enabled": false,
   "threshold": 0.85,
   "max_parallelism": 4,
   "fast_reasoning_effort": "medium",
@@ -3537,7 +3538,7 @@ exit 0
     fn test_dry_write_passes_max_parallelism_to_usecase_config() {
         let infra_config = load_infra_dry_check_config_from_json(
             r#"{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 7,
                 "fast_reasoning_effort": "medium",
@@ -3562,7 +3563,7 @@ exit 0
     fn test_dry_write_passes_known_bad_calibration_to_usecase_config() {
         let infra_config = load_infra_dry_check_config_from_json(
             r#"{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 4,
                 "fast_reasoning_effort": "medium",
@@ -3792,7 +3793,7 @@ exit 0
         // File config threshold = 0.85.
         let infra_config = load_infra_dry_check_config_from_json(
             r#"{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 4,
                 "fast_reasoning_effort": "medium",
@@ -3826,7 +3827,7 @@ exit 0
         // File config threshold = 0.85.
         let infra_config = load_infra_dry_check_config_from_json(
             r#"{
-                "schema_version": 3,
+                "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 4,
                 "fast_reasoning_effort": "medium",

@@ -200,7 +200,8 @@ mod tests {
         std::fs::write(
             harness_config_dir.join("dry-check.json"),
             r#"{
-  "schema_version": 3,
+  "schema_version": 4,
+  "enabled": false,
   "threshold": 0.85,
   "max_parallelism": 4,
   "fast_reasoning_effort": "medium",
