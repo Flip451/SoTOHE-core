@@ -16,32 +16,38 @@
     {
       "id": "T003",
       "description": "Usecase DryCheckConfig: add `enabled: bool` public field and update `DryCheckConfig::new()` to accept an `enabled: bool` parameter. The derive attributes (Debug, Clone, PartialEq, Eq) are inherited by the new field.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f815dd2c7c261fe423be0fac97bc53d1a729585a"
     },
     {
       "id": "T004",
       "description": "Composition: update `build_usecase_dry_check_config` in `apps/cli-composition/src/dry.rs` to propagate `infra_config.enabled()` into `DryCheckConfig::new(...)` as the `enabled` argument.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f815dd2c7c261fe423be0fac97bc53d1a729585a"
     },
     {
       "id": "T005",
       "description": "Usecase DryCheckApprovalInteractor: add `dry_config: DryCheckConfig` field. Update `DryCheckApprovalInteractor::new()` to accept `dry_config` as its first parameter. In `check_approved`, return `Ok(DryCheckApprovalVerdict::Approved)` immediately when `dry_config.enabled` is false, before executing staleness, fingerprint, and all-resolved checks. This is the service-boundary safety net; T006 adds the CLI composition early return that avoids building DRY inputs when the gate is disabled.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f815dd2c7c261fe423be0fac97bc53d1a729585a"
     },
     {
       "id": "T006",
       "description": "Composition wiring for DryCheckApprovalInteractor: in `apps/cli-composition/src/dry.rs` (dry_check_approved), load `.harness/config/dry-check.json` and build the usecase DryCheckConfig before dry diff/corpus preparation. If `enabled` is false, return Approved immediately without resolving the dry diff base, computing corpus fingerprints, building fragment refs, constructing coverage/store adapters, or constructing `DryCheckApprovalInteractor`. If `enabled` is true, preserve the existing preparation flow and pass the DryCheckConfig as the first argument to `DryCheckApprovalInteractor::new`. Update the `apps/cli-composition/src/track/fixpoint_resolve.rs` approval-interactor call site in the enabled path as part of T008.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f815dd2c7c261fe423be0fac97bc53d1a729585a"
     },
     {
       "id": "T007",
       "description": "Usecase FixpointResolveInteractor: add `dry_config: DryCheckConfig` field. Update `FixpointResolveInteractor::new()` to accept `dry_config` as its first parameter. In `resolve`, when `dry_config.enabled` is false, skip the dry gate call entirely and treat the dry gate as Approved (do not return RunDfp; proceed to review gate evaluation).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f815dd2c7c261fe423be0fac97bc53d1a729585a"
     },
     {
       "id": "T008",
       "description": "Composition wiring for FixpointResolveInteractor: in `apps/cli-composition/src/track/fixpoint_resolve.rs`, load `.harness/config/dry-check.json` and build the usecase DryCheckConfig before dry diff-base resolution, corpus fingerprinting, fragment-ref construction, and dry approval adapter construction. If `enabled` is false, skip that dry-gate preparation entirely, pass an empty `current_fragment_refs` set and a no-op dry approval service, and rely on `FixpointResolveInteractor::resolve` to bypass the dry gate and continue to review/ref-verify evaluation. If `enabled` is true, preserve the existing dry preparation flow, pass DryCheckConfig to `DryCheckApprovalInteractor::new`, and pass the same DryCheckConfig as the first argument to `FixpointResolveInteractor::new`.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f815dd2c7c261fe423be0fac97bc53d1a729585a"
     },
     {
       "id": "T009",
@@ -52,22 +58,40 @@
     {
       "id": "T010",
       "description": "Unit tests for usecase DryCheckApprovalInteractor: add tests covering (a) enabled=false returns Approved immediately without touching the coverage port or reader, and (b) enabled=true with existing coverage-absent and violation scenarios behave unchanged. Update `make_interactor` helpers to supply DryCheckConfig with appropriate enabled value.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f815dd2c7c261fe423be0fac97bc53d1a729585a"
     },
     {
       "id": "T011",
       "description": "Unit tests for usecase FixpointResolveInteractor: add tests covering (a) enabled=false with a dry gate that would return Blocked still resolves to RunRfp/RunRefVerify/Commit based on review and ref-verify gate states (dry gate bypassed), and (b) enabled=true behavior identical to current (dry Blocked returns RunDfp). Update `make_interactor` helpers to accept DryCheckConfig.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f815dd2c7c261fe423be0fac97bc53d1a729585a"
     },
     {
       "id": "T012",
       "description": "Verify the ADR cross-reference: confirm the Follow-up section of `knowledge/adr/2026-06-02-0716-dry-checker.md` contains the supersede notice for `2026-06-19-2335-dry-gate-configurable-default-off.md` (add if absent). Run `cargo make ci` to confirm the full test suite (fmt-check + clippy + nextest + deny + check-layers + verify-*) passes with all changes from T001-T011.",
+      "status": "done",
+      "commit_hash": "f815dd2c7c261fe423be0fac97bc53d1a729585a"
+    },
+    {
+      "id": "T013",
+      "description": "D4 infrastructure setup: (1) add `fast_reasoning_effort: Option<String>` and `final_reasoning_effort: Option<String>` fields to `CapabilityConfigDto` in `libs/infrastructure/src/agent_profiles.rs` (serde struct, `deny_unknown_fields` update) and add the corresponding `fast_reasoning_effort()` / `final_reasoning_effort()` accessors to the `impl CapabilityConfigDto` block; (2) add `\"fast_reasoning_effort\"` and `\"final_reasoning_effort\"` to `.harness/config/agent-profiles.json` under `capabilities.dry-checker`, using the values currently in `.harness/config/dry-check.json` (`\"medium\"` / `\"high\"`). Atomicity: T013 must land in the same commit as T014 because T014 removes the reasoning_effort fields from `DryCheckConfig` and updates `dry.rs` to call `CapabilityConfigDto::fast_reasoning_effort()` / `final_reasoning_effort()` — the composition root must compile at every commit.",
+      "status": "in_progress"
+    },
+    {
+      "id": "T014",
+      "description": "D4 infrastructure cleanup and composition root migration (must be the same commit as T013): (1) remove `fast_reasoning_effort` and `final_reasoning_effort` fields from `DryCheckConfigDto` and `DryCheckConfig` in `libs/infrastructure/src/dry_check/config.rs`; remove `validate_reasoning_effort` helper, `ALLOWED_REASONING_EFFORTS` constant, `InvalidReasoningEffort` variant from `DryCheckConfigError`, and the two corresponding public accessors `fast_reasoning_effort()` / `final_reasoning_effort()`; update `DryCheckConfig::load` to no longer call `validate_reasoning_effort`; (2) update `fingerprint_with_threshold` canonical encoding in `config.rs` to exclude `fast_reasoning_effort` / `final_reasoning_effort` lines — the new encoding covers only `enabled`, `threshold`, `max_parallelism`, `known_bad_injection_rate_percent`, `known_bad_detection_threshold_percent` (CN-08 / IN-10); (3) in `apps/cli-composition/src/dry.rs` `dry_write`, replace `infra_config.fast_reasoning_effort().to_owned()` and `infra_config.final_reasoning_effort().to_owned()` calls with reads from `AgentProfiles` via `CapabilityConfigDto::fast_reasoning_effort()` / `final_reasoning_effort()` — load `agent-profiles.json` before constructing `CodexDryChecker`; (4) update `.harness/config/dry-check.json` to remove the `fast_reasoning_effort` and `final_reasoning_effort` fields (the loader now has `deny_unknown_fields` and would reject the old file). After this task the codebase must compile without errors.",
+      "status": "in_progress"
+    },
+    {
+      "id": "T015",
+      "description": "D4 tests update and CI pass: (1) update all test fixtures in `libs/infrastructure/src/dry_check/config.rs` that include `fast_reasoning_effort` / `final_reasoning_effort` fields — remove those fields from every JSON fixture string so the updated `deny_unknown_fields` DTO can parse them; (2) remove or update tests that assert on `fast_reasoning_effort()` / `final_reasoning_effort()` accessors (these methods no longer exist); (3) add tests covering: (a) that a v4 `dry-check.json` containing `fast_reasoning_effort` or `final_reasoning_effort` fields returns a `Parse` error (unknown field rejected by `deny_unknown_fields`), (b) that `fingerprint` does NOT change when reasoning effort values differ (i.e., the fingerprint is stable across the field move), (c) `fast_reasoning_effort()` / `final_reasoning_effort()` accessors on `CapabilityConfigDto` return `Some` when present and `None` when absent; (4) add tests in `agent_profiles.rs` confirming the new fields are deserialized correctly; (5) run `cargo make ci` to confirm the full suite passes.",
       "status": "in_progress"
     }
   ],
   "plan": {
     "summary": [
-      "Add `enabled: bool` to the DRY gate configuration path (infrastructure DTO -> usecase config -> interactor fields) and implement the opt-in short-circuit at both evaluation points (DryCheckApprovalInteractor and FixpointResolveInteractor). Migrate dry-check.json schema from v3 to v4."
+      "Add `enabled: bool` to the DRY gate configuration path (infrastructure DTO -> usecase config -> interactor fields) and implement the opt-in short-circuit at both evaluation points (DryCheckApprovalInteractor and FixpointResolveInteractor). Migrate dry-check.json schema from v3 to v4. (T001-T012 complete.) Move reasoning_effort fields from dry-check.json to agent-profiles.json capabilities.dry-checker, remove them from DryCheckConfig accessors and fingerprint, and update the composition root to read reasoning effort from AgentProfiles/CapabilityConfigDto (D4 / IN-08 / IN-09 / IN-10)."
     ],
     "sections": [
       {
@@ -136,6 +160,25 @@
           "T010",
           "T011",
           "T012"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "D4: reasoning_effort migration from dry-check.json to agent-profiles.json",
+        "description": [
+          "Add `fast_reasoning_effort` / `final_reasoning_effort` to `CapabilityConfigDto` (infrastructure) with serde deserialization and accessors.",
+          "Add those fields to `.harness/config/agent-profiles.json` `capabilities.dry-checker`.",
+          "Remove `fast_reasoning_effort` / `final_reasoning_effort` from `DryCheckConfigDto`, `DryCheckConfig`, fingerprint encoding, and validation in the infrastructure dry_check::config module.",
+          "Remove `DryCheckConfigError::InvalidReasoningEffort` variant.",
+          "Update `dry.rs` composition root to read reasoning effort from `AgentProfiles`/`CapabilityConfigDto` instead of `DryCheckConfig`.",
+          "Remove the two fields from `.harness/config/dry-check.json` (deny_unknown_fields now rejects them).",
+          "T013 and T014 are atomic (same commit) to keep the codebase compilable.",
+          "Update all test fixtures that embed the old reasoning_effort fields, remove accessor tests, and add new tests for the deny_unknown_fields rejection, fingerprint stability, and CapabilityConfigDto accessor coverage."
+        ],
+        "task_ids": [
+          "T013",
+          "T014",
+          "T015"
         ]
       }
     ]

@@ -1,16 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8ed81ef173839f28c8083b8f3e3b513be3b100000d9bc27af0850d6e2cbb5508",
+  "catalogue_declaration_hash": "c5dec8908c836f94316850f37b76800ac957b8ad313c137ecb68608c9e2f3c51",
   "signals": [
+    {
+      "type_name": "CapabilityConfigDto",
+      "signal": "blue",
+      "entry_hash": "eb333b402b8a06ac72e8edce92b5eba97c6bd39071c6acfcc6f42ca0844e1496"
+    },
     {
       "type_name": "DryCheckConfig",
       "signal": "blue",
-      "entry_hash": "92aa3b04e12ac5ed923801295209062dbc2aafa5d16c88516a8963e2d0ae3e7c"
+      "entry_hash": "72c6e783d8c0ffdb11a80343f5989dcdafe5dde296e165b24d9146975dcdbc1b"
     },
     {
       "type_name": "DryCheckConfigError",
       "signal": "blue",
-      "entry_hash": "a50e223a4ac98c4195adb1557b33a55e2c14b1293bf93b8d060953275316b904"
+      "entry_hash": "f639e9de3310a4c9ac7675570b726835c518e338a51e389ed90c2767f8f2eb1a"
     }
   ]
 }

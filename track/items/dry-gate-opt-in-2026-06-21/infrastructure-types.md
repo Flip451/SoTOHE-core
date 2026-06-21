@@ -4,11 +4,12 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckConfigError | error_type | reference | Io, Parse, UnsupportedSchemaVersion, InvalidThreshold, InvalidParallelism, InvalidReasoningEffort, InvalidPercent | 🔵 | 🔵 |
+| DryCheckConfigError | error_type | modify | Io, Parse, UnsupportedSchemaVersion, InvalidThreshold, InvalidParallelism, InvalidPercent | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CapabilityConfigDto | dto | modify | — | 🟡 | 🔵 |
 | DryCheckConfig | dto | modify | — | 🔵 | 🔵 |
 

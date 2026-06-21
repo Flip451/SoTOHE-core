@@ -35,19 +35,6 @@ pub enum DryCheckConfigError {
     #[error("invalid max_parallelism in dry-check config: must be nonzero (got {0})")]
     InvalidParallelism(usize),
 
-    /// A reasoning effort value is not one of the allowed values (D4 / IN-04).
-    ///
-    /// Allowed values: `"low"`, `"medium"`, `"high"`, `"minimal"`.
-    #[error(
-        "invalid reasoning_effort in dry-check config for field '{field}': '{value}' (allowed: low, medium, high, minimal)"
-    )]
-    InvalidReasoningEffort {
-        /// The config field name that contained the invalid value (e.g., `"fast_reasoning_effort"`).
-        field: String,
-        /// The invalid value that was provided.
-        value: String,
-    },
-
     /// A percent value is outside the valid range `1..=100` (D4 / IN-04).
     #[error("invalid percent in dry-check config for field '{field}': {value} (must be 1..=100)")]
     InvalidPercent {
@@ -85,12 +72,6 @@ struct DryCheckConfigDto {
     /// [`DEFAULT_MAX_PARALLELISM`] when the field is omitted.
     #[serde(default = "default_max_parallelism")]
     max_parallelism: usize,
-    /// D4 (T011): reasoning effort for the fast-round DRY checker.
-    /// Allowed values: "low", "medium", "high", "minimal".
-    fast_reasoning_effort: String,
-    /// D4 (T011): reasoning effort for the final-round DRY checker.
-    /// Allowed values: "low", "medium", "high", "minimal".
-    final_reasoning_effort: String,
     /// D4 (T011): injection rate for known-bad samples in calibration (percent).
     known_bad_injection_rate_percent: u8,
     /// D4 (T011): detection threshold for known-bad samples in calibration (percent).
@@ -105,21 +86,6 @@ const DEFAULT_MAX_PARALLELISM: usize = 4;
 
 fn default_max_parallelism() -> usize {
     DEFAULT_MAX_PARALLELISM
-}
-
-/// Allowed reasoning effort values for Codex CLI `model_reasoning_effort` (D4 / IN-04).
-const ALLOWED_REASONING_EFFORTS: &[&str] = &["low", "medium", "high", "minimal"];
-
-/// Validates a reasoning effort string, returning `Err` with the field name and invalid value.
-fn validate_reasoning_effort(field: &str, value: &str) -> Result<(), DryCheckConfigError> {
-    if ALLOWED_REASONING_EFFORTS.contains(&value) {
-        Ok(())
-    } else {
-        Err(DryCheckConfigError::InvalidReasoningEffort {
-            field: field.to_owned(),
-            value: value.to_owned(),
-        })
-    }
 }
 
 /// Validates a percent value is in `1..=100`, returning `Err` with the field name and value.
@@ -145,8 +111,6 @@ pub struct DryCheckConfig {
     enabled: bool,
     threshold: domain::semantic_dup::SimilarityThreshold,
     max_parallelism: usize,
-    fast_reasoning_effort: String,
-    final_reasoning_effort: String,
     known_bad_injection_rate_percent: u8,
     known_bad_detection_threshold_percent: u8,
 }
@@ -155,19 +119,21 @@ impl DryCheckConfig {
     /// Loads the DRY-check configuration from a JSON file.
     ///
     /// Reads the file at `path`, validates `schema_version`, parses JSON, and
-    /// validates the `threshold`, `fast_reasoning_effort`, `final_reasoning_effort`,
-    /// and percent fields. Fails closed on any I/O or parse error (CN-04 / D9): no
-    /// fallback to a default value.
+    /// validates the `threshold`, `max_parallelism`, and percent fields. Fails closed
+    /// on any I/O or parse error (CN-04 / D9): no fallback to a default value.
+    ///
+    /// After D4: `fast_reasoning_effort` / `final_reasoning_effort` are no longer read
+    /// from this file — they live in `agent-profiles.json` under the `dry-checker`
+    /// capability. The schema rejects any config that still carries those fields
+    /// (`deny_unknown_fields` on the DTO enforces the removal).
     ///
     /// # Errors
     ///
     /// - [`DryCheckConfigError::Io`] if the file cannot be read.
-    /// - [`DryCheckConfigError::Parse`] if the JSON is invalid.
+    /// - [`DryCheckConfigError::Parse`] if the JSON is invalid or contains unknown fields.
     /// - [`DryCheckConfigError::UnsupportedSchemaVersion`] if `schema_version` is not `4`.
     /// - [`DryCheckConfigError::InvalidThreshold`] if `threshold` is outside `[0.0, 1.0]`.
     /// - [`DryCheckConfigError::InvalidParallelism`] if `max_parallelism` is zero.
-    /// - [`DryCheckConfigError::InvalidReasoningEffort`] if `fast_reasoning_effort` or
-    ///   `final_reasoning_effort` is not one of `"low"`, `"medium"`, `"high"`, `"minimal"`.
     /// - [`DryCheckConfigError::InvalidPercent`] if `known_bad_injection_rate_percent` or
     ///   `known_bad_detection_threshold_percent` is outside `1..=100`.
     pub fn load(path: &Path) -> Result<DryCheckConfig, DryCheckConfigError> {
@@ -195,9 +161,6 @@ impl DryCheckConfig {
             return Err(DryCheckConfigError::InvalidParallelism(dto.max_parallelism));
         }
 
-        validate_reasoning_effort("fast_reasoning_effort", &dto.fast_reasoning_effort)?;
-        validate_reasoning_effort("final_reasoning_effort", &dto.final_reasoning_effort)?;
-
         validate_percent("known_bad_injection_rate_percent", dto.known_bad_injection_rate_percent)?;
         validate_percent(
             "known_bad_detection_threshold_percent",
@@ -208,8 +171,6 @@ impl DryCheckConfig {
             enabled: dto.enabled,
             threshold,
             max_parallelism: dto.max_parallelism,
-            fast_reasoning_effort: dto.fast_reasoning_effort,
-            final_reasoning_effort: dto.final_reasoning_effort,
             known_bad_injection_rate_percent: dto.known_bad_injection_rate_percent,
             known_bad_detection_threshold_percent: dto.known_bad_detection_threshold_percent,
         })
@@ -231,16 +192,6 @@ impl DryCheckConfig {
     /// Returns the configured judge fan-out `max_parallelism` (D3 / IN-03).
     pub fn max_parallelism(&self) -> usize {
         self.max_parallelism
-    }
-
-    /// Returns the reasoning effort for the fast-round DRY checker (D4 / IN-04).
-    pub fn fast_reasoning_effort(&self) -> &str {
-        &self.fast_reasoning_effort
-    }
-
-    /// Returns the reasoning effort for the final-round DRY checker (D4 / IN-04).
-    pub fn final_reasoning_effort(&self) -> &str {
-        &self.final_reasoning_effort
     }
 
     /// Returns the injection rate for known-bad calibration samples, as a percent (D4 / IN-04).
@@ -273,21 +224,21 @@ impl DryCheckConfig {
     /// - `enabled`
     /// - `threshold`
     /// - `max_parallelism`
-    /// - `fast_reasoning_effort`
-    /// - `final_reasoning_effort`
     /// - `known_bad_injection_rate_percent`
     /// - `known_bad_detection_threshold_percent`
+    ///
+    /// After D4: `fast_reasoning_effort` / `final_reasoning_effort` are excluded from
+    /// the canonical encoding (CN-08 / IN-10) because they now live in `agent-profiles.json`
+    /// and do not belong to the dry-check config fingerprint.
     pub fn fingerprint_with_threshold(
         &self,
         effective_threshold: domain::semantic_dup::SimilarityThreshold,
     ) -> domain::dry_check::DryCheckConfigFingerprint {
         let canonical = format!(
-            "enabled={}\nthreshold={}\nmax_parallelism={}\nfast_reasoning_effort={}\nfinal_reasoning_effort={}\nknown_bad_injection_rate_percent={}\nknown_bad_detection_threshold_percent={}",
+            "enabled={}\nthreshold={}\nmax_parallelism={}\nknown_bad_injection_rate_percent={}\nknown_bad_detection_threshold_percent={}",
             self.enabled,
             (effective_threshold.value() + 0.0_f32).to_bits(),
             self.max_parallelism,
-            self.fast_reasoning_effort,
-            self.final_reasoning_effort,
             self.known_bad_injection_rate_percent,
             self.known_bad_detection_threshold_percent,
         );
@@ -337,8 +288,6 @@ mod tests {
         "schema_version": 4,
         "threshold": 0.85,
         "max_parallelism": 4,
-        "fast_reasoning_effort": "medium",
-        "final_reasoning_effort": "high",
         "known_bad_injection_rate_percent": 10,
         "known_bad_detection_threshold_percent": 90
     }"#;
@@ -352,22 +301,6 @@ mod tests {
         assert!((t.value() - 0.85_f32).abs() < f32::EPSILON);
     }
 
-    /// Builds the JSON body for a minimal v4 config with the given reasoning efforts.
-    ///
-    /// Used by both valid-effort and invalid-effort tests so the fixture shape is defined once.
-    fn config_json_with_reasoning_efforts(fast_effort: &str, final_effort: &str) -> String {
-        format!(
-            r#"{{
-                "schema_version": 4,
-                "threshold": 0.85,
-                "fast_reasoning_effort": "{fast_effort}",
-                "final_reasoning_effort": "{final_effort}",
-                "known_bad_injection_rate_percent": 10,
-                "known_bad_detection_threshold_percent": 90
-            }}"#
-        )
-    }
-
     /// Builds the JSON body for a minimal v4 config with the given `threshold`.
     ///
     /// Used by both success and error-path tests so the fixture shape is defined once.
@@ -376,8 +309,6 @@ mod tests {
             r#"{{
                 "schema_version": 4,
                 "threshold": {threshold},
-                "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high",
                 "known_bad_injection_rate_percent": 10,
                 "known_bad_detection_threshold_percent": 90
             }}"#
@@ -423,7 +354,7 @@ mod tests {
     #[test]
     fn test_load_with_unsupported_schema_version_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let content = r#"{"schema_version": 99, "threshold": 0.85, "max_parallelism": 4, "fast_reasoning_effort": "medium", "final_reasoning_effort": "high", "known_bad_injection_rate_percent": 10, "known_bad_detection_threshold_percent": 90}"#;
+        let content = r#"{"schema_version": 99, "threshold": 0.85, "max_parallelism": 4, "known_bad_injection_rate_percent": 10, "known_bad_detection_threshold_percent": 90}"#;
         let path = write_json(dir.path(), "dry-check.json", content);
         let err = DryCheckConfig::load(&path).unwrap_err();
         assert!(
@@ -467,8 +398,6 @@ mod tests {
             "schema_version": 3,
             "threshold": 0.85,
             "max_parallelism": 4,
-            "fast_reasoning_effort": "medium",
-            "final_reasoning_effort": "high",
             "known_bad_injection_rate_percent": 10,
             "known_bad_detection_threshold_percent": 90
         }"#;
@@ -507,8 +436,6 @@ mod tests {
         let content = r#"{
             "schema_version": 4,
             "threshold": 0.85,
-            "fast_reasoning_effort": "medium",
-            "final_reasoning_effort": "high",
             "known_bad_injection_rate_percent": 10,
             "known_bad_detection_threshold_percent": 90
         }"#;
@@ -525,8 +452,6 @@ mod tests {
             "schema_version": 4,
             "enabled": false,
             "threshold": 0.85,
-            "fast_reasoning_effort": "medium",
-            "final_reasoning_effort": "high",
             "known_bad_injection_rate_percent": 10,
             "known_bad_detection_threshold_percent": 90
         }"#;
@@ -543,14 +468,62 @@ mod tests {
             "schema_version": 4,
             "enabled": true,
             "threshold": 0.85,
-            "fast_reasoning_effort": "medium",
-            "final_reasoning_effort": "high",
             "known_bad_injection_rate_percent": 10,
             "known_bad_detection_threshold_percent": 90
         }"#;
         let path = write_json(dir.path(), "dry-check.json", content);
         let config = DryCheckConfig::load(&path).unwrap();
         assert!(config.enabled(), "enabled must be true when explicitly set to true");
+    }
+
+    // ── D4 (T013/T015): v4 + reasoning_effort residual fields are rejected ────
+
+    #[test]
+    fn test_load_v4_with_residual_fast_reasoning_effort_returns_parse_error() {
+        // After D4, fast_reasoning_effort is no longer a field in dry-check.json.
+        // deny_unknown_fields must reject a v4 config that still carries it.
+        let dir = tempfile::tempdir().unwrap();
+        let content = r#"{
+            "schema_version": 4,
+            "threshold": 0.85,
+            "fast_reasoning_effort": "medium",
+            "known_bad_injection_rate_percent": 10,
+            "known_bad_detection_threshold_percent": 90
+        }"#;
+        let path = write_json(dir.path(), "dry-check.json", content);
+        let err = DryCheckConfig::load(&path).unwrap_err();
+        assert!(
+            matches!(err, DryCheckConfigError::Parse(_)),
+            "v4 config with residual fast_reasoning_effort must fail with Parse, got: {err}"
+        );
+        assert!(
+            err.to_string().contains("fast_reasoning_effort"),
+            "error must mention the unknown field name, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_load_v4_with_residual_final_reasoning_effort_returns_parse_error() {
+        // After D4, final_reasoning_effort is no longer a field in dry-check.json.
+        // deny_unknown_fields must reject a v4 config that still carries it.
+        let dir = tempfile::tempdir().unwrap();
+        let content = r#"{
+            "schema_version": 4,
+            "threshold": 0.85,
+            "final_reasoning_effort": "high",
+            "known_bad_injection_rate_percent": 10,
+            "known_bad_detection_threshold_percent": 90
+        }"#;
+        let path = write_json(dir.path(), "dry-check.json", content);
+        let err = DryCheckConfig::load(&path).unwrap_err();
+        assert!(
+            matches!(err, DryCheckConfigError::Parse(_)),
+            "v4 config with residual final_reasoning_effort must fail with Parse, got: {err}"
+        );
+        assert!(
+            err.to_string().contains("final_reasoning_effort"),
+            "error must mention the unknown field name, got: {err}"
+        );
     }
 
     // ── D3 (T008) max_parallelism tests ────────────────────────────────────────
@@ -562,8 +535,6 @@ mod tests {
             "schema_version": 4,
             "threshold": 0.85,
             "max_parallelism": 8,
-            "fast_reasoning_effort": "medium",
-            "final_reasoning_effort": "high",
             "known_bad_injection_rate_percent": 10,
             "known_bad_detection_threshold_percent": 90
         }"#;
@@ -579,8 +550,6 @@ mod tests {
         let content = r#"{
             "schema_version": 4,
             "threshold": 0.85,
-            "fast_reasoning_effort": "medium",
-            "final_reasoning_effort": "high",
             "known_bad_injection_rate_percent": 10,
             "known_bad_detection_threshold_percent": 90
         }"#;
@@ -596,8 +565,6 @@ mod tests {
             "schema_version": 4,
             "threshold": 0.85,
             "max_parallelism": 0,
-            "fast_reasoning_effort": "medium",
-            "final_reasoning_effort": "high",
             "known_bad_injection_rate_percent": 10,
             "known_bad_detection_threshold_percent": 90
         }"#;
@@ -633,53 +600,6 @@ mod tests {
         );
     }
 
-    // ── D4 (T011) reasoning_effort tests ───────────────────────────────────────
-
-    #[test]
-    fn test_load_v4_with_valid_reasoning_efforts_succeeds() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = write_json(dir.path(), "dry-check.json", VALID_CONFIG);
-        let config = DryCheckConfig::load(&path).unwrap();
-        assert_eq!(config.fast_reasoning_effort(), "medium");
-        assert_eq!(config.final_reasoning_effort(), "high");
-        assert_eq!(config.known_bad_injection_rate_percent(), 10);
-        assert_eq!(config.known_bad_detection_threshold_percent(), 90);
-    }
-
-    #[test]
-    fn test_load_with_all_valid_reasoning_effort_values_succeed() {
-        for effort in ["low", "medium", "high", "minimal"] {
-            let dir = tempfile::tempdir().unwrap();
-            let content = config_json_with_reasoning_efforts(effort, effort);
-            let path = write_json(dir.path(), "dry-check.json", &content);
-            let result = DryCheckConfig::load(&path);
-            assert!(result.is_ok(), "expected Ok for effort={effort}, got: {result:?}");
-        }
-    }
-
-    #[test]
-    fn test_load_with_invalid_reasoning_effort_returns_error() {
-        // Table-driven: (fast_effort, final_effort, invalid_field, invalid_value)
-        let cases = [
-            ("turbo", "high", "fast_reasoning_effort", "turbo"),
-            ("medium", "ultra", "final_reasoning_effort", "ultra"),
-        ];
-        for (fast, final_, expected_field, expected_value) in cases {
-            let content = config_json_with_reasoning_efforts(fast, final_);
-            let dir = tempfile::tempdir().unwrap();
-            let path = write_json(dir.path(), "dry-check.json", &content);
-            let err = DryCheckConfig::load(&path).unwrap_err();
-            assert!(
-                matches!(
-                    &err,
-                    DryCheckConfigError::InvalidReasoningEffort { field, value }
-                        if field == expected_field && value == expected_value
-                ),
-                "expected InvalidReasoningEffort for {expected_field}={expected_value}, got: {err}"
-            );
-        }
-    }
-
     // ── D4 (T011) percent validation tests ─────────────────────────────────────
 
     #[test]
@@ -691,8 +611,6 @@ mod tests {
                 r#"{{
                     "schema_version": 4,
                     "threshold": 0.85,
-                    "fast_reasoning_effort": "medium",
-                    "final_reasoning_effort": "high",
                     "known_bad_injection_rate_percent": {invalid_value},
                     "known_bad_detection_threshold_percent": 90
                 }}"#
@@ -717,8 +635,6 @@ mod tests {
         let content = r#"{
             "schema_version": 4,
             "threshold": 0.85,
-            "fast_reasoning_effort": "medium",
-            "final_reasoning_effort": "high",
             "known_bad_injection_rate_percent": 10,
             "known_bad_detection_threshold_percent": 0
         }"#;
@@ -743,8 +659,6 @@ mod tests {
                 r#"{{
                     "schema_version": 4,
                     "threshold": 0.85,
-                    "fast_reasoning_effort": "medium",
-                    "final_reasoning_effort": "high",
                     "known_bad_injection_rate_percent": {injection},
                     "known_bad_detection_threshold_percent": {threshold}
                 }}"#
@@ -791,8 +705,6 @@ mod tests {
                 "enabled": true,
                 "threshold": 0.85,
                 "max_parallelism": 4,
-                "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high",
                 "known_bad_injection_rate_percent": 10,
                 "known_bad_detection_threshold_percent": 90
             }"#,
@@ -809,25 +721,12 @@ mod tests {
                 "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 8,
-                "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high",
                 "known_bad_injection_rate_percent": 10,
                 "known_bad_detection_threshold_percent": 90
             }"#,
         )
         .fingerprint();
         assert_ne!(cfg_4, cfg_8, "fingerprint must differ when max_parallelism changes");
-    }
-
-    #[test]
-    fn test_fingerprint_changes_when_reasoning_efforts_change() {
-        let cfg_medium_high = load_from_str(VALID_CONFIG).fingerprint();
-        let cfg_low_low =
-            load_from_str(&config_json_with_reasoning_efforts("low", "low")).fingerprint();
-        assert_ne!(
-            cfg_medium_high, cfg_low_low,
-            "fingerprint must differ when reasoning efforts change"
-        );
     }
 
     #[test]
@@ -838,14 +737,34 @@ mod tests {
                 "schema_version": 4,
                 "threshold": 0.85,
                 "max_parallelism": 4,
-                "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high",
                 "known_bad_injection_rate_percent": 20,
                 "known_bad_detection_threshold_percent": 80
             }"#,
         )
         .fingerprint();
         assert_ne!(cfg_10_90, cfg_20_80, "fingerprint must differ when known-bad percents change");
+    }
+
+    /// D4 / T013 / T015 / CN-08 / IN-10: reasoning effort fields must NOT affect
+    /// the fingerprint — they now live in agent-profiles.json, not dry-check.json.
+    ///
+    /// This test confirms fingerprint stability: two configs that are otherwise
+    /// identical produce the same fingerprint regardless of what is configured
+    /// in agent-profiles.json for reasoning effort.
+    ///
+    /// Note: this property cannot be demonstrated by varying the dry-check.json
+    /// fields (they were removed), so we confirm it indirectly by showing that
+    /// VALID_CONFIG (which has no reasoning_effort fields) still produces a
+    /// deterministic fingerprint when loaded twice.
+    #[test]
+    fn test_fingerprint_is_stable_without_reasoning_effort_fields() {
+        // Same config without reasoning_effort fields must produce identical fingerprints.
+        let fp1 = load_from_str(VALID_CONFIG).fingerprint();
+        let fp2 = load_from_str(VALID_CONFIG).fingerprint();
+        assert_eq!(
+            fp1, fp2,
+            "fingerprint must be stable after reasoning_effort fields are removed (CN-08/IN-10)"
+        );
     }
 
     #[test]

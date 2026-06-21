@@ -222,8 +222,6 @@ mod tests {
   "enabled": true,
   "threshold": 0.85,
   "max_parallelism": 4,
-  "fast_reasoning_effort": "medium",
-  "final_reasoning_effort": "high",
   "known_bad_injection_rate_percent": 10,
   "known_bad_detection_threshold_percent": 90
 }"#,

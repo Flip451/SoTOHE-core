@@ -1,74 +1,35 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6f815c60775ea802c474fc21d2c4f286a2999f092c3cac19af07fabf9a7ad9e9",
-          "at": "2026-06-21T08:37:13Z"
+          "hash": "rvw1:sha256:c4a14cdfb63b3dca3d847289cb56dbe447949b097b97422f16bc6737fa1315c5",
+          "at": "2026-06-21T08:36:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6f815c60775ea802c474fc21d2c4f286a2999f092c3cac19af07fabf9a7ad9e9",
-          "at": "2026-06-21T08:40:15Z"
+          "hash": "rvw1:sha256:c4a14cdfb63b3dca3d847289cb56dbe447949b097b97422f16bc6737fa1315c5",
+          "at": "2026-06-21T08:39:49Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fffca3b895d0782b1ff7934174af8053eccceaf72ad7481da8156a9520f40522",
-          "at": "2026-06-21T09:53:05Z"
+          "hash": "rvw1:sha256:bac8ea0f23f437d966081343d96fd5fed40ec99f6ee249373976e0f561809790",
+          "at": "2026-06-21T11:39:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fffca3b895d0782b1ff7934174af8053eccceaf72ad7481da8156a9520f40522",
-          "at": "2026-06-21T09:56:19Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
-          "at": "2026-06-21T08:37:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
-          "at": "2026-06-21T08:37:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
-          "at": "2026-06-21T08:40:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22c8255741c411861032c43cd03e6bdad33215f8825f540fc7fe8c90e0f997b1",
-          "at": "2026-06-21T09:51:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22c8255741c411861032c43cd03e6bdad33215f8825f540fc7fe8c90e0f997b1",
-          "at": "2026-06-21T09:55:27Z"
+          "hash": "rvw1:sha256:bac8ea0f23f437d966081343d96fd5fed40ec99f6ee249373976e0f561809790",
+          "at": "2026-06-21T11:41:56Z"
         }
       ]
     },
@@ -102,6 +63,20 @@
           "findings": [],
           "hash": "rvw1:sha256:3c09883a01ea59c4c9f107d16b1ac9e752bb9113f282803a3c60ea0a2e858fe1",
           "at": "2026-06-21T08:42:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:461c2efdcfed4eb9e0307adb765f6e30f7fbfb0ca0cd9c0d8b39fac7d8e6a960",
+          "at": "2026-06-21T11:42:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:461c2efdcfed4eb9e0307adb765f6e30f7fbfb0ca0cd9c0d8b39fac7d8e6a960",
+          "at": "2026-06-21T11:44:29Z"
         }
       ]
     },
@@ -134,6 +109,111 @@
           "findings": [],
           "hash": "rvw1:sha256:690e8f80b539595bf84f26938497b07a5384061f680f929a4f936e3549411bb1",
           "at": "2026-06-21T09:52:55Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f815c60775ea802c474fc21d2c4f286a2999f092c3cac19af07fabf9a7ad9e9",
+          "at": "2026-06-21T08:37:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f815c60775ea802c474fc21d2c4f286a2999f092c3cac19af07fabf9a7ad9e9",
+          "at": "2026-06-21T08:40:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fffca3b895d0782b1ff7934174af8053eccceaf72ad7481da8156a9520f40522",
+          "at": "2026-06-21T09:53:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fffca3b895d0782b1ff7934174af8053eccceaf72ad7481da8156a9520f40522",
+          "at": "2026-06-21T09:56:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f297852f15657d1cd3105edd821a57dc95c757058355efc45e1f19053e9043b",
+          "at": "2026-06-21T11:42:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_dry_checker_config` reads `fast_reasoning_effort` / `final_reasoning_effort` from `AgentProfiles` and forwards them to `CodexDryChecker` without checking the allowed values. OS-06 says the loader intentionally leaves these strings untyped and the composition root remains the final allowed-values guard, while the downstream checker constructor just stores the strings and later passes them to `model_reasoning_effort`. This regresses the previous fail-closed validation path: an invalid profile value like `\"turbo\"` now reaches the Codex invocation instead of failing during wiring.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 676,
+              "category": "wiring stale to spec"
+            }
+          ],
+          "hash": "rvw1:sha256:5f297852f15657d1cd3105edd821a57dc95c757058355efc45e1f19053e9043b",
+          "at": "2026-06-21T11:46:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ebcf27d04876c13ab02e394d1c064e4808f60fbea3dd018ec9bcc7c9eb8b521",
+          "at": "2026-06-21T11:50:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load` now runs unconditionally before the `explicit_model` branch, so `dry_write` no longer preserves the existing explicit-override contract: a malformed or missing `.harness/config/agent-profiles.json` will fail the command even when `model: Some(...)` is supplied, and the existing `test_dry_write_explicit_model_bypasses_agent_profiles_resolution` will regress. If the D4 change is meant to keep explicit overrides independent, gate the profile load on `explicit_model.is_none()` or defer it until after the `items_dir` validation path.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/dry_checker_config.rs",
+              "line": 66,
+              "category": "regression"
+            }
+          ],
+          "hash": "rvw1:sha256:91319110cc013da683a14c5769f20982c17cdedde9baf65155188df251b54dfc",
+          "at": "2026-06-21T12:07:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_dry_checker_config` now short-circuits when `explicit_model` is set, so `dry_write --model ...` no longer loads `agent-profiles.json` for the `dry-checker` capability. That silently drops any configured `fast_reasoning_effort` / `final_reasoning_effort` and the associated validation, so the dry checker runs with the built-in defaults even when the profile explicitly requests different efforts.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry/dry_checker_config.rs",
+              "line": 66,
+              "category": "application logic in composition"
+            }
+          ],
+          "hash": "rvw1:sha256:8bd66d4b86b7d6b7a48723c81832c9363744355ffc4753818aabc7d026de1796",
+          "at": "2026-06-21T12:10:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4556dd459a8259ce636a1a6dac00a0a5539d7a760df9aba1be564575e1cf8434",
+          "at": "2026-06-21T12:15:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4556dd459a8259ce636a1a6dac00a0a5539d7a760df9aba1be564575e1cf8434",
+          "at": "2026-06-21T12:19:03Z"
         }
       ]
     },
@@ -268,24 +348,80 @@
           "findings": [],
           "hash": "rvw1:sha256:af96bde1a49a898750c758a47354fbdd61666b8926523a9d60b06480421a7797",
           "at": "2026-06-21T09:54:26Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c4a14cdfb63b3dca3d847289cb56dbe447949b097b97422f16bc6737fa1315c5",
-          "at": "2026-06-21T08:36:24Z"
+          "hash": "rvw1:sha256:4343fbafca554596781a7e10e4d12cd6e870c091923bb67a6d32f71674ea6440",
+          "at": "2026-06-21T10:09:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4677badaf29560c93e5d806a255e2f0894609691821cee39deb69f23368a8ae",
+          "at": "2026-06-21T11:43:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c4a14cdfb63b3dca3d847289cb56dbe447949b097b97422f16bc6737fa1315c5",
-          "at": "2026-06-21T08:39:49Z"
+          "hash": "rvw1:sha256:a4677badaf29560c93e5d806a255e2f0894609691821cee39deb69f23368a8ae",
+          "at": "2026-06-21T11:47:59Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
+          "at": "2026-06-21T08:37:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
+          "at": "2026-06-21T08:37:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3a7ee779f82f414de35350848a99f04889eb3e3f2bb2e8553cafc3661a6699",
+          "at": "2026-06-21T08:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22c8255741c411861032c43cd03e6bdad33215f8825f540fc7fe8c90e0f997b1",
+          "at": "2026-06-21T09:51:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22c8255741c411861032c43cd03e6bdad33215f8825f540fc7fe8c90e0f997b1",
+          "at": "2026-06-21T09:55:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e08265d1e26b0c73807fb4b0128af78aed9f5be5bf0bf40c26beb318ce3fbfe3",
+          "at": "2026-06-21T11:40:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e08265d1e26b0c73807fb4b0128af78aed9f5be5bf0bf40c26beb318ce3fbfe3",
+          "at": "2026-06-21T11:42:47Z"
         }
       ]
     }

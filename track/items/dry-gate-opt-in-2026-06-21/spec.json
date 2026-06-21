@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "version": "1.0",
+  "version": "1.1",
   "title": "DRY ゲートを利用者設定で切り替え可能にし、既定を無効（opt-in）とする",
   "goal": [
     {
@@ -32,13 +32,23 @@
           "anchor": "D3"
         }
       ]
+    },
+    {
+      "id": "GO-04",
+      "text": "dry-checker の reasoning effort 設定（`fast_reasoning_effort` / `final_reasoning_effort`）を `.harness/config/dry-check.json` から `.harness/config/agent-profiles.json` の `capabilities.dry-checker` に移す。`dry-check.json` の schema_version は v4 のまま据え置き、D2 の `enabled` 追加と D4 の reasoning_effort 削除を同一スキーマ（v4）内に統合する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+          "anchor": "D4"
+        }
+      ]
     }
   ],
   "scope": {
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "`.harness/config/dry-check.json` のスキーマに boolean キー `enabled` を追加する。`schema_version` を 3 から 4 に上げる。schema_version 4 のファイルで `enabled` キーが省略された場合は `false`（gate off）として扱う（opt-in の既定 OFF を schema レベルで表現する）。",
+        "text": "`.harness/config/dry-check.json` のスキーマに boolean キー `enabled` を追加する。`schema_version` は 3 から 4 に上げる（D2 決定）。schema_version 4 のファイルで `enabled` キーが省略された場合は `false`（gate off）として扱う（opt-in の既定 OFF を schema レベルで表現する）。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
@@ -88,11 +98,11 @@
       },
       {
         "id": "IN-06",
-        "text": "実際の `.harness/config/dry-check.json` を schema_version 4 に更新し、`enabled: false` を既定値として追記する。既存フィールド（`threshold`、`max_parallelism`、`fast_reasoning_effort`、`final_reasoning_effort`、`known_bad_injection_rate_percent`、`known_bad_detection_threshold_percent`）はそのまま維持する。",
+        "text": "実際の `.harness/config/dry-check.json` を schema_version 4 の最終形に更新し、`enabled: false` を含む。`fast_reasoning_effort` と `final_reasoning_effort` の 2 フィールドは D4 により削除する。D2 の `enabled` 追加と D4 の reasoning_effort 削除は 1 回の schema 更新として v4 内に統合する（中間 schema を作らない）。残存フィールドは `enabled`・`threshold`・`max_parallelism`・`known_bad_injection_rate_percent`・`known_bad_detection_threshold_percent` となる。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
-            "anchor": "D2"
+            "anchor": "D4"
           }
         ]
       },
@@ -103,6 +113,36 @@
           {
             "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
             "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "`.harness/config/agent-profiles.json` の `capabilities.dry-checker` オブジェクトに `fast_reasoning_effort` と `final_reasoning_effort` の 2 フィールドを追加する。キー名は `dry-check.json` での旧名称をそのまま踏襲する。これら 2 フィールドは dry-checker capability が使う推論強度の設定であり、`model` / `fast_model` と同じカテゴリに属する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "インフラ層の `DryCheckConfigDto` から `fast_reasoning_effort` / `final_reasoning_effort` フィールドを削除し、schema_version 4 の codec を再実装する。`DryCheckConfig`（インフラ側）の `fast_reasoning_effort()` / `final_reasoning_effort()` accessors を削除する。composition root（`dry.rs`）の reasoning effort 取得先を `DryCheckConfig` から `AgentProfiles` に切り替える。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "`DryCheckConfig::fingerprint` の canonical encoding から `fast_reasoning_effort` / `final_reasoning_effort` を除外する。これら 2 フィールドは dry-check.json のスキーマを離れるため、coverage manifest の staleness 判定に含めるべきでない。fingerprint が変わるため、既存の coverage manifest は stale 扱いとなり `dry write` の再実行が必要になる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+            "anchor": "D4"
           }
         ]
       }
@@ -157,6 +197,16 @@
             "anchor": "D2"
           }
         ]
+      },
+      {
+        "id": "OS-06",
+        "text": "`agent-profiles.json` 側での `fast_reasoning_effort` / `final_reasoning_effort` の値バリデーション（allowed values チェック）は対象外。`agent-profiles.json` の loader は文字列フィールドを untyped のまま保持し、値の検証は composition root（caller 側）が行う。allowed values の強制は以前と同様に composition root が担う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+            "anchor": "D4"
+          }
+        ]
       }
     ]
   },
@@ -203,11 +253,11 @@
     },
     {
       "id": "CN-05",
-      "text": "`schema_version` が 4 以外の `dry-check.json` を読み込んだ場合は旧スキーマとして hard error とする。`enabled` フィールドを持たない旧 schema_version 3 ファイルは無効であり、明示的な schema_version 4 への更新を利用者に求める。",
+      "text": "`schema_version` が 4 以外の `dry-check.json` を読み込んだ場合は旧スキーマとして hard error とする。D2 と D4 を統合した schema_version 4 が唯一サポートされるバージョンであり、schema_version 4 以外のファイルは無効として明示的な migration を利用者に求める。なお reasoning_effort フィールドが残ったままの古い v4 ファイルを投入すると、loader の `deny_unknown_fields` により Parse エラーが発生する（migration 要求の手段）。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
-          "anchor": "D2"
+          "anchor": "D4"
         }
       ]
     },
@@ -220,16 +270,36 @@
           "anchor": "D2"
         }
       ]
+    },
+    {
+      "id": "CN-07",
+      "text": "reasoning effort の設定（`fast_reasoning_effort` / `final_reasoning_effort`）は `agent-profiles.json` の `capabilities.dry-checker` から composition root が直接読み取り、`CodexDryChecker` に渡す。usecase 層・domain 層は reasoning effort を保持しない。`DryCheckConfig`（usecase 層）に reasoning effort フィールドは追加しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "`DryCheckConfig::fingerprint` の canonical encoding から `fast_reasoning_effort` / `final_reasoning_effort` を除外する。fingerprint は dry-check.json が持つフィールドのみを対象とし、agent-profiles.json 由来の設定は含めない。reasoning effort の変更は coverage manifest の staleness 判定に影響しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+          "anchor": "D4"
+        }
+      ]
     }
   ],
   "acceptance_criteria": [
     {
       "id": "AC-01",
-      "text": "`.harness/config/dry-check.json` が `\"schema_version\": 4` と `\"enabled\": false` を含む形で更新されており、既存の `threshold`・`max_parallelism`・reasoning effort・probe 設定フィールドがそのまま維持されている。",
+      "text": "`.harness/config/dry-check.json` が `\"schema_version\": 4` と `\"enabled\": false` を含む形で更新されており、`fast_reasoning_effort` / `final_reasoning_effort` フィールドが削除されている。残存フィールドは `enabled`・`threshold`・`max_parallelism`・`known_bad_injection_rate_percent`・`known_bad_detection_threshold_percent` のみ。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
-          "anchor": "D2"
+          "anchor": "D4"
         }
       ]
     },
@@ -265,11 +335,11 @@
     },
     {
       "id": "AC-05",
-      "text": "schema_version 4 の `dry-check.json` で `enabled` キーが省略されているとき、`false`（gate off）として扱われ、hard error にならない。一方、`schema_version` が 4 以外（例: 旧 schema_version 3）のファイルを読み込んだときは hard error が発生する（CN-05 の制約に対応）。",
+      "text": "schema_version 4 の `dry-check.json` で `enabled` キーが省略されているとき、`false`（gate off）として扱われ、hard error にならない。reasoning_effort フィールドが v4 ファイルに残っている場合は loader の `deny_unknown_fields` により Parse エラーが発生し、利用者に migration を促す。schema_version が 4 以外のファイルを読み込んだときは `UnsupportedSchemaVersion` エラーが発生する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
-          "anchor": "D2"
+          "anchor": "D4"
         }
       ]
     },
@@ -302,6 +372,26 @@
           "anchor": "D3"
         }
       ]
+    },
+    {
+      "id": "AC-09",
+      "text": "`.harness/config/agent-profiles.json` の `capabilities.dry-checker` に `fast_reasoning_effort` と `final_reasoning_effort` が追加されており、`dry.rs` の composition root がこれらを `AgentProfiles` 経由で読み取って `CodexDryChecker` に渡している。`DryCheckConfig`（インフラ層）の `fast_reasoning_effort()` / `final_reasoning_effort()` accessors が削除されている。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`DryCheckConfig::fingerprint` の canonical encoding が `fast_reasoning_effort` / `final_reasoning_effort` を含まない形に更新されており、reasoning effort を変更しても既存の coverage manifest が stale 扱いにならない（fingerprint が変わらない）ことをテストで確認できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+          "anchor": "D4"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -327,7 +417,7 @@
     }
   ],
   "signals": {
-    "blue": 29,
+    "blue": 38,
     "yellow": 0,
     "red": 0
   }
