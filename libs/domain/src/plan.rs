@@ -1,4 +1,4 @@
-use crate::{TaskId, ValidationError};
+use crate::{NonEmptyString, TaskId, ValidationError};
 
 /// A section within a plan, grouping related tasks under a title.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -21,14 +21,11 @@ impl PlanSection {
         task_ids: Vec<TaskId>,
     ) -> Result<Self, ValidationError> {
         let id = id.into();
-        if id.trim().is_empty() {
-            return Err(ValidationError::EmptyPlanSectionId);
-        }
+        NonEmptyString::try_new(id.as_str()).map_err(|_| ValidationError::EmptyPlanSectionId)?;
 
         let title = title.into();
-        if title.trim().is_empty() {
-            return Err(ValidationError::EmptyPlanSectionTitle);
-        }
+        NonEmptyString::try_new(title.as_str())
+            .map_err(|_| ValidationError::EmptyPlanSectionTitle)?;
 
         Ok(Self { id, title, description, task_ids })
     }

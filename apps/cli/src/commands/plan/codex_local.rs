@@ -5,7 +5,6 @@
 //! return the exit code.
 
 use std::ffi::OsString;
-use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::process::{Child, Command, ExitCode, Stdio};
 use std::thread;
@@ -14,7 +13,10 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 #[cfg(unix)]
 use std::os::unix::process::CommandExt;
 
-use super::{CodexInvocation, PLAN_RUNTIME_DIR, POLL_INTERVAL, PlanCodexLocalArgs, PlanRunResult};
+use cli_composition::tee_stderr_to_file;
+
+use super::{CodexInvocation, PLAN_RUNTIME_DIR, PlanCodexLocalArgs, PlanRunResult};
+use crate::commands::POLL_INTERVAL;
 
 #[cfg(test)]
 use super::CODEX_BIN_ENV;
@@ -128,21 +130,6 @@ fn spawn_codex(
     });
 
     Ok((child, tee_handle))
-}
-
-/// Copies lines from a pipe to both a log file and inherited stderr.
-fn tee_stderr_to_file(pipe: std::process::ChildStderr, mut log_file: std::fs::File) {
-    let reader = BufReader::new(pipe);
-    for line in reader.lines() {
-        match line {
-            Ok(line) => {
-                let _ = writeln!(log_file, "{line}");
-                eprintln!("{line}");
-            }
-            Err(_) => break,
-        }
-    }
-    let _ = log_file.flush();
 }
 
 pub(super) fn run_codex_local_invocation(

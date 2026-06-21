@@ -150,8 +150,11 @@ mod tests {
         let result = execute_spec_element_hash(items_dir, "../evil".to_owned(), None);
         assert!(result.is_err());
         let msg = result.unwrap_err().to_string();
+        // Error text is the domain form: "track id '...' must be a lowercase slug".
+        // Accept either the domain form or legacy "invalid track id" prefix (behaviour: rejection).
         assert!(
-            msg.to_ascii_lowercase().contains("invalid track id"),
+            msg.contains("must be a lowercase slug")
+                || msg.to_ascii_lowercase().contains("invalid track id"),
             "error should mention path-traversal rejection: {msg}"
         );
     }

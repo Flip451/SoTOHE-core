@@ -4,42 +4,14 @@ use std::path::{Path, PathBuf};
 
 use cli_composition::CliApp;
 
-/// Validates a track ID string (lowercase slug: `[a-z0-9]([a-z0-9-]*[a-z0-9])?`).
-///
-/// Mirrors the validation performed by `domain::TrackId::try_new` without
-/// importing domain types.
+/// Validates a track ID string by delegating to the canonical domain rule via
+/// cli_composition.
 ///
 /// # Errors
 ///
 /// Returns an error string describing the failure.
 pub(crate) fn validate_track_id_str(value: &str) -> Result<(), String> {
-    if value.is_empty() {
-        return Err(format!("invalid track id: '{value}' (must not be empty)"));
-    }
-    let mut chars = value.chars();
-    match chars.next() {
-        Some(first) if first.is_ascii_lowercase() || first.is_ascii_digit() => {}
-        _ => {
-            return Err(format!(
-                "invalid track id: '{value}' (must start with lowercase letter or digit)"
-            ));
-        }
-    }
-    let mut previous_was_hyphen = false;
-    for ch in chars {
-        let is_valid = ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-';
-        if !is_valid {
-            return Err(format!("invalid track id: '{value}' (invalid character '{ch}')"));
-        }
-        if ch == '-' && previous_was_hyphen {
-            return Err(format!("invalid track id: '{value}' (double hyphen not allowed)"));
-        }
-        previous_was_hyphen = ch == '-';
-    }
-    if previous_was_hyphen {
-        return Err(format!("invalid track id: '{value}' (must not end with hyphen)"));
-    }
-    Ok(())
+    CliApp::new().track_validate_id(value)
 }
 
 /// Validates a track branch name string (`track/<valid-track-id>`).

@@ -211,7 +211,7 @@ impl Drop for OutputLastMessageCleanup {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
-    use spawn::REVIEW_RUNTIME_DIR;
+    use crate::codex_common::REVIEW_RUNTIME_DIR;
     use std::path::Path;
 
     fn make_command() -> RunReviewFixCommand {

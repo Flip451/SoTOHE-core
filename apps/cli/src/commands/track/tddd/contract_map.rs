@@ -55,8 +55,12 @@ mod tests {
         let result = execute_contract_map(items_dir, "../evil".to_owned(), dir.path().into(), None);
         let err = result.expect_err("path traversal track id must be rejected");
         let msg = format!("{err}");
+        // Error text is the domain form: "track id '...' must be a lowercase slug".
+        // Accept either the domain form or legacy "invalid" prefix (behaviour: rejection).
         assert!(
-            msg.contains("invalid track ID") || msg.contains("invalid"),
+            msg.contains("must be a lowercase slug")
+                || msg.contains("invalid track ID")
+                || msg.contains("invalid"),
             "error must reject invalid track id, got: {msg}"
         );
     }

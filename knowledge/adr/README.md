@@ -203,6 +203,12 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
 | [モジュールサイズ制限の厳格化と分割リファクタリング](2026-06-06-1609-enforce-module-size-limit-splitting.md) | Proposed | 2026-06-06 |
 
+### DRY / リファクタ
+
+| ADR | Status | Date |
+|-----|--------|------|
+| [既存 DRY 違反の一掃 — 横断・既存重複を正典へ集約する](2026-06-19-0924-existing-dry-violation-cleanup.md) | Proposed | 2026-06-19 |
+
 ### Review コマンド / API
 
 | ADR | Status | Date |

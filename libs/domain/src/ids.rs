@@ -165,6 +165,19 @@ impl fmt::Display for TrackBranch {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct NonEmptyString(String);
 
+/// Trim `value` and reject empty / whitespace-only input.
+///
+/// Single source of truth for the "trimmed non-empty string" rule shared by
+/// [`NonEmptyString`] and [`ReviewGroupName`].
+///
+/// # Errors
+///
+/// Returns [`ValidationError::EmptyString`] when the trimmed input is empty.
+fn validate_trimmed_non_empty(value: impl Into<String>) -> Result<String, ValidationError> {
+    let trimmed = value.into().trim().to_owned();
+    if trimmed.is_empty() { Err(ValidationError::EmptyString) } else { Ok(trimmed) }
+}
+
 impl NonEmptyString {
     /// Validate and wrap `value` as a [`NonEmptyString`].
     ///
@@ -176,8 +189,7 @@ impl NonEmptyString {
     /// Returns [`ValidationError::EmptyString`] when the trimmed input is
     /// empty.
     pub fn try_new(value: impl Into<String>) -> Result<Self, ValidationError> {
-        let trimmed = value.into().trim().to_owned();
-        if trimmed.is_empty() { Err(ValidationError::EmptyString) } else { Ok(Self(trimmed)) }
+        validate_trimmed_non_empty(value).map(Self)
     }
 }
 
@@ -212,8 +224,7 @@ impl ReviewGroupName {
     /// Returns [`ValidationError::EmptyString`] when the trimmed input is
     /// empty.
     pub fn try_new(value: impl Into<String>) -> Result<Self, ValidationError> {
-        let trimmed = value.into().trim().to_owned();
-        if trimmed.is_empty() { Err(ValidationError::EmptyString) } else { Ok(Self(trimmed)) }
+        validate_trimmed_non_empty(value).map(Self)
     }
 }
 

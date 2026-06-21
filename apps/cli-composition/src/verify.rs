@@ -77,8 +77,8 @@ pub fn execute_catalogue_spec_refs(
     workspace_root: PathBuf,
     skip_stale: bool,
 ) -> Result<CommandOutcome, String> {
-    // Validate track id (path traversal guard) without importing domain types (CN-01 / AC-03).
-    validate_track_id_str_local(&track_id).map_err(|e| format!("invalid track ID: {e}"))?;
+    // Validate track id (path traversal guard) — delegates to the canonical domain rule.
+    crate::track::validate_track_id_str(&track_id).map_err(|e| format!("invalid track ID: {e}"))?;
 
     let mut all_formatted_findings: Vec<String> = Vec::new();
     let no_findings =
@@ -105,37 +105,6 @@ pub fn execute_catalogue_spec_refs(
             .join("\n");
         Ok(CommandOutcome { stdout: None, stderr: Some(stderr), exit_code: 1 })
     }
-}
-
-/// Validates a track ID string without importing domain types.
-fn validate_track_id_str_local(value: &str) -> Result<(), String> {
-    if value.is_empty() {
-        return Err(format!("invalid track id: '{value}' (must not be empty)"));
-    }
-    let mut chars = value.chars();
-    match chars.next() {
-        Some(first) if first.is_ascii_lowercase() || first.is_ascii_digit() => {}
-        _ => {
-            return Err(format!(
-                "invalid track id: '{value}' (must start with lowercase letter or digit)"
-            ));
-        }
-    }
-    let mut previous_was_hyphen = false;
-    for ch in chars {
-        let is_valid = ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-';
-        if !is_valid {
-            return Err(format!("invalid track id: '{value}' (invalid character '{ch}')"));
-        }
-        if ch == '-' && previous_was_hyphen {
-            return Err(format!("invalid track id: '{value}' (double hyphen not allowed)"));
-        }
-        previous_was_hyphen = ch == '-';
-    }
-    if previous_was_hyphen {
-        return Err(format!("invalid track id: '{value}' (must not end with hyphen)"));
-    }
-    Ok(())
 }
 
 impl CliApp {

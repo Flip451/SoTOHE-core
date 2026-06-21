@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "existing-dry-violation-cleanup-2026-06-19",
+  "title": "既存 DRY 違反の一掃 — 横断・既存重複を正典へ集約する",
+  "branch": "track/existing-dry-violation-cleanup-2026-06-19",
+  "created_at": "2026-06-19T12:37:38Z",
+  "updated_at": "2026-06-19T12:37:38Z"
+}

@@ -1,0 +1,790 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f398adb3c64a16286ded2510512df0dba2564cd749b28f3955c0963f94b0814c",
+          "at": "2026-06-19T16:48:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f398adb3c64a16286ded2510512df0dba2564cd749b28f3955c0963f94b0814c",
+          "at": "2026-06-19T16:51:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d99289181ed00dcedc114f88f8baefbe6202936daeb53b62f984a7c3411bf10",
+          "at": "2026-06-19T23:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d99289181ed00dcedc114f88f8baefbe6202936daeb53b62f984a7c3411bf10",
+          "at": "2026-06-19T23:31:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:515a3e55b42b6620c428d67fa797ce83d6d5499868b62ebdc55bd0975ae47b89",
+          "at": "2026-06-20T02:13:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:515a3e55b42b6620c428d67fa797ce83d6d5499868b62ebdc55bd0975ae47b89",
+          "at": "2026-06-20T02:15:28Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
+          "at": "2026-06-19T15:54:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3e0d253b705ac17db3fbcdaa5412af122704f2c30ab59bf6c449618d00e9b14",
+          "at": "2026-06-19T15:57:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
+          "at": "2026-06-19T16:20:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1120f2ab45ea84df8753780fef697f9a85fcb9f842df7991ecb07070cbba3a15",
+          "at": "2026-06-19T16:22:04Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ecf4963f06fae0a775dbd8af1a86c3292cee9390ce03b2f0c12467d832b5e6d3",
+          "at": "2026-06-19T23:27:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ecf4963f06fae0a775dbd8af1a86c3292cee9390ce03b2f0c12467d832b5e6d3",
+          "at": "2026-06-19T23:28:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35c250bec1f321d295541ba0f2e39d2047e95bdd3597b0f3dacf9757fdf9c67b",
+          "at": "2026-06-20T00:08:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35c250bec1f321d295541ba0f2e39d2047e95bdd3597b0f3dacf9757fdf9c67b",
+          "at": "2026-06-20T00:09:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a7dd38c95cc3c6f9d818b516829fb0e358202c926ee678295aa4a597711d8d1",
+          "at": "2026-06-20T02:10:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a7dd38c95cc3c6f9d818b516829fb0e358202c926ee678295aa4a597711d8d1",
+          "at": "2026-06-20T02:12:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4ed2ea9b8d166c9e140c3d2a3e9ff2932752f2207e9d699fb0f35d7dcbd1dc6",
+          "at": "2026-06-20T02:27:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4ed2ea9b8d166c9e140c3d2a3e9ff2932752f2207e9d699fb0f35d7dcbd1dc6",
+          "at": "2026-06-20T02:28:57Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file dates PR #148's merge as 2026-06-04, but the bundle README and evaluation.md both place the same merge on 2026-06-02. The evidence set is internally inconsistent about the snapshot boundary.",
+              "severity": "medium",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/gate-cache-evaluation.md",
+              "line": 4,
+              "category": "contradiction"
+            },
+            {
+              "message": "The bullet says `\"tmp/reviewer-runtime\"` is defined in four separate locations, but the rationale says five occurrences and the locations list contains five paths. The count in the heading is wrong.",
+              "severity": "medium",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/after/report.md",
+              "line": 255,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:fe84374edf98ba29171e2050540ff88696c16a76bdbec5c8fac9c6d86585e6d0",
+          "at": "2026-06-19T12:45:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluation.md` says the overall density drop is \"fully concentrated in cli and cli-composition\", but the table immediately above shows domain density also fell from 0.743 to 0.713 (-4.0%). The statement should say the drop is mostly, not fully, concentrated in those two crates.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/evaluation.md",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3c45adcd75fec328948332edebd3002b15b36645ba81ad1a9dde19e323c86beb",
+          "at": "2026-06-19T12:51:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80a191d146da859e9c91bb13d3da72d2d39c724a9e8600c3b9f82ea5b74e7f70",
+          "at": "2026-06-19T12:56:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluation.md` says the before/after census used the same model `claude-sonnet-4-6`, but the checked-in workflow documents and implements a mixed model setup: Sonnet for scan/load/synthesis and Opus for adversarial verification (`dry-scan.workflow.js` lines 6-7 and 335-346). This makes the methodology claim internally inconsistent; update the fairness-control wording to describe the model mix, or adjust the workflow/provenance if Sonnet-only was intended.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-06-19-dry-check/evaluation.md",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:80a191d146da859e9c91bb13d3da72d2d39c724a9e8600c3b9f82ea5b74e7f70",
+          "at": "2026-06-19T13:02:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The report generator labels every cross-layer finding as “Cross-layer (knowledge) duplications — the DRY gate's prime targets”, but it only filters on cross-layer locations and includes exact-clone/near-clone/data-dup entries, while the evaluation says the gate targets semantic diff-vs-corpus duplication and structurally misses cross-layer knowledge/data duplication. This makes the generated before/after reports contradict the bundle’s own gate model and misclassify the highlighted section.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-06-19-dry-check/methodology/report-gen.jq",
+              "line": 50,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f275016aeb88f5818c21ef5bae5ee74701c2fdfa008eb266bdabc19e3c632ccc",
+          "at": "2026-06-19T13:07:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d99aaebf4b2770c84c82813bc21e80267e6727dd7696a249d6e4d47aecfb41a",
+          "at": "2026-06-19T13:13:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011/T012 are not executable as written: both tasks place the shared constant in `libs/infrastructure` as `pub(crate)`, but the listed consumers include `apps/cli` and `apps/cli-composition`, which are different crates and cannot import a `pub(crate)` item from infrastructure. This needs either a public re-export/shared module or a different home for the constants.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/plan.md",
+              "line": 48,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:55ce1e4c9d9fd19bfe46e2eb39e2d46882eee63557098cdedff84a4a59ed72df",
+          "at": "2026-06-19T14:01:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e49f2711e7d70754b3a0a7f4e8771098bb1a8f01720d32d3c0240cb7d5e9fd1",
+          "at": "2026-06-19T14:06:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03 requires lock acquisition and 4-source git-diff union to be extracted to a shared module, but the implementation plan explicitly defers git-diff union and T006/T007 only cover subprocess helpers plus SHA-256. `task-coverage.json` still marks AC-03 as covered by T006/T007, so completing the plan can leave AC-03 unsatisfied. Update the spec/acceptance criteria or add tasks so the accepted D3 deferral is represented consistently.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/task-coverage.json",
+              "line": 28,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-04 includes consolidating track-directory magic strings and other constants, but the D4 implementation tasks only cover CwdGuard, git init helpers, stub bindings, POLL_INTERVAL, and REVIEWER_RUNTIME_DIR. `task-coverage.json` marks IN-04 fully covered by T008-T012 even though none of those tasks addresses the track-directory string consolidation called out by the spec, leaving in-scope work without an executable task.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/task-coverage.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2e49f2711e7d70754b3a0a7f4e8771098bb1a8f01720d32d3c0240cb7d5e9fd1",
+          "at": "2026-06-19T14:13:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03 requires the D3 remediation to extract the Codex subprocess timeout-poll loop, but T006 only schedules `spawn_codex`, `drain_pipe`, `tee_stderr_to_file`, and the runtime-path builder, while T007 only handles SHA-256 hex delegation. As written, the implementation plan can complete all listed D3 tasks while leaving the timeout-poll loop outside any task, so the claimed AC-03 coverage is incomplete.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/plan.md",
+              "line": 32,
+              "category": "contradiction"
+            },
+            {
+              "message": "T008 directs the shared `CwdGuard`/`CurrentDirGuard` definition into a `#[cfg(test)]` location and then has separate crates (`apps/cli`, `apps/cli-composition`) import it. In Rust, `cfg(test)` items in the infrastructure crate are not exported when that crate is compiled as a dependency of another crate's tests, so this task is not executable as described; it needs a dev-visible public test-support API, feature, or separate test-support crate.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/plan.md",
+              "line": 42,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d05edfb4c62cd728e3b6409409102f04519ebe87f8ddeaa5c558be8c87b52a56",
+          "at": "2026-06-19T14:20:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7623c565b271433278b3b3b72a922556087b2de59177a41c76581fa2c6d5373",
+          "at": "2026-06-19T14:26:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b27a09d4eb793f76dfede40795c0aaf8a4d7817a508fbc51ced9567799894e6",
+          "at": "2026-06-19T14:55:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` still tells T008/T009 to create a dev-visible shared test-support API that dependent crates import, including a workspace dev-dependency/public feature and a public API. That contradicts ADR D4 and spec IN-04/AC-04, which deliberately scope these helpers to `#[cfg(test)]` common test-support modules and exclude the earlier cross-crate dev-visible API approach. An implementer following these tasks would add an out-of-scope API instead of the reconciled design, so the D4 tasks/rendered plan need to be realigned with the ADR/spec before implementation.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f4cc6cc26fc5bdcf12ea9b6c28427a5fbbeb1359bf6cb4ad4e22f7447e4448e0",
+          "at": "2026-06-19T15:11:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 requires one `#[cfg(test)]` apps/cli helper to replace both `apps/cli/tests/transition_integration.rs` and the unit-test helpers under `apps/cli/src/...`. Those are different Cargo test crates: integration tests cannot use the binary crate's `#[cfg(test)] pub(crate)` module, while `tests/common` is not normally visible to source unit tests. As written, the task is infeasible without either keeping duplicate helpers, moving tests, or introducing a dev-visible helper that the plan explicitly forbids, so AC-04 cannot be satisfied by the described implementation.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/plan.md",
+              "line": 43,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6a5fc9db4b4ee3dec4fc49fc4f7c48aee553150f3e886609a61757c61292af29",
+          "at": "2026-06-19T15:18:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011, and the same instruction in T012, makes the plan infeasible: it tells implementers to promote `apps/cli` to a production dependency on `libs/infrastructure` while also requiring `cargo make ci` to pass. The repository architecture rules allow the `cli` crate to depend only on `cli_composition`, so this implementation path will fail the layer check; the shared constant needs to be consumed without adding a direct CLI -> infrastructure production dependency.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 66,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:57ed7c9cd7b9d5c5ec4955fb62ad33670ab76ff2d3a8e1e19b395aaaaf3c14e3",
+          "at": "2026-06-19T15:32:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57ed7c9cd7b9d5c5ec4955fb62ad33670ab76ff2d3a8e1e19b395aaaaf3c14e3",
+          "at": "2026-06-19T15:32:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T012 lists existing `\"tmp/reviewer-runtime\"` inline literals, then excludes them as \"call-site literals\" and only requires replacing the three const definitions. That contradicts IN-04/AC-05, which require this value to be consolidated to a single const per architectural-layer boundary; the current task can leave same-boundary runtime-dir literals outside remediation while still claiming D4 is complete.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:edb71bf3bf7cf4188da4509c2fe020603ae02b027b629bf094d4dfaaced18cfd",
+          "at": "2026-06-19T15:45:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 cites ADR D4 but changes the constants remediation from D4's single `const` definitions into one const per architecture boundary, and explicitly treats cross-boundary occurrences as non-violations. That lets T011/T012/T013 complete while still leaving duplicate `POLL_INTERVAL` or `tmp/reviewer-runtime` values across cli/infrastructure boundaries, so the plan no longer satisfies the D4 data-dup cleanup it claims to implement.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json",
+              "line": 250,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:20d01ca072a5ad175611134d7ca7932b399fa0468ea86d39ad9c93bcbc53688e",
+          "at": "2026-06-19T15:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99d895f061b22a5c0f055830348c49e1c5f90ab98c579479000ad2fae44bf8f9",
+          "at": "2026-06-19T15:59:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`related_conventions` makes `hexagonal-architecture.md#Layer Dependencies` required reading, but that section says the CLI may depend on `infrastructure`, while AC-05/T011/T012 rely on `architecture-rules.json` forbidding `cli -> infrastructure` and explicitly prohibit introducing that dependency. This leaves the constants tasks with contradictory layer guidance: following the cited convention would produce the dependency the acceptance criteria says must not exist.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json",
+              "line": 281,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:99d895f061b22a5c0f055830348c49e1c5f90ab98c579479000ad2fae44bf8f9",
+          "at": "2026-06-19T16:01:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19e0fad4d8448ad71cda14756acc5a6f840b23a062d74c568c816d8b2fcc1bdd",
+          "at": "2026-06-19T16:09:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19e0fad4d8448ad71cda14756acc5a6f840b23a062d74c568c816d8b2fcc1bdd",
+          "at": "2026-06-19T16:12:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d623cad773fe3a2158a53f789637b13e38bb6109f7e01ee2bc447abb099482cd",
+          "at": "2026-06-19T16:54:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d623cad773fe3a2158a53f789637b13e38bb6109f7e01ee2bc447abb099482cd",
+          "at": "2026-06-19T16:56:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e85b7a96661ebac108bf320e11cb91120c76b7b85a816153180c68fad3c21f4",
+          "at": "2026-06-19T17:05:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e85b7a96661ebac108bf320e11cb91120c76b7b85a816153180c68fad3c21f4",
+          "at": "2026-06-19T17:06:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50a9cc78b88cc3c144309519425f0479c4bce12ff6caf1d20fe7031423af70b3",
+          "at": "2026-06-19T17:18:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50a9cc78b88cc3c144309519425f0479c4bce12ff6caf1d20fe7031423af70b3",
+          "at": "2026-06-19T17:19:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f10c8018f3a51f490e1017665e7e62992408ed092ff9152797adc96c4e27bf3",
+          "at": "2026-06-19T17:31:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f10c8018f3a51f490e1017665e7e62992408ed092ff9152797adc96c4e27bf3",
+          "at": "2026-06-19T17:32:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9015343e34f651baa61d03f06f8d60ded78ad5a76d6d5e7b8b75aa6b7953cdc9",
+          "at": "2026-06-19T23:33:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9015343e34f651baa61d03f06f8d60ded78ad5a76d6d5e7b8b75aa6b7953cdc9",
+          "at": "2026-06-19T23:34:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2619f16d483fe48927e79e6cf6deaa0069283c0841d62235f7a712a8299cb0a",
+          "at": "2026-06-19T23:47:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 still describes extracting the subprocess helpers into a `pub(crate)` infrastructure module and updating only the two infrastructure callers, but the infrastructure catalogue now says `tee_stderr_to_file` must be `pub` so it can be re-exported through `cli_composition` and used by the apps/cli planner. Those are conflicting implementation contracts: following T006 as written would keep the helper crate-private and leave out the CLI planner reuse that the catalogue now requires.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a2619f16d483fe48927e79e6cf6deaa0069283c0841d62235f7a712a8299cb0a",
+          "at": "2026-06-19T23:49:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S3's summary is stale: it still says T006 moves `run_codex_child` into a new `codex_subprocess`/`codex_common` module and keeps all code inside infrastructure. That contradicts the updated T006 text below, and the same stale wording is still mirrored in `plan.md:28`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 110,
+              "category": "contradiction"
+            },
+            {
+              "message": "The D3 catalogue docs still say the `run_codex_child` timeout-poll loop remains `pub(crate)` in `codex_common`, but T006 explicitly keeps that loop per-module and only shares `spawn_codex`, `drain_pipe`, `runtime_path`, and `tee_stderr_to_file`. The same stale claim also repeats at lines 30 and 50 in this file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/existing-dry-violation-cleanup-2026-06-19/infrastructure-types.json",
+              "line": 15,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:509ee9abd6ce2c90e548065153a88cecdbfec63342a313878b427fa7655e3be8",
+          "at": "2026-06-19T23:52:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 now says the run_codex_child timeout-poll loop must stay per-module because reviewer and dry-checker behavior differs, but the S3 plan summary still instructs implementers to extract that loop into a shared pub(crate) infrastructure module. This is an internal plan contradiction that can send the implementation in the opposite direction from the task-level design.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "line": 110,
+              "category": "contradiction"
+            },
+            {
+              "message": "The infrastructure catalogue still describes the run_codex_child poll-loop as one of the helpers remaining pub(crate) in codex_common, while T006 explicitly says that loop stays per-module and is not shared. The catalogue should not advertise a shared type/API shape that the implementation plan rejects.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/infrastructure-types.json",
+              "line": 50,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:509ee9abd6ce2c90e548065153a88cecdbfec63342a313878b427fa7655e3be8",
+          "at": "2026-06-19T23:53:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6d8821526b7f9bbdcc460904afdbc455ba4cc113c8e023f7c632d006e655df9",
+          "at": "2026-06-19T23:58:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6d8821526b7f9bbdcc460904afdbc455ba4cc113c8e023f7c632d006e655df9",
+          "at": "2026-06-20T00:00:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7eccee5e4f24f4a99867f632afe0da789e20ea226ad3115e4c3f30c49343991e",
+          "at": "2026-06-20T00:10:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7eccee5e4f24f4a99867f632afe0da789e20ea226ad3115e4c3f30c49343991e",
+          "at": "2026-06-20T00:11:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25cc750e6b4746b57f531b1d6a1148b49ccd36d3baa6c4b4606143c5e3d9da52",
+          "at": "2026-06-20T01:02:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07 still requires the final DRY census to show the D4 test-helper duplicate cluster has disappeared, but the same spec now moves that entire test-helper subcluster out of scope in OS-06 and the impl plan marks T008-T010 as skipped. That leaves T013 with an impossible completion criterion: it must prove removal of duplicates that this plan explicitly will not remove. Narrow AC-07/T013 to the D4 constants subcluster, or explicitly exclude the deferred test-helper pairs from the final census expectation.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json",
+              "line": 270,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:25cc750e6b4746b57f531b1d6a1148b49ccd36d3baa6c4b4606143c5e3d9da52",
+          "at": "2026-06-20T01:03:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f91a738a5ea51fcc8d70b620f863af5dec25945fda627f21b8da222339ca2923",
+          "at": "2026-06-20T01:08:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f91a738a5ea51fcc8d70b620f863af5dec25945fda627f21b8da222339ca2923",
+          "at": "2026-06-20T01:10:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17c1261101860f2b09b5489891be582cd7e07add9fe6f5ab88a5b815aedc581d",
+          "at": "2026-06-20T02:16:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17c1261101860f2b09b5489891be582cd7e07add9fe6f5ab88a5b815aedc581d",
+          "at": "2026-06-20T02:17:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b8da47fb9b6585365d1a9d9582b6cf8c9fa2df6687c1f08a4bca9e1eb262092",
+          "at": "2026-06-20T02:29:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b8da47fb9b6585365d1a9d9582b6cf8c9fa2df6687c1f08a4bca9e1eb262092",
+          "at": "2026-06-20T02:31:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bf82dc2452885ca95c7cdde41e453820b52ebd13f45c37705349475aac25938",
+          "at": "2026-06-20T02:37:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T013 observations assert that `bin/sotp dry check-approved` is APPROVED for all commits, but the same file later says the deferred D4 test-helper copies remain and that the whole-codebase DRY gate has no accept-list or layer-aware context and therefore judges those retained copies as violations. Those two claims cannot both be true, so the plan artifact does not provide a coherent AC-07/T013 verification record: either the gate is not actually green with the deferred copies, or the deferral/gate limitation narrative is wrong.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/observations.md",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3bf82dc2452885ca95c7cdde41e453820b52ebd13f45c37705349475aac25938",
+          "at": "2026-06-20T02:39:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fab864388e4ef5dbcae8a0dd8e27c01c7f17184e32e197b88e60f62b7cdc97b",
+          "at": "2026-06-20T02:42:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`observations.md` records T013 as already completed: it says the post-remediation verification confirmed the in-scope clusters are resolved and that `check-approved` passed for all commits. However `impl-plan.json` still has T013 at `status: \"in_progress\"` and `plan.md` renders it as `[~]` with only 12/13 resolved. These artifacts now disagree on whether the AC-07 completion task is finished, so the plan state is not semantically coherent.",
+              "severity": "P1",
+              "file": "track/items/existing-dry-violation-cleanup-2026-06-19/observations.md",
+              "line": 5,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4fab864388e4ef5dbcae8a0dd8e27c01c7f17184e32e197b88e60f62b7cdc97b",
+          "at": "2026-06-20T02:43:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:251a498da2d8258c802b225471b2bf90782a8bba92972cdce586727552e24a4b",
+          "at": "2026-06-20T02:45:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:251a498da2d8258c802b225471b2bf90782a8bba92972cdce586727552e24a4b",
+          "at": "2026-06-20T02:48:08Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
+          "at": "2026-06-19T16:52:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e2db2a25a3dae8b47d025d4b1a42b9aca94a6e086648af5b9a9efda9db41ddf",
+          "at": "2026-06-19T16:53:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e497afc3259746e8db92109d36b0ba87ade3372aaa177ba1ff2e57df7617868",
+          "at": "2026-06-19T23:31:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e497afc3259746e8db92109d36b0ba87ade3372aaa177ba1ff2e57df7617868",
+          "at": "2026-06-19T23:32:20Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68fd7166a69ab901fc55026c84431a34c1010fa66801ac0ce7e1193666c9ec89",
+          "at": "2026-06-19T17:04:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68fd7166a69ab901fc55026c84431a34c1010fa66801ac0ce7e1193666c9ec89",
+          "at": "2026-06-19T17:04:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75ba5e29c778ec5842fd6297a4bcbddd56430285a442cde9a11cb5833501ee6e",
+          "at": "2026-06-19T17:15:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75ba5e29c778ec5842fd6297a4bcbddd56430285a442cde9a11cb5833501ee6e",
+          "at": "2026-06-19T17:17:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fed22981601883d5cdb630a52e29c7f165bf34c2f786058043f8425ac68b7a75",
+          "at": "2026-06-19T17:29:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fed22981601883d5cdb630a52e29c7f165bf34c2f786058043f8425ac68b7a75",
+          "at": "2026-06-19T17:30:39Z"
+        }
+      ]
+    }
+  }
+}

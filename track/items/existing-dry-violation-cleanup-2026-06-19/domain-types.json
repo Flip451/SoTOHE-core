@@ -1,0 +1,47 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "TrackId": {
+      "action": "reference",
+      "role": { "ValueObject": { "invariants": [
+        { "name": "valid_track_id_slug", "predicate": { "SelfMethod": "try_new" } }
+      ] } },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": ["String"], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "ids",
+      "docs": "Canonical validated track identifier (lowercase slug). D1: the sole authoritative implementation of track-ID validation — usecase and CLI copies are deleted and delegated here via TrackId::try_new.",
+      "spec_refs": [
+        { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "NonEmptyString": {
+      "action": "reference",
+      "role": { "ValueObject": { "invariants": [
+        { "name": "non_empty_trimmed", "predicate": { "SelfMethod": "try_new" } }
+      ] } },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": ["String"], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "ids",
+      "docs": "Canonical non-empty-trimmed-string value object. D2: the sole authoritative implementation of the empty/whitespace-only invariant — inline is_empty()/trim().is_empty() guards in domain constructors are replaced by NonEmptyString::try_new delegation.",
+      "spec_refs": [
+        { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/existing-dry-violation-cleanup-2026-06-19/spec.json", "anchor": "CN-06" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

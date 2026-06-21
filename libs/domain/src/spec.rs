@@ -12,7 +12,7 @@ use std::collections::HashSet;
 use std::fmt;
 
 use crate::plan_ref::{AdrRef, ConventionRef, InformalGroundRef, SpecElementId};
-use crate::{ConfidenceSignal, SignalCounts, Timestamp};
+use crate::{ConfidenceSignal, NonEmptyString, SignalCounts, Timestamp};
 
 // ---------------------------------------------------------------------------
 // Value objects
@@ -49,9 +49,8 @@ impl SpecRequirement {
         informal_grounds: Vec<InformalGroundRef>,
     ) -> Result<Self, SpecValidationError> {
         let text = text.into();
-        if text.trim().is_empty() {
-            return Err(SpecValidationError::EmptyRequirementText);
-        }
+        NonEmptyString::try_new(text.as_str())
+            .map_err(|_| SpecValidationError::EmptyRequirementText)?;
         Ok(Self { id, text, adr_refs, convention_refs, informal_grounds })
     }
 
@@ -146,9 +145,8 @@ impl SpecSection {
         content: Vec<String>,
     ) -> Result<Self, SpecValidationError> {
         let title = title.into();
-        if title.trim().is_empty() {
-            return Err(SpecValidationError::EmptySectionTitle);
-        }
+        NonEmptyString::try_new(title.as_str())
+            .map_err(|_| SpecValidationError::EmptySectionTitle)?;
         Ok(Self { title, content })
     }
 
@@ -209,12 +207,8 @@ impl SpecDocument {
     ) -> Result<Self, SpecValidationError> {
         let title = title.into();
         let version = version.into();
-        if title.trim().is_empty() {
-            return Err(SpecValidationError::EmptyTitle);
-        }
-        if version.trim().is_empty() {
-            return Err(SpecValidationError::EmptyVersion);
-        }
+        NonEmptyString::try_new(title.as_str()).map_err(|_| SpecValidationError::EmptyTitle)?;
+        NonEmptyString::try_new(version.as_str()).map_err(|_| SpecValidationError::EmptyVersion)?;
 
         // Validate element id uniqueness across all requirement sections.
         let mut seen_ids: HashSet<String> = HashSet::new();

@@ -1,8 +1,16 @@
 //! CLI subcommand definitions.
 
 use std::process::ExitCode;
+use std::time::Duration;
 
 use cli_composition::CommandOutcome;
+
+/// Polling interval for subprocess completion checks in CLI command adapters.
+///
+/// Shared by all CLI subcommand adapters (`plan`, `review`) that poll Codex or Claude
+/// subprocesses for completion (ADR D4 / AC-05). Intentionally separate from the
+/// infrastructure-layer constant — coincidental cross-layer equality, not a shared dependency.
+pub(crate) const POLL_INTERVAL: Duration = Duration::from_millis(50);
 
 pub mod arch;
 pub mod conventions;

@@ -3,7 +3,6 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::ExitCode;
-use std::time::Duration;
 
 use clap::{ArgGroup, Args, Subcommand};
 
@@ -16,7 +15,6 @@ use codex_local::execute_codex_local;
 const DEFAULT_TIMEOUT_SECONDS: u64 = 600;
 
 pub(crate) const PLAN_RUNTIME_DIR: &str = "tmp/planner-runtime";
-pub(crate) const POLL_INTERVAL: Duration = Duration::from_millis(50);
 #[cfg(test)]
 pub(crate) const CODEX_BIN_ENV: &str = "SOTP_CODEX_BIN";
 

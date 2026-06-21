@@ -82,6 +82,14 @@ pub use signal::SignalGateName;
 pub use telemetry::TelemetryReportInput;
 pub use track::fixpoint_resolve::FixpointResolveInput;
 
+/// Re-exports [`infrastructure::codex_common::tee_stderr_to_file`] so that
+/// `apps/cli` can use it without importing `infrastructure` directly (which the
+/// architecture disallows for normal `cli` dependencies).
+///
+/// Only `std` types appear in the signature, so no infrastructure types leak
+/// across the boundary.
+pub use infrastructure::codex_common::tee_stderr_to_file;
+
 /// Build the argument vector for a `codex exec --sandbox read-only` invocation.
 ///
 /// Re-exports [`infrastructure::codex_common::build_codex_read_only_invocation`]
