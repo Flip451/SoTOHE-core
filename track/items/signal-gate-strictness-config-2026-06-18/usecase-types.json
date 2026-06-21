@@ -1,0 +1,838 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "AdrUserChain": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "chain::adr_user",
+      "docs": "Chain ⓪ implementation struct. Implements `domain::ChainIdentity` (ID = ChainId::AdrUser), `usecase::chain::SoTChain`, and `usecase::chain::LiveSoTChain`. Does NOT implement `usecase::chain::PersistedSoTChain` — live calc only, no persistence file. Signal source: ADR frontmatter in `knowledge/adr/`. Unit struct; stateless dispatch; UseCase role is legal for usecase layer per R1 matrix.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "SpecAdrChain": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "chain::spec_adr",
+      "docs": "Chain ① implementation struct. Implements `domain::ChainIdentity`, `domain::PersistedSoTChainGate`, and `usecase::chain::LoadablePersistedChain`; the usecase blanket impl gives `usecase::chain::PersistedSoTChain` and `usecase::chain::SoTChain`. Persistence target: the `signals` field in `track/items/<track_id>/spec.json`; no per-layer catalogue-spec-signals artifact is used for chain ①. `evaluate_gate` delegates to `domain::check_spec_doc_signals`. `check_freshness` implements the self-consistency check: `doc.evaluate_signals()` vs `doc.signals()`. Unit struct; stateless dispatch; UseCase role is legal for usecase layer per R1 matrix.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogSpecChain": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "chain::catalog_spec",
+      "docs": "Chain ② implementation struct. Implements `domain::ChainIdentity`, `domain::PersistedSoTChainGate`, and `usecase::chain::LoadablePersistedChain`; the usecase blanket impl gives `usecase::chain::PersistedSoTChain` and `usecase::chain::SoTChain`. `evaluate_gate` delegates to `domain::check_catalogue_spec_signals` (the new domain pure function from D2). `check_freshness` compares entry_hash from the signals document against current catalogue bytes. Unit struct; stateless dispatch; UseCase role is legal for usecase layer per R1 matrix.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "ImplCatalogChain": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "chain::impl_catalog",
+      "docs": "Chain ③ implementation struct. Implements `domain::ChainIdentity`, `domain::PersistedSoTChainGate`, and `usecase::chain::LoadablePersistedChain`; the usecase blanket impl gives `usecase::chain::PersistedSoTChain` and `usecase::chain::SoTChain`. `evaluate_gate` delegates to `domain::check_type_signals`. `check_freshness` compares declaration_hash from the type-signals document against current catalogue bytes. Unit struct; stateless dispatch; UseCase role is legal for usecase layer per R1 matrix.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyAdrSignalsCommand": {
+      "action": "modify",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "verify_adr_signals",
+      "docs": "CQRS command for the verify-ADR-signals operation. Currently a unit struct; `strict` mode is resolved from `SignalGateMatrix` at the call site rather than embedded in the command, per D3 config-driven design.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "SignalLayerReaderError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Io", "payload": { "kind": "unit" } },
+          { "name": "TrackIdUnresolved", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal",
+      "docs": "Error type for `SignalLayerReader` port methods. `Io` represents a sanitized filesystem / OS failure reported by the local adapter; it is intentionally payload-free and must not expose paths, hostnames, or OS details through the usecase contract. `TrackIdUnresolved` signals that the active-track ID could not be determined (e.g., no active track branch found).",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "SoTChain": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "check",
+          "receiver": null,
+          "params": [
+            {
+              "name": "input",
+              "ty": "&<Self>::Input<'_>"
+            },
+            {
+              "name": "strictness",
+              "ty": "domain::Strictness"
+            }
+          ],
+          "returns": "domain::verify::VerifyOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [
+        "domain::ChainIdentity"
+      ],
+      "module_path": "chain::traits",
+      "docs": "Minimal check contract satisfied by all four chains. Provides `check(input, strictness) -> VerifyOutcome`. For chains ①②③ this is fulfilled via blanket impl over `PersistedSoTChain`, and CLI `check-*` dispatch for those three chains goes through this trait. Chain ⓪ implements `SoTChain` directly via `AdrUserChain`, but its CLI dispatch (`signal calc-adr-user` / `signal check-adr-user`) is wired through the infrastructure verifier `execute_verify_adr_signals_with_strict` from the composition root until AdrFilePort DI is finished (T006) — see spec AC-10 / AC-11. Moved from `domain::chain` per reviewer Finding #1.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "GO-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "LiveSoTChain": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "calc_live",
+          "receiver": null,
+          "params": [
+            {
+              "name": "input",
+              "ty": "&<Self>::Input<'_>"
+            }
+          ],
+          "returns": "Result<<Self>::LiveCalc, <Self>::CalcError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "assoc_types": [
+        { "name": "LiveCalc" },
+        { "name": "CalcError" }
+      ],
+      "supertrait_bounds": [
+        "SoTChain"
+      ],
+      "module_path": "chain::traits",
+      "docs": "Extension of `SoTChain` for chains that compute signals live without persisting. Implemented only by `AdrUserChain` (chain ⓪). `calc_live` returns the live-computed result without writing any file. Moved from `domain::chain` per reviewer Finding #1.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "GO-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-18" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "LoadablePersistedChain": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "calc",
+          "receiver": null,
+          "params": [
+            { "name": "input", "ty": "&<Self>::Input<'_>" }
+          ],
+          "returns": "Result<<Self>::Persisted, <Self>::CalcError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "load",
+          "receiver": null,
+          "params": [
+            { "name": "input", "ty": "&<Self>::Input<'_>" }
+          ],
+          "returns": "Result<<Self>::Persisted, <Self>::CalcError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "check_freshness",
+          "receiver": null,
+          "params": [
+            { "name": "input", "ty": "&<Self>::Input<'_>" },
+            { "name": "persisted", "ty": "&<Self>::Persisted" }
+          ],
+          "returns": "Result<(), <Self>::StaleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "assoc_types": [],
+      "supertrait_bounds": [
+        "domain::PersistedSoTChainGate"
+      ],
+      "module_path": "chain::traits",
+      "docs": "I/O port contract for chains ①②③ that persist their computed signal documents. Carries the impure operations that require I/O: `calc` (compute + persist), `load` (read persisted), `check_freshness` (stale detection). Implementations live in `usecase::chain::{spec_adr, catalog_spec, impl_catalog}`. Moved from `domain::chain` per reviewer Finding #1; blanket impls over this trait are defined in `usecase::chain::traits`.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "GO-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "PersistedSoTChain": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [],
+      "assoc_types": [],
+      "supertrait_bounds": [
+        "domain::PersistedSoTChainGate",
+        "LoadablePersistedChain"
+      ],
+      "module_path": "chain::traits",
+      "docs": "Full contract for chains ①②③: sealed supertrait combining `domain::PersistedSoTChainGate` (pure gate) and `LoadablePersistedChain` (I/O port). Blanket impl: any `T: LoadablePersistedChain` automatically satisfies `PersistedSoTChain`. The `SoTChain::check` blanket impl for any `T: PersistedSoTChain` runs `load → check_freshness → evaluate_gate`. Chain ⓪ does not implement this trait. Moved from `domain::chain` per reviewer Finding #1.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "GO-04" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-09" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-10" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-11" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-18" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyAdrSignals": {
+      "action": "reference",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "verify",
+          "receiver": "&self",
+          "params": [{ "name": "command", "ty": "VerifyAdrSignalsCommand" }],
+          "returns": "Result<domain::AdrVerifyReport, VerifyAdrSignalsError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "verify_adr_signals",
+      "docs": "Carried as reference: baseline-identical, no structural change in this track. Exposed for contract-map edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalLayerReader": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "active_track_id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<domain::TrackId, SignalLayerReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "enabled_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ],
+          "returns": "Result<Vec<domain::tddd::LayerId>, SignalLayerReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "catalogue_bytes",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "layer", "ty": "domain::tddd::LayerId" }
+          ],
+          "returns": "Result<Option<Vec<u8>>, SignalLayerReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "signal",
+      "docs": "Secondary port for the argless signal orchestrator functions (CN-16 / CN-17 / D8). Provides active-track ID (`active_track_id()`), TDDD-enabled layer list (`enabled_layers(track_id)`), and per-layer catalogue file bytes (`catalogue_bytes(track_id, layer)`). The usecase orchestrator calls `active_track_id()` first, then passes the resolved `TrackId` explicitly to `enabled_layers` and `catalogue_bytes` — making active-track resolution a usecase responsibility. The port does NOT return file paths — per D8-4, signals-file path construction is an infrastructure responsibility (infrastructure primitives construct the output path from the layer ID). The usecase function receives bytes from this port, computes SHA-256 hex, and passes `(LayerId, sha256_hex, track_id_str)` to the `per_layer_fn` closure, where `track_id_str` is the orchestrator-resolved active track ID. Declared in `libs/usecase/src/signal/`; implemented by a local filesystem adapter in `libs/infrastructure/src/`. `apps/cli-composition/src/signal.rs` only wires that adapter and the `per_layer_fn` closures into the usecase orchestrator.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-22" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackBlobReader": {
+      "action": "modify",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::spec::SpecDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<(Vec<u8>, String)>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_impl_plan",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::ImplPlanDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_catalogue_for_spec_ref_check",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String, std::collections::HashMap<String, domain::ContentHash>)>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_catalogue_spec_signals_document",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::CatalogueSpecSignalsDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_catalogue_spec_signal_opted_in_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_type_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::TypeSignalsDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_adr_verify_report",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "String" }
+          ],
+          "returns": "BlobFetchResult<domain::AdrVerifyReport>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "merge_gate",
+      "docs": "Secondary port for reading track-level domain documents for merge gate evaluation. Modified in this track to add `read_adr_verify_report(branch)` supporting chain ⓪ evaluation in `check_strict_merge_gate` for the target branch without exposing filesystem paths to the usecase layer.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-06" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "usecase::signal::calc_impl_catalog": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "per_layer_fn", "ty": "F" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] },
+        { "name": "F", "bounds": ["Fn(domain::tddd::LayerId, &str, &str) -> domain::verify::VerifyOutcome"] }
+      ],
+      "where_predicates": [],
+      "docs": "Per-layer-argless (no `--signals-path`, `--catalog-hash`, `--layer` flags exposed) orchestrator for `signal calc-impl-catalog` (chain ③). All filesystem access goes through the `reader: &R` port (`SignalLayerReader` trait). Execution: (1) calls `reader.active_track_id()` to resolve the track ID (active-track resolution is a usecase responsibility per D8-4); (2) calls `reader.enabled_layers(track_id)` to enumerate TDDD-enabled layers; (3) for each layer, calls `reader.catalogue_bytes(track_id, layer)` to get bytes and computes SHA-256 hex; (4) calls `per_layer_fn(layer_id, hash_hex, track_id_str)`, where `track_id_str` is the orchestrator-resolved active track ID. The infrastructure primitive constructs the signals-file output path from layer ID. Layers with `None` bytes are no-op. No path is passed through this function. Per CN-16 / CN-17.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::signal::calc_catalog_spec": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "per_layer_fn", "ty": "F" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] },
+        { "name": "F", "bounds": ["Fn(domain::tddd::LayerId, &str, &str) -> domain::verify::VerifyOutcome"] }
+      ],
+      "where_predicates": [],
+      "docs": "Per-layer-argless (no `--signals-path`, `--catalog-hash`, `--layer` flags exposed) orchestrator for `signal calc-catalog-spec` (chain ②). All filesystem access goes through the `reader: &R` port (`SignalLayerReader` trait). Execution: (1) calls `reader.active_track_id()`; (2) calls `reader.enabled_layers(track_id)`; (3) for each layer calls `reader.catalogue_bytes(track_id, layer)` and computes SHA-256 hex; (4) calls `per_layer_fn(layer_id, hash_hex, track_id_str)`, where `track_id_str` is the orchestrator-resolved active track ID. Infrastructure primitive constructs catalogue-spec-signals output path from layer ID. Layers with `None` bytes are no-op. Per CN-16 / CN-17.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::signal::check_impl_catalog": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "per_layer_fn", "ty": "F" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] },
+        { "name": "F", "bounds": ["Fn(domain::tddd::LayerId, &str, &str) -> domain::verify::VerifyOutcome"] }
+      ],
+      "where_predicates": [],
+      "docs": "Per-layer-argless (no `--signals-path`, `--catalog-hash`, `--layer` flags exposed) orchestrator for `signal check-impl-catalog` (chain ③). All filesystem access goes through the `reader: &R` port. Execution: (1) `reader.active_track_id()`; (2) `reader.enabled_layers(track_id)`; (3) per layer: `reader.catalogue_bytes(track_id, layer)` → SHA-256 hex → `per_layer_fn(layer_id, hash_hex, track_id_str)`, where `track_id_str` is the orchestrator-resolved active track ID. Infrastructure primitive constructs signals-file path from layer ID. Strictness is NOT a parameter of this function — the cli-composition closure captures `strict: bool` from the `SignalGateMatrix` at the call site (D8-5) and encodes it in the `per_layer_fn` closure. Per CN-16 / CN-17.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::signal::check_catalog_spec": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "per_layer_fn", "ty": "F" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] },
+        { "name": "F", "bounds": ["Fn(domain::tddd::LayerId, &str, &str) -> domain::verify::VerifyOutcome"] }
+      ],
+      "where_predicates": [],
+      "docs": "Per-layer-argless (no `--signals-path`, `--catalog-hash`, `--layer` flags exposed) orchestrator for `signal check-catalog-spec` (chain ②). All filesystem access goes through the `reader: &R` port. Execution: (1) `reader.active_track_id()`; (2) `reader.enabled_layers(track_id)`; (3) per layer: `reader.catalogue_bytes(track_id, layer)` → SHA-256 hex → `per_layer_fn(layer_id, hash_hex, track_id_str)`, where `track_id_str` is the orchestrator-resolved active track ID. Infrastructure primitive constructs catalogue-spec-signals output path from layer ID. Strictness is NOT a parameter of this function — the cli-composition closure captures `strict: bool` from `SignalGateMatrix` and encodes it in `per_layer_fn` (D8-5). Per CN-16 / CN-17.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-21" }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::signal::resolve_spec_json_path": {
+      "action": "add",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "reader", "ty": "&R" },
+        { "name": "workspace_root", "ty": "&std::path::Path" },
+        { "name": "override_path", "ty": "Option<std::path::PathBuf>" }
+      ],
+      "returns": "Result<std::path::PathBuf, SignalLayerReaderError>",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["SignalLayerReader"] }
+      ],
+      "where_predicates": [],
+      "docs": "Resolve `spec.json` path for chain ① (`spec-adr`) commands. When `override_path` is `Some`, returns it verbatim. Otherwise consults `reader.active_track_id()` and constructs `<workspace_root>/track/items/<track-id>/spec.json`. Centralises the resolution policy so adapter / composition code never branches on `Option<PathBuf>` itself. Active-track resolution is the usecase orchestrator responsibility per CN-17 / ADR §D8.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::merge_gate::check_strict_merge_gate": {
+      "action": "modify",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "branch", "ty": "&str" },
+        { "name": "reader", "ty": "&R" },
+        { "name": "gate_matrix", "ty": "&domain::SignalGateMatrix" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["TrackBlobReader", "usecase::catalogue_spec_refs::SpecElementHashReader"] }
+      ],
+      "where_predicates": [],
+      "docs": "Strict merge gate orchestrating all four chains. Modified from baseline to receive a validated domain `SignalGateMatrix` from the CLI/infrastructure boundary, add chain ⓪ ADR-user evaluation (repo-global ADR directory scan), and resolve merge-gate strictness for every chain from the matrix cells (`adr_user`, `spec_adr`, `catalog_spec`, and `impl_catalog`) instead of hardcoding strict evaluation for chains ①②③. The usecase function does not load `.harness/config/signal-gates.json` directly.",
+      "spec_refs": [
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "AC-06" },
+        { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "GO-03" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalLayerReaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SignalLayerReaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "SignalLayerReaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::ChainIdentity",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::chain::SoTChain",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::chain::LiveSoTChain",
+      "for_type": "AdrUserChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::ChainIdentity",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::PersistedSoTChainGate",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::chain::LoadablePersistedChain",
+      "for_type": "SpecAdrChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::ChainIdentity",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::PersistedSoTChainGate",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::chain::LoadablePersistedChain",
+      "for_type": "CatalogSpecChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::ChainIdentity",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::PersistedSoTChainGate",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::chain::LoadablePersistedChain",
+      "for_type": "ImplCatalogChain"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::chain::PersistedSoTChain",
+      "for_type": "T",
+      "impl_generics": [
+        {
+          "name": "T",
+          "bounds": []
+        }
+      ],
+      "impl_where_predicates": [
+        {
+          "lhs": "T",
+          "rhs": [
+            "usecase::chain::LoadablePersistedChain"
+          ]
+        }
+      ]
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::chain::SoTChain",
+      "for_type": "T",
+      "impl_generics": [
+        {
+          "name": "T",
+          "bounds": []
+        }
+      ],
+      "impl_where_predicates": [
+        {
+          "lhs": "T",
+          "rhs": [
+            "usecase::chain::PersistedSoTChain"
+          ]
+        }
+      ]
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "VerifyAdrSignalsCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::default::Default",
+      "for_type": "VerifyAdrSignalsCommand"
+    }
+  ]
+}

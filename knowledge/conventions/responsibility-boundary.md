@@ -20,6 +20,10 @@ SoTOHE はテンプレート（framework）であり、その CI ゲート / ver
   - **framework 自身のコード**の品質 — `sotp` CLI と `libs/*` の fmt / clippy / test / no-panic / DRY。
 - **利用者が所有する領域**（提供 + docs のみ。CI 強制しない）:
   - provider / agent 設定 — `.claude/settings.json`（permission allow/deny ＝利用者のセキュリティ姿勢）、`.codex/*`（config / rules / hooks / agents）、model / provider / skill / hook の選択。
+  - signal gate 設定 — `.harness/config/signal-gates.json`（SoT Chain の各ゲートの strictness）。SoTOHE は推奨デフォルトを同梱し docs で意図を説明するが、CI で強制しない。
+    - `commit_gate.impl_catalog: "interim"` は TDDD の構造的必然（カタログ宣言フェーズで Yellow `RustSourceAbsent` が出るため、commit 時に strict にするとコミット不能になる）。
+    - `commit_gate.adr_user: "interim"` は SoTOHE のワークフロー選択（ADR Yellow → エスカレーションをどのコミットでも着地させられるよう commit 時は lax にし、merge 時に strict に切り替えて PR キューで保証する）。
+    - テンプレート利用者は自ワークフローに応じてこれらを上書きしてよい。adr-strict バリアント（`commit_gate.adr_user: "strict"`）は `.harness/config/samples/signal-gates.adr-strict.json` を参照。
   - 利用者の domain コード（SoTOHE は architecture を提供し、利用者が中身を埋める）。
 - **禁止**: 利用者所有領域の設定値・ファイル存在・allow/deny エントリ・散文の正確文言を verifier の期待リストに結合させて CI で hard-fail させること。これは越権であり、脆く、偽の安心を生む。
 - 設定の良し悪し（危険な allow を入れていないか等）は、利用者自身の責任と review（人間 / LLM の判断）に委ねる。SoTOHE は危険な例とその理由を docs に書いて**警告**するが、CI で**強制**しない。
@@ -28,6 +32,7 @@ SoTOHE はテンプレート（framework）であり、その CI ゲート / ver
 
 - Good: `verify-view-freshness`（生成ビューが JSON SSoT と一致するか）、`adr-signals`（decision が grounding されているか）、`check-layers`（層依存方向）、`cargo make ci` の fmt/clippy/test。いずれも SoTOHE 自身の整合性。
 - Good: `.codex/config.toml` や `.claude/settings.json` を**デフォルトとして同梱**し、`.claude/rules/10-guardrails.md` 等で意図・危険例を説明する（提供 + docs）。
+- Good: `.harness/config/signal-gates.json` を**推奨デフォルトとして同梱**し、`responsibility-boundary.md` で `interim` の理由（TDDD 構造的必然 vs ワークフロー選択）を説明する（提供 + docs）。
 - Bad: `verify-orchestra` のように `.claude/settings.json` の allow/deny エントリや `.codex/*` の設定値・ファイル存在・rules の allow リストを「期待リスト」と照合して CI で hard-fail させる（利用者設定の enforcement ＝越権。2026-06-13 に全廃。ADR `2026-06-13-0002-codex-orchestrator-settings-addition` 参照）。
 - Bad: 人間向け doc に特定の散文スニペットが在る/無いを CI で照合する（言い換えで壊れ、偽安心）。
 

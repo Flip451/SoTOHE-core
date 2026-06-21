@@ -1,0 +1,1254 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "4321342fe24b0f159369b891203d47b067275893a45f4bb9e6f3bb87bdd78df9",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。`check-*` が `--gate commit|merge` でセルを解決し、集約コマンド `signal check --gate commit|merge`（4 chain を一括評価）も用意する。"
+      }
+    },
+    {
+      "claim_hash": "4321342fe24b0f159369b891203d47b067275893a45f4bb9e6f3bb87bdd78df9",
+      "evidence_hash": "22830ef401d4948b6d91cb208abf946ccd1dace5af25bbe6081203778278c7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` は全 chain × gate の 8 セルを完全に明示する必要があり、暗黙の default を持たない。"
+      }
+    },
+    {
+      "claim_hash": "4321342fe24b0f159369b891203d47b067275893a45f4bb9e6f3bb87bdd78df9",
+      "evidence_hash": "1bb553acfbf07f038990eeb770eafa6c2d0c09b54956a80f52c87d6dac2ee1d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json`（推奨デフォルト: commit_gate = ① ② strict・③ ⓪ interim、merge_gate = 全 strict）が実ファイルとして存在し、`check-*` が `--gate commit|merge` でセルを解決する。`signal check --gate commit|merge`（4 chain 一括評価）が動作する。"
+      }
+    },
+    {
+      "claim_hash": "b724da87412e6885949a1bcd4d7fe8dec6d37742a511beefafb14a54fcc030a5",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "b724da87412e6885949a1bcd4d7fe8dec6d37742a511beefafb14a54fcc030a5",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。"
+      }
+    },
+    {
+      "claim_hash": "b724da87412e6885949a1bcd4d7fe8dec6d37742a511beefafb14a54fcc030a5",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "820cd2617a178cf70c69f7bac5e1b2b376f3fcfdbd28624e42c06e46f5223b33",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT`"
+      }
+    },
+    {
+      "claim_hash": "820cd2617a178cf70c69f7bac5e1b2b376f3fcfdbd28624e42c06e46f5223b33",
+      "evidence_hash": "1bb553acfbf07f038990eeb770eafa6c2d0c09b54956a80f52c87d6dac2ee1d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-*` が `--gate commit|merge` でセルを解決する。`signal check --gate commit|merge`（4 chain 一括評価）が動作する。"
+      }
+    },
+    {
+      "claim_hash": "fba6cd20d70c40d86f539d75909a7f8d536eb1aebdc86708e0b6582036907e7f",
+      "evidence_hash": "2feb8cf4c5cb81fabdb901807ef37dc3e62ec178b310918864d475e4f4ac99a5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `check-<chain>` コマンドが参照する strictness（strict / interim）を `.harness/config/signal-gates.json` で chain × gate（commit / merge）ごとに宣言的に管理し、config の不在・不正・不完全を hard error とする"
+      }
+    },
+    {
+      "claim_hash": "fba6cd20d70c40d86f539d75909a7f8d536eb1aebdc86708e0b6582036907e7f",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": ".harness/config/signal-gates.json を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。`check-*` が `--gate commit|merge` でセルを解決し、集約コマンド `signal check --gate commit|merge`（4 chain を一括評価）も用意する。"
+      }
+    },
+    {
+      "claim_hash": "fba6cd20d70c40d86f539d75909a7f8d536eb1aebdc86708e0b6582036907e7f",
+      "evidence_hash": "22830ef401d4948b6d91cb208abf946ccd1dace5af25bbe6081203778278c7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal-gates.json` は全 chain × gate の 8 セルを完全に明示する必要があり、暗黙の default を持たない。"
+      }
+    },
+    {
+      "claim_hash": "fba6cd20d70c40d86f539d75909a7f8d536eb1aebdc86708e0b6582036907e7f",
+      "evidence_hash": "1bb553acfbf07f038990eeb770eafa6c2d0c09b54956a80f52c87d6dac2ee1d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/signal-gates.json（推奨デフォルト: commit_gate = ① ② strict・③ ⓪ interim、merge_gate = 全 strict）が実ファイルとして存在し、`check-*` が `--gate commit|merge` でセルを解決する。`"
+      }
+    },
+    {
+      "claim_hash": "9c6e9844e52feaa4b9020024f04a7a7a48c8509e6964fd3a28d7075afcea10c7",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "` .harness/config/signal-gates.json` を chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT として新設する。"
+      }
+    },
+    {
+      "claim_hash": "9c6e9844e52feaa4b9020024f04a7a7a48c8509e6964fd3a28d7075afcea10c7",
+      "evidence_hash": "e21a3ac31a016a34c303eb135996fa1bf3ed1fe7666e71936276a15c30700467",
+      "verdict": {
+        "kind": "pass",
+        "citation": "strictness の値を現在の 2 値（`\"strict\"` / `\"interim\"`）超に拡張することは対象外。strictness 多値化は「2 値では表現できない」フィードバックが蓄積した時点で別 ADR で検討する。"
+      }
+    },
+    {
+      "claim_hash": "9c6e9844e52feaa4b9020024f04a7a7a48c8509e6964fd3a28d7075afcea10c7",
+      "evidence_hash": "5f186bf753e3b087b8e4162546b8cfa877e056f62ca3386c25783873cc880457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `check-*` の Yellow 扱い: `strict=true`（または `--gate` が strict セルに解決）→ `Finding::error`、`strict=false`（または `--gate` が interim セルに解決）→ `Finding::warning`。"
+      }
+    },
+    {
+      "claim_hash": "dca9c86ed39bf303b0b77f618d4959e1285516842d2b8f062f4890ff001e96e2",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "dca9c86ed39bf303b0b77f618d4959e1285516842d2b8f062f4890ff001e96e2",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。"
+      }
+    },
+    {
+      "claim_hash": "dca9c86ed39bf303b0b77f618d4959e1285516842d2b8f062f4890ff001e96e2",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。"
+      }
+    },
+    {
+      "claim_hash": "84fa01e37cd5c15e3df14e15a164f473adc731745c869adbc61c287e269e4200",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "84fa01e37cd5c15e3df14e15a164f473adc731745c869adbc61c287e269e4200",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "84fa01e37cd5c15e3df14e15a164f473adc731745c869adbc61c287e269e4200",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "84fa01e37cd5c15e3df14e15a164f473adc731745c869adbc61c287e269e4200",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "84fa01e37cd5c15e3df14e15a164f473adc731745c869adbc61c287e269e4200",
+      "evidence_hash": "736d39c226f510f5dc78726dbc64a1f7216ce1feea36fcbe659afc80023b342a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`PersistedSoTChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。"
+      }
+    },
+    {
+      "claim_hash": "84fa01e37cd5c15e3df14e15a164f473adc731745c869adbc61c287e269e4200",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "e50e7abf5b6ddcef20e2702e705428586b946dc2f3adb0814ae22bf7e3f80ed9",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "e50e7abf5b6ddcef20e2702e705428586b946dc2f3adb0814ae22bf7e3f80ed9",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "e50e7abf5b6ddcef20e2702e705428586b946dc2f3adb0814ae22bf7e3f80ed9",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "e50e7abf5b6ddcef20e2702e705428586b946dc2f3adb0814ae22bf7e3f80ed9",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "e50e7abf5b6ddcef20e2702e705428586b946dc2f3adb0814ae22bf7e3f80ed9",
+      "evidence_hash": "736d39c226f510f5dc78726dbc64a1f7216ce1feea36fcbe659afc80023b342a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`PersistedSoTChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。① ② ③ の `PersistedSoTChain::evaluate_gate` は既存 domain 純粋関数（`check_spec_doc_signals` / `check_catalogue_spec_signals`（新設） / `check_type_signals`）を薄くラップする。"
+      }
+    },
+    {
+      "claim_hash": "e50e7abf5b6ddcef20e2702e705428586b946dc2f3adb0814ae22bf7e3f80ed9",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "4eed27db31d67b0b82ed10bd9f477e8ec1e1147b2aac98c90370f9abb85ace46",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "4eed27db31d67b0b82ed10bd9f477e8ec1e1147b2aac98c90370f9abb85ace46",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`...` ⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "4eed27db31d67b0b82ed10bd9f477e8ec1e1147b2aac98c90370f9abb85ace46",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "4eed27db31d67b0b82ed10bd9f477e8ec1e1147b2aac98c90370f9abb85ace46",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "8c649aa7be3eced788db66737ba35770763b59aa9edc9b15549b410064c49d1c",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "8c649aa7be3eced788db66737ba35770763b59aa9edc9b15549b410064c49d1c",
+      "evidence_hash": "8d9a3f13705dbcda3a4c0799b5af2ae7c85881e61c8082c89fb0b311203942a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型のシグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "8c649aa7be3eced788db66737ba35770763b59aa9edc9b15549b410064c49d1c",
+      "evidence_hash": "89fd786d22843d2436814bc4418e13994bf5d62abb1eff30785aa45ce32f5ab1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strict)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "782af7209396fe43ee23e189dcd8d457d1bf2e50ca14d7fe2be1707ad1f43e3b",
+      "evidence_hash": "89de184854b337a551857624b110dbf85aa5f5b03612d7314bb044b901c557c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "782af7209396fe43ee23e189dcd8d457d1bf2e50ca14d7fe2be1707ad1f43e3b",
+      "evidence_hash": "8d9a3f13705dbcda3a4c0799b5af2ae7c85881e61c8082c89fb0b311203942a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型のシグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "782af7209396fe43ee23e189dcd8d457d1bf2e50ca14d7fe2be1707ad1f43e3b",
+      "evidence_hash": "89fd786d22843d2436814bc4418e13994bf5d62abb1eff30785aa45ce32f5ab1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strict)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "4543a0dc83878c6c541f753780a7d95b200ef136feb603f6e6642bc685024dfa",
+      "evidence_hash": "39ab235ef79244ce7bb9f3f3b8442070e013965b38db8c054842217392e2ef93",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。… `AssocConstDecl` は `name: String` / `ty: String` / `default: Option<String>` を持つ新ドメイン型とする。"
+      }
+    },
+    {
+      "claim_hash": "4543a0dc83878c6c541f753780a7d95b200ef136feb603f6e6642bc685024dfa",
+      "evidence_hash": "1b2c846389ed099af7a0ab569b75d5e2900b9abc31f539c686389c0d7621f0cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` の `assoc_types` / `assoc_consts` フィールドは既存カタログとの後方互換性を保たなければならない。フィールドが存在しない（または空配列の）カタログエントリは有効とし、`assoc_types: []` / `assoc_consts: []` として扱う（デフォルト空）。`AssocTypeDecl.default` / `AssocConstDecl.default` が `None` の場合は JSON シリアライズ時に省略する（`#[serde(skip_serializing_if = \"Option::is_none\"]` 相当）。"
+      }
+    },
+    {
+      "claim_hash": "c072a36b3435f0e30750b0897521bd9332e9e905de2a44328f04883cd96deafe",
+      "evidence_hash": "39ab235ef79244ce7bb9f3f3b8442070e013965b38db8c054842217392e2ef93",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocTypeDecl` は `name: String` / `bounds: Vec<String>` / `default: Option<String>` を持つ新ドメイン型とする。"
+      }
+    },
+    {
+      "claim_hash": "c072a36b3435f0e30750b0897521bd9332e9e905de2a44328f04883cd96deafe",
+      "evidence_hash": "1b2c846389ed099af7a0ab569b75d5e2900b9abc31f539c686389c0d7621f0cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` の `assoc_types` / `assoc_consts` フィールドは既存カタログとの後方互換性を保たなければならない。フィールドが存在しない（または空配列の）カタログエントリは有効とし、`assoc_types: []` / `assoc_consts: []` として扱う（デフォルト空）。`AssocTypeDecl.default` / `AssocConstDecl.default` が `None` の場合は JSON シリアライズ時に省略する（`#[serde(skip_serializing_if = \"Option::is_none\"]` 相当）。"
+      }
+    },
+    {
+      "claim_hash": "9437e57516d781cc00a751457b9a539eb549ca360c2b8937f8c73d223dbf0618",
+      "evidence_hash": "e07ab19188f950a0cde5aaeaa6324467f28107fcd709c64e370bd076f0499fe1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain × gate（commit_gate / merge_gate）× strictness（`\"strict\"` / `\"interim\"`）の宣言的 SoT"
+      }
+    },
+    {
+      "claim_hash": "9437e57516d781cc00a751457b9a539eb549ca360c2b8937f8c73d223dbf0618",
+      "evidence_hash": "e21a3ac31a016a34c303eb135996fa1bf3ed1fe7666e71936276a15c30700467",
+      "verdict": {
+        "kind": "pass",
+        "citation": "strictness の値を現在の 2 値（`\"strict\"` / `\"interim\"`）超に拡張することは対象外。"
+      }
+    },
+    {
+      "claim_hash": "9437e57516d781cc00a751457b9a539eb549ca360c2b8937f8c73d223dbf0618",
+      "evidence_hash": "5f186bf753e3b087b8e4162546b8cfa877e056f62ca3386c25783873cc880457",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 `check-*` の Yellow 扱い: `strict=true`（または `--gate` が strict セルに解決）→ `Finding::error`、`strict=false`（または `--gate` が interim セルに解決）→ `Finding::warning`。"
+      }
+    },
+    {
+      "claim_hash": "7edb423129b0fbac8474910f85c66c962f775a5fd9c77d6e64d8f01450ca5e6b",
+      "evidence_hash": "39ab235ef79244ce7bb9f3f3b8442070e013965b38db8c054842217392e2ef93",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。"
+      }
+    },
+    {
+      "claim_hash": "7edb423129b0fbac8474910f85c66c962f775a5fd9c77d6e64d8f01450ca5e6b",
+      "evidence_hash": "1b2c846389ed099af7a0ab569b75d5e2900b9abc31f539c686389c0d7621f0cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` の `assoc_types` / `assoc_consts` フィールドは既存カタログとの後方互換性を保たなければならない。フィールドが存在しない（または空配列の）カタログエントリは有効とし、`assoc_types: []` / `assoc_consts: []` として扱う（デフォルト空）。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "2c7345951ea9df5ce10df224ddd5d99a9eae8b2177b740ebb5de89654035bd49",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain-types.json` に `assoc_types` / `assoc_consts` フィールドを持つ `TraitEntry` として宣言された `ChainIdentity`（`const ID: ChainId` + `type Input<'a>` 等）、`LiveSoTChain`（`type LiveCalc` / `type CalcError` 等）、`PersistedSoTChain`（`type Persisted` / `type StaleError` 等）の各 trait が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。items.len の差（A-side < C-side だった AssocType / AssocConst を A-side が補填）による不一致が解消されている。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "2f627638abe9187ba6a5deea707e4678e7f2b8be08ee494a96063d72b2bab4e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0",
+      "evidence_hash": "736d39c226f510f5dc78726dbc64a1f7216ce1feea36fcbe659afc80023b342a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`PersistedSoTChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。"
+      }
+    },
+    {
+      "claim_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0",
+      "evidence_hash": "2c7345951ea9df5ce10df224ddd5d99a9eae8b2177b740ebb5de89654035bd49",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`LiveSoTChain`（`type LiveCalc` / `type CalcError` 等）の各 trait が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。"
+      }
+    },
+    {
+      "claim_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0",
+      "evidence_hash": "2f627638abe9187ba6a5deea707e4678e7f2b8be08ee494a96063d72b2bab4e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。... この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d",
+      "evidence_hash": "736d39c226f510f5dc78726dbc64a1f7216ce1feea36fcbe659afc80023b342a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`PersistedSoTChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。① ② ③ の `PersistedSoTChain::evaluate_gate` は既存 domain 純粋関数（`check_spec_doc_signals` / `check_catalogue_spec_signals`（新設） / `check_type_signals`）を薄くラップする。"
+      }
+    },
+    {
+      "claim_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。`apps/cli/src/commands/signal/` に新 `signal` モジュールが存在する。"
+      }
+    },
+    {
+      "claim_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d",
+      "evidence_hash": "2c7345951ea9df5ce10df224ddd5d99a9eae8b2177b740ebb5de89654035bd49",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain`（`type Persisted` / `type StaleError` 等）の各 trait が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。items.len の差（A-side < C-side だった AssocType / AssocConst を A-side が補填）による不一致が解消されている。既存の `methods` フィールドのみを持つ古い `TraitEntry` JSON は変更なしに読み込めること（後方互換性 CN-15 が満たされている）。"
+      }
+    },
+    {
+      "claim_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d",
+      "evidence_hash": "2f627638abe9187ba6a5deea707e4678e7f2b8be08ee494a96063d72b2bab4e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。`<Self as Trait>::Assoc` 形式は syn の `parse_str` が `<Self as _>::...` を解析できないという構造的制約により A-side では表現不能であるため、使用を禁ずる。この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "e815a9d92a2c602994d59279693637c7ccf90b0b018cc0f485251bf874ae123b",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "e815a9d92a2c602994d59279693637c7ccf90b0b018cc0f485251bf874ae123b",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "e815a9d92a2c602994d59279693637c7ccf90b0b018cc0f485251bf874ae123b",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "e815a9d92a2c602994d59279693637c7ccf90b0b018cc0f485251bf874ae123b",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "e815a9d92a2c602994d59279693637c7ccf90b0b018cc0f485251bf874ae123b",
+      "evidence_hash": "2f627638abe9187ba6a5deea707e4678e7f2b8be08ee494a96063d72b2bab4e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。... この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "498abec7e200fa24ebb8ac0582f4d6ebae37adc6fa3c5f88311f25f5810be688",
+      "evidence_hash": "ff31e06aad75400a86776d43c8829e6a58aaf2594b56bc14d6a9d37d0437e29d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocConstDecl` は `name: String` / `ty: TypeRef` / `default_value: Option<String>` を持つ新ドメイン型とする。"
+      }
+    },
+    {
+      "claim_hash": "498abec7e200fa24ebb8ac0582f4d6ebae37adc6fa3c5f88311f25f5810be688",
+      "evidence_hash": "f0ed073fc9d2d036b9f3374cd9145e5637c2d6ad08a9dfcbb23de3ddc75f7289",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` の `assoc_types` / `assoc_consts` フィールドは既存カタログとの後方互換性を保たなければならない。フィールドが存在しない（または空配列の）カタログエントリは有効とし、`assoc_types: []` / `assoc_consts: []` として扱う（デフォルト空）。`AssocTypeDecl.default` / `AssocConstDecl.default_value` が `None` の場合は JSON シリアライズ時に省略する（`#[serde(skip_serializing_if = \"Option::is_none\"]` 相当）。"
+      }
+    },
+    {
+      "claim_hash": "3c4d7c2d45aeecb66c8cd7b9758fb5222497299fd16a485d186b2a6a64126305",
+      "evidence_hash": "ff31e06aad75400a86776d43c8829e6a58aaf2594b56bc14d6a9d37d0437e29d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocConstDecl` は `name: String` / `ty: TypeRef` / `default_value: Option<String>` を持つ新ドメイン型とする。"
+      }
+    },
+    {
+      "claim_hash": "c444deaf6506316837c86b4c6a6f98d83aebc2eceb9aa90636b9617a2f89dfcb",
+      "evidence_hash": "ff31e06aad75400a86776d43c8829e6a58aaf2594b56bc14d6a9d37d0437e29d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocTypeDecl` は `name: String` / `bounds: Vec<TypeRef>` / `default: Option<TypeRef>` を持つ新ドメイン型とする。"
+      }
+    },
+    {
+      "claim_hash": "c444deaf6506316837c86b4c6a6f98d83aebc2eceb9aa90636b9617a2f89dfcb",
+      "evidence_hash": "f0ed073fc9d2d036b9f3374cd9145e5637c2d6ad08a9dfcbb23de3ddc75f7289",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` の `assoc_types` / `assoc_consts` フィールドは既存カタログとの後方互換性を保たなければならない。フィールドが存在しない（または空配列の）カタログエントリは有効とし、`assoc_types: []` / `assoc_consts: []` として扱う（デフォルト空）。`AssocTypeDecl.default` / `AssocConstDecl.default_value` が `None` の場合は JSON シリアライズ時に省略する（`#[serde(skip_serializing_if = \"Option::is_none\"]` 相当）。"
+      }
+    },
+    {
+      "claim_hash": "7edb423129b0fbac8474910f85c66c962f775a5fd9c77d6e64d8f01450ca5e6b",
+      "evidence_hash": "ff31e06aad75400a86776d43c8829e6a58aaf2594b56bc14d6a9d37d0437e29d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。"
+      }
+    },
+    {
+      "claim_hash": "7edb423129b0fbac8474910f85c66c962f775a5fd9c77d6e64d8f01450ca5e6b",
+      "evidence_hash": "f0ed073fc9d2d036b9f3374cd9145e5637c2d6ad08a9dfcbb23de3ddc75f7289",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` の `assoc_types` / `assoc_consts` フィールドは既存カタログとの後方互換性を保たなければならない。フィールドが存在しない（または空配列の）カタログエントリは有効とし、`assoc_types: []` / `assoc_consts: []` として扱う（デフォルト空）。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。"
+      }
+    },
+    {
+      "claim_hash": "e815a9d92a2c602994d59279693637c7ccf90b0b018cc0f485251bf874ae123b",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。... この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "7ad58c150444c82ae49d009d782981b2e93ec56fcdd0e496a60c681513937f81",
+      "evidence_hash": "ff31e06aad75400a86776d43c8829e6a58aaf2594b56bc14d6a9d37d0437e29d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocConstDecl` は `name: String` / `ty: TypeRef` / `default_value: Option<String>` を持つ新ドメイン型とする。対応するインフラ層の変更として `catalogue_document_codec` と `encoder_state_fn_trait_codec` が `ItemEnum::AssocType` / `ItemEnum::AssocConst` を emit するよう拡張する。"
+      }
+    },
+    {
+      "claim_hash": "498abec7e200fa24ebb8ac0582f4d6ebae37adc6fa3c5f88311f25f5810be688",
+      "evidence_hash": "7b75695d28ae825241d1d82d3dd6d23ee46b0d38cea9907ec0c2389ca0740e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AssocConstDecl` は `name: AssocConstName` / `ty: TypeRef` / `default_value: Option<String>` を持つ新ドメイン型とし、`AssocConstName` は関連 const 名専用の validated newtype として追加する。"
+      }
+    },
+    {
+      "claim_hash": "7ad58c150444c82ae49d009d782981b2e93ec56fcdd0e496a60c681513937f81",
+      "evidence_hash": "7b75695d28ae825241d1d82d3dd6d23ee46b0d38cea9907ec0c2389ca0740e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AssocConstDecl` は `name: AssocConstName` / `ty: TypeRef` / `default_value: Option<String>` を持つ新ドメイン型とし、`AssocConstName` は関連 const 名専用の validated newtype として追加する。"
+      }
+    },
+    {
+      "claim_hash": "c444deaf6506316837c86b4c6a6f98d83aebc2eceb9aa90636b9617a2f89dfcb",
+      "evidence_hash": "7b75695d28ae825241d1d82d3dd6d23ee46b0d38cea9907ec0c2389ca0740e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocTypeDecl` は `name: TypeName` / `bounds: Vec<TypeRef>` / `default: Option<TypeRef>` を持つ新ドメイン型とする。"
+      }
+    },
+    {
+      "claim_hash": "7edb423129b0fbac8474910f85c66c962f775a5fd9c77d6e64d8f01450ca5e6b",
+      "evidence_hash": "7b75695d28ae825241d1d82d3dd6d23ee46b0d38cea9907ec0c2389ca0740e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。"
+      }
+    },
+    {
+      "claim_hash": "782af7209396fe43ee23e189dcd8d457d1bf2e50ca14d7fe2be1707ad1f43e3b",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "8b6ae0b7d7e77063a462b2994679dbd141c92ad30496faa797403fc3c6cc3eb4",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "8b6ae0b7d7e77063a462b2994679dbd141c92ad30496faa797403fc3c6cc3eb4",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "8b6ae0b7d7e77063a462b2994679dbd141c92ad30496faa797403fc3c6cc3eb4",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "8b6ae0b7d7e77063a462b2994679dbd141c92ad30496faa797403fc3c6cc3eb4",
+      "evidence_hash": "736d39c226f510f5dc78726dbc64a1f7216ce1feea36fcbe659afc80023b342a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`PersistedSoTChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。① ② ③ の `PersistedSoTChain::evaluate_gate` は既存 domain 純粋関数（`check_spec_doc_signals` / `check_catalogue_spec_signals`（新設） / `check_type_signals`）を薄くラップする。"
+      }
+    },
+    {
+      "claim_hash": "8b6ae0b7d7e77063a462b2994679dbd141c92ad30496faa797403fc3c6cc3eb4",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "8b6ae0b7d7e77063a462b2994679dbd141c92ad30496faa797403fc3c6cc3eb4",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。... この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "99636343477018cb3e59285f54dd8f7cba3644e777e7bd5ad9eba772ef0de02c",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "99636343477018cb3e59285f54dd8f7cba3644e777e7bd5ad9eba772ef0de02c",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "99636343477018cb3e59285f54dd8f7cba3644e777e7bd5ad9eba772ef0de02c",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "99636343477018cb3e59285f54dd8f7cba3644e777e7bd5ad9eba772ef0de02c",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChain` を実装して blanket impl で `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "99636343477018cb3e59285f54dd8f7cba3644e777e7bd5ad9eba772ef0de02c",
+      "evidence_hash": "736d39c226f510f5dc78726dbc64a1f7216ce1feea36fcbe659afc80023b342a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`PersistedSoTChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。① ② ③ の `PersistedSoTChain::evaluate_gate` は既存 domain 純粋関数（`check_spec_doc_signals` / `check_catalogue_spec_signals`（新設） / `check_type_signals`）を薄くラップする。"
+      }
+    },
+    {
+      "claim_hash": "99636343477018cb3e59285f54dd8f7cba3644e777e7bd5ad9eba772ef0de02c",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "99636343477018cb3e59285f54dd8f7cba3644e777e7bd5ad9eba772ef0de02c",
+      "evidence_hash": "2c7345951ea9df5ce10df224ddd5d99a9eae8b2177b740ebb5de89654035bd49",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain-types.json` に `assoc_types` / `assoc_consts` フィールドを持つ `TraitEntry` として宣言された `ChainIdentity`（`const ID: ChainId` + `type Input<'a>` 等）、`LiveSoTChain`（`type LiveCalc` / `type CalcError` 等）、`PersistedSoTChain`（`type Persisted` / `type StaleError` 等）の各 trait が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。"
+      }
+    },
+    {
+      "claim_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`① ② ③ は \u001cPersistedSoTChain\u001d（blanket impl で \u001cSoTChain\u001d を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8",
+      "evidence_hash": "2c7345951ea9df5ce10df224ddd5d99a9eae8b2177b740ebb5de89654035bd49",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PersistedSoTChain（`type Persisted` / `type StaleError` 等）の各 trait が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。"
+      }
+    },
+    {
+      "claim_hash": "2483ec35c0dd74f98230aa54b3cc633d2ad00fbd116d471923a749aeddcb0457",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "2483ec35c0dd74f98230aa54b3cc633d2ad00fbd116d471923a749aeddcb0457",
+      "evidence_hash": "f454d33a99d82417fec0f31b9edeade42c79417792a44f49c1ab969a9351adea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の 4 traits を定義し、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChain`（blanket impl で `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "2483ec35c0dd74f98230aa54b3cc633d2ad00fbd116d471923a749aeddcb0457",
+      "evidence_hash": "78971eec5d8cd82356f0040f10d758ffca66a930fcc89379884a26da094ca479",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChain: ChainIdentity` の 4 traits が定義され、`impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。"
+      }
+    },
+    {
+      "claim_hash": "2483ec35c0dd74f98230aa54b3cc633d2ad00fbd116d471923a749aeddcb0457",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "2483ec35c0dd74f98230aa54b3cc633d2ad00fbd116d471923a749aeddcb0457",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。... この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "eebea71936b15099ac6d0941aba1ee697327a74ee8d4289b11f59c1218b31d94",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "eebea71936b15099ac6d0941aba1ee697327a74ee8d4289b11f59c1218b31d94",
+      "evidence_hash": "8d9a3f13705dbcda3a4c0799b5af2ae7c85881e61c8082c89fb0b311203942a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型のシグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "eebea71936b15099ac6d0941aba1ee697327a74ee8d4289b11f59c1218b31d94",
+      "evidence_hash": "89fd786d22843d2436814bc4418e13994bf5d62abb1eff30785aa45ce32f5ab1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strict)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "35496adfef7143ff1d21e6309708ffba2b745688d83d7ffa3e5a44ecd2bb4b0d",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Strict 対応の adr-signal verifier として `execute_verify_adr_signals_with_strict(project_root, strict)` を新設し、既存の `execute_verify_adr_signals(project_root)` は非 strict のショートカットとして `_with_strict(project_root, false)` に delegate する形に保つ。これにより `signal check-adr-user --strict` で Yellow（`ReviewFindingRef`）も block できる。chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "35496adfef7143ff1d21e6309708ffba2b745688d83d7ffa3e5a44ecd2bb4b0d",
+      "evidence_hash": "8d9a3f13705dbcda3a4c0799b5af2ae7c85881e61c8082c89fb0b311203942a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型のシグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "35496adfef7143ff1d21e6309708ffba2b745688d83d7ffa3e5a44ecd2bb4b0d",
+      "evidence_hash": "89fd786d22843d2436814bc4418e13994bf5d62abb1eff30785aa45ce32f5ab1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strict)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "1fe7d70796cce0e4e007e2132196b029c876428fc6201b35fa28af2e1f03f79e",
+      "evidence_hash": "ddf02b18bdf8507f1922d2c3739cc0d9dbffe967e7df43c8a1f496f28d9eb843",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各々が独立した `--strict` を取るよう per-chain 化する。... chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。」"
+      }
+    },
+    {
+      "claim_hash": "1fe7d70796cce0e4e007e2132196b029c876428fc6201b35fa28af2e1f03f79e",
+      "evidence_hash": "8d9a3f13705dbcda3a4c0799b5af2ae7c85881e61c8082c89fb0b311203942a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型のシグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "1fe7d70796cce0e4e007e2132196b029c876428fc6201b35fa28af2e1f03f79e",
+      "evidence_hash": "89fd786d22843d2436814bc4418e13994bf5d62abb1eff30785aa45ce32f5ab1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strict)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "99636343477018cb3e59285f54dd8f7cba3644e777e7bd5ad9eba772ef0de02c",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "fail",
+        "reason": "The reference is unrelated to this catalogue entry. CN-14 constrains how GAT projection types must be written in catalogue declarations, specifically for entries declaring `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` GATs. This claim declares the `PersistedSoTChain` trait as a sealed supertrait with no associated types or GAT projection forms, so it does not implement or serve the cited constraint."
+      }
+    },
+    {
+      "claim_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。"
+      }
+    },
+    {
+      "claim_hash": "7252f729ae98389058a819656bc41ab886bf352e6f8239fd320407635c8ecee1",
+      "evidence_hash": "7b75695d28ae825241d1d82d3dd6d23ee46b0d38cea9907ec0c2389ca0740e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocTypeDecl` は `name: TypeName` / `bounds: Vec<TypeRef>` / `default: Option<TypeRef>` を持つ新ドメイン型とする。`AssocConstDecl` は `name: AssocConstName` / `ty: TypeRef` / `default_value: Option<String>` を持つ新ドメイン型とし、`AssocConstName` は関連 const 名専用の validated newtype として追加する。"
+      }
+    },
+    {
+      "claim_hash": "7252f729ae98389058a819656bc41ab886bf352e6f8239fd320407635c8ecee1",
+      "evidence_hash": "f0ed073fc9d2d036b9f3374cd9145e5637c2d6ad08a9dfcbb23de3ddc75f7289",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TraitEntry` の `assoc_types` / `assoc_consts` フィールドは既存カタログとの後方互換性を保たなければならない。フィールドが存在しない（または空配列の）カタログエントリは有効とし、`assoc_types: []` / `assoc_consts: []` として扱う（デフォルト空）。`AssocTypeDecl.default` / `AssocConstDecl.default_value` が `None` の場合は JSON シリアライズ時に省略する（`#[serde(skip_serializing_if = \"Option::is_none\"]` 相当）。これにより既存の `TraitEntry` JSON を変更なしに読み込める。"
+      }
+    },
+    {
+      "claim_hash": "b724da87412e6885949a1bcd4d7fe8dec6d37742a511beefafb14a54fcc030a5",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChainGate` / `LoadablePersistedChain` / `PersistedSoTChain` の trait taxonomy を定義し、`impl<T: PersistedSoTChain> SoTChain for T` と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "b724da87412e6885949a1bcd4d7fe8dec6d37742a511beefafb14a54fcc030a5",
+      "evidence_hash": "66d98509799da3647446b6a4d39e1c4f1550c3c2d60604b95037ae1c38c0934c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChainGate: ChainIdentity` / `LoadablePersistedChain: PersistedSoTChainGate` / `PersistedSoTChain: PersistedSoTChainGate + LoadablePersistedChain` の trait taxonomy が定義され、`impl<T: LoadablePersistedChain> PersistedSoTChain for T` と `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChainGate` / `LoadablePersistedChain` / `PersistedSoTChain` の trait taxonomy を定義し、`impl<T: PersistedSoTChain> SoTChain for T` と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` の blanket impl を置く。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "66d98509799da3647446b6a4d39e1c4f1550c3c2d60604b95037ae1c38c0934c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChainGate: ChainIdentity` / `LoadablePersistedChain: PersistedSoTChainGate` / `PersistedSoTChain: PersistedSoTChainGate + LoadablePersistedChain` の trait taxonomy が定義され"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "4e37423b346be20b2c0a0005869b8253ee69081f355cad68b0304629666b9f40",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain-types.json` に `assoc_types` / `assoc_consts` フィールドを持つ `TraitEntry` として宣言された `ChainIdentity`（`const ID: ChainId` + `type Input<'a>` 等）"
+      }
+    },
+    {
+      "claim_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChainGate` / `LoadablePersistedChain` / `PersistedSoTChain` の trait taxonomy を定義し、`impl<T: PersistedSoTChain> SoTChain for T` と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8",
+      "evidence_hash": "4e37423b346be20b2c0a0005869b8253ee69081f355cad68b0304629666b9f40",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChainGate`（`type Persisted` / `type CalcError` / `type StaleError` 等）が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。"
+      }
+    },
+    {
+      "claim_hash": "eebea71936b15099ac6d0941aba1ee697327a74ee8d4289b11f59c1218b31d94",
+      "evidence_hash": "0e594f0430ca9d22e96d4df5d530ffb75d04f94272f479ce049fd001baed4f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strictness: Strictness) -> VerifyOutcome` に抽出し、① ③ と同型の `Strictness` 引数シグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "eebea71936b15099ac6d0941aba1ee697327a74ee8d4289b11f59c1218b31d94",
+      "evidence_hash": "5797633f5a3bcf0e22a46f970dd6131af209f1abd5d30cadfa6995102e39a204",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strictness: Strictness) -> VerifyOutcome` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型の `Strictness` 引数シグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "eebea71936b15099ac6d0941aba1ee697327a74ee8d4289b11f59c1218b31d94",
+      "evidence_hash": "8ae366e8526300ba5141e61f1258b81cb5699700ac6ce5bbd76390597e6023f7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strictness)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "35496adfef7143ff1d21e6309708ffba2b745688d83d7ffa3e5a44ecd2bb4b0d",
+      "evidence_hash": "0e594f0430ca9d22e96d4df5d530ffb75d04f94272f479ce049fd001baed4f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strictness: Strictness) -> VerifyOutcome` に抽出し、① ③ と同型の `Strictness` 引数シグネチャで 1 本化する。」"
+      }
+    },
+    {
+      "claim_hash": "35496adfef7143ff1d21e6309708ffba2b745688d83d7ffa3e5a44ecd2bb4b0d",
+      "evidence_hash": "5797633f5a3bcf0e22a46f970dd6131af209f1abd5d30cadfa6995102e39a204",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strictness: Strictness) -> VerifyOutcome` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型の `Strictness` 引数シグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "35496adfef7143ff1d21e6309708ffba2b745688d83d7ffa3e5a44ecd2bb4b0d",
+      "evidence_hash": "8ae366e8526300ba5141e61f1258b81cb5699700ac6ce5bbd76390597e6023f7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strictness)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "1fe7d70796cce0e4e007e2132196b029c876428fc6201b35fa28af2e1f03f79e",
+      "evidence_hash": "0e594f0430ca9d22e96d4df5d530ffb75d04f94272f479ce049fd001baed4f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。Strict 対応の adr-signal verifier として `execute_verify_adr_signals_with_strict(project_root, strict)` を新設し、既存の `execute_verify_adr_signals(project_root)` は非 strict のショートカットとして `_with_strict(project_root, false)` に delegate する形に保つ。これにより `signal check-adr-user --strict` で Yellow（`ReviewFindingRef`）も block できる。"
+      }
+    },
+    {
+      "claim_hash": "1fe7d70796cce0e4e007e2132196b029c876428fc6201b35fa28af2e1f03f79e",
+      "evidence_hash": "5797633f5a3bcf0e22a46f970dd6131af209f1abd5d30cadfa6995102e39a204",
+      "verdict": {
+        "kind": "pass",
+        "citation": "① ③ の `check_spec_doc_signals` / `check_type_signals` と同型の `Strictness` 引数シグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "1fe7d70796cce0e4e007e2132196b029c876428fc6201b35fa28af2e1f03f79e",
+      "evidence_hash": "8ae366e8526300ba5141e61f1258b81cb5699700ac6ce5bbd76390597e6023f7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strictness)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "3ea6dc8566ebbd3146bb61e3951ef387ba7c184acc34f85f9a727d69be9dfa66",
+      "evidence_hash": "7b75695d28ae825241d1d82d3dd6d23ee46b0d38cea9907ec0c2389ca0740e5d",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines validation errors for RustExpression::try_new (empty string and whitespace-boundary handling), while the evidence is about TraitEntry associated type/const catalogue fields and related codec emission. The evidence motivates no part of RustExpressionError, so this spec reference is unrelated."
+      }
+    },
+    {
+      "claim_hash": "7252f729ae98389058a819656bc41ab886bf352e6f8239fd320407635c8ecee1",
+      "evidence_hash": "4dcb69c88e15cae70fbe81b8daa5e40144ac8e06dec8cbd3a65bdabc0b4c0c54",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AssocConstDecl` は `name: AssocConstName` / `ty: TypeRef` / `default_value: Option<RustExpression>` を持つ新ドメイン型とし、`AssocConstName` は関連 const 名専用の validated newtype、`RustExpression` は非空かつ前後空白なしを検証する関連 const default 値用の validated newtype"
+      }
+    },
+    {
+      "claim_hash": "7ad58c150444c82ae49d009d782981b2e93ec56fcdd0e496a60c681513937f81",
+      "evidence_hash": "4dcb69c88e15cae70fbe81b8daa5e40144ac8e06dec8cbd3a65bdabc0b4c0c54",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AssocConstDecl` は `name: AssocConstName` / `ty: TypeRef` / `default_value: Option<RustExpression>` を持つ新ドメイン型とし、`AssocConstName` は関連 const 名専用の validated newtype"
+      }
+    },
+    {
+      "claim_hash": "c444deaf6506316837c86b4c6a6f98d83aebc2eceb9aa90636b9617a2f89dfcb",
+      "evidence_hash": "4dcb69c88e15cae70fbe81b8daa5e40144ac8e06dec8cbd3a65bdabc0b4c0c54",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocTypeDecl` は `name: TypeName` / `bounds: Vec<TypeRef>` / `default: Option<TypeRef>` を持つ新ドメイン型とする。"
+      }
+    },
+    {
+      "claim_hash": "b724da87412e6885949a1bcd4d7fe8dec6d37742a511beefafb14a54fcc030a5",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` / `Strictness` / `GateKind` / `ChainGateEntry` / `SignalGateMatrix` と、domain 純粋 contract である `ChainIdentity` / `PersistedSoTChainGate` を定義する。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し"
+      }
+    },
+    {
+      "claim_hash": "b724da87412e6885949a1bcd4d7fe8dec6d37742a511beefafb14a54fcc030a5",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `PersistedSoTChainGate: ChainIdentity` が定義され、... chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "a422951d1bf718825aada5956e7d1c1b6c282ee014352ad236bddaf903b88d62",
+      "evidence_hash": "4dcb69c88e15cae70fbe81b8daa5e40144ac8e06dec8cbd3a65bdabc0b4c0c54",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AssocConstDecl` は `name: AssocConstName` / `ty: TypeRef` / `default_value: Option<RustExpression>` を持つ新ドメイン型とし、`AssocConstName` は関連 const 名専用の validated newtype、`RustExpression` は非空かつ前後空白なしを検証する関連 const default 値用の validated newtype（エラー型 `RustExpressionError` を含む）として追加する。"
+      }
+    },
+    {
+      "claim_hash": "3ea6dc8566ebbd3146bb61e3951ef387ba7c184acc34f85f9a727d69be9dfa66",
+      "evidence_hash": "4dcb69c88e15cae70fbe81b8daa5e40144ac8e06dec8cbd3a65bdabc0b4c0c54",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`RustExpression` は非空かつ前後空白なしを検証する関連 const default 値用の validated newtype（エラー型 `RustExpressionError` を含む）として追加する。"
+      }
+    },
+    {
+      "claim_hash": "7edb423129b0fbac8474910f85c66c962f775a5fd9c77d6e64d8f01450ca5e6b",
+      "evidence_hash": "4dcb69c88e15cae70fbe81b8daa5e40144ac8e06dec8cbd3a65bdabc0b4c0c54",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` および `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` / `Strictness` / `GateKind` / `ChainGateEntry` / `SignalGateMatrix` と、domain 純粋 contract である `ChainIdentity` / `PersistedSoTChainGate` を定義する。"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs` に `ChainId` enum と `ChainIdentity` / `PersistedSoTChainGate: ChainIdentity` が定義され、`libs/usecase/src/chain/traits.rs` に `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `LoadablePersistedChain: PersistedSoTChainGate` / `PersistedSoTChain: PersistedSoTChainGate + LoadablePersistedChain` の usecase trait taxonomy"
+      }
+    },
+    {
+      "claim_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d",
+      "evidence_hash": "0320871315c2855919af8af3bf653638f40fb89737398a3aa1bfb5c0e97da698",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain-types.json` に `assoc_types` / `assoc_consts` フィールドを持つ `TraitEntry` として宣言された `ChainIdentity`（`const ID: ChainId` + `type Input<'a>` 等）"
+      }
+    },
+    {
+      "claim_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8",
+      "evidence_hash": "0320871315c2855919af8af3bf653638f40fb89737398a3aa1bfb5c0e97da698",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChainGate`（`type Persisted` / `type CalcError` / `type StaleError` 等）が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。"
+      }
+    }
+  ]
+}

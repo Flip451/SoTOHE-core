@@ -11,38 +11,34 @@ decisions:
     user_decision_ref: "chat_segment:user-decision:implementation-order-schema-then-roles-then-linter:2026-06-08"
     status: proposed
   - id: D4
-    review_finding_ref: "researcher-gap-analysis:2026-05-25"
     user_decision_ref: "chat_segment:user-decision:per-variant-enum-first-semantics:2026-05-26"
     status: proposed
   - id: D5
     user_decision_ref: "chat_segment:user-decision:identity-accessor-schema-plus-equality-linter-optin:2026-05-27"
     status: proposed
   - id: D6
-    review_finding_ref: "researcher-gap-analysis:2026-05-25"
     user_decision_ref: "chat_segment:user-decision:per-variant-enum-first-semantics:2026-05-26"
     status: proposed
   - id: D7
-    review_finding_ref: "researcher-gap-analysis:2026-05-25"
     user_decision_ref: "chat_segment:user-decision:per-variant-enum-first-semantics:2026-05-26"
     status: proposed
   - id: D8
-    review_finding_ref: "researcher-gap-analysis:2026-05-25"
     user_decision_ref: "chat_segment:user-decision:per-variant-enum-first-semantics:2026-05-26"
     status: proposed
   - id: D9
-    review_finding_ref: "researcher-gap-analysis:2026-05-25"
+    user_decision_ref: "chat_segment:user-direction:tddd-pattern-semantics-track-2026-06-20:domain-event-variant-approved"
     status: proposed
   - id: D10
     user_decision_ref: "chat_segment:user-decision:repository-independent-variant:2026-05-26"
     status: proposed
   - id: D11
-    review_finding_ref: "researcher-gap-analysis:2026-05-25"
+    user_decision_ref: "chat_segment:user-direction:tddd-pattern-semantics-track-2026-06-20:aggregate-boundary-lint-approved"
     status: proposed
   - id: D12
-    review_finding_ref: "researcher-gap-analysis:2026-05-25"
+    user_decision_ref: "chat_segment:user-direction:tddd-pattern-semantics-track-2026-06-20:presenter-controller-omission-approved"
     status: proposed
   - id: D13
-    review_finding_ref: "researcher-gap-analysis:2026-05-25"
+    user_decision_ref: "chat_segment:user-direction:tddd-pattern-semantics-track-2026-06-20:saga-readmodel-deferred-approved"
     status: proposed
   - id: D14
     user_decision_ref: "chat_segment:user-decision:make-illegal-states-unrepresentable-field-optionality:2026-05-25"

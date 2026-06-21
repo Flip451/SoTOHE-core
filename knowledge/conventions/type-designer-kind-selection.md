@@ -64,7 +64,7 @@
 
 凡例: `✓` = OK, `△` = 要根拠 (default ではない、docs フィールドに根拠を記録)、`✗` = forbidden, `**ONLY**` = この層以外で使うことを禁止
 
-`✗` または **ONLY** を破る role × layer 選択は、`bin/sotp track type-signals` の signal 評価以前に **role 違反** として draft 段階で却下する。
+`✗` または **ONLY** を破る role × layer 選択は、`bin/sotp signal calc-impl-catalog` の signal 評価以前に **role 違反** として draft 段階で却下する。
 
 R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` のうち `for_type` が `SecondaryAdapter` 型を指す entry の `trait_ref` が参照する port が当該 track の catalogue に未 declare の場合、`-.impl.->` edge が silently skip される。
 
@@ -311,7 +311,7 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 
 - 第一線: catalogue を起草する agent の定義で本 convention の reading + compliance を義務付ける
 - 第二線: track ごとの reviewer briefing (`tmp/reviewer-runtime/briefing-{scope}.md`) で本 convention を参照し、R1〜R10 の checklist を review 観点として明示する。`.harness/custom/review-prompts/<scope>.md` は利用者所有の severity policy であり、framework methodology の enforcement source にはしない
-- 第三線: `bin/sotp track type-signals` の signal 評価 (catalogue → spec の trace integrity)。role 違反は signal 評価より先に draft 段階で却下するため、検証の網としては最終 backstop の位置づけ
+- 第三線: `bin/sotp signal calc-impl-catalog` の signal 評価 (catalogue → spec の trace integrity)。role 違反は signal 評価より先に draft 段階で却下するため、検証の網としては最終 backstop の位置づけ
 
 将来の自動化候補: catalogue codec (`libs/infrastructure/src/tddd/catalogue_document_codec/`) で R1 layer-role マトリクスを machine-readable に表現し、`bin/sotp` の codec validation で reject する (`forbidden` 組合せ → codec error)。
 

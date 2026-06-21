@@ -20,6 +20,7 @@ pub mod schema_export_codec;
 mod schema_export_tests;
 pub mod semantic_dup;
 pub mod shell;
+pub mod signal_layer_reader;
 pub mod spec;
 pub mod task_coverage_codec;
 pub mod tddd;

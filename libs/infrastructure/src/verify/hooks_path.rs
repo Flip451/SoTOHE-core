@@ -66,9 +66,10 @@ fn strip_git_config_line_ending(value: &str) -> &str {
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use std::path::Path;
-    use std::process::Command;
 
     use tempfile::TempDir;
+
+    use crate::verify::test_support::run_git;
 
     use super::*;
 
@@ -78,21 +79,6 @@ mod tests {
 
     fn set_hooks_path(root: &Path, value: &str) {
         run_git(root, &["config", "--local", "core.hooksPath", value]);
-    }
-
-    fn run_git(root: &Path, args: &[&str]) {
-        let output = Command::new("git")
-            .args(args)
-            .current_dir(root)
-            .output()
-            .expect("git command must run in hooks-path verifier tests");
-        assert!(
-            output.status.success(),
-            "git command failed: git {}\nstdout:\n{}\nstderr:\n{}",
-            args.join(" "),
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
-        );
     }
 
     #[test]

@@ -20,7 +20,7 @@
 
 ## YAML front-matter
 
-各 ADR ファイルは MD body の前に YAML front-matter ブロックを置く。`bin/sotp verify adr-signals` がこの front-matter を読み取って各 decision の根拠 trace と lifecycle を検証する。
+各 ADR ファイルは MD body の前に YAML front-matter ブロックを置く。`bin/sotp signal check-adr-user` がこの front-matter を読み取って各 decision の根拠 trace と lifecycle を検証する。
 
 front-matter の起点は `2026-04-27-1234-adr-decision-traceability-lifecycle.md` D1-D3。
 
@@ -95,7 +95,7 @@ dispatch の実体は `parse_adr_frontmatter`(`libs/infrastructure/src/adr_decis
 
 ### Fail-closed 振る舞い
 
-`bin/sotp verify adr-signals` は `knowledge/adr/` 配下の全 `*.md` を走査する。front-matter のない `.md` ファイルは **即座に fail** する — `parse_adr_frontmatter` が内部で `MissingAdrId` を返し、filesystem adapter がそれを read error として伝播させる (新規 ADR が未記入のまま slip-through するのを防ぐ fail-closed 設計, CN-04)。
+`bin/sotp signal check-adr-user` は `knowledge/adr/` 配下の全 `*.md` を走査する。front-matter のない `.md` ファイルは **即座に fail** する — `parse_adr_frontmatter` が内部で `MissingAdrId` を返し、filesystem adapter がそれを read error として伝播させる (新規 ADR が未記入のまま slip-through するのを防ぐ fail-closed 設計, CN-04)。
 
 新規 ADR を追加する際は必ず先に front-matter を入れる。`grandfathered: true` は本 front-matter フォーマット採択前の既存 ADR に遡って back-fill する場合にのみ使用できる (`grandfathered 用途` セクション参照)。新規 ADR では必ず `user_decision_ref` または `review_finding_ref` を埋める。
 

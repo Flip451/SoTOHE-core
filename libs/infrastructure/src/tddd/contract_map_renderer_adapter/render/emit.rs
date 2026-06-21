@@ -330,6 +330,40 @@ pub(super) fn emit_entry<'a>(
                 None, // Self unresolvable in trait context
             )?;
 
+            // D4: associated type nodes — render each AssocTypeDecl as a labelled node
+            // inside the trait subgraph (mirrors `assoc_type[{fp}]:{bounds}={default}`
+            // fingerprint).  No edge is emitted for the bounds/default (they affect signal
+            // equality via the fingerprint, not graph topology).
+            for assoc_type in &trait_entry.assoc_types {
+                let assoc_node_id =
+                    format!("{entry_sg_id}_assoctype_{}", sanitize(assoc_type.name.as_str()));
+                let assoc_label = format!("type {}", assoc_type.name.as_str());
+                let assoc_shape = style.node.get("AssocType").and_then(|ns| ns.shape.as_deref());
+                let assoc_node_def = apply_shape(&assoc_label, assoc_shape);
+                subgraph_lines.push(format!("    {assoc_node_id}{assoc_node_def}"));
+                if let Some(ns) = style.node.get("AssocType") {
+                    if let Some(ref class) = ns.class {
+                        class_attach.push(format!("class {assoc_node_id} {class}"));
+                    }
+                }
+            }
+
+            // D4: associated const nodes — render each AssocConstDecl as a labelled node
+            // inside the trait subgraph (mirrors `assoc_const:{ty}={val}` fingerprint).
+            for assoc_const in &trait_entry.assoc_consts {
+                let assoc_node_id =
+                    format!("{entry_sg_id}_assocconst_{}", sanitize(assoc_const.name.as_str()));
+                let assoc_label = format!("const {}", assoc_const.name.as_str());
+                let assoc_shape = style.node.get("AssocConst").and_then(|ns| ns.shape.as_deref());
+                let assoc_node_def = apply_shape(&assoc_label, assoc_shape);
+                subgraph_lines.push(format!("    {assoc_node_id}{assoc_node_def}"));
+                if let Some(ns) = style.node.get("AssocConst") {
+                    if let Some(ref class) = ns.class {
+                        class_attach.push(format!("class {assoc_node_id} {class}"));
+                    }
+                }
+            }
+
             subgraph_lines.push("  end".to_string());
 
             // Role class attach: attached to the representative node (carries trait identity).

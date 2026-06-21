@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "4d9b464a59dc498ee79554796b127ec9fc5d0ce7b260cff4d32ab4a453bb312e",
+  "signals": [
+    {
+      "type_name": "AssocConstDecl",
+      "signal": "blue",
+      "entry_hash": "7252f729ae98389058a819656bc41ab886bf352e6f8239fd320407635c8ecee1"
+    },
+    {
+      "type_name": "AssocConstName",
+      "signal": "blue",
+      "entry_hash": "7ad58c150444c82ae49d009d782981b2e93ec56fcdd0e496a60c681513937f81"
+    },
+    {
+      "type_name": "AssocTypeDecl",
+      "signal": "blue",
+      "entry_hash": "c444deaf6506316837c86b4c6a6f98d83aebc2eceb9aa90636b9617a2f89dfcb"
+    },
+    {
+      "type_name": "ChainGateEntry",
+      "signal": "blue",
+      "entry_hash": "4321342fe24b0f159369b891203d47b067275893a45f4bb9e6f3bb87bdd78df9"
+    },
+    {
+      "type_name": "ChainId",
+      "signal": "blue",
+      "entry_hash": "b724da87412e6885949a1bcd4d7fe8dec6d37742a511beefafb14a54fcc030a5"
+    },
+    {
+      "type_name": "GateKind",
+      "signal": "blue",
+      "entry_hash": "820cd2617a178cf70c69f7bac5e1b2b376f3fcfdbd28624e42c06e46f5223b33"
+    },
+    {
+      "type_name": "RustExpression",
+      "signal": "blue",
+      "entry_hash": "a422951d1bf718825aada5956e7d1c1b6c282ee014352ad236bddaf903b88d62"
+    },
+    {
+      "type_name": "RustExpressionError",
+      "signal": "blue",
+      "entry_hash": "3ea6dc8566ebbd3146bb61e3951ef387ba7c184acc34f85f9a727d69be9dfa66"
+    },
+    {
+      "type_name": "SignalGateMatrix",
+      "signal": "blue",
+      "entry_hash": "fba6cd20d70c40d86f539d75909a7f8d536eb1aebdc86708e0b6582036907e7f"
+    },
+    {
+      "type_name": "Strictness",
+      "signal": "blue",
+      "entry_hash": "9437e57516d781cc00a751457b9a539eb549ca360c2b8937f8c73d223dbf0618"
+    },
+    {
+      "type_name": "TraitEntry",
+      "signal": "blue",
+      "entry_hash": "7edb423129b0fbac8474910f85c66c962f775a5fd9c77d6e64d8f01450ca5e6b"
+    },
+    {
+      "type_name": "ChainIdentity",
+      "signal": "blue",
+      "entry_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d"
+    },
+    {
+      "type_name": "PersistedSoTChainGate",
+      "signal": "blue",
+      "entry_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8"
+    },
+    {
+      "type_name": "domain::chain::check_catalogue_spec_signals",
+      "signal": "blue",
+      "entry_hash": "eebea71936b15099ac6d0941aba1ee697327a74ee8d4289b11f59c1218b31d94"
+    },
+    {
+      "type_name": "domain::spec::check_spec_doc_signals",
+      "signal": "blue",
+      "entry_hash": "35496adfef7143ff1d21e6309708ffba2b745688d83d7ffa3e5a44ecd2bb4b0d"
+    },
+    {
+      "type_name": "domain::tddd::consistency::check_type_signals",
+      "signal": "blue",
+      "entry_hash": "1fe7d70796cce0e4e007e2132196b029c876428fc6201b35fa28af2e1f03f79e"
+    }
+  ]
+}

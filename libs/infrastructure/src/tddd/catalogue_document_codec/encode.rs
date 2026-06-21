@@ -2,7 +2,7 @@
 
 use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2, TypestateMarker};
 use domain::tddd::catalogue_v2::entries::{
-    FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+    AssocConstDecl, AssocTypeDecl, FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, InvariantPredicate};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
@@ -16,10 +16,10 @@ use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos
 use super::CatalogueDocumentCodecError;
 use super::SCHEMA_VERSION;
 use super::dto::{
-    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
-    MethodDeclarationDto, MethodGenericParamDto, ParamDto, StructShapeDto, TraitEntryDto,
-    TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
-    WherePredicateDeclDto,
+    AssocConstDeclDto, AssocTypeDeclDto, BoundOpDto, CatalogueDocumentDto, FieldDeclDto,
+    FunctionEntryDto, InherentImplDeclDto, MethodDeclarationDto, MethodGenericParamDto, ParamDto,
+    StructShapeDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto,
+    VariantDeclDto, VariantPayloadDto, WherePredicateDeclDto,
 };
 use super::dto_roles::{
     ContractRoleDto, DataRoleDto, IdentityAccessorDto, InvariantDeclDto, InvariantPredicateDto,
@@ -329,10 +329,14 @@ pub(super) fn trait_entry_to_dto(
     let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
     let where_predicates =
         entry.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
+    let assoc_types = entry.assoc_types.iter().map(assoc_type_decl_to_dto).collect();
+    let assoc_consts = entry.assoc_consts.iter().map(assoc_const_decl_to_dto).collect();
     Ok(TraitEntryDto {
         action: entry.action.to_string(),
         role: contract_role_to_dto(&entry.role),
         methods,
+        assoc_types,
+        assoc_consts,
         supertrait_bounds: entry.supertrait_bounds.iter().map(|b| b.as_str().to_owned()).collect(),
         generics: method_generic_params_to_dtos(&entry.generics),
         where_predicates,
@@ -341,6 +345,22 @@ pub(super) fn trait_entry_to_dto(
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
         informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
     })
+}
+
+fn assoc_type_decl_to_dto(decl: &AssocTypeDecl) -> AssocTypeDeclDto {
+    AssocTypeDeclDto {
+        name: decl.name.as_str().to_owned(),
+        bounds: decl.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+        default: decl.default.as_ref().map(|d| d.as_str().to_owned()),
+    }
+}
+
+fn assoc_const_decl_to_dto(decl: &AssocConstDecl) -> AssocConstDeclDto {
+    AssocConstDeclDto {
+        name: decl.name.as_str().to_owned(),
+        ty: decl.ty.as_str().to_owned(),
+        default_value: decl.default_value.as_ref().map(|e| e.as_str().to_owned()),
+    }
 }
 
 fn contract_role_to_dto(role: &ContractRole) -> ContractRoleDto {

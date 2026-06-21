@@ -1453,4 +1453,154 @@ mod tests {
              build_combined_canon_map + format_type_with_canon_occ chain)"
         );
     }
+
+    /// Cross-namespace name reuse: `type Item` and `const Item` on the same trait must
+    /// NOT collide in the method map.  Rust permits the same bare name in the type
+    /// namespace (`type Item`) and the value namespace (`const Item`) simultaneously,
+    /// so both must appear as distinct entries in the BTreeMap with namespace-qualified
+    /// keys (`"type:Item"` and `"const:Item"`).
+    ///
+    /// This is the correctness regression introduced by D4 (signal-gate-strictness-config
+    /// track): once `AssocType` and `AssocConst` items are both emitted into
+    /// `Trait.items`, a bare-name key causes last-write-wins collision and silently drops
+    /// one item from the comparison.  After the namespace-qualified key fix, both items
+    /// survive and the map length matches `items.len()`.
+    #[test]
+    fn test_build_trait_method_map_cross_namespace_name_no_collision() {
+        use rustdoc_types::{Generics, ItemEnum, Type};
+
+        let empty_generics = Generics { params: vec![], where_predicates: vec![] };
+
+        // `type Item` — associated type with no bounds and no default.
+        let assoc_type_item = rustdoc_types::Item {
+            id: Id(10),
+            crate_id: 0,
+            name: Some("Item".to_string()),
+            span: None,
+            visibility: rustdoc_types::Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::AssocType {
+                generics: empty_generics.clone(),
+                bounds: vec![],
+                type_: None,
+            },
+        };
+
+        // `const Item: u8` — associated const (no default value).
+        let assoc_const_item = rustdoc_types::Item {
+            id: Id(11),
+            crate_id: 0,
+            name: Some("Item".to_string()),
+            span: None,
+            visibility: rustdoc_types::Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::AssocConst { type_: Type::Primitive("u8".to_string()), value: None },
+        };
+
+        let mut index: HashMap<Id, Item> = HashMap::new();
+        index.insert(Id(10), assoc_type_item);
+        index.insert(Id(11), assoc_const_item);
+
+        let (map, unsupported) = super::build_trait_method_map(&[Id(10), Id(11)], &index, None);
+
+        assert!(!unsupported, "cross-namespace items must not set the unsupported flag");
+        assert_eq!(
+            map.len(),
+            2,
+            "build_trait_method_map: `type Item` and `const Item` must produce two distinct \
+             map entries (namespace-qualified keys prevent last-write-wins collision); \
+             got map = {map:?}"
+        );
+        assert!(
+            map.contains_key("type:Item"),
+            "map must contain key `type:Item`; got keys = {:?}",
+            map.keys().collect::<Vec<_>>()
+        );
+        assert!(
+            map.contains_key("const:Item"),
+            "map must contain key `const:Item`; got keys = {:?}",
+            map.keys().collect::<Vec<_>>()
+        );
+    }
+
+    /// Two identical traits with both `type Item` and `const Item: u8` must compare
+    /// structurally equal (namespace-qualified keys are symmetric — same keys on both sides).
+    #[test]
+    fn test_traits_structurally_equal_cross_namespace_same_trait_compares_equal() {
+        use rustdoc_types::{Generics, ItemEnum, Type};
+
+        let empty_generics = Generics { params: vec![], where_predicates: vec![] };
+
+        let make_assoc_type_item = |id: u32| rustdoc_types::Item {
+            id: Id(id),
+            crate_id: 0,
+            name: Some("Item".to_string()),
+            span: None,
+            visibility: rustdoc_types::Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::AssocType {
+                generics: empty_generics.clone(),
+                bounds: vec![],
+                type_: None,
+            },
+        };
+
+        let make_assoc_const_item = |id: u32| rustdoc_types::Item {
+            id: Id(id),
+            crate_id: 0,
+            name: Some("Item".to_string()),
+            span: None,
+            visibility: rustdoc_types::Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::AssocConst { type_: Type::Primitive("u8".to_string()), value: None },
+        };
+
+        // A-side: trait with items [type Item, const Item]
+        let (a_type_id, a_const_id) = (Id(20), Id(21));
+        let mut a_index: HashMap<Id, Item> = HashMap::new();
+        a_index.insert(a_type_id, make_assoc_type_item(20));
+        a_index.insert(a_const_id, make_assoc_const_item(21));
+        let a_trait = Trait {
+            is_auto: false,
+            is_unsafe: false,
+            is_dyn_compatible: true,
+            items: vec![a_type_id, a_const_id],
+            generics: empty_generics.clone(),
+            bounds: vec![],
+            implementations: vec![],
+        };
+
+        // C-side: identical trait with items [type Item, const Item] (different item IDs)
+        let (c_type_id, c_const_id) = (Id(30), Id(31));
+        let mut c_index: HashMap<Id, Item> = HashMap::new();
+        c_index.insert(c_type_id, make_assoc_type_item(30));
+        c_index.insert(c_const_id, make_assoc_const_item(31));
+        let c_trait = Trait {
+            is_auto: false,
+            is_unsafe: false,
+            is_dyn_compatible: true,
+            items: vec![c_type_id, c_const_id],
+            generics: empty_generics.clone(),
+            bounds: vec![],
+            implementations: vec![],
+        };
+
+        assert!(
+            traits_structurally_equal(&a_trait, &c_trait, &a_index, &c_index),
+            "two identical traits with cross-namespace `type Item` + `const Item` must compare \
+             structurally equal (namespace-qualified keys are symmetric)"
+        );
+    }
 }

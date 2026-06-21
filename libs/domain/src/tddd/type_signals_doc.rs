@@ -27,7 +27,7 @@ pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 1;
 
 /// In-memory representation of `<layer>-type-signals.json` (schema_version 1).
 ///
-/// Records the output of a single `sotp track type-signals` run for one layer:
+/// Records the output of a single `sotp signal calc-impl-catalog` run for one layer:
 /// the per-type confidence signals, the generation timestamp, and a SHA-256
 /// fingerprint of the declaration file bytes at evaluation time. The
 /// fingerprint enables `verify_from_spec_json` to detect stale evaluation

@@ -42,6 +42,8 @@ use serde::{Deserialize, de};
 use thiserror::Error;
 
 mod decode;
+mod decode_assoc;
+mod decode_impls;
 mod decode_roles;
 mod dto;
 mod dto_roles;
@@ -253,7 +255,7 @@ impl CatalogueDocumentCodec {
                     to: SCHEMA_VERSION,
                     reason: "role wire format changed from string to discriminated-object in v5; \
                              re-generate the catalogue via the type-designer agent, \
-                             then run `sotp track type-signals`",
+                             then run `sotp signal calc-impl-catalog`",
                 });
             }
             actual => {
@@ -1272,6 +1274,154 @@ mod tests {
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_trait_without_assoc_items_defaults_to_empty() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "PlainPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits.values().next().unwrap();
+
+        assert!(entry.assoc_types.is_empty(), "omitted assoc_types must default to empty");
+        assert!(entry.assoc_consts.is_empty(), "omitted assoc_consts must default to empty");
+    }
+
+    #[test]
+    fn test_trait_assoc_items_decode_and_round_trip() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "ProjectionPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [],
+      "assoc_types": [
+        { "name": "Output", "bounds": ["Send"], "default": "Vec<u8>" }
+      ],
+      "assoc_consts": [
+        { "name": "ID", "ty": "usize", "default_value": "42" }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits.values().next().unwrap();
+
+        assert_eq!(entry.assoc_types.len(), 1);
+        assert_eq!(entry.assoc_types[0].name.as_str(), "Output");
+        assert_eq!(entry.assoc_types[0].bounds[0].as_str(), "Send");
+        assert_eq!(entry.assoc_types[0].default.as_ref().unwrap().as_str(), "Vec<u8>");
+        assert_eq!(entry.assoc_consts.len(), 1);
+        assert_eq!(entry.assoc_consts[0].name.as_str(), "ID");
+        assert_eq!(entry.assoc_consts[0].ty.as_str(), "usize");
+        assert_eq!(entry.assoc_consts[0].default_value.as_ref().map(|e| e.as_str()), Some("42"));
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(encoded.contains("\"assoc_types\""), "assoc_types must encode: {encoded}");
+        assert!(encoded.contains("\"assoc_consts\""), "assoc_consts must encode: {encoded}");
+        assert!(
+            encoded.contains("\"default_value\": \"42\""),
+            "assoc const default_value must encode: {encoded}"
+        );
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_trait_assoc_type_with_invalid_name_returns_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "ProjectionPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [],
+      "assoc_types": [
+        { "name": "Bad-Name", "bounds": [], "default": "usize" }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "invalid associated type names must fail decode, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_trait_assoc_const_empty_default_value_returns_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "ProjectionPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [],
+      "assoc_consts": [
+        { "name": "ID", "ty": "usize", "default_value": "" }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "empty associated const default_value must fail decode, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_trait_method_and_assoc_const_same_name_returns_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "ProjectionPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [
+        { "name": "ID", "params": [], "returns": "()" }
+      ],
+      "assoc_consts": [
+        { "name": "ID", "ty": "usize" }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "methods and associated consts share the value namespace, got: {result:?}"
+        );
     }
 
     #[test]

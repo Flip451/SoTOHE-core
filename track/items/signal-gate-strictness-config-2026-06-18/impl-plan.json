@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "D7: Add `libs/domain/src/chain.rs` (new file) with the domain-owned chain value objects (`ChainId`, `Strictness`, `GateKind`, `ChainGateEntry`, `SignalGateMatrix`) and pure domain contracts: `ChainIdentity` (associated const ID + GAT Input) and `PersistedSoTChainGate: ChainIdentity` (associated types plus `evaluate_gate` / error mappers). Re-export domain-owned types from `libs/domain/src/lib.rs`. Keep dispatch and I/O traits out of domain: `SoTChain`, `LiveSoTChain`, `LoadablePersistedChain`, `PersistedSoTChain`, and their blanket impls are introduced in the usecase layer by T005. Standard derives: Debug, Clone, Copy, PartialEq, Eq for all enums; Debug, Clone, PartialEq, Eq for structs. No serde on domain types (serde-free constraint). Unit tests: ChainGateEntry::resolve returns correct Strictness for each GateKind variant; SignalGateMatrix::resolve returns correct cell for each (ChainId, GateKind) pair. Estimated diff: ~200 lines.",
+      "status": "done",
+      "commit_hash": "858ff46e7ba4fe4fb7613b4a07cdf3738664d9f7"
+    },
+    {
+      "id": "T002",
+      "description": "D2 / CN-05: Add `domain::chain::check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strictness: Strictness) -> VerifyOutcome` pure domain free function in `libs/domain/src/chain.rs` (or a sub-module `libs/domain/src/chain/check.rs` re-exported from `chain`). This function extracts the Red/Yellow gate logic currently duplicated in `libs/usecase/src/merge_gate/chain2_gate.rs` (inline) and `libs/infrastructure/src/verify/catalogue_spec_signals.rs` (inline) into a single domain-layer pure function, symmetric with the existing `check_spec_doc_signals` (chain ①) and `check_type_signals` (chain ③). Rules: Red signals always `Finding::error` regardless of strictness; Yellow signals → `Finding::error` when `strictness == Strictness::Strict`, `Finding::warning` when `strictness == Strictness::Interim`. Export from `libs/domain/src/lib.rs`. Unit tests: all-blue doc passes; red signal errors regardless of strictness; yellow Strict errors; yellow Interim warns. Estimated diff: ~100 lines.",
+      "status": "done",
+      "commit_hash": "bd7c28ca06d0a72bc909c7fb323194cbce39c839"
+    },
+    {
+      "id": "T003",
+      "description": "D3 / D4: Add `libs/infrastructure/src/verify/signal_gates_config.rs` (new module) with: `StrictnessDto` serde boundary enum mirroring `domain::Strictness` (loader validation maps unknown strictness strings to `InvalidValue`; malformed JSON remains `ParseFailed`); `GateRowDto` serde struct with four `StrictnessDto` fields (adr_user, spec_adr, catalog_spec, impl_catalog); `SignalGatesConfig` serde struct with `schema_version: u32` + `commit_gate: GateRowDto` + `merge_gate: GateRowDto` (`#[serde(rename = \"$schema_version\")]` for the dollar-prefixed key); `SignalGatesConfigError` enum (FileNotFound, ParseFailed, SchemaVersionUnknown, MissingKey, InvalidValue) with Display + Error impls; `load_signal_gates_config(config_path: PathBuf) -> Result<domain::SignalGateMatrix, SignalGatesConfigError>` free function that reads, parses, validates `$schema_version == 1`, checks all required keys, and converts to `domain::SignalGateMatrix` — no implicit fallback on any error. `From<StrictnessDto> for domain::Strictness` impl. Re-export from `libs/infrastructure/src/verify/mod.rs`. Unit tests: valid config round-trips correctly; file-not-found returns FileNotFound; malformed JSON returns ParseFailed; unknown schema_version returns SchemaVersionUnknown; missing key returns MissingKey; invalid strictness string returns InvalidValue. Estimated diff: ~220 lines.",
+      "status": "done",
+      "commit_hash": "3690c6d59be59a457ebd011bbaf6f5aa645a5f58"
+    },
+    {
+      "id": "T004",
+      "description": "D6: (1) Create `.harness/config/signal-gates.json` with the recommended default (commit_gate: adr_user=interim, spec_adr=strict, catalog_spec=strict, impl_catalog=interim; merge_gate: all strict) and `$schema_version: 1`. (2) Create `.harness/config/samples/signal-gates.adr-strict.json` with commit_gate.adr_user=strict variant for users who want adr_user strict at commit time. (3) Update `knowledge/conventions/responsibility-boundary.md` to add `.harness/config/signal-gates.json` to the template-user-editable list, noting the distinction between commit_gate.impl_catalog=interim (TDDD structural necessity) vs commit_gate.adr_user=interim (SoTOHE workflow choice). Estimated diff: ~70 lines.",
+      "status": "done",
+      "commit_hash": "d4edb7f2910b3b78734856f32ebd3b42e2af355f"
+    },
+    {
+      "id": "T005",
+      "description": "D7: Add `libs/usecase/src/chain/traits.rs` with the usecase-owned dispatch/I/O traits `SoTChain`, `LiveSoTChain`, `LoadablePersistedChain`, `PersistedSoTChain`, plus blanket impls `impl<T: LoadablePersistedChain> PersistedSoTChain for T` and `impl<T: PersistedSoTChain> SoTChain for T`. Add `libs/usecase/src/chain/` sub-modules: `adr_user.rs` (AdrUserChain unit struct implementing ChainIdentity + SoTChain + LiveSoTChain — live scan of knowledge/adr/ frontmatter, no persistence file); `spec_adr.rs` (SpecAdrChain unit struct implementing ChainIdentity + PersistedSoTChainGate + LoadablePersistedChain — `evaluate_gate` delegates to `domain::check_spec_doc_signals`, `check_freshness` implements self-consistency check comparing `doc.evaluate_signals()` vs `doc.signals()`); `catalog_spec.rs` (CatalogSpecChain unit struct implementing ChainIdentity + PersistedSoTChainGate + LoadablePersistedChain — `evaluate_gate` delegates to `domain::check_catalogue_spec_signals` (T002), `check_freshness` compares entry_hash from signals doc with current catalogue bytes SHA-256); `impl_catalog.rs` (ImplCatalogChain unit struct implementing ChainIdentity + PersistedSoTChainGate + LoadablePersistedChain — `evaluate_gate` delegates to `domain::check_type_signals`, `check_freshness` compares declaration_hash from type-signals doc with current catalogue bytes SHA-256). Add `mod.rs` to re-export the traits and four chain structs. All four get SoTChain via the usecase blanket impls (chains ①②③ through the empty combining PersistedSoTChain) or direct impl (chain ⓪). Unit/static trait-bound tests: assert AdrUserChain satisfies ChainIdentity + SoTChain + LiveSoTChain, assert SpecAdrChain/CatalogSpecChain/ImplCatalogChain satisfy PersistedSoTChainGate + LoadablePersistedChain + PersistedSoTChain and are accepted by SoTChain-bound helper functions through the blanket impl, and cover freshness/evaluate_gate delegation happy/error paths with mocked persisted documents. Depends on T001 and T002. Estimated diff: ~350 lines.",
+      "status": "done",
+      "commit_hash": "2b0c636ebfe8ed73308f072f5cb0b6f83f105497"
+    },
+    {
+      "id": "T014",
+      "description": "Parser D1 (ADR 2026-06-18-0822 §D1) — `Type::QualifiedPath` builder: Replace the early-return `unresolved_type(\"<qualified_path>\")` branch at `libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs` line 60-63 with a builder that constructs `rustdoc_types::Type::QualifiedPath { name, self_type, trait_, args }`. Use `convert_type` recursively on `qself.ty` for `self_type`, `resolve_trait_bound_path` on the path segments before `qself.position` for `trait_`, the immediately-following segment ident for `name`, and `convert_generic_args` on that segment's generic arguments for `args`. Do not touch `format_qualified_path_with`, `methods_structurally_equal`, or the catalogue schema. Add unit tests in the same module covering: simple `<T as Trait>::Assoc` without args, canonical GAT projection `&<Self as ChainIdentity>::Input<'_>`, and qualified-path inside Vec args `Vec<<T as Trait>::Item>`. SIGNAL IMPACT: This task unlocks parser expressiveness only. The production catalogue still uses `\"Self\"` placeholder in `params[].ty`; the existing 4 GAT-related Yellows (`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain`) REMAIN Yellow after this task. Acceptance: `bin/sotp track type-signals` continues to exit 0 (no regression) and the new unit tests pass. Estimated diff: ~60 lines (net addition replaces 4-line stub). Depends on T005. spec_anchors: IN-11, CN-10.",
+      "status": "done",
+      "commit_hash": "12ab11610ac160948f5be747ee45d3d67f8b37a5"
+    },
+    {
+      "id": "T015",
+      "description": "Parser D2 (ADR 2026-06-18-0822 §D2) — `generic_params` context + `Type::Generic` encoding: Add `generic_params: &[&str]` parameter to `parse_type_ref_str` (and propagate through all reachable internal parser entry points). In `convert_type_path`, insert a new step after `resolve_local` (and before the Unresolved fallback): if the single-segment identifier is found in `generic_params`, return `Type::Generic(name)` immediately. Update all infrastructure-side codec callsites that decode `TraitImplDeclV2.for_type` to compute a `generic_params` slice from the entry's `impl_generics: Vec<MethodGenericParam>` names and pass it to the parser. For method signatures, propagate a `generic_params` context derived from trait generics + method generics through `methods[].params[].ty` and `methods[].returns` decoding so that generic-param names are resolved consistently throughout a method signature. Add unit tests using a smoke-test fixture: `for_type: \"T\"` with `impl_generics: [{name: \"T\"}]` → `Type::Generic(\"T\")`; `for_type: \"T\"` with no `impl_generics` → falls through to `Type::ResolvedPath` (existing behaviour preserved). SIGNAL IMPACT: This task unlocks parser expressiveness only. No production catalogue entry with `for_type: \"T\"` + `impl_generics` exists yet; `bin/sotp track type-signals` continues to exit 0 (no regression) after this task. The fixture-level smoke test verifies the new code path independently of the catalogue. The actual catalogue blanket impl entry is NOT added until T016. Acceptance: `bin/sotp track type-signals` exits 0; smoke-test unit tests pass. Estimated diff: ~120 lines. Independent of T014. spec_anchors: IN-12, CN-11.",
+      "status": "done",
+      "commit_hash": "55572c706e015fee023811b40083b5ede38c7ab9"
+    },
+    {
+      "id": "T016",
+      "description": "D3 Formatter dedup (ADR 2026-06-18-0822 §D3): In `libs/infrastructure/src/tddd/signal_evaluator_v2/format/ty_base.rs`, remove the two duplicated QualifiedPath inline arms from `format_type_common_arms` and `fmt_rec`, delegating both to the shared `format_qualified_path_with` helper. Also normalize the empty-path Self-projection trait: in `format_qualified_path_with`, treat `trait_` = `Some(Path { path: \"\" })` the same as `None`, outputting `\"_\"` in both cases. This makes the C-side empty-path Self projection and the A-side `<Self>::Assoc<args>` catalogue literal (parsed as `trait_=None`) converge to the comparison string `<Self as _>::Assoc<args>`, enabling string-equality comparison to pass. Acceptance: `bin/sotp track type-signals` exits 0 (no regression); unit/integration tests demonstrate the DRY dedup and empty-path normalization. spec_anchors: IN-13, CN-13, AC-17.",
+      "status": "done",
+      "commit_hash": "f3e3b9b5e5b491a0c1608987070d84a5af470929"
+    },
+    {
+      "id": "T017",
+      "description": "D4 Catalogue schema extension (ADR 2026-06-18-0822 §D4): Add `assoc_types: Vec<AssocTypeDecl>` and `assoc_consts: Vec<AssocConstDecl>` fields to `TraitEntry` in `libs/domain/src/tddd/catalogue_v2/entries.rs`. `AssocTypeDecl` holds `name: TypeName` / `bounds: Vec<TypeRef>` / `default: Option<TypeRef>`; `AssocConstDecl` holds `name: AssocConstName` / `ty: TypeRef` / `default_value: Option<RustExpression>`, with `AssocConstName` added as a validated newtype for associated const identifiers and `RustExpression` / `RustExpressionError` added as the validated default-expression value object and error type. Both fields default to empty (`#[serde(default)]`) to maintain backward compat with existing TraitEntry JSON, and optional default fields are omitted when `None`. Extend the infrastructure codecs `catalogue_document_codec` and `encoder_state_fn_trait_codec` to emit `ItemEnum::AssocType` / `ItemEnum::AssocConst` items. GAT lifetime / type params are intentionally excluded from `AssocTypeDecl` per OS-09. Do NOT relax `items.len` comparison in `trait_eq.rs` per OS-10. spec_anchors: IN-14, CN-15, OS-09, OS-10, AC-18.",
+      "status": "done",
+      "commit_hash": "f3e3b9b5e5b491a0c1608987070d84a5af470929"
+    },
+    {
+      "id": "T018",
+      "description": "D3c Catalogue declarations update (plan-artifact authoring): Update `domain-types.json` and `usecase-types.json` to reflect the canonical forms now supported by the D3 formatter and D4 schema. (1) Revise GAT projection `params[].ty` entries across domain-owned `ChainIdentity` / `PersistedSoTChainGate` and usecase-owned `SoTChain` / `LiveSoTChain` / `LoadablePersistedChain` / `PersistedSoTChain` trait methods from the old `\"Self\"` placeholder to the `<Self>::Assoc<'_>` canonical form (qself position=0, trait_=None). (2) Add `assoc_types` and `assoc_consts` declarations to the trait entries that own associated items (`ChainIdentity`, `LiveSoTChain`, `PersistedSoTChainGate`) while keeping the empty combining `PersistedSoTChain` entry at `assoc_types: []` / `assoc_consts: []`. (3) Add or confirm the usecase blanket impl entry `{ \"action\": \"add\", \"trait_ref\": \"usecase::chain::SoTChain\", \"for_type\": \"T\", \"impl_generics\": [...], \"impl_where_predicates\": [...] }`. This is a plan-artifact-only change (no source code). Acceptance: `bin/sotp track type-signals` (or `signal calc-impl-catalog`) shows the trait methods and assoc-item declarations as 🔵 Blue. spec_anchors: CN-14, AC-14, AC-15.",
+      "status": "done",
+      "commit_hash": "f3e3b9b5e5b491a0c1608987070d84a5af470929"
+    },
+    {
+      "id": "T019",
+      "description": "Blanket-impl `#[doc(hidden)]` removal + final signal verification (ADR 2026-06-18-0822 §D2 / CN-12): Strip `#[doc(hidden)]` and its accompanying schema-limitation comment from `libs/usecase/src/chain/traits.rs` on the `impl<T: PersistedSoTChain> SoTChain for T` blanket impl, making it visible to rustdoc. Run `bin/sotp signal calc-impl-catalog` (or equivalent) and verify: the usecase blanket impl entry transitions from 🟡 Yellow `RustSourceAbsent` to 🔵 Blue; the trait methods and assoc-item declarations from T018 remain 🔵 Blue; no new Yellows or Reds appear. Final state: domain/usecase TDDD signals all Blue. Depends on T016, T017, T018. spec_anchors: CN-12, AC-16, AC-19.",
+      "status": "done",
+      "commit_hash": "f3e3b9b5e5b491a0c1608987070d84a5af470929"
+    },
+    {
+      "id": "T006",
+      "description": "D2 / D5: (1) Add `libs/infrastructure/src/verify/adr_signals.rs::execute_verify_adr_signals_with_strict(project_root: &Path, strict: bool)` — when `strict=true`, `ReviewFindingRef` (Yellow) promotes to `Finding::error`; Red (`NoGrounds`) always errors; `Grandfathered` always skip. Keep `execute_verify_adr_signals(project_root)` as the non-strict compatibility delegate to `_with_strict(project_root, false)`. (2) Add `read_adr_verify_report(&self, branch: String) -> BlobFetchResult<domain::AdrVerifyReport>` method to the `TrackBlobReader` trait in `libs/usecase/src/merge_gate.rs`, with a corresponding adapter impl that scans ADR frontmatter for the target branch and returns the domain report without exposing a filesystem path to the usecase layer. (3) Modify the merge-gate caller at the CLI/infrastructure boundary to load `SignalGateMatrix` via `load_signal_gates_config` and pass the validated domain matrix into `usecase::merge_gate::check_strict_merge_gate`; the usecase function itself must not depend on infrastructure. (4) Modify `check_strict_merge_gate` to accept that `domain::SignalGateMatrix`, pass its existing `branch` argument to `reader.read_adr_verify_report(branch)`, resolve `GateKind::Merge` strictness for all four cells (`adr_user`, `spec_adr`, `catalog_spec`, `impl_catalog`), use the resolved strict bools for the existing chain ①②③ evaluations instead of hardcoded `strict=true`, and add chain ⓪ evaluation via `AdrUserChain::check` (or equivalent report-to-outcome path) with the resolved `merge_gate.adr_user` strictness. Depends on T001, T003, T005. Estimated diff: ~200 lines.",
+      "status": "done",
+      "commit_hash": "12ab11610ac160948f5be747ee45d3d67f8b37a5"
+    },
+    {
+      "id": "T007",
+      "description": "D2 / IN-03 / CN-04: Modify `libs/infrastructure/src/verify/spec_states.rs::verify_from_spec_json` to split Stage1 and Stage2. Stage1 (chain ① `check-spec-adr`): keep `check_spec_doc_signals(&spec_doc, strict)` — add the new self-consistency freshness check: compute `spec_doc.evaluate_signals()` and compare with stored `spec_doc.signals()`; if they differ, return stale error with a message prompting `signal calc-spec-adr`. Stage2 (chain ③ `check-impl-catalog`): extract into a new separate public function (e.g., `verify_type_signals_from_spec_json` or similar) callable independently by the new `signal check-impl-catalog` CLI command, accepting its own `strict: bool`. The existing `verify_from_spec_json` signature is modified per the infrastructure-types.json catalogue (Stage1 only). Ensure backward-compat compile: any internal callers of the old combined function are updated in this same task. Estimated diff: ~200 lines.",
+      "status": "done",
+      "commit_hash": "c73c6f508f45a5a56dbe451126adb9d6963fb12d"
+    },
+    {
+      "id": "T008",
+      "description": "D2 / CN-05 / AC-03: Modify `libs/infrastructure/src/verify/catalogue_spec_signals.rs`: (1) `execute_catalogue_spec_signals` — replace the inline Red/Yellow evaluation logic with a call to `domain::check_catalogue_spec_signals(&doc, strictness)` from T002. (2) `execute_catalogue_spec_signals_check` — same delegation. Also remove the corresponding inline logic from `libs/usecase/src/merge_gate/chain2_gate.rs::check_chain2_for_layer` and replace with a call to `domain::check_catalogue_spec_signals`. This completes the consolidation of the three inline implementations into the single domain pure function. Additionally, expose two `pub` helper functions `compute_catalogue_declaration_hash` and `compute_catalogue_entry_hash` for use by integration tests in other crates that need to build `catalogue-spec-signals.json` fixtures without going through the full refresher pipeline. All existing callers still compile; no existing public API surface changes. Depends on T002. Estimated diff: ~130 lines.",
+      "status": "done"
+    },
+    {
+      "id": "T009",
+      "description": "D1 / D5 / AC-01 / AC-11: Add `apps/cli/src/commands/signal/` module with 8 individual commands and 1 aggregate: `calc_adr_user.rs` (no-persist live display, wired through `CliApp::signal_calc_adr_user` to `infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict(project_root, false)` while `AdrUserChain::calc_live` remains the usecase taxonomy placeholder); `check_adr_user.rs` (same verifier path with strictness resolved from --strict flag or --gate + load_signal_gates_config); `calc_spec_adr.rs` (delegates to SpecAdrChain::calc via PersistedSoTChain, persists signals to spec.json); `check_spec_adr.rs` (delegates to SpecAdrChain::check via SoTChain with freshness, resolves strictness); `calc_catalog_spec.rs` (delegates to CatalogSpecChain::calc); `check_catalog_spec.rs` (delegates to CatalogSpecChain::check with entry_hash freshness); `calc_impl_catalog.rs` (delegates to ImplCatalogChain::calc); `check_impl_catalog.rs` (delegates to ImplCatalogChain::check with declaration_hash freshness); `mod.rs` with SignalCommand enum routing all 8 sub-commands plus aggregate `check --gate commit|merge`. Add `signal` to the top-level sotp command enum. UI uses `catalog` spelling (not `catalogue`). Each `check-*` accepts `--strict` override and `--gate commit|merge` for config-driven resolution. The aggregate `signal check --gate` runs all 4 chains in order and aggregates findings. Tests: parser/dispatch tests for all 8 commands and aggregate `signal check --gate`, strict-vs-gate resolution tests (including invalid flag combinations if mutually exclusive), config-driven strictness cell selection for commit/merge, aggregate all-four-chain execution with mocked outcomes, and CLI surface assertions that command names use `catalog` spelling and no old command aliases remain. Depends on T001, T003, T005, T006, T007, T008. Estimated diff: ~420 lines.",
+      "status": "done"
+    },
+    {
+      "id": "T010",
+      "description": "D5 / AC-07: Final cleanup after Makefile/CI and docs references have moved to the new `signal` namespace. Remove old CLI commands that are superseded by the new `signal` namespace. In `apps/cli/src/commands/verify.rs`: remove `AdrSignals` variant (→ `signal check-adr-user`), remove `CatalogueSpecSignals` variant (→ `signal check-catalog-spec`), remove `SpecStates` variant (→ `signal check-spec-adr` + `signal check-impl-catalog`). In `apps/cli/src/commands/track/signals.rs`: remove or repurpose `sotp track signals` (→ `signal calc-spec-adr`). In `apps/cli/src/commands/track/tddd/signals.rs`: remove `sotp track type-signals` (→ `signal calc-impl-catalog`). In `apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs`: remove `sotp track catalogue-spec-signals` (→ `signal calc-catalog-spec`). No backward-compat aliases per AC-07 / OS-06 / no-backward-compat.md. Also remove corresponding CLI composition wiring in `apps/cli-composition/` for the removed commands. Depends on T009, T011, T012. Estimated diff: ~300 lines (deletions-heavy).",
+      "status": "done"
+    },
+    {
+      "id": "T011",
+      "description": "D5 / AC-07: Update `Makefile.toml` to replace all references to old commands with the new `signal` namespace while old commands still exist, so each task boundary remains CI-runnable. Key changes: (1) `track-active-gate` script: `bin/sotp track type-signals` → `bin/sotp signal calc-impl-catalog`; `bin/sotp track catalogue-spec-signals` → `bin/sotp signal calc-catalog-spec`. (2) `verify-adr-signals-local` task: replace `verify adr-signals` arg with `signal check-adr-user --gate commit`. (3) `verify-spec-states-current-local` task: replace `verify spec-states` with `signal check-spec-adr --gate commit` + add separate `signal check-impl-catalog --gate commit`. (4) `check-catalogue-spec-signals-local` task: replace `verify catalogue-spec-signals` with `signal check-catalog-spec --gate commit`. (5) Update `ci-local` and `ci` dependency arrays to reference new task names. (6) Remove task definitions for `verify-adr-signals` / `verify-spec-states-current-local` / `check-catalogue-spec-signals-local` that directly called old commands, and add new equivalents. Depends on T009. Estimated diff: ~120 lines.",
+      "status": "done"
+    },
+    {
+      "id": "T012",
+      "description": "D5 / AC-07: Update all remaining internal references to old signal commands. (1) Any `.claude/` hook scripts or agent prompts referencing `track signals` / `track type-signals` / `track catalogue-spec-signals` / `verify spec-states` / `verify adr-signals` / `verify catalogue-spec-signals` → replace with new `signal` namespace equivalents. (2) Update `knowledge/` documentation files and convention files that reference the old commands. (3) Update any `CLAUDE.md` / `README.md` references. (4) Update `track/tech-stack.md` if it references old commands. (5) Verify `architecture-rules.json` and `Makefile.toml` are consistent (no orphaned task references). No alias period. Depends on T011. Estimated diff: ~100 lines.",
+      "status": "done"
+    },
+    {
+      "id": "T013",
+      "description": "D4 / AC-05: Add comprehensive unit tests for `load_signal_gates_config` covering all hard-error scenarios: (1) file not found → `SignalGatesConfigError::FileNotFound`; (2) malformed JSON → `ParseFailed`; (3) `$schema_version` = 0 or 99 → `SchemaVersionUnknown`; (4) missing `commit_gate` object → `MissingKey`; (5) missing individual chain×gate cell → `MissingKey`; (6) invalid strictness string (e.g. `\"permissive\"`) → `InvalidValue`; (7) valid config with recommended defaults → Ok with expected `SignalGateMatrix`; (8) valid config with all-strict → Ok. Also add integration-level test verifying that the committed `.harness/config/signal-gates.json` (T004) parses successfully. Add unit tests for `SignalGatesConfigError::Display` variants (actionable messages). Depends on T003, T004. Estimated diff: ~200 lines.",
+      "status": "done"
+    },
+    {
+      "id": "T020",
+      "description": "CN-16 / CN-17 / D8 ADR-conformance refactor — per-layer-argless usecase orchestrators + CLI thin-wire + Makefile cleanup: (1) Add new port trait `SignalLayerReader` in `libs/usecase/src/signal/` with 3 methods: `active_track_id() -> Result<TrackId, ...>`, `enabled_layers(track_id: TrackId) -> Result<Vec<LayerId>, ...>`, `catalogue_bytes(track_id: TrackId, layer: LayerId) -> Result<Option<Vec<u8>>, ...>`. The usecase function calls `active_track_id()`, then passes the resolved `TrackId` to `enabled_layers` and `catalogue_bytes` — making active-track resolution an explicit usecase-owned step (D8-4). Implement 4 usecase orchestrator functions: `calc_impl_catalog<R, F>(reader: &R, per_layer_fn: F) -> VerifyOutcome where R: SignalLayerReader, F: Fn(LayerId, &str, &str) -> VerifyOutcome` (the 3rd `&str` argument is `track_id_str`, supplied by the usecase orchestrator after it resolves the active track ID — keeping active-track resolution out of cli-composition per CN-17/D8-4), and similarly for `calc_catalog_spec<R, F>`, `check_impl_catalog<R, F>(reader: &R, per_layer_fn: F)`, `check_catalog_spec<R, F>(reader: &R, per_layer_fn: F)`. All 4 functions have identical signatures (no `strict: bool` parameter in any). Each function: (a) resolves active track ID; (b) obtains the infrastructure-backed enabled layer list through `reader.enabled_layers(track_id)` and iterates the returned `LayerId` values; (c) per layer reads catalogue bytes, computes SHA-256 hex; (d) calls `per_layer_fn(layer_id, sha256_hex, track_id_str)`. The callback receives layer, hash, and the orchestrator-supplied `track_id_str`; it does not expose per-layer paths or hashes as CLI/composition arguments, and cli-composition itself never re-resolves the active track ID. Output-path construction remains behind infrastructure primitives, while active-track policy remains the usecase-owned `SignalLayerReader` flow; the plan does not specify a second active-track lookup in `apps/cli-composition`. Strictness is captured in the cli-composition closure — for check variants, cli-composition resolves `strict` from `SignalGateMatrix` and passes it to the chain-specific infrastructure check primitive inside the closure (`check_impl_catalog_from_signals_file` or equivalent for chain ③; `check_catalog_spec_from_signals_file` or equivalent for chain ②). The usecase function itself is agnostic to strictness. CLI commands have no per-layer flags (CN-16). Layers with `None` bytes are skipped. (2) Implement the local filesystem `SignalLayerReader` adapter in `libs/infrastructure/src/`; it owns the filesystem-backed `architecture-rules.json` layer enumeration and returns domain `LayerId` values through the port. `apps/cli-composition/src/signal.rs` wires that adapter and wraps infrastructure primitives as layer/hash closures. Those closures receive `|layer_id, hash, track_id_str|` (the 3rd arg supplied by the usecase orchestrator) and delegate output-path resolution to infrastructure; check closures may capture `strict` from the gate matrix, but they do not expose per-layer paths/hashes or define active-track policy. (3) Drop `--signals-path` and `--catalog-hash` from 4 CLI command files (per CN-16). Each shrinks to ≤30 LOC. (4) Simplify `Makefile.toml::track-active-gate` per D8-3. (5) Update doc references. (6) Tests: usecase unit tests with mock `SignalLayerReader` and mock `per_layer_fn`. Acceptance: AC-20, AC-21, AC-22. Depends on T009, T011, T012, T013. Estimated diff: ~500–700 lines.",
+      "status": "done"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Domain Foundation: Chain Types, Traits, and Blanket Impl (D7)",
+        "description": [
+          "Establish the Rust type foundation in `libs/domain/src/chain.rs`: the chain value-object types (ChainId, Strictness, GateKind, ChainGateEntry, SignalGateMatrix) plus pure domain contracts (`ChainIdentity`, `PersistedSoTChainGate`). Usecase-owned dispatch/I/O traits and blanket impls are introduced in `libs/usecase/src/chain/traits.rs` by T005.",
+          "Extract the chain ② Red/Yellow gate logic into `domain::check_catalogue_spec_signals` — a pure domain function symmetric with the existing chain ① and ③ pure functions."
+        ],
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Infrastructure Config Loader and Harness Config Files (D3 / D4 / D6)",
+        "description": [
+          "Add the `signal_gates_config` infrastructure module: DTO structs, `SignalGatesConfigError`, and `load_signal_gates_config` — the single function that reads, validates, and converts `.harness/config/signal-gates.json` to `domain::SignalGateMatrix` with hard errors on any problem.",
+          "Commit the recommended default `.harness/config/signal-gates.json` and the ADR-strict sample variant. Update `responsibility-boundary.md`."
+        ],
+        "task_ids": [
+          "T003",
+          "T004"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Usecase Chain Structs and Trait Impls (D7)",
+        "description": [
+          "Implement the four chain structs in `libs/usecase/src/chain/`: AdrUserChain (LiveSoTChain, no persistence), SpecAdrChain, CatalogSpecChain, ImplCatalogChain (all PersistedSoTChainGate + LoadablePersistedChain, gaining PersistedSoTChain and SoTChain via blanket impls). Each persisted struct wires its evaluate_gate to the appropriate domain pure function and its check_freshness to the appropriate hash comparison mechanism."
+        ],
+        "task_ids": [
+          "T005"
+        ]
+      },
+      {
+        "id": "S8",
+        "title": "Parser Extension + Formatter Dedup + Catalogue Schema + Canonical Declarations + doc(hidden) Removal (ADR 2026-06-18-0822 D1/D2/D3/D4)",
+        "description": [
+          "Six tasks bring the trait taxonomy to 🔵 Blue across parser, formatter, domain schema, catalogue plan-artifact, and the blanket-impl visibility fix.",
+          "T014 (parser D1, DONE/committed 12ab1161): Replace the `qself.is_some()` early-return stub with a full `Type::QualifiedPath` builder. UNLOCKS expressiveness only — GAT-related Yellows remain because the catalogue still uses `\"Self\"` placeholder.",
+          "T015 (parser D2, DONE/committed 55572c70): Add `generic_params: &[&str]` context to `parse_type_ref_str` and insert a `Type::Generic(name)` step after `resolve_local`. UNLOCKS expressiveness only.",
+          "T016 (D3 formatter dedup, implementer): Dedup the two QualifiedPath inline arms in `format_type_common_arms` / `fmt_rec` → single `format_qualified_path_with` delegation. Normalize empty-path Self-projection (`trait_=Some(Path{path:\"\"})`) to `\"_\"` token, converging C-side and A-side to the same string.",
+          "T017 (D4 catalogue schema, domain+infra): Add `assoc_types: Vec<AssocTypeDecl>` and `assoc_consts: Vec<AssocConstDecl>` to `TraitEntry`, with `AssocConstDecl.default_value` represented by the `RustExpression` validated newtype. Extend infra codecs to emit `ItemEnum::AssocType` / `ItemEnum::AssocConst`. Backward-compat: missing fields default to empty. OS-09/OS-10 explicitly NOT done.",
+          "T018 (D3c catalogue declarations, plan-artifact): Update `domain-types.json` and `usecase-types.json`: (a) revise GAT params[].ty from `\"Self\"` placeholder to `<Self>::Assoc<'_>` canonical form; (b) add assoc_types / assoc_consts declarations to the trait entries that own associated items and keep the empty combining `PersistedSoTChain` entry explicitly empty; (c) confirm the usecase blanket impl entry with impl_generics+impl_where_predicates.",
+          "T019 (blanket-impl doc(hidden) removal + final signal check, usecase): Strip `#[doc(hidden)]` from the blanket impl in `libs/usecase/src/chain/traits.rs`. Final verification: domain/usecase signals all Blue.",
+          "EXECUTION ORDER: T014 and T015 are committed. T016 (formatter), T017 (schema), T018 (declarations), and T019 (usecase final signal check) are completed and recorded under commit f3e3b9b5. No S8 commit sequencing remains for the next operator."
+        ],
+        "task_ids": [
+          "T014",
+          "T015",
+          "T016",
+          "T017",
+          "T018",
+          "T019"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Infrastructure Verify Rewiring: strict params, Stage1/Stage2 split, domain delegation (D2)",
+        "description": [
+          "Add `execute_verify_adr_signals_with_strict(project_root, strict)` while keeping `execute_verify_adr_signals(project_root)` as the non-strict delegate. Add `read_adr_verify_report` to `TrackBlobReader`. Wire chain ⓪ into `check_strict_merge_gate`.",
+          "Split `verify_from_spec_json` into Stage1 (check-spec-adr with self-consistency freshness check) and separate Stage2 (check-impl-catalog with independent strict).",
+          "Replace inline Red/Yellow logic in `execute_catalogue_spec_signals*` and `chain2_gate.rs` with calls to `domain::check_catalogue_spec_signals`."
+        ],
+        "task_ids": [
+          "T006",
+          "T007",
+          "T008"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "CLI signal Namespace: 8 Commands + Aggregate check (D1 / D5)",
+        "description": [
+          "Add `apps/cli/src/commands/signal/` with the 8 orthogonal commands (`calc-*` / `check-*` × 4 chains) and the aggregate `signal check --gate commit|merge`. CLI surface uses `catalog` spelling. Each `check-*` resolves strictness from `--strict` or from `load_signal_gates_config` when `--gate` is specified."
+        ],
+        "task_ids": [
+          "T009"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "Makefile / Docs Migration and Old Command Removal (D5 / no-backward-compat)",
+        "description": [
+          "First rewire Makefile.toml and CI to the new `signal` namespace while old commands still exist, then update remaining internal references (hooks, docs, CLAUDE.md), and only then remove superseded CLI commands from verify.rs and track/ sub-commands. No backward-compat alias period."
+        ],
+        "task_ids": [
+          "T011",
+          "T012",
+          "T010"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "Config Validation Tests (D4)",
+        "description": [
+          "Comprehensive unit tests for `load_signal_gates_config` covering all hard-error branches: file not found, parse failure, schema version unknown, missing key, invalid value. Integration test that the committed default config parses to the expected SignalGateMatrix."
+        ],
+        "task_ids": [
+          "T013"
+        ]
+      },
+      {
+        "id": "S9",
+        "title": "ADR-Conformance Refactor: Argless Usecase Orchestrators + CLI Thin-Wire + Makefile Cleanup (CN-16 / CN-17 / D8)",
+        "description": [
+          "Implement the `SignalLayerReader` secondary port trait in `libs/usecase/src/signal/` (methods: `active_track_id`, `enabled_layers`, `catalogue_bytes`; no path methods per D8-4). Implement 4 usecase orchestrator functions (`calc_impl_catalog`, `calc_catalog_spec`, `check_impl_catalog`, `check_catalog_spec`) that use the `SignalLayerReader` port for filesystem access and inject infrastructure primitives via `per_layer_fn: Fn(LayerId, &str, &str) -> VerifyOutcome` (1st `&str` is SHA-256 hex, 2nd `&str` is `track_id_str` supplied by the orchestrator). Active-track resolution and hash computation are performed by the usecase orchestrator for port calls; the callback receives layer + hash + track_id and delegates output-path construction to infrastructure primitives without exposing per-layer path arguments on the CLI/composition boundary. The plan does not specify a second active-track lookup in `apps/cli-composition`. The filesystem-backed TDDD layer enumeration is infrastructure-owned per D8-4 and is consumed by the usecase through `enabled_layers(track_id)` as domain `LayerId` values before iteration — making all four commands callable without per-layer flags from CLI (per CN-16 / CN-17 / D8-4).",
+          "Thin-wire the CLI command files to ≤30 LOC each (per CN-17 / D8-1) by removing `--signals-path` / `--catalog-hash` clap args and delegating all orchestration to the usecase layer.",
+          "Remove the per-layer loop and `sha256sum` calls from `Makefile.toml::track-active-gate`, reducing it to a 3-line bare sequence or deleting it entirely (per AC-22 / D8-3).",
+          "Update any remaining doc references that describe per-layer arg usage."
+        ],
+        "task_ids": [
+          "T020"
+        ]
+      }
+    ]
+  }
+}

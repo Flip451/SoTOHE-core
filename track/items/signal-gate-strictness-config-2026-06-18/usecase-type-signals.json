@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-21T04:03:32Z",
+  "declaration_hash": "23cb3e9d8672a5a570739a2f99e49618e554a246a5529de01be521feecafb5e5",
+  "signals": [
+    {
+      "type_name": "AdrUserChain",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ChainIdentity",
+        "LiveSoTChain",
+        "SoTChain",
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "CatalogSpecChain",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ChainIdentity",
+        "LoadablePersistedChain",
+        "PersistedSoTChainGate",
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "ImplCatalogChain",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ChainIdentity",
+        "LoadablePersistedChain",
+        "PersistedSoTChainGate",
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "LiveSoTChain",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "LoadablePersistedChain",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PersistedSoTChain",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalLayerReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalLayerReaderError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SoTChain",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecAdrChain",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ChainIdentity",
+        "LoadablePersistedChain",
+        "PersistedSoTChainGate",
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyAdrSignalsCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::default::Default",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "usecase::merge_gate::check_strict_merge_gate",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::signal::calc_catalog_spec",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::signal::calc_impl_catalog",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::signal::check_catalog_spec",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::signal::check_impl_catalog",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::signal::resolve_spec_json_path",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "_",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "PersistedSoTChain",
+        "SoTChain"
+      ]
+    },
+    {
+      "type_name": "VerifyAdrSignals",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

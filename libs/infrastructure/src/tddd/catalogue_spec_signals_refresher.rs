@@ -201,7 +201,7 @@ pub fn refresh_one_layer(
             format!("internal: catalogue hash for layer '{layer_id}' is not canonical hex: {e}")
         })?;
 
-    // Summary counts for stdout (same pattern as `sotp track type-signals`).
+    // Summary counts for stdout (same pattern as `sotp signal calc-impl-catalog`).
     let (blue, yellow, red) = count_signals(&signals);
 
     // Build the document and persist atomically.

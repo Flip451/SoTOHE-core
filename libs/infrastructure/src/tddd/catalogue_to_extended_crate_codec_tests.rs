@@ -3,7 +3,7 @@
 use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
-use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+use domain::tddd::catalogue_v2::entries::{AssocConstDecl, AssocTypeDecl, TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::methods::{
     MethodDeclaration, MethodGenericParam, ParamDeclaration,
 };
@@ -11,11 +11,12 @@ use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction, Self
 use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, FieldName, MethodName, ModulePath, ParamName, TraitName,
-    TypeName, TypeRef, VariantName,
+    AssocConstName, CatalogueDocument, CrateName, FieldName, MethodName, ModulePath, ParamName,
+    TraitName, TypeName, TypeRef, VariantName,
 };
 use rustdoc_types::{
-    GenericBound, GenericParamDefKind, Id, ItemEnum, Type, VariantKind, WherePredicate,
+    AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, GenericParamDefKind, Id,
+    ItemEnum, Term, Type, VariantKind, WherePredicate,
 };
 
 use super::*;
@@ -58,6 +59,8 @@ fn test_encode_returns_ambiguous_identifier_when_type_and_trait_share_name() {
             action: ItemAction::Add,
             role: ContractRole::SpecificationPort,
             methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],
             where_predicates: vec![],
@@ -525,6 +528,8 @@ fn test_encode_trait_entry_produces_trait_item() {
             action: ItemAction::Add,
             role: ContractRole::SecondaryPort,
             methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],
             where_predicates: vec![],
@@ -845,6 +850,8 @@ fn test_encode_trait_method_with_has_default_impl_true_produces_has_body_true() 
             action: ItemAction::Add,
             role: ContractRole::SpecificationPort,
             methods: vec![method],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],
             where_predicates: vec![],
@@ -893,6 +900,8 @@ fn test_encode_trait_method_with_has_default_impl_false_produces_has_body_false(
             action: ItemAction::Add,
             role: ContractRole::SpecificationPort,
             methods: vec![method],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],
             where_predicates: vec![],
@@ -1792,6 +1801,8 @@ fn test_trait_decl_generics_encoded_correctly() {
             action: ItemAction::Add,
             role: ContractRole::SpecificationPort,
             methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![method_generic],
             where_predicates: vec![where_pred],
@@ -1940,6 +1951,67 @@ fn test_trait_impl_block_generics_encoded_correctly() {
         "T must appear as LHS of at least one WherePredicate::BoundPredicate in the impl block \
          generics, got: {:?}",
         impl_inner.generics.where_predicates
+    );
+}
+
+#[test]
+fn test_trait_impl_for_type_generic_shadows_same_named_local_type() {
+    let mut doc = make_doc("domain");
+    doc.types.insert(
+        TypeName::new("T").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::value_object(),
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            methods: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+    doc.traits.insert(
+        TraitName::new("Port").unwrap(),
+        TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let mut trait_impl =
+        TraitImplDeclV2::new(TypeRef::new("Port").unwrap(), TypeRef::new("T").unwrap());
+    trait_impl.impl_generics =
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+    doc.trait_impls.push(trait_impl);
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let trait_impl_item = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| matches!(&item.inner, ItemEnum::Impl(i) if i.trait_.is_some()))
+        .expect("must find a trait Impl item");
+    let ItemEnum::Impl(ref impl_inner) = trait_impl_item.inner else {
+        panic!("expected Impl inner");
+    };
+
+    assert_eq!(
+        impl_inner.for_,
+        Type::Generic("T".to_string()),
+        "impl<T> Port for T must encode the impl target as generic T, not the local type named T"
     );
 }
 
@@ -2100,6 +2172,8 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_no_generics() {
             action: ItemAction::Add,
             role: ContractRole::SpecificationPort,
             methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![],
             supertrait_bounds: vec![],
             generics: vec![],         // empty = old catalogue
             where_predicates: vec![], // empty = old catalogue
@@ -2132,5 +2206,360 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_no_generics() {
         t.generics.where_predicates.is_empty(),
         "trait with no generics must encode to empty where_predicates, got: {:?}",
         t.generics.where_predicates
+    );
+}
+
+#[test]
+fn test_trait_assoc_items_encode_trait_generic_projection_types() {
+    let mut doc = make_doc("domain");
+    doc.traits.insert(
+        TraitName::new("ProjectionPort").unwrap(),
+        TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            assoc_types: vec![AssocTypeDecl {
+                name: TypeName::new("Output").unwrap(),
+                bounds: vec![],
+                default: Some(TypeRef::new("Vec<T::Item>").unwrap()),
+            }],
+            assoc_consts: vec![AssocConstDecl {
+                name: AssocConstName::new("ID").unwrap(),
+                ty: TypeRef::new("<T as Iterator>::Item").unwrap(),
+                default_value: None,
+            }],
+            supertrait_bounds: vec![],
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![],
+            }],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = encoded.krate();
+    let trait_item = krate
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("ProjectionPort")
+                && matches!(item.inner, ItemEnum::Trait(_))
+        })
+        .expect("ProjectionPort trait must be encoded");
+    let ItemEnum::Trait(trait_inner) = &trait_item.inner else { panic!("expected Trait") };
+
+    let assoc_type = trait_inner
+        .items
+        .iter()
+        .filter_map(|id| krate.index.get(id))
+        .find(|item| item.name.as_deref() == Some("Output"))
+        .expect("Output associated type must be linked from Trait.items");
+    let ItemEnum::AssocType { type_: Some(Type::ResolvedPath(vec_path)), .. } = &assoc_type.inner
+    else {
+        panic!("expected assoc type default Vec<T::Item>, got {:?}", assoc_type.inner);
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = vec_path.args.as_deref() else {
+        panic!("Vec default must carry generic args: {vec_path:?}");
+    };
+    let Some(GenericArg::Type(Type::QualifiedPath { name, self_type, trait_, .. })) = args.first()
+    else {
+        panic!("Vec<T::Item> arg must encode as QualifiedPath, got {args:?}");
+    };
+    assert_eq!(name, "Item");
+    assert!(trait_.is_none(), "T::Item projection must have no explicit trait path");
+    assert_eq!(self_type.as_ref(), &Type::Generic("T".to_string()));
+
+    let assoc_const = trait_inner
+        .items
+        .iter()
+        .filter_map(|id| krate.index.get(id))
+        .find(|item| item.name.as_deref() == Some("ID"))
+        .expect("ID associated const must be linked from Trait.items");
+    let ItemEnum::AssocConst { type_: Type::QualifiedPath { name, self_type, trait_, .. }, .. } =
+        &assoc_const.inner
+    else {
+        panic!("expected assoc const type <T as Iterator>::Item, got {:?}", assoc_const.inner);
+    };
+    assert_eq!(name, "Item");
+    assert_eq!(self_type.as_ref(), &Type::Generic("T".to_string()));
+    assert!(
+        trait_.as_ref().is_some_and(|path| path.path.ends_with("Iterator")),
+        "expected Iterator trait path, got {trait_:?}"
+    );
+}
+
+#[test]
+fn test_trait_assoc_items_reject_invalid_trait_generic_projection_name() {
+    let mut doc = make_doc("domain");
+    doc.traits.insert(
+        TraitName::new("InvalidProjectionPort").unwrap(),
+        TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            assoc_types: vec![AssocTypeDecl {
+                name: TypeName::new("Output").unwrap(),
+                bounds: vec![],
+                default: Some(TypeRef::new("T::Item-foo").unwrap()),
+            }],
+            assoc_consts: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![],
+            }],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    assert!(
+        matches!(result, Err(domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_))),
+        "invalid associated projection names must fall through to parser validation, got {result:?}"
+    );
+}
+
+#[test]
+fn test_trait_assoc_items_resolve_external_ids_inside_explicit_qualified_paths() {
+    let mut doc = make_doc("domain");
+    doc.traits.insert(
+        TraitName::new("ExternalProjectionPort").unwrap(),
+        TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            assoc_types: vec![],
+            assoc_consts: vec![AssocConstDecl {
+                name: AssocConstName::new("EXTERNAL").unwrap(),
+                ty: TypeRef::new("<ext::Foo as ext::Trait>::Assoc").unwrap(),
+                default_value: None,
+            }],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = encoded.krate();
+    let trait_item = krate
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("ExternalProjectionPort")
+                && matches!(item.inner, ItemEnum::Trait(_))
+        })
+        .expect("ExternalProjectionPort trait must be encoded");
+    let ItemEnum::Trait(trait_inner) = &trait_item.inner else { panic!("expected Trait") };
+
+    let assoc_const = trait_inner
+        .items
+        .iter()
+        .filter_map(|id| krate.index.get(id))
+        .find(|item| item.name.as_deref() == Some("EXTERNAL"))
+        .expect("EXTERNAL associated const must be linked from Trait.items");
+    let ItemEnum::AssocConst { type_: Type::QualifiedPath { self_type, trait_, .. }, .. } =
+        &assoc_const.inner
+    else {
+        panic!("expected explicit qualified path type, got {:?}", assoc_const.inner);
+    };
+    let Type::ResolvedPath(self_path) = self_type.as_ref() else {
+        panic!("expected external self type path, got {self_type:?}");
+    };
+    assert_eq!(self_path.path, "ext::Foo");
+    assert_ne!(
+        self_path.id,
+        Id(UNRESOLVED_CRATE_ID),
+        "qualified-path self_type external id must be resolved"
+    );
+    assert!(
+        krate.paths.contains_key(&self_path.id),
+        "resolved external self_type id must have a path summary"
+    );
+
+    let trait_path = trait_.as_ref().expect("qualified path must keep the explicit trait path");
+    assert_eq!(trait_path.path, "ext::Trait");
+    assert_ne!(
+        trait_path.id,
+        Id(UNRESOLVED_CRATE_ID),
+        "qualified-path trait external id must be resolved"
+    );
+    assert!(
+        krate.paths.contains_key(&trait_path.id),
+        "resolved external trait id must have a path summary"
+    );
+}
+
+#[test]
+fn test_trait_assoc_items_rewrite_nested_trait_generic_projections() {
+    fn assert_t_item_projection(ty: &Type, context: &str) {
+        let Type::QualifiedPath { name, self_type, trait_, .. } = ty else {
+            panic!("{context}: expected T::Item qualified projection, got {ty:?}");
+        };
+        assert_eq!(name, "Item", "{context}: associated item name");
+        assert!(trait_.is_none(), "{context}: T::Item must have no explicit trait path");
+        assert_eq!(
+            self_type.as_ref(),
+            &Type::Generic("T".to_string()),
+            "{context}: projection self type"
+        );
+    }
+
+    fn iterator_item_constraint_type<'a>(path: &'a rustdoc_types::Path, context: &str) -> &'a Type {
+        let Some(GenericArgs::AngleBracketed { constraints, .. }) = path.args.as_deref() else {
+            panic!("{context}: expected Iterator associated-item constraint args, got {path:?}");
+        };
+        let item_constraint = constraints
+            .iter()
+            .find(|constraint| constraint.name == "Item")
+            .expect("Iterator<Item = ...> constraint must be present");
+        let AssocItemConstraintKind::Equality(Term::Type(ty)) = &item_constraint.binding else {
+            panic!("{context}: expected Item equality type, got {:?}", item_constraint.binding);
+        };
+        ty
+    }
+
+    fn assert_iterator_constraint_projects_t_item(path: &rustdoc_types::Path, context: &str) {
+        let ty = iterator_item_constraint_type(path, context);
+        assert_t_item_projection(ty, context);
+    }
+
+    let mut doc = make_doc("domain");
+    doc.traits.insert(
+        TraitName::new("NestedProjectionPort").unwrap(),
+        TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            assoc_types: vec![
+                AssocTypeDecl {
+                    name: TypeName::new("FnOutput").unwrap(),
+                    bounds: vec![],
+                    default: Some(TypeRef::new("fn() -> T::Item").unwrap()),
+                },
+                AssocTypeDecl {
+                    name: TypeName::new("ImplOutput").unwrap(),
+                    bounds: vec![],
+                    default: Some(TypeRef::new("impl Iterator<Item = T::Item>").unwrap()),
+                },
+                AssocTypeDecl {
+                    name: TypeName::new("DynOutput").unwrap(),
+                    bounds: vec![],
+                    default: Some(TypeRef::new("dyn Iterator<Item = T::Item>").unwrap()),
+                },
+                AssocTypeDecl {
+                    name: TypeName::new("BoundedOutput").unwrap(),
+                    bounds: vec![TypeRef::new("Iterator<Item = T::Item>").unwrap()],
+                    default: None,
+                },
+                AssocTypeDecl {
+                    name: TypeName::new("ShadowedOutput").unwrap(),
+                    bounds: vec![TypeRef::new("Iterator<Item = From>").unwrap()],
+                    default: None,
+                },
+            ],
+            assoc_consts: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![
+                MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
+                MethodGenericParam { name: ParamName::new("From").unwrap(), bounds: vec![] },
+            ],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = encoded.krate();
+    assert!(
+        !krate.external_crates.values().any(|krate| krate.name == "T"),
+        "trait generic projection T::Item must not register T as an external crate: {:?}",
+        krate.external_crates
+    );
+    let trait_item = krate
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("NestedProjectionPort")
+                && matches!(item.inner, ItemEnum::Trait(_))
+        })
+        .expect("NestedProjectionPort trait must be encoded");
+    let ItemEnum::Trait(trait_inner) = &trait_item.inner else { panic!("expected Trait") };
+
+    let find_assoc_type = |assoc_name: &str| {
+        trait_inner
+            .items
+            .iter()
+            .filter_map(|id| krate.index.get(id))
+            .find(|item| item.name.as_deref() == Some(assoc_name))
+            .unwrap_or_else(|| {
+                panic!("{assoc_name} associated type must be linked from Trait.items")
+            })
+    };
+
+    let ItemEnum::AssocType { type_: Some(Type::FunctionPointer(fn_ptr)), .. } =
+        &find_assoc_type("FnOutput").inner
+    else {
+        panic!("FnOutput must encode as a function pointer");
+    };
+    let fn_output = fn_ptr.sig.output.as_ref().expect("function pointer must have output type");
+    assert_t_item_projection(fn_output, "function pointer output");
+
+    let ItemEnum::AssocType { type_: Some(Type::ImplTrait(bounds)), .. } =
+        &find_assoc_type("ImplOutput").inner
+    else {
+        panic!("ImplOutput must encode as impl Trait");
+    };
+    let Some(GenericBound::TraitBound { trait_: impl_trait_path, .. }) = bounds.first() else {
+        panic!("ImplOutput must carry an Iterator trait bound, got {bounds:?}");
+    };
+    assert_iterator_constraint_projects_t_item(impl_trait_path, "impl trait constraint");
+
+    let ItemEnum::AssocType { type_: Some(Type::DynTrait(dyn_trait)), .. } =
+        &find_assoc_type("DynOutput").inner
+    else {
+        panic!("DynOutput must encode as dyn Trait");
+    };
+    let Some(poly_trait) = dyn_trait.traits.first() else {
+        panic!("DynOutput must carry an Iterator trait");
+    };
+    assert_iterator_constraint_projects_t_item(&poly_trait.trait_, "dyn trait constraint");
+
+    let ItemEnum::AssocType { bounds, .. } = &find_assoc_type("BoundedOutput").inner else {
+        panic!("BoundedOutput must encode as an associated type");
+    };
+    let Some(GenericBound::TraitBound { trait_: bounded_trait_path, .. }) = bounds.first() else {
+        panic!("BoundedOutput must carry an Iterator trait bound, got {bounds:?}");
+    };
+    assert_iterator_constraint_projects_t_item(bounded_trait_path, "assoc type bound constraint");
+
+    let ItemEnum::AssocType { bounds, .. } = &find_assoc_type("ShadowedOutput").inner else {
+        panic!("ShadowedOutput must encode as an associated type");
+    };
+    let Some(GenericBound::TraitBound { trait_: shadowed_trait_path, .. }) = bounds.first() else {
+        panic!("ShadowedOutput must carry an Iterator trait bound, got {bounds:?}");
+    };
+    let shadowed_item_type =
+        iterator_item_constraint_type(shadowed_trait_path, "shadowed generic bound constraint");
+    assert_eq!(
+        shadowed_item_type,
+        &Type::Generic("From".to_string()),
+        "trait generic `From` must shadow the std prelude trait in assoc type bounds"
     );
 }

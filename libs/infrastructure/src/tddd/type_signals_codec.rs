@@ -55,7 +55,7 @@ pub enum TypeSignalsCodecError {
 
     #[error(
         "unsupported schema_version: expected 1, got {0}. \
-         Re-run `sotp track type-signals` with the current sotp build to \
+         Re-run `sotp signal calc-impl-catalog` with the current sotp build to \
          regenerate the signal file (declaration_hash algorithm is pinned at \
          schema_version 1: raw SHA-256 of declaration file bytes post-encode)."
     )]

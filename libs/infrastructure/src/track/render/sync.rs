@@ -382,7 +382,7 @@ pub fn sync_rendered_views(
                             // T020 Cat-Spec column (ADR 2026-04-23-0344 §D2.5).
                             // Opt-in gated; fail-closed on missing / symlinked /
                             // malformed / stale — remediation is documented in
-                            // the error message (`sotp track catalogue-spec-signals
+                            // the error message (`sotp signal calc-catalog-spec
                             // <track_id>`). Opt-out layers render the legacy
                             // 5-column view (None).
                             let v3_spec_signals_doc = if binding.catalogue_spec_signal_enabled() {

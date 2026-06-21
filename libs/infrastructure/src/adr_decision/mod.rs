@@ -19,10 +19,14 @@
 pub mod adapter;
 mod dto;
 pub mod error;
+pub mod git_blob_adapter;
 pub mod parse;
+#[cfg(test)]
+pub(crate) mod test_support;
 
 pub use adapter::FsAdrFileAdapter;
 pub use error::AdrFrontMatterCodecError;
+pub use git_blob_adapter::GitBlobAdrFileAdapter;
 pub use parse::parse_adr_frontmatter;
 // Re-export the port trait so callers don't need to import from `domain` directly.
 pub use domain::AdrFilePort;

@@ -158,6 +158,111 @@ pub(crate) fn git_show_blob(repo_root: &Path, branch: &str, path: &str) -> BlobR
     }
 }
 
+/// Lists regular-file blob entries directly under `origin/<branch>:<dir_path>/`.
+///
+/// Runs `git ls-tree origin/<branch> -- <dir_path>/` (note trailing slash) and
+/// parses each output line.
+///
+/// ## Fail-closed symlink / submodule policy
+///
+/// Symlink (`120000`) and submodule (`160000`) entries are **rejected** with an
+/// `Err` rather than silently skipped. Silently skipping them would create a
+/// security gap: a PR that replaces all `.md` ADR files with symlinks would
+/// produce an empty listing, causing the caller to treat the directory as absent
+/// (vacuously green) and bypass the symlink check entirely.
+///
+/// Other unexpected modes (not `100644`, `100755`, `120000`, or `160000`) are
+/// silently skipped because they are git internals (e.g. `040000` for a nested
+/// tree) that are not meaningful in a flat directory listing.
+///
+/// Returns the repo-relative path of each included entry in the form
+/// `<dir_path>/<filename>` (using `/` as separator), sorted in ascending
+/// byte order.
+///
+/// # Return value
+///
+/// - `Ok(paths)` — listing succeeded; `paths` may be empty when the directory
+///   is absent or contains no regular files.
+/// - `Err(msg)` — git spawn failure, non-zero git exit, or a symlink /
+///   submodule entry was found in the directory (fail-closed).
+///
+/// # Errors
+///
+/// Returns `Err(String)` on spawn failure, non-zero git exit, or a symlink /
+/// submodule entry detected in the output.
+pub(crate) fn git_ls_tree_dir(
+    repo_root: &Path,
+    branch: &str,
+    dir_path: &str,
+) -> Result<Vec<String>, String> {
+    let git_ref = format!("origin/{branch}");
+    // Trailing slash is important: it tells git ls-tree to list the directory's
+    // direct children rather than the directory entry itself.
+    let dir_arg = format!("{dir_path}/");
+    let output = spawn_git(repo_root, &["ls-tree", &git_ref, "--", &dir_arg])
+        .map_err(|e| format!("failed to run git ls-tree for {dir_path}: {e}"))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!(
+            "git ls-tree failed for {dir_path} (exit {}): {}",
+            output.status.code().unwrap_or(-1),
+            stderr.trim()
+        ));
+    }
+
+    // `git ls-tree` output format per entry:
+    //   <mode> SP <type> SP <hash> TAB <path>\n
+    //
+    // When listing with a trailing slash (`knowledge/adr/`), git returns the
+    // repo-relative path of each direct child, e.g.:
+    //   100644 blob abc123\tknowledge/adr/2026-01-01-foo.md
+    //
+    // The TAB-separated path field is already the full repo-relative path, so
+    // we use it directly without adding a `dir_path/` prefix.
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let mut paths: Vec<String> = Vec::new();
+    for line in stdout.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        // Format: <mode> <type> <hash>\t<repo-relative-path>
+        let mode_str = line.split_whitespace().next().unwrap_or("");
+        let mode = match u32::from_str_radix(mode_str, 8) {
+            Ok(m) => m,
+            Err(_) => continue, // skip unparseable lines (not a valid git ls-tree line)
+        };
+        // Fail-closed: reject symlinks and submodules rather than skipping them.
+        // Silently skipping would allow a PR to replace all .md files with symlinks,
+        // yielding an empty listing and a vacuously green chain.
+        if mode == 0o120_000 {
+            let repo_path = line.split_once('\t').map(|x| x.1.trim()).unwrap_or("<unknown>");
+            return Err(format!(
+                "symlink is not allowed at {repo_path} in {dir_path} (fail-closed: use a regular file)"
+            ));
+        }
+        if mode == 0o160_000 {
+            let repo_path = line.split_once('\t').map(|x| x.1.trim()).unwrap_or("<unknown>");
+            return Err(format!(
+                "submodule is not allowed at {repo_path} in {dir_path} (fail-closed)"
+            ));
+        }
+        // Skip other non-regular-file modes (e.g. nested trees 040000) without error.
+        if !matches!(mode, 0o100_644 | 0o100_755) {
+            continue;
+        }
+        // Extract the repo-relative path after the TAB separator.
+        let repo_path = match line.split_once('\t').map(|x| x.1) {
+            Some(p) => p.trim(),
+            None => continue,
+        };
+        paths.push(repo_path.to_owned());
+    }
+    paths.sort();
+    Ok(paths)
+}
+
 /// Safely fetches a blob from `origin/<branch>:<path>` with fail-closed
 /// symlink and submodule rejection.
 ///
@@ -195,7 +300,6 @@ pub(crate) fn fetch_blob_safe(repo_root: &Path, branch: &str, path: &str) -> Blo
 #[allow(clippy::unwrap_used, clippy::panic, clippy::indexing_slicing, clippy::expect_used)]
 mod tests {
     use super::*;
-    use std::process::Command;
 
     // --- is_path_not_found_stderr ---
 
@@ -229,27 +333,7 @@ mod tests {
     // command path.
 
     fn git(cwd: &Path, args: &[&str]) {
-        let output = Command::new("git")
-            .env("LANG", "C")
-            .env("LC_ALL", "C")
-            .env("LANGUAGE", "C")
-            // Use a local identity so commits don't fail on CI agents.
-            .env("GIT_AUTHOR_NAME", "test")
-            .env("GIT_AUTHOR_EMAIL", "test@example.com")
-            .env("GIT_COMMITTER_NAME", "test")
-            .env("GIT_COMMITTER_EMAIL", "test@example.com")
-            .args(args)
-            .current_dir(cwd)
-            .output()
-            .expect("git command failed to spawn");
-        if !output.status.success() {
-            panic!(
-                "git {:?} failed: stdout={} stderr={}",
-                args,
-                String::from_utf8_lossy(&output.stdout),
-                String::from_utf8_lossy(&output.stderr)
-            );
-        }
+        crate::verify::test_support::git_with_identity(cwd, args);
     }
 
     fn setup_repo_with_file(filename: &str, contents: &[u8]) -> tempfile::TempDir {
@@ -368,6 +452,103 @@ mod tests {
                 assert!(msg.contains("symlink"), "expected symlink message, got: {msg}");
             }
             other => panic!("expected CommandFailed(symlink), got {other:?}"),
+        }
+    }
+
+    // --- git_ls_tree_dir ---
+
+    /// Creates a repo with a directory containing multiple files for ls-tree tests.
+    fn setup_repo_with_dir(dir_name: &str, files: &[(&str, &[u8])]) -> tempfile::TempDir {
+        let tmp = tempfile::tempdir().unwrap();
+        let repo = tmp.path();
+        git(repo, &["init", "--quiet", "--initial-branch=main"]);
+        if files.is_empty() {
+            // Commit a placeholder so the initial commit is non-empty.
+            std::fs::write(repo.join(".gitkeep"), b"").unwrap();
+            git(repo, &["add", ".gitkeep"]);
+        } else {
+            let sub = repo.join(dir_name);
+            std::fs::create_dir_all(&sub).unwrap();
+            for (name, contents) in files {
+                std::fs::write(sub.join(name), contents).unwrap();
+            }
+            git(repo, &["add", dir_name]);
+        }
+        git(repo, &["commit", "--quiet", "-m", "initial"]);
+        git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
+        git(repo, &["fetch", "--quiet", "origin"]);
+        tmp
+    }
+
+    #[test]
+    fn test_git_ls_tree_dir_empty_dir_returns_empty() {
+        // A dir with no files → empty list (placeholder commit outside the dir).
+        let dir = setup_repo_with_dir("knowledge/adr", &[]);
+        let paths = git_ls_tree_dir(dir.path(), "main", "knowledge/adr").unwrap();
+        assert!(paths.is_empty(), "expected empty list for absent dir, got {paths:?}");
+    }
+
+    #[test]
+    fn test_git_ls_tree_dir_non_existent_dir_returns_empty() {
+        // A dir that was never committed → ls-tree returns nothing (exit 0, empty stdout).
+        let dir = setup_repo_with_dir("knowledge/adr", &[]);
+        let paths = git_ls_tree_dir(dir.path(), "main", "does/not/exist").unwrap();
+        assert!(paths.is_empty(), "expected empty for absent dir, got {paths:?}");
+    }
+
+    #[test]
+    fn test_git_ls_tree_dir_single_file_returns_repo_relative_path() {
+        let dir = setup_repo_with_dir("knowledge/adr", &[("2026-01-01-0001-foo.md", b"# foo")]);
+        let paths = git_ls_tree_dir(dir.path(), "main", "knowledge/adr").unwrap();
+        assert_eq!(paths, vec!["knowledge/adr/2026-01-01-0001-foo.md".to_owned()], "got {paths:?}");
+    }
+
+    #[test]
+    fn test_git_ls_tree_dir_multiple_files_returns_sorted() {
+        let dir = setup_repo_with_dir(
+            "knowledge/adr",
+            &[
+                ("2026-01-02-0002-bar.md", b"# bar"),
+                ("2026-01-01-0001-foo.md", b"# foo"),
+                ("2026-01-03-0003-baz.md", b"# baz"),
+            ],
+        );
+        let paths = git_ls_tree_dir(dir.path(), "main", "knowledge/adr").unwrap();
+        assert_eq!(
+            paths,
+            vec![
+                "knowledge/adr/2026-01-01-0001-foo.md".to_owned(),
+                "knowledge/adr/2026-01-02-0002-bar.md".to_owned(),
+                "knowledge/adr/2026-01-03-0003-baz.md".to_owned(),
+            ],
+            "paths must be sorted; got {paths:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_git_ls_tree_dir_rejects_symlinks() {
+        // A symlink committed inside the dir must cause an Err (fail-closed),
+        // not be silently skipped. Silently skipping would allow an attacker to
+        // replace .md files with symlinks and get a vacuously-green listing.
+        let tmp = tempfile::tempdir().unwrap();
+        let repo = tmp.path();
+        git(repo, &["init", "--quiet", "--initial-branch=main"]);
+        let adr_dir = repo.join("knowledge/adr");
+        std::fs::create_dir_all(&adr_dir).unwrap();
+        std::fs::write(adr_dir.join("real.md"), b"# real").unwrap();
+        std::os::unix::fs::symlink("real.md", adr_dir.join("link.md")).unwrap();
+        git(repo, &["add", "knowledge"]);
+        git(repo, &["commit", "--quiet", "-m", "add files"]);
+        git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
+        git(repo, &["fetch", "--quiet", "origin"]);
+
+        let result = git_ls_tree_dir(repo, "main", "knowledge/adr");
+        match result {
+            Err(msg) => {
+                assert!(msg.contains("symlink"), "expected symlink error message, got: {msg}");
+            }
+            Ok(paths) => panic!("expected Err for symlink entry, got Ok({paths:?})"),
         }
     }
 }

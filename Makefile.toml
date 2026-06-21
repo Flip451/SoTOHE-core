@@ -319,15 +319,51 @@ args = ["run", "--quiet", "-p", "cli", "--", "verify", "plan-artifact-refs"]
 
 [tasks.verify-adr-signals-local]
 private = true
-description = "[internal] Verify ADR decision signal grounds across knowledge/adr/ (red_count >= 1 → exit 1) per ADR 2026-04-27-1234 §D1 / AC-01"
+description = "[internal] Verify ADR decision signal grounds across knowledge/adr/ (chain ⓪ check-adr-user --gate commit). Red blocks; strictness resolved from signal-gates.json."
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "verify", "adr-signals"]
+args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-adr-user", "--gate", "commit"]
 
 [tasks.verify-spec-states-current-local]
 private = true
-description = "[internal] Verify current track's spec.json signals in CI interim mode. Yellow surfaces as Finding::warning; only red blocks. Active track auto-resolved from branch (CN-01, IN-08). Strict enforcement happens at sotp pr wait-and-merge."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "verify", "spec-states"]
+description = "[internal] Chain ① check-spec-adr --gate commit: verify current track spec.json→ADR signals. Active track auto-resolved from branch; skips on non-track branches or absent spec.json."
+script_runner = "@shell"
+script = ['''
+set -e
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+case "$BRANCH" in
+  track/*)
+    TRACK_ID="${BRANCH#track/}"
+    SPEC_JSON="track/items/${TRACK_ID}/spec.json"
+    if [ ! -f "$SPEC_JSON" ]; then
+      printf "[SKIP] verify-spec-states-current-local: spec.json absent (Phase 0 or pre-Phase-1); skipping\n"
+      exit 0
+    fi
+    cargo run --quiet -p cli -- signal check-spec-adr --gate commit --spec-json "$SPEC_JSON"
+    ;;
+  *)
+    printf "[SKIP] verify-spec-states-current-local: not on a track branch; skipping\n"
+    exit 0
+    ;;
+esac
+''']
+
+[tasks.signal-check-impl-catalog-local]
+private = true
+description = "[internal] Chain ③ check-impl-catalog --gate commit: argless impl↔catalog signal gate (T020 / D8 — active track and layers resolved internally). Skips gracefully when not on a track branch."
+script_runner = "@shell"
+script = ['''
+set -e
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+case "$BRANCH" in
+  track/*)
+    cargo run --quiet -p cli -- signal check-impl-catalog --gate commit
+    ;;
+  *)
+    printf "[SKIP] signal-check-impl-catalog-local: not on a track branch; skipping\n"
+    exit 0
+    ;;
+esac
+''']
 
 [tasks.verify-catalogue-spec-refs-local]
 private = true
@@ -337,9 +373,21 @@ args = ["run", "--quiet", "-p", "cli", "--", "verify", "catalogue-spec-refs"]
 
 [tasks.check-catalogue-spec-signals-local]
 private = true
-description = "[internal] Check catalogue-spec signal gate (strict=false interim mode): Red blocks, Yellow warns. Active track auto-resolved from branch (IN-08)."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "verify", "catalogue-spec-signals"]
+description = "[internal] Chain ② check-catalog-spec --gate commit: argless catalog→spec signal gate (T020 / D8 — active track and layers resolved internally). Skips gracefully when not on a track branch."
+script_runner = "@shell"
+script = ['''
+set -e
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+case "$BRANCH" in
+  track/*)
+    cargo run --quiet -p cli -- signal check-catalog-spec --gate commit
+    ;;
+  *)
+    printf "[SKIP] check-catalogue-spec-signals-local: not on a track branch; skipping\n"
+    exit 0
+    ;;
+esac
+''']
 
 [tasks.ci-rust-local]
 private = true
@@ -349,7 +397,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -357,7 +405,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -569,9 +617,14 @@ args = ["pr", "review-cycle", "${@}"]
 
 [tasks.track-active-gate]
 private = true
-description = "[gate] Regen sequence: type-signals → catalogue-spec-signals → views sync. Both track-commit-message and review invocations depend on this shared task (D4 symmetry, CN-11 DRY). Each sotp command self-resolves the active track from the current branch (D1). Absent catalogue files are skipped unconditionally. Fail-closed: non-zero exit aborts the chain (CN-09)."
+description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → views sync (T020 / D8: argless; active track and layers resolved internally). Both track-commit-message and review invocations depend on this shared task (D4 symmetry, CN-11 DRY). Fail-closed: non-zero exit aborts the chain (CN-09)."
 script_runner = "@shell"
-script = ['bin/sotp track type-signals && bin/sotp track catalogue-spec-signals && bin/sotp track views sync']
+script = ['''
+set -e
+bin/sotp signal calc-impl-catalog
+bin/sotp signal calc-catalog-spec
+bin/sotp track views sync
+''']
 
 [tasks.track-set-commit-hash]
 description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff base)"

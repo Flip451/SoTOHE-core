@@ -17,14 +17,20 @@
 
 use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
+use std::sync::Arc;
 
+use domain::AdrVerifyReport;
 use domain::ImplPlanDocument;
 use domain::TypeSignalsDocument;
 use domain::spec::SpecDocument;
 use domain::tddd::catalogue_v2::CatalogueDocument;
-use domain::{CatalogueSpecSignalsDocument, ContentHash, SpecElementId};
+use domain::validate_branch_ref;
+use domain::{AdrFilePort, CatalogueSpecSignalsDocument, ContentHash, SpecElementId};
 use usecase::catalogue_spec_refs::SpecElementHashReader;
 use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
+use usecase::verify_adr_signals::{
+    VerifyAdrSignals, VerifyAdrSignalsCommand, VerifyAdrSignalsInteractor,
+};
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 
@@ -357,7 +363,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
 
     /// Reads `<layer>-catalogue-spec-signals.json` and decodes it via the
     /// T010 codec. Returns `NotFound` when the signals file has not been
-    /// generated yet (no `sotp track catalogue-spec-signals` run on this
+    /// generated yet (no `sotp signal calc-catalog-spec` run on this
     /// branch), `FetchError` on I/O / decode failure.
     fn read_catalogue_spec_signals_document(
         &self,
@@ -411,6 +417,132 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             Err(e) => {
                 BlobFetchResult::FetchError(format!("{path}: {signal_filename} decode error: {e}"))
             }
+        }
+    }
+
+    /// Reads ADR frontmatter from `origin/<branch>:knowledge/adr/` via git-blob
+    /// fetching and returns a domain [`AdrVerifyReport`].
+    ///
+    /// Uses [`crate::adr_decision::GitBlobAdrFileAdapter`] — the same
+    /// `git ls-tree` / `git show` pipeline as the other merge-gate readers —
+    /// so that chain ⓪ ADR evaluation is always performed against the PR branch
+    /// ref rather than the local worktree.
+    ///
+    /// ## Why not the local worktree?
+    ///
+    /// Reading from `repo_root/knowledge/adr/` (the previous approach) means the
+    /// ADR state visible to the merge gate depends on what is checked out locally,
+    /// not what was pushed to the PR branch. A reviewer could therefore pass the
+    /// gate with locally-edited ADRs that were never committed. The git-blob path
+    /// is consistent with how all other chain signals are evaluated.
+    ///
+    /// Returns:
+    /// - `Found(report)` when ADR scanning succeeds (empty `knowledge/adr/`
+    ///   directory is also a valid success — zero decisions maps to a clean report).
+    /// - `NotFound` when `knowledge/adr` is absent on the branch (empty `ls-tree`
+    ///   stdout → no ADR directory committed → chain ⓪ is vacuously green).
+    /// - `FetchError(msg)` on branch validation failure, git spawn / exit error,
+    ///   non-UTF-8 blob content, or YAML front-matter parse failure.
+    fn read_adr_verify_report(&self, branch: String) -> BlobFetchResult<AdrVerifyReport> {
+        // Validate the branch name before constructing any git-ref string (D4.2).
+        if let Err(err) = validate_branch_ref(&branch) {
+            return BlobFetchResult::FetchError(format!("invalid branch ref: {err}"));
+        }
+
+        // Probe ancestor + target tree entries on the branch BEFORE listing.
+        // `git ls-tree origin/<branch> -- knowledge/adr/` yields zero entries
+        // both when the directory is genuinely absent AND when `knowledge/adr`
+        // (or its ancestor `knowledge`) is a committed symlink/submodule/file —
+        // without these probes an attacker could replace any ancestor with a
+        // symlink and silently bypass chain ⓪. Fail-closed for non-tree modes
+        // at every level; only the truly-absent case maps to NotFound (chain
+        // ⓪ vacuously green for fresh tracks).
+        use crate::git_cli::show::{TreeEntryKind, git_ls_tree_entry_kind};
+        for ancestor in ["knowledge"] {
+            match git_ls_tree_entry_kind(&self.repo_root, &branch, ancestor) {
+                Ok(TreeEntryKind::NotFound) => return BlobFetchResult::NotFound,
+                Ok(TreeEntryKind::Other(0o040_000)) => {}
+                Ok(TreeEntryKind::Symlink) => {
+                    return BlobFetchResult::FetchError(format!(
+                        "{ancestor} on branch '{branch}' is a symlink — refusing to follow"
+                    ));
+                }
+                Ok(TreeEntryKind::Submodule) => {
+                    return BlobFetchResult::FetchError(format!(
+                        "{ancestor} on branch '{branch}' is a submodule — refusing to follow"
+                    ));
+                }
+                Ok(TreeEntryKind::RegularFile) => {
+                    return BlobFetchResult::FetchError(format!(
+                        "{ancestor} on branch '{branch}' is a regular file, not a directory"
+                    ));
+                }
+                Ok(TreeEntryKind::Other(mode)) => {
+                    return BlobFetchResult::FetchError(format!(
+                        "{ancestor} on branch '{branch}' has unsupported git tree mode {mode:o}"
+                    ));
+                }
+                Err(e) => {
+                    return BlobFetchResult::FetchError(format!(
+                        "failed to probe {ancestor} on branch '{branch}': {e}"
+                    ));
+                }
+            }
+        }
+        match git_ls_tree_entry_kind(&self.repo_root, &branch, "knowledge/adr") {
+            Ok(TreeEntryKind::NotFound) => return BlobFetchResult::NotFound,
+            Ok(TreeEntryKind::Symlink) => {
+                return BlobFetchResult::FetchError(format!(
+                    "knowledge/adr on branch '{branch}' is a symlink — refusing to follow"
+                ));
+            }
+            Ok(TreeEntryKind::Submodule) => {
+                return BlobFetchResult::FetchError(format!(
+                    "knowledge/adr on branch '{branch}' is a submodule — refusing to follow"
+                ));
+            }
+            Ok(TreeEntryKind::RegularFile) => {
+                return BlobFetchResult::FetchError(format!(
+                    "knowledge/adr on branch '{branch}' is a regular file, not a directory"
+                ));
+            }
+            // Mode 040000 (tree / directory) lands in Other(0o040000); any
+            // other unexpected mode also flows through this arm and must be
+            // rejected fail-closed (the only mode the merge gate accepts is a
+            // real directory tree).
+            Ok(TreeEntryKind::Other(0o040_000)) => {}
+            Ok(TreeEntryKind::Other(mode)) => {
+                return BlobFetchResult::FetchError(format!(
+                    "knowledge/adr on branch '{branch}' has unsupported git tree mode {mode:o}"
+                ));
+            }
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "failed to probe knowledge/adr on branch '{branch}': {e}"
+                ));
+            }
+        }
+
+        let adapter =
+            crate::adr_decision::GitBlobAdrFileAdapter::new(self.repo_root.clone(), branch.clone());
+        let port: Arc<dyn AdrFilePort> = Arc::new(adapter);
+
+        let paths = match port.list_adr_paths() {
+            Ok(p) => p,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!("adr scan failed: {e}"));
+            }
+        };
+
+        // After the tree-mode probe, an empty listing means the directory is
+        // committed-but-empty: treat as Found with zero decisions (the
+        // interactor produces a clean report).
+        let _ = paths;
+
+        let interactor = VerifyAdrSignalsInteractor::new(port);
+        match interactor.verify(VerifyAdrSignalsCommand) {
+            Ok(report) => BlobFetchResult::Found(report),
+            Err(e) => BlobFetchResult::FetchError(format!("adr scan failed: {e}")),
         }
     }
 }
@@ -473,82 +605,22 @@ impl SpecElementHashReader for GitShowTrackBlobReader {
             Ok(s) => s,
             Err(result) => return result,
         };
-        // Pre-validate spec.json via the codec so that schema violations
-        // (unknown element IDs, structural errors) cause a fail-closed
-        // FetchError rather than a silent partial map. The codec already
-        // runs in `read_spec_document`; mirroring it here means both
-        // callers of spec.json see the same validation gate.
-        if let Err(e) = crate::spec::codec::decode(&text) {
-            return BlobFetchResult::FetchError(format!("{path}: spec.json validation error: {e}"));
+        // Delegate all text-parsing and hashing to the shared pure helper so
+        // the logic is maintained in one place (`plan_artifact_refs::spec_element_hashes_from_text`).
+        match super::plan_artifact_refs::spec_element_hashes_from_text(&text, &path) {
+            Ok(map) => BlobFetchResult::Found(map),
+            Err(e) => BlobFetchResult::FetchError(e),
         }
-        let raw: serde_json::Value = match serde_json::from_str(&text) {
-            Ok(v) => v,
-            Err(e) => {
-                return BlobFetchResult::FetchError(format!(
-                    "{path}: spec.json JSON parse error: {e}"
-                ));
-            }
-        };
-        let element_map = super::plan_artifact_refs::build_element_map(&raw);
-        let mut out: BTreeMap<SpecElementId, ContentHash> = BTreeMap::new();
-        for (id_str, canonical_json) in element_map {
-            let anchor = match SpecElementId::try_new(id_str.clone()) {
-                Ok(a) => a,
-                Err(_) => {
-                    // spec.json already passed upstream validation; skip ids
-                    // that do not match the SpecElementId newtype pattern
-                    // rather than fail the whole read.
-                    continue;
-                }
-            };
-            let hash_hex = super::plan_artifact_refs::canonical_json_sha256(&canonical_json);
-            let hash = match ContentHash::try_from_hex(hash_hex) {
-                Ok(h) => h,
-                Err(e) => {
-                    return BlobFetchResult::FetchError(format!(
-                        "{path}: internal canonical-hash parse error for '{}': {e}",
-                        anchor.as_ref()
-                    ));
-                }
-            };
-            out.insert(anchor, hash);
-        }
-        BlobFetchResult::Found(out)
     }
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
-    use std::path::Path;
-    use std::process::Command;
-
     use super::*;
+    use crate::adr_decision::test_support::{git, setup_repo_with_adr_blobs};
 
     // --- Fixture helpers ---
-
-    fn git(cwd: &Path, args: &[&str]) {
-        let output = Command::new("git")
-            .env("LANG", "C")
-            .env("LC_ALL", "C")
-            .env("LANGUAGE", "C")
-            .env("GIT_AUTHOR_NAME", "test")
-            .env("GIT_AUTHOR_EMAIL", "test@example.com")
-            .env("GIT_COMMITTER_NAME", "test")
-            .env("GIT_COMMITTER_EMAIL", "test@example.com")
-            .args(args)
-            .current_dir(cwd)
-            .output()
-            .expect("git command failed to spawn");
-        if !output.status.success() {
-            panic!(
-                "git {:?} failed: stdout={} stderr={}",
-                args,
-                String::from_utf8_lossy(&output.stdout),
-                String::from_utf8_lossy(&output.stderr)
-            );
-        }
-    }
 
     /// Creates a temp git repo with a track directory containing the
     /// supplied blobs, then sets up a local `origin` remote pointing to
@@ -940,6 +1012,134 @@ mod tests {
                 assert!(msg.contains("symlink"), "{msg}");
             }
             other => panic!("expected FetchError(symlink), got {other:?}"),
+        }
+    }
+
+    // --- read_adr_verify_report (git-blob path) ---
+    //
+    // These tests use a real git repo so that `origin/<branch>:knowledge/adr/`
+    // can be resolved. The fixture helpers follow the same pattern as
+    // `setup_repo_with_track` above.
+
+    const ADR_ACCEPTED_FRONTMATTER: &str = "\
+---
+adr_id: test-accepted
+decisions:
+  - id: D1
+    status: accepted
+    user_decision_ref: chat:2026-01-01
+---
+# body
+";
+
+    const ADR_BAD_FRONTMATTER: &str = "# no frontmatter here\n";
+
+    #[test]
+    fn test_read_adr_verify_report_found_counts_adr_signals() {
+        // Happy path: one accepted ADR on the branch → blue=1.
+        // Verifies the `branch` argument is actually used (not local worktree).
+        let dir =
+            setup_repo_with_adr_blobs(&[("2026-06-18-0001-test.md", ADR_ACCEPTED_FRONTMATTER)]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_adr_verify_report("main".to_owned()) {
+            BlobFetchResult::Found(report) => {
+                assert_eq!(report.blue_count(), 1);
+                assert_eq!(report.yellow_count(), 0);
+                assert_eq!(report.red_count(), 0);
+                assert_eq!(report.grandfathered_count(), 0);
+            }
+            other => panic!("expected Found, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_adr_verify_report_not_found_when_no_adr_files() {
+        // No knowledge/adr directory on the branch → NotFound.
+        let dir = setup_repo_with_adr_blobs(&[]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        assert!(
+            matches!(reader.read_adr_verify_report("main".to_owned()), BlobFetchResult::NotFound),
+            "expected NotFound when no ADR files on branch"
+        );
+    }
+
+    #[test]
+    fn test_read_adr_verify_report_parse_failure_returns_fetch_error() {
+        // An ADR file with no front-matter → parse failure → FetchError.
+        let dir = setup_repo_with_adr_blobs(&[("bad.md", ADR_BAD_FRONTMATTER)]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_adr_verify_report("main".to_owned()) {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(msg.contains("adr scan failed"), "{msg}");
+            }
+            other => panic!("expected FetchError, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_adr_verify_report_invalid_branch_returns_fetch_error() {
+        // A branch name with embedded whitespace must be rejected before git is called.
+        let dir = setup_repo_with_adr_blobs(&[]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_adr_verify_report("bad branch name".to_owned()) {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(msg.contains("invalid branch ref"), "{msg}");
+            }
+            other => panic!("expected FetchError for invalid branch, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_adr_verify_report_branch_arg_matters() {
+        // Verifies that the `branch` argument drives the git-blob lookup:
+        // "main" has an ADR but "does-not-exist" should fail with FetchError
+        // (bad branch → git ls-tree fails → ListPaths error → FetchError).
+        let dir =
+            setup_repo_with_adr_blobs(&[("2026-06-18-0001-test.md", ADR_ACCEPTED_FRONTMATTER)]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        // "main" succeeds
+        assert!(matches!(
+            reader.read_adr_verify_report("main".to_owned()),
+            BlobFetchResult::Found(_)
+        ));
+        // non-existent branch → git ls-tree returns non-zero → FetchError
+        match reader.read_adr_verify_report("does-not-exist".to_owned()) {
+            BlobFetchResult::FetchError(_) => {}
+            other => panic!("expected FetchError for non-existent branch, got {other:?}"),
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_adr_verify_report_rejects_symlink_adr_file_via_git_blob() {
+        // A symlinked .md file committed in knowledge/adr/ must be rejected by
+        // git_ls_tree_dir (fail-closed at the listing stage: mode 120000 is not
+        // a regular file, so the whole listing fails rather than silently skipping
+        // the symlink, ADR §D4.3). The error propagates as FetchError.
+        let tmp = tempfile::tempdir().unwrap();
+        let repo = tmp.path();
+        git(repo, &["init", "--quiet", "--initial-branch=main"]);
+        let adr_dir = repo.join("knowledge/adr");
+        std::fs::create_dir_all(&adr_dir).unwrap();
+        // Commit a real file and a symlink pointing to it.
+        std::fs::write(adr_dir.join("real.md"), ADR_ACCEPTED_FRONTMATTER).unwrap();
+        std::os::unix::fs::symlink("real.md", adr_dir.join("link.md")).unwrap();
+        git(repo, &["add", "knowledge"]);
+        git(repo, &["commit", "--quiet", "-m", "add files"]);
+        git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
+        git(repo, &["fetch", "--quiet", "origin"]);
+
+        // git_ls_tree_dir rejects symlinks at the listing stage (fail-closed).
+        // The whole listing fails, so read_adr_verify_report returns FetchError.
+        let reader = GitShowTrackBlobReader::new(repo.to_path_buf());
+        match reader.read_adr_verify_report("main".to_owned()) {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(
+                    msg.contains("symlink") || msg.contains("adr scan failed"),
+                    "expected symlink rejection error, got: {msg}"
+                );
+            }
+            other => panic!("expected FetchError(symlink rejection), got {other:?}"),
         }
     }
 

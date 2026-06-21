@@ -372,25 +372,30 @@ pub fn evaluate_requirement_signal(
 ///
 /// # Rules
 ///
-/// - `signals` is `None` → `VerifyFinding::error` (unevaluated; run `sotp track signals` first)
+/// - `signals` is `None` → `VerifyFinding::error` (unevaluated; run `sotp signal calc-spec-adr` first)
 /// - `SignalCounts::total() == 0` → `VerifyFinding::error` (evaluated but empty — treated as unevaluated)
 /// - `signals.red > 0` → `VerifyFinding::error` (red is always an error, regardless of mode)
-/// - `signals.yellow > 0` and `strict = true` → `VerifyFinding::error` (merge gate rejects Yellow)
-/// - `signals.yellow > 0` and `strict = false` → `VerifyFinding::warning` (interim mode visualizes Yellow, PASSes)
+/// - `signals.yellow > 0` and `Strictness::Strict` → `VerifyFinding::error` (merge gate rejects Yellow)
+/// - `signals.yellow > 0` and `Strictness::Interim` → `VerifyFinding::warning` (interim mode visualizes Yellow, PASSes)
 /// - All Blue → `VerifyOutcome::pass()` (no findings)
 ///
-/// The `strict` parameter is:
-/// - `true` for the merge gate (all Yellow must be upgraded to Blue before merge)
-/// - `false` for CI interim mode (Yellow is allowed during iteration but visualized)
+/// Taking [`Strictness`](crate::chain::Strictness) (not `bool`) preserves type safety per
+/// `knowledge/conventions/prefer-type-safe-abstractions.md` § Enum-first: callers
+/// pass a domain-named discriminant so an inverted conversion cannot silently flip
+/// gate behavior.
 ///
 /// Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D2, §D8.6.
 #[must_use]
-pub fn check_spec_doc_signals(doc: &SpecDocument, strict: bool) -> crate::verify::VerifyOutcome {
+pub fn check_spec_doc_signals(
+    doc: &SpecDocument,
+    strictness: crate::chain::Strictness,
+) -> crate::verify::VerifyOutcome {
+    use crate::chain::Strictness;
     use crate::verify::{VerifyFinding, VerifyOutcome};
 
     let Some(counts) = doc.signals() else {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(
-            "spec signals not yet evaluated — run `sotp track signals` first".to_owned(),
+            "spec signals not yet evaluated — run `sotp signal calc-spec-adr --spec-json <path/to/spec.json>` first".to_owned(),
         )]);
     };
 
@@ -413,10 +418,12 @@ pub fn check_spec_doc_signals(doc: &SpecDocument, strict: bool) -> crate::verify
             "spec.json: {} yellow signal(s) detected — merge gate will block these until upgraded to Blue. Upgrade by creating an ADR and referencing it via adr_refs[] (convention_refs[] are outside signal evaluation scope per ADR D3.1 and do not affect the signal).",
             counts.yellow()
         );
-        if strict {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]);
-        }
-        return VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)]);
+        return match strictness {
+            Strictness::Strict => VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]),
+            Strictness::Interim => {
+                VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)])
+            }
+        };
     }
 
     VerifyOutcome::pass()
@@ -994,8 +1001,9 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_none_returns_error() {
+        use crate::chain::Strictness;
         let doc = doc_with_signals(None);
-        let outcome = check_spec_doc_signals(&doc, false);
+        let outcome = check_spec_doc_signals(&doc, Strictness::Interim);
         assert!(outcome.has_errors(), "None signals must be an error");
         assert!(
             outcome.findings()[0].message().contains("not yet evaluated"),
@@ -1006,31 +1014,35 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_all_zero_returns_error() {
+        use crate::chain::Strictness;
         let doc = doc_with_signals(Some(SignalCounts::new(0, 0, 0)));
-        let outcome = check_spec_doc_signals(&doc, false);
+        let outcome = check_spec_doc_signals(&doc, Strictness::Interim);
         assert!(outcome.has_errors(), "all-zero signals must be an error");
         assert!(outcome.findings()[0].message().contains("all-zero"));
     }
 
     #[test]
     fn test_check_spec_doc_signals_red_is_error_in_interim_mode() {
+        use crate::chain::Strictness;
         let doc = doc_with_signals(Some(SignalCounts::new(1, 0, 2)));
-        let outcome = check_spec_doc_signals(&doc, false);
+        let outcome = check_spec_doc_signals(&doc, Strictness::Interim);
         assert!(outcome.has_errors(), "red>0 must be an error in interim mode");
         assert!(outcome.findings()[0].message().contains("red=2"));
     }
 
     #[test]
     fn test_check_spec_doc_signals_red_is_error_in_strict_mode() {
+        use crate::chain::Strictness;
         let doc = doc_with_signals(Some(SignalCounts::new(1, 0, 2)));
-        let outcome = check_spec_doc_signals(&doc, true);
+        let outcome = check_spec_doc_signals(&doc, Strictness::Strict);
         assert!(outcome.has_errors(), "red>0 must be an error in strict mode");
     }
 
     #[test]
     fn test_check_spec_doc_signals_yellow_is_warning_in_interim_mode() {
+        use crate::chain::Strictness;
         let doc = doc_with_signals(Some(SignalCounts::new(3, 2, 0)));
-        let outcome = check_spec_doc_signals(&doc, false);
+        let outcome = check_spec_doc_signals(&doc, Strictness::Interim);
         assert!(!outcome.has_errors(), "yellow in interim mode must not be an error: {outcome:?}");
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1, "expected exactly one warning finding");
@@ -1042,8 +1054,9 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_yellow_is_error_in_strict_mode() {
+        use crate::chain::Strictness;
         let doc = doc_with_signals(Some(SignalCounts::new(3, 2, 0)));
-        let outcome = check_spec_doc_signals(&doc, true);
+        let outcome = check_spec_doc_signals(&doc, Strictness::Strict);
         assert!(outcome.has_errors(), "yellow in strict mode must be an error");
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1);
@@ -1053,16 +1066,17 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_all_blue_passes_in_both_modes() {
+        use crate::chain::Strictness;
         let doc = doc_with_signals(Some(SignalCounts::new(10, 0, 0)));
 
-        let outcome_interim = check_spec_doc_signals(&doc, false);
+        let outcome_interim = check_spec_doc_signals(&doc, Strictness::Interim);
         assert!(!outcome_interim.has_errors());
         assert!(
             outcome_interim.findings().is_empty(),
             "all-Blue must produce zero findings in interim mode"
         );
 
-        let outcome_strict = check_spec_doc_signals(&doc, true);
+        let outcome_strict = check_spec_doc_signals(&doc, Strictness::Strict);
         assert!(!outcome_strict.has_errors());
         assert!(
             outcome_strict.findings().is_empty(),

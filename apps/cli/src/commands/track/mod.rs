@@ -10,7 +10,6 @@ mod dispatch;
 pub mod fixpoint_resolve;
 mod resolve;
 pub(crate) mod set_commit_hash;
-mod signals;
 mod state_ops;
 pub(crate) mod tddd;
 mod transition;
@@ -155,40 +154,6 @@ pub enum TrackCommand {
         track_id: Option<String>,
     },
 
-    /// Evaluate spec.md source tags and store results in metadata.json spec_signals.
-    Signals {
-        /// Path to the track items root directory (e.g., `track/items`).
-        #[arg(long, default_value = "track/items")]
-        items_dir: PathBuf,
-
-        /// Track ID (directory name under items_dir).
-        /// When omitted, resolved from the current git branch (`track/<id>`).
-        #[arg(long)]
-        track_id: Option<String>,
-    },
-
-    /// Evaluate domain type signals via rustdoc schema export and store results in domain-types.json.
-    TypeSignals {
-        /// Track ID (directory name under `workspace_root/track/items`).
-        /// When omitted, resolved from the current git branch (`track/<id>`).
-        #[arg(long)]
-        track_id: Option<String>,
-
-        /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
-        ///
-        /// The track items directory is always derived as
-        /// `<workspace_root>/track/items` inside the interactor.
-        #[arg(long, default_value = ".")]
-        workspace_root: PathBuf,
-
-        /// Optional layer id filter. When omitted all `tddd.enabled` layers
-        /// are processed in `architecture-rules.json` order. When supplied,
-        /// the specified layer id must be `tddd.enabled=true`; targeting a
-        /// disabled layer is fail-closed.
-        #[arg(long)]
-        layer: Option<String>,
-    },
-
     /// Render a mermaid type graph from rustdoc schema export.
     ///
     /// When `--cluster-depth 0` writes a single flat `<layer>-graph.md` file.
@@ -283,35 +248,6 @@ pub enum TrackCommand {
         /// rendered. Unknown layer ids fail closed.
         #[arg(long)]
         layers: Option<String>,
-    },
-
-    /// Regenerate `<layer>-catalogue-spec-signals.json` for each
-    /// catalogue-spec-enabled layer (SoT Chain ② pre-commit step).
-    ///
-    /// Reads the LOCAL `<layer>-types.json` (not the origin blob) so
-    /// uncommitted changes are reflected. Emits per-entry signals computed
-    /// via the informal-priority rule (ADR D1.1) plus the raw-bytes SHA-256
-    /// `catalogue_declaration_hash` used by the stale-detection gate.
-    CatalogueSpecSignals {
-        /// Path to the track items root directory (e.g., `track/items`).
-        #[arg(long, default_value = "track/items")]
-        items_dir: PathBuf,
-
-        /// Track ID (directory name under items_dir).
-        /// When omitted, resolved from the current git branch (`track/<id>`).
-        #[arg(long)]
-        track_id: Option<String>,
-
-        /// Workspace root directory (must contain `architecture-rules.json`).
-        /// Defaults to current directory.
-        #[arg(long, default_value = ".")]
-        workspace_root: PathBuf,
-
-        /// Optional layer id filter. When omitted all `tddd.enabled` layers
-        /// are processed. When supplied, the specified layer id must be
-        /// `tddd.enabled=true`.
-        #[arg(long)]
-        layer: Option<String>,
     },
 
     /// Emit canonical SHA-256 hashes for spec.json elements (helper for
@@ -507,11 +443,9 @@ impl TrackCommand {
             | TrackCommand::ClearOverride { items_dir, .. }
             | TrackCommand::NextTask { items_dir, .. }
             | TrackCommand::TaskCounts { items_dir, .. }
-            | TrackCommand::Signals { items_dir, .. }
             | TrackCommand::TypeGraph { items_dir, .. }
             | TrackCommand::BaselineGraph { items_dir, .. }
             | TrackCommand::ContractMap { items_dir, .. }
-            | TrackCommand::CatalogueSpecSignals { items_dir, .. }
             | TrackCommand::SpecElementHash { items_dir, .. } => items_dir.clone(),
 
             // FixpointResolve embeds items_dir inside FixpointResolveArgs.
@@ -534,8 +468,7 @@ impl TrackCommand {
             // These variants derive their items path from workspace_root
             // internally; return <workspace_root>/track/items so that a
             // non-default --workspace-root is honoured for telemetry path resolution.
-            TrackCommand::TypeSignals { workspace_root, .. }
-            | TrackCommand::BaselineCapture { workspace_root, .. }
+            TrackCommand::BaselineCapture { workspace_root, .. }
             | TrackCommand::Lint { workspace_root, .. }
             | TrackCommand::CatalogueImplSignals { workspace_root, .. } => {
                 workspace_root.join("track").join("items")
@@ -1109,29 +1042,6 @@ mod tests {
             commit_hash: None,
         };
         assert_eq!(cmd.items_dir(), std::path::Path::new("track/items"));
-    }
-
-    /// TypeSignals derives items_dir from workspace_root: default workspace_root "."
-    /// yields "./track/items".
-    #[test]
-    fn test_items_dir_accessor_returns_workspace_root_derived_path_for_type_signals() {
-        let cmd = TrackCommand::TypeSignals {
-            track_id: None,
-            workspace_root: PathBuf::from("."),
-            layer: None,
-        };
-        assert_eq!(cmd.items_dir(), PathBuf::from(".").join("track").join("items"));
-    }
-
-    /// TypeSignals with a non-default workspace_root derives items_dir correctly.
-    #[test]
-    fn test_items_dir_accessor_returns_non_default_workspace_root_for_type_signals() {
-        let cmd = TrackCommand::TypeSignals {
-            track_id: None,
-            workspace_root: PathBuf::from("/custom/root"),
-            layer: None,
-        };
-        assert_eq!(cmd.items_dir(), PathBuf::from("/custom/root/track/items"));
     }
 
     /// SetCommitHash has no items_dir argument; accessor discovers the git repo root and
