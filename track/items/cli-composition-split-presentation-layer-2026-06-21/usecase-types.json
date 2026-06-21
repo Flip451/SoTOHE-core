@@ -186,7 +186,7 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Io", "payload": { "kind": "tuple", "fields": ["std::io::Error"] } },
+          { "name": "Io", "payload": { "kind": "tuple", "fields": ["String"] } },
           { "name": "Serialize", "payload": { "kind": "tuple", "fields": ["String"] } }
         ]
       },
@@ -976,6 +976,21 @@
       "action": "add",
       "trait_ref": "PrReviewPollingService",
       "for_type": "PrReviewPollingInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ArchivedTrackTelemetryError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ArchivedTrackTelemetryError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ArchivedTrackTelemetryError"
     }
   ]
 }

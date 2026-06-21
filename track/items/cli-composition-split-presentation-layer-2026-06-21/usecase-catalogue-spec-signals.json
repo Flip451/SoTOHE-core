@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a8d5d116c633d56d61cc2418f3c4cfd1d53104b095bf3498fbb9728275b5d131",
+  "catalogue_declaration_hash": "257fabd3fde10c406493260a66194f466efab4cd89527dbaef0c13750ab10c10",
   "signals": [
     {
       "type_name": "ArchivedTrackTelemetryCommand",
@@ -10,7 +10,7 @@
     {
       "type_name": "ArchivedTrackTelemetryError",
       "signal": "blue",
-      "entry_hash": "de104ceeeef608fe3ecd4750a5d3b4fe3505af27091bc2b46b3fcf880a173765"
+      "entry_hash": "3237ffe5f1e62d83afb98d158f052a185f82ef4270ecfa3cb4d277623a61276b"
     },
     {
       "type_name": "ArchivedTrackTelemetryInteractor",

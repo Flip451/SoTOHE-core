@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FsArchivedTrackTelemetryAdapter | secondary_adapter | — | impl ArchivedTrackTelemetryPort | 🟡 | 🔵 |
+| FsArchivedTrackTelemetryAdapter | secondary_adapter | — | impl ArchivedTrackTelemetryPort | 🔵 | 🔵 |
 | FsRefVerifyGateStateAdapter | secondary_adapter | — | impl RefVerifyGateStatePort | 🟡 | 🔵 |
 | FsReviewGateStateAdapter | secondary_adapter | — | impl ReviewGateStatePort | 🟡 | 🔵 |
 | FsSpecFileWriterAdapter | secondary_adapter | — | impl SpecFileWriterPort | 🟡 | 🔵 |

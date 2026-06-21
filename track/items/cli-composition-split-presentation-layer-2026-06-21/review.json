@@ -335,6 +335,71 @@
           "findings": [],
           "hash": "rvw1:sha256:01321d192c505db5cb74aac561d51d7f2698108cecd71ee1847979d41ee03e92",
           "at": "2026-06-21T19:49:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7733921f805c5bd1e61afcdd77d5c2212bd662ac6388b968e6993a63ae3d9f5",
+          "at": "2026-06-21T20:24:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7733921f805c5bd1e61afcdd77d5c2212bd662ac6388b968e6993a63ae3d9f5",
+          "at": "2026-06-21T20:28:47Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
+          "at": "2026-06-21T20:24:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`emit` creates and opens the telemetry path with plain `create_dir_all`/`OpenOptions::open`, so a symlinked `telemetry_dir` component or pre-existing `telemetry.jsonl` symlink is followed instead of being rejected. This adapter is the infrastructure I/O boundary for the injected telemetry path; when it is wired to archived-track logs, a symlink under the trusted archive tree can redirect appends outside that tree instead of failing closed. Match the existing CN-04/scope_config_loader symlink-rejection pattern, or use a trusted-root guard plus no-follow open before writing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/telemetry/archived_track.rs",
+              "line": 71,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
+          "at": "2026-06-21T20:28:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:668de97b8087e893c5e23aa36e429b42930dfa0f04faa423cca7db5ad910e637",
+          "at": "2026-06-21T20:33:13Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
+          "at": "2026-06-21T20:24:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
+          "at": "2026-06-21T20:27:29Z"
         }
       ]
     }

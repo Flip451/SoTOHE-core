@@ -37,10 +37,16 @@ pub mod signal;
 pub mod skill_compliance;
 pub mod task_completion;
 pub mod task_ops;
+pub mod telemetry;
 pub mod track_phase;
 pub mod track_resolution;
 pub mod type_signals;
 pub mod verify_adr_signals;
+
+pub use telemetry::{
+    ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryError, ArchivedTrackTelemetryInteractor,
+    ArchivedTrackTelemetryPort, ArchivedTrackTelemetryService,
+};
 
 use std::sync::Arc;
 

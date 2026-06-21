@@ -689,6 +689,22 @@
         "kind": "pass",
         "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
       }
+    },
+    {
+      "claim_hash": "3237ffe5f1e62d83afb98d158f052a185f82ef4270ecfa3cb4d277623a61276b",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し"
+      }
+    },
+    {
+      "claim_hash": "3237ffe5f1e62d83afb98d158f052a185f82ef4270ecfa3cb4d277623a61276b",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
     }
   ]
 }

@@ -1,0 +1,177 @@
+{
+  "schema_version": 4,
+  "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888",
+  "corpus_fingerprint": "8dd55e5edcab78b0573c7b9ea387da046590bf4a2d4ae7d1ec616ea983967f0b",
+  "fragment_refs": [
+    {
+      "path": "libs/infrastructure/src/lib.rs",
+      "content_hash": "fa4b19bb5b0ce1ace270d9201972ae63ca93a04753894a81c7fc9e4ba5d61a70"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "018e692e64c70a1229188b82e049607402b4241f0e311bc3b241fbc6d19dec02"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "3cbe4b9f686cafff17e83274dd5e8f357cd9d8681f6f02df9e50a21d116cd3bc"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "3db8722bffec0131dde97f9e18df4ed1880cbe74602da75d1511c7b7e3cf6588"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "5db29345b68db89a1f3d916e7faa21afb157399e60fe811ac4bd90a33519b1c0"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "6d23e0803c7a6e5040a8b3e0ed4ce91cad2468ffae7e3e72e848c7a78cd7a714"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "6dcd7df8ee882ba006f0fb2aafa50fa63729916f22867bec864dac7686e1e9a8"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "9e1c5d23845dc360383ce7a2f263eb20c88c0b8ce29d3c3a56e8fc8adf94f365"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "aa95b8b56c278401f0fd5f82fd8b7d10c5984b39418efbe89d79784ad6460d3e"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "b2556963a6960cfe849a4b2b77a63060c3a4ee582c8377c97f906215c892494f"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/archived_track.rs",
+      "content_hash": "d915a39648a5d9195131c7fde0eb9a9de48363f32c905e875e2b8744d6b97673"
+    },
+    {
+      "path": "libs/infrastructure/src/telemetry/mod.rs",
+      "content_hash": "7eb060068776759cf7a2e241f281e1d86446984095f1cddc073f5ea9f15ba276"
+    },
+    {
+      "path": "libs/usecase/src/lib.rs",
+      "content_hash": "11417b0831a47ff4d25ef103c422782303ee8072cc460135657f48a51f61bde4"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "0557f096312a6f493c0774d6879ca468820e233d866a3864e32a8ecd83ff5419"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "19ec7bcda092e5810c9e62581881ab33ac3d0952f1433f26eae8ab104024a094"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "35b07b88f2ef05f162721c39794e6e828ba94e0de60140aa8b8c0a1ed7bbe2f8"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "8308f3b8c2fbd8cd3b244178e0d51e2782a2bd29c139909ab47b769bb009fede"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "9a554e499c2c17131508b021b67c07953c2b9e0c92d38f9c8fc66a4191044e87"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "9c1565e1c1770cc14de6a3ce3717a2f9a42e071a3a9c83cf4aaef136349e1d88"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "a8ee76b8493bb5770e9af13f0d81e466f4f66e769f85e47dd86d8bfc47eacb3e"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "aa7c953d28cd2fc7d8a31aebe26826972645a31e31afc3e1db0e5d17bf0ab6bd"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "ba40020d8e9174c4baa1bfbae88eb22bd6bb27cb5af6acd7e094c2a1b0be55f3"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "c2328efa963deaeb4062072ea54a3623b56db25bf5674c87c527e2d08c0d2f58"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "e3a7f716b815c9f0953e188a851b5bd536c3b49bdd72ab4512f65cf365ff5b3a"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "e4797f7bb3277d4bdf419ef54cc99f71b028330603204304028bb33f2f4c308b"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "f3f5283bf5117d44576122fbf61daefe15e2a5e1e9853f67b1b66b133f0e353e"
+    },
+    {
+      "path": "libs/usecase/src/telemetry.rs",
+      "content_hash": "f43eff0a7f0a5a5ebc4583c388ce69f212d48018308c4ff2600c2db19ee16466"
+    }
+  ],
+  "processed_pair_keys": [
+    {
+      "low": {
+        "path": "libs/domain/src/lib.rs",
+        "content_hash": "813e70774b0b7801b96d06afa6eded55a9ac85cca2618c4fc39db78cda2ceebf"
+      },
+      "high": {
+        "path": "libs/infrastructure/src/lib.rs",
+        "content_hash": "fa4b19bb5b0ce1ace270d9201972ae63ca93a04753894a81c7fc9e4ba5d61a70"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/domain/src/lib.rs",
+        "content_hash": "813e70774b0b7801b96d06afa6eded55a9ac85cca2618c4fc39db78cda2ceebf"
+      },
+      "high": {
+        "path": "libs/usecase/src/lib.rs",
+        "content_hash": "11417b0831a47ff4d25ef103c422782303ee8072cc460135657f48a51f61bde4"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/infrastructure/src/lib.rs",
+        "content_hash": "fa4b19bb5b0ce1ace270d9201972ae63ca93a04753894a81c7fc9e4ba5d61a70"
+      },
+      "high": {
+        "path": "libs/usecase/src/lib.rs",
+        "content_hash": "11417b0831a47ff4d25ef103c422782303ee8072cc460135657f48a51f61bde4"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/telemetry.rs",
+        "content_hash": "8308f3b8c2fbd8cd3b244178e0d51e2782a2bd29c139909ab47b769bb009fede"
+      },
+      "high": {
+        "path": "libs/usecase/src/telemetry.rs",
+        "content_hash": "e4797f7bb3277d4bdf419ef54cc99f71b028330603204304028bb33f2f4c308b"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/telemetry.rs",
+        "content_hash": "9c1565e1c1770cc14de6a3ce3717a2f9a42e071a3a9c83cf4aaef136349e1d88"
+      },
+      "high": {
+        "path": "libs/usecase/src/telemetry.rs",
+        "content_hash": "c2328efa963deaeb4062072ea54a3623b56db25bf5674c87c527e2d08c0d2f58"
+      }
+    },
+    {
+      "low": {
+        "path": "libs/usecase/src/telemetry.rs",
+        "content_hash": "aa7c953d28cd2fc7d8a31aebe26826972645a31e31afc3e1db0e5d17bf0ab6bd"
+      },
+      "high": {
+        "path": "libs/usecase/src/verify_adr_signals.rs",
+        "content_hash": "709480bbeb651d7e591dc37e3199d8ec3d86276042085a3f13543e624b70110a"
+      }
+    }
+  ]
+}

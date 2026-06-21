@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "records": [
+    {
+      "low_path": "libs/domain/src/lib.rs",
+      "low_hash": "813e70774b0b7801b96d06afa6eded55a9ac85cca2618c4fc39db78cda2ceebf",
+      "high_path": "libs/infrastructure/src/lib.rs",
+      "high_hash": "fa4b19bb5b0ce1ace270d9201972ae63ca93a04753894a81c7fc9e4ba5d61a70",
+      "changed_path": "libs/infrastructure/src/lib.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8927717804908752,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a4bd65f143c2811e356d91a64d256a10bbf19373",
+      "rationale": "The two fragments do not duplicate implementation logic. The domain crate defines domain modules and re-exports domain types, while the infrastructure crate declares its own infrastructure modules and adapters. The shared module names reflect corresponding concepts across layers, not repeated code or duplicated business rules.",
+      "recorded_at": "2026-06-21T20:20:00Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/domain/src/lib.rs",
+      "low_hash": "813e70774b0b7801b96d06afa6eded55a9ac85cca2618c4fc39db78cda2ceebf",
+      "high_path": "libs/usecase/src/lib.rs",
+      "high_hash": "11417b0831a47ff4d25ef103c422782303ee8072cc460135657f48a51f61bde4",
+      "changed_path": "libs/usecase/src/lib.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8537750840187073,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a4bd65f143c2811e356d91a64d256a10bbf19373",
+      "rationale": "The `usecase` crate is not re-implementing domain logic; it is intentionally re-exporting domain types (`TrackId`, `LayerId`, `ValidationError`, etc.) at the composition boundary so callers can depend on a single facade. The domain crate already owns the canonical definitions, and this file only forwards them, so this is a layering choice rather than duplicated code or behavior.",
+      "recorded_at": "2026-06-21T20:20:00Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/infrastructure/src/lib.rs",
+      "low_hash": "fa4b19bb5b0ce1ace270d9201972ae63ca93a04753894a81c7fc9e4ba5d61a70",
+      "high_path": "libs/usecase/src/lib.rs",
+      "high_hash": "11417b0831a47ff4d25ef103c422782303ee8072cc460135657f48a51f61bde4",
+      "changed_path": "libs/infrastructure/src/lib.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8709083795547485,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a4bd65f143c2811e356d91a64d256a10bbf19373",
+      "rationale": "These fragments do not show repeated implementation of the same logic. The infrastructure crate is adding a module surface for infrastructure concerns, while the usecase crate already exposes its own `dry_check` module as part of a different layer. Matching module names across crates is not, by itself, a DRY violation, and there is no duplicated code path shown here.",
+      "recorded_at": "2026-06-21T20:20:00Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/usecase/src/telemetry.rs",
+      "low_hash": "8308f3b8c2fbd8cd3b244178e0d51e2782a2bd29c139909ab47b769bb009fede",
+      "high_path": "libs/usecase/src/telemetry.rs",
+      "high_hash": "e4797f7bb3277d4bdf419ef54cc99f71b028330603204304028bb33f2f4c308b",
+      "changed_path": "libs/usecase/src/telemetry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9129719138145448,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a4bd65f143c2811e356d91a64d256a10bbf19373",
+      "rationale": "The two fragments are not duplicating implementation logic; they describe adjacent parts of the same API surface. The changed fragment defines the service trait, while the existing fragment shows the interactor that implements it. Shared terminology in the doc comments is expected at the boundary and does not by itself indicate repeated code or a DRY problem.",
+      "recorded_at": "2026-06-21T20:20:00Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/usecase/src/telemetry.rs",
+      "low_hash": "9c1565e1c1770cc14de6a3ce3717a2f9a42e071a3a9c83cf4aaef136349e1d88",
+      "high_path": "libs/usecase/src/telemetry.rs",
+      "high_hash": "c2328efa963deaeb4062072ea54a3623b56db25bf5674c87c527e2d08c0d2f58",
+      "changed_path": "libs/usecase/src/telemetry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8616201281547546,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a4bd65f143c2811e356d91a64d256a10bbf19373",
+      "rationale": "These are two small test-only trait impls for different helper types with different behavior: `MockPort` records calls, while `FailingPort` returns an error. The shared `impl ArchivedTrackTelemetryPort for ...` boilerplate is not duplicated business logic and is normal in Rust tests, so this does not rise to a DRY violation.",
+      "recorded_at": "2026-06-21T20:20:00Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    },
+    {
+      "low_path": "libs/usecase/src/telemetry.rs",
+      "low_hash": "aa7c953d28cd2fc7d8a31aebe26826972645a31e31afc3e1db0e5d17bf0ab6bd",
+      "high_path": "libs/usecase/src/verify_adr_signals.rs",
+      "high_hash": "709480bbeb651d7e591dc37e3199d8ec3d86276042085a3f13543e624b70110a",
+      "changed_path": "libs/usecase/src/telemetry.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8659370541572571,
+      "threshold": 0.8500000238418579,
+      "base_commit": "a4bd65f143c2811e356d91a64d256a10bbf19373",
+      "rationale": "These snippets share the same constructor shape, but the repetition is only a trivial `Self { port }` initializer for different types (`ArchivedTrackTelemetryPort` vs `AdrFilePort`). This is conventional boilerplate rather than harmful duplication, and abstracting it would add indirection without reducing meaningful maintenance cost.",
+      "recorded_at": "2026-06-21T20:20:00Z",
+      "config_fingerprint": "c71d60a1208dc677c64786937d53cda289effd4d7551640b5c894595cee25888"
+    }
+  ]
+}

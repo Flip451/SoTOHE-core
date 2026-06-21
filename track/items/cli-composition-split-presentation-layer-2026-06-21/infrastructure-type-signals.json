@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-21T19:50:39Z",
+  "generated_at": "2026-06-21T20:34:43Z",
   "declaration_hash": "4af94046228f4abf4d15a4f672927009acb340f679f6879e877867495f0a6bb5",
   "signals": [
     {
       "type_name": "FsArchivedTrackTelemetryAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ArchivedTrackTelemetryPort"
       ]
     },

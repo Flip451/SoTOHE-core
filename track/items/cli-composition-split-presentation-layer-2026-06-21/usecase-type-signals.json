@@ -1,40 +1,45 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-21T19:50:36Z",
-  "declaration_hash": "a8d5d116c633d56d61cc2418f3c4cfd1d53104b095bf3498fbb9728275b5d131",
+  "generated_at": "2026-06-21T20:34:40Z",
+  "declaration_hash": "257fabd3fde10c406493260a66194f466efab4cd89527dbaef0c13750ab10c10",
   "signals": [
     {
       "type_name": "ArchivedTrackTelemetryCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ArchivedTrackTelemetryError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
     },
     {
       "type_name": "ArchivedTrackTelemetryInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ArchivedTrackTelemetryService"
       ]
     },
     {
       "type_name": "ArchivedTrackTelemetryPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ArchivedTrackTelemetryService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "D4OrchestrationError",

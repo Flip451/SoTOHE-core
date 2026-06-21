@@ -26,6 +26,7 @@ pub mod task_coverage_codec;
 pub mod tddd;
 pub mod telemetry;
 pub mod track;
+pub use telemetry::archived_track::FsArchivedTrackTelemetryAdapter;
 pub use track::fs_symlink_guard::FsSymlinkGuard;
 pub mod type_catalogue_render;
 pub mod verify;
