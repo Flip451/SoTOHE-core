@@ -384,6 +384,76 @@
       ],
       "informal_grounds": []
     },
+    "RustExpressionError": {
+      "action": "add",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Empty", "payload": { "kind": "unit" } },
+          { "name": "WhitespaceBoundary", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "docs": "Error type returned by RustExpression::try_new. Variants: Empty (string was empty), WhitespaceBoundary (string has leading or trailing whitespace).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RustExpression": {
+      "action": "add",
+      "role": {
+        "ValueObject": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "s", "ty": "impl Into<String>" }
+          ],
+          "returns": "Result<Self, RustExpressionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "docs": "Newtype wrapping String for validated Rust expression strings. Used as the type of AssocConstDecl::default_value to encode the Rust expression contract in the type system (prefer-type-safe-abstractions § Newtype). Validation: non-empty, no leading/trailing whitespace. Full Rust syntax parsing is deferred to the infrastructure codec layer (syn::parse_str::<syn::Expr>).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
     "AssocConstDecl": {
       "action": "add",
       "role": {
@@ -396,14 +466,14 @@
           "fields": [
             { "name": "name", "ty": "AssocConstName" },
             { "name": "ty", "ty": "TypeRef" },
-            { "name": "default_value", "ty": "Option<String>" }
+            { "name": "default_value", "ty": "Option<RustExpression>" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "tddd::catalogue_v2::entries",
-      "docs": "Declaration of an associated constant item in a trait. Used in TraitEntry::assoc_consts to declare associated constants so that the A-side item count matches the C-side rustdoc item count. name field uses AssocConstName (dedicated validated newtype for const identifiers).",
+      "docs": "Declaration of an associated constant item in a trait. Used in TraitEntry::assoc_consts to declare associated constants so that the A-side item count matches the C-side rustdoc item count. name field uses AssocConstName (dedicated validated newtype for const identifiers). default_value uses RustExpression (validated newtype for Rust expression strings, prefer-type-safe-abstractions § Newtype).",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -462,187 +532,12 @@
       ],
       "informal_grounds": []
     },
-    "SoTChain": {
+    "PersistedSoTChainGate": {
       "action": "add",
       "role": {
         "SecondaryPort": {}
       },
       "methods": [
-        {
-          "name": "check",
-          "receiver": null,
-          "params": [
-            {
-              "name": "input",
-              "ty": "&<Self>::Input<'_>"
-            },
-            {
-              "name": "strict",
-              "ty": "bool"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ],
-      "supertrait_bounds": [
-        "ChainIdentity"
-      ],
-      "module_path": "chain",
-      "docs": "Minimal check contract satisfied by all four chains. Provides `check(input, strict) -> VerifyOutcome`. For chains ①②③ this is fulfilled via blanket impl over `PersistedSoTChain`; for chain ⓪ it is fulfilled directly. CLI `check-*` dispatch goes through this trait.",
-      "spec_refs": [
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "GO-04"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "IN-10"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-09"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-11"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-14"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "LiveSoTChain": {
-      "action": "add",
-      "role": {
-        "SecondaryPort": {}
-      },
-      "methods": [
-        {
-          "name": "calc_live",
-          "receiver": null,
-          "params": [
-            {
-              "name": "input",
-              "ty": "&<Self>::Input<'_>"
-            }
-          ],
-          "returns": "Result<<Self>::LiveCalc, <Self>::CalcError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ],
-      "assoc_types": [
-        {
-          "name": "LiveCalc"
-        },
-        {
-          "name": "CalcError"
-        }
-      ],
-      "supertrait_bounds": [
-        "SoTChain"
-      ],
-      "module_path": "chain",
-      "docs": "Extension of `SoTChain` for chains that compute signals live without persisting. Implemented only by `AdrUserChain` (chain ⓪). `calc_live` returns the live-computed result without writing any file. Compiling `PersistedSoTChain::calc` for chain ⓪ is intentionally impossible.",
-      "spec_refs": [
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "GO-04"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "IN-10"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-06"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-09"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-10"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-11"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-18"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-14"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "PersistedSoTChain": {
-      "action": "add",
-      "role": {
-        "SecondaryPort": {}
-      },
-      "methods": [
-        {
-          "name": "calc",
-          "receiver": null,
-          "params": [
-            {
-              "name": "input",
-              "ty": "&<Self>::Input<'_>"
-            }
-          ],
-          "returns": "Result<<Self>::Persisted, <Self>::CalcError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "load",
-          "receiver": null,
-          "params": [
-            {
-              "name": "input",
-              "ty": "&<Self>::Input<'_>"
-            }
-          ],
-          "returns": "Result<<Self>::Persisted, <Self>::CalcError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "check_freshness",
-          "receiver": null,
-          "params": [
-            {
-              "name": "input",
-              "ty": "&<Self>::Input<'_>"
-            },
-            {
-              "name": "persisted",
-              "ty": "&<Self>::Persisted"
-            }
-          ],
-          "returns": "Result<(), <Self>::StaleError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
         {
           "name": "evaluate_gate",
           "receiver": null,
@@ -652,8 +547,8 @@
               "ty": "&<Self>::Persisted"
             },
             {
-              "name": "strict",
-              "ty": "bool"
+              "name": "strictness",
+              "ty": "Strictness"
             }
           ],
           "returns": "VerifyOutcome",
@@ -708,7 +603,7 @@
         "ChainIdentity"
       ],
       "module_path": "chain",
-      "docs": "Full contract for chains ①②③ that persist their computed signal documents. Provides `calc` (compute + persist), `load` (read persisted), `check_freshness` (stale detection), `evaluate_gate` (signal-gate logic delegating to domain pure functions), plus error-to-VerifyOutcome converters. The `SoTChain::check` blanket impl for any `T: PersistedSoTChain` runs `load → check_freshness → evaluate_gate`. Chain ⓪ does not implement this trait.",
+      "docs": "Pure gate contract for chains ①②③ that persist their computed signal documents. Carries only the pure, value-level concerns: associated types `Persisted`, `CalcError`, `StaleError`; `evaluate_gate` (delegates to domain pure function); `calc_error` / `stale_error` (error-to-VerifyOutcome converters). The impure I/O methods live in `LoadablePersistedChain`. Chain ⓪ does not implement this trait.",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -717,22 +612,6 @@
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
           "anchor": "IN-10"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "CN-06"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-09"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-10"
-        },
-        {
-          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
-          "anchor": "AC-11"
         },
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -756,15 +635,83 @@
           "ty": "&CatalogueSpecSignalsDocument"
         },
         {
-          "name": "strict",
-          "ty": "bool"
+          "name": "strictness",
+          "ty": "Strictness"
         }
       ],
       "returns": "VerifyOutcome",
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Pure domain function for chain ② (catalogue-spec) Red/Yellow gate evaluation. Symmetric with `check_spec_doc_signals` (chain ①) and `check_type_signals` (chain ③). Extracted from the two inline duplicate implementations in `libs/usecase/src/merge_gate/chain2_gate.rs` and `libs/infrastructure/src/verify/catalogue_spec_signals.rs` per D2/CN-05. Yellow signals produce `Finding::error` when `strict=true`, `Finding::warning` when `strict=false`; Red signals always produce `Finding::error`.",
+      "docs": "Pure domain function for chain ② (catalogue-spec) Red/Yellow gate evaluation. Symmetric with `check_spec_doc_signals` (chain ①) and `check_type_signals` (chain ③). Extracted from the two inline duplicate implementations per D2/CN-05. Yellow signals produce `Finding::error` when `Strictness::Strict`, `Finding::warning` when `Strictness::Interim`; Red signals always produce `Finding::error`.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "domain::spec::check_spec_doc_signals": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "doc",
+          "ty": "&SpecDocument"
+        },
+        {
+          "name": "strictness",
+          "ty": "Strictness"
+        }
+      ],
+      "returns": "VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pure domain function for chain ① (spec-adr) Red/Yellow gate evaluation. Yellow signals produce `Finding::error` when `Strictness::Strict`, `Finding::warning` when `Strictness::Interim`; Red signals always produce `Finding::error`. Signature updated from `bool` to `Strictness` per Finding #1 (Enum-first).",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "domain::tddd::consistency::check_type_signals": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "signals_doc",
+          "ty": "&TypeSignalsDocument"
+        },
+        {
+          "name": "strictness",
+          "ty": "Strictness"
+        }
+      ],
+      "returns": "VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pure domain function for chain ③ (impl-catalog) Red/Yellow gate evaluation. Yellow signals produce `Finding::error` when `Strictness::Strict`, `Finding::warning` when `Strictness::Interim`; Red signals always produce `Finding::error`. Signature updated from `bool` to `Strictness` per Finding #1 (Enum-first).",
       "spec_refs": [
         {
           "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
@@ -905,25 +852,6 @@
       "for_type": "SignalGateMatrix"
     },
     {
-      "action": "add",
-      "trait_ref": "SoTChain",
-      "for_type": "T",
-      "impl_generics": [
-        {
-          "name": "T",
-          "bounds": []
-        }
-      ],
-      "impl_where_predicates": [
-        {
-          "lhs": "T",
-          "rhs": [
-            "PersistedSoTChain"
-          ]
-        }
-      ]
-    },
-    {
       "action": "reference",
       "trait_ref": "core::fmt::Debug",
       "for_type": "TraitEntry"
@@ -966,6 +894,46 @@
     {
       "action": "add",
       "trait_ref": "core::fmt::Debug",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialOrd",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Ord",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RustExpression"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
       "for_type": "AssocConstDecl"
     },
     {
@@ -982,6 +950,36 @@
       "action": "add",
       "trait_ref": "core::cmp::Eq",
       "for_type": "AssocConstDecl"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RustExpressionError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "RustExpressionError"
     },
     {
       "action": "add",

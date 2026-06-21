@@ -1,7 +1,7 @@
 //! Chain ① (`spec-adr`) implementation.
 //!
-//! [`SpecAdrChain`] implements [`ChainIdentity`] and [`PersistedSoTChain`].
-//! The blanket impl in `domain::chain` derives [`domain::SoTChain`] automatically.
+//! [`SpecAdrChain`] implements [`ChainIdentity`] and [`crate::chain::traits::PersistedSoTChain`].
+//! The blanket impl in `usecase::chain::traits` derives [`crate::chain::traits::SoTChain`] automatically.
 //!
 //! # Persistence target
 //!
@@ -34,8 +34,10 @@
 
 use std::path::Path;
 
+use crate::chain::traits::LoadablePersistedChain;
 use domain::{
-    ChainId, ChainIdentity, PersistedSoTChain, SignalCounts, SpecDocument, check_spec_doc_signals,
+    ChainId, ChainIdentity, PersistedSoTChainGate, SignalCounts, SpecDocument, Strictness,
+    check_spec_doc_signals,
     verify::{VerifyFinding, VerifyOutcome},
 };
 
@@ -97,7 +99,7 @@ pub struct SpecAdrCalcError(pub String);
 /// Chain ① implementation: spec → ADR (spec requirement grounding completeness).
 ///
 /// Unit struct; stateless dispatch.  Implements [`ChainIdentity`] and
-/// [`PersistedSoTChain`]; obtains [`domain::SoTChain`] via the domain blanket impl.
+/// [`crate::chain::traits::PersistedSoTChain`]; obtains [`crate::chain::traits::SoTChain`] via the usecase blanket impl.
 #[derive(Debug, Clone, Copy)]
 pub struct SpecAdrChain;
 
@@ -110,9 +112,9 @@ impl ChainIdentity for SpecAdrChain {
     type Input<'a> = SpecAdrInput<'a>;
 }
 
-// ── PersistedSoTChain ─────────────────────────────────────────────────────────
+// ── PersistedSoTChainGate (pure domain gate) ──────────────────────────────────
 
-impl PersistedSoTChain for SpecAdrChain {
+impl PersistedSoTChainGate for SpecAdrChain {
     /// The persisted signal document type.
     type Persisted = SpecDocument;
     /// Error produced by [`calc`] and [`load`].
@@ -125,6 +127,29 @@ impl PersistedSoTChain for SpecAdrChain {
     /// [`check_freshness`]: SpecAdrChain::check_freshness
     type StaleError = SpecAdrStaleError;
 
+    /// Delegate to `domain::check_spec_doc_signals`.
+    fn evaluate_gate(persisted: &Self::Persisted, strictness: Strictness) -> VerifyOutcome {
+        check_spec_doc_signals(persisted, strictness)
+    }
+
+    /// Convert a [`SpecAdrCalcError`] into a [`VerifyOutcome`] error finding.
+    fn calc_error(error: Self::CalcError) -> VerifyOutcome {
+        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "chain ① (spec-adr): {error}"
+        ))])
+    }
+
+    /// Convert a [`SpecAdrStaleError`] into a [`VerifyOutcome`] error finding.
+    fn stale_error(error: Self::StaleError) -> VerifyOutcome {
+        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "chain ① (spec-adr): {error}"
+        ))])
+    }
+}
+
+// ── LoadablePersistedChain (I/O port, usecase layer) ──────────────────────────
+
+impl LoadablePersistedChain for SpecAdrChain {
     /// Compute signals for `spec.json` and write them back.
     ///
     /// # T007 placeholder
@@ -167,25 +192,6 @@ impl PersistedSoTChain for SpecAdrChain {
             None => Err(SpecAdrStaleError { cached: SignalCounts::new(0, 0, 0), fresh }),
         }
     }
-
-    /// Delegate to `domain::check_spec_doc_signals`.
-    fn evaluate_gate(persisted: &Self::Persisted, strict: bool) -> VerifyOutcome {
-        check_spec_doc_signals(persisted, strict)
-    }
-
-    /// Convert a [`SpecAdrCalcError`] into a [`VerifyOutcome`] error finding.
-    fn calc_error(error: Self::CalcError) -> VerifyOutcome {
-        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "chain ① (spec-adr): {error}"
-        ))])
-    }
-
-    /// Convert a [`SpecAdrStaleError`] into a [`VerifyOutcome`] error finding.
-    fn stale_error(error: Self::StaleError) -> VerifyOutcome {
-        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "chain ① (spec-adr): {error}"
-        ))])
-    }
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -197,9 +203,10 @@ mod tests {
     use std::path::PathBuf;
 
     use crate::chain::test_support::{assert_persisted_chain_bounds, call_sotchain_check};
+    use crate::chain::traits::LoadablePersistedChain;
     use domain::{
-        AdrAnchor, AdrRef, ChainId, ChainIdentity, PersistedSoTChain, SignalCounts, SpecDocument,
-        SpecElementId, SpecRequirement, SpecScope, verify::Severity,
+        AdrAnchor, AdrRef, ChainId, ChainIdentity, PersistedSoTChainGate, SignalCounts,
+        SpecDocument, SpecElementId, SpecRequirement, SpecScope, Strictness, verify::Severity,
     };
 
     use super::{SpecAdrChain, SpecAdrInput, SpecAdrStaleError};
@@ -222,7 +229,7 @@ mod tests {
     fn test_spec_adr_chain_accepted_by_sotchain_bound_via_blanket_impl() {
         let input = SpecAdrInput::new(Path::new("/tmp/spec.json"));
         // load is not yet wired; check should return a calc_error finding.
-        let outcome = call_sotchain_check::<SpecAdrChain>(&input, false);
+        let outcome = call_sotchain_check::<SpecAdrChain>(&input, Strictness::Interim);
         assert!(outcome.has_errors(), "unwired load must surface as calc_error: {outcome:?}");
     }
 
@@ -298,7 +305,7 @@ mod tests {
         let doc = make_doc_with_signals(Some(SignalCounts::new(1, 0, 0)));
         let input = SpecAdrInput::new(Path::new("/tmp/spec.json"));
         let _ = input; // input not used by evaluate_gate
-        let outcome = SpecAdrChain::evaluate_gate(&doc, false);
+        let outcome = SpecAdrChain::evaluate_gate(&doc, Strictness::Interim);
         assert!(outcome.findings().is_empty(), "all-blue spec must pass gate: {outcome:?}");
     }
 
@@ -306,7 +313,7 @@ mod tests {
     fn test_evaluate_gate_returns_error_for_none_signals() {
         // domain::check_spec_doc_signals returns an error when signals is None.
         let doc = make_doc_with_signals(None);
-        let outcome = SpecAdrChain::evaluate_gate(&doc, false);
+        let outcome = SpecAdrChain::evaluate_gate(&doc, Strictness::Interim);
         assert!(
             outcome.has_errors(),
             "None signals must be an error from evaluate_gate: {outcome:?}"

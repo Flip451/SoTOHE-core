@@ -288,10 +288,10 @@ where
     //    resolved from gate_matrix.adr_user at GateKind::Merge. This is a soft
     //    dependency: Chain ⓪ does not gate the remaining stages — its findings
     //    are accumulated into `outcome` but do not short-circuit Chains ①②③.
-    let adr_strict = gate_matrix.resolve(ChainId::AdrUser, GateKind::Merge) == Strictness::Strict;
+    let adr_strictness: Strictness = gate_matrix.resolve(ChainId::AdrUser, GateKind::Merge);
     let chain0_outcome = match reader.read_adr_verify_report(branch.to_owned()) {
         BlobFetchResult::Found(report) => {
-            crate::chain::adr_user::adr_report_to_outcome(&report, adr_strict)
+            crate::chain::adr_user::adr_report_to_outcome(&report, adr_strictness)
         }
         BlobFetchResult::NotFound => {
             // ADR directory absent on the branch — treat as clean (no decisions
@@ -357,9 +357,8 @@ where
         }
     }
 
-    let spec_adr_strict =
-        gate_matrix.resolve(ChainId::SpecAdr, GateKind::Merge) == Strictness::Strict;
-    let stage1 = check_spec_doc_signals(&spec_doc, spec_adr_strict);
+    let spec_adr_strictness = gate_matrix.resolve(ChainId::SpecAdr, GateKind::Merge);
+    let stage1 = check_spec_doc_signals(&spec_doc, spec_adr_strictness);
     if stage1.has_errors() {
         return with_chain0(stage1);
     }
@@ -423,8 +422,7 @@ where
     //
     // The catalogue's TDDD opt-out check (step 1 NotFound) preserves the pre-T022
     // behavior: a layer without a catalogue file is not enrolled in Stage 2.
-    let impl_catalog_strict =
-        gate_matrix.resolve(ChainId::ImplCatalog, GateKind::Merge) == Strictness::Strict;
+    let impl_catalog_strictness = gate_matrix.resolve(ChainId::ImplCatalog, GateKind::Merge);
     let mut outcome = stage1;
     for layer_id in &layer_ids {
         // Step 1: read catalogue bytes + hash (opt-out check and freshness data).
@@ -478,7 +476,7 @@ where
         }
 
         // Step 4: signal gate — strictness resolved from gate_matrix.impl_catalog.
-        outcome.merge(check_type_signals(&signals_doc, impl_catalog_strict));
+        outcome.merge(check_type_signals(&signals_doc, impl_catalog_strictness));
     }
 
     // Stage 3 (Chain ② — ADR §D3.6 / IN-14): catalogue-spec integrity binary
@@ -563,8 +561,7 @@ where
     };
 
     // Resolve strictness for Chain ② (catalog-spec) from gate_matrix.
-    let catalog_spec_strict =
-        gate_matrix.resolve(ChainId::CatalogSpec, GateKind::Merge) == Strictness::Strict;
+    let catalog_spec_strictness = gate_matrix.resolve(ChainId::CatalogSpec, GateKind::Merge);
     for layer_id in &layer_ids {
         // Skip layers that have NOT opted in to Chain ② — mere presence of a
         // signals file is insufficient (see the opted_in_layers comment above).
@@ -579,7 +576,7 @@ where
             track_id,
             layer_id,
             &spec_element_hashes,
-            catalog_spec_strict,
+            catalog_spec_strictness,
         ));
     }
 

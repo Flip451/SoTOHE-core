@@ -3,7 +3,7 @@
 //! Extracted from `decode.rs` to keep that module within the 700-line size budget.
 
 use domain::tddd::catalogue_v2::entries::{AssocConstDecl, AssocTypeDecl};
-use domain::tddd::catalogue_v2::{AssocConstName, TypeName, TypeRef};
+use domain::tddd::catalogue_v2::{AssocConstName, RustExpression, TypeName, TypeRef};
 
 use super::CatalogueDocumentCodecError;
 use super::dto::{AssocConstDeclDto, AssocTypeDeclDto};
@@ -74,7 +74,9 @@ pub(super) fn assoc_const_decl_from_dto(
                     "assoc_consts[{idx}].default_value '{value}' is not a valid Rust expression: {e}"
                 ))
             })?;
-            Ok(value)
+            RustExpression::try_new(value.clone()).map_err(|e| {
+                err(format!("assoc_consts[{idx}].default_value '{value}': {e}"))
+            })
         })
         .transpose()?;
     Ok(AssocConstDecl { name, ty, default_value })

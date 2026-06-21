@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "22b7aaf20f31b3700d1964b6629ddfc518c8470e0014dfb86135f6844cb9eb44",
+  "catalogue_declaration_hash": "4d9b464a59dc498ee79554796b127ec9fc5d0ce7b260cff4d32ab4a453bb312e",
   "signals": [
     {
       "type_name": "AssocConstDecl",
       "signal": "blue",
-      "entry_hash": "498abec7e200fa24ebb8ac0582f4d6ebae37adc6fa3c5f88311f25f5810be688"
+      "entry_hash": "7252f729ae98389058a819656bc41ab886bf352e6f8239fd320407635c8ecee1"
     },
     {
       "type_name": "AssocConstName",
@@ -33,6 +33,16 @@
       "entry_hash": "820cd2617a178cf70c69f7bac5e1b2b376f3fcfdbd28624e42c06e46f5223b33"
     },
     {
+      "type_name": "RustExpression",
+      "signal": "blue",
+      "entry_hash": "a422951d1bf718825aada5956e7d1c1b6c282ee014352ad236bddaf903b88d62"
+    },
+    {
+      "type_name": "RustExpressionError",
+      "signal": "blue",
+      "entry_hash": "3ea6dc8566ebbd3146bb61e3951ef387ba7c184acc34f85f9a727d69be9dfa66"
+    },
+    {
       "type_name": "SignalGateMatrix",
       "signal": "blue",
       "entry_hash": "fba6cd20d70c40d86f539d75909a7f8d536eb1aebdc86708e0b6582036907e7f"
@@ -53,24 +63,24 @@
       "entry_hash": "1b03801dbcd4e1566a0359bf7e2b7fa586039712aa0afe9d28ba13d1cdad3a7d"
     },
     {
-      "type_name": "LiveSoTChain",
+      "type_name": "PersistedSoTChainGate",
       "signal": "blue",
-      "entry_hash": "3a46b93da45b68fbea9be84a06ca1ff76d08afe6e1d906dfba343dc828c8c9f0"
-    },
-    {
-      "type_name": "PersistedSoTChain",
-      "signal": "blue",
-      "entry_hash": "36ea7f6e5e091deb029a711c2b2096236681b10bd45e68e9bc1e4e5230f4605d"
-    },
-    {
-      "type_name": "SoTChain",
-      "signal": "blue",
-      "entry_hash": "e815a9d92a2c602994d59279693637c7ccf90b0b018cc0f485251bf874ae123b"
+      "entry_hash": "40e05b42be949e3256a83e146d3a4929fa2a11188868c149144fee4f0e637fe8"
     },
     {
       "type_name": "domain::chain::check_catalogue_spec_signals",
       "signal": "blue",
-      "entry_hash": "782af7209396fe43ee23e189dcd8d457d1bf2e50ca14d7fe2be1707ad1f43e3b"
+      "entry_hash": "eebea71936b15099ac6d0941aba1ee697327a74ee8d4289b11f59c1218b31d94"
+    },
+    {
+      "type_name": "domain::spec::check_spec_doc_signals",
+      "signal": "blue",
+      "entry_hash": "35496adfef7143ff1d21e6309708ffba2b745688d83d7ffa3e5a44ecd2bb4b0d"
+    },
+    {
+      "type_name": "domain::tddd::consistency::check_type_signals",
+      "signal": "blue",
+      "entry_hash": "1fe7d70796cce0e4e007e2132196b029c876428fc6201b35fa28af2e1f03f79e"
     }
   ]
 }

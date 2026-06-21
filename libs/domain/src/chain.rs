@@ -27,16 +27,19 @@
 //! # Trait hierarchy
 //!
 //! ```text
-//! ChainIdentity
-//!   ├── SoTChain              ← minimal check contract; all 4 chains satisfy this
-//!   │     └── LiveSoTChain   ← live calc without persistence; chain ⓪ (adr-user) only
-//!   └── PersistedSoTChain    ← calc+load+freshness+gate; chains ①②③
-//!         (blanket impl of SoTChain for any T: PersistedSoTChain)
+//! ChainIdentity                      (domain)
+//!   ├── SoTChain                     (usecase::chain::traits) ← minimal check contract
+//!   │     └── LiveSoTChain           (usecase::chain::traits) ← live calc without persistence
+//!   └── PersistedSoTChainGate        (domain) ← pure gate; chains ①②③
+//!         └── LoadablePersistedChain (usecase::chain::traits) ← I/O port; chains ①②③
+//!               └── PersistedSoTChain (usecase::chain::traits) ← sealed supertrait
+//!                     (blanket impl of SoTChain for any T: PersistedSoTChain)
 //! ```
 //!
-//! The split between [`LiveSoTChain`] and [`PersistedSoTChain`] makes illegal states
-//! unrepresentable: chain ⓪ cannot be asked to `calc` into a file or to `check_freshness`
-//! against a persisted document — those operations do not exist on the type.
+//! `SoTChain`, `LiveSoTChain`, `LoadablePersistedChain`, and `PersistedSoTChain` were
+//! moved to `usecase::chain::traits` (reviewer Finding #1): those traits cover I/O and
+//! dispatch concerns that belong in the usecase layer. `ChainIdentity` and
+//! `PersistedSoTChainGate` remain here as pure domain contracts.
 
 use crate::ConfidenceSignal;
 use crate::tddd::catalogue_spec_signal::CatalogueSpecSignalsDocument;
@@ -156,20 +159,21 @@ impl SignalGateMatrix {
 /// # Rules
 ///
 /// - No signals (`doc.signals` is empty) → `VerifyOutcome::pass()` (empty catalogue / no entries).
-/// - Any Red signal → `VerifyFinding::error` (unconditional, regardless of `strict`).
-/// - Yellow signal, `strict = true` → `VerifyFinding::error`.
-/// - Yellow signal, `strict = false` → `VerifyFinding::warning`.
+/// - Any Red signal → `VerifyFinding::error` (unconditional, regardless of `strictness`).
+/// - Yellow signal, `Strictness::Strict` → `VerifyFinding::error`.
+/// - Yellow signal, `Strictness::Interim` → `VerifyFinding::warning`.
 /// - All Blue / no Yellow → `VerifyOutcome::pass()`.
 ///
-/// The `strict` parameter is:
-/// - `true` for the merge gate (all Yellow must be upgraded to Blue before merge).
-/// - `false` for CI interim mode (Yellow is allowed during iteration but visualized).
+/// Taking [`Strictness`] (not `bool`) preserves type safety per
+/// `knowledge/conventions/prefer-type-safe-abstractions.md` § Enum-first: callers
+/// pass a domain-named discriminant so an inverted conversion cannot silently flip
+/// gate behavior.
 ///
 /// Reference: ADR `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md` §D2.
 #[must_use]
 pub fn check_catalogue_spec_signals(
     doc: &CatalogueSpecSignalsDocument,
-    strict: bool,
+    strictness: Strictness,
 ) -> VerifyOutcome {
     let signals = &doc.signals;
 
@@ -178,7 +182,7 @@ pub fn check_catalogue_spec_signals(
         return VerifyOutcome::pass();
     }
 
-    // Red check: always an error, regardless of strict mode.
+    // Red check: always an error, regardless of strictness.
     let reds: Vec<&str> = signals
         .iter()
         .filter(|s| s.signal == ConfidenceSignal::Red)
@@ -194,7 +198,7 @@ pub fn check_catalogue_spec_signals(
         ))]);
     }
 
-    // Yellow check: error in strict mode, warning in interim mode.
+    // Yellow check: error in Strict mode, warning in Interim mode.
     let yellows: Vec<&str> = signals
         .iter()
         .filter(|s| s.signal == ConfidenceSignal::Yellow)
@@ -209,10 +213,12 @@ pub fn check_catalogue_spec_signals(
             yellows.len(),
             yellows.join(", ")
         );
-        if strict {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]);
-        }
-        return VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)]);
+        return match strictness {
+            Strictness::Strict => VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]),
+            Strictness::Interim => {
+                VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)])
+            }
+        };
     }
 
     VerifyOutcome::pass()
@@ -255,75 +261,26 @@ pub trait ChainIdentity {
     type Input<'a>;
 }
 
-/// Minimal check contract satisfied by all four chains.
+/// Pure gate contract for chains ①②③ that persist their computed signal documents.
 ///
-/// Provides `check(input, strict) -> VerifyOutcome`. The `strict` flag is resolved
-/// by the caller from a [`SignalGateMatrix`] before dispatch.
+/// Carries only the pure, value-level concerns that the domain layer owns:
+/// - associated types `Persisted`, `CalcError`, `StaleError` (the document and error shapes)
+/// - `evaluate_gate`: delegate to the corresponding domain pure function
+/// - `calc_error` / `stale_error`: convert chain-specific errors into [`VerifyOutcome`]
 ///
-/// For chains ①②③ this is fulfilled via the blanket impl over [`PersistedSoTChain`];
-/// for chain ⓪ it is fulfilled directly (because chain ⓪ does not persist state).
-/// CLI `check-*` dispatch goes through this trait.
-pub trait SoTChain: ChainIdentity {
-    /// Evaluate the chain's gate for the given input, returning a [`VerifyOutcome`].
-    ///
-    /// - `strict = true`: Yellow signals produce `Finding::error`.
-    /// - `strict = false`: Yellow signals produce `Finding::warning`.
-    ///
-    /// Red signals always produce `Finding::error` regardless of `strict`.
-    fn check(input: &Self::Input<'_>, strict: bool) -> VerifyOutcome;
-}
-
-/// Extension of [`SoTChain`] for chains that compute signals live without persisting.
+/// The impure I/O methods (`calc`, `load`, `check_freshness`) live in
+/// `usecase::chain::LoadablePersistedChain`, keeping the domain trait free of
+/// I/O concerns per hexagonal-architecture port placement rules (CN-05).
 ///
-/// Implemented **only** by `AdrUserChain` (chain ⓪). `calc_live` returns the
-/// live-computed result without writing any file. Compiling [`PersistedSoTChain::calc`]
-/// for chain ⓪ is intentionally impossible — the types do not exist on the chain type.
-///
-/// # Associated types
-///
-/// - `LiveCalc`: the computed result type returned by `calc_live`.
-/// - `CalcError`: the error type returned when live calculation fails.
-pub trait LiveSoTChain: SoTChain {
-    /// The live-computed signal result type (e.g. a grounding report for chain ⓪).
-    type LiveCalc;
-    /// Error produced when `calc_live` cannot complete.
-    type CalcError;
-
-    /// Compute the chain's signals live from `input` without writing any persisted file.
-    ///
-    /// Used by `signal calc-adr-user`. The result is displayed to the user or
-    /// consumed by the caller; it is never serialised to disk by this call.
-    fn calc_live(input: &Self::Input<'_>) -> Result<Self::LiveCalc, Self::CalcError>;
-}
-
-/// Full contract for chains ①②③ that persist their computed signal documents.
-///
-/// Provides:
-/// - [`calc`](PersistedSoTChain::calc): compute signals and write the persisted document.
-/// - [`load`](PersistedSoTChain::load): read an already-persisted document from disk.
-/// - [`check_freshness`](PersistedSoTChain::check_freshness): detect stale calc results
-///   (e.g. hash comparison, self-consistency checks — see ADR D7 §5 for per-chain details).
-/// - [`evaluate_gate`](PersistedSoTChain::evaluate_gate): delegate to the domain pure
-///   function (`check_spec_doc_signals` / `check_catalogue_spec_signals` /
-///   `check_type_signals`) for the signal-gate logic.
-/// - [`calc_error`](PersistedSoTChain::calc_error) /
-///   [`stale_error`](PersistedSoTChain::stale_error): convert chain-specific error types
-///   into a [`VerifyOutcome`] for uniform CLI output.
-///
-/// Chain ⓪ does **not** implement this trait. The blanket impl `impl<T: PersistedSoTChain>
-/// SoTChain for T` ensures that the `SoTChain::check` path for chains ①②③ always runs
-/// `load → check_freshness → evaluate_gate`, making it impossible to skip freshness
-/// verification in an ad-hoc `check` implementation.
+/// Chain ⓪ does **not** implement this trait.
 ///
 /// # Associated types
 ///
 /// - `Persisted`: the persisted document type (e.g. `SpecDocument`, `CatalogueSpecSignalsDocument`,
 ///   `TypeSignalsDocument`).
-/// - `CalcError`: error produced by [`calc`](PersistedSoTChain::calc) or
-///   [`load`](PersistedSoTChain::load).
-/// - `StaleError`: error produced by [`check_freshness`](PersistedSoTChain::check_freshness)
-///   when the persisted document is out of date.
-pub trait PersistedSoTChain: ChainIdentity {
+/// - `CalcError`: error produced when computing or loading the persisted document fails.
+/// - `StaleError`: error produced when freshness verification detects a stale document.
+pub trait PersistedSoTChainGate: ChainIdentity {
     /// The persisted signal document type.
     type Persisted;
     /// Error produced when computing or loading the persisted document fails.
@@ -331,74 +288,19 @@ pub trait PersistedSoTChain: ChainIdentity {
     /// Error produced when freshness verification detects a stale document.
     type StaleError;
 
-    /// Compute signals from `input` and write the result to the persisted document path.
-    ///
-    /// Used by `signal calc-<chain>` for chains ①②③.
-    fn calc(input: &Self::Input<'_>) -> Result<Self::Persisted, Self::CalcError>;
-
-    /// Load a previously persisted document from the path specified in `input`.
-    ///
-    /// Returns `Err(CalcError)` if the document cannot be read or deserialized (which
-    /// typically means `calc` has never been run or the file was deleted).
-    fn load(input: &Self::Input<'_>) -> Result<Self::Persisted, Self::CalcError>;
-
-    /// Verify that `persisted` is still up-to-date relative to the current `input`.
-    ///
-    /// Returns `Ok(())` if the document is fresh, or `Err(StaleError)` if the
-    /// underlying sources have changed since the last `calc` run. Stale detection
-    /// is always a hard error — callers must rerun `calc` before proceeding.
-    ///
-    /// Per ADR §5 each chain has its own freshness mechanism:
-    /// - ① self-consistency check (`evaluate_signals()` vs stored `signals()`).
-    /// - ② entry hash comparison (`entry_hash` vs current catalogue bytes SHA-256).
-    /// - ③ declaration hash comparison (`declaration_hash` vs current catalogue bytes SHA-256).
-    fn check_freshness(
-        input: &Self::Input<'_>,
-        persisted: &Self::Persisted,
-    ) -> Result<(), Self::StaleError>;
-
     /// Apply the signal-gate logic to `persisted` and return the verdict.
     ///
     /// Delegates to the corresponding domain pure function:
-    /// - ① `check_spec_doc_signals(&doc, strict)`
-    /// - ② `check_catalogue_spec_signals(&doc, strict)` (D2 new function)
-    /// - ③ `check_type_signals(&doc, strict)`
-    fn evaluate_gate(persisted: &Self::Persisted, strict: bool) -> VerifyOutcome;
+    /// - ① `check_spec_doc_signals(&doc, strictness)`
+    /// - ② `check_catalogue_spec_signals(&doc, strictness)` (D2 new function)
+    /// - ③ `check_type_signals(&doc, strictness)`
+    fn evaluate_gate(persisted: &Self::Persisted, strictness: Strictness) -> VerifyOutcome;
 
     /// Convert a `CalcError` into a [`VerifyOutcome`] for uniform CLI display.
     fn calc_error(error: Self::CalcError) -> VerifyOutcome;
 
     /// Convert a `StaleError` into a [`VerifyOutcome`] for uniform CLI display.
     fn stale_error(error: Self::StaleError) -> VerifyOutcome;
-}
-
-// ── Blanket impl ─────────────────────────────────────────────────────────────
-
-/// Blanket impl: any `T: PersistedSoTChain` automatically satisfies [`SoTChain`].
-///
-/// The `check` pipeline is fixed as `load → check_freshness → evaluate_gate`, making
-/// it impossible to implement a persisted chain's `check` that skips freshness.
-///
-/// Previously `#[doc(hidden)]` because the catalogue schema could not express
-/// a generic blanket impl (`for_type` requires a concrete TypeRef). With T015's
-/// generic_params support on `trait_impls`, the catalogue entry with
-/// `for_type: "T"`, `impl_generics: [{name:"T"}]`, and
-/// `impl_where_predicates: [{lhs:"T", rhs:["PersistedSoTChain"]}]` now matches
-/// the rustdoc-visible blanket impl, so `doc(hidden)` is no longer needed.
-impl<T> SoTChain for T
-where
-    T: PersistedSoTChain,
-{
-    fn check(input: &Self::Input<'_>, strict: bool) -> VerifyOutcome {
-        let persisted = match T::load(input) {
-            Ok(persisted) => persisted,
-            Err(error) => return T::calc_error(error),
-        };
-        match T::check_freshness(input, &persisted) {
-            Ok(()) => T::evaluate_gate(&persisted, strict),
-            Err(error) => T::stale_error(error),
-        }
-    }
 }
 
 // ── Unit tests ────────────────────────────────────────────────────────────────
@@ -560,7 +462,7 @@ mod tests {
 
     #[test]
     fn test_check_catalogue_spec_signals_empty_signals_passes() {
-        let outcome = check_catalogue_spec_signals(&doc(vec![]), false);
+        let outcome = check_catalogue_spec_signals(&doc(vec![]), Strictness::Interim);
         assert!(outcome.findings().is_empty(), "empty signals must pass (no entries): {outcome:?}");
     }
 
@@ -571,13 +473,13 @@ mod tests {
             signal("TypeB", ConfidenceSignal::Blue),
         ]);
 
-        let outcome_interim = check_catalogue_spec_signals(&d, false);
+        let outcome_interim = check_catalogue_spec_signals(&d, Strictness::Interim);
         assert!(
             outcome_interim.findings().is_empty(),
             "all-Blue interim must produce zero findings: {outcome_interim:?}"
         );
 
-        let outcome_strict = check_catalogue_spec_signals(&d, true);
+        let outcome_strict = check_catalogue_spec_signals(&d, Strictness::Strict);
         assert!(
             outcome_strict.findings().is_empty(),
             "all-Blue strict must produce zero findings: {outcome_strict:?}"
@@ -591,7 +493,7 @@ mod tests {
             signal("TypeB", ConfidenceSignal::Red),
         ]);
 
-        let outcome_interim = check_catalogue_spec_signals(&d, false);
+        let outcome_interim = check_catalogue_spec_signals(&d, Strictness::Interim);
         assert!(
             outcome_interim.has_errors(),
             "red must be an error in interim mode: {outcome_interim:?}"
@@ -599,7 +501,7 @@ mod tests {
         let msg = outcome_interim.findings()[0].message();
         assert!(msg.contains("TypeB"), "error must name the offending entry: {msg}");
 
-        let outcome_strict = check_catalogue_spec_signals(&d, true);
+        let outcome_strict = check_catalogue_spec_signals(&d, Strictness::Strict);
         assert!(
             outcome_strict.has_errors(),
             "red must be an error in strict mode: {outcome_strict:?}"
@@ -613,7 +515,7 @@ mod tests {
             signal("TypeB", ConfidenceSignal::Yellow),
         ]);
 
-        let outcome = check_catalogue_spec_signals(&d, false);
+        let outcome = check_catalogue_spec_signals(&d, Strictness::Interim);
         assert!(!outcome.has_errors(), "yellow in interim mode must not be an error: {outcome:?}");
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1, "expected exactly one warning finding");
@@ -630,7 +532,7 @@ mod tests {
             signal("TypeB", ConfidenceSignal::Yellow),
         ]);
 
-        let outcome = check_catalogue_spec_signals(&d, true);
+        let outcome = check_catalogue_spec_signals(&d, Strictness::Strict);
         assert!(outcome.has_errors(), "yellow in strict mode must be an error: {outcome:?}");
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1);

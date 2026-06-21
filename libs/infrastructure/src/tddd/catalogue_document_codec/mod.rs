@@ -1331,7 +1331,7 @@ mod tests {
         assert_eq!(entry.assoc_consts.len(), 1);
         assert_eq!(entry.assoc_consts[0].name.as_str(), "ID");
         assert_eq!(entry.assoc_consts[0].ty.as_str(), "usize");
-        assert_eq!(entry.assoc_consts[0].default_value.as_deref(), Some("42"));
+        assert_eq!(entry.assoc_consts[0].default_value.as_ref().map(|e| e.as_str()), Some("42"));
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         assert!(encoded.contains("\"assoc_types\""), "assoc_types must encode: {encoded}");

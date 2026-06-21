@@ -1,7 +1,7 @@
 //! Chain ⓪ (`adr-user`) implementation.
 //!
-//! [`AdrUserChain`] implements [`ChainIdentity`], [`SoTChain`], and
-//! [`LiveSoTChain`]. It does **not** implement [`domain::PersistedSoTChain`] — live
+//! [`AdrUserChain`] implements [`ChainIdentity`], [`crate::chain::traits::SoTChain`], and
+//! [`crate::chain::traits::LiveSoTChain`]. It does **not** implement [`crate::chain::traits::PersistedSoTChain`] — live
 //! scan only, no persistence file.
 //!
 //! # Input type
@@ -32,15 +32,16 @@
 
 use std::path::Path;
 
+use crate::chain::traits::{LiveSoTChain, SoTChain};
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{AdrFilePortError, AdrVerifyReport, ChainId, ChainIdentity, LiveSoTChain, SoTChain};
+use domain::{AdrFilePortError, AdrVerifyReport, ChainId, ChainIdentity, Strictness};
 
 // ── Chain ⓪ struct ───────────────────────────────────────────────────────────
 
 /// Chain ⓪ implementation: ADR → user decision (provenance completeness).
 ///
-/// Unit struct; stateless dispatch. Implements [`ChainIdentity`], [`SoTChain`],
-/// and [`LiveSoTChain`]. Does **not** implement [`domain::PersistedSoTChain`].
+/// Unit struct; stateless dispatch. Implements [`ChainIdentity`], [`crate::chain::traits::SoTChain`],
+/// and [`crate::chain::traits::LiveSoTChain`]. Does **not** implement [`crate::chain::traits::PersistedSoTChain`].
 ///
 /// See module documentation for the T006 wiring open question.
 #[derive(Debug, Clone, Copy)]
@@ -64,7 +65,7 @@ impl SoTChain for AdrUserChain {
     /// that prompts the operator to wire the ADR file port.
     ///
     /// [`calc_live`]: AdrUserChain::calc_live
-    fn check(input: &Self::Input<'_>, strict: bool) -> VerifyOutcome {
+    fn check(input: &Self::Input<'_>, strictness: Strictness) -> VerifyOutcome {
         let report = match Self::calc_live(input) {
             Ok(r) => r,
             Err(e) => {
@@ -73,7 +74,7 @@ impl SoTChain for AdrUserChain {
                 ))]);
             }
         };
-        adr_report_to_outcome(&report, strict)
+        adr_report_to_outcome(&report, strictness)
     }
 }
 
@@ -128,7 +129,7 @@ impl LiveSoTChain for AdrUserChain {
 /// warning evaluation — they are informational only (back-fill debt).
 #[doc(hidden)]
 #[must_use]
-pub fn adr_report_to_outcome(report: &AdrVerifyReport, strict: bool) -> VerifyOutcome {
+pub fn adr_report_to_outcome(report: &AdrVerifyReport, strictness: Strictness) -> VerifyOutcome {
     if report.red_count() >= 1 {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{} ADR decision(s) have Red signal (no traced grounds) — \
@@ -143,10 +144,12 @@ pub fn adr_report_to_outcome(report: &AdrVerifyReport, strict: bool) -> VerifyOu
              Add a `user_decision_ref` to each entry.",
             report.yellow_count()
         );
-        if strict {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]);
-        }
-        return VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)]);
+        return match strictness {
+            Strictness::Strict => VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]),
+            Strictness::Interim => {
+                VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)])
+            }
+        };
     }
     VerifyOutcome::pass()
 }
@@ -158,8 +161,9 @@ pub fn adr_report_to_outcome(report: &AdrVerifyReport, strict: bool) -> VerifyOu
 mod tests {
     use std::path::Path;
 
+    use crate::chain::traits::{LiveSoTChain, SoTChain};
     use domain::verify::Severity;
-    use domain::{AdrVerifyReport, ChainId, ChainIdentity, LiveSoTChain, SoTChain};
+    use domain::{AdrVerifyReport, ChainId, ChainIdentity, Strictness};
 
     use super::{AdrUserChain, adr_report_to_outcome};
 
@@ -190,7 +194,7 @@ mod tests {
     #[test]
     fn test_adr_report_to_outcome_all_blue_passes() {
         let report = AdrVerifyReport::new(5, 0, 0, 1);
-        let outcome = adr_report_to_outcome(&report, false);
+        let outcome = adr_report_to_outcome(&report, Strictness::Interim);
         assert!(outcome.findings().is_empty(), "all-blue must pass: {outcome:?}");
     }
 
@@ -198,18 +202,18 @@ mod tests {
     fn test_adr_report_to_outcome_red_is_error_regardless_of_strict() {
         let report = AdrVerifyReport::new(0, 0, 2, 0);
 
-        let outcome_interim = adr_report_to_outcome(&report, false);
+        let outcome_interim = adr_report_to_outcome(&report, Strictness::Interim);
         assert!(outcome_interim.has_errors(), "red must error in interim: {outcome_interim:?}");
         assert!(outcome_interim.findings()[0].message().contains("2 ADR decision"));
 
-        let outcome_strict = adr_report_to_outcome(&report, true);
+        let outcome_strict = adr_report_to_outcome(&report, Strictness::Strict);
         assert!(outcome_strict.has_errors(), "red must error in strict: {outcome_strict:?}");
     }
 
     #[test]
     fn test_adr_report_to_outcome_yellow_is_warning_in_interim_mode() {
         let report = AdrVerifyReport::new(3, 2, 0, 0);
-        let outcome = adr_report_to_outcome(&report, false);
+        let outcome = adr_report_to_outcome(&report, Strictness::Interim);
         assert!(!outcome.has_errors(), "yellow in interim must not error: {outcome:?}");
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1, "expected exactly one finding");
@@ -221,7 +225,7 @@ mod tests {
     #[test]
     fn test_adr_report_to_outcome_yellow_is_error_in_strict_mode() {
         let report = AdrVerifyReport::new(3, 1, 0, 0);
-        let outcome = adr_report_to_outcome(&report, true);
+        let outcome = adr_report_to_outcome(&report, Strictness::Strict);
         assert!(outcome.has_errors(), "yellow in strict must error: {outcome:?}");
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1);
@@ -232,7 +236,7 @@ mod tests {
     fn test_adr_report_to_outcome_grandfathered_does_not_affect_gate() {
         // 10 grandfathered decisions should not block or warn.
         let report = AdrVerifyReport::new(5, 0, 0, 10);
-        let outcome = adr_report_to_outcome(&report, true);
+        let outcome = adr_report_to_outcome(&report, Strictness::Strict);
         assert!(outcome.findings().is_empty(), "grandfathered must not affect gate: {outcome:?}");
     }
 
@@ -240,7 +244,7 @@ mod tests {
     fn test_adr_report_to_outcome_red_takes_priority_over_yellow() {
         // When both red and yellow are non-zero, red error fires first.
         let report = AdrVerifyReport::new(0, 1, 1, 0);
-        let outcome_interim = adr_report_to_outcome(&report, false);
+        let outcome_interim = adr_report_to_outcome(&report, Strictness::Interim);
         assert!(outcome_interim.has_errors(), "red > yellow must still error: {outcome_interim:?}");
         assert!(outcome_interim.findings()[0].message().contains("Red signal"));
     }
@@ -251,7 +255,7 @@ mod tests {
     fn test_check_returns_error_when_calc_live_not_yet_wired() {
         // The placeholder impl returns an error; check must surface it.
         let path = Path::new("/tmp/project");
-        let outcome = AdrUserChain::check(&path, false);
+        let outcome = AdrUserChain::check(&path, Strictness::Interim);
         assert!(outcome.has_errors(), "unwired calc_live must surface as error: {outcome:?}");
         assert!(
             outcome.findings()[0].message().contains("not yet wired"),

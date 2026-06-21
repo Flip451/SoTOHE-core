@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-20T11:20:21Z",
-  "declaration_hash": "3b6bbfd58daec1e6c8384bb5682344082f1bdfb3f9fd8445dbfa3a3c6ea98c84",
+  "generated_at": "2026-06-21T04:03:35Z",
+  "declaration_hash": "f934bc0d7d770d02da1a0ff237129c8da6115faa4c2b749cae667734e85312dc",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -136,6 +136,24 @@
     },
     {
       "type_name": "infrastructure::verify::spec_states::verify_type_signals_from_spec_json",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::catalogue_spec_signals_path",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::impl_catalog_signals_path",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_from_workspace",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

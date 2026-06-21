@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "67b25e36dc1979db93691225e377c22a3d3dcbb49a463ae4ee02a9d60e25b445",
+  "catalogue_declaration_hash": "23cb3e9d8672a5a570739a2f99e49618e554a246a5529de01be521feecafb5e5",
   "signals": [
     {
       "type_name": "AdrUserChain",
       "signal": "blue",
-      "entry_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194"
+      "entry_hash": "0fb53afd8b6e0bfe44daf16809e40e8a8caf4c0025702312852e3ffd5024fc94"
     },
     {
       "type_name": "CatalogSpecChain",
       "signal": "blue",
-      "entry_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6"
+      "entry_hash": "b793e9a68dc946ccc195422dc11bcf33a0ffb3b6f8d33a9ff4b123a630267580"
     },
     {
       "type_name": "ImplCatalogChain",
       "signal": "blue",
-      "entry_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef"
+      "entry_hash": "a231d46dbe97a51f7fd29507b704c82b1c9d3b7888ab0e9d99c505c9a15ea1bc"
     },
     {
       "type_name": "SignalLayerReaderError",
@@ -25,7 +25,7 @@
     {
       "type_name": "SpecAdrChain",
       "signal": "blue",
-      "entry_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f"
+      "entry_hash": "8640eb9ea885b1ba2f976872710414568ff2053be73ff08560bf63c05edc3081"
     },
     {
       "type_name": "VerifyAdrSignalsCommand",
@@ -33,9 +33,29 @@
       "entry_hash": "04b52e16c636818996263543bf3ac3a5685c12404531925e59de94e0389884ca"
     },
     {
+      "type_name": "LiveSoTChain",
+      "signal": "blue",
+      "entry_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf"
+    },
+    {
+      "type_name": "LoadablePersistedChain",
+      "signal": "blue",
+      "entry_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200"
+    },
+    {
+      "type_name": "PersistedSoTChain",
+      "signal": "blue",
+      "entry_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a"
+    },
+    {
       "type_name": "SignalLayerReader",
       "signal": "blue",
-      "entry_hash": "feee9051934802ec6a8a9731885cb74e565e7752ec433702d7221e719694a952"
+      "entry_hash": "cb96b162245bcde9cfec1a456abc8b79c0edd26af9c0de0eb619b63744626255"
+    },
+    {
+      "type_name": "SoTChain",
+      "signal": "blue",
+      "entry_hash": "4ec82db7fc9e8ec813850a98c04a647add2d3d529ff045ecf5730bfd8b566806"
     },
     {
       "type_name": "TrackBlobReader",
@@ -55,22 +75,22 @@
     {
       "type_name": "usecase::signal::calc_catalog_spec",
       "signal": "blue",
-      "entry_hash": "6808c0d6148a50dd4ffe59c251f235ab4e913760b107492bb22b8e16a15e996e"
+      "entry_hash": "bcd3e44aa2f5fc26b840f9177792e39cc4edaba5540d1f5f820786840a9258ef"
     },
     {
       "type_name": "usecase::signal::calc_impl_catalog",
       "signal": "blue",
-      "entry_hash": "f5e12b5e70df0a0e22db9edc4939f88290fc491f14ee3e9f9a945bfbc5a40c15"
+      "entry_hash": "45565cfdab6429b183d9800c6b0426e07e9a6af7dc911229772be49c72dfb684"
     },
     {
       "type_name": "usecase::signal::check_catalog_spec",
       "signal": "blue",
-      "entry_hash": "5ba369bb7e234784ec4531ffda653db11de7e375003e2e0fd4f0e6ebffd8cea0"
+      "entry_hash": "e0646ef58650bc66850764f4c60965b3d970b928b77f2a7389a6f60e77279fda"
     },
     {
       "type_name": "usecase::signal::check_impl_catalog",
       "signal": "blue",
-      "entry_hash": "58e63ae4dd2a3fda321a1b296aa851d4d6bd54305d2b2341dae79c42e050a816"
+      "entry_hash": "bff4b7635b996e23a8ee7732484a7e46ec5a7c8fd66f3c3c36ad41436c47484e"
     },
     {
       "type_name": "usecase::signal::resolve_spec_json_path",

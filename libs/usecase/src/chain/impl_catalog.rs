@@ -1,7 +1,7 @@
 //! Chain ③ (`impl-catalog`) implementation.
 //!
-//! [`ImplCatalogChain`] implements [`ChainIdentity`] and [`PersistedSoTChain`].
-//! The blanket impl in `domain::chain` derives [`domain::SoTChain`] automatically.
+//! [`ImplCatalogChain`] implements [`ChainIdentity`] and [`crate::chain::traits::PersistedSoTChain`].
+//! The blanket impl in `usecase::chain::traits` derives [`crate::chain::traits::SoTChain`] automatically.
 //!
 //! # Persistence target
 //!
@@ -33,8 +33,9 @@
 
 use std::path::Path;
 
+use crate::chain::traits::LoadablePersistedChain;
 use domain::{
-    ChainId, ChainIdentity, ContentHash, PersistedSoTChain, TypeSignalsDocument,
+    ChainId, ChainIdentity, ContentHash, PersistedSoTChainGate, Strictness, TypeSignalsDocument,
     check_type_signals,
     verify::{VerifyFinding, VerifyOutcome},
 };
@@ -98,7 +99,7 @@ pub struct ImplCatalogCalcError(pub String);
 /// rustdoc API consistency).
 ///
 /// Unit struct; stateless dispatch.  Implements [`ChainIdentity`] and
-/// [`PersistedSoTChain`]; obtains [`domain::SoTChain`] via the domain blanket impl.
+/// [`crate::chain::traits::PersistedSoTChain`]; obtains [`crate::chain::traits::SoTChain`] via the usecase blanket impl.
 #[derive(Debug, Clone, Copy)]
 pub struct ImplCatalogChain;
 
@@ -111,9 +112,9 @@ impl ChainIdentity for ImplCatalogChain {
     type Input<'a> = ImplCatalogInput<'a>;
 }
 
-// ── PersistedSoTChain ─────────────────────────────────────────────────────────
+// ── PersistedSoTChainGate (pure domain gate) ──────────────────────────────────
 
-impl PersistedSoTChain for ImplCatalogChain {
+impl PersistedSoTChainGate for ImplCatalogChain {
     /// The persisted signal document type.
     type Persisted = TypeSignalsDocument;
     /// Error produced by [`calc`] and [`load`].
@@ -126,6 +127,29 @@ impl PersistedSoTChain for ImplCatalogChain {
     /// [`check_freshness`]: ImplCatalogChain::check_freshness
     type StaleError = ImplCatalogStaleError;
 
+    /// Delegate to [`domain::check_type_signals`].
+    fn evaluate_gate(persisted: &Self::Persisted, strictness: Strictness) -> VerifyOutcome {
+        check_type_signals(persisted, strictness)
+    }
+
+    /// Convert an [`ImplCatalogCalcError`] into a [`VerifyOutcome`] error finding.
+    fn calc_error(error: Self::CalcError) -> VerifyOutcome {
+        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "chain ③ (impl-catalog): {error}"
+        ))])
+    }
+
+    /// Convert an [`ImplCatalogStaleError`] into a [`VerifyOutcome`] error finding.
+    fn stale_error(error: Self::StaleError) -> VerifyOutcome {
+        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "chain ③ (impl-catalog): {error}"
+        ))])
+    }
+}
+
+// ── LoadablePersistedChain (I/O port, usecase layer) ──────────────────────────
+
+impl LoadablePersistedChain for ImplCatalogChain {
     /// Compute type signals and write `<layer>-type-signals.json`.
     ///
     /// # T007 placeholder
@@ -164,25 +188,6 @@ impl PersistedSoTChain for ImplCatalogChain {
             Err(ImplCatalogStaleError { stored: stored.to_owned(), current })
         }
     }
-
-    /// Delegate to [`domain::check_type_signals`].
-    fn evaluate_gate(persisted: &Self::Persisted, strict: bool) -> VerifyOutcome {
-        check_type_signals(persisted, strict)
-    }
-
-    /// Convert an [`ImplCatalogCalcError`] into a [`VerifyOutcome`] error finding.
-    fn calc_error(error: Self::CalcError) -> VerifyOutcome {
-        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "chain ③ (impl-catalog): {error}"
-        ))])
-    }
-
-    /// Convert an [`ImplCatalogStaleError`] into a [`VerifyOutcome`] error finding.
-    fn stale_error(error: Self::StaleError) -> VerifyOutcome {
-        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "chain ③ (impl-catalog): {error}"
-        ))])
-    }
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -193,9 +198,10 @@ mod tests {
     use std::path::Path;
 
     use crate::chain::test_support::{assert_persisted_chain_bounds, call_sotchain_check};
+    use crate::chain::traits::LoadablePersistedChain;
     use domain::{
-        ChainId, ChainIdentity, ConfidenceSignal, ContentHash, PersistedSoTChain, Timestamp,
-        TypeSignal, TypeSignalsDocument, verify::Severity,
+        ChainId, ChainIdentity, ConfidenceSignal, ContentHash, PersistedSoTChainGate, Strictness,
+        Timestamp, TypeSignal, TypeSignalsDocument, verify::Severity,
     };
 
     use super::{ImplCatalogChain, ImplCatalogInput, ImplCatalogStaleError};
@@ -218,7 +224,7 @@ mod tests {
     fn test_impl_catalog_chain_accepted_by_sotchain_bound_via_blanket_impl() {
         let hash = ContentHash::from_bytes([0u8; 32]);
         let input = ImplCatalogInput::new(Path::new("/tmp/type-signals.json"), &hash);
-        let outcome = call_sotchain_check::<ImplCatalogChain>(&input, false);
+        let outcome = call_sotchain_check::<ImplCatalogChain>(&input, Strictness::Interim);
         assert!(outcome.has_errors(), "unwired load must surface as calc_error: {outcome:?}");
     }
 
@@ -280,7 +286,7 @@ mod tests {
     fn test_evaluate_gate_delegates_to_check_type_signals_pass() {
         let hex = zero_hex();
         let doc = make_doc(&hex, vec![make_type_signal("Foo", ConfidenceSignal::Blue)]);
-        let outcome = ImplCatalogChain::evaluate_gate(&doc, false);
+        let outcome = ImplCatalogChain::evaluate_gate(&doc, Strictness::Interim);
         assert!(outcome.findings().is_empty(), "all-blue must pass gate: {outcome:?}");
     }
 
@@ -288,7 +294,7 @@ mod tests {
     fn test_evaluate_gate_delegates_to_check_type_signals_red_error() {
         let hex = zero_hex();
         let doc = make_doc(&hex, vec![make_type_signal("Bar", ConfidenceSignal::Red)]);
-        let outcome = ImplCatalogChain::evaluate_gate(&doc, false);
+        let outcome = ImplCatalogChain::evaluate_gate(&doc, Strictness::Interim);
         assert!(outcome.has_errors(), "red signal must be an error: {outcome:?}");
     }
 
@@ -296,7 +302,7 @@ mod tests {
     fn test_evaluate_gate_delegates_to_check_type_signals_yellow_warning() {
         let hex = zero_hex();
         let doc = make_doc(&hex, vec![make_type_signal("Baz", ConfidenceSignal::Yellow)]);
-        let outcome = ImplCatalogChain::evaluate_gate(&doc, false);
+        let outcome = ImplCatalogChain::evaluate_gate(&doc, Strictness::Interim);
         assert!(!outcome.has_errors(), "yellow in interim must warn, not error: {outcome:?}");
         assert_eq!(outcome.findings()[0].severity(), Severity::Warning);
     }

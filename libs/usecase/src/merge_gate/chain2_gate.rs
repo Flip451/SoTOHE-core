@@ -9,7 +9,8 @@ use std::collections::{BTreeMap, HashMap};
 use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::verify::{VerifyFinding, VerifyOutcome};
 use domain::{
-    CatalogueSpecSignalsDocument, ContentHash, SpecElementId, check_catalogue_spec_signals,
+    CatalogueSpecSignalsDocument, ContentHash, SpecElementId, Strictness,
+    check_catalogue_spec_signals,
 };
 
 use super::{BlobFetchResult, TrackBlobReader};
@@ -31,16 +32,16 @@ use crate::catalogue_traversal::iter_catalogue_entries;
 /// - `layer_id`: the TDDD layer being evaluated (e.g. `"domain"`, `"usecase"`).
 /// - `spec_element_hashes`: the spec-element anchor → hash map produced by
 ///   [`crate::catalogue_spec_refs::SpecElementHashReader::read_spec_element_hashes`].
-/// - `strict`: when `true`, Yellow catalogue-spec signals produce blocking errors;
-///   when `false`, Yellow produces warnings. Resolved from `gate_matrix.catalog_spec`
-///   at `GateKind::Merge` by the caller.
+/// - `strictness`: [`Strictness::Strict`] means Yellow catalogue-spec signals produce
+///   blocking errors; [`Strictness::Interim`] means Yellow produces warnings only.
+///   Resolved from `gate_matrix.catalog_spec` at `GateKind::Merge` by the caller.
 pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
     reader: &R,
     branch: &str,
     track_id: &str,
     layer_id: &str,
     spec_element_hashes: &BTreeMap<SpecElementId, ContentHash>,
-    strict: bool,
+    strictness: Strictness,
 ) -> VerifyOutcome {
     let mut outcome = VerifyOutcome::pass();
 
@@ -245,7 +246,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
     }
 
     // Confidence signal gate — delegate to domain pure function (D2 / CN-05 / AC-03).
-    outcome.merge(check_catalogue_spec_signals(&signals_doc, strict));
+    outcome.merge(check_catalogue_spec_signals(&signals_doc, strictness));
 
     outcome
 }

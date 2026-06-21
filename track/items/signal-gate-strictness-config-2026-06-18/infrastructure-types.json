@@ -260,7 +260,7 @@
       },
       "methods": [],
       "module_path": "signal_layer_reader",
-      "docs": "Local filesystem adapter implementing `usecase::signal::SignalLayerReader`. Provides local I/O behind the usecase-owned orchestration flow: the usecase asks for the active track through the port, obtains the domain-defined TDDD layer set through the port, and requests per-layer catalogue bytes from `track/items/<track-id>/<layer>-types.json`. This adapter does not own per-layer iteration, TDDD layer semantics, catalogue SHA-256 calculation, or signals output path construction; those remain in the domain/usecase/infrastructure responsibilities defined by D8.",
+      "docs": "Local filesystem adapter implementing `usecase::signal::SignalLayerReader`. Provides local I/O behind the usecase-owned orchestration flow: the usecase asks for the active track through the port, obtains the infrastructure-loaded TDDD layer set through the port as domain `LayerId` values, and requests per-layer catalogue bytes from `track/items/<track-id>/<catalogue-file>`, where `catalogue-file` is the configured `tddd.catalogue_file` and defaults to `<layer>-types.json` when omitted. This adapter owns the filesystem-backed `architecture-rules.json` read/validation for layer enumeration, but not per-layer iteration, catalogue SHA-256 calculation, or signals output path construction; those remain in the usecase/infrastructure responsibilities defined by D8.",
       "spec_refs": [
         { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-16" },
         { "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json", "anchor": "CN-17" }
@@ -296,6 +296,88 @@
   },
   "traits": {},
   "functions": {
+    "infrastructure::verify::tddd_layers::catalogue_spec_signals_path": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "binding",
+          "ty": "&infrastructure::verify::tddd_layers::TdddLayerBinding"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&str"
+        }
+      ],
+      "returns": "std::path::PathBuf",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Returns the absolute path to a layer's catalogue-spec signals file: `<workspace_root>/track/items/<track_id>/<layer_id>-catalogue-spec-signals.json`. Keeps the `track/items/<track_id>/<file>` layout behind the infrastructure boundary so cli-composition / cli stay wire-up-only per ADR `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md` §D8-2.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::tddd_layers::impl_catalog_signals_path": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "binding",
+          "ty": "&infrastructure::verify::tddd_layers::TdddLayerBinding"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&str"
+        }
+      ],
+      "returns": "std::path::PathBuf",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Returns the absolute path to a layer's impl-catalog (`signal_file`) signals file: `<workspace_root>/track/items/<track_id>/<binding.signal_file()>`. Same purpose as `catalogue_spec_signals_path` but for chain ③ (impl ↔ catalog) signals. Per ADR §D8-2.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::tddd_layers::load_tddd_layers_from_workspace": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<Vec<infrastructure::verify::tddd_layers::TdddLayerBinding>, infrastructure::verify::tddd_layers::LoadTdddLayersError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Infrastructure I/O helper for adapter wiring: materializes the already-configured TDDD layer bindings from `<workspace_root>/architecture-rules.json` using the existing symlink-guarded parser. This function does not own layer-set semantics, active-track orchestration, or per-layer iteration; it only hides the on-disk `architecture-rules.json` filename behind the infrastructure boundary so usecase orchestration can depend on the `SignalLayerReader` port per CN-17.",
+      "spec_refs": [
+        {
+          "file": "track/items/signal-gate-strictness-config-2026-06-18/spec.json",
+          "anchor": "CN-17"
+        }
+      ],
+      "informal_grounds": []
+    },
     "infrastructure::verify::signal_gates_config::load_signal_gates_config": {
       "action": "add",
       "role": "FreeFunction",

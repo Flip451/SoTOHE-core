@@ -359,7 +359,7 @@ fn assoc_const_decl_to_dto(decl: &AssocConstDecl) -> AssocConstDeclDto {
     AssocConstDeclDto {
         name: decl.name.as_str().to_owned(),
         ty: decl.ty.as_str().to_owned(),
-        default_value: decl.default_value.clone(),
+        default_value: decl.default_value.as_ref().map(|e| e.as_str().to_owned()),
     }
 }
 

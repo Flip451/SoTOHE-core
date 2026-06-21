@@ -133,7 +133,7 @@ rustdoc は `&Self::Input<'_>` のような Self 射影型を `Type::QualifiedPa
 
 ### D4: カタログ trait スキーマに AssocType / AssocConst の宣言フィールドを追加する
 
-`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` と `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocTypeDecl` は `name: TypeName` + `bounds: Vec<TypeRef>` + `default: Option<TypeRef>` を持つ。`AssocConstDecl` は `name: AssocConstName` + `ty: TypeRef` + `default_value: Option<String>` を持つ。`AssocConstName` は関連 const 名専用の validated newtype として追加し、関連 type 名には既存の `TypeName` を使う。いずれも default 系フィールドが空の場合は JSON 上で省略される（既存カタログとの後方互換性を保つ）。
+`libs/domain/src/tddd/catalogue_v2/entries.rs` の `TraitEntry` に `assoc_types: Vec<AssocTypeDecl>` と `assoc_consts: Vec<AssocConstDecl>` フィールドを追加する。`AssocTypeDecl` は `name: TypeName` + `bounds: Vec<TypeRef>` + `default: Option<TypeRef>` を持つ。`AssocConstDecl` は `name: AssocConstName` + `ty: TypeRef` + `default_value: Option<RustExpression>` を持つ。`AssocConstName` は関連 const 名専用の validated newtype として追加し、関連 type 名には既存の `TypeName` を使う。`RustExpression` は関連 const default 値（Rust expression）専用の validated newtype として追加し、非空かつ前後空白なしを `RustExpressionError`（`Empty` / `WhitespaceBoundary` variants）で検証する（後続 ADR `2026-06-16-1030-signal-gate-strictness-config.md` の reviewer finding に対応する primitive obsession 解消、§Newtype / `knowledge/conventions/prefer-type-safe-abstractions.md`）。いずれも default 系フィールドが空の場合は JSON 上で省略される（既存カタログとの後方互換性を保つ）。
 
 対応するインフラ層の変更として、`catalogue_document_codec` と `encoder_state_fn_trait_codec` が `ItemEnum::AssocType` / `ItemEnum::AssocConst` を emit するよう拡張する。
 

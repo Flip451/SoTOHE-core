@@ -7,7 +7,7 @@
 use std::path::PathBuf;
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{CatalogueSpecSignalsDocument, ContentHash, check_catalogue_spec_signals};
+use domain::{CatalogueSpecSignalsDocument, ContentHash, Strictness, check_catalogue_spec_signals};
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::catalogue_spec_signals_codec;
@@ -327,7 +327,8 @@ pub fn execute_catalogue_spec_signals(
             continue;
         }
 
-        outcome.merge(check_catalogue_spec_signals(&doc, strict));
+        let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
+        outcome.merge(check_catalogue_spec_signals(&doc, strictness));
     }
     outcome
 }
@@ -450,7 +451,8 @@ pub fn check_catalog_spec_from_signals_file(
                 return VerifyOutcome::from_findings(findings);
             }
 
-            check_catalogue_spec_signals(&doc, strict)
+            let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
+            check_catalogue_spec_signals(&doc, strictness)
         },
     )
 }

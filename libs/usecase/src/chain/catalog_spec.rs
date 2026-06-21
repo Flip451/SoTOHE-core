@@ -1,7 +1,7 @@
 //! Chain ② (`catalog-spec`) implementation.
 //!
-//! [`CatalogSpecChain`] implements [`ChainIdentity`] and [`PersistedSoTChain`].
-//! The blanket impl in `domain::chain` derives [`domain::SoTChain`] automatically.
+//! [`CatalogSpecChain`] implements [`ChainIdentity`] and [`crate::chain::traits::PersistedSoTChain`].
+//! The blanket impl in `usecase::chain::traits` derives [`crate::chain::traits::SoTChain`] automatically.
 //!
 //! # Persistence target
 //!
@@ -36,9 +36,10 @@
 
 use std::path::Path;
 
+use crate::chain::traits::LoadablePersistedChain;
 use domain::{
-    CatalogueSpecSignalsDocument, ChainId, ChainIdentity, ContentHash, PersistedSoTChain,
-    check_catalogue_spec_signals,
+    CatalogueSpecSignalsDocument, ChainId, ChainIdentity, ContentHash, PersistedSoTChainGate,
+    Strictness, check_catalogue_spec_signals,
     verify::{VerifyFinding, VerifyOutcome},
 };
 
@@ -136,7 +137,7 @@ pub struct CatalogSpecCalcError(pub String);
 /// completeness).
 ///
 /// Unit struct; stateless dispatch.  Implements [`ChainIdentity`] and
-/// [`PersistedSoTChain`]; obtains [`domain::SoTChain`] via the domain blanket impl.
+/// [`crate::chain::traits::PersistedSoTChain`]; obtains [`crate::chain::traits::SoTChain`] via the usecase blanket impl.
 #[derive(Debug, Clone, Copy)]
 pub struct CatalogSpecChain;
 
@@ -149,9 +150,9 @@ impl ChainIdentity for CatalogSpecChain {
     type Input<'a> = CatalogSpecInput<'a>;
 }
 
-// ── PersistedSoTChain ─────────────────────────────────────────────────────────
+// ── PersistedSoTChainGate (pure domain gate) ──────────────────────────────────
 
-impl PersistedSoTChain for CatalogSpecChain {
+impl PersistedSoTChainGate for CatalogSpecChain {
     /// The persisted signal document type.
     type Persisted = CatalogueSpecSignalsDocument;
     /// Error produced by [`calc`] and [`load`].
@@ -164,6 +165,29 @@ impl PersistedSoTChain for CatalogSpecChain {
     /// [`check_freshness`]: CatalogSpecChain::check_freshness
     type StaleError = CatalogSpecStaleError;
 
+    /// Delegate to [`domain::check_catalogue_spec_signals`].
+    fn evaluate_gate(persisted: &Self::Persisted, strictness: Strictness) -> VerifyOutcome {
+        check_catalogue_spec_signals(persisted, strictness)
+    }
+
+    /// Convert a [`CatalogSpecCalcError`] into a [`VerifyOutcome`] error finding.
+    fn calc_error(error: Self::CalcError) -> VerifyOutcome {
+        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "chain ② (catalog-spec): {error}"
+        ))])
+    }
+
+    /// Convert a [`CatalogSpecStaleError`] into a [`VerifyOutcome`] error finding.
+    fn stale_error(error: Self::StaleError) -> VerifyOutcome {
+        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "chain ② (catalog-spec): {error}"
+        ))])
+    }
+}
+
+// ── LoadablePersistedChain (I/O port, usecase layer) ──────────────────────────
+
+impl LoadablePersistedChain for CatalogSpecChain {
     /// Compute catalogue-spec signals and write `<layer>-catalogue-spec-signals.json`.
     ///
     /// # T008 placeholder
@@ -245,25 +269,6 @@ impl PersistedSoTChain for CatalogSpecChain {
 
         Ok(())
     }
-
-    /// Delegate to [`domain::check_catalogue_spec_signals`].
-    fn evaluate_gate(persisted: &Self::Persisted, strict: bool) -> VerifyOutcome {
-        check_catalogue_spec_signals(persisted, strict)
-    }
-
-    /// Convert a [`CatalogSpecCalcError`] into a [`VerifyOutcome`] error finding.
-    fn calc_error(error: Self::CalcError) -> VerifyOutcome {
-        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "chain ② (catalog-spec): {error}"
-        ))])
-    }
-
-    /// Convert a [`CatalogSpecStaleError`] into a [`VerifyOutcome`] error finding.
-    fn stale_error(error: Self::StaleError) -> VerifyOutcome {
-        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "chain ② (catalog-spec): {error}"
-        ))])
-    }
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -274,9 +279,10 @@ mod tests {
     use std::path::Path;
 
     use crate::chain::test_support::{assert_persisted_chain_bounds, call_sotchain_check};
+    use crate::chain::traits::LoadablePersistedChain;
     use domain::{
         CatalogueSpecSignal, CatalogueSpecSignalsDocument, ChainId, ChainIdentity,
-        ConfidenceSignal, ContentHash, PersistedSoTChain, verify::Severity,
+        ConfidenceSignal, ContentHash, PersistedSoTChainGate, Strictness, verify::Severity,
     };
 
     use super::{CatalogSpecChain, CatalogSpecInput, CatalogSpecStaleError};
@@ -299,7 +305,7 @@ mod tests {
     fn test_catalog_spec_chain_accepted_by_sotchain_bound_via_blanket_impl() {
         let hash = ContentHash::from_bytes([0u8; 32]);
         let input = CatalogSpecInput::new(Path::new("/tmp/sig.json"), &hash, &[]);
-        let outcome = call_sotchain_check::<CatalogSpecChain>(&input, false);
+        let outcome = call_sotchain_check::<CatalogSpecChain>(&input, Strictness::Interim);
         assert!(outcome.has_errors(), "unwired load must surface as calc_error: {outcome:?}");
     }
 
@@ -473,21 +479,21 @@ mod tests {
     #[test]
     fn test_evaluate_gate_delegates_to_check_catalogue_spec_signals_pass() {
         let doc = doc_with_hash(hash(0x00), vec![signal("TypeA", ConfidenceSignal::Blue)]);
-        let outcome = CatalogSpecChain::evaluate_gate(&doc, false);
+        let outcome = CatalogSpecChain::evaluate_gate(&doc, Strictness::Interim);
         assert!(outcome.findings().is_empty(), "all-blue doc must pass gate: {outcome:?}");
     }
 
     #[test]
     fn test_evaluate_gate_delegates_to_check_catalogue_spec_signals_red_error() {
         let doc = doc_with_hash(hash(0x00), vec![signal("TypeA", ConfidenceSignal::Red)]);
-        let outcome = CatalogSpecChain::evaluate_gate(&doc, false);
+        let outcome = CatalogSpecChain::evaluate_gate(&doc, Strictness::Interim);
         assert!(outcome.has_errors(), "red signal must be an error: {outcome:?}");
     }
 
     #[test]
     fn test_evaluate_gate_delegates_to_check_catalogue_spec_signals_yellow_warning() {
         let doc = doc_with_hash(hash(0x00), vec![signal("TypeA", ConfidenceSignal::Yellow)]);
-        let outcome = CatalogSpecChain::evaluate_gate(&doc, false);
+        let outcome = CatalogSpecChain::evaluate_gate(&doc, Strictness::Interim);
         assert!(!outcome.has_errors(), "yellow in interim must warn, not error: {outcome:?}");
         assert_eq!(outcome.findings()[0].severity(), Severity::Warning);
     }

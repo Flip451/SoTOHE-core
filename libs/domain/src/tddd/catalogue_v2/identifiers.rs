@@ -251,6 +251,75 @@ identifier_newtype!(
 );
 
 // ---------------------------------------------------------------------------
+// RustExpressionError — error type for RustExpression
+// ---------------------------------------------------------------------------
+
+/// Error type returned by [`RustExpression::try_new`].
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+pub enum RustExpressionError {
+    /// The expression string was empty.
+    #[error("Rust expression must not be empty")]
+    Empty,
+    /// The expression string has leading or trailing whitespace.
+    #[error("Rust expression must not have leading or trailing whitespace, got: '{0}'")]
+    WhitespaceBoundary(String),
+}
+
+// ---------------------------------------------------------------------------
+// RustExpression — validated Rust expression string
+// ---------------------------------------------------------------------------
+
+/// Newtype wrapping `String` for validated Rust expression strings.
+///
+/// Used as the type of `AssocConstDecl::default_value` to encode the "Rust
+/// expression" contract in the type system per
+/// `knowledge/conventions/prefer-type-safe-abstractions.md` § Newtype.
+///
+/// # Validation (performed in [`RustExpression::try_new`])
+///
+/// - Non-empty string (rejects `""`).
+/// - Rejects leading or trailing ASCII/Unicode whitespace.
+///
+/// Full Rust syntax parsing is deliberately NOT performed here — only trivial
+/// rejections are applied. The infrastructure codec layer applies additional
+/// `syn::parse_str::<syn::Expr>` validation at the boundary.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct RustExpression(String);
+
+impl RustExpression {
+    /// Creates a new `RustExpression`, rejecting empty strings and strings with
+    /// leading/trailing whitespace.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RustExpressionError::Empty`] for empty input.
+    /// Returns [`RustExpressionError::WhitespaceBoundary`] if the string starts
+    /// or ends with whitespace.
+    pub fn try_new(s: impl Into<String>) -> Result<Self, RustExpressionError> {
+        let s = s.into();
+        if s.is_empty() {
+            return Err(RustExpressionError::Empty);
+        }
+        if s != s.trim() {
+            return Err(RustExpressionError::WhitespaceBoundary(s));
+        }
+        Ok(Self(s))
+    }
+
+    /// Returns the underlying string slice.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl fmt::Display for RustExpression {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
+// ---------------------------------------------------------------------------
 // ModulePath — Vec<Identifier> joined with ::
 // ---------------------------------------------------------------------------
 
@@ -522,5 +591,47 @@ mod assoc_const_name_tests {
         let displayed = original.to_string();
         let parsed: AssocConstName = displayed.parse().unwrap();
         assert_eq!(original, parsed);
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod rust_expression_tests {
+    use super::*;
+
+    #[test]
+    fn test_rust_expression_empty_string_is_rejected() {
+        assert_eq!(RustExpression::try_new(""), Err(RustExpressionError::Empty));
+    }
+
+    #[test]
+    fn test_rust_expression_leading_whitespace_is_rejected() {
+        let result = RustExpression::try_new(" 42");
+        assert!(
+            matches!(result, Err(RustExpressionError::WhitespaceBoundary(_))),
+            "expected WhitespaceBoundary, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_rust_expression_trailing_whitespace_is_rejected() {
+        let result = RustExpression::try_new("42 ");
+        assert!(
+            matches!(result, Err(RustExpressionError::WhitespaceBoundary(_))),
+            "expected WhitespaceBoundary, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_rust_expression_valid_expressions_are_accepted() {
+        assert!(RustExpression::try_new("42").is_ok());
+        assert!(RustExpression::try_new("DEFAULT_CHAIN_ID").is_ok());
+        assert!(RustExpression::try_new("vec![1,2,3]").is_ok());
+    }
+
+    #[test]
+    fn test_rust_expression_display_returns_underlying_string() {
+        let expr = RustExpression::try_new("DEFAULT_CHAIN_ID").unwrap();
+        assert_eq!(expr.to_string(), "DEFAULT_CHAIN_ID");
     }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3b6bbfd58daec1e6c8384bb5682344082f1bdfb3f9fd8445dbfa3a3c6ea98c84",
+  "catalogue_declaration_hash": "f934bc0d7d770d02da1a0ff237129c8da6115faa4c2b749cae667734e85312dc",
   "signals": [
     {
       "type_name": "GateRowDto",
@@ -15,7 +15,7 @@
     {
       "type_name": "LocalSignalLayerReaderAdapter",
       "signal": "blue",
-      "entry_hash": "edd1fdab8f3f2a94e11648dc12bf29fe54e94aa50b6b358ab8385be5767eb3c7"
+      "entry_hash": "60013ecc3ccac3d2b97e0680ce197e842b4e515ce1bb98a37067262837d652cf"
     },
     {
       "type_name": "SignalGatesConfig",
@@ -91,6 +91,21 @@
       "type_name": "infrastructure::verify::spec_states::verify_type_signals_from_spec_json",
       "signal": "blue",
       "entry_hash": "05fd3609d5a1aa4d8c4fa5f45d5617899cbd1cdb5069980f5fe38bcf55d87fce"
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::catalogue_spec_signals_path",
+      "signal": "blue",
+      "entry_hash": "f5614251babdccae1b1b3f5b475955cc810109cdcc7bedd840b023b5272ec849"
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::impl_catalog_signals_path",
+      "signal": "blue",
+      "entry_hash": "d377e2c78de7217ed9246ac687706a56aedd2508ae21245d8cae4f97018be91c"
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_from_workspace",
+      "signal": "blue",
+      "entry_hash": "89f135b22a093926ef89d35283fd6986ea109e9890185c5b5fcf6e332cb8a1a3"
     }
   ]
 }

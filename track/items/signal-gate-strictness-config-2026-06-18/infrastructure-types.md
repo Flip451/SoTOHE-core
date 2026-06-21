@@ -42,4 +42,7 @@
 | infrastructure::verify::spec_states::check_impl_catalog_from_signals_file | free_function | — | fn(signals_path: &std::path::Path, catalog_hash_hex: &str, strict: bool) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 | infrastructure::verify::spec_states::verify_from_spec_json | free_function | modify | fn(spec_json_path: std::path::PathBuf, strict: bool, trusted_root: std::path::PathBuf) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 | infrastructure::verify::spec_states::verify_type_signals_from_spec_json | free_function | — | fn(spec_json_path: std::path::PathBuf, strict: bool, trusted_root: std::path::PathBuf) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
+| infrastructure::verify::tddd_layers::catalogue_spec_signals_path | free_function | — | fn(binding: &infrastructure::verify::tddd_layers::TdddLayerBinding, workspace_root: &std::path::Path, track_id: &str) -> std::path::PathBuf | 🔵 | 🔵 |
+| infrastructure::verify::tddd_layers::impl_catalog_signals_path | free_function | — | fn(binding: &infrastructure::verify::tddd_layers::TdddLayerBinding, workspace_root: &std::path::Path, track_id: &str) -> std::path::PathBuf | 🔵 | 🔵 |
+| infrastructure::verify::tddd_layers::load_tddd_layers_from_workspace | free_function | — | fn(workspace_root: &std::path::Path) -> Result<Vec<infrastructure::verify::tddd_layers::TdddLayerBinding>, infrastructure::verify::tddd_layers::LoadTdddLayersError> | 🔵 | 🔵 |
 

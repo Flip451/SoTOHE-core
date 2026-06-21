@@ -63,32 +63,21 @@ subgraph domain["domain"]
     R27_domain_domain_ChainIdentity_assoctype_Input[type Input]
     R27_domain_domain_ChainIdentity_assocconst_ID[const ID]
   end
-  subgraph R26_domain_domain_LiveSoTChain["chain::LiveSoTChain"]
+  subgraph R35_domain_domain_PersistedSoTChainGate["chain::PersistedSoTChainGate"]
     direction TB
-    R26_domain_domain_LiveSoTChain__self[LiveSoTChain]
-    R26_domain_domain_LiveSoTChain_calc_live([calc_live])
-    R26_domain_domain_LiveSoTChain_assoctype_LiveCalc[type LiveCalc]
-    R26_domain_domain_LiveSoTChain_assoctype_CalcError[type CalcError]
-  end
-  subgraph R31_domain_domain_PersistedSoTChain["chain::PersistedSoTChain"]
-    direction TB
-    R31_domain_domain_PersistedSoTChain__self[PersistedSoTChain]
-    R31_domain_domain_PersistedSoTChain_calc([calc])
-    R31_domain_domain_PersistedSoTChain_load([load])
-    R31_domain_domain_PersistedSoTChain_check_freshness([check_freshness])
-    R31_domain_domain_PersistedSoTChain_evaluate_gate([evaluate_gate])
-    R31_domain_domain_PersistedSoTChain_calc_error([calc_error])
-    R31_domain_domain_PersistedSoTChain_stale_error([stale_error])
-    R31_domain_domain_PersistedSoTChain_assoctype_Persisted[type Persisted]
-    R31_domain_domain_PersistedSoTChain_assoctype_CalcError[type CalcError]
-    R31_domain_domain_PersistedSoTChain_assoctype_StaleError[type StaleError]
-  end
-  subgraph R22_domain_domain_SoTChain["chain::SoTChain"]
-    direction TB
-    R22_domain_domain_SoTChain__self[SoTChain]
-    R22_domain_domain_SoTChain_check([check])
+    R35_domain_domain_PersistedSoTChainGate__self[PersistedSoTChainGate]
+    R35_domain_domain_PersistedSoTChainGate_evaluate_gate([evaluate_gate])
+    R35_domain_domain_PersistedSoTChainGate_calc_error([calc_error])
+    R35_domain_domain_PersistedSoTChainGate_stale_error([stale_error])
+    R35_domain_domain_PersistedSoTChainGate_assoctype_Persisted[type Persisted]
+    R35_domain_domain_PersistedSoTChainGate_assoctype_CalcError[type CalcError]
+    R35_domain_domain_PersistedSoTChainGate_assoctype_StaleError[type StaleError]
   end
   F57_domain_domain_domain__chain__check_catalogue_spec_signals[[check_catalogue_spec_signals]]
+  end
+  subgraph domain_domain_module_spec["domain::spec"]
+    direction TB
+  F50_domain_domain_domain__spec__check_spec_doc_signals[[check_spec_doc_signals]]
   end
   subgraph domain_domain_module_tddd["domain::tddd"]
     direction TB
@@ -106,10 +95,23 @@ subgraph domain["domain"]
     direction TB
     T27_domain_domain_AssocTypeDecl__self[AssocTypeDecl]
   end
+  subgraph T28_domain_domain_RustExpression["tddd::catalogue_v2::identifiers::RustExpression"]
+    direction TB
+    T28_domain_domain_RustExpression__self[RustExpression]
+    T28_domain_domain_RustExpression_try_new([try_new])
+    T28_domain_domain_RustExpression_as_str([as_str])
+  end
+  subgraph T33_domain_domain_RustExpressionError["tddd::catalogue_v2::identifiers::RustExpressionError"]
+    direction TB
+    T33_domain_domain_RustExpressionError__self[RustExpressionError]
+    T33_domain_domain_RustExpressionError_Empty[Empty]
+    T33_domain_domain_RustExpressionError_WhitespaceBoundary[WhitespaceBoundary]
+  end
   subgraph T24_domain_domain_TraitEntry["tddd::catalogue_v2::entries::TraitEntry"]
     direction TB
     T24_domain_domain_TraitEntry__self[TraitEntry]
   end
+  F59_domain_domain_domain__tddd__consistency__check_type_signals[[check_type_signals]]
   end
 end
 subgraph usecase["usecase"]
@@ -131,6 +133,29 @@ subgraph usecase["usecase"]
   subgraph T28_usecase_usecase_SpecAdrChain["chain::spec_adr::SpecAdrChain"]
     direction TB
     T28_usecase_usecase_SpecAdrChain__self[SpecAdrChain]
+  end
+  subgraph R28_usecase_usecase_LiveSoTChain["chain::traits::LiveSoTChain"]
+    direction TB
+    R28_usecase_usecase_LiveSoTChain__self[LiveSoTChain]
+    R28_usecase_usecase_LiveSoTChain_calc_live([calc_live])
+    R28_usecase_usecase_LiveSoTChain_assoctype_LiveCalc[type LiveCalc]
+    R28_usecase_usecase_LiveSoTChain_assoctype_CalcError[type CalcError]
+  end
+  subgraph R38_usecase_usecase_LoadablePersistedChain["chain::traits::LoadablePersistedChain"]
+    direction TB
+    R38_usecase_usecase_LoadablePersistedChain__self[LoadablePersistedChain]
+    R38_usecase_usecase_LoadablePersistedChain_calc([calc])
+    R38_usecase_usecase_LoadablePersistedChain_load([load])
+    R38_usecase_usecase_LoadablePersistedChain_check_freshness([check_freshness])
+  end
+  subgraph R33_usecase_usecase_PersistedSoTChain["chain::traits::PersistedSoTChain"]
+    direction TB
+    R33_usecase_usecase_PersistedSoTChain__self[PersistedSoTChain]
+  end
+  subgraph R24_usecase_usecase_SoTChain["chain::traits::SoTChain"]
+    direction TB
+    R24_usecase_usecase_SoTChain__self[SoTChain]
+    R24_usecase_usecase_SoTChain_check([check])
   end
   end
   subgraph usecase_usecase_module_merge_gate["usecase::merge_gate"]
@@ -241,6 +266,9 @@ subgraph infrastructure["infrastructure"]
   F103_infrastructure_infrastructure_infrastructure__verify__spec_states__check_impl_catalog_from_signals_file[[check_impl_catalog_from_signals_file]]
   F88_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_from_spec_json[[verify_from_spec_json]]
   F101_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_type_signals_from_spec_json[[verify_type_signals_from_spec_json]]
+  F94_infrastructure_infrastructure_infrastructure__verify__tddd_layers__catalogue_spec_signals_path[[catalogue_spec_signals_path]]
+  F92_infrastructure_infrastructure_infrastructure__verify__tddd_layers__impl_catalog_signals_path[[impl_catalog_signals_path]]
+  F98_infrastructure_infrastructure_infrastructure__verify__tddd_layers__load_tddd_layers_from_workspace[[load_tddd_layers_from_workspace]]
   end
 end
 T28_domain_domain_ChainGateEntry_resolve --o T22_domain_domain_GateKind__self
@@ -254,10 +282,18 @@ T30_domain_domain_SignalGateMatrix__self --o|adr_user| T28_domain_domain_ChainGa
 T30_domain_domain_SignalGateMatrix__self --o|spec_adr| T28_domain_domain_ChainGateEntry__self
 T30_domain_domain_SignalGateMatrix__self --o|catalog_spec| T28_domain_domain_ChainGateEntry__self
 T30_domain_domain_SignalGateMatrix__self --o|impl_catalog| T28_domain_domain_ChainGateEntry__self
+R35_domain_domain_PersistedSoTChainGate_evaluate_gate --o T24_domain_domain_Strictness__self
+F57_domain_domain_domain__chain__check_catalogue_spec_signals --o T24_domain_domain_Strictness__self
+F50_domain_domain_domain__spec__check_spec_doc_signals --o T24_domain_domain_Strictness__self
 T28_domain_domain_AssocConstDecl__self --o|name| T28_domain_domain_AssocConstName__self
+T28_domain_domain_AssocConstDecl__self --o|default_value| T28_domain_domain_RustExpression__self
 T28_domain_domain_AssocConstName_new --> T28_domain_domain_AssocConstName__self
+T28_domain_domain_RustExpression_try_new --> T33_domain_domain_RustExpressionError__self
+T28_domain_domain_RustExpression_try_new --> T28_domain_domain_RustExpression__self
 T24_domain_domain_TraitEntry__self --o|assoc_types| T27_domain_domain_AssocTypeDecl__self
 T24_domain_domain_TraitEntry__self --o|assoc_consts| T28_domain_domain_AssocConstDecl__self
+F59_domain_domain_domain__tddd__consistency__check_type_signals --o T24_domain_domain_Strictness__self
+R24_usecase_usecase_SoTChain_check --o T24_domain_domain_Strictness__self
 F60_usecase_usecase_usecase__merge_gate__check_strict_merge_gate --o T30_domain_domain_SignalGateMatrix__self
 R33_usecase_usecase_SignalLayerReader_active_track_id --> T38_usecase_usecase_SignalLayerReaderError__self
 R33_usecase_usecase_SignalLayerReader_enabled_layers --> T38_usecase_usecase_SignalLayerReaderError__self
@@ -265,14 +301,17 @@ R33_usecase_usecase_SignalLayerReader_catalogue_bytes --> T38_usecase_usecase_Si
 F55_usecase_usecase_usecase__signal__resolve_spec_json_path --> T38_usecase_usecase_SignalLayerReaderError__self
 R32_usecase_usecase_VerifyAdrSignals_verify --o T39_usecase_usecase_VerifyAdrSignalsCommand__self
 T28_usecase_usecase_AdrUserChain__self -.impl.-> R27_domain_domain_ChainIdentity__self
-T28_usecase_usecase_AdrUserChain__self -.impl.-> R22_domain_domain_SoTChain__self
-T28_usecase_usecase_AdrUserChain__self -.impl.-> R26_domain_domain_LiveSoTChain__self
+T28_usecase_usecase_AdrUserChain__self -.impl.-> R24_usecase_usecase_SoTChain__self
+T28_usecase_usecase_AdrUserChain__self -.impl.-> R28_usecase_usecase_LiveSoTChain__self
 T28_usecase_usecase_SpecAdrChain__self -.impl.-> R27_domain_domain_ChainIdentity__self
-T28_usecase_usecase_SpecAdrChain__self -.impl.-> R31_domain_domain_PersistedSoTChain__self
+T28_usecase_usecase_SpecAdrChain__self -.impl.-> R35_domain_domain_PersistedSoTChainGate__self
+T28_usecase_usecase_SpecAdrChain__self -.impl.-> R38_usecase_usecase_LoadablePersistedChain__self
 T32_usecase_usecase_CatalogSpecChain__self -.impl.-> R27_domain_domain_ChainIdentity__self
-T32_usecase_usecase_CatalogSpecChain__self -.impl.-> R31_domain_domain_PersistedSoTChain__self
+T32_usecase_usecase_CatalogSpecChain__self -.impl.-> R35_domain_domain_PersistedSoTChainGate__self
+T32_usecase_usecase_CatalogSpecChain__self -.impl.-> R38_usecase_usecase_LoadablePersistedChain__self
 T32_usecase_usecase_ImplCatalogChain__self -.impl.-> R27_domain_domain_ChainIdentity__self
-T32_usecase_usecase_ImplCatalogChain__self -.impl.-> R31_domain_domain_PersistedSoTChain__self
+T32_usecase_usecase_ImplCatalogChain__self -.impl.-> R35_domain_domain_PersistedSoTChainGate__self
+T32_usecase_usecase_ImplCatalogChain__self -.impl.-> R38_usecase_usecase_LoadablePersistedChain__self
 T51_infrastructure_infrastructure_GitBlobAdrFileAdapter_new --> T51_infrastructure_infrastructure_GitBlobAdrFileAdapter__self
 T59_infrastructure_infrastructure_LocalSignalLayerReaderAdapter_discover --> T59_infrastructure_infrastructure_LocalSignalLayerReaderAdapter__self
 T59_infrastructure_infrastructure_LocalSignalLayerReaderAdapter_new --> T59_infrastructure_infrastructure_LocalSignalLayerReaderAdapter__self
@@ -303,29 +342,41 @@ class T24_domain_domain_Strictness_Strict variant_node
 class T24_domain_domain_Strictness_Interim variant_node
 class T24_domain_domain_Strictness__self value_object
 class R27_domain_domain_ChainIdentity__self secondary_port
-class R26_domain_domain_LiveSoTChain_calc_live method_node
-class R26_domain_domain_LiveSoTChain__self secondary_port
-class R31_domain_domain_PersistedSoTChain_calc method_node
-class R31_domain_domain_PersistedSoTChain_load method_node
-class R31_domain_domain_PersistedSoTChain_check_freshness method_node
-class R31_domain_domain_PersistedSoTChain_evaluate_gate method_node
-class R31_domain_domain_PersistedSoTChain_calc_error method_node
-class R31_domain_domain_PersistedSoTChain_stale_error method_node
-class R31_domain_domain_PersistedSoTChain__self secondary_port
-class R22_domain_domain_SoTChain_check method_node
-class R22_domain_domain_SoTChain__self secondary_port
+class R35_domain_domain_PersistedSoTChainGate_evaluate_gate method_node
+class R35_domain_domain_PersistedSoTChainGate_calc_error method_node
+class R35_domain_domain_PersistedSoTChainGate_stale_error method_node
+class R35_domain_domain_PersistedSoTChainGate__self secondary_port
 class F57_domain_domain_domain__chain__check_catalogue_spec_signals free_function
 class F57_domain_domain_domain__chain__check_catalogue_spec_signals function_node
+class F50_domain_domain_domain__spec__check_spec_doc_signals free_function
+class F50_domain_domain_domain__spec__check_spec_doc_signals function_node
 class T28_domain_domain_AssocConstDecl__self value_object
 class T28_domain_domain_AssocConstName_new method_node
 class T28_domain_domain_AssocConstName_as_str method_node
 class T28_domain_domain_AssocConstName__self value_object
 class T27_domain_domain_AssocTypeDecl__self value_object
+class T28_domain_domain_RustExpression_try_new method_node
+class T28_domain_domain_RustExpression_as_str method_node
+class T28_domain_domain_RustExpression__self value_object
+class T33_domain_domain_RustExpressionError_Empty variant_node
+class T33_domain_domain_RustExpressionError_WhitespaceBoundary variant_node
+class T33_domain_domain_RustExpressionError__self error_type
 class T24_domain_domain_TraitEntry__self value_object
+class F59_domain_domain_domain__tddd__consistency__check_type_signals free_function
+class F59_domain_domain_domain__tddd__consistency__check_type_signals function_node
 class T28_usecase_usecase_AdrUserChain__self use_case
 class T32_usecase_usecase_CatalogSpecChain__self use_case
 class T32_usecase_usecase_ImplCatalogChain__self use_case
 class T28_usecase_usecase_SpecAdrChain__self use_case
+class R28_usecase_usecase_LiveSoTChain_calc_live method_node
+class R28_usecase_usecase_LiveSoTChain__self secondary_port
+class R38_usecase_usecase_LoadablePersistedChain_calc method_node
+class R38_usecase_usecase_LoadablePersistedChain_load method_node
+class R38_usecase_usecase_LoadablePersistedChain_check_freshness method_node
+class R38_usecase_usecase_LoadablePersistedChain__self secondary_port
+class R33_usecase_usecase_PersistedSoTChain__self secondary_port
+class R24_usecase_usecase_SoTChain_check method_node
+class R24_usecase_usecase_SoTChain__self secondary_port
 class R31_usecase_usecase_TrackBlobReader_read_spec_document method_node
 class R31_usecase_usecase_TrackBlobReader_read_type_catalogue method_node
 class R31_usecase_usecase_TrackBlobReader_read_impl_plan method_node
@@ -399,4 +450,10 @@ class F88_infrastructure_infrastructure_infrastructure__verify__spec_states__ver
 class F88_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_from_spec_json function_node
 class F101_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_type_signals_from_spec_json free_function
 class F101_infrastructure_infrastructure_infrastructure__verify__spec_states__verify_type_signals_from_spec_json function_node
+class F94_infrastructure_infrastructure_infrastructure__verify__tddd_layers__catalogue_spec_signals_path free_function
+class F94_infrastructure_infrastructure_infrastructure__verify__tddd_layers__catalogue_spec_signals_path function_node
+class F92_infrastructure_infrastructure_infrastructure__verify__tddd_layers__impl_catalog_signals_path free_function
+class F92_infrastructure_infrastructure_infrastructure__verify__tddd_layers__impl_catalog_signals_path function_node
+class F98_infrastructure_infrastructure_infrastructure__verify__tddd_layers__load_tddd_layers_from_workspace free_function
+class F98_infrastructure_infrastructure_infrastructure__verify__tddd_layers__load_tddd_layers_from_workspace function_node
 ```

@@ -7,7 +7,6 @@ use crate::signal_layer_chain::{
 };
 use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome};
 use infrastructure::verify::tddd_layers::TdddLayerBinding;
-use usecase::signal::SignalLayerReader as _;
 
 /// Selects the gate context when resolving strictness from `signal-gates.json`.
 ///
@@ -257,18 +256,19 @@ impl CliApp {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
         use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
         use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
-        use infrastructure::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
+        use infrastructure::verify::tddd_layers::{
+            LoadTdddLayersError, load_tddd_layers_from_workspace,
+        };
 
         let repo = SystemGitRepo::discover()
             .map_err(|e| format!("signal calc-catalog-spec: cannot discover git repo: {e}"))?;
         let workspace_root = repo.root().to_path_buf();
         let items_dir = workspace_root.join("track").join("items");
-        let rules_path = workspace_root.join("architecture-rules.json");
 
-        let bindings: Vec<_> = load_tddd_layers(&rules_path, &workspace_root)
+        let bindings: Vec<_> = load_tddd_layers_from_workspace(&workspace_root)
             .map_err(|e| match e {
                 LoadTdddLayersError::Io { path, source } => format!("{}: {source}", path.display()),
-                LoadTdddLayersError::Parse(err) => format!("{}: {err}", rules_path.display()),
+                LoadTdddLayersError::Parse(err) => format!("architecture-rules.json: {err}"),
             })?
             .into_iter()
             .filter(TdddLayerBinding::catalogue_spec_signal_enabled)
@@ -280,19 +280,9 @@ impl CliApp {
             bindings: bindings.clone(),
         };
 
-        let track_id_str = {
-            reader
-                .active_track_id()
-                .map_err(|e| {
-                    format!("signal calc-catalog-spec: cannot resolve active track id: {e}")
-                })?
-                .to_string()
-        };
-
         let per_layer_fn = {
             let items_dir = items_dir.clone();
-            let track_id_str = track_id_str.clone();
-            move |layer: domain::tddd::LayerId, _hash_hex: &str| {
+            move |layer: domain::tddd::LayerId, _hash_hex: &str, track_id_str: &str| {
                 let layer_str = layer.as_ref();
                 let binding = match bindings.iter().find(|b| b.layer_id() == layer_str) {
                     Some(b) => b,
@@ -304,11 +294,11 @@ impl CliApp {
                         ]);
                     }
                 };
-                let track_dir = items_dir.join(&track_id_str);
+                let track_dir = items_dir.join(track_id_str);
                 match infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer(
                     &items_dir,
                     &track_dir,
-                    &track_id_str,
+                    track_id_str,
                     binding,
                     &writer,
                 ) {
@@ -339,7 +329,7 @@ impl CliApp {
             workspace_root,
             domain::ChainId::CatalogSpec,
             "signal check-catalog-spec",
-            TdddLayerBinding::catalogue_spec_signal_file,
+            infrastructure::verify::tddd_layers::catalogue_spec_signals_path,
             TdddLayerBinding::catalogue_spec_signal_enabled,
             // Chain ② may have layers where `catalogue_spec_signal_enabled` is false;
             // an empty filtered set is not necessarily a misconfiguration for chain ②.
@@ -381,26 +371,16 @@ impl CliApp {
         let reader = LocalSignalLayerReaderAdapter::discover()
             .map_err(|e| format!("signal calc-impl-catalog: {e}"))?;
 
-        let track_id_str = {
-            use usecase::signal::SignalLayerReader as _;
-            reader
-                .active_track_id()
-                .map_err(|e| {
-                    format!("signal calc-impl-catalog: cannot resolve active track id: {e}")
-                })?
-                .to_string()
-        };
-
         let per_layer_fn = {
             let items_dir = items_dir.clone();
             let workspace_root = workspace_root.clone();
             let branch = branch.clone();
-            let track_id_str = track_id_str.clone();
-            move |layer: domain::tddd::LayerId, _hash_hex: &str| {
+            move |layer: domain::tddd::LayerId, _hash_hex: &str, track_id_str: &str| {
                 let layer_str = layer.as_ref().to_owned();
+                let track_id = track_id_str.to_owned();
                 match interactor.run(TypeSignalsRequest {
                     items_dir: items_dir.clone(),
-                    track_id: track_id_str.clone(),
+                    track_id,
                     branch: branch.clone(),
                     workspace_root: workspace_root.clone(),
                     layer: Some(layer_str.clone()),
@@ -432,7 +412,7 @@ impl CliApp {
             workspace_root,
             domain::ChainId::ImplCatalog,
             "signal check-impl-catalog",
-            TdddLayerBinding::signal_file,
+            infrastructure::verify::tddd_layers::impl_catalog_signals_path,
             |_| true,
             // Chain ③ must fail-closed when the TDDD-enabled layer set is empty.
             // A repo where every layer has `tddd.enabled = false` (or no tddd blocks)
@@ -547,7 +527,7 @@ impl CliApp {
             catalog_strict,
             workspace_root.clone(),
             "signal check-catalog-spec",
-            TdddLayerBinding::catalogue_spec_signal_file,
+            infrastructure::verify::tddd_layers::catalogue_spec_signals_path,
             TdddLayerBinding::catalogue_spec_signal_enabled,
             false,
             |signals_path, hash_hex, strict| {
@@ -567,7 +547,7 @@ impl CliApp {
             impl_strict,
             workspace_root,
             "signal check-impl-catalog",
-            TdddLayerBinding::signal_file,
+            infrastructure::verify::tddd_layers::impl_catalog_signals_path,
             |_| true,
             true,
             |signals_path, hash_hex, strict| {

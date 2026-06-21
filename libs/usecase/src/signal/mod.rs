@@ -61,7 +61,7 @@ fn merge_layer_outcomes(outcomes: Vec<VerifyOutcome>) -> VerifyOutcome {
 fn run_per_layer<R, F>(reader: &R, per_layer_fn: F) -> VerifyOutcome
 where
     R: SignalLayerReader,
-    F: Fn(LayerId, &str) -> VerifyOutcome,
+    F: Fn(LayerId, &str, &str) -> VerifyOutcome,
 {
     let track_id = match reader.active_track_id() {
         Ok(id) => id,
@@ -71,6 +71,7 @@ where
             ))]);
         }
     };
+    let track_id_str = track_id.to_string();
 
     let layers = match reader.enabled_layers(track_id.clone()) {
         Ok(ls) => ls,
@@ -101,26 +102,34 @@ where
             let digest = sha2::Sha256::digest(&bytes);
             digest.iter().map(|b| format!("{b:02x}")).collect::<String>()
         };
-        outcomes.push(per_layer_fn(layer, &hash_hex));
+        outcomes.push(per_layer_fn(layer, &hash_hex, &track_id_str));
     }
 
     merge_layer_outcomes(outcomes)
 }
 
 /// Argless orchestrator for `signal calc-impl-catalog` (chain ③).
+///
+/// The `per_layer_fn` closure receives `(layer, hash_hex, track_id_str)` where
+/// `track_id_str` is the active-track ID resolved by this orchestrator (CN-17 / D8).
+/// Callers must not resolve the active track separately in the composition layer.
 pub fn calc_impl_catalog<R, F>(reader: &R, per_layer_fn: F) -> VerifyOutcome
 where
     R: SignalLayerReader,
-    F: Fn(LayerId, &str) -> VerifyOutcome,
+    F: Fn(LayerId, &str, &str) -> VerifyOutcome,
 {
     run_per_layer(reader, per_layer_fn)
 }
 
 /// Argless orchestrator for `signal calc-catalog-spec` (chain ②).
+///
+/// The `per_layer_fn` closure receives `(layer, hash_hex, track_id_str)` where
+/// `track_id_str` is the active-track ID resolved by this orchestrator (CN-17 / D8).
+/// Callers must not resolve the active track separately in the composition layer.
 pub fn calc_catalog_spec<R, F>(reader: &R, per_layer_fn: F) -> VerifyOutcome
 where
     R: SignalLayerReader,
-    F: Fn(LayerId, &str) -> VerifyOutcome,
+    F: Fn(LayerId, &str, &str) -> VerifyOutcome,
 {
     run_per_layer(reader, per_layer_fn)
 }
@@ -129,10 +138,13 @@ where
 ///
 /// Strictness is NOT a parameter — the `per_layer_fn` closure captures
 /// `strict: bool` from the `SignalGateMatrix` at the call site (D8-5).
+///
+/// The `per_layer_fn` closure receives `(layer, hash_hex, track_id_str)` where
+/// `track_id_str` is the active-track ID resolved by this orchestrator (CN-17 / D8).
 pub fn check_impl_catalog<R, F>(reader: &R, per_layer_fn: F) -> VerifyOutcome
 where
     R: SignalLayerReader,
-    F: Fn(LayerId, &str) -> VerifyOutcome,
+    F: Fn(LayerId, &str, &str) -> VerifyOutcome,
 {
     run_per_layer(reader, per_layer_fn)
 }
@@ -141,10 +153,13 @@ where
 ///
 /// Strictness is NOT a parameter — the `per_layer_fn` closure captures
 /// `strict: bool` from the `SignalGateMatrix` at the call site (D8-5).
+///
+/// The `per_layer_fn` closure receives `(layer, hash_hex, track_id_str)` where
+/// `track_id_str` is the active-track ID resolved by this orchestrator (CN-17 / D8).
 pub fn check_catalog_spec<R, F>(reader: &R, per_layer_fn: F) -> VerifyOutcome
 where
     R: SignalLayerReader,
-    F: Fn(LayerId, &str) -> VerifyOutcome,
+    F: Fn(LayerId, &str, &str) -> VerifyOutcome,
 {
     run_per_layer(reader, per_layer_fn)
 }
@@ -250,10 +265,10 @@ mod tests {
     }
 
     fn spy_fn(
-        calls: &RefCell<Vec<(String, String)>>,
-    ) -> impl Fn(LayerId, &str) -> VerifyOutcome + '_ {
-        move |layer, hash| {
-            calls.borrow_mut().push((layer.to_string(), hash.to_owned()));
+        calls: &RefCell<Vec<(String, String, String)>>,
+    ) -> impl Fn(LayerId, &str, &str) -> VerifyOutcome + '_ {
+        move |layer, hash, track_id| {
+            calls.borrow_mut().push((layer.to_string(), hash.to_owned(), track_id.to_owned()));
             VerifyOutcome::pass()
         }
     }
@@ -414,7 +429,7 @@ mod tests {
     fn test_check_impl_catalog_captures_strict_in_closure() {
         let reader =
             MockReader::new("my-track-2026-01-01", &["domain"]).with_bytes("domain", b"data");
-        let outcome = check_impl_catalog(&reader, |_layer, _hash| {
+        let outcome = check_impl_catalog(&reader, |_layer, _hash, _track_id| {
             VerifyOutcome::from_findings(vec![VerifyFinding::error("strict violation")])
         });
 

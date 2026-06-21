@@ -5,11 +5,11 @@
 //! free functions that the chain ②/③ `check_*` methods on `CliApp` delegate to.
 //! Kept in a sibling module to keep `signal.rs` under the 700-line cap.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::{CommandOutcome, cmd_outcome::render_outcome, signal::SignalGateName};
 use infrastructure::verify::tddd_layers::TdddLayerBinding;
-use usecase::signal::{SignalLayerReader as _, SignalLayerReaderError};
+use usecase::signal::SignalLayerReaderError;
 
 pub(crate) struct BindingSignalLayerReader {
     pub(crate) inner: infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter,
@@ -44,6 +44,18 @@ impl usecase::signal::SignalLayerReader for BindingSignalLayerReader {
 }
 
 /// Shared body for `signal_check_catalog_spec` and `signal_check_impl_catalog`.
+///
+/// `signals_path_fn` is the per-chain path resolver supplied by callers
+/// (`TdddLayerBinding::catalogue_spec_signals_path` for chain ②,
+/// `TdddLayerBinding::impl_catalog_signals_path` for chain ③). All
+/// `<items_dir>/<track_id>/<file>` path assembly happens inside infrastructure
+/// (`TdddLayerBinding`), keeping cli-composition wire-up-only per ADR
+/// `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md` §D8-2.
+///
+/// The `run_usecase` callback receives a `Box<dyn Fn(LayerId, hash_hex, track_id_str)>`
+/// closure whose `track_id_str` argument is supplied by the usecase orchestrator
+/// (CN-17 / D8) — cli-composition resolves the track ID from the reader via
+/// the orchestrator, not locally.
 #[allow(clippy::too_many_arguments, clippy::type_complexity)]
 pub(crate) fn signal_check_layer_chain(
     strict_override: bool,
@@ -51,13 +63,13 @@ pub(crate) fn signal_check_layer_chain(
     workspace_root: Option<PathBuf>,
     chain_id: domain::ChainId,
     command_label: &str,
-    signal_file_name: impl Fn(&TdddLayerBinding) -> String + 'static,
+    signals_path_fn: impl Fn(&TdddLayerBinding, &Path, &str) -> PathBuf + 'static,
     include_binding: impl Fn(&TdddLayerBinding) -> bool + 'static,
     fail_on_empty_bindings: bool,
     verifier: impl Fn(&std::path::Path, &str, bool) -> infrastructure::verify::VerifyOutcome + 'static,
     run_usecase: impl Fn(
         &BindingSignalLayerReader,
-        Box<dyn Fn(domain::tddd::LayerId, &str) -> infrastructure::verify::VerifyOutcome>,
+        Box<dyn Fn(domain::tddd::LayerId, &str, &str) -> infrastructure::verify::VerifyOutcome>,
     ) -> infrastructure::verify::VerifyOutcome,
 ) -> Result<CommandOutcome, String> {
     let strict = match crate::signal::resolve_strict(
@@ -74,7 +86,7 @@ pub(crate) fn signal_check_layer_chain(
         strict,
         workspace_root,
         command_label,
-        signal_file_name,
+        signals_path_fn,
         include_binding,
         fail_on_empty_bindings,
         verifier,
@@ -87,19 +99,19 @@ pub(crate) fn signal_check_layer_chain_with_strict(
     strict: bool,
     workspace_root: Option<PathBuf>,
     command_label: &str,
-    signal_file_name: impl Fn(&TdddLayerBinding) -> String + 'static,
+    signals_path_fn: impl Fn(&TdddLayerBinding, &Path, &str) -> PathBuf + 'static,
     include_binding: impl Fn(&TdddLayerBinding) -> bool + 'static,
     fail_on_empty_bindings: bool,
     verifier: impl Fn(&std::path::Path, &str, bool) -> infrastructure::verify::VerifyOutcome + 'static,
     run_usecase: impl Fn(
         &BindingSignalLayerReader,
-        Box<dyn Fn(domain::tddd::LayerId, &str) -> infrastructure::verify::VerifyOutcome>,
+        Box<dyn Fn(domain::tddd::LayerId, &str, &str) -> infrastructure::verify::VerifyOutcome>,
     ) -> infrastructure::verify::VerifyOutcome,
 ) -> Result<CommandOutcome, String> {
     use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
     use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
     use infrastructure::verify::tddd_layers::{
-        LoadTdddLayersError, find_binding, load_tddd_layers,
+        LoadTdddLayersError, find_binding, load_tddd_layers_from_workspace,
     };
 
     let root = match workspace_root {
@@ -110,11 +122,9 @@ pub(crate) fn signal_check_layer_chain_with_strict(
             repo.root().to_path_buf()
         }
     };
-    let items_dir = root.join("track").join("items");
-    let rules_path = root.join("architecture-rules.json");
-    let bindings = load_tddd_layers(&rules_path, &root).map_err(|e| match e {
+    let bindings = load_tddd_layers_from_workspace(&root).map_err(|e| match e {
         LoadTdddLayersError::Io { path, source } => format!("{}: {source}", path.display()),
-        LoadTdddLayersError::Parse(err) => format!("{}: {err}", rules_path.display()),
+        LoadTdddLayersError::Parse(err) => format!("architecture-rules.json: {err}"),
     })?;
     let bindings: Vec<_> = bindings.into_iter().filter(|b| include_binding(b)).collect();
 
@@ -143,19 +153,15 @@ pub(crate) fn signal_check_layer_chain_with_strict(
         bindings: bindings.clone(),
     };
 
-    let track_id_str = {
-        reader
-            .active_track_id()
-            .map_err(|e| format!("{command_label}: cannot resolve active track id: {e}"))?
-            .to_string()
-    };
-
+    // Active-track ID resolution is owned by the usecase orchestrator (CN-17 / D8).
+    // The `per_layer_fn` closure receives `track_id_str` as a third argument supplied
+    // by `run_per_layer` inside the orchestrator — cli-composition must not call
+    // `reader.active_track_id()` here.
     let per_layer_fn: Box<
-        dyn Fn(domain::tddd::LayerId, &str) -> infrastructure::verify::VerifyOutcome,
+        dyn Fn(domain::tddd::LayerId, &str, &str) -> infrastructure::verify::VerifyOutcome,
     > = {
-        let items_dir = items_dir.clone();
-        let track_id_str = track_id_str.clone();
-        Box::new(move |layer: domain::tddd::LayerId, hash_hex: &str| {
+        let root = root.clone();
+        Box::new(move |layer: domain::tddd::LayerId, hash_hex: &str, track_id_str: &str| {
             let layer_str = layer.as_ref();
             let Some(binding) = find_binding(&bindings, layer_str) else {
                 return infrastructure::verify::VerifyOutcome::from_findings(vec![
@@ -164,7 +170,7 @@ pub(crate) fn signal_check_layer_chain_with_strict(
                     )),
                 ]);
             };
-            let signals_path = items_dir.join(&track_id_str).join(signal_file_name(binding));
+            let signals_path = signals_path_fn(binding, &root, track_id_str);
             verifier(&signals_path, hash_hex, strict)
         })
     };

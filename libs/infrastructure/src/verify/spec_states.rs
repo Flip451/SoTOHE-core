@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 
 use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{SignalCounts, check_type_signals};
+use domain::{SignalCounts, Strictness, check_type_signals};
 
 use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard;
@@ -48,7 +48,8 @@ pub fn verify_from_spec_json(
     }
 
     // Stage 1: delegate to the shared domain-layer pure function.
-    check_spec_doc_signals(&spec_doc, strict)
+    let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
+    check_spec_doc_signals(&spec_doc, strictness)
 }
 
 enum SpecSignalFreshness {
@@ -336,7 +337,8 @@ fn evaluate_layer_catalogue(
         }
     };
 
-    check_type_signals(&signals_doc, strict)
+    let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
+    check_type_signals(&signals_doc, strictness)
 }
 
 /// Evaluate chain ③ (`check-impl-catalog`) gate for a single layer with explicit paths.
@@ -370,7 +372,10 @@ pub fn check_impl_catalog_from_signals_file(
                 current
             )
         },
-        |doc, _normalized_signals, _workspace_root| check_type_signals(&doc, strict),
+        |doc, _normalized_signals, _workspace_root| {
+            let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
+            check_type_signals(&doc, strictness)
+        },
     )
 }
 
@@ -400,11 +405,12 @@ pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutc
     }
 
     // Shared legacy markdown prelude: read the file and guard against generated v2 content.
-    let content = match read_legacy_spec_markdown_with_label(spec_path, "states") {
-        Ok(c) => c,
-        Err(outcome) => return outcome,
-    };
-    verify_domain_states_markdown(spec_path, &content)
+    let content =
+        match read_legacy_spec_markdown_with_label(spec_path, "states", Some(trusted_root)) {
+            Ok(c) => c,
+            Err(outcome) => return outcome,
+        };
+    super::spec_states_legacy_markdown::verify_domain_states_markdown(spec_path, &content)
 }
 
 fn verify_sibling_json_stages(
@@ -457,8 +463,14 @@ fn merge_unique_findings(outcome: &mut VerifyOutcome, other: VerifyOutcome) {
 pub(crate) fn read_legacy_spec_markdown_with_label(
     spec_path: &Path,
     verifier_label: &str,
+    trusted_root: Option<&Path>,
 ) -> Result<String, VerifyOutcome> {
-    let content = std::fs::read_to_string(spec_path).map_err(|e| {
+    let guarded_spec_path = super::spec_states_legacy_markdown::guard_legacy_spec_markdown_path(
+        spec_path,
+        trusted_root,
+    )?;
+
+    let content = std::fs::read_to_string(&guarded_spec_path).map_err(|e| {
         VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "cannot read {}: {e}",
             spec_path.display()
@@ -480,87 +492,6 @@ pub(crate) fn read_legacy_spec_markdown_with_label(
         ))]));
     }
     Ok(content)
-}
-
-enum DomainStatesMarkdownCheck {
-    MissingSection,
-    EmptyTable,
-    MissingSeparator,
-    SeparatorWithoutHeader,
-    NoDataRows,
-    Valid,
-}
-
-fn verify_domain_states_markdown(spec_path: &Path, content: &str) -> VerifyOutcome {
-    match check_domain_states_markdown(content) {
-        DomainStatesMarkdownCheck::Valid => VerifyOutcome::pass(),
-        DomainStatesMarkdownCheck::MissingSection => {
-            VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{}: missing '## Domain States' section",
-                spec_path.display()
-            ))])
-        }
-        DomainStatesMarkdownCheck::EmptyTable => {
-            VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{}: '## Domain States' section has no markdown table",
-                spec_path.display()
-            ))])
-        }
-        DomainStatesMarkdownCheck::MissingSeparator => {
-            VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{}: '## Domain States' table has no separator row (header-only table)",
-                spec_path.display()
-            ))])
-        }
-        DomainStatesMarkdownCheck::SeparatorWithoutHeader => {
-            VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{}: '## Domain States' table has no header row before separator",
-                spec_path.display()
-            ))])
-        }
-        DomainStatesMarkdownCheck::NoDataRows => {
-            VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{}: '## Domain States' table has no data rows (header + separator only)",
-                spec_path.display()
-            ))])
-        }
-    }
-}
-
-fn check_domain_states_markdown(content: &str) -> DomainStatesMarkdownCheck {
-    let body_lines = visible_markdown_body_lines(content);
-    let Some(section_idx) =
-        body_lines.iter().position(|line| line.trim_end() == "## Domain States")
-    else {
-        return DomainStatesMarkdownCheck::MissingSection;
-    };
-
-    let table_lines: Vec<&str> = body_lines
-        .iter()
-        .skip(section_idx + 1)
-        .take_while(|line| !is_markdown_section_boundary(line))
-        .copied()
-        .filter(|line| line.trim_start().starts_with('|'))
-        .collect();
-
-    if table_lines.is_empty() {
-        return DomainStatesMarkdownCheck::EmptyTable;
-    }
-
-    let sep_idx = table_lines.iter().position(|l| is_table_separator(l));
-    let Some(sep_pos) = sep_idx else {
-        return DomainStatesMarkdownCheck::MissingSeparator;
-    };
-    if sep_pos == 0 {
-        return DomainStatesMarkdownCheck::SeparatorWithoutHeader;
-    }
-
-    let has_data_row = table_lines.iter().skip(sep_pos + 1).any(|line| !is_table_separator(line));
-    if has_data_row {
-        DomainStatesMarkdownCheck::Valid
-    } else {
-        DomainStatesMarkdownCheck::NoDataRows
-    }
 }
 
 pub(crate) fn visible_markdown_body_lines(content: &str) -> Vec<&str> {
@@ -615,11 +546,6 @@ fn leading_marker_count(trimmed: &str, marker: char) -> usize {
     trimmed.chars().take_while(|c| *c == marker).count()
 }
 
-fn is_markdown_section_boundary(line: &str) -> bool {
-    let trimmed = line.trim_end();
-    trimmed.starts_with("## ") || trimmed == "##" || trimmed.starts_with("# ") || trimmed == "#"
-}
-
 /// Derives the sibling `spec.json` path from a `spec.md` path by replacing
 /// the filename component.
 ///
@@ -629,23 +555,6 @@ pub(crate) fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBu
         .parent()
         .map(|dir| if dir.as_os_str().is_empty() { Path::new(".") } else { dir })
         .map(|dir| dir.join("spec.json"))
-}
-
-/// Returns `true` when `line` is a markdown table separator row.
-///
-/// A separator row consists solely of `|`, `-`, `:`, and space characters
-/// and starts with `|`.
-fn is_table_separator(line: &str) -> bool {
-    let trimmed = line.trim();
-    if !trimmed.starts_with('|') {
-        return false;
-    }
-    // Must contain at least one `-` to distinguish from a header row.
-    if !trimmed.contains('-') {
-        return false;
-    }
-    // All characters must be `|`, `-`, `:`, or space.
-    trimmed.chars().all(|c| matches!(c, '|' | '-' | ':' | ' '))
 }
 
 #[cfg(test)]
@@ -1360,6 +1269,28 @@ mod tests {
         assert!(
             !outcome.has_errors(),
             "legacy markdown path with valid table must pass: {outcome:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_verify_rejects_legacy_spec_md_symlink() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("real-spec.md");
+        std::fs::write(
+            &target,
+            "## Domain States\n\n| State | Desc |\n|-------|------|\n| Ready | ok |\n",
+        )
+        .unwrap();
+        let link = dir.path().join("spec.md");
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        let outcome = verify(&link, false, dir.path());
+
+        assert!(outcome.has_errors(), "legacy spec.md symlink must be rejected: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("symlink")),
+            "finding must mention symlink: {outcome:?}"
         );
     }
 

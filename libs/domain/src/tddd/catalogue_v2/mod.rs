@@ -51,7 +51,8 @@ pub use entries::{
 
 pub use identifiers::{
     AssocConstName, CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError,
-    InvariantName, MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
+    InvariantName, MethodName, ModulePath, ParamName, RustExpression, RustExpressionError,
+    TraitName, TypeName, TypeRef, VariantName,
 };
 
 pub use methods::{

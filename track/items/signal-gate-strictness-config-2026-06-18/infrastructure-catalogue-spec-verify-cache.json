@@ -921,6 +921,158 @@
         "kind": "pass",
         "citation": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(&doc, strict)` に抽出し、① ③ と同型のシグネチャで 1 本化する。"
       }
+    },
+    {
+      "claim_hash": "f5614251babdccae1b1b3f5b475955cc810109cdcc7bedd840b023b5272ec849",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "d377e2c78de7217ed9246ac687706a56aedd2508ae21245d8cae4f97018be91c",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "9751abedb5d81d6cddc14d90ab08fb08084525b1c502debafcf7c3cd3e9268e5",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来のレイヤーセット）は `libs/domain/src/` の domain primitive 責務"
+      }
+    },
+    {
+      "claim_hash": "938a15c12fce0f14bf193b7f027fe6ab0e614b9720afb2533adb2a283b43ba8f",
+      "evidence_hash": "0e594f0430ca9d22e96d4df5d530ffb75d04f94272f479ce049fd001baed4f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `execute_verify_adr_signals(project_root)` は非 strict のショートカットとして `_with_strict(project_root, false)` に delegate する形に保つ。"
+      }
+    },
+    {
+      "claim_hash": "cdbecf26371d4f0cf806c7f1587af1c88f15f9c01586e3561915f777dfe6572d",
+      "evidence_hash": "0e594f0430ca9d22e96d4df5d530ffb75d04f94272f479ce049fd001baed4f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strictness: Strictness) -> VerifyOutcome` に抽出し、① ③ と同型の `Strictness` 引数シグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "cdbecf26371d4f0cf806c7f1587af1c88f15f9c01586e3561915f777dfe6572d",
+      "evidence_hash": "5797633f5a3bcf0e22a46f970dd6131af209f1abd5d30cadfa6995102e39a204",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strictness: Strictness) -> VerifyOutcome` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型の `Strictness` 引数シグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "cdbecf26371d4f0cf806c7f1587af1c88f15f9c01586e3561915f777dfe6572d",
+      "evidence_hash": "8ae366e8526300ba5141e61f1258b81cb5699700ac6ce5bbd76390597e6023f7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定が domain 層の `check_catalogue_spec_signals(&doc, strictness)` に集約されており、`merge_gate/chain2_gate.rs` と `infrastructure/.../catalogue_spec_signals.rs` の 2 重 inline 実装がこの 1 本に置き換わっている。"
+      }
+    },
+    {
+      "claim_hash": "b7ab0cc07305def79e230c43d41751b7088408e115a2a2a820f326f5f0ad0c01",
+      "evidence_hash": "0e594f0430ca9d22e96d4df5d530ffb75d04f94272f479ce049fd001baed4f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックを domain 層の新純粋関数 `check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strictness: Strictness) -> VerifyOutcome` に抽出し、① ③ と同型の `Strictness` 引数シグネチャで 1 本化する。"
+      }
+    },
+    {
+      "claim_hash": "b7ab0cc07305def79e230c43d41751b7088408e115a2a2a820f326f5f0ad0c01",
+      "evidence_hash": "5797633f5a3bcf0e22a46f970dd6131af209f1abd5d30cadfa6995102e39a204",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② の Red/Yellow 判定ロジックは domain 層の純粋関数 `check_catalogue_spec_signals(doc: &CatalogueSpecSignalsDocument, strictness: Strictness) -> VerifyOutcome` に抽出し、現状の infrastructure / usecase 2 箇所への inline 重複実装を 1 本に集約する。① ③ の `check_spec_doc_signals` / `check_type_signals` と同型の `Strictness` 引数シグネチャとする。"
+      }
+    },
+    {
+      "claim_hash": "fc6cfad4ba7517fb1ebfb541596109afdc368ea5ffafaddaf75a544218f813f4",
+      "evidence_hash": "0e594f0430ca9d22e96d4df5d530ffb75d04f94272f479ce049fd001baed4f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。"
+      }
+    },
+    {
+      "claim_hash": "05fd3609d5a1aa4d8c4fa5f45d5617899cbd1cdb5069980f5fe38bcf55d87fce",
+      "evidence_hash": "0e594f0430ca9d22e96d4df5d530ffb75d04f94272f479ce049fd001baed4f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `verify spec-states` を `signal check-spec-adr`（chain ①）と `signal check-impl-catalog`（chain ③）に分割し、各々が独立した `--strict` を取るよう per-chain 化する。"
+      }
+    },
+    {
+      "claim_hash": "89f135b22a093926ef89d35283fd6986ea109e9890185c5b5fcf6e332cb8a1a3",
+      "evidence_hash": "252db380a9ff96fe0d8306ebc35d096716d8c5ad6fde501ccc9101122f5373fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来のレイヤーセット）は `libs/domain/src/` の domain primitive 責務"
+      }
+    },
+    {
+      "claim_hash": "0096272e35e8952700deb307ec879ad010bd26e4041013f5c8817673db72490d",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "0096272e35e8952700deb307ec879ad010bd26e4041013f5c8817673db72490d",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来の filesystem-backed レイヤーセット読取）は `libs/infrastructure/src/verify/tddd_layers/` の infrastructure primitive 責務であり、usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。"
+      }
+    },
+    {
+      "claim_hash": "f5614251babdccae1b1b3f5b475955cc810109cdcc7bedd840b023b5272ec849",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "d377e2c78de7217ed9246ac687706a56aedd2508ae21245d8cae4f97018be91c",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "89f135b22a093926ef89d35283fd6986ea109e9890185c5b5fcf6e332cb8a1a3",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来の filesystem-backed レイヤーセット読取）は `libs/infrastructure/src/verify/tddd_layers/` の infrastructure primitive 責務であり、usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。"
+      }
+    },
+    {
+      "claim_hash": "60013ecc3ccac3d2b97e0680ce197e842b4e515ce1bb98a37067262837d652cf",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "60013ecc3ccac3d2b97e0680ce197e842b4e515ce1bb98a37067262837d652cf",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来の filesystem-backed レイヤーセット読取）は `libs/infrastructure/src/verify/tddd_layers/` の infrastructure primitive 責務であり、usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。"
+      }
     }
   ]
 }

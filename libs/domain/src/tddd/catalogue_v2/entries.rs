@@ -14,7 +14,9 @@
 
 use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
-use crate::tddd::catalogue_v2::identifiers::{AssocConstName, ModulePath, TypeName, TypeRef};
+use crate::tddd::catalogue_v2::identifiers::{
+    AssocConstName, ModulePath, RustExpression, TypeName, TypeRef,
+};
 use crate::tddd::catalogue_v2::methods::{
     MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
 };
@@ -85,7 +87,7 @@ pub struct AssocConstDecl {
     pub ty: TypeRef,
     /// Optional default value expression (e.g. `Some("42")` for `const N: usize = 42`).
     /// `None` when the constant has no default (common for trait-required constants).
-    pub default_value: Option<String>,
+    pub default_value: Option<RustExpression>,
 }
 
 // ---------------------------------------------------------------------------
@@ -293,7 +295,7 @@ mod tests {
     use super::*;
     use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
     use crate::tddd::catalogue_v2::identifiers::{
-        CrateName, FieldName, MethodName, ModulePath, ParamName, TypeName, TypeRef,
+        CrateName, FieldName, MethodName, ModulePath, ParamName, RustExpression, TypeName, TypeRef,
     };
     use crate::tddd::catalogue_v2::roles::{NonEmptyVec, SelfReceiver};
     use crate::tddd::catalogue_v2::variants::FieldDecl;
@@ -598,7 +600,7 @@ mod tests {
         with_assoc_const.assoc_consts = vec![AssocConstDecl {
             name: AssocConstName::new("CHAIN_ID").unwrap(),
             ty: TypeRef::new("ChainId").unwrap(),
-            default_value: Some("DEFAULT_CHAIN_ID".to_string()),
+            default_value: Some(RustExpression::try_new("DEFAULT_CHAIN_ID").unwrap()),
         }];
         assert_ne!(base, with_assoc_const, "assoc_consts field must participate in equality");
     }

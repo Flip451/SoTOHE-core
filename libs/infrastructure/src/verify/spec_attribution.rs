@@ -126,7 +126,7 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     }
 
     // Shared legacy markdown prelude: read the file and guard against generated v2 content.
-    let content = match read_legacy_spec_markdown_with_label(spec_path, "attribution") {
+    let content = match read_legacy_spec_markdown_with_label(spec_path, "attribution", None) {
         Ok(c) => c,
         Err(outcome) => return outcome,
     };

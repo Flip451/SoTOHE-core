@@ -38,8 +38,8 @@ pub use adr_decision::{
     evaluate_adr_decision,
 };
 pub use chain::{
-    ChainGateEntry, ChainId, ChainIdentity, GateKind, LiveSoTChain, PersistedSoTChain,
-    SignalGateMatrix, SoTChain, Strictness, check_catalogue_spec_signals,
+    ChainGateEntry, ChainId, ChainIdentity, GateKind, PersistedSoTChainGate, SignalGateMatrix,
+    Strictness, check_catalogue_spec_signals,
 };
 pub use decision::Decision;
 pub use dry_check::{

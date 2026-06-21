@@ -24,6 +24,7 @@ use thiserror::Error;
 use domain::{ChainGateEntry, SignalGateMatrix, Strictness};
 
 use crate::git_cli::show::{BlobResult, fetch_blob_safe};
+use crate::track::symlink_guard::reject_symlinks_below;
 
 // ── DTO types (serde boundary — never exposed to domain) ─────────────────────
 
@@ -57,6 +58,7 @@ impl From<StrictnessDto> for Strictness {
 /// SoT Chain signal chains. Converts to a pair of [`domain::ChainGateEntry`] values
 /// (one per chain) after schema validation.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct GateRowDto {
     /// Strictness for chain ⓪ (`adr-user`).
     pub adr_user: StrictnessDto,
@@ -76,6 +78,7 @@ pub struct GateRowDto {
 ///
 /// The `$schema_version` dollar-prefixed key is mapped via `#[serde(rename)]`.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SignalGatesConfig {
     /// Config schema version — must be `1`.
     #[serde(rename = "$schema_version")]
@@ -186,6 +189,8 @@ const SUPPORTED_SCHEMA_VERSION: u32 = 1;
 pub fn load_signal_gates_config(
     config_path: PathBuf,
 ) -> Result<SignalGateMatrix, SignalGatesConfigError> {
+    guard_config_path_before_read(&config_path)?;
+
     // Step 1: read the raw JSON text.
     let raw = std::fs::read_to_string(&config_path)
         .map_err(|_| SignalGatesConfigError::FileNotFound { path: config_path.clone() })?;
@@ -269,6 +274,7 @@ fn parse_signal_gates_config_str(
             actual: schema_version,
         });
     }
+    validate_top_level_keys(&value, display_path)?;
 
     // Steps 4 & 5: validate all required keys and strictness values, then convert.
     let commit_gate = extract_gate_row(&value, "commit_gate", display_path)?;
@@ -296,6 +302,54 @@ fn parse_signal_gates_config_str(
 
 // ── Private helpers ───────────────────────────────────────────────────────────
 
+/// Reject symlinks and workspace-escaping paths before reading the local config file.
+fn guard_config_path_before_read(config_path: &Path) -> Result<(), SignalGatesConfigError> {
+    let absolute_path = crate::verify::trusted_root::absolutize(config_path);
+    let trusted_root =
+        crate::verify::trusted_root::resolve_trusted_root(&absolute_path).map_err(|e| {
+            SignalGatesConfigError::ParseFailed {
+                path: config_path.to_path_buf(),
+                reason: format!("path rejected before read: {e}"),
+            }
+        })?;
+
+    match reject_symlinks_below(&absolute_path, &trusted_root) {
+        Ok(true) => {}
+        Ok(false) => {
+            return Err(SignalGatesConfigError::FileNotFound { path: config_path.to_path_buf() });
+        }
+        Err(e) => {
+            return Err(SignalGatesConfigError::ParseFailed {
+                path: config_path.to_path_buf(),
+                reason: format!("path rejected before read: {e}"),
+            });
+        }
+    }
+
+    let canonical_root =
+        trusted_root.canonicalize().map_err(|e| SignalGatesConfigError::ParseFailed {
+            path: config_path.to_path_buf(),
+            reason: format!("trusted root rejected before read: {e}"),
+        })?;
+    let canonical_path =
+        absolute_path.canonicalize().map_err(|e| SignalGatesConfigError::ParseFailed {
+            path: config_path.to_path_buf(),
+            reason: format!("path rejected before read: {e}"),
+        })?;
+    if !canonical_path.starts_with(&canonical_root) {
+        return Err(SignalGatesConfigError::ParseFailed {
+            path: config_path.to_path_buf(),
+            reason: format!(
+                "path rejected before read: '{}' resolves outside trusted root '{}'",
+                config_path.display(),
+                trusted_root.display()
+            ),
+        });
+    }
+
+    Ok(())
+}
+
 /// Validate that the parsed document is a top-level JSON object.
 fn validate_top_level_object(
     value: &serde_json::Value,
@@ -309,6 +363,27 @@ fn validate_top_level_object(
         path: config_path.to_path_buf(),
         reason: format!("top-level JSON document must be an object, got {}", json_type_name(value)),
     })
+}
+
+/// Reject unknown top-level keys in the schema-versioned config document.
+fn validate_top_level_keys(
+    value: &serde_json::Value,
+    config_path: &Path,
+) -> Result<(), SignalGatesConfigError> {
+    const TOP_LEVEL_KEYS: &[&str] = &["$schema_version", "commit_gate", "merge_gate"];
+
+    let Some(map) = value.as_object() else {
+        return Ok(());
+    };
+    for key in map.keys() {
+        if !TOP_LEVEL_KEYS.contains(&key.as_str()) {
+            return Err(SignalGatesConfigError::ParseFailed {
+                path: config_path.to_path_buf(),
+                reason: format!("unknown key \"{key}\" in schema_version 1 config"),
+            });
+        }
+    }
+    Ok(())
 }
 
 /// Extract and validate `$schema_version` from the top-level JSON object.
@@ -368,6 +443,15 @@ fn validate_gate_shape_and_values(
         path: config_path.to_path_buf(),
         reason: format!("{gate_key} must be an object, got {}", json_type_name(gate_obj)),
     })?;
+
+    for key in gate_map.keys() {
+        if !CHAIN_CELLS.contains(&key.as_str()) {
+            return Err(SignalGatesConfigError::ParseFailed {
+                path: config_path.to_path_buf(),
+                reason: format!("unknown key \"{gate_key}.{key}\" in schema_version 1 config"),
+            });
+        }
+    }
 
     for cell in CHAIN_CELLS {
         match gate_map.get(*cell) {
@@ -499,6 +583,26 @@ mod tests {
         );
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn test_load_symlinked_config_path_returns_parse_failed_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let real = dir.path().join("real-signal-gates.json");
+        std::fs::write(&real, recommended_default_json()).unwrap();
+        let link = dir.path().join("signal-gates.json");
+        std::os::unix::fs::symlink(&real, &link).unwrap();
+
+        let result = load_signal_gates_config(link.clone());
+        assert!(
+            matches!(
+                result,
+                Err(SignalGatesConfigError::ParseFailed { ref path, ref reason })
+                if path == &link && reason.contains("path rejected before read") && reason.contains("symlink")
+            ),
+            "expected ParseFailed for symlinked config path, got: {result:?}"
+        );
+    }
+
     // ── malformed JSON ────────────────────────────────────────────────────────
 
     #[test]
@@ -522,6 +626,45 @@ mod tests {
                 if path == &f.path().to_path_buf() && reason.contains("top-level JSON document must be an object")
             ),
             "expected ParseFailed with config path for non-object document, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_load_unknown_top_level_key_returns_parse_failed_error() {
+        let json = r#"{
+  "$schema_version": 1,
+  "commit_gate": { "adr_user": "interim", "spec_adr": "strict", "catalog_spec": "strict", "impl_catalog": "interim" },
+  "merge_gate":  { "adr_user": "strict", "spec_adr": "strict", "catalog_spec": "strict", "impl_catalog": "strict" },
+  "future_gate": { "adr_user": "strict" }
+}"#;
+        let f = write_config(json);
+        let result = load_signal_gates_config(f.path().to_path_buf());
+        assert!(
+            matches!(
+                result,
+                Err(SignalGatesConfigError::ParseFailed { ref reason, .. })
+                if reason.contains("unknown key") && reason.contains("future_gate")
+            ),
+            "expected ParseFailed for unknown top-level key, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_load_unknown_gate_cell_returns_parse_failed_error() {
+        let json = r#"{
+  "$schema_version": 1,
+  "commit_gate": { "adr_user": "interim", "spec_adr": "strict", "catalog_spec": "strict", "impl_catalog": "interim", "future_chain": "strict" },
+  "merge_gate":  { "adr_user": "strict", "spec_adr": "strict", "catalog_spec": "strict", "impl_catalog": "strict" }
+}"#;
+        let f = write_config(json);
+        let result = load_signal_gates_config(f.path().to_path_buf());
+        assert!(
+            matches!(
+                result,
+                Err(SignalGatesConfigError::ParseFailed { ref reason, .. })
+                if reason.contains("unknown key") && reason.contains("commit_gate.future_chain")
+            ),
+            "expected ParseFailed for unknown gate cell, got: {result:?}"
         );
     }
 

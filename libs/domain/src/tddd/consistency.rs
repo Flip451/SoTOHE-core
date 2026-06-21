@@ -10,6 +10,7 @@
 //! declared entries (ADR 2026-05-11-2330 §D4), so all Yellows count.
 
 use crate::ConfidenceSignal;
+use crate::chain::Strictness;
 use crate::tddd::type_signals_doc::TypeSignalsDocument;
 use crate::verify::{VerifyFinding, VerifyOutcome};
 
@@ -72,9 +73,17 @@ fn classify_type_signal_gate(signals_doc: &TypeSignalsDocument) -> TypeSignalGat
 /// Returns findings when Red signals are present (both modes) or Yellow signals
 /// are present in strict mode.
 ///
+/// Taking [`Strictness`] (not `bool`) preserves type safety per
+/// `knowledge/conventions/prefer-type-safe-abstractions.md` § Enum-first: callers
+/// pass a domain-named discriminant so an inverted conversion cannot silently flip
+/// gate behavior.
+///
 /// Reference: ADR `knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md` §D4.
 #[must_use]
-pub fn check_type_signals(signals_doc: &TypeSignalsDocument, strict: bool) -> VerifyOutcome {
+pub fn check_type_signals(
+    signals_doc: &TypeSignalsDocument,
+    strictness: Strictness,
+) -> VerifyOutcome {
     match classify_type_signal_gate(signals_doc) {
         // Empty signals → pass (empty catalogue / no declarations).
         // ADR 2026-04-19-1242 §D6.4: zero type declarations are valid for tracks
@@ -98,10 +107,13 @@ pub fn check_type_signals(signals_doc: &TypeSignalsDocument, strict: bool) -> Ve
                 all_yellow.len(),
                 all_yellow.join(", ")
             );
-            if strict {
-                VerifyOutcome::from_findings(vec![VerifyFinding::error(message)])
-            } else {
-                VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)])
+            match strictness {
+                Strictness::Strict => {
+                    VerifyOutcome::from_findings(vec![VerifyFinding::error(message)])
+                }
+                Strictness::Interim => {
+                    VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)])
+                }
             }
         }
     }
@@ -136,19 +148,19 @@ mod tests {
     fn test_check_type_signals_empty_signals_passes_per_adr_d64() {
         // Empty signal list → pass (no declarations / empty catalogue opt-in).
         let doc = make_doc(vec![]);
-        let outcome = check_type_signals(&doc, false);
+        let outcome = check_type_signals(&doc, Strictness::Interim);
         assert!(outcome.findings().is_empty(), "empty signals must pass per D6.4: {outcome:?}");
     }
 
     #[test]
     fn test_check_type_signals_red_is_error_regardless_of_mode() {
         let doc = make_doc(vec![make_signal("TrackId", "value_object", ConfidenceSignal::Red)]);
-        let outcome_interim = check_type_signals(&doc, false);
+        let outcome_interim = check_type_signals(&doc, Strictness::Interim);
         assert!(
             outcome_interim.has_errors(),
             "red in interim must be an error: {outcome_interim:?}"
         );
-        let outcome_strict = check_type_signals(&doc, true);
+        let outcome_strict = check_type_signals(&doc, Strictness::Strict);
         assert!(outcome_strict.has_errors(), "red in strict must be an error: {outcome_strict:?}");
     }
 
@@ -158,7 +170,7 @@ mod tests {
             make_signal("TrackId", "value_object", ConfidenceSignal::Blue),
             make_signal("ReviewState", "value_object", ConfidenceSignal::Yellow),
         ]);
-        let outcome = check_type_signals(&doc, false);
+        let outcome = check_type_signals(&doc, Strictness::Interim);
         assert!(!outcome.has_errors(), "yellow in interim must not be an error: {outcome:?}");
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1);
@@ -172,7 +184,7 @@ mod tests {
     #[test]
     fn test_check_type_signals_yellow_is_error_in_strict_mode() {
         let doc = make_doc(vec![make_signal("TrackId", "value_object", ConfidenceSignal::Yellow)]);
-        let outcome = check_type_signals(&doc, true);
+        let outcome = check_type_signals(&doc, Strictness::Strict);
         assert!(outcome.has_errors(), "yellow in strict must be an error: {outcome:?}");
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1);
@@ -187,22 +199,22 @@ mod tests {
             make_signal("ReviewState", "value_object", ConfidenceSignal::Blue),
         ]);
 
-        let outcome_interim = check_type_signals(&doc, false);
+        let outcome_interim = check_type_signals(&doc, Strictness::Interim);
         assert!(!outcome_interim.has_errors(), "all-blue interim: {outcome_interim:?}");
         assert!(outcome_interim.findings().is_empty());
 
-        let outcome_strict = check_type_signals(&doc, true);
+        let outcome_strict = check_type_signals(&doc, Strictness::Strict);
         assert!(!outcome_strict.has_errors(), "all-blue strict: {outcome_strict:?}");
         assert!(outcome_strict.findings().is_empty());
     }
 
-    /// D4 regression: documents that `check_type_signals(signals_doc, strict=false)`
+    /// D4 regression: documents that `check_type_signals(signals_doc, Strictness::Interim)`
     /// blocks on an "undeclared implementation" (`C\(S∪D)` region → 🔴 signal).
     ///
     /// ADR `2026-05-11-2330` §D4 states:
     ///   "Undeclared implementations in the `C\(S∪D)` region, which are 🔴 entries in
     ///   `<layer>-type-signals.json`, are blocked by the existing commit gate
-    ///   (`check_type_signals(doc, strict=false)`) unconditionally."
+    ///   (`check_type_signals(doc, Strictness::Interim)`) unconditionally."
     ///
     /// A `CMinusSUnionD` entry corresponds to a type present in the current code (C)
     /// but not declared in the catalogue (S) or as a delete target (D). In v3 this
@@ -222,7 +234,7 @@ mod tests {
         )]);
 
         // Even in non-strict (commit-gate) mode, a Red signal blocks.
-        let outcome = check_type_signals(&doc, /* strict = */ false);
+        let outcome = check_type_signals(&doc, Strictness::Interim);
         assert!(
             outcome.has_errors(),
             "CMinusSUnionD Red signal must block commit gate (has_errors must be true): {outcome:?}"
@@ -248,7 +260,7 @@ mod tests {
             Vec::new(),
             Vec::new(),
         )]);
-        let outcome = check_type_signals(&doc, false);
+        let outcome = check_type_signals(&doc, Strictness::Interim);
         assert!(outcome.has_errors(), "red reverse signal must be an error: {outcome:?}");
         let msg = outcome.findings()[0].message();
         assert!(msg.contains("UndeclaredType"), "must mention the offending type: {msg}");
@@ -268,11 +280,11 @@ mod tests {
             Vec::new(),
             Vec::new(),
         )]);
-        let outcome_interim = check_type_signals(&doc, false);
+        let outcome_interim = check_type_signals(&doc, Strictness::Interim);
         assert!(!outcome_interim.has_errors(), "yellow in interim must warn, not error");
         assert!(!outcome_interim.findings().is_empty(), "must have a warning finding");
 
-        let outcome_strict = check_type_signals(&doc, true);
+        let outcome_strict = check_type_signals(&doc, Strictness::Strict);
         assert!(outcome_strict.has_errors(), "yellow in strict must be an error");
     }
 }

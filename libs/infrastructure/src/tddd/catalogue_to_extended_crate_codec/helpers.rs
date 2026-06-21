@@ -511,7 +511,7 @@ impl EncoderState {
     ) -> Result<rustdoc_types::Item, CatalogueToExtendedCrateCodecError> {
         let type_ = self.encode_trait_scoped_type_ref(decl.ty.as_str(), trait_generic_names)?;
 
-        let value = decl.default_value.clone();
+        let value = decl.default_value.as_ref().map(|e| e.as_str().to_owned());
 
         Ok(make_item(id, Some(decl.name.to_string()), None, ItemEnum::AssocConst { type_, value }))
     }

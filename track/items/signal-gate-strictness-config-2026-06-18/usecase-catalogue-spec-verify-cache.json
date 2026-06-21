@@ -953,6 +953,1054 @@
         "kind": "pass",
         "citation": "Strict 対応の adr-signal verifier として `execute_verify_adr_signals_with_strict(project_root, strict)` を新設し、既存の `execute_verify_adr_signals(project_root)` は非 strict のショートカットとして `_with_strict(project_root, false)` に delegate する形に保つ。"
       }
+    },
+    {
+      "claim_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194",
+      "evidence_hash": "66d98509799da3647446b6a4d39e1c4f1550c3c2d60604b95037ae1c38c0934c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "98404efb7498f8b0742111ab1ab38747fc7c489a61de50f7835fca1e6de7b194",
+      "evidence_hash": "f495dab53a43b095c5dc942efb94d550778ed2b9eafb74eb65e7a9fec82df230",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`LoadablePersistedChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。"
+      }
+    },
+    {
+      "claim_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "7dfc1b74a8af162d1861bb0a1ab15fce504f8f2569e20951ab7fba1d7e1293a6",
+      "evidence_hash": "66d98509799da3647446b6a4d39e1c4f1550c3c2d60604b95037ae1c38c0934c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl<T: LoadablePersistedChain> PersistedSoTChain for T` と `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "69e5a964790069747c890ffcc1cd8a5cb6bfa57cfdedf243e4d46e18dd8bbdef",
+      "evidence_hash": "66d98509799da3647446b6a4d39e1c4f1550c3c2d60604b95037ae1c38c0934c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装し、blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "89e4f297bbbc0cb3f91597fb0a48ca6f22ba51e2aca0035da3891b72a7b6330f",
+      "evidence_hash": "66d98509799da3647446b6a4d39e1c4f1550c3c2d60604b95037ae1c38c0934c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "04b52e16c636818996263543bf3ac3a5685c12404531925e59de94e0389884ca",
+      "evidence_hash": "0e594f0430ca9d22e96d4df5d530ffb75d04f94272f479ce049fd001baed4f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Strict 対応の adr-signal verifier として `execute_verify_adr_signals_with_strict(project_root, strict)` を新設し、既存の `execute_verify_adr_signals(project_root)` は非 strict のショートカットとして `_with_strict(project_root, false)` に delegate する"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChainGate` / `LoadablePersistedChain` / `PersistedSoTChain` の trait taxonomy を定義し、`impl<T: PersistedSoTChain> SoTChain for T` と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "66d98509799da3647446b6a4d39e1c4f1550c3c2d60604b95037ae1c38c0934c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` ... chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "f495dab53a43b095c5dc942efb94d550778ed2b9eafb74eb65e7a9fec82df230",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`LoadablePersistedChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "4e37423b346be20b2c0a0005869b8253ee69081f355cad68b0304629666b9f40",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain-types.json` に `assoc_types` / `assoc_consts` フィールドを持つ `TraitEntry` として宣言された `ChainIdentity`（`const ID: ChainId` + `type Input<'a>` 等）、`LiveSoTChain`（`type LiveCalc` / `type CalcError` 等）、`PersistedSoTChainGate`（`type Persisted` / `type CalcError` / `type StaleError` 等）、および空の結合 trait としての `PersistedSoTChain`（`assoc_types: []` / `assoc_consts: []`）が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChainGate` / `LoadablePersistedChain` / `PersistedSoTChain` の trait taxonomy を定義し、`impl<T: PersistedSoTChain> SoTChain for T` と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する."
+      }
+    },
+    {
+      "claim_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200",
+      "evidence_hash": "f495dab53a43b095c5dc942efb94d550778ed2b9eafb74eb65e7a9fec82df230",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`LoadablePersistedChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。① ② ③ の `PersistedSoTChainGate::evaluate_gate` は既存 domain 純粋関数（`check_spec_doc_signals` / `check_catalogue_spec_signals`（新設） / `check_type_signals`）を薄くラップする。"
+      }
+    },
+    {
+      "claim_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。... この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChainGate` / `LoadablePersistedChain` / `PersistedSoTChain` の trait taxonomy を定義し、`impl<T: PersistedSoTChain> SoTChain for T` と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` の blanket impl を置く。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。これにより chain ⓪ に対して永続 `calc` / `check_freshness` を呼ぶコードはコンパイルエラーになる（make illegal states unrepresentable）。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "66d98509799da3647446b6a4d39e1c4f1550c3c2d60604b95037ae1c38c0934c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain: PersistedSoTChainGate + LoadablePersistedChain` の trait taxonomy が定義され、`impl<T: LoadablePersistedChain> PersistedSoTChain for T` と `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "f495dab53a43b095c5dc942efb94d550778ed2b9eafb74eb65e7a9fec82df230",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`LoadablePersistedChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。① ② ③ の `PersistedSoTChainGate::evaluate_gate` は既存 domain 純粋関数（`check_spec_doc_signals` / `check_catalogue_spec_signals`（新設） / `check_type_signals`）を薄くラップする。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "4e37423b346be20b2c0a0005869b8253ee69081f355cad68b0304629666b9f40",
+      "verdict": {
+        "kind": "pass",
+        "citation": "および空の結合 trait としての `PersistedSoTChain` (`assoc_types: []` / `assoc_consts: []`)"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "58929182342b4950540299e5bb16b948d82b1ce2bf4387e563aa92d106d91987",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "58929182342b4950540299e5bb16b948d82b1ce2bf4387e563aa92d106d91987",
+      "evidence_hash": "c41dff70865bd9a7db24ec1e843302fde05b7b3120b35e83ab276f8bcbcfafa9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/domain/src/chain.rs`（新規）に `ChainId` enum と `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChainGate` / `LoadablePersistedChain` / `PersistedSoTChain` の trait taxonomy を定義し、`impl<T: PersistedSoTChain> SoTChain for T` と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "58929182342b4950540299e5bb16b948d82b1ce2bf4387e563aa92d106d91987",
+      "evidence_hash": "66d98509799da3647446b6a4d39e1c4f1550c3c2d60604b95037ae1c38c0934c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainId` enum と `ChainIdentity` / `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `PersistedSoTChainGate: ChainIdentity` / `LoadablePersistedChain: PersistedSoTChainGate` / `PersistedSoTChain: PersistedSoTChainGate + LoadablePersistedChain` の trait taxonomy が定義され、`impl<T: LoadablePersistedChain> PersistedSoTChain for T` と `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。"
+      }
+    },
+    {
+      "claim_hash": "58929182342b4950540299e5bb16b948d82b1ce2bf4387e563aa92d106d91987",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "58929182342b4950540299e5bb16b948d82b1ce2bf4387e563aa92d106d91987",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。... この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "0fb53afd8b6e0bfe44daf16809e40e8a8caf4c0025702312852e3ffd5024fc94",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "0fb53afd8b6e0bfe44daf16809e40e8a8caf4c0025702312852e3ffd5024fc94",
+      "evidence_hash": "0d79b6e16ec3adbb80db3e9a544aa43488475fe6b8ba753e10261839c73c77a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PersistedSoTChain` は chain ①②③ にのみ実装し、chain ⓪ には実装しない。chain ⓪ は `SoTChain` + `LiveSoTChain` を実装する。"
+      }
+    },
+    {
+      "claim_hash": "0fb53afd8b6e0bfe44daf16809e40e8a8caf4c0025702312852e3ffd5024fc94",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "0fb53afd8b6e0bfe44daf16809e40e8a8caf4c0025702312852e3ffd5024fc94",
+      "evidence_hash": "f495dab53a43b095c5dc942efb94d550778ed2b9eafb74eb65e7a9fec82df230",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`LoadablePersistedChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。`signal calc-adr-user` は `LiveSoTChain::calc_live` 経由でのみ実装される。"
+      }
+    },
+    {
+      "claim_hash": "0fb53afd8b6e0bfe44daf16809e40e8a8caf4c0025702312852e3ffd5024fc94",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "b793e9a68dc946ccc195422dc11bcf33a0ffb3b6f8d33a9ff4b123a630267580",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "b793e9a68dc946ccc195422dc11bcf33a0ffb3b6f8d33a9ff4b123a630267580",
+      "evidence_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③: 既存の entry_hash / declaration_hash 比較 mechanism を引き継ぐ。stale 検出は全 chain で `Finding::error` 固定（strictness によらず常時 block）。"
+      }
+    },
+    {
+      "claim_hash": "b793e9a68dc946ccc195422dc11bcf33a0ffb3b6f8d33a9ff4b123a630267580",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
+    },
+    {
+      "claim_hash": "b793e9a68dc946ccc195422dc11bcf33a0ffb3b6f8d33a9ff4b123a630267580",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "b793e9a68dc946ccc195422dc11bcf33a0ffb3b6f8d33a9ff4b123a630267580",
+      "evidence_hash": "52d74bdd474f4ba741adb9526c1223373147c130a16dbc8cb313cadf2f07055f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-catalog-spec` は `entry_hash` 不一致のとき `Finding::error`。chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力では signal を正しく評価できないため）。"
+      }
+    },
+    {
+      "claim_hash": "b793e9a68dc946ccc195422dc11bcf33a0ffb3b6f8d33a9ff4b123a630267580",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "a231d46dbe97a51f7fd29507b704c82b1c9d3b7888ab0e9d99c505c9a15ea1bc",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "a231d46dbe97a51f7fd29507b704c82b1c9d3b7888ab0e9d99c505c9a15ea1bc",
+      "evidence_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③: 既存の entry_hash / declaration_hash 比較 mechanism を引き継ぐ。stale 検出は全 chain で `Finding::error` 固定（strictness によらず常時 block）。"
+      }
+    },
+    {
+      "claim_hash": "a231d46dbe97a51f7fd29507b704c82b1c9d3b7888ab0e9d99c505c9a15ea1bc",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ② ③ は既存の entry_hash / declaration_hash 比較で stale を検出し同じく `Finding::error`。"
+      }
+    },
+    {
+      "claim_hash": "a231d46dbe97a51f7fd29507b704c82b1c9d3b7888ab0e9d99c505c9a15ea1bc",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "a231d46dbe97a51f7fd29507b704c82b1c9d3b7888ab0e9d99c505c9a15ea1bc",
+      "evidence_hash": "52d74bdd474f4ba741adb9526c1223373147c130a16dbc8cb313cadf2f07055f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-impl-catalog` は `declaration_hash` 不一致のとき `Finding::error`。chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない（stale 入力では signal を正しく評価できないため）。"
+      }
+    },
+    {
+      "claim_hash": "a231d46dbe97a51f7fd29507b704c82b1c9d3b7888ab0e9d99c505c9a15ea1bc",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "8640eb9ea885b1ba2f976872710414568ff2053be73ff08560bf63c05edc3081",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "8640eb9ea885b1ba2f976872710414568ff2053be73ff08560bf63c05edc3081",
+      "evidence_hash": "1842892fad25b2be85b1086c3a5f85a6386b48a424e5c8489282c43961f6e3e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ①: `doc.evaluate_signals()` と `doc.signals()` の self-consistency check（新規実装）."
+      }
+    },
+    {
+      "claim_hash": "8640eb9ea885b1ba2f976872710414568ff2053be73ff08560bf63c05edc3081",
+      "evidence_hash": "e3bced0987b2f0440d4c378b2f403d658982a9754ef0a545ea6b0b780e440783",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① の `check-spec-adr` は calc 結果の freshness を self-consistency check（`doc.evaluate_signals()` と保存値 `doc.signals()` の比較）で検証し、不一致のとき `Finding::error` を返す。"
+      }
+    },
+    {
+      "claim_hash": "8640eb9ea885b1ba2f976872710414568ff2053be73ff08560bf63c05edc3081",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "8640eb9ea885b1ba2f976872710414568ff2053be73ff08560bf63c05edc3081",
+      "evidence_hash": "52d74bdd474f4ba741adb9526c1223373147c130a16dbc8cb313cadf2f07055f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check-spec-adr` は `doc.evaluate_signals()` と `doc.signals()` を比較し不一致のとき `Finding::error`（stale エラー、`signal calc-spec-adr` 再実行を促すメッセージ付き）を返す。... chain ①②③ の stale 不一致検出（freshness 検証）は strictness によらず常時 `Finding::error` とし、warning 化しない"
+      }
+    },
+    {
+      "claim_hash": "8640eb9ea885b1ba2f976872710414568ff2053be73ff08560bf63c05edc3081",
+      "evidence_hash": "b32468d2050d6ba761b95c73b36156499ab25da9d42cd101f77d10e88c3b2a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait 経由になっており、`calc-adr-user` は `LiveSoTChain`、① ② ③ の `calc-*` は `PersistedSoTChain`、全 `check-*` は `SoTChain`（① ② ③ は blanket impl）に配線される。`apps/cli/src/commands/signal/` に新 `signal` モジュールが存在する。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/traits.rs`（新規）に usecase dispatch / I/O port contract である `SoTChain` / `LiveSoTChain` / `LoadablePersistedChain` / `PersistedSoTChain` と、`impl<T: LoadablePersistedChain> PersistedSoTChain for T` / `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/traits.rs` に `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `LoadablePersistedChain: PersistedSoTChainGate` / `PersistedSoTChain: PersistedSoTChainGate + LoadablePersistedChain` の usecase trait taxonomy ... chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "0320871315c2855919af8af3bf653638f40fb89737398a3aa1bfb5c0e97da698",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`usecase-types.json` に宣言された `LiveSoTChain`（`type LiveCalc` / `CalcError` 等）と空の結合 trait としての `PersistedSoTChain`（`assoc_types: []` / `assoc_consts: []`）が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。"
+      }
+    },
+    {
+      "claim_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/traits.rs`（新規）に usecase dispatch / I/O port contract である `SoTChain` / `LiveSoTChain` / `LoadablePersistedChain` / `PersistedSoTChain` と、`impl<T: LoadablePersistedChain> PersistedSoTChain for T` / `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/traits.rs`（新規）に usecase dispatch / I/O port contract である `SoTChain` / `LiveSoTChain` / `LoadablePersistedChain` / `PersistedSoTChain` と、`impl<T: LoadablePersistedChain> PersistedSoTChain for T` / `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/traits.rs` に `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `LoadablePersistedChain: PersistedSoTChainGate` / `PersistedSoTChain: PersistedSoTChainGate + LoadablePersistedChain` の usecase trait taxonomy と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` / `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "0320871315c2855919af8af3bf653638f40fb89737398a3aa1bfb5c0e97da698",
+      "verdict": {
+        "kind": "pass",
+        "citation": "空の結合 trait としての `PersistedSoTChain`（`assoc_types: []` / `assoc_consts: []`）が、`bin/sotp signal calc-impl-catalog` 実行後に 🔵 Blue と評価される。"
+      }
+    },
+    {
+      "claim_hash": "58929182342b4950540299e5bb16b948d82b1ce2bf4387e563aa92d106d91987",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/traits.rs`（新規）に usecase dispatch / I/O port contract である `SoTChain` / `LiveSoTChain` / `LoadablePersistedChain` / `PersistedSoTChain` と、`impl<T: LoadablePersistedChain> PersistedSoTChain for T` / `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。"
+      }
+    },
+    {
+      "claim_hash": "58929182342b4950540299e5bb16b948d82b1ce2bf4387e563aa92d106d91987",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/traits.rs` に `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `LoadablePersistedChain: PersistedSoTChainGate` / `PersistedSoTChain: PersistedSoTChainGate + LoadablePersistedChain` の usecase trait taxonomy と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` / `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "72e9a24561ac0dcc3f07d2ac32613493651c0a2b4a838d4a6c3e20d3c990d141",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "active-track 解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務 ... usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る."
+      }
+    },
+    {
+      "claim_hash": "feee9051934802ec6a8a9731885cb74e565e7752ec433702d7221e719694a952",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来の filesystem-backed レイヤーセット読取）は `libs/infrastructure/src/verify/tddd_layers/` の infrastructure primitive 責務であり、usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。"
+      }
+    },
+    {
+      "claim_hash": "feee9051934802ec6a8a9731885cb74e565e7752ec433702d7221e719694a952",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "45a87834893bf820c47a5d6920b62652a76ef4a101babc85f0ff7487271b7873",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "45a87834893bf820c47a5d6920b62652a76ef4a101babc85f0ff7487271b7873",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来の filesystem-backed レイヤーセット読取）は `libs/infrastructure/src/verify/tddd_layers/` の infrastructure primitive 責務であり、usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務でなければならず... per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）"
+      }
+    },
+    {
+      "claim_hash": "45a87834893bf820c47a5d6920b62652a76ef4a101babc85f0ff7487271b7873",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue が存在しないレイヤーに対しては no-op となる。"
+      }
+    },
+    {
+      "claim_hash": "45a87834893bf820c47a5d6920b62652a76ef4a101babc85f0ff7487271b7873",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "5d6288cb36c3984d94afd90a6fa11e5fe06e548ce456d4f97b7646fab6dc05bc",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "5d6288cb36c3984d94afd90a6fa11e5fe06e548ce456d4f97b7646fab6dc05bc",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来の filesystem-backed レイヤーセット読取）は `libs/infrastructure/src/verify/tddd_layers/` の infrastructure primitive 責務であり、usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務でなければならず、... per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "5d6288cb36c3984d94afd90a6fa11e5fe06e548ce456d4f97b7646fab6dc05bc",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD 対象レイヤーが存在するトラックブランチから `bin/sotp signal calc-impl-catalog`（per-layer フラグなし）を実行すると、`<layer>-types.json` が存在する全レイヤーについて `<layer>-type-signals.json` が生成または更新され、catalogue が存在しないレイヤーに対しては no-op となる。... いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "5d6288cb36c3984d94afd90a6fa11e5fe06e548ce456d4f97b7646fab6dc05bc",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "5cf84436fa133cf18e629fbadf9ac736c40385578734e40397ed81d0dff67c63",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "5cf84436fa133cf18e629fbadf9ac736c40385578734e40397ed81d0dff67c63",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務でなければならず... per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）"
+      }
+    },
+    {
+      "claim_hash": "5cf84436fa133cf18e629fbadf9ac736c40385578734e40397ed81d0dff67c63",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal check-catalog-spec`（per-layer フラグなし）... いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "5cf84436fa133cf18e629fbadf9ac736c40385578734e40397ed81d0dff67c63",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "7ac11802ebac37bea0bd93885d55792bb1d0965fa1aac36220bb7a838f1f6399",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。gate 選択フラグ（`--gate commit|merge`）や strictness フラグ（`--strict`）はレイヤー指定フラグではないため許容される。"
+      }
+    },
+    {
+      "claim_hash": "7ac11802ebac37bea0bd93885d55792bb1d0965fa1aac36220bb7a838f1f6399",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。"
+      }
+    },
+    {
+      "claim_hash": "7ac11802ebac37bea0bd93885d55792bb1d0965fa1aac36220bb7a838f1f6399",
+      "evidence_hash": "c2e02bb57ca5eb8e84488f476fec40f2cc05ee355ca673f7fff30e7aca7cbcaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal check-impl-catalog`（per-layer フラグなし）を実行すると... 正常に動作する。いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "7ac11802ebac37bea0bd93885d55792bb1d0965fa1aac36220bb7a838f1f6399",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "d89af22361eb48d7fa1874e52446a2fdcd94c14be948eff87899fecf331990e7",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務"
+      }
+    },
+    {
+      "claim_hash": "0fb53afd8b6e0bfe44daf16809e40e8a8caf4c0025702312852e3ffd5024fc94",
+      "evidence_hash": "284e88280fdf21b40f8d6cbba583a059ab283efc134026f04761da84f8649ca3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「chain ⓪ に対して永続 `calc`（`LoadablePersistedChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。実装済みの `signal calc-adr-user` / `signal check-adr-user` は no-persist の live ADR signal scan として … `AdrUserChain::calc_live` は usecase trait taxonomy 上の placeholder のままとする。」"
+      }
+    },
+    {
+      "claim_hash": "0fb53afd8b6e0bfe44daf16809e40e8a8caf4c0025702312852e3ffd5024fc94",
+      "evidence_hash": "84cf6400a728cb2549d005a1f49263da97016901fc21f4401ac19a13d9ef9ece",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait / composition boundary に沿っており、chain ⓪ の `calc-adr-user` / `check-adr-user` は infrastructure verifier 経由の no-persist live scan"
+      }
+    },
+    {
+      "claim_hash": "b793e9a68dc946ccc195422dc11bcf33a0ffb3b6f8d33a9ff4b123a630267580",
+      "evidence_hash": "84cf6400a728cb2549d005a1f49263da97016901fc21f4401ac19a13d9ef9ece",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「chain ⓪ の `calc-adr-user` / `check-adr-user` は infrastructure verifier 経由の no-persist live scan、① ② ③ の `calc-*` は `PersistedSoTChain`、① ② ③ の `check-*` は `SoTChain`（blanket impl）に配線される。」"
+      }
+    },
+    {
+      "claim_hash": "a231d46dbe97a51f7fd29507b704c82b1c9d3b7888ab0e9d99c505c9a15ea1bc",
+      "evidence_hash": "84cf6400a728cb2549d005a1f49263da97016901fc21f4401ac19a13d9ef9ece",
+      "verdict": {
+        "kind": "pass",
+        "citation": "① ② ③ の `calc-*` は `PersistedSoTChain`、① ② ③ の `check-*` は `SoTChain`（blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "8640eb9ea885b1ba2f976872710414568ff2053be73ff08560bf63c05edc3081",
+      "evidence_hash": "84cf6400a728cb2549d005a1f49263da97016901fc21f4401ac19a13d9ef9ece",
+      "verdict": {
+        "kind": "pass",
+        "citation": "① ② ③ の `calc-*` は `PersistedSoTChain`、① ② ③ の `check-*` は `SoTChain`（blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "284e88280fdf21b40f8d6cbba583a059ab283efc134026f04761da84f8649ca3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`LoadablePersistedChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。実装済みの `signal calc-adr-user` / `signal check-adr-user` は no-persist の live ADR signal scan として CLI composition root から `infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict(project_root, strict)`（calc は `strict=false`）へ配線され、`AdrUserChain::calc_live` は usecase trait taxonomy 上の placeholder のままとする。"
+      }
+    },
+    {
+      "claim_hash": "dd13f7274300ec78a17c895b288522273e09ad4d6870b960bca5413bff8f4cbf",
+      "evidence_hash": "84cf6400a728cb2549d005a1f49263da97016901fc21f4401ac19a13d9ef9ece",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ の `calc-adr-user` / `check-adr-user` は infrastructure verifier 経由の no-persist live scan"
+      }
+    },
+    {
+      "claim_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200",
+      "evidence_hash": "284e88280fdf21b40f8d6cbba583a059ab283efc134026f04761da84f8649ca3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`LoadablePersistedChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。 ... ① ② ③ の `PersistedSoTChainGate::evaluate_gate` は既存 domain 純粋関数（`check_spec_doc_signals` / `check_catalogue_spec_signals`（新設） / `check_type_signals`）を薄くラップする。"
+      }
+    },
+    {
+      "claim_hash": "0abedc9850484361d2072ce18d42eb1582310ae2758ce94ff64e4f70869a2200",
+      "evidence_hash": "84cf6400a728cb2549d005a1f49263da97016901fc21f4401ac19a13d9ef9ece",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI ディスパッチが trait / composition boundary に沿っており、chain ⓪ の `calc-adr-user` / `check-adr-user` は infrastructure verifier 経由の no-persist live scan、① ② ③ の `calc-*` は `PersistedSoTChain`、① ② ③ の `check-*` は `SoTChain`（blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "284e88280fdf21b40f8d6cbba583a059ab283efc134026f04761da84f8649ca3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "chain ⓪ に対して永続 `calc`（`LoadablePersistedChain::calc`）/ `check_freshness` を呼ぼうとするコードがコンパイルエラーになる。... ① ② ③ の `PersistedSoTChainGate::evaluate_gate` は既存 domain 純粋関数（`check_spec_doc_signals` / `check_catalogue_spec_signals`（新設） / `check_type_signals`）を薄くラップする。"
+      }
+    },
+    {
+      "claim_hash": "13d8070012bc6c25e01c156fd67901aaf21b9dcc53388516969d20f08b20c79a",
+      "evidence_hash": "84cf6400a728cb2549d005a1f49263da97016901fc21f4401ac19a13d9ef9ece",
+      "verdict": {
+        "kind": "pass",
+        "citation": "① ② ③ の `calc-*` は `PersistedSoTChain`、① ② ③ の `check-*` は `SoTChain`（blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "cb96b162245bcde9cfec1a456abc8b79c0edd26af9c0de0eb619b63744626255",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。"
+      }
+    },
+    {
+      "claim_hash": "cb96b162245bcde9cfec1a456abc8b79c0edd26af9c0de0eb619b63744626255",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来の filesystem-backed レイヤーセット読取）は `libs/infrastructure/src/verify/tddd_layers/` の infrastructure primitive 責務であり、usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。 / per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり"
+      }
+    },
+    {
+      "claim_hash": "cb96b162245bcde9cfec1a456abc8b79c0edd26af9c0de0eb619b63744626255",
+      "evidence_hash": "04fcbaba475bb1844d1893b688a973cb7a5bcc0ddf6e0f685d028c5e02fa982a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD 対象レイヤーが存在するトラックブランチから `bin/sotp signal calc-impl-catalog`（per-layer フラグなし）を実行すると、各レイヤーの設定済み catalogue file（`tddd.catalogue_file`、未指定時は `<layer>-types.json`）が存在する全レイヤーについて対応する type-signals file（catalogue file から導出、既定では `<layer>-type-signals.json`）が生成または更新され、catalogue が存在しないレイヤーに対しては no-op となる。... いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "cb96b162245bcde9cfec1a456abc8b79c0edd26af9c0de0eb619b63744626255",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。」"
+      }
+    },
+    {
+      "claim_hash": "cb96b162245bcde9cfec1a456abc8b79c0edd26af9c0de0eb619b63744626255",
+      "evidence_hash": "12caa5a5007ce28e420a48f0b7d45b426614e2947c1703b71fa63e44cac7d0ff",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Makefile.toml` 内の `signal` 名前空間タスクが `for LAYER` ループ・`sha256sum` 呼び出し・パス構築パターンを含まない。`track-active-gate` は完全に削除されているか、または `bin/sotp signal calc-impl-catalog`・`bin/sotp signal calc-catalog-spec`・`bin/sotp track views sync` の 3 行の bare コマンドシーケンスへ縮減されている。"
+      }
+    },
+    {
+      "claim_hash": "4ec82db7fc9e8ec813850a98c04a647add2d3d529ff045ecf5730bfd8b566806",
+      "evidence_hash": "4588baa232f1ebec4161eaeb8fdceb2e2498843eff4786f33b59328e9c6018d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChain` の trait taxonomy を導入し、新 chain 追加時の実装漏れと inline 重複実装の両方をコンパイル時に排除できる構造を提供する。"
+      }
+    },
+    {
+      "claim_hash": "4ec82db7fc9e8ec813850a98c04a647add2d3d529ff045ecf5730bfd8b566806",
+      "evidence_hash": "ac6b3d4692c8524fd5c1d9ba8896c06124a0d7b6dd323a0e97b0596eb8240a50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/traits.rs`（新規）に usecase dispatch / I/O port contract である `SoTChain` / `LiveSoTChain` / `LoadablePersistedChain` / `PersistedSoTChain` と、`impl<T: LoadablePersistedChain> PersistedSoTChain for T` / `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl を置く。`libs/usecase/src/chain/`（新規）に chain ごとの struct（`AdrUserChain` / `SpecAdrChain` / `CatalogSpecChain` / `ImplCatalogChain`）を定義し、⓪ は `SoTChain` + `LiveSoTChain`、① ② ③ は `PersistedSoTChainGate` + `LoadablePersistedChain`（blanket impl で `PersistedSoTChain` と `SoTChain` を得る）を実装する。"
+      }
+    },
+    {
+      "claim_hash": "4ec82db7fc9e8ec813850a98c04a647add2d3d529ff045ecf5730bfd8b566806",
+      "evidence_hash": "f35906fb3da264eaad6b91c567f8bc564dc4c03e18ccb737784b02273bf56765",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/chain/traits.rs` に `SoTChain: ChainIdentity` / `LiveSoTChain: SoTChain` / `LoadablePersistedChain: PersistedSoTChainGate` / `PersistedSoTChain: PersistedSoTChainGate + LoadablePersistedChain` の usecase trait taxonomy と `impl<T: LoadablePersistedChain> PersistedSoTChain for T` / `impl<T: PersistedSoTChain> SoTChain for T` の blanket impl が存在する。chain ⓪ `AdrUserChain` が `SoTChain` + `LiveSoTChain` を実装し、chain ① ② ③ の struct が `PersistedSoTChainGate` + `LoadablePersistedChain` を実装して blanket impl で `PersistedSoTChain` と `SoTChain` を得る。"
+      }
+    },
+    {
+      "claim_hash": "4ec82db7fc9e8ec813850a98c04a647add2d3d529ff045ecf5730bfd8b566806",
+      "evidence_hash": "84cf6400a728cb2549d005a1f49263da97016901fc21f4401ac19a13d9ef9ece",
+      "verdict": {
+        "kind": "pass",
+        "citation": "① ② ③ の `check-*` は `SoTChain`（blanket impl）に配線される。"
+      }
+    },
+    {
+      "claim_hash": "4ec82db7fc9e8ec813850a98c04a647add2d3d529ff045ecf5730bfd8b566806",
+      "evidence_hash": "0d0bce1e065e07ce212d6ac62f632da424a313a2204f6ce816402cf92392ad33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GAT 射影型を catalogue に記述する場合、`<Self>::Assoc` 形式（qself が position 0 で `trait_` が `None`）を正規形として用いなければならない。この慣例は `ChainIdentity` / `LiveSoTChain` / `PersistedSoTChain` の GAT（`type Input<'a>` 等）を catalogue に宣言するすべての箇所に適用される。"
+      }
+    },
+    {
+      "claim_hash": "bcd3e44aa2f5fc26b840f9177792e39cc4edaba5540d1f5f820786840a9258ef",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "bcd3e44aa2f5fc26b840f9177792e39cc4edaba5540d1f5f820786840a9258ef",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙…は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務でなければならず… per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）"
+      }
+    },
+    {
+      "claim_hash": "bcd3e44aa2f5fc26b840f9177792e39cc4edaba5540d1f5f820786840a9258ef",
+      "evidence_hash": "04fcbaba475bb1844d1893b688a973cb7a5bcc0ddf6e0f685d028c5e02fa982a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal calc-catalog-spec`（per-layer フラグなし）... catalogue が存在しないレイヤーに対しては no-op となる。... いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "bcd3e44aa2f5fc26b840f9177792e39cc4edaba5540d1f5f820786840a9258ef",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "45565cfdab6429b183d9800c6b0426e07e9a6af7dc911229772be49c72dfb684",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。"
+      }
+    },
+    {
+      "claim_hash": "45565cfdab6429b183d9800c6b0426e07e9a6af7dc911229772be49c72dfb684",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙 ... は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務 ... per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）"
+      }
+    },
+    {
+      "claim_hash": "45565cfdab6429b183d9800c6b0426e07e9a6af7dc911229772be49c72dfb684",
+      "evidence_hash": "04fcbaba475bb1844d1893b688a973cb7a5bcc0ddf6e0f685d028c5e02fa982a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各レイヤーの設定済み catalogue file（`tddd.catalogue_file`、未指定時は `<layer>-types.json`）が存在する全レイヤーについて対応する type-signals file（catalogue file から導出、既定では `<layer>-type-signals.json`）が生成または更新され、catalogue が存在しないレイヤーに対しては no-op となる。... いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "45565cfdab6429b183d9800c6b0426e07e9a6af7dc911229772be49c72dfb684",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "e0646ef58650bc66850764f4c60965b3d970b928b77f2a7389a6f60e77279fda",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。gate 選択フラグ（`--gate commit|merge`）や strictness フラグ（`--strict`）はレイヤー指定フラグではないため許容される。"
+      }
+    },
+    {
+      "claim_hash": "e0646ef58650bc66850764f4c60965b3d970b928b77f2a7389a6f60e77279fda",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙（`architecture-rules.json` 由来の filesystem-backed レイヤーセット読取）は `libs/infrastructure/src/verify/tddd_layers/` の infrastructure primitive 責務であり、usecase は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務でなければならず、これらの active-track 解決・TDDD レイヤー列挙・hash 算出は CLI コマンドファイル・`apps/cli-composition`・`Makefile.toml` に含んではならない。per-layer の signals ファイル（出力）のパス構築は **infrastructure の責務**（infrastructure primitive が layer ID から出力先パスを構築する）であり、domain / usecase / CLI コマンドファイル / `apps/cli-composition` / `Makefile.toml` に含んではならない。"
+      }
+    },
+    {
+      "claim_hash": "e0646ef58650bc66850764f4c60965b3d970b928b77f2a7389a6f60e77279fda",
+      "evidence_hash": "04fcbaba475bb1844d1893b688a973cb7a5bcc0ddf6e0f685d028c5e02fa982a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同様に `bin/sotp signal calc-catalog-spec`（per-layer フラグなし）、`bin/sotp signal check-impl-catalog`（per-layer フラグなし）、`bin/sotp signal check-catalog-spec`（per-layer フラグなし）、および `bin/sotp signal check --gate commit|merge`（per-layer フラグなし; `--gate` は gate 選択フラグであり per-layer フラグではない）が同条件で正常に動作する。いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "e0646ef58650bc66850764f4c60965b3d970b928b77f2a7389a6f60e77279fda",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、SHA-256 hash 算出は `libs/domain/` または `libs/usecase/` に存在する。"
+      }
+    },
+    {
+      "claim_hash": "bff4b7635b996e23a8ee7732484a7e46ec5a7c8fd66f3c3c36ad41436c47484e",
+      "evidence_hash": "3812b83bf252983d08649638e065e864da812080a09201c583586e20d5b98a1d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`signal calc-impl-catalog`、`signal calc-catalog-spec`、`signal check-impl-catalog`、`signal check-catalog-spec`、および集約コマンド `signal check --gate commit|merge` は **per-layer フラグなし（per-layer-argless）で呼び出し可能**でなければならない。具体的には `--signals-path`、`--catalog-hash`、`--layer` その他の「どのレイヤーを対象とするか」をユーザーに指定させるフラグを呼び出し元に露出してはならない。gate 選択フラグ（`--gate commit|merge`）や strictness フラグ（`--strict`）はレイヤー指定フラグではないため許容される。"
+      }
+    },
+    {
+      "claim_hash": "bff4b7635b996e23a8ee7732484a7e46ec5a7c8fd66f3c3c36ad41436c47484e",
+      "evidence_hash": "f7ec7fe9396d34850c8158a8017a065d1f2befdac0f7d404369fa2947840fe09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラックの解決（現ブランチ → トラック ID）は `libs/usecase/src/` の usecase オーケストレーター責務、TDDD 対象レイヤーの列挙は `SignalLayerReader::enabled_layers(track_id)` port 経由で `domain::tddd::LayerId` 値として受け取る。catalog hash 算出（SHA-256）は `libs/usecase/src/` または `libs/domain/src/` の責務"
+      }
+    },
+    {
+      "claim_hash": "bff4b7635b996e23a8ee7732484a7e46ec5a7c8fd66f3c3c36ad41436c47484e",
+      "evidence_hash": "04fcbaba475bb1844d1893b688a973cb7a5bcc0ddf6e0f685d028c5e02fa982a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal check-impl-catalog`（per-layer フラグなし）... いずれのコマンドも `--signals-path`・`--catalog-hash`・`--layer` 等の per-layer フラグを呼び出し元に要求しない。"
+      }
+    },
+    {
+      "claim_hash": "bff4b7635b996e23a8ee7732484a7e46ec5a7c8fd66f3c3c36ad41436c47484e",
+      "evidence_hash": "69a4b52c97a3eda7b04c568fdf03d977fa55e4fc6c2547b4c99cd77ae12f2c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/src/signal.rs` には存在しない。"
+      }
+    },
+    {
+      "claim_hash": "cb96b162245bcde9cfec1a456abc8b79c0edd26af9c0de0eb619b63744626255",
+      "evidence_hash": "080eef52125cf78a3efc6ea9875003ba2bdc4aa28a6a18de2ef4d4d83676320c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`アクティブトラック解決は libs/usecase/`、`SHA-256 hash 算出は D8-4 の配置表に従い libs/domain/ または libs/usecase/ に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が libs/infrastructure/src/ に存在し、apps/cli/src/commands/signal/ および apps/cli-composition/ 配下のいずれのファイルにも存在しない。`"
+      }
+    },
+    {
+      "claim_hash": "bcd3e44aa2f5fc26b840f9177792e39cc4edaba5540d1f5f820786840a9258ef",
+      "evidence_hash": "080eef52125cf78a3efc6ea9875003ba2bdc4aa28a6a18de2ef4d4d83676320c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/` 配下のいずれのファイルにも存在しない。"
+      }
+    },
+    {
+      "claim_hash": "45565cfdab6429b183d9800c6b0426e07e9a6af7dc911229772be49c72dfb684",
+      "evidence_hash": "080eef52125cf78a3efc6ea9875003ba2bdc4aa28a6a18de2ef4d4d83676320c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/` 配下のいずれのファイルにも存在しない。"
+      }
+    },
+    {
+      "claim_hash": "e0646ef58650bc66850764f4c60965b3d970b928b77f2a7389a6f60e77279fda",
+      "evidence_hash": "080eef52125cf78a3efc6ea9875003ba2bdc4aa28a6a18de2ef4d4d83676320c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/` 配下のいずれのファイルにも存在しない。"
+      }
+    },
+    {
+      "claim_hash": "bff4b7635b996e23a8ee7732484a7e46ec5a7c8fd66f3c3c36ad41436c47484e",
+      "evidence_hash": "080eef52125cf78a3efc6ea9875003ba2bdc4aa28a6a18de2ef4d4d83676320c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブトラック解決は `libs/usecase/`、TDDD レイヤー列挙（`architecture-rules.json` read + validation）は `libs/infrastructure/src/verify/tddd_layers/`、SHA-256 hash 算出は D8-4 の配置表に従い `libs/domain/` または `libs/usecase/` に存在する。signals ファイルパス構築（D8-4 に追加された行に従い）が `libs/infrastructure/src/` に存在し、`apps/cli/src/commands/signal/` および `apps/cli-composition/` 配下のいずれのファイルにも存在しない。"
+      }
     }
   ]
 }
