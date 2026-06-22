@@ -48,11 +48,9 @@ fn run_files(args: &FilesArgs) -> Result<String, String> {
     let track_id =
         crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
 
-    let outcome = cli_composition::CliApp::new().review_files(
-        args.scope.clone(),
-        Some(track_id),
-        args.items_dir.clone(),
-    )?;
+    let outcome = cli_composition::CliApp::new()
+        .review_files(args.scope.clone(), Some(track_id), args.items_dir.clone())
+        .map_err(|e| e.to_string())?;
     outcome.stdout.ok_or_else(|| "review files returned no output".to_owned())
 }
 

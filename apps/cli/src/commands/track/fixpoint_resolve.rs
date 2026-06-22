@@ -36,7 +36,7 @@ pub fn execute_fixpoint_resolve(args: FixpointResolveArgs) -> Result<ExitCode, C
             current_branch: args.current_branch,
             items_dir: args.items_dir,
         })
-        .map_err(CliError::Message)?;
+        .map_err(|e| CliError::Message(e.to_string()))?;
 
     if let Some(msg) = outcome.stdout {
         println!("{msg}");

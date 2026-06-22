@@ -47,11 +47,9 @@ fn run_classify(args: &ClassifyArgs) -> Result<String, String> {
     let track_id =
         crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
 
-    let outcome = cli_composition::CliApp::new().review_classify(
-        args.paths.clone(),
-        Some(track_id),
-        args.items_dir.clone(),
-    )?;
+    let outcome = cli_composition::CliApp::new()
+        .review_classify(args.paths.clone(), Some(track_id), args.items_dir.clone())
+        .map_err(|e| e.to_string())?;
     outcome.stdout.ok_or_else(|| "review classify returned no output".to_owned())
 }
 

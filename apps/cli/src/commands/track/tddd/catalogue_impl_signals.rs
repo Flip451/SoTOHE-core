@@ -21,7 +21,7 @@ pub fn execute_catalogue_impl_signals(
 ) -> Result<ExitCode, CliError> {
     let outcome = CliApp::new()
         .track_catalogue_impl_signals(Some(track_id), workspace_root, layer)
-        .map_err(CliError::Message)?;
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }

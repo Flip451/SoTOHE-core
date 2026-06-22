@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 
 use clap::Args;
-use cli_composition::{CliApp, CommandOutcome};
+use cli_composition::{CliApp, CommandOutcome, CompositionError};
 
 use super::CheckFlags;
 
@@ -19,7 +19,7 @@ pub struct CheckAdrUserArgs {
 }
 
 /// Execute `signal check-adr-user`.
-pub fn run(app: &CliApp, args: CheckAdrUserArgs) -> Result<CommandOutcome, String> {
+pub fn run(app: &CliApp, args: CheckAdrUserArgs) -> Result<CommandOutcome, CompositionError> {
     let gate = args.flags.gate_name();
     app.signal_check_adr_user(args.project_root, args.flags.strict, gate, args.flags.workspace_root)
 }

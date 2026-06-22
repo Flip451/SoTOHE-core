@@ -3,6 +3,7 @@
 //! Encapsulates the `.commit_hash` write operation and failure-recovery hint output.
 //! The underlying persist logic is provided by `review_v2::persist_commit_hash_for_track`.
 
+use crate::error::CompositionError;
 use crate::{CliApp, CommandOutcome};
 
 impl CliApp {
@@ -23,7 +24,10 @@ impl CliApp {
     /// Returns `Err` only on unexpected internal failures that prevent even forming
     /// the outcome (currently not reachable — all failures are returned as
     /// `Ok(CommandOutcome::failure)`).
-    pub fn track_set_commit_hash(&self, track_id: &str) -> Result<CommandOutcome, String> {
+    pub fn track_set_commit_hash(
+        &self,
+        track_id: &str,
+    ) -> Result<CommandOutcome, CompositionError> {
         match crate::review_v2::persist_commit_hash_for_track(track_id) {
             Ok(sha) => {
                 eprintln!("[set-commit-hash] Recorded .commit_hash: {sha}");

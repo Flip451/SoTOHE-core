@@ -11,7 +11,9 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
     let app = CliApp::new();
     match action {
         ViewAction::Validate { project_root } => {
-            let outcome = app.track_views_validate(project_root).map_err(CliError::Message)?;
+            let outcome = app
+                .track_views_validate(project_root)
+                .map_err(|e| CliError::Message(e.to_string()))?;
             if let Some(ref s) = outcome.stdout {
                 println!("{s}");
             }

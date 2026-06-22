@@ -3,7 +3,7 @@
 use std::process::ExitCode;
 use std::time::Duration;
 
-use cli_composition::CommandOutcome;
+use cli_composition::{CommandOutcome, CompositionError};
 
 /// Polling interval for subprocess completion checks in CLI command adapters.
 ///
@@ -36,8 +36,8 @@ pub mod verify_catalogue_spec_refs;
 ///
 /// On `Ok(outcome)`: prints stdout (no trailing newline added — the content
 /// already includes one when expected) and stderr, then returns the exit code.
-/// On `Err(msg)`: prints `msg` to stderr and returns `ExitCode::FAILURE`.
-pub(crate) fn outcome_to_exit(result: Result<CommandOutcome, String>) -> ExitCode {
+/// On `Err(e)`: prints the error message to stderr and returns `ExitCode::FAILURE`.
+pub(crate) fn outcome_to_exit(result: Result<CommandOutcome, CompositionError>) -> ExitCode {
     match result {
         Ok(outcome) => {
             if let Some(stdout) = outcome.stdout {
@@ -48,8 +48,8 @@ pub(crate) fn outcome_to_exit(result: Result<CommandOutcome, String>) -> ExitCod
             }
             ExitCode::from(outcome.exit_code)
         }
-        Err(msg) => {
-            eprintln!("{msg}");
+        Err(e) => {
+            eprintln!("{e}");
             ExitCode::FAILURE
         }
     }

@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 impl CliApp {
     /// Atomically write `content` to `path` (tmp + fsync + rename).
@@ -14,9 +14,9 @@ impl CliApp {
         &self,
         path: PathBuf,
         content: &[u8],
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         infrastructure::track::atomic_write::atomic_write_file(&path, content)
-            .map_err(|e| format!("atomic write failed: {e}"))?;
+            .map_err(|e| CompositionError::Infrastructure(format!("atomic write failed: {e}")))?;
         Ok(CommandOutcome::success(None))
     }
 }

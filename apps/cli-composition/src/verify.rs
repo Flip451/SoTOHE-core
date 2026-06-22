@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome};
+use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome, error::CompositionError};
 
 /// Render a skip outcome (non-track branch, AC-16).
 fn render_skip(label: &str, reason: &str) -> CommandOutcome {
@@ -76,9 +76,10 @@ pub fn execute_catalogue_spec_refs(
     track_id: String,
     workspace_root: PathBuf,
     skip_stale: bool,
-) -> Result<CommandOutcome, String> {
+) -> Result<CommandOutcome, CompositionError> {
     // Validate track id (path traversal guard) — delegates to the canonical domain rule.
-    crate::track::validate_track_id_str(&track_id).map_err(|e| format!("invalid track ID: {e}"))?;
+    crate::track::validate_track_id_str(&track_id)
+        .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
 
     let mut all_formatted_findings: Vec<String> = Vec::new();
     let no_findings =
@@ -89,7 +90,7 @@ pub fn execute_catalogue_spec_refs(
             skip_stale,
             &mut all_formatted_findings,
         )
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
 
     if no_findings {
         Ok(CommandOutcome::success(Some("[OK] catalogue-spec-refs: no findings".to_owned())))
@@ -112,7 +113,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_tech_stack(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_tech_stack(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::tech_stack::verify(&project_root);
         Ok(render_outcome("verify tech stack readiness", &outcome))
     }
@@ -121,7 +125,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_latest_track(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_latest_track(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::latest_track::verify(&project_root);
         Ok(render_outcome("verify latest track files", &outcome))
     }
@@ -130,7 +137,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_arch_docs(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_arch_docs(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let mut outcome = infrastructure::verify::architecture_rules::verify(&project_root);
         outcome.merge(infrastructure::verify::doc_patterns::verify(&project_root));
         outcome.merge(infrastructure::conventions::verify_convention_index(&project_root));
@@ -141,7 +151,7 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_layers(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_layers(&self, project_root: PathBuf) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::layers::verify(&project_root);
         Ok(render_outcome("verify layers", &outcome))
     }
@@ -150,7 +160,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_hooks_path(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_hooks_path(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::hooks_path::verify(&project_root);
         Ok(render_outcome("verify hooks path", &outcome))
     }
@@ -159,7 +172,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_spec_attribution(&self, spec_path: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_spec_attribution(
+        &self,
+        spec_path: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::spec_attribution::verify(&spec_path);
         Ok(render_outcome("verify spec attribution", &outcome))
     }
@@ -168,7 +184,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_spec_frontmatter(&self, spec_path: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_spec_frontmatter(
+        &self,
+        spec_path: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::spec_frontmatter::verify(&spec_path);
         Ok(render_outcome("verify spec frontmatter", &outcome))
     }
@@ -180,7 +199,7 @@ impl CliApp {
     pub fn verify_canonical_modules(
         &self,
         project_root: PathBuf,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::canonical_modules::verify(&project_root);
         Ok(render_outcome("verify canonical modules", &outcome))
     }
@@ -189,7 +208,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_module_size(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_module_size(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::module_size::verify(&project_root);
         Ok(render_outcome("verify module size", &outcome))
     }
@@ -198,7 +220,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_domain_purity(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_domain_purity(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::domain_purity::verify(&project_root);
         Ok(render_outcome("verify domain purity", &outcome))
     }
@@ -207,7 +232,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_domain_strings(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_domain_strings(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::domain_strings::verify(&project_root);
         Ok(render_outcome("verify domain strings", &outcome))
     }
@@ -216,7 +244,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_usecase_purity(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_usecase_purity(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::usecase_purity::verify(&project_root);
         Ok(render_outcome("verify usecase purity", &outcome))
     }
@@ -225,7 +256,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_doc_links(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_doc_links(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::doc_links::verify(&project_root);
         Ok(render_outcome("verify doc links", &outcome))
     }
@@ -234,7 +268,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_view_freshness(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_view_freshness(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::view_freshness::verify(&project_root);
         Ok(render_outcome("verify view freshness", &outcome))
     }
@@ -243,7 +280,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_spec_signals(&self, spec_path: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn verify_spec_signals(
+        &self,
+        spec_path: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::spec_signals::verify(&spec_path);
         Ok(render_outcome("verify spec signals", &outcome))
     }
@@ -258,10 +298,12 @@ impl CliApp {
     pub fn verify_plan_artifact_refs(
         &self,
         track_dir: Option<PathBuf>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::verify::VerifyFinding;
 
-        if track_dir.is_none() && resolve_ci_verify_track_id()?.is_none() {
+        if track_dir.is_none()
+            && resolve_ci_verify_track_id().map_err(CompositionError::AdapterInit)?.is_none()
+        {
             return Ok(render_skip("verify plan artifact refs", "not on a track branch; skipping"));
         }
 
@@ -300,8 +342,12 @@ impl CliApp {
         items_dir: PathBuf,
         workspace_root: PathBuf,
         skip_stale: bool,
-    ) -> Result<CommandOutcome, String> {
-        if track_id.is_none() && resolve_ci_verify_track_id_from_root(&workspace_root)?.is_none() {
+    ) -> Result<CommandOutcome, CompositionError> {
+        if track_id.is_none()
+            && resolve_ci_verify_track_id_from_root(&workspace_root)
+                .map_err(CompositionError::AdapterInit)?
+                .is_none()
+        {
             return Ok(render_skip(
                 "verify catalogue-spec-refs",
                 "not on a track branch; skipping",
@@ -312,7 +358,8 @@ impl CliApp {
             Some(id) => id,
             None => {
                 use crate::track::resolve_track_id_from_root;
-                resolve_track_id_from_root(None, &workspace_root)?
+                resolve_track_id_from_root(None, &workspace_root)
+                    .map_err(CompositionError::WiringFailed)?
             }
         };
 

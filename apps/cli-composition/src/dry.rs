@@ -28,7 +28,7 @@ use usecase::dry_check::{
     DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _, fragment_ref_of,
 };
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 mod corpus_root;
 mod dry_checker_config;
@@ -232,33 +232,41 @@ impl CliApp {
     ///
     /// Returns `Err` on arg validation, diff acquisition, fragment extraction,
     /// adapter construction, or interactor failures.
-    pub fn dry_write(&self, input: DryWriteInput) -> Result<CommandOutcome, String> {
+    pub fn dry_write(&self, input: DryWriteInput) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
         // Resolve repo root to anchor paths.
-        let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+        let git = SystemGitRepo::discover()
+            .map_err(|e| CompositionError::AdapterInit(format!("git discover: {e}")))?;
         let root = git.root().to_path_buf();
-        let canonical_root =
-            root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
-        let track_id = parse_dry_track_id(&input.track_id)?;
+        let canonical_root = root.canonicalize().map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to canonicalize repo root: {e}"))
+        })?;
+        let track_id =
+            parse_dry_track_id(&input.track_id).map_err(CompositionError::WiringFailed)?;
         let telemetry_writer =
             resolve_dry_write_telemetry_writer(&input.items_dir, track_id.as_ref());
         let dry_checker_config = if input.model.is_none() {
-            Some(resolve_dry_checker_config(&root, &input.capability_name, None)?)
+            Some(
+                resolve_dry_checker_config(&root, &input.capability_name, None)
+                    .map_err(CompositionError::ConfigLoad)?,
+            )
         } else {
             None
         };
 
         // Locate per-track directory.
         let items_dir_abs =
-            resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")?;
+            resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")
+                .map_err(CompositionError::WiringFailed)?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
         let (fast_model, effective_model, fast_reasoning_effort, final_reasoning_effort) =
             match dry_checker_config {
                 Some(config) => config,
                 None => {
-                    resolve_dry_checker_config(&root, &input.capability_name, input.model.clone())?
+                    resolve_dry_checker_config(&root, &input.capability_name, input.model.clone())
+                        .map_err(CompositionError::ConfigLoad)?
                 }
             };
 
@@ -267,36 +275,38 @@ impl CliApp {
         let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
 
         // Resolve diff base (fail-closed three-branch policy).
-        let base = resolve_dry_diff_base(
-            input.base_commit.as_deref(),
-            &commit_hash_path,
-            &canonical_root,
-        )?;
+        let base =
+            resolve_dry_diff_base(input.base_commit.as_deref(), &commit_hash_path, &canonical_root)
+                .map_err(CompositionError::WiringFailed)?;
 
         // Always load infra config for max_parallelism (D3 / T010); --threshold overrides its threshold.
         let config_path = root.join(".harness/config/dry-check.json");
-        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
-            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+        let infra_config =
+            infrastructure::dry_check::DryCheckConfig::load(&config_path).map_err(|e| {
+                CompositionError::ConfigLoad(format!("failed to load dry-check config: {e}"))
+            })?;
 
         let threshold = match input.threshold {
-            Some(t) => {
-                SimilarityThreshold::new(t).map_err(|e| format!("invalid --threshold: {e}"))?
-            }
+            Some(t) => SimilarityThreshold::new(t)
+                .map_err(|e| CompositionError::WiringFailed(format!("invalid --threshold: {e}")))?,
             None => infra_config.threshold(),
         };
 
-        let usecase_config = build_usecase_dry_check_config(&infra_config)?;
+        let usecase_config =
+            build_usecase_dry_check_config(&infra_config).map_err(CompositionError::ConfigLoad)?;
 
         let workspace_root = resolve_existing_dir_under_repo(
             &input.workspace_root,
             &root,
             &canonical_root,
             "workspace_root",
-        )?;
+        )
+        .map_err(CompositionError::WiringFailed)?;
 
         // Build diff_fragments + corpus_fragments via shared hunk-scope pipeline.
         let (diff_fragments, corpus_fragments) =
-            build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)?;
+            build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)
+                .map_err(CompositionError::Infrastructure)?;
         let diff_fragments_processed = diff_fragments.len();
         let corpus_fingerprint = compute_dry_corpus_fingerprint_from_fragments(&corpus_fragments);
 
@@ -312,7 +322,9 @@ impl CliApp {
         let store_for_summary = store.clone();
         let records_before = store_for_summary
             .read_records()
-            .map_err(|e| format!("dry-check read before write failed: {e}"))?
+            .map_err(|e| {
+                CompositionError::Infrastructure(format!("dry-check read before write failed: {e}"))
+            })?
             .len();
         let (agent, tiered_recorder) = RecordingDryAgent::new(CodexDryChecker::new(
             fast_model.clone(),
@@ -322,9 +334,9 @@ impl CliApp {
             input.capability_name.clone(),
         ));
         let agent = Arc::new(agent);
-        let embedding_port = Arc::new(
-            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
-        );
+        let embedding_port = Arc::new(FastEmbedAdapter::new().map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to load embedding model: {e}"))
+        })?);
 
         // D7/IN-10: persistent index keyed by file-level content hash; `NullInsertIndexProxy`
         // makes the interactor's `build_corpus_index` a no-op (corpus already correct).
@@ -332,7 +344,8 @@ impl CliApp {
             &input.db_path,
             corpus_fragments,
             embedding_port.as_ref(),
-        )?;
+        )
+        .map_err(CompositionError::Infrastructure)?;
 
         // Resolve the stored fingerprint using the safe-approval rule:
         // - If the effective threshold is stricter or equal to the file config threshold,
@@ -345,7 +358,8 @@ impl CliApp {
 
         // D5: persist the corpus root beside coverage so pure-read approval paths
         // can recompute the same fragment-snapshot fingerprint.
-        write_dry_corpus_root_manifest(&track_dir, &workspace_root, &canonical_root)?;
+        write_dry_corpus_root_manifest(&track_dir, &workspace_root, &canonical_root)
+            .map_err(CompositionError::Infrastructure)?;
 
         let interactor = DryCheckInteractor::new(
             embedding_port,
@@ -406,13 +420,15 @@ impl CliApp {
             }
         }
 
-        let findings: Vec<DryCheckFinding> =
-            dry_result.map_err(|e| format!("dry-check write cycle failed: {e}"))?;
+        let findings: Vec<DryCheckFinding> = dry_result
+            .map_err(|e| CompositionError::Usecase(format!("dry-check write cycle failed: {e}")))?;
         // D5 (T004): coverage is now written inside `DryCheckInteractor::run_dry_check`.
 
         let records_after = store_for_summary
             .read_records()
-            .map_err(|e| format!("dry-check read after write failed: {e}"))?
+            .map_err(|e| {
+                CompositionError::Infrastructure(format!("dry-check read after write failed: {e}"))
+            })?
             .len();
         let records_appended = records_after.saturating_sub(records_before);
         let pairs_checked = records_appended;
@@ -428,31 +444,36 @@ impl CliApp {
     /// # Errors
     ///
     /// Returns `Err` on store access failures (`DryCheckReaderError`).
-    pub fn dry_results(&self, input: DryResultsInput) -> Result<CommandOutcome, String> {
+    pub fn dry_results(&self, input: DryResultsInput) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
-        let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+        let git = SystemGitRepo::discover()
+            .map_err(|e| CompositionError::AdapterInit(format!("git discover: {e}")))?;
         let root = git.root().to_path_buf();
-        let canonical_repo_root =
-            root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
-        let track_id = parse_dry_track_id(&input.track_id)?;
+        let canonical_repo_root = root.canonicalize().map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to canonicalize repo root: {e}"))
+        })?;
+        let track_id =
+            parse_dry_track_id(&input.track_id).map_err(CompositionError::WiringFailed)?;
 
         let items_dir_abs = resolve_existing_dir_under_repo(
             &input.items_dir,
             &root,
             &canonical_repo_root,
             "items_dir",
-        )?;
+        )
+        .map_err(CompositionError::WiringFailed)?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
         let dry_check_json_path = track_dir.join("dry-check.json");
 
-        let filter = parse_verdict_filter(&input.filter)?;
+        let filter = parse_verdict_filter(&input.filter).map_err(CompositionError::WiringFailed)?;
 
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_repo_root));
         let interactor = DryCheckResultsInteractor::new(store);
 
-        let results =
-            interactor.get_results(filter).map_err(|e| format!("dry results read failed: {e}"))?;
+        let results = interactor.get_results(filter).map_err(|e| {
+            CompositionError::Infrastructure(format!("dry results read failed: {e}"))
+        })?;
 
         let mut lines: Vec<String> = Vec::new();
         lines.push(format!("dry results: {} record(s)", results.records.len()));
@@ -502,7 +523,7 @@ impl CliApp {
     pub fn dry_check_approved(
         &self,
         input: DryCheckApprovedInput,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use std::collections::BTreeSet;
 
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
@@ -510,11 +531,14 @@ impl CliApp {
         // D5 (T007 / IN-07 / AC-02 / CN-10): GateEval telemetry start.
         let gate_start = Instant::now();
 
-        let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+        let git = SystemGitRepo::discover()
+            .map_err(|e| CompositionError::AdapterInit(format!("git discover: {e}")))?;
         let root = git.root().to_path_buf();
-        let canonical_repo_root =
-            root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
-        let track_id = parse_dry_track_id(&input.track_id)?;
+        let canonical_repo_root = root.canonicalize().map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to canonicalize repo root: {e}"))
+        })?;
+        let track_id =
+            parse_dry_track_id(&input.track_id).map_err(CompositionError::WiringFailed)?;
 
         // Validate items_dir containment before loading config so that security /
         // input-validation errors are always raised regardless of `enabled`.
@@ -523,14 +547,18 @@ impl CliApp {
             &root,
             &canonical_repo_root,
             "items_dir",
-        )?;
+        )
+        .map_err(CompositionError::WiringFailed)?;
 
         // T006 CLI composition early-return: load config and short-circuit when
         // `enabled` is false — avoids all diff/corpus/embedding work.
         let config_path = root.join(".harness/config/dry-check.json");
-        let infra_config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
-            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
-        let usecase_dry_config = build_usecase_dry_check_config(&infra_config)?;
+        let infra_config =
+            infrastructure::dry_check::DryCheckConfig::load(&config_path).map_err(|e| {
+                CompositionError::ConfigLoad(format!("failed to load dry-check config: {e}"))
+            })?;
+        let usecase_dry_config =
+            build_usecase_dry_check_config(&infra_config).map_err(CompositionError::ConfigLoad)?;
 
         if !usecase_dry_config.enabled {
             // Gate is disabled: return Approved immediately without resolving diff base,
@@ -550,7 +578,8 @@ impl CliApp {
             input.base_commit.as_deref(),
             &commit_hash_path,
             &canonical_repo_root,
-        )?;
+        )
+        .map_err(CompositionError::WiringFailed)?;
 
         // D5 / IN-05 (T005): pure-read gate — diff fragments only.
         // Reuse the workspace root recorded by `dry write` so a scoped run
@@ -576,12 +605,16 @@ impl CliApp {
                 }
             };
         let (diff_fragments, _corpus_fragments) =
-            build_diff_and_corpus_fragments(&base, &approval_workspace_root, &canonical_repo_root)?;
+            build_diff_and_corpus_fragments(&base, &approval_workspace_root, &canonical_repo_root)
+                .map_err(CompositionError::Infrastructure)?;
 
         let mut current_fragment_refs: BTreeSet<domain::dry_check::FragmentRef> = BTreeSet::new();
         for fragment in &diff_fragments {
-            let fragment_ref = fragment_ref_of(fragment)
-                .map_err(|e| format!("dry check-approved: failed to derive fragment ref: {e}"))?;
+            let fragment_ref = fragment_ref_of(fragment).map_err(|e| {
+                CompositionError::WiringFailed(format!(
+                    "dry check-approved: failed to derive fragment ref: {e}"
+                ))
+            })?;
             current_fragment_refs.insert(fragment_ref);
         }
 
@@ -604,7 +637,7 @@ impl CliApp {
 
         let verdict = interactor
             .check_approved(&track_id, &current_fragment_refs)
-            .map_err(|e| format!("dry check-approved failed: {e}"))?;
+            .map_err(|e| CompositionError::Usecase(format!("dry check-approved failed: {e}")))?;
 
         // D5 (T007 / IN-07 / AC-02 / CN-10): emit GateEval telemetry.
         let telemetry_writer =
@@ -1201,7 +1234,7 @@ mod tests {
             model: Some("gpt-test".to_owned()),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("invalid --track-id"),
             "unsafe track_id must be rejected before prompt construction, got: {message}"
@@ -1335,7 +1368,7 @@ exit 0
             model: None,
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
 
         // Model fallback from profiles must supply a non-empty model: the
         // "no model specified" branch must NOT be reached.
@@ -1385,7 +1418,7 @@ exit 0
             model: Some("gpt-explicit-override".to_owned()),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
 
         // Explicit model must NOT trigger the "no model specified" fallback error.
         assert!(
@@ -1505,7 +1538,8 @@ exit 0
             &self,
             codex_script: &str,
             model: Option<&str>,
-        ) -> (Result<crate::CommandOutcome, String>, Vec<EnvGuard>) {
+        ) -> (Result<crate::CommandOutcome, crate::error::CompositionError>, Vec<EnvGuard>)
+        {
             let fake_codex = write_fake_codex_runner(&self.fake_bin_dir, codex_script);
 
             let mut path_entries = vec![self.fake_bin_dir.clone()];
@@ -1817,7 +1851,7 @@ exit 0
             items_dir: dir.path().to_path_buf(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("invalid --filter"),
             "error must describe the invalid filter, got: {message}"
@@ -1833,7 +1867,7 @@ exit 0
             items_dir: dir.path().to_path_buf(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("items_dir"),
             "error must reject escaped items_dir, got: {message}"
@@ -1849,7 +1883,7 @@ exit 0
             items_dir: dir.path().to_path_buf(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("invalid --track-id"),
             "error must reject escaped track_id, got: {message}"
@@ -1873,7 +1907,7 @@ exit 0
             capability_name: "dry-checker".to_owned(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("invalid --base-commit"),
             "error must describe the invalid base commit, got: {message}"
@@ -1894,7 +1928,7 @@ exit 0
             capability_name: "dry-checker".to_owned(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("items_dir"),
             "error must reject escaped items_dir, got: {message}"
@@ -1915,7 +1949,7 @@ exit 0
             capability_name: "dry-checker".to_owned(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("invalid --track-id"),
             "error must reject escaped track_id, got: {message}"
@@ -1937,7 +1971,7 @@ exit 0
             capability_name: "dry-checker".to_owned(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("invalid --threshold"),
             "missing track dir must not be rejected before threshold validation, got: {message}"
@@ -1987,7 +2021,7 @@ exit 0
             items_dir: items_dir.clone(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("invalid --base-commit"),
             "error must describe the invalid base commit, got: {message}"
@@ -2003,7 +2037,7 @@ exit 0
             items_dir: dir.path().to_path_buf(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("items_dir"),
             "error must reject escaped items_dir, got: {message}"
@@ -2019,7 +2053,7 @@ exit 0
             items_dir: dir.path().to_path_buf(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("invalid --track-id"),
             "error must reject escaped track_id, got: {message}"
@@ -2071,7 +2105,7 @@ exit 0
             items_dir: items_dir.clone(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             !message.contains("invalid --threshold"),
             "threshold is no longer consulted; got: {message}"
@@ -2110,7 +2144,7 @@ exit 0
             capability_name: "dry-checker".to_owned(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             !message.contains("invalid --threshold"),
             "must not hit Some(t) branch; got: {message}"
@@ -2168,7 +2202,7 @@ exit 0
             items_dir: items_dir.clone(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             !message.contains("invalid --threshold"),
             "must not hit Some(t) branch; got: {message}"
@@ -2244,7 +2278,7 @@ exit 0
             capability_name: "dry-checker".to_owned(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         // Must fail at items_dir validation, not at agent-profiles loading.
         assert!(
             message.contains("items_dir"),
@@ -2274,7 +2308,7 @@ exit 0
             capability_name: "nonexistent-capability-for-test".to_owned(),
         });
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("capability not defined in agent-profiles.json")
                 || message.contains("nonexistent-capability-for-test"),

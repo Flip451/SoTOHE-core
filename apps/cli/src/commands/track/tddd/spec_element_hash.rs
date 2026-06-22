@@ -25,7 +25,7 @@ pub fn execute_spec_element_hash(
 ) -> Result<ExitCode, CliError> {
     let outcome = CliApp::new()
         .track_spec_element_hash(items_dir, Some(track_id), anchor)
-        .map_err(CliError::Message)?;
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }

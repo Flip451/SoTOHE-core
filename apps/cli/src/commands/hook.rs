@@ -85,7 +85,7 @@ pub fn execute_inner(cmd: HookCommand) -> Result<cli_composition::CommandOutcome
             }
 
             let hook_name = hook.hook_name().to_owned();
-            CliApp::new().hook_dispatch(hook_name, git_hook_args)
+            CliApp::new().hook_dispatch(hook_name, git_hook_args).map_err(|e| e.to_string())
         }
     }
 }

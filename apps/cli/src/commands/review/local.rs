@@ -83,7 +83,8 @@ fn run_execute_local(args: &LocalArgs) -> Result<u8, String> {
         items_dir: args.items_dir.clone(),
     };
 
-    let outcome = cli_composition::CliApp::new().review_run_local(input)?;
+    let outcome =
+        cli_composition::CliApp::new().review_run_local(input).map_err(|e| e.to_string())?;
 
     if let Some(line) = &outcome.stdout {
         writeln!(io::stdout(), "{line}").map_err(|e| format!("failed to write stdout: {e}"))?;

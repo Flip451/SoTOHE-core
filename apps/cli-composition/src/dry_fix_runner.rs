@@ -1,33 +1,45 @@
 use crate::dry::RunDryFixLocalInput;
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 impl CliApp {
-    pub fn dry_run_fix_local(&self, input: RunDryFixLocalInput) -> Result<CommandOutcome, String> {
+    pub fn dry_run_fix_local(
+        &self,
+        input: RunDryFixLocalInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-        let repo = SystemGitRepo::discover()
-            .map_err(|e| format!("[ERROR] failed to discover git repository root: {e}"))?;
+        let repo = SystemGitRepo::discover().map_err(|e| {
+            CompositionError::AdapterInit(format!(
+                "[ERROR] failed to discover git repository root: {e}"
+            ))
+        })?;
         let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path)
-            .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
+        let profiles = AgentProfiles::load(&profiles_path).map_err(|e| {
+            CompositionError::ConfigLoad(format!("[ERROR] failed to load agent-profiles.json: {e}"))
+        })?;
         let track_id = ::domain::TrackId::try_new(input.track_id.trim())
-            .map_err(|e| format!("invalid --track-id: {e}"))?;
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
         let resolved =
             profiles.resolve_execution("dry-fix-lead", RoundType::Final).ok_or_else(|| {
-                "[ERROR] dry-fix-lead capability not defined in agent-profiles.json".to_owned()
+                CompositionError::WiringFailed(
+                    "[ERROR] dry-fix-lead capability not defined in agent-profiles.json".to_owned(),
+                )
             })?;
         let model = input.model.clone().or_else(|| resolved.model.clone()).ok_or_else(|| {
-            "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
-         dry-fix-lead capability"
-                .to_owned()
+            CompositionError::WiringFailed(
+                "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
+             dry-fix-lead capability"
+                    .to_owned(),
+            )
         })?;
         eprintln!("[sotp dry fix-local] provider={} model={}", resolved.provider, &model);
         match resolved.provider.as_str() {
-            "codex" => run_dry_fix_codex(&model, track_id.as_ref(), &input.briefing_file),
-            other => Err(format!(
+            "codex" => run_dry_fix_codex(&model, track_id.as_ref(), &input.briefing_file)
+                .map_err(CompositionError::Infrastructure),
+            other => Err(CompositionError::WiringFailed(format!(
                 "[ERROR] unsupported dry-fix-lead provider '{other}' (supported: 'codex')"
-            )),
+            ))),
         }
     }
 }

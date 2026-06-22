@@ -17,7 +17,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 /// Input DTO for `sotp telemetry report`.
 #[derive(Debug, Clone)]
@@ -43,12 +43,16 @@ impl CliApp {
     /// # Errors
     /// Returns `Err(String)` for structural errors that prevent even a partial
     /// report (e.g. track directory absent or unreadable file).
-    pub fn telemetry_report(&self, input: TelemetryReportInput) -> Result<CommandOutcome, String> {
+    pub fn telemetry_report(
+        &self,
+        input: TelemetryReportInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::telemetry::TelemetryReport;
 
         let report = TelemetryReport::new(input.items_dir);
-        let output =
-            report.aggregate(&input.track_id).map_err(|e| format!("telemetry report: {e}"))?;
+        let output = report
+            .aggregate(&input.track_id)
+            .map_err(|e| CompositionError::Infrastructure(format!("telemetry report: {e}")))?;
 
         let text = format_report(&input.track_id, &output);
         Ok(CommandOutcome::success(Some(text)))
@@ -268,7 +272,7 @@ mod tests {
         });
 
         assert!(result.is_err(), "missing track must return Err");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("does-not-exist") || msg.contains("track not found"),
             "error must mention track id; got: {msg}"

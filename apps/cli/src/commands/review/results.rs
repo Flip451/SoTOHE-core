@@ -50,7 +50,8 @@ fn run_results(args: &ResultsArgs) -> Result<String, String> {
         no_hint: args.no_hint,
     };
 
-    let outcome = cli_composition::CliApp::new().review_results(input)?;
+    let outcome =
+        cli_composition::CliApp::new().review_results(input).map_err(|e| e.to_string())?;
     outcome.stdout.ok_or_else(|| "review results returned no output".to_owned())
 }
 

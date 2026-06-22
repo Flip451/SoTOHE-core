@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 /// Input DTO for `domain_export_schema`.
 #[derive(Debug, Clone)]
@@ -21,33 +21,39 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when workspace root discovery or schema export fails.
-    pub fn domain_export_schema(&self, input: ExportSchemaInput) -> Result<CommandOutcome, String> {
+    pub fn domain_export_schema(
+        &self,
+        input: ExportSchemaInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::schema_export::RustdocSchemaExporter;
         use usecase::export_schema::{
             ExportSchemaCommand, ExportSchemaInteractor, ExportSchemaService,
         };
 
-        let workspace_root = discover_workspace_root()?;
+        let workspace_root = discover_workspace_root().map_err(CompositionError::AdapterInit)?;
 
         let exporter = Arc::new(RustdocSchemaExporter::new(workspace_root));
         let service = ExportSchemaInteractor::new(exporter);
 
         let raw_json = service
             .export(ExportSchemaCommand { crate_name: input.crate_name })
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| CompositionError::Usecase(e.to_string()))?;
 
         let json = if input.pretty {
             raw_json
         } else {
-            let value: serde_json::Value = serde_json::from_str(&raw_json)
-                .map_err(|e| format!("failed to parse schema JSON: {e}"))?;
-            serde_json::to_string(&value)
-                .map_err(|e| format!("failed to compact schema JSON: {e}"))?
+            let value: serde_json::Value = serde_json::from_str(&raw_json).map_err(|e| {
+                CompositionError::Infrastructure(format!("failed to parse schema JSON: {e}"))
+            })?;
+            serde_json::to_string(&value).map_err(|e| {
+                CompositionError::Infrastructure(format!("failed to compact schema JSON: {e}"))
+            })?
         };
 
         if let Some(path) = &input.output {
-            std::fs::write(path, &json)
-                .map_err(|e| format!("failed to write {}: {e}", path.display()))?;
+            std::fs::write(path, &json).map_err(|e| {
+                CompositionError::Infrastructure(format!("failed to write {}: {e}", path.display()))
+            })?;
             Ok(CommandOutcome {
                 stdout: None,
                 stderr: Some(format!("[OK] Schema written to {}", path.display())),

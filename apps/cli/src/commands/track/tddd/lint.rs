@@ -22,7 +22,7 @@ pub fn execute_lint(
 ) -> Result<ExitCode, CliError> {
     let outcome = CliApp::new()
         .track_lint(Some(track_id), layer_id, workspace_root, rules_file)
-        .map_err(CliError::Message)?;
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }

@@ -17,7 +17,7 @@ pub(super) fn execute_add_task(
     let app = CliApp::new();
     let outcome = app
         .track_add_task_resolved(items_dir, track_id, description, section, after)
-        .map_err(CliError::Message)?;
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }
@@ -33,7 +33,7 @@ pub(super) fn execute_set_override(
     let app = CliApp::new();
     let outcome = app
         .track_set_override_resolved(items_dir, track_id, status, reason)
-        .map_err(CliError::Message)?;
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }
@@ -45,8 +45,9 @@ pub(super) fn execute_clear_override(
     track_id: String,
 ) -> Result<ExitCode, CliError> {
     let app = CliApp::new();
-    let outcome =
-        app.track_clear_override_resolved(items_dir, track_id).map_err(CliError::Message)?;
+    let outcome = app
+        .track_clear_override_resolved(items_dir, track_id)
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }
@@ -58,7 +59,9 @@ pub(super) fn execute_next_task(
     track_id: String,
 ) -> Result<ExitCode, CliError> {
     let app = CliApp::new();
-    let outcome = app.track_next_task_resolved(items_dir, track_id).map_err(CliError::Message)?;
+    let outcome = app
+        .track_next_task_resolved(items_dir, track_id)
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }
@@ -70,7 +73,9 @@ pub(super) fn execute_task_counts(
     track_id: String,
 ) -> Result<ExitCode, CliError> {
     let app = CliApp::new();
-    let outcome = app.track_task_counts_resolved(items_dir, track_id).map_err(CliError::Message)?;
+    let outcome = app
+        .track_task_counts_resolved(items_dir, track_id)
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }

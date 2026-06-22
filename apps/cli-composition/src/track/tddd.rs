@@ -7,6 +7,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use crate::error::CompositionError;
 use crate::{CliApp, CommandOutcome};
 
 impl CliApp {
@@ -24,7 +25,7 @@ impl CliApp {
         track_id: Option<String>,
         workspace_root: PathBuf,
         layer: Option<String>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
@@ -33,16 +34,21 @@ impl CliApp {
         };
 
         let items_dir = workspace_root.join("track").join("items");
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
+            .map_err(CompositionError::AdapterInit)?;
 
         // Resolve the current git branch for the CN-07 guard (TypeSignalsInteractor requires it).
         let branch = SystemGitRepo::discover_from(&workspace_root)
-            .map_err(|e| format!("cannot discover git repo: {e}"))?
+            .map_err(|e| CompositionError::AdapterInit(format!("cannot discover git repo: {e}")))?
             .current_branch()
-            .map_err(|e| format!("cannot read current branch: {e}"))?
+            .map_err(|e| {
+                CompositionError::Infrastructure(format!("cannot read current branch: {e}"))
+            })?
             .ok_or_else(|| {
-                "cannot read current branch: git rev-parse --abbrev-ref HEAD returned non-zero"
-                    .to_owned()
+                CompositionError::Infrastructure(
+                    "cannot read current branch: git rev-parse --abbrev-ref HEAD returned non-zero"
+                        .to_owned(),
+                )
             })?;
 
         let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
@@ -57,7 +63,7 @@ impl CliApp {
                 workspace_root,
                 layer,
             })
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| CompositionError::Usecase(e.to_string()))?;
 
         Ok(CommandOutcome::success(None))
     }
@@ -76,10 +82,12 @@ impl CliApp {
         _layer: Option<String>,
         _cluster_depth: usize,
         _edges: String,
-    ) -> Result<CommandOutcome, String> {
-        Err("sotp track type-graph is removed in T008. \
+    ) -> Result<CommandOutcome, CompositionError> {
+        Err(CompositionError::WiringFailed(
+            "sotp track type-graph is removed in T008. \
              Use `sotp track catalogue-impl-signals` instead."
-            .to_owned())
+                .to_owned(),
+        ))
     }
 
     /// Render the rustdoc-input baseline graph (Reality View) for a track.
@@ -94,7 +102,7 @@ impl CliApp {
         track_id: Option<String>,
         workspace_root: PathBuf,
         layers: Option<String>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::tddd::baseline_graph_loader_adapter::BaselineGraphLoaderAdapter;
         use infrastructure::tddd::baseline_graph_renderer_adapter::BaselineGraphRendererAdapter;
         use infrastructure::tddd::baseline_graph_writer_adapter::BaselineGraphWriterAdapter;
@@ -103,13 +111,18 @@ impl CliApp {
         };
         use usecase::{LayerId, TrackId};
 
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
+            .map_err(CompositionError::AdapterInit)?;
 
-        let typed_track_id = TrackId::try_new(resolved_id.clone())
-            .map_err(|e| format!("invalid track ID '{resolved_id}': {e}"))?;
+        let typed_track_id = TrackId::try_new(resolved_id.clone()).map_err(|e| {
+            CompositionError::WiringFailed(format!("invalid track ID '{resolved_id}': {e}"))
+        })?;
 
-        let layer_filter_parsed: Option<Vec<LayerId>> =
-            layers.as_deref().map(parse_layer_filter_ids).transpose()?;
+        let layer_filter_parsed: Option<Vec<LayerId>> = layers
+            .as_deref()
+            .map(parse_layer_filter_ids)
+            .transpose()
+            .map_err(CompositionError::WiringFailed)?;
 
         let rules_path = workspace_root.join("architecture-rules.json");
         let loader =
@@ -124,8 +137,9 @@ impl CliApp {
             track_id: typed_track_id,
             layer_filter: layer_filter_parsed,
         };
-        let out =
-            renderer_ref.execute(&cmd).map_err(|e| format!("baseline-graph render failed: {e}"))?;
+        let out = renderer_ref
+            .execute(&cmd)
+            .map_err(|e| CompositionError::Usecase(format!("baseline-graph render failed: {e}")))?;
 
         let msg = format!(
             "[OK] baseline-graph: wrote depth-1 overview + depth-2 cluster files for track '{}' \
@@ -147,7 +161,7 @@ impl CliApp {
         track_id: Option<String>,
         workspace_root: PathBuf,
         layers: Option<String>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::tddd::contract_map_adapter::{FsCatalogueLoader, FsContractMapWriter};
         use infrastructure::tddd::contract_map_renderer_adapter::ContractMapRendererAdapter;
         use usecase::contract_map_workflow::{
@@ -155,13 +169,18 @@ impl CliApp {
         };
         use usecase::{LayerId, TrackId};
 
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
+            .map_err(CompositionError::AdapterInit)?;
 
-        let typed_track_id = TrackId::try_new(resolved_id.clone())
-            .map_err(|e| format!("invalid track ID '{resolved_id}': {e}"))?;
+        let typed_track_id = TrackId::try_new(resolved_id.clone()).map_err(|e| {
+            CompositionError::WiringFailed(format!("invalid track ID '{resolved_id}': {e}"))
+        })?;
 
-        let layer_filter_parsed: Option<Vec<LayerId>> =
-            layers.as_deref().map(parse_layer_filter_ids).transpose()?;
+        let layer_filter_parsed: Option<Vec<LayerId>> = layers
+            .as_deref()
+            .map(parse_layer_filter_ids)
+            .transpose()
+            .map_err(CompositionError::WiringFailed)?;
 
         let rules_path = workspace_root.join("architecture-rules.json");
         let loader = FsCatalogueLoader::new(items_dir.clone(), rules_path, workspace_root.clone());
@@ -175,8 +194,9 @@ impl CliApp {
             track_id: typed_track_id,
             layer_filter: layer_filter_parsed,
         };
-        let out =
-            renderer_ref.execute(&cmd).map_err(|e| format!("contract-map render failed: {e}"))?;
+        let out = renderer_ref
+            .execute(&cmd)
+            .map_err(|e| CompositionError::Usecase(format!("contract-map render failed: {e}")))?;
 
         let msg = format!(
             "[OK] contract-map: wrote track/items/{resolved_id}/contract-map.md \
@@ -198,31 +218,33 @@ impl CliApp {
         track_id: Option<String>,
         workspace_root: PathBuf,
         layer: Option<String>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
         use infrastructure::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
         use usecase::TrackId;
 
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
+            .map_err(CompositionError::AdapterInit)?;
 
         // Validate track_id format (CN-01 / AC-03). Must happen before any filesystem access.
-        TrackId::try_new(&resolved_id)
-            .map_err(|e| format!("invalid track ID '{resolved_id}': {e}"))?;
+        TrackId::try_new(&resolved_id).map_err(|e| {
+            CompositionError::WiringFailed(format!("invalid track ID '{resolved_id}': {e}"))
+        })?;
 
         // Security: verify the items_dir root itself is not a symlink.
         match items_dir.symlink_metadata() {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(format!(
+                return Err(CompositionError::WiringFailed(format!(
                     "symlink guard: refusing to follow symlink at items_dir: {}",
                     items_dir.display()
-                ));
+                )));
             }
             Ok(_) => {}
             Err(e) => {
-                return Err(format!(
+                return Err(CompositionError::Infrastructure(format!(
                     "symlink guard: cannot stat items_dir {}: {e}",
                     items_dir.display()
-                ));
+                )));
             }
         }
 
@@ -230,17 +252,17 @@ impl CliApp {
         let track_dir = items_dir.join(&resolved_id);
         match track_dir.symlink_metadata() {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(format!(
+                return Err(CompositionError::WiringFailed(format!(
                     "symlink guard: refusing to follow symlink at track directory: {}",
                     track_dir.display()
-                ));
+                )));
             }
             Ok(_) => {}
             Err(e) => {
-                return Err(format!(
+                return Err(CompositionError::Infrastructure(format!(
                     "symlink guard: cannot stat track directory {}: {e}",
                     track_dir.display()
-                ));
+                )));
             }
         }
 
@@ -248,18 +270,18 @@ impl CliApp {
         let rules_path = workspace_root.join("architecture-rules.json");
         let bindings = load_tddd_layers(&rules_path, &workspace_root).map_err(|e| match e {
             LoadTdddLayersError::Io { path, source } => {
-                format!("{}: {source}", path.display())
+                CompositionError::ConfigLoad(format!("{}: {source}", path.display()))
             }
             LoadTdddLayersError::Parse(err) => {
-                format!("{}: {err}", rules_path.display())
+                CompositionError::ConfigLoad(format!("{}: {err}", rules_path.display()))
             }
         })?;
 
         let bindings = if let Some(filter) = layer.as_deref() {
             let Some(binding) = bindings.iter().find(|b| b.layer_id() == filter) else {
-                return Err(format!(
+                return Err(CompositionError::WiringFailed(format!(
                     "layer '{filter}' is not tddd.enabled in architecture-rules.json"
-                ));
+                )));
             };
             vec![binding.clone()]
         } else {
@@ -267,10 +289,10 @@ impl CliApp {
         };
 
         if bindings.is_empty() {
-            return Err(
+            return Err(CompositionError::WiringFailed(
                 "no tddd.enabled layers found in architecture-rules.json; nothing to evaluate"
                     .to_owned(),
-            );
+            ));
         }
 
         let writer = FsCatalogueSpecSignalsStore::new(items_dir.clone());
@@ -307,20 +329,20 @@ impl CliApp {
                         Ok(()) => {}
                         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
                         Err(e) => {
-                            return Err(format!(
+                            return Err(CompositionError::Infrastructure(format!(
                                 "failed to remove stale signals file '{}': {e}",
                                 stale_signals_path.display(),
-                            ));
+                            )));
                         }
                     }
                     continue;
                 }
                 Err(e) => {
-                    return Err(format!(
+                    return Err(CompositionError::Infrastructure(format!(
                         "cannot stat catalogue '{}' for layer '{}': {e}",
                         catalogue_path.display(),
                         binding.layer_id(),
-                    ));
+                    )));
                 }
             }
 
@@ -330,7 +352,8 @@ impl CliApp {
                 &resolved_id,
                 binding,
                 &writer,
-            )?;
+            )
+            .map_err(CompositionError::Infrastructure)?;
         }
 
         Ok(CommandOutcome::success(None))
@@ -347,28 +370,31 @@ impl CliApp {
         items_dir: PathBuf,
         track_id: Option<String>,
         anchor: Option<String>,
-    ) -> Result<CommandOutcome, String> {
-        let resolved_id = super::resolve_track_id(track_id, &items_dir)?;
+    ) -> Result<CommandOutcome, CompositionError> {
+        let resolved_id = super::resolve_track_id(track_id, &items_dir)
+            .map_err(CompositionError::WiringFailed)?;
 
-        super::validate_track_id_str(&resolved_id)?;
+        super::validate_track_id_str(&resolved_id).map_err(CompositionError::WiringFailed)?;
 
         let hashes = infrastructure::track::spec_element_hash::compute_spec_element_hashes(
             items_dir,
             &resolved_id,
             anchor.as_deref(),
         )
-        .map_err(|e| e.0)?;
+        .map_err(|e| CompositionError::Infrastructure(e.0))?;
 
         let output = match anchor {
             Some(ref anchor_id) => {
                 if let Some(hash) = hashes.get(anchor_id) {
                     hash.clone()
                 } else {
-                    return Err(format!("anchor '{anchor_id}' not found in spec.json"));
+                    return Err(CompositionError::WiringFailed(format!(
+                        "anchor '{anchor_id}' not found in spec.json"
+                    )));
                 }
             }
             None => serde_json::to_string_pretty(&hashes)
-                .map_err(|e| format!("JSON encode error: {e}"))?,
+                .map_err(|e| CompositionError::Infrastructure(format!("JSON encode error: {e}")))?,
         };
 
         Ok(CommandOutcome::success(Some(output)))
@@ -389,7 +415,7 @@ impl CliApp {
         workspace_root: PathBuf,
         source_workspace: Option<PathBuf>,
         layer: Option<String>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::FsSymlinkGuard;
         use infrastructure::tddd::rustdoc_baseline_capture_adapter::RustdocBaselineCaptureAdapter;
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
@@ -398,7 +424,8 @@ impl CliApp {
         };
 
         let items_dir = workspace_root.join("track").join("items");
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
+            .map_err(CompositionError::AdapterInit)?;
 
         let symlink_guard = Arc::new(FsSymlinkGuard::new());
         let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
@@ -413,7 +440,7 @@ impl CliApp {
                 source_workspace,
                 layer,
             })
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| CompositionError::Usecase(e.to_string()))?;
 
         Ok(CommandOutcome::success(None))
     }
@@ -430,7 +457,7 @@ impl CliApp {
         layer_id: String,
         workspace_root: PathBuf,
         rules_file: Option<PathBuf>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::tddd::contract_map_adapter::FsCatalogueLoader;
         use infrastructure::tddd::fs_lint_config_loader::FsLintConfigLoader;
         use usecase::catalogue_lint_workflow::{
@@ -438,7 +465,8 @@ impl CliApp {
             RunCatalogueLintInteractor,
         };
 
-        let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)?;
+        let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)
+            .map_err(CompositionError::WiringFailed)?;
 
         // Resolve the config file path: --rules-file overrides the default location.
         let config_path = rules_file
@@ -468,7 +496,9 @@ impl CliApp {
                 );
                 return Ok(CommandOutcome { stdout: None, stderr: Some(msg), exit_code: 1 });
             }
-            Err(e) => return Err(format!("catalogue lint failed: {e}")),
+            Err(e) => {
+                return Err(CompositionError::Usecase(format!("catalogue lint failed: {e}")));
+            }
         };
 
         let mut stdout_lines = Vec::new();
@@ -500,7 +530,7 @@ impl CliApp {
         track_id: Option<String>,
         workspace_root: PathBuf,
         layer: Option<String>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::FsSymlinkGuard;
         use infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
         use infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter;
@@ -511,7 +541,8 @@ impl CliApp {
             CatalogueImplSignalsInteractor, CatalogueImplSignalsService,
         };
 
-        let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)?;
+        let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)
+            .map_err(CompositionError::WiringFailed)?;
 
         let catalogue_loader = Arc::new(FsCatalogueDocumentLoader::new());
         let ext_crate_codec = Arc::new(CatalogueToExtendedCrateCodec::new());
@@ -529,8 +560,9 @@ impl CliApp {
             symlink_guard,
         );
 
-        let report =
-            interactor.run(resolved_id, workspace_root, layer).map_err(|e| e.to_string())?;
+        let report = interactor
+            .run(resolved_id, workspace_root, layer)
+            .map_err(|e| CompositionError::Usecase(e.to_string()))?;
 
         let exit_code = if report.any_red { 1 } else { 0 };
         Ok(CommandOutcome { stdout: Some(report.text), stderr: None, exit_code })

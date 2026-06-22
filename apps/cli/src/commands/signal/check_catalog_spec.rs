@@ -1,7 +1,7 @@
 //! `signal check-catalog-spec` — evaluate catalog→spec gate (chain ②).
 
 use clap::Args;
-use cli_composition::{CliApp, CommandOutcome};
+use cli_composition::{CliApp, CommandOutcome, CompositionError};
 
 use super::CheckFlags;
 
@@ -17,7 +17,7 @@ pub struct CheckCatalogSpecArgs {
 }
 
 /// Execute `signal check-catalog-spec`.
-pub fn run(app: &CliApp, args: CheckCatalogSpecArgs) -> Result<CommandOutcome, String> {
+pub fn run(app: &CliApp, args: CheckCatalogSpecArgs) -> Result<CommandOutcome, CompositionError> {
     let gate = args.flags.gate_name();
     app.signal_check_catalog_spec(args.flags.strict, gate, args.flags.workspace_root)
 }

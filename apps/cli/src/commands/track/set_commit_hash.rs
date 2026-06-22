@@ -18,7 +18,8 @@ use crate::CliError;
 /// `Err` (distinct from a failure `CommandOutcome`).
 pub fn execute_set_commit_hash(track_id: String) -> Result<ExitCode, CliError> {
     let app = CliApp::new();
-    let outcome = app.track_set_commit_hash(&track_id).map_err(CliError::Message)?;
+    let outcome =
+        app.track_set_commit_hash(&track_id).map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }

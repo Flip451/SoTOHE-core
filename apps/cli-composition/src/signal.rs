@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use crate::signal_layer_chain::{
     BindingSignalLayerReader, signal_check_layer_chain, signal_check_layer_chain_with_strict,
 };
-use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome};
+use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome, error::CompositionError};
 use infrastructure::verify::tddd_layers::TdddLayerBinding;
 
 /// Selects the gate context when resolving strictness from `signal-gates.json`.
@@ -126,7 +126,10 @@ fn resolve_spec_json_path(
 
 impl CliApp {
     /// Compute ADR signal grounding live from `project_root/knowledge/adr/`.
-    pub fn signal_calc_adr_user(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+    pub fn signal_calc_adr_user(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
         let outcome = infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict(
             &project_root,
             false,
@@ -141,7 +144,7 @@ impl CliApp {
         strict_override: bool,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         let strict = match resolve_strict(
             strict_override,
             gate,
@@ -168,7 +171,7 @@ impl CliApp {
         &self,
         spec_json_path: Option<PathBuf>,
         workspace_root: Option<PathBuf>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use std::sync::Arc;
 
         use infrastructure::spec::FsSpecFileWriterAdapter;
@@ -186,7 +189,7 @@ impl CliApp {
         let interactor = SpecAdrSignalInteractor::new(Arc::new(adapter));
         interactor
             .calc_and_persist(SpecAdrSignalCommand { spec_json_path })
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| CompositionError::Usecase(e.to_string()))?;
         let outcome = infrastructure::verify::VerifyOutcome::pass();
         Ok(render_outcome("signal calc-spec-adr", &outcome))
     }
@@ -208,7 +211,7 @@ impl CliApp {
         strict_override: bool,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         let strict = match resolve_strict(
             strict_override,
             gate,
@@ -249,7 +252,7 @@ impl CliApp {
     }
 
     /// Compute and persist chain ② (catalog→spec) signals for all TDDD-enabled layers.
-    pub fn signal_calc_catalog_spec(&self) -> Result<CommandOutcome, String> {
+    pub fn signal_calc_catalog_spec(&self) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
         use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
         use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
@@ -257,15 +260,22 @@ impl CliApp {
             LoadTdddLayersError, load_tddd_layers_from_workspace,
         };
 
-        let repo = SystemGitRepo::discover()
-            .map_err(|e| format!("signal calc-catalog-spec: cannot discover git repo: {e}"))?;
+        let repo = SystemGitRepo::discover().map_err(|e| {
+            CompositionError::AdapterInit(format!(
+                "signal calc-catalog-spec: cannot discover git repo: {e}"
+            ))
+        })?;
         let workspace_root = repo.root().to_path_buf();
         let items_dir = workspace_root.join("track").join("items");
 
         let bindings: Vec<_> = load_tddd_layers_from_workspace(&workspace_root)
-            .map_err(|e| match e {
-                LoadTdddLayersError::Io { path, source } => format!("{}: {source}", path.display()),
-                LoadTdddLayersError::Parse(err) => format!("architecture-rules.json: {err}"),
+            .map_err(|e| {
+                CompositionError::ConfigLoad(match e {
+                    LoadTdddLayersError::Io { path, source } => {
+                        format!("{}: {source}", path.display())
+                    }
+                    LoadTdddLayersError::Parse(err) => format!("architecture-rules.json: {err}"),
+                })
             })?
             .into_iter()
             .filter(TdddLayerBinding::catalogue_spec_signal_enabled)
@@ -319,7 +329,7 @@ impl CliApp {
         strict_override: bool,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         signal_check_layer_chain(
             strict_override,
             gate,
@@ -343,7 +353,7 @@ impl CliApp {
     }
 
     /// Compute and persist chain ③ (impl↔catalog) signals for all TDDD-enabled layers.
-    pub fn signal_calc_impl_catalog(&self) -> Result<CommandOutcome, String> {
+    pub fn signal_calc_impl_catalog(&self) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
         use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
@@ -352,13 +362,24 @@ impl CliApp {
             TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService,
         };
 
-        let repo = SystemGitRepo::discover()
-            .map_err(|e| format!("signal calc-impl-catalog: cannot discover git repo: {e}"))?;
+        let repo = SystemGitRepo::discover().map_err(|e| {
+            CompositionError::AdapterInit(format!(
+                "signal calc-impl-catalog: cannot discover git repo: {e}"
+            ))
+        })?;
         let workspace_root = repo.root().to_path_buf();
         let branch = repo
             .current_branch()
-            .map_err(|e| format!("signal calc-impl-catalog: cannot read current branch: {e}"))?
-            .ok_or_else(|| "signal calc-impl-catalog: cannot read current branch".to_owned())?;
+            .map_err(|e| {
+                CompositionError::AdapterInit(format!(
+                    "signal calc-impl-catalog: cannot read current branch: {e}"
+                ))
+            })?
+            .ok_or_else(|| {
+                CompositionError::AdapterInit(
+                    "signal calc-impl-catalog: cannot read current branch".to_owned(),
+                )
+            })?;
 
         let items_dir = workspace_root.join("track").join("items");
         let layer_bindings = std::sync::Arc::new(FsTdddLayerBindingsAdapter::new());
@@ -366,7 +387,7 @@ impl CliApp {
         let interactor = TypeSignalsInteractor::new(layer_bindings, executor);
 
         let reader = LocalSignalLayerReaderAdapter::discover()
-            .map_err(|e| format!("signal calc-impl-catalog: {e}"))?;
+            .map_err(|e| CompositionError::AdapterInit(format!("signal calc-impl-catalog: {e}")))?;
 
         let per_layer_fn = {
             let items_dir = items_dir.clone();
@@ -402,7 +423,7 @@ impl CliApp {
         strict_override: bool,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         signal_check_layer_chain(
             strict_override,
             gate,
@@ -437,7 +458,7 @@ impl CliApp {
         spec_json_path: Option<PathBuf>,
         gate: SignalGateName,
         workspace_root: Option<PathBuf>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use std::sync::Arc;
 
         use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
@@ -592,7 +613,8 @@ impl CliApp {
                     |reader, per_layer_fn| {
                         usecase::signal::check_catalog_spec(reader, per_layer_fn)
                     },
-                )?;
+                )
+                .map_err(|e| e.to_string())?;
                 Ok(SignalChainOutput {
                     chain_label: "signal check-catalog-spec".to_owned(),
                     passed: cmd_outcome.exit_code == 0,
@@ -623,7 +645,8 @@ impl CliApp {
                     |reader, per_layer_fn| {
                         usecase::signal::check_impl_catalog(reader, per_layer_fn)
                     },
-                )?;
+                )
+                .map_err(|e| e.to_string())?;
                 Ok(SignalChainOutput {
                     chain_label: "signal check-impl-catalog".to_owned(),
                     passed: cmd_outcome.exit_code == 0,

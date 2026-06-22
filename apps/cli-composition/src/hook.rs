@@ -9,7 +9,7 @@ use std::io::Read as _;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 /// CLI-layer serde type for Claude Code hook JSON envelope.
 /// Security-critical fields (`tool_name`) must NOT use `#[serde(default)]` —
@@ -131,7 +131,7 @@ impl CliApp {
         &self,
         hook_name: String,
         hook_args: Vec<String>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::shell::ConchShellParser;
         use usecase::hook_dispatch::{
             HookDispatchCommand, HookDispatchInteractor, HookDispatchService, HookVerdictDecision,
@@ -215,7 +215,7 @@ impl CliApp {
         }
     }
 
-    fn hook_dispatch_user_prompt_submit(&self) -> Result<CommandOutcome, String> {
+    fn hook_dispatch_user_prompt_submit(&self) -> Result<CommandOutcome, CompositionError> {
         let mut stdin_buf = String::new();
         if std::io::stdin().read_to_string(&mut stdin_buf).is_err() {
             return Ok(CommandOutcome::success(None)); // advisory — never block
@@ -252,7 +252,10 @@ impl CliApp {
 }
 
 /// Build a `CommandOutcome` for a hook error, respecting pre/post semantics.
-fn make_hook_error(is_post_tool_use: bool, message: &str) -> Result<CommandOutcome, String> {
+fn make_hook_error(
+    is_post_tool_use: bool,
+    message: &str,
+) -> Result<CommandOutcome, CompositionError> {
     if is_post_tool_use {
         // PostToolUse: warn + exit 0 (cannot block)
         Ok(CommandOutcome {

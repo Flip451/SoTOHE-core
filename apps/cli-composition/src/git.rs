@@ -5,21 +5,22 @@ use std::path::{Path, PathBuf};
 
 use infrastructure::git_cli::GitRepository as _;
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 impl CliApp {
     /// Stage the whole worktree except transient automation scratch files.
     ///
     /// # Errors
     /// Returns `Err` when git discovery or staging fails.
-    pub fn git_add_all(&self) -> Result<CommandOutcome, String> {
+    pub fn git_add_all(&self) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::SystemGitRepo;
         use usecase::git_workflow::TRANSIENT_AUTOMATION_DIRS;
         use usecase::git_workflow::TRANSIENT_AUTOMATION_FILES;
 
-        let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         repo.stage_all_excluding(TRANSIENT_AUTOMATION_FILES, TRANSIENT_AUTOMATION_DIRS)
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         Ok(CommandOutcome::success(None))
     }
 
@@ -31,18 +32,20 @@ impl CliApp {
         &self,
         path: PathBuf,
         cleanup: bool,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::SystemGitRepo;
 
-        let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let path = repo.resolve_path(&path);
 
-        let stage_paths = load_stage_paths(&path)?;
+        let stage_paths = load_stage_paths(&path).map_err(CompositionError::WiringFailed)?;
 
         let mut owned_args = vec!["add".to_owned(), "--".to_owned()];
         owned_args.extend(stage_paths);
         let args: Vec<&str> = owned_args.iter().map(String::as_str).collect();
-        let code = repo.status(&args).map_err(|e| e.to_string())?;
+        let code =
+            repo.status(&args).map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         if code == 0 {
             if cleanup {
                 let _ = fs::remove_file(&path);
@@ -62,7 +65,7 @@ impl CliApp {
         path: PathBuf,
         cleanup: bool,
         track_dir: Option<PathBuf>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::{
             SystemGitRepo, collect_track_branch_claims, load_explicit_track_branch,
         };
@@ -71,10 +74,12 @@ impl CliApp {
             verify_explicit_track_branch,
         };
 
-        let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let path = repo.resolve_path(&path);
 
-        ensure_existing_nonempty_file(&path, "commit message file")?;
+        ensure_existing_nonempty_file(&path, "commit message file")
+            .map_err(CompositionError::WiringFailed)?;
 
         let explicit_track = track_dir
             .map(|td| {
@@ -85,36 +90,45 @@ impl CliApp {
                         expected_branch: metadata.branch,
                         status: metadata.status,
                     })
-                    .map_err(|e| e.to_string())
+                    .map_err(|e| CompositionError::WiringFailed(e.to_string()))
             })
             .transpose()?;
 
         // Fail-closed: non-track-branch commits are always rejected.
-        match repo.current_branch().map_err(|e| e.to_string())?.as_deref() {
+        match repo
+            .current_branch()
+            .map_err(|e| CompositionError::AdapterInit(e.to_string()))?
+            .as_deref()
+        {
             Some(branch) if branch.starts_with("track/") => {}
             Some("HEAD") => {
-                return Err("detached HEAD: switch to a track branch before committing".to_owned());
+                return Err(CompositionError::WiringFailed(
+                    "detached HEAD: switch to a track branch before committing".to_owned(),
+                ));
             }
             Some(_) => {
-                return Err(
-                    "non-track branch: switch to a track branch before committing".to_owned()
-                );
+                return Err(CompositionError::WiringFailed(
+                    "non-track branch: switch to a track branch before committing".to_owned(),
+                ));
             }
             None => {
-                return Err(
-                    "cannot determine current git branch; switch to a track branch before committing".to_owned(),
-                );
+                return Err(CompositionError::WiringFailed(
+                    "cannot determine current git branch; switch to a track branch before committing"
+                        .to_owned(),
+                ));
             }
         }
 
         if let Some(explicit_track) = explicit_track.as_ref() {
-            let current = repo.current_branch().map_err(|e| e.to_string())?;
+            let current =
+                repo.current_branch().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
             verify_explicit_track_branch(current.as_deref(), explicit_track)
-                .map_err(|e| format!("Branch guard: {e}"))?;
+                .map_err(|e| CompositionError::WiringFailed(format!("Branch guard: {e}")))?;
         } else {
-            let current = repo.current_branch().map_err(|e| e.to_string())?;
+            let current =
+                repo.current_branch().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
             let claims = collect_track_branch_claims(repo.root())
-                .map_err(|e| e.to_string())?
+                .map_err(|e| CompositionError::Infrastructure(e.to_string()))?
                 .into_iter()
                 .map(|claim| TrackBranchClaim {
                     track_name: claim.track_name,
@@ -123,11 +137,13 @@ impl CliApp {
                 })
                 .collect::<Vec<_>>();
             verify_auto_detected_branch(current.as_deref(), &claims)
-                .map_err(|e| format!("Branch guard: {e}"))?;
+                .map_err(|e| CompositionError::WiringFailed(format!("Branch guard: {e}")))?;
         }
 
         let path_str = path.to_string_lossy().into_owned();
-        let code = repo.status(&["commit", "-F", path_str.as_str()]).map_err(|e| e.to_string())?;
+        let code = repo
+            .status(&["commit", "-F", path_str.as_str()])
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         if code == 0 {
             if cleanup {
                 let _ = fs::remove_file(&path);
@@ -146,16 +162,18 @@ impl CliApp {
         &self,
         path: PathBuf,
         cleanup: bool,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::SystemGitRepo;
 
-        let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let path = repo.resolve_path(&path);
-        ensure_existing_nonempty_file(&path, "git note file")?;
+        ensure_existing_nonempty_file(&path, "git note file")
+            .map_err(CompositionError::WiringFailed)?;
         let path_str = path.to_string_lossy().into_owned();
         let code = repo
             .status(&["notes", "add", "-f", "-F", path_str.as_str(), "HEAD"])
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         if code == 0 {
             if cleanup {
                 let _ = fs::remove_file(&path);
@@ -170,14 +188,18 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when git discovery or checkout fails.
-    pub fn git_switch_and_pull(&self, branch: String) -> Result<CommandOutcome, String> {
+    pub fn git_switch_and_pull(&self, branch: String) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::SystemGitRepo;
 
-        let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let mut stdout_lines = Vec::<String>::new();
 
         stdout_lines.push(format!("Switching to {branch}..."));
-        match repo.status(&["checkout", &branch]).map_err(|e| e.to_string())? {
+        match repo
+            .status(&["checkout", &branch])
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?
+        {
             0 => {}
             code => {
                 return Ok(CommandOutcome {
@@ -189,7 +211,10 @@ impl CliApp {
         }
 
         stdout_lines.push(format!("Pulling latest from origin/{branch}..."));
-        match repo.status(&["pull", "--ff-only"]).map_err(|e| e.to_string())? {
+        match repo
+            .status(&["pull", "--ff-only"])
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?
+        {
             0 => {
                 stdout_lines.push(format!("[OK] On {branch}, up to date."));
             }
@@ -205,14 +230,16 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when git discovery or unstage fails.
-    pub fn git_unstage(&self, paths: Vec<PathBuf>) -> Result<CommandOutcome, String> {
+    pub fn git_unstage(&self, paths: Vec<PathBuf>) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::SystemGitRepo;
 
-        let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let mut args = vec!["restore", "--staged", "--"];
         let path_strs: Vec<String> = paths.iter().map(|p| p.display().to_string()).collect();
         args.extend(path_strs.iter().map(String::as_str));
-        let code = repo.status(&args).map_err(|e| e.to_string())?;
+        let code =
+            repo.status(&args).map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         if code == 0 {
             Ok(CommandOutcome::success(None))
         } else {

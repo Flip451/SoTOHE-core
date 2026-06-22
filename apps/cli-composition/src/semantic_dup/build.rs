@@ -9,7 +9,7 @@ use infrastructure::semantic_dup::{
 };
 use usecase::semantic_dup::{BuildIndexCommand, BuildIndexService as _};
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
 
@@ -314,9 +314,10 @@ impl CliApp {
     pub fn semantic_dup_index_build(
         &self,
         input: DupIndexBuildInput,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         // Step 1: Validate that db_path is safe to overwrite — no deletions yet.
-        validate_db_path_for_rebuild(&input.db_path, &input.workspace_root)?;
+        validate_db_path_for_rebuild(&input.db_path, &input.workspace_root)
+            .map_err(CompositionError::WiringFailed)?;
 
         // Step 1b: Recover from a crash that occurred between the two renames in
         // `commit_rebuilt_index`.  If `db_path` is absent but the deterministic
@@ -330,23 +331,24 @@ impl CliApp {
         // `.{name}.old` path must NOT be restored into `db_path`.  If `.old`
         // exists but is NOT tool-owned, leave it completely untouched — an
         // absent `db_path` is a valid fresh-build state in that case.
-        let crash_backup = backup_path_for(&input.db_path)?;
+        let crash_backup =
+            backup_path_for(&input.db_path).map_err(CompositionError::WiringFailed)?;
         if !input.db_path.exists()
             && std::fs::symlink_metadata(&crash_backup).is_ok()
             && is_tool_owned_index(&crash_backup)
         {
             std::fs::rename(&crash_backup, &input.db_path).map_err(|e| {
-                format!(
+                CompositionError::Infrastructure(format!(
                     "found orphaned backup {} from a previous crash but failed to \
                      restore it to {}: {e}",
                     crash_backup.display(),
                     input.db_path.display(),
-                )
+                ))
             })?;
         }
 
         // Step 2: Derive the temp build path (sibling of db_path).
-        let temp_path = temp_build_path(&input.db_path)?;
+        let temp_path = temp_build_path(&input.db_path).map_err(CompositionError::WiringFailed)?;
 
         // Step 3: Remove any leftover temp dir from a prior crashed run.
         //
@@ -364,7 +366,7 @@ impl CliApp {
         // the conflict manually.
         if std::fs::symlink_metadata(&temp_path).is_ok() {
             if !is_tool_owned_index(&temp_path) {
-                return Err(format!(
+                return Err(CompositionError::WiringFailed(format!(
                     "the path '{}' already exists but is not owned by this tool \
                      (missing '{}' ownership marker); refusing to delete it to \
                      prevent data loss. \
@@ -374,20 +376,23 @@ impl CliApp {
                     OWNERSHIP_MARKER,
                     temp_path.display(),
                     temp_path.display(),
-                ));
+                )));
             }
             std::fs::remove_dir_all(&temp_path).map_err(|e| {
-                format!("failed to remove stale temp build dir {}: {e}", temp_path.display())
+                CompositionError::Infrastructure(format!(
+                    "failed to remove stale temp build dir {}: {e}",
+                    temp_path.display()
+                ))
             })?;
         }
 
         // Ensure the parent directory of temp_path exists.
         if let Some(parent) = temp_path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
-                format!(
+                CompositionError::Infrastructure(format!(
                     "failed to create parent directory for temp build path {}: {e}",
                     temp_path.display()
-                )
+                ))
             })?;
         }
 
@@ -399,7 +404,7 @@ impl CliApp {
             Err(e) => {
                 // Best-effort cleanup of the temp build dir; ignore cleanup errors.
                 let _ = std::fs::remove_dir_all(&temp_path);
-                return Err(e);
+                return Err(CompositionError::Infrastructure(e));
             }
         };
 
@@ -415,7 +420,8 @@ impl CliApp {
         }
 
         // Step 5: Atomic swap — promote temp_path to db_path.
-        commit_rebuilt_index(&temp_path, &input.db_path)?;
+        commit_rebuilt_index(&temp_path, &input.db_path)
+            .map_err(CompositionError::Infrastructure)?;
 
         Ok(CommandOutcome::success(Some(format!(
             "Indexed {fragment_count} fragment(s) (extracted: {fragment_count})"
@@ -795,7 +801,7 @@ mod tests {
             result.is_err(),
             "build must return Err when unrecognized dir occupies the temp path"
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("not owned by this tool"),
             "error message must explain the rejection, got: {msg}"
@@ -1228,7 +1234,7 @@ mod tests {
             result.is_err(),
             "build must return Err when recognizable-but-unowned dir occupies temp_path"
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("not owned by this tool"),
             "error message must mention ownership, got: {msg}"

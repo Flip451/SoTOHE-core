@@ -8,7 +8,7 @@ use std::process::ExitCode;
 use clap::{Args, Subcommand};
 use cli_composition::CliApp;
 
-use crate::CliError;
+use super::outcome_to_exit;
 
 #[derive(Debug, Subcommand)]
 pub enum PrCommand {
@@ -95,35 +95,24 @@ pub struct ReviewCycleArgs {
 pub fn execute(cmd: PrCommand) -> ExitCode {
     let app = CliApp::new();
     match cmd {
-        PrCommand::Push(args) => run(app.pr_push(args.track_id)),
-        PrCommand::EnsurePr(args) => run(app.pr_ensure(args.track_id, args.base)),
-        PrCommand::Status(args) => run(app.pr_status(args.pr)),
-        PrCommand::WaitAndMerge(args) => {
-            run(app.pr_wait_and_merge(args.pr, args.interval, args.timeout, args.method))
-        }
-        PrCommand::TriggerReview(args) => run(app.pr_trigger_review(args.pr)),
-        PrCommand::PollReview(args) => {
-            run(app.pr_poll_review(args.pr, args.trigger_timestamp, args.interval, args.timeout))
-        }
-        PrCommand::ReviewCycle(args) => run(app.pr_review_cycle(args.track_id, args.resume)),
-    }
-}
-
-fn run(result: Result<cli_composition::CommandOutcome, String>) -> ExitCode {
-    match result {
-        Ok(outcome) => {
-            if let Some(ref s) = outcome.stdout {
-                println!("{s}");
-            }
-            if let Some(ref s) = outcome.stderr {
-                eprintln!("{s}");
-            }
-            ExitCode::from(outcome.exit_code)
-        }
-        Err(err) => {
-            let cli_err = CliError::Message(err);
-            eprintln!("{cli_err}");
-            cli_err.exit_code()
+        PrCommand::Push(args) => outcome_to_exit(app.pr_push(args.track_id)),
+        PrCommand::EnsurePr(args) => outcome_to_exit(app.pr_ensure(args.track_id, args.base)),
+        PrCommand::Status(args) => outcome_to_exit(app.pr_status(args.pr)),
+        PrCommand::WaitAndMerge(args) => outcome_to_exit(app.pr_wait_and_merge(
+            args.pr,
+            args.interval,
+            args.timeout,
+            args.method,
+        )),
+        PrCommand::TriggerReview(args) => outcome_to_exit(app.pr_trigger_review(args.pr)),
+        PrCommand::PollReview(args) => outcome_to_exit(app.pr_poll_review(
+            args.pr,
+            args.trigger_timestamp,
+            args.interval,
+            args.timeout,
+        )),
+        PrCommand::ReviewCycle(args) => {
+            outcome_to_exit(app.pr_review_cycle(args.track_id, args.resume))
         }
     }
 }

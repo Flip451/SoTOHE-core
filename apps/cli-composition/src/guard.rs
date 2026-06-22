@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 impl CliApp {
     /// Check a shell command against the guard policy.
@@ -12,7 +12,7 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn guard_check(&self, command: String) -> Result<CommandOutcome, String> {
+    pub fn guard_check(&self, command: String) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::shell::ConchShellParser;
         use usecase::hook_dispatch::{
             HookDispatchCommand, HookDispatchInteractor, HookDispatchService, HookVerdictDecision,

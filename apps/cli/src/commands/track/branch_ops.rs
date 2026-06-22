@@ -43,7 +43,9 @@ fn execute_branch_create(args: BranchArgs) -> Result<ExitCode, CliError> {
     resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
     let app = CliApp::new();
-    let outcome = app.track_branch_create(items_dir, track_id).map_err(CliError::Message)?;
+    let outcome = app
+        .track_branch_create(items_dir, track_id)
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }
@@ -71,7 +73,9 @@ fn execute_branch_switch(args: BranchArgs) -> Result<ExitCode, CliError> {
     resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
     let app = CliApp::new();
-    let outcome = app.track_branch_switch(items_dir, track_id).map_err(CliError::Message)?;
+    let outcome = app
+        .track_branch_switch(items_dir, track_id)
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }

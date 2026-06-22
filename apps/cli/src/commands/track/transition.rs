@@ -15,7 +15,7 @@ pub(super) fn execute_transition(
     let app = CliApp::new();
     let outcome = app
         .track_transition(items_dir, Some(track_id), task_id, target_status, commit_hash)
-        .map_err(CliError::Message)?;
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }

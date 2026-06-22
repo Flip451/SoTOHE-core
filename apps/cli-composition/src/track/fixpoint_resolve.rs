@@ -38,6 +38,7 @@ use domain::track_phase::FixpointStep;
 use usecase::dry_check::DryCheckConfig;
 use usecase::fixpoint_resolve::{FixpointCurrentBranch, FixpointResolveError};
 
+use crate::error::CompositionError;
 use crate::{CliApp, CommandOutcome};
 
 use super::resolve_project_root;
@@ -188,25 +189,30 @@ impl CliApp {
     /// - `current_branch` is empty or does not match `"track/<track_id>"`.
     /// - git repo discovery or diff base resolution fails.
     /// - Any gate adapter returns an error.
-    pub fn fixpoint_resolve(&self, input: FixpointResolveInput) -> Result<CommandOutcome, String> {
+    pub fn fixpoint_resolve(
+        &self,
+        input: FixpointResolveInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::SystemGitRepo;
 
         // ── Validate inputs ───────────────────────────────────────────────────
         super::validate_track_id_str(&input.track_id)
-            .map_err(|e| format!("invalid --track-id: {e}"))?;
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
 
         let track_id = TrackId::try_new(input.track_id.clone())
-            .map_err(|e| format!("invalid track ID: {e}"))?;
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
 
-        let current_branch = FixpointCurrentBranch::try_new(input.current_branch.clone())
-            .map_err(|e| format!("invalid --current-branch: {e}"))?;
+        let current_branch =
+            FixpointCurrentBranch::try_new(input.current_branch.clone()).map_err(|e| {
+                CompositionError::WiringFailed(format!("invalid --current-branch: {e}"))
+            })?;
 
         // ── Track-not-active guard ────────────────────────────────────────────
         let expected_branch = format!("track/{}", track_id.as_ref());
         if current_branch.as_str() != expected_branch {
-            return Err(
-                FixpointResolveError::TrackNotActive { branch: expected_branch }.to_string()
-            );
+            return Err(CompositionError::WiringFailed(
+                FixpointResolveError::TrackNotActive { branch: expected_branch }.to_string(),
+            ));
         }
 
         // ── Resolve items_dir and discover git repo ───────────────────────────
@@ -216,14 +222,13 @@ impl CliApp {
         // policy used by all other track commands (`resolve_existing_dir_under_repo`
         // in `dry/shared.rs`): CWD-discovery is the trust anchor, not path-based
         // discovery from an untrusted input argument.
-        let cwd_repo =
-            SystemGitRepo::discover().map_err(|e| format!("cannot discover git repo: {e}"))?;
+        let cwd_repo = SystemGitRepo::discover()
+            .map_err(|e| CompositionError::AdapterInit(format!("cannot discover git repo: {e}")))?;
         let repo_root = {
             use infrastructure::git_cli::GitRepository as _;
-            cwd_repo
-                .root()
-                .canonicalize()
-                .map_err(|e| format!("cannot canonicalize repo root: {e}"))?
+            cwd_repo.root().canonicalize().map_err(|e| {
+                CompositionError::Infrastructure(format!("cannot canonicalize repo root: {e}"))
+            })?
         };
 
         // Resolve the canonical items_dir path:
@@ -232,17 +237,17 @@ impl CliApp {
         //   `resolve_existing_dir_under_repo`) then canonicalize.
         let canonical_items_dir = if input.items_dir.is_absolute() {
             input.items_dir.canonicalize().map_err(|_| {
-                format!(
+                CompositionError::WiringFailed(format!(
                     "--items-dir '{}' must be an existing directory under the repository root",
                     input.items_dir.display()
-                )
+                ))
             })?
         } else {
             repo_root.join(&input.items_dir).canonicalize().map_err(|_| {
-                format!(
+                CompositionError::WiringFailed(format!(
                     "--items-dir '{}' must be an existing directory under the repository root",
                     input.items_dir.display()
-                )
+                ))
             })?
         };
 
@@ -250,10 +255,10 @@ impl CliApp {
         // This must be checked against the CWD-discovered `repo_root`, not against
         // a repo discovered from `canonical_root` (which could be a different checkout).
         if !canonical_items_dir.starts_with(&repo_root) {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "--items-dir '{}' must be an existing directory under the repository root",
                 input.items_dir.display()
-            ));
+            )));
         }
 
         // Derive canonical_root (project root = parent of track/) from the
@@ -263,23 +268,29 @@ impl CliApp {
             .and_then(|p| {
                 p.canonicalize().map_err(|e| format!("cannot canonicalize project root: {e}"))
             })
-            .map_err(|e| format!("cannot derive project root from items_dir: {e}"))?;
+            .map_err(|e| {
+                CompositionError::WiringFailed(format!(
+                    "cannot derive project root from items_dir: {e}"
+                ))
+            })?;
 
         // Verify items_dir is actually a directory (not a file or missing).
         if !canonical_items_dir.is_dir() {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "--items-dir '{}' must be an existing directory under the repository root",
                 input.items_dir.display()
-            ));
+            )));
         }
 
         // ── Load DRY gate config early (T008) ────────────────────────────────
         // Load the usecase dry config before dry prep so `enabled=false` can skip all
         // dry diff-base resolution, corpus fingerprinting, and fragment-ref construction.
         let dry_config_path = repo_root.join(".harness/config/dry-check.json");
-        let dry_infra_config = InfraDryCheckConfig::load(&dry_config_path)
-            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
-        let usecase_dry_config = crate::dry::build_usecase_dry_check_config_pub(&dry_infra_config)?;
+        let dry_infra_config = InfraDryCheckConfig::load(&dry_config_path).map_err(|e| {
+            CompositionError::ConfigLoad(format!("failed to load dry-check config: {e}"))
+        })?;
+        let usecase_dry_config = crate::dry::build_usecase_dry_check_config_pub(&dry_infra_config)
+            .map_err(CompositionError::ConfigLoad)?;
 
         let track_dir = canonical_items_dir.join(track_id.as_ref());
 
@@ -293,10 +304,15 @@ impl CliApp {
         let dry_gate = make_dry_gate_interactor();
         let current_config_fingerprint = dry_infra_config.fingerprint();
 
-        let original_cwd =
-            std::env::current_dir().map_err(|e| format!("cannot read current directory: {e}"))?;
-        std::env::set_current_dir(&repo_root)
-            .map_err(|e| format!("cannot enter repo root '{}': {e}", repo_root.display()))?;
+        let original_cwd = std::env::current_dir().map_err(|e| {
+            CompositionError::Infrastructure(format!("cannot read current directory: {e}"))
+        })?;
+        std::env::set_current_dir(&repo_root).map_err(|e| {
+            CompositionError::Infrastructure(format!(
+                "cannot enter repo root '{}': {e}",
+                repo_root.display()
+            ))
+        })?;
 
         let dry_gate_result = dry_gate.resolve_dry_gate(FixpointDryGateCommand {
             track_dir: track_dir.clone(),
@@ -310,8 +326,9 @@ impl CliApp {
             eprintln!("[warn] fixpoint-resolve: failed to restore CWD after dry-gate: {e}");
         }
 
-        let dry_gate_output =
-            dry_gate_result.map_err(|e| format!("fixpoint-resolve dry-gate failed: {e}"))?;
+        let dry_gate_output = dry_gate_result.map_err(|e| {
+            CompositionError::Usecase(format!("fixpoint-resolve dry-gate failed: {e}"))
+        })?;
 
         let current_fragment_refs = dry_gate_output.current_fragment_refs;
         let dry_approval = dry_gate_output.dry_approval;
@@ -335,7 +352,9 @@ impl CliApp {
 
         let cmd = FixpointResolveCommand { track_id, current_branch, current_fragment_refs };
 
-        let step = interactor.resolve(&cmd).map_err(|e| format!("fixpoint-resolve failed: {e}"))?;
+        let step = interactor
+            .resolve(&cmd)
+            .map_err(|e| CompositionError::Usecase(format!("fixpoint-resolve failed: {e}")))?;
 
         Ok(CommandOutcome::success(Some(format_fixpoint_step(step))))
     }
@@ -465,7 +484,7 @@ mod tests {
         drop(dir);
 
         assert!(result.is_err(), "expected Err when items_dir is outside the repo");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("items_dir")
                 || msg.contains("items-dir")
@@ -492,7 +511,7 @@ mod tests {
         drop(dir);
 
         assert!(result.is_err(), "expected Err when branch does not match track");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("not active")
                 || msg.contains("TrackNotActive")
@@ -515,7 +534,7 @@ mod tests {
         drop(dir);
 
         assert!(result.is_err(), "expected Err for empty current_branch");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("current-branch") || msg.contains("InvalidCurrentBranch"),
             "error must mention the invalid branch, got: {msg}"
@@ -532,7 +551,7 @@ mod tests {
         });
 
         assert!(result.is_err(), "expected Err for empty track_id");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("track-id") || msg.contains("track id"),
             "error must mention the invalid track-id, got: {msg}"
@@ -668,7 +687,7 @@ mod tests {
         drop(dir);
 
         assert!(result.is_err(), "expected Err when items_dir is a file");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("directory") || msg.contains("items_dir") || msg.contains("items-dir"),
             "error must mention directory constraint, got: {msg}"

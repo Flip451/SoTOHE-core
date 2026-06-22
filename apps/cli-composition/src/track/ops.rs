@@ -8,6 +8,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use crate::error::CompositionError;
 use crate::{CliApp, CommandOutcome};
 
 use super::{
@@ -29,13 +30,14 @@ impl CliApp {
         description: String,
         section: Option<String>,
         after: Option<String>,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
 
-        validate_track_id_str(&track_id)?;
+        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
 
-        let project_root = resolve_project_root(&items_dir)?;
+        let project_root =
+            resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
 
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
@@ -53,7 +55,9 @@ impl CliApp {
                 after
             }
             Some(ref a) => {
-                return Err(format!("invalid --after value {a:?}: expected T<digits> (e.g. T001)"));
+                return Err(CompositionError::WiringFailed(format!(
+                    "invalid --after value {a:?}: expected T<digits> (e.g. T001)"
+                )));
             }
             None => None,
         };
@@ -65,7 +69,9 @@ impl CliApp {
             section,
             after_task_id,
         };
-        let output = service.add_task(cmd).map_err(|e| format!("add-task failed: {e}"))?;
+        let output = service
+            .add_task(cmd)
+            .map_err(|e| CompositionError::Usecase(format!("add-task failed: {e}")))?;
 
         let new_task_id = output.task_id.as_deref().unwrap_or("?");
         let mut lines = vec![format!(
@@ -87,13 +93,14 @@ impl CliApp {
         track_id: String,
         status: String,
         reason: String,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
 
-        validate_track_id_str(&track_id)?;
+        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
 
-        let project_root = resolve_project_root(&items_dir)?;
+        let project_root =
+            resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
 
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
@@ -106,7 +113,9 @@ impl CliApp {
             status: status.clone(),
             reason,
         };
-        let output = service.set_override(cmd).map_err(|e| format!("set-override failed: {e}"))?;
+        let output = service
+            .set_override(cmd)
+            .map_err(|e| CompositionError::Usecase(format!("set-override failed: {e}")))?;
 
         let mut lines = vec![format!(
             "[OK] Override set to '{}' (track status: {})",
@@ -125,13 +134,14 @@ impl CliApp {
         &self,
         items_dir: PathBuf,
         track_id: String,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
 
-        validate_track_id_str(&track_id)?;
+        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
 
-        let project_root = resolve_project_root(&items_dir)?;
+        let project_root =
+            resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
 
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
@@ -139,8 +149,9 @@ impl CliApp {
             usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
 
         let cmd = usecase::task_ops::ClearOverrideCommand { items_dir, track_id: track_id.clone() };
-        let output =
-            service.clear_override(cmd).map_err(|e| format!("clear-override failed: {e}"))?;
+        let output = service
+            .clear_override(cmd)
+            .map_err(|e| CompositionError::Usecase(format!("clear-override failed: {e}")))?;
 
         let mut lines =
             vec![format!("[OK] Override cleared (track status: {})", output.derived_status)];
@@ -157,7 +168,7 @@ impl CliApp {
         &self,
         items_dir: PathBuf,
         track_id: String,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskQueryService as _;
 
@@ -166,13 +177,13 @@ impl CliApp {
 
         let next = service
             .next_task(track_id.clone(), items_dir.clone())
-            .map_err(|e| format!("next-task failed: {e}"))?;
+            .map_err(|e| CompositionError::Usecase(format!("next-task failed: {e}")))?;
 
         let payload = match next {
             Some(task) => {
-                let counts = service
-                    .task_counts(track_id, items_dir)
-                    .map_err(|e| format!("next-task failed (counts): {e}"))?;
+                let counts = service.task_counts(track_id, items_dir).map_err(|e| {
+                    CompositionError::Usecase(format!("next-task failed (counts): {e}"))
+                })?;
                 let task_status = if counts.in_progress > 0 { "in_progress" } else { "todo" };
                 serde_json::json!({
                     "task_id": task.task_id,
@@ -200,7 +211,7 @@ impl CliApp {
         &self,
         items_dir: PathBuf,
         track_id: String,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskQueryService as _;
 
@@ -209,7 +220,7 @@ impl CliApp {
 
         let counts = service
             .task_counts(track_id, items_dir)
-            .map_err(|e| format!("task-counts failed: {e}"))?;
+            .map_err(|e| CompositionError::Usecase(format!("task-counts failed: {e}")))?;
 
         let total = counts.todo + counts.in_progress + counts.done + counts.skipped;
         let json = format!(

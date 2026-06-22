@@ -178,7 +178,7 @@ impl VerifyCommand {
 fn dispatch_to_outcome(
     app: &CliApp,
     cmd: VerifyCommand,
-) -> Result<cli_composition::CommandOutcome, String> {
+) -> Result<cli_composition::CommandOutcome, cli_composition::CompositionError> {
     match cmd {
         VerifyCommand::TechStack(args) => app.verify_tech_stack(args.project_root),
         VerifyCommand::LatestTrack(args) => app.verify_latest_track(args.project_root),
@@ -212,7 +212,7 @@ fn dispatch_to_outcome(
 /// actual findings rather than a static label).
 pub fn execute_with_summary(cmd: VerifyCommand) -> (ExitCode, Option<String>) {
     let app = CliApp::new();
-    run_capturing(dispatch_to_outcome(&app, cmd))
+    run_capturing(dispatch_to_outcome(&app, cmd).map_err(|e| e.to_string()))
 }
 
 /// Dispatch `cmd`, print its outcome, and return the exit code.

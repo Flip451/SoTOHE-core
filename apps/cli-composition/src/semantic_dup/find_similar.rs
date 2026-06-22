@@ -9,7 +9,7 @@ use infrastructure::semantic_dup::{
 };
 use usecase::semantic_dup::{FindSimilarCommand, FindSimilarInteractor, FindSimilarService as _};
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
 
@@ -80,14 +80,19 @@ impl CliApp {
     pub fn semantic_dup_find_similar(
         &self,
         input: FindSimilarInput,
-    ) -> Result<CommandOutcome, String> {
-        let top_k = TopK::new(input.top_k).map_err(|e| format!("invalid --top-k value: {e}"))?;
+    ) -> Result<CommandOutcome, CompositionError> {
+        let top_k = TopK::new(input.top_k)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --top-k value: {e}")))?;
 
         // Query fragments use start_line=1 / end_line=u32::MAX as a sentinel
         // so they are never excluded by hunk-level filtering.
-        let fragment =
-            CodeFragment::new(PathBuf::from("<query>"), input.fragment_text.clone(), 1, u32::MAX)
-                .map_err(|e| format!("invalid query fragment: {e}"))?;
+        let fragment = CodeFragment::new(
+            PathBuf::from("<query>"),
+            input.fragment_text.clone(),
+            1,
+            u32::MAX,
+        )
+        .map_err(|e| CompositionError::WiringFailed(format!("invalid query fragment: {e}")))?;
 
         // Validate that the semantic index exists and is recognizable BEFORE
         // constructing the embedding or index adapters.  An absent or typo'd
@@ -97,26 +102,29 @@ impl CliApp {
         // operational error, distinct from a query that legitimately found
         // nothing.
         if !is_recognizable_lancedb_index(&input.db_path) {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "find-similar: no semantic index found at '{}' (missing '{}' marker); \
                  run `sotp dup-index build` first",
                 input.db_path.display(),
                 LANCEDB_TABLE_MARKER,
-            ));
+            )));
         }
 
-        let embedding_port = Arc::new(
-            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
-        );
+        let embedding_port = Arc::new(FastEmbedAdapter::new().map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to load embedding model: {e}"))
+        })?);
         let index_port =
             Arc::new(LanceDbSemanticIndexAdapter::new(input.db_path.clone()).map_err(|e| {
-                format!("failed to open index at {}: {e}", input.db_path.display())
+                CompositionError::AdapterInit(format!(
+                    "failed to open index at {}: {e}",
+                    input.db_path.display()
+                ))
             })?);
 
         let interactor = FindSimilarInteractor::new(embedding_port, index_port);
         let output = interactor
             .find_similar(&FindSimilarCommand { fragment, top_k })
-            .map_err(|e| format!("find-similar failed: {e}"))?;
+            .map_err(|e| CompositionError::Usecase(format!("find-similar failed: {e}")))?;
 
         if output.results.is_empty() {
             return Ok(CommandOutcome::success(Some("(no results found)".to_owned())));
@@ -253,7 +261,7 @@ mod tests {
             "find-similar must return Err when db_path does not exist, got: {:?}",
             result.ok()
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("dup-index build"),
             "error message must reference 'dup-index build', got: {msg}"
@@ -289,7 +297,7 @@ mod tests {
             "find-similar must return Err when db_path exists but has no LanceDB marker, got: {:?}",
             result.ok()
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("dup-index build"),
             "error message must reference 'dup-index build', got: {msg}"

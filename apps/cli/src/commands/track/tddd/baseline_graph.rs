@@ -22,7 +22,7 @@ pub fn execute_baseline_graph(
 ) -> Result<ExitCode, CliError> {
     let outcome = CliApp::new()
         .track_baseline_graph(items_dir, Some(track_id), workspace_root, layers)
-        .map_err(CliError::Message)?;
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }

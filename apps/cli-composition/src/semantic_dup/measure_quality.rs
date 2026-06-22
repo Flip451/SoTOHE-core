@@ -10,7 +10,7 @@ use usecase::semantic_dup::{
     MeasureQualityCommand, MeasureQualityInteractor, MeasureQualityService as _,
 };
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 // Re-export shim: implementation relocated to `libs/infrastructure` per ADR 1328 D7.
 pub(crate) use infrastructure::semantic_dup::noop_adapter::NoopSemanticIndexPort;
@@ -38,19 +38,20 @@ impl CliApp {
     pub fn semantic_dup_index_measure_quality(
         &self,
         input: DupIndexMeasureQualityInput,
-    ) -> Result<CommandOutcome, String> {
-        let fragments = extract_code_fragments(&input.workspace_root)
-            .map_err(|e| format!("fragment extraction failed: {e}"))?;
+    ) -> Result<CommandOutcome, CompositionError> {
+        let fragments = extract_code_fragments(&input.workspace_root).map_err(|e| {
+            CompositionError::Infrastructure(format!("fragment extraction failed: {e}"))
+        })?;
 
-        let embedding_port = Arc::new(
-            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
-        );
+        let embedding_port = Arc::new(FastEmbedAdapter::new().map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to load embedding model: {e}"))
+        })?);
         let index_port = Arc::new(NoopSemanticIndexPort);
 
         let interactor = MeasureQualityInteractor::new(embedding_port, index_port);
         let metrics = interactor
             .measure_quality(&MeasureQualityCommand { fragments })
-            .map_err(|e| format!("measure-quality failed: {e}"))?;
+            .map_err(|e| CompositionError::Usecase(format!("measure-quality failed: {e}")))?;
 
         let p = &metrics.cosine_percentiles;
         let json = serde_json::to_string_pretty(&serde_json::json!({
@@ -67,7 +68,9 @@ impl CliApp {
             },
             "above_threshold_rate": metrics.above_threshold_rate,
         }))
-        .map_err(|e| format!("failed to serialize metrics to JSON: {e}"))?;
+        .map_err(|e| {
+            CompositionError::Infrastructure(format!("failed to serialize metrics to JSON: {e}"))
+        })?;
 
         Ok(CommandOutcome::success(Some(json)))
     }

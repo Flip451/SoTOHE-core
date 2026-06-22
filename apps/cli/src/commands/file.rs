@@ -48,6 +48,6 @@ fn write_atomic(path: PathBuf) -> Result<ExitCode, CliError> {
         )));
     }
 
-    CliApp::new().file_write_atomic(path, &buf).map_err(CliError::Message)?;
+    CliApp::new().file_write_atomic(path, &buf).map_err(|e| CliError::Message(e.to_string()))?;
     Ok(ExitCode::SUCCESS)
 }

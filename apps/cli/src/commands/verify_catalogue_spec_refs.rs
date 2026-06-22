@@ -40,7 +40,7 @@ pub fn execute_verify_catalogue_spec_refs(
         workspace_root,
         skip_stale,
     )
-    .map_err(CliError::Message)?;
+    .map_err(|e| CliError::Message(e.to_string()))?;
 
     if let Some(stdout) = &outcome.stdout {
         println!("{stdout}");

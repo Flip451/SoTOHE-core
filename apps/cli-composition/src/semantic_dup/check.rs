@@ -9,7 +9,7 @@ use infrastructure::semantic_dup::{
 };
 use usecase::semantic_dup::{DupCheckCommand, DupCheckInteractor, DupCheckService as _};
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index, truncate_snippet};
 
@@ -86,26 +86,40 @@ impl CliApp {
     /// missing or typo'd index silently disables the duplicate gate, so the
     /// command fails loudly instead.  Run `sotp dup-index build` first to create
     /// a valid index.
-    pub fn semantic_dup_check(&self, input: DupCheckInput) -> Result<CommandOutcome, String> {
+    pub fn semantic_dup_check(
+        &self,
+        input: DupCheckInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         // Reject the illegal combination: --ack requires --ack-file to be set.
         if input.ack && input.ack_file.is_none() {
-            return Err("--ack requires --ack-file to be specified".to_owned());
+            return Err(CompositionError::WiringFailed(
+                "--ack requires --ack-file to be specified".to_owned(),
+            ));
         }
 
-        let threshold = SimilarityThreshold::new(input.threshold)
-            .map_err(|e| format!("invalid --threshold value: {e}"))?;
+        let threshold = SimilarityThreshold::new(input.threshold).map_err(|e| {
+            CompositionError::WiringFailed(format!("invalid --threshold value: {e}"))
+        })?;
 
         // Read all fragment files.
         let mut fragments: Vec<CodeFragment> = Vec::new();
         for path in &input.fragment_files {
-            let content = std::fs::read_to_string(path)
-                .map_err(|e| format!("cannot read fragment file {}: {e}", path.display()))?;
+            let content = std::fs::read_to_string(path).map_err(|e| {
+                CompositionError::Infrastructure(format!(
+                    "cannot read fragment file {}: {e}",
+                    path.display()
+                ))
+            })?;
             // Fragments loaded from files for dup-check do not have line-span
             // information (dup-check operates on whole-file fragments from CLI
             // arguments). Use start_line=1 / end_line=u32::MAX as a sentinel
             // so these fragments always overlap any hunk if needed.
-            let fragment = CodeFragment::new(path.clone(), content, 1, u32::MAX)
-                .map_err(|e| format!("invalid fragment in {}: {e}", path.display()))?;
+            let fragment = CodeFragment::new(path.clone(), content, 1, u32::MAX).map_err(|e| {
+                CompositionError::WiringFailed(format!(
+                    "invalid fragment in {}: {e}",
+                    path.display()
+                ))
+            })?;
             fragments.push(fragment);
         }
 
@@ -118,7 +132,7 @@ impl CliApp {
         // Load the ack set (empty on first run).
         let ack_path_opt = input.ack_file.as_deref();
         let ack_set = match ack_path_opt {
-            Some(p) => read_ack_set(p)?,
+            Some(p) => read_ack_set(p).map_err(CompositionError::Infrastructure)?,
             None => std::collections::HashSet::new(),
         };
 
@@ -143,27 +157,30 @@ impl CliApp {
         // `fragments` table → no search results → exit 0 "no near-duplicates
         // found"), silently disabling the duplicate gate.
         if !is_recognizable_lancedb_index(&input.db_path) {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "dup-check: no semantic index found at '{}' (missing '{}' marker); \
                  run `sotp dup-index build` first — refusing to run the duplicate \
                  gate against a missing index",
                 input.db_path.display(),
                 LANCEDB_TABLE_MARKER,
-            ));
+            )));
         }
 
-        let embedding_port = Arc::new(
-            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
-        );
+        let embedding_port = Arc::new(FastEmbedAdapter::new().map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to load embedding model: {e}"))
+        })?);
         let index_port =
             Arc::new(LanceDbSemanticIndexAdapter::new(input.db_path.clone()).map_err(|e| {
-                format!("failed to open index at {}: {e}", input.db_path.display())
+                CompositionError::AdapterInit(format!(
+                    "failed to open index at {}: {e}",
+                    input.db_path.display()
+                ))
             })?);
 
         let interactor = DupCheckInteractor::new(embedding_port, index_port);
         let output = interactor
             .dup_check(&DupCheckCommand { fragments: check_fragments, threshold })
-            .map_err(|e| format!("dup-check failed: {e}"))?;
+            .map_err(|e| CompositionError::Usecase(format!("dup-check failed: {e}")))?;
 
         // Build stderr warnings string.
         let mut warning_lines: Vec<String> = Vec::new();
@@ -194,7 +211,7 @@ impl CliApp {
                 for h in &warn_hashes {
                     updated_ack_set.insert(h.clone());
                 }
-                write_ack_set(p, &updated_ack_set)?;
+                write_ack_set(p, &updated_ack_set).map_err(CompositionError::Infrastructure)?;
             }
         }
 
@@ -462,7 +479,7 @@ mod tests {
             "dup-check must return Err when db_path does not exist, got: {:?}",
             result.ok()
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("dup-index build"),
             "error message must reference 'dup-index build', got: {msg}"
@@ -501,7 +518,7 @@ mod tests {
             "dup-check must return Err when db_path exists but has no LanceDB marker, got: {:?}",
             result.ok()
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("dup-index build"),
             "error message must reference 'dup-index build', got: {msg}"
