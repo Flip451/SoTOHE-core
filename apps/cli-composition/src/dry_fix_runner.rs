@@ -2,7 +2,28 @@ use crate::dry::RunDryFixLocalInput;
 use crate::{CliApp, CommandOutcome, error::CompositionError};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
-impl CliApp {
+
+// ── Per-context composition root ──────────────────────────────────────────────
+
+/// Composition root for the `dry_fix_runner` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct DryFixRunnerCompositionRoot;
+
+impl DryFixRunnerCompositionRoot {
+    /// Create a new `DryFixRunnerCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for DryFixRunnerCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DryFixRunnerCompositionRoot {
     pub fn dry_run_fix_local(
         &self,
         input: RunDryFixLocalInput,
@@ -43,6 +64,19 @@ impl CliApp {
         }
     }
 }
+
+// ── CliApp delegation shims ───────────────────────────────────────────────────
+
+impl CliApp {
+    /// Delegates to [`DryFixRunnerCompositionRoot::dry_run_fix_local`].
+    pub fn dry_run_fix_local(
+        &self,
+        input: RunDryFixLocalInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        DryFixRunnerCompositionRoot::new().dry_run_fix_local(input)
+    }
+}
+
 const DRY_FIX_SENTINEL_PREFIX: &str = "DRY_FIX_STATUS: ";
 const DRY_FIX_REDACTED_ENV_VARS: &[&str] =
     &["OPENAI_API_KEY", "OPENAI_ORG_ID", "OPENAI_BASE_URL", "CODEX_API_KEY"];

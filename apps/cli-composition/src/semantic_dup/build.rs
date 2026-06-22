@@ -9,6 +9,7 @@ use infrastructure::semantic_dup::{
 };
 use usecase::semantic_dup::{BuildIndexCommand, BuildIndexService as _};
 
+use super::SemanticDupCompositionRoot;
 use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
@@ -287,7 +288,7 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
     Ok(())
 }
 
-impl CliApp {
+impl SemanticDupCompositionRoot {
     /// Run `sotp dup-index build`: extract workspace fragments, embed each,
     /// and insert into the LanceDB index.
     ///
@@ -484,6 +485,18 @@ impl CliApp {
         }?; // `index_port` (and the Arc inside) is dropped here.
 
         Ok(fragment_count)
+    }
+}
+
+// ── CliApp delegation shims ───────────────────────────────────────────────────
+
+impl CliApp {
+    /// Delegates to [`SemanticDupCompositionRoot::semantic_dup_index_build`].
+    pub fn semantic_dup_index_build(
+        &self,
+        input: DupIndexBuildInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        SemanticDupCompositionRoot::new().semantic_dup_index_build(input)
     }
 }
 

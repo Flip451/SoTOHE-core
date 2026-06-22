@@ -28,7 +28,8 @@
     {
       "id": "T005",
       "description": "D4 orchestration to usecase — SignalGate application service: Add `usecase::signal_gate` module with `SignalGateCommand`, `SignalGateOutput`, `SignalChainOutput`, `SignalGateError`, `SignalGateService` trait, and `SignalGateInteractor` struct (implementing `SignalGateService`). `SignalGateInteractor::new()` takes the injected `SignalLayerReader` port, `SignalGateMatrix` strictness source, and the three chain-runner ports (`AdrChainRunnerPort`, `SpecAdrChainRunnerPort`, `LayerChainRunnerPort`). The interactor sequences the 4 SoT chains (adr-user, spec-adr, catalog-spec, impl-catalog), resolves strictness per gate matrix, and aggregates results into `SignalGateOutput`. This extracts the multi-step orchestration currently in `apps/cli-composition/src/signal.rs:437-567` (`signal_check_gate`). After adding the interactor, add a re-export shim in `cli_composition::signal` that delegates to the new usecase service. Unit tests: `run_gate` sequences all 4 chains; failed chain propagates to `SignalGateError::ChainExecutionFailed`; `passed` field reflects aggregate result. Estimated diff: ~280 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "08a52fd2"
     },
     {
       "id": "T006",
@@ -69,12 +70,13 @@
     {
       "id": "T012",
       "description": "D2 CliApp god-facade dissolution — Group 2 (guard, hook, git, verify, ref_verify, signal, telemetry): Introduce `GuardCompositionRoot`, `HookCompositionRoot`, `GitCompositionRoot`, `VerifyCompositionRoot`, `RefVerifyCompositionRoot`, `SignalCompositionRoot`, `TelemetryCompositionRoot`. Each holds its injected ports and implements the corresponding command handler methods. Remove the corresponding `impl CliApp` blocks and forward calls from the remaining `CliApp` compatibility shim. Update `apps/cli/src/main.rs` wiring. CI must stay green. Estimated diff: ~400 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "734db5f69f952a1422f084af6629164b281db1fb"
     },
     {
       "id": "T013",
-      "description": "D2 CliApp god-facade dissolution — Group 3 (dry, dry_fix_runner, pr, review_v2, semantic_dup): Introduce `DryCompositionRoot`, `PrCompositionRoot`, `ReviewCompositionRoot`, `SemanticDupCompositionRoot`. Each holds injected adapters. Remove corresponding `impl CliApp` blocks. After this task, `CliApp` should have no remaining `impl` blocks carrying command logic — only the compatibility shim forwarding to per-context roots, or removed entirely if all call sites have been updated. Remove `pub struct CliApp;` from `lib.rs` if all usages are gone. Update `apps/cli/src/main.rs` wiring to construct per-context roots directly. CI must stay green. Estimated diff: ~450 lines.",
-      "status": "todo"
+      "description": "D2 CliApp god-facade dissolution — Group 3 (dry, dry_fix_runner, pr, review_v2, semantic_dup): Introduce `DryCompositionRoot`, `DryFixRunnerCompositionRoot`, `PrCompositionRoot`, `ReviewCompositionRoot`, `SemanticDupCompositionRoot`. Each holds injected adapters. Remove corresponding `impl CliApp` blocks. After this task, `CliApp` should have no remaining `impl` blocks carrying command logic — only the compatibility shim forwarding to per-context roots, or removed entirely if all call sites have been updated. Remove `pub struct CliApp;` from `lib.rs` if all usages are gone. Update `apps/cli/src/main.rs` wiring to construct per-context roots directly. CI must stay green. Estimated diff: ~450 lines.",
+      "status": "in_progress"
     },
     {
       "id": "T014",

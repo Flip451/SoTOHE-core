@@ -28,14 +28,17 @@ use usecase::dry_check::{
     DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _, fragment_ref_of,
 };
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 mod corpus_root;
 mod dry_checker_config;
 mod manifest;
 mod persistent_index;
 mod shared;
+mod shim;
 mod tier_telemetry;
+
+pub use shim::DryCompositionRoot;
 
 pub(crate) use corpus_root::resolve_dry_corpus_fingerprint_root;
 use corpus_root::{
@@ -219,9 +222,9 @@ fn resolve_write_config_fingerprint(
     }
 }
 
-// ── CliApp impl — dry write ───────────────────────────────────────────────────
+// ── DryCompositionRoot impl — dry write ──────────────────────────────────────
 
-impl CliApp {
+impl DryCompositionRoot {
     /// Run `sotp dry write`: detect DRY violations for the current diff scope and
     /// record results to dry-check.json.
     ///
@@ -679,6 +682,7 @@ mod tests {
     use super::*;
     use std::ffi::OsString;
 
+    use crate::CliApp;
     use crate::dry_fix_runner::{
         DryFixSessionLogCleanup, build_dry_fix_invocation, dry_fix_build_safe_env,
         dry_fix_build_smoke_env, dry_fix_smoke_test_codex_version, dry_fix_spawn_and_collect,

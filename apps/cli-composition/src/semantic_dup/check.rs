@@ -9,6 +9,7 @@ use infrastructure::semantic_dup::{
 };
 use usecase::semantic_dup::{DupCheckCommand, DupCheckInteractor, DupCheckService as _};
 
+use super::SemanticDupCompositionRoot;
 use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index, truncate_snippet};
@@ -70,7 +71,7 @@ fn fragment_content_hash(content: &str) -> String {
     format!("{digest:x}")
 }
 
-impl CliApp {
+impl SemanticDupCompositionRoot {
     /// Run `sotp dup-check`: check diff fragments against the semantic index.
     ///
     /// CN-02/AC-04: always exits 0 (soft gate — warnings to stderr, no block).
@@ -229,6 +230,18 @@ impl CliApp {
                 exit_code: 0, // soft gate — always exit 0
             })
         }
+    }
+}
+
+// ── CliApp delegation shims ───────────────────────────────────────────────────
+
+impl CliApp {
+    /// Delegates to [`SemanticDupCompositionRoot::semantic_dup_check`].
+    pub fn semantic_dup_check(
+        &self,
+        input: DupCheckInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        SemanticDupCompositionRoot::new().semantic_dup_check(input)
     }
 }
 

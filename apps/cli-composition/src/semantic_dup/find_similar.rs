@@ -9,6 +9,7 @@ use infrastructure::semantic_dup::{
 };
 use usecase::semantic_dup::{FindSimilarCommand, FindSimilarInteractor, FindSimilarService as _};
 
+use super::SemanticDupCompositionRoot;
 use crate::{CliApp, CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
@@ -55,7 +56,7 @@ fn format_find_similar_results(results: &[SimilarFragment]) -> String {
         .join("\n\n")
 }
 
-impl CliApp {
+impl SemanticDupCompositionRoot {
     /// Run `sotp find-similar`: embed the query fragment and retrieve top-k
     /// similar entries from the index.
     ///
@@ -131,6 +132,18 @@ impl CliApp {
         }
 
         Ok(CommandOutcome::success(Some(format_find_similar_results(&output.results))))
+    }
+}
+
+// ── CliApp delegation shims ───────────────────────────────────────────────────
+
+impl CliApp {
+    /// Delegates to [`SemanticDupCompositionRoot::semantic_dup_find_similar`].
+    pub fn semantic_dup_find_similar(
+        &self,
+        input: FindSimilarInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        SemanticDupCompositionRoot::new().semantic_dup_find_similar(input)
     }
 }
 

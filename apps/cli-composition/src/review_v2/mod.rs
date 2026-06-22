@@ -14,6 +14,7 @@ pub(crate) mod run;
 mod run_fix;
 pub(crate) mod scope;
 pub(crate) mod shared;
+mod shim;
 
 pub use inputs::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
@@ -45,7 +46,9 @@ use std::time::{Duration, Instant};
 
 use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
+
+pub use shim::ReviewCompositionRoot;
 
 struct ReviewTelemetry<'a> {
     findings_count: u32,
@@ -102,7 +105,7 @@ fn review_telemetry_for_outcome<'a>(
     }
 }
 
-impl CliApp {
+impl ReviewCompositionRoot {
     /// Run the local Codex-backed reviewer and auto-record verdict to review.json.
     ///
     /// Resolves `track_id` from the current git branch when `input.track_id` is

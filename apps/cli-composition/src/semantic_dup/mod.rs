@@ -16,3 +16,23 @@ pub use build::DupIndexBuildInput;
 pub use check::DupCheckInput;
 pub use find_similar::FindSimilarInput;
 pub use measure_quality::DupIndexMeasureQualityInput;
+
+// ── Per-context composition root ──────────────────────────────────────────────
+
+/// Composition root for the `semantic_dup` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct SemanticDupCompositionRoot;
+
+impl SemanticDupCompositionRoot {
+    /// Create a new `SemanticDupCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for SemanticDupCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
