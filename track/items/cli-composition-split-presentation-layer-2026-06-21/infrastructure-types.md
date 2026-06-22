@@ -10,6 +10,6 @@
 | FsSpecFileWriterAdapter | secondary_adapter | — | impl SpecFileWriterPort | 🟡 | 🔵 |
 | NoOpDryApprovalService | secondary_adapter | — | impl DryCheckApprovalService | 🟡 | 🔵 |
 | NoopSemanticIndexPort | secondary_adapter | — | impl SemanticIndexPort | 🟡 | 🔵 |
-| NullInsertIndexProxy | secondary_adapter | — | impl SemanticIndexPort | 🟡 | 🔵 |
-| RecordingDryAgent | secondary_adapter | — | impl DryCheckAgentPort | 🟡 | 🔵 |
+| NullInsertIndexProxy | secondary_adapter | — | impl SemanticIndexPort | 🔵 | 🔵 |
+| RecordingDryAgent | secondary_adapter | — | impl DryCheckAgentPort | 🔵 | 🔵 |
 

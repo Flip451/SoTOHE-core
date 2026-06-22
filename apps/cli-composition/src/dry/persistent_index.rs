@@ -2,14 +2,20 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::sync::Arc;
 
-use domain::semantic_dup::{CodeFragment, SimilarFragment, TopK};
+use domain::semantic_dup::CodeFragment;
 use infrastructure::semantic_dup::index::LanceDbSemanticIndexAdapter;
-use usecase::semantic_dup::{EmbeddingPort, SemanticIndexError, SemanticIndexPort};
+use usecase::semantic_dup::{EmbeddingPort, SemanticIndexPort};
 
 use super::manifest::{
     EMBEDDING_MODEL_ID, IndexManifest, SEMANTIC_INDEX_CACHE_MARKER_SUFFIX, compute_manifest_diff,
     file_content_hash, manifest_sidecar_path, manifest_source_path_key,
     persistent_index_suffixed_path, read_manifest, remove_manifest, write_manifest,
+};
+
+// ── Re-exports from infrastructure (D7 / CN-06) ───────────────────────────────
+
+pub(super) use infrastructure::semantic_dup::null_insert_proxy::{
+    NullInsertIndexProxy, PersistentIndexLock, acquire_persistent_index_lock,
 };
 
 const LANCEDB_TABLE_MARKER: &str = "fragments.lance";
@@ -21,10 +27,6 @@ fn remove_persistent_index_marker(db_path: &Path) -> Result<(), String> {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
         Err(e) => Err(format!("failed to remove index cache marker {}: {e}", marker.display())),
     }
-}
-
-pub(super) fn persistent_index_lock_path(db_path: &Path) -> std::path::PathBuf {
-    persistent_index_suffixed_path(db_path, ".lock")
 }
 
 pub(super) fn persistent_index_marker_path(db_path: &Path) -> std::path::PathBuf {
@@ -229,31 +231,8 @@ fn require_persistent_index_marker(db_path: &Path, operation: &str) -> Result<()
     }
 }
 
-pub(super) struct PersistentIndexLock {
-    _file: std::fs::File,
-}
-
-pub(super) fn acquire_persistent_index_lock(db_path: &Path) -> Result<PersistentIndexLock, String> {
-    use fs4::fs_std::FileExt as _;
-
-    let lock_path = persistent_index_lock_path(db_path);
-    if let Some(parent) = lock_path.parent() {
-        if !parent.as_os_str().is_empty() {
-            std::fs::create_dir_all(parent)
-                .map_err(|e| format!("failed to create index lock parent dir: {e}"))?;
-        }
-    }
-    let file = std::fs::OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(false)
-        .open(&lock_path)
-        .map_err(|e| format!("failed to open index lock {}: {e}", lock_path.display()))?;
-    file.lock_exclusive()
-        .map_err(|e| format!("failed to lock index cache {}: {e}", lock_path.display()))?;
-
-    Ok(PersistentIndexLock { _file: file })
-}
+// PersistentIndexLock and acquire_persistent_index_lock are re-exported above
+// from infrastructure::semantic_dup::null_insert_proxy.
 
 /// Remove `db_path` directory (and all its contents) to clear stale index data.
 ///
@@ -270,50 +249,7 @@ pub(super) fn clear_persistent_index_dir(db_path: &Path) -> Result<(), String> {
     remove_persistent_index_marker(db_path)
 }
 
-/// A `SemanticIndexPort` proxy that makes `insert` and `insert_batch` no-ops
-/// while forwarding `delete_by_source_path` and `search` to the wrapped adapter.
-///
-/// Used on the reuse / incremental path: the persistent index is already
-/// populated (or partially updated) before the interactors run.
-pub(super) struct NullInsertIndexProxy {
-    inner: Arc<LanceDbSemanticIndexAdapter>,
-    _cache_lock: PersistentIndexLock,
-}
-
-impl NullInsertIndexProxy {
-    pub(super) fn new(
-        inner: Arc<LanceDbSemanticIndexAdapter>,
-        cache_lock: PersistentIndexLock,
-    ) -> Self {
-        Self { inner, _cache_lock: cache_lock }
-    }
-}
-
-impl SemanticIndexPort for NullInsertIndexProxy {
-    fn insert(
-        &self,
-        _fragment: &CodeFragment,
-        _embedding: &[f32],
-    ) -> Result<(), SemanticIndexError> {
-        Ok(())
-    }
-
-    fn insert_batch(&self, _items: &[(CodeFragment, Vec<f32>)]) -> Result<(), SemanticIndexError> {
-        Ok(())
-    }
-
-    fn delete_by_source_path(&self, source_path: &Path) -> Result<(), SemanticIndexError> {
-        self.inner.delete_by_source_path(source_path)
-    }
-
-    fn search(
-        &self,
-        embedding: &[f32],
-        top_k: TopK,
-    ) -> Result<Vec<SimilarFragment>, SemanticIndexError> {
-        self.inner.search(embedding, top_k)
-    }
-}
+// NullInsertIndexProxy is re-exported above from infrastructure::semantic_dup::null_insert_proxy.
 
 fn group_fragment_refs_by_path(fragments: &[CodeFragment]) -> HashMap<String, Vec<&CodeFragment>> {
     let mut by_path: HashMap<String, Vec<&CodeFragment>> = Default::default();

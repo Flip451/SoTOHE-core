@@ -58,7 +58,7 @@
       },
       "methods": [],
       "module_path": "dry_check::recording_agent",
-      "docs": "Telemetry-wrapping decorator adapter implementing DryCheckAgentPort. Wraps an inner DryCheckAgentPort, intercepts judge() calls to record telemetry events, then delegates to the inner agent. All fields are private (inner agent + telemetry writer). Relocated from cli_composition::dry::tier_telemetry per ADR 1328 D7.",
+      "docs": "Telemetry-wrapping decorator adapter implementing DryCheckAgentPort. Wraps an inner DryCheckAgentPort implementor, intercepts judge() calls to record per-tier telemetry counters, then delegates to the inner agent. The constructor takes only the inner agent and returns both the adapter and a TieredDryAgentRecorder; private fields hold the inner agent plus fast/final recorders. Relocated from cli_composition::dry::tier_telemetry per ADR 1328 D7.",
       "spec_refs": [
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
@@ -200,13 +200,31 @@
     },
     {
       "type_name": "RecordingDryAgent",
+      "impl_generics": [{ "name": "A" }],
       "methods": [
         {
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "inner", "ty": "std::sync::Arc<dyn usecase::dry_check::ports::DryCheckAgentPort>" },
-            { "name": "telemetry_writer", "ty": "std::sync::Arc<TelemetryWriter>" }
+            { "name": "inner", "ty": "A" }
+          ],
+          "returns": "(Self, infrastructure::dry_check::recording_agent::TieredDryAgentRecorder)",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "NullInsertIndexProxy",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "inner", "ty": "std::sync::Arc<infrastructure::semantic_dup::index::LanceDbSemanticIndexAdapter>" },
+            { "name": "cache_lock", "ty": "infrastructure::semantic_dup::null_insert_proxy::PersistentIndexLock" }
           ],
           "returns": "Self",
           "is_async": false,

@@ -46,6 +46,8 @@ use corpus_root::{
 };
 pub(crate) use dry_checker_config::build_usecase_dry_check_config_pub;
 use dry_checker_config::{build_usecase_dry_check_config, resolve_dry_checker_config};
+#[cfg(test)]
+use infrastructure::dry_check::recording_agent::DryAgentRunRecorder;
 use persistent_index::open_persistent_index_with_corpus;
 #[cfg(test)]
 use shared::git_diff_path_key;
@@ -57,14 +59,12 @@ use shared::{
     parse_dry_track_id, parse_verdict_filter, resolve_dry_diff_base,
     resolve_existing_dir_under_repo,
 };
-#[cfg(test)]
-use tier_telemetry::{
-    DryAgentRunRecorder, TieredDryAgentRecorder, dry_agent_error_is_subprocess_failure,
-};
 use tier_telemetry::{
     RecordingDryAgent, dry_tiered_telemetry_for_result, emit_dry_tier_external_subprocess,
     emit_dry_tier_review_round,
 };
+#[cfg(test)]
+use tier_telemetry::{TieredDryAgentRecorder, dry_agent_error_is_subprocess_failure};
 
 #[cfg(test)]
 use domain::dry_check::{DryCheckApprovalVerdict, VerdictFilter, fragments_overlapping_hunks};
@@ -81,16 +81,13 @@ use manifest::{
 };
 #[cfg(test)]
 use persistent_index::{
-    NullInsertIndexProxy, acquire_persistent_index_lock, clear_persistent_index_dir,
-    persistent_index_lock_path, persistent_index_marker_path, write_persistent_index_marker,
+    clear_persistent_index_dir, persistent_index_marker_path, write_persistent_index_marker,
 };
 #[cfg(test)]
 use usecase::dry_check::{
     DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckCycleError,
     DryCheckJudgeTier,
 };
-#[cfg(test)]
-use usecase::semantic_dup::SemanticIndexPort;
 
 // ── Input DTOs ────────────────────────────────────────────────────────────────
 
@@ -1093,56 +1090,8 @@ mod tests {
         assert_eq!(recorder.started_at(), first_start);
     }
 
-    struct ViolationAgent {
-        rationale: &'static str,
-    }
-
-    impl DryCheckAgentPort for ViolationAgent {
-        fn judge(
-            &self,
-            _changed_fragment: &CodeFragment,
-            _candidate_fragment: &CodeFragment,
-            _tier: DryCheckJudgeTier,
-        ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
-            Ok(DryCheckAgentJudgment::Violation {
-                rationale: domain::Rationale::new(self.rationale).unwrap(),
-                finding: dry_check_finding_for_tests(),
-            })
-        }
-    }
-
-    fn dry_check_finding_for_tests() -> DryCheckFinding {
-        let changed_ref = domain::FragmentRef::new(
-            domain::review_v2::FilePath::new("src/a.rs").unwrap(),
-            domain::FragmentContentHash::new("a".repeat(64)).unwrap(),
-        );
-        let candidate_ref = domain::FragmentRef::new(
-            domain::review_v2::FilePath::new("src/b.rs").unwrap(),
-            domain::FragmentContentHash::new("b".repeat(64)).unwrap(),
-        );
-        DryCheckFinding::new(changed_ref, candidate_ref, "extract shared helper").unwrap()
-    }
-
-    #[test]
-    fn test_recording_dry_agent_counts_violation_judgment_before_persistence() {
-        let (agent, tiered) =
-            RecordingDryAgent::new(ViolationAgent { rationale: "same control flow" });
-        let changed =
-            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
-        let candidate =
-            CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
-
-        let result = agent.judge(&changed, &candidate, DryCheckJudgeTier::Final);
-
-        assert!(matches!(result, Ok(DryCheckAgentJudgment::Violation { .. })));
-        // Final tier recorder must capture the violation; fast tier must be idle.
-        assert_eq!(tiered.final_.findings_count(), 1);
-        assert!(tiered.final_.has_completed());
-        assert_eq!(tiered.fast.findings_count(), 0);
-        assert!(!tiered.fast.has_completed());
-    }
-
     // ── T013: per-tier ReviewRound telemetry (IN-07 / AC-09 / CN-10) ─────────
+    // Note: RecordingDryAgent unit tests relocated to infrastructure::dry_check::recording_agent.
 
     struct TieredDryAgent {
         fast_model: String,
@@ -1222,31 +1171,6 @@ mod tests {
         assert!(fast_t.is_some(), "fast tier was invoked → fast telemetry must be Some");
         let final_ = final_t.expect("final tier was invoked → final telemetry must be Some");
         assert!(final_.subprocess_started_at.is_some(), "final tier started_at must be recorded");
-    }
-
-    /// T013 AC: tier-specific models are correctly routed to per-tier recorders.
-    ///
-    /// `RecordingDryAgent` must route `judge()` calls to the correct per-tier
-    /// recorder. This test verifies that fast-tier calls increment the fast
-    /// recorder and final-tier calls increment the final recorder independently.
-    #[test]
-    fn test_tiered_recording_tier_specific_model_is_recorded_per_tier() {
-        let (agent, tiered) = RecordingDryAgent::new(ViolationAgent { rationale: "duplicated" });
-        let changed =
-            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
-        let candidate =
-            CodeFragment::new(PathBuf::from("src/b.rs"), "fn b() {}".to_owned(), 1, 1).unwrap();
-
-        // Two fast-tier violations.
-        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
-        agent.judge(&changed, &candidate, DryCheckJudgeTier::Fast).unwrap();
-        // One final-tier violation.
-        agent.judge(&changed, &candidate, DryCheckJudgeTier::Final).unwrap();
-
-        assert_eq!(tiered.fast.findings_count(), 2, "fast recorder must count 2 violations");
-        assert_eq!(tiered.final_.findings_count(), 1, "final recorder must count 1 violation");
-        assert!(tiered.fast.started_at().is_some(), "fast tier must record started_at");
-        assert!(tiered.final_.started_at().is_some(), "final tier must record started_at");
     }
 
     /// Fragments whose path cannot be stripped (not under repo_root) are kept
@@ -2950,69 +2874,9 @@ exit 0
         clear_persistent_index_dir(&absent).unwrap();
     }
 
-    /// Persistent index lock creates and holds a sidecar lock file.
-    #[test]
-    fn test_acquire_persistent_index_lock_creates_lock_sidecar() {
-        let dir = tempfile::tempdir().unwrap();
-        let db_path = dir.path().join("idx");
-        let lock_path = persistent_index_lock_path(&db_path);
-
-        let _lock = acquire_persistent_index_lock(&db_path).unwrap();
-
-        assert!(lock_path.exists(), "lock acquisition must create the lock sidecar");
-    }
-
-    /// NullInsertIndexProxy makes insert_batch a no-op (no panic, Ok returned).
-    #[test]
-    fn test_null_insert_index_proxy_insert_batch_is_noop() {
-        let dir = tempfile::tempdir().unwrap();
-        let db_path = dir.path().join("idx");
-        let real_adapter = Arc::new(LanceDbSemanticIndexAdapter::new(db_path.clone()).unwrap());
-        let lock = acquire_persistent_index_lock(&db_path).unwrap();
-        let proxy = NullInsertIndexProxy::new(Arc::clone(&real_adapter), lock);
-
-        // insert_batch with non-empty items must be a no-op (Ok(()), no writes).
-        let frag =
-            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
-        let result = proxy.insert_batch(&[(frag, vec![0.1_f32, 0.2_f32])]);
-        assert!(result.is_ok(), "NullInsertIndexProxy::insert_batch must return Ok(())");
-    }
-
-    /// NullInsertIndexProxy makes insert a no-op.
-    #[test]
-    fn test_null_insert_index_proxy_insert_is_noop() {
-        let dir = tempfile::tempdir().unwrap();
-        let db_path = dir.path().join("idx");
-        let real_adapter = Arc::new(LanceDbSemanticIndexAdapter::new(db_path.clone()).unwrap());
-        let lock = acquire_persistent_index_lock(&db_path).unwrap();
-        let proxy = NullInsertIndexProxy::new(Arc::clone(&real_adapter), lock);
-
-        let frag =
-            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
-        let result = proxy.insert(&frag, &[0.1_f32]);
-        assert!(result.is_ok(), "NullInsertIndexProxy::insert must return Ok(())");
-    }
-
-    /// NullInsertIndexProxy forwards delete_by_source_path to the inner adapter.
-    #[test]
-    fn test_null_insert_index_proxy_delete_by_source_path_forwards_to_inner() {
-        let dir = tempfile::tempdir().unwrap();
-        let db_path = dir.path().join("idx");
-        let real_adapter = Arc::new(LanceDbSemanticIndexAdapter::new(db_path.clone()).unwrap());
-        let lock = acquire_persistent_index_lock(&db_path).unwrap();
-        let proxy = NullInsertIndexProxy::new(Arc::clone(&real_adapter), lock);
-
-        // Deleting from an empty (non-existent) table must succeed (no-op at the DB level,
-        // but the call must be forwarded — not silently swallowed by the proxy).
-        let result = proxy.delete_by_source_path(std::path::Path::new("src/a.rs"));
-        assert!(
-            result.is_ok(),
-            "NullInsertIndexProxy::delete_by_source_path must forward and return Ok(()): {:?}",
-            result.err()
-        );
-    }
-
     // ── open_persistent_index_with_corpus (D7 manifest-based) ────────────────
+    // Note: NullInsertIndexProxy + PersistentIndexLock unit tests relocated to
+    // infrastructure::semantic_dup::null_insert_proxy.
 
     /// No manifest → full rebuild (embed_batch called once), manifest written.
     #[test]

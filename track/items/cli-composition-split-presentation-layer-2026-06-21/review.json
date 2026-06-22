@@ -19,6 +19,54 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:dry-check` now introduces a `skipped` terminal state at `.claude/commands/track/dry-check.md:15`, but the top-level orchestrator still documents only `completed` / `blocked` / `failed` for the DFP step in `.claude/commands/track/full-cycle.md:43-52`. That leaves the new opt-out outcome unhandled on the main `/track:full-cycle` path, so repositories with `dry-check.enabled: false` can still stall before Review instead of flowing through as intended.",
+              "severity": "medium",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 15,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a1d3453dcf748c5af002c892028a11ce1ba42c76a7d9f5cd4f12c1332b32661f",
+          "at": "2026-06-21T23:59:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0a now short-circuits before the existing `track/<id>` branch check in Step 0b, so when `.harness/config/dry-check.json` is missing or `enabled:false`, `/track:dry-check` can return success even from a non-track branch. That bypasses the command's own branch guard and can let `/track:full-cycle` continue from the wrong workspace.",
+              "severity": "P1",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 11,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:965179d8fd5486f561cdf68ab8d7cd5b77af496c131c54ac19ad109c5f76ac7d",
+          "at": "2026-06-22T00:05:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41c28cb50db4a6857743b5b705d9f90109c91da500d21324bfe00b1ef88034e5",
+          "at": "2026-06-22T00:08:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41c28cb50db4a6857743b5b705d9f90109c91da500d21324bfe00b1ef88034e5",
+          "at": "2026-06-22T00:11:33Z"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -41,6 +89,20 @@
           "findings": [],
           "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
           "at": "2026-06-21T22:50:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
+          "at": "2026-06-21T23:48:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
+          "at": "2026-06-21T23:52:24Z"
         }
       ]
     },
@@ -222,6 +284,35 @@
           "findings": [],
           "hash": "rvw1:sha256:80b9e6a0f5b73ec2f0d31392fc0861388d44780d13ac818d8fc43a3e140d31f8",
           "at": "2026-06-21T22:52:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f4ec9cf8e6b7fc1435688d92a5add00b6b3579e803e9f84961d0125a0ffff84",
+          "at": "2026-06-21T23:49:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OpenOptions::open(&lock_path)` will follow an existing `<db_path>.lock` symlink, so a caller can end up locking an attacker-controlled target outside the intended index sidecar. This is an infrastructure I/O boundary; add a `symlink_metadata(&lock_path)` check before opening and reject `file_type().is_symlink()` like the existing real-file boundary checks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/null_insert_proxy.rs",
+              "line": 61,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:8f4ec9cf8e6b7fc1435688d92a5add00b6b3579e803e9f84961d0125a0ffff84",
+          "at": "2026-06-21T23:52:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74dc983b793e948f4ce1bc80f94124a8042aa1904f7fb9d94f63416f7ce810a6",
+          "at": "2026-06-21T23:56:28Z"
         }
       ]
     },
@@ -609,6 +700,35 @@
           "findings": [],
           "hash": "rvw1:sha256:9197f2b235fd8c0982f4ff2775eadbca53f8630b3d8eeba45daafa46c849866f",
           "at": "2026-06-21T22:49:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:281df8c490521389458a99808ebfe973c34a8d5277c73a54bf01ce623d8e52ba",
+          "at": "2026-06-21T23:48:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RecordingDryAgent`'s catalogue docs still describe the private fields as `inner agent + telemetry writer`, but the same artifact now declares `RecordingDryAgent::new(inner: A) -> (Self, TieredDryAgentRecorder)`. That constructor shape no longer injects a telemetry writer and instead exposes the recorder pair, so the catalogue gives readers the old ownership model. Update the docs to describe the inner agent plus per-tier recorders / returned `TieredDryAgentRecorder`.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/infrastructure-types.json",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:281df8c490521389458a99808ebfe973c34a8d5277c73a54bf01ce623d8e52ba",
+          "at": "2026-06-21T23:53:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed5499dab1e919c3fdbc10621780dda7ff13d869c06da13090a33c3ef4718e9a",
+          "at": "2026-06-21T23:56:51Z"
         }
       ]
     }

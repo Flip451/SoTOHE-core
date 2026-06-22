@@ -26,6 +26,8 @@ pub mod task_coverage_codec;
 pub mod tddd;
 pub mod telemetry;
 pub mod track;
+pub use dry_check::recording_agent::RecordingDryAgent;
+pub use semantic_dup::null_insert_proxy::NullInsertIndexProxy;
 pub use telemetry::archived_track::FsArchivedTrackTelemetryAdapter;
 pub use track::fs_symlink_guard::FsSymlinkGuard;
 pub use track::gate_state::{FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter};

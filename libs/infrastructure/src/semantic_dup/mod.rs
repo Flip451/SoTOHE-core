@@ -16,3 +16,6 @@
 pub mod embedding;
 pub mod extractor;
 pub mod index;
+pub mod null_insert_proxy;
+
+pub use null_insert_proxy::NullInsertIndexProxy;

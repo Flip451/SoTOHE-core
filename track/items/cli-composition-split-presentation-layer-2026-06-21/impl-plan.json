@@ -9,12 +9,13 @@
     {
       "id": "T002",
       "description": "D7 adapter relocation Group A (high priority, re-export shim): Relocate `FsReviewGateStateAdapter` and `FsRefVerifyGateStateAdapter` from `apps/cli-composition/src/track/fixpoint_resolve.rs` to `libs/infrastructure/src/track/gate_state.rs`. Add `impl ReviewGateStatePort for FsReviewGateStateAdapter` and `impl RefVerifyGateStatePort for FsRefVerifyGateStateAdapter`. In `cli_composition`, replace the struct definitions with `pub(crate) use infrastructure::track::gate_state::{FsReviewGateStateAdapter, FsRefVerifyGateStateAdapter}` re-export shims so that existing wiring in `cli_composition` compiles without change. Unit tests for each adapter (happy path + fs error). Estimated diff: ~200 lines.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "13c52a64eb4815865c56de4ece96bfcc55221301"
     },
     {
       "id": "T003",
       "description": "D7 adapter relocation Group B (medium priority, re-export shim): Relocate `RecordingDryAgent` from `apps/cli-composition/src/dry/tier_telemetry.rs` and `NullInsertIndexProxy` (plus `PersistentIndexLock`) from `apps/cli-composition/src/dry/persistent_index.rs` to `libs/infrastructure/src/dry_check/recording_agent.rs` and `libs/infrastructure/src/semantic_dup/null_insert_proxy.rs` respectively. `NullInsertIndexProxy::new()` takes the `LanceDbSemanticIndexAdapter` and `PersistentIndexLock` as private fields. Add shim re-exports in `cli_composition` so that the composition wiring continues to compile. Unit/integration tests: `RecordingDryAgent` delegates `judge()` to inner and records telemetry; `NullInsertIndexProxy` suppresses insert but delegates search/delete. Estimated diff: ~250 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",
