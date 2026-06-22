@@ -18,6 +18,7 @@ pub mod catalogue_traversal;
 pub mod chain;
 pub mod commit_hash_persistence;
 pub mod contract_map_workflow;
+pub mod d4_orchestration;
 pub mod dry_check;
 pub mod export_schema;
 pub mod fixpoint_resolve;

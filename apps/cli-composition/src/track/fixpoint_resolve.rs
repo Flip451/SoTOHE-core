@@ -13,10 +13,15 @@ use std::sync::Arc;
 
 use domain::TrackId;
 use domain::dry_check::FragmentRef;
+use infrastructure::dry_check::GitDryCheckDiffGetter;
 use infrastructure::dry_check::{
     DryCheckConfig as InfraDryCheckConfig, FsDryCheckCoverageAdapter, FsDryCheckStore,
 };
-use usecase::dry_check::{DryCheckApprovalInteractor, DryCheckApprovalService, fragment_ref_of};
+use infrastructure::semantic_dup::CodeFragmentExtractorAdapter;
+use usecase::dry_check::{
+    DryCheckApprovalInteractor, DryCheckApprovalService, DryFragmentPipelineCommand,
+    DryFragmentPipelineInteractor, DryFragmentPipelineService as _,
+};
 use usecase::fixpoint_resolve::{
     FixpointResolveCommand, FixpointResolveInteractor, FixpointResolveService as _,
     RefVerifyGateStatePort, ReviewGateStatePort,
@@ -97,13 +102,10 @@ fn resolve_dry_diff_base_for_track(
 
 /// Build the current diff fragment ref set for the dry gate (D5 / IN-05).
 ///
-/// `canonical_root` is the project root (parent of `track/items`); it is passed
-/// to [`extract_code_fragments`] so that all Rust source files in the project are
-/// scanned.  `repo_root` is the git repository root (returned by
-/// `SystemGitRepo::root()`); it is used for path normalization so that fragment
-/// source paths match the repo-relative paths emitted by
-/// [`GitDryCheckDiffGetter`].  In the common case `canonical_root == repo_root`;
-/// they differ only when the project lives in a subdirectory of a monorepo.
+/// Shim: delegates to [`DryFragmentPipelineInteractor`] (D4 orchestration
+/// extraction, T007). The CWD must already be set to `repo_root` by the caller
+/// (same invariant as before — the caller in `CliApp::fixpoint_resolve` sets
+/// CWD before calling this shim and restores it after).
 ///
 /// # Errors
 ///
@@ -113,78 +115,21 @@ fn build_current_fragment_refs(
     repo_root: &std::path::Path,
     base: &domain::CommitHash,
 ) -> Result<BTreeSet<FragmentRef>, String> {
-    use domain::dry_check::fragments_overlapping_hunks;
-    use domain::semantic_dup::CodeFragment;
-    use infrastructure::dry_check::GitDryCheckDiffGetter;
-    use infrastructure::semantic_dup::extractor::extract_code_fragments;
-    use usecase::dry_check::DryCheckDiffSource as _;
+    let diff_source = Arc::new(GitDryCheckDiffGetter);
+    let extractor = Arc::new(CodeFragmentExtractorAdapter::new());
+    let pipeline = DryFragmentPipelineInteractor::new(diff_source, extractor);
 
-    // Anchor diff discovery to the repo root.
-    // `GitDryCheckDiffGetter` calls `SystemGitRepo::discover()` which uses the
-    // process CWD; temporarily change CWD to `repo_root` so that the discover
-    // call is rooted at the correct repo regardless of the caller's CWD.
-    let original_cwd =
-        std::env::current_dir().map_err(|e| format!("cannot read current directory: {e}"))?;
-    std::env::set_current_dir(repo_root)
-        .map_err(|e| format!("cannot enter repo root '{}': {e}", repo_root.display()))?;
+    let cmd = DryFragmentPipelineCommand {
+        canonical_root: canonical_root.to_path_buf(),
+        repo_root: repo_root.to_path_buf(),
+        base: base.clone(),
+    };
 
-    let getter = GitDryCheckDiffGetter;
-    let changed_hunks_result = getter.list_changed_hunks(base);
+    let output = pipeline
+        .derive_current_refs(cmd)
+        .map_err(|e| format!("fixpoint-resolve: fragment pipeline: {e}"))?;
 
-    // Restore CWD before propagating any error.
-    let restore_err = std::env::set_current_dir(&original_cwd).err();
-    if let Some(e) = restore_err {
-        eprintln!("[warn] fixpoint-resolve: failed to restore CWD: {e}");
-    }
-
-    let changed_hunks =
-        changed_hunks_result.map_err(|e| format!("list_changed_hunks failed: {e}"))?;
-
-    let raw_fragments = extract_code_fragments(canonical_root)
-        .map_err(|e| format!("fragment extraction failed: {e}"))?;
-
-    // Normalize to repo-relative paths (strip the git repo root prefix so that
-    // fragment paths match the repo-relative hunk paths emitted by
-    // `GitDryCheckDiffGetter`).
-    let mut normalized: Vec<CodeFragment> = Vec::with_capacity(raw_fragments.len());
-    for frag in raw_fragments {
-        let rel = frag
-            .source_path
-            .strip_prefix(repo_root)
-            .map(|p| p.to_path_buf())
-            .unwrap_or_else(|_| frag.source_path.clone());
-        let rel_str = rel.to_string_lossy().replace('\\', "/");
-        let rebuilt = CodeFragment::new(
-            std::path::PathBuf::from(&rel_str),
-            frag.content().to_owned(),
-            frag.start_line(),
-            frag.end_line(),
-        )
-        .map_err(|e| format!("fragment rebuild failed: {e}"))?;
-        normalized.push(rebuilt);
-    }
-
-    let changed_paths: std::collections::HashSet<String> =
-        changed_hunks.iter().map(|h| h.path().as_str().to_owned()).collect();
-
-    let candidates: Vec<CodeFragment> = normalized
-        .iter()
-        .filter(|f| {
-            let key = f.source_path.to_string_lossy().replace('\\', "/");
-            changed_paths.contains(key.as_str())
-        })
-        .cloned()
-        .collect();
-
-    let diff_fragments = fragments_overlapping_hunks(&candidates, &changed_hunks);
-
-    let mut refs = BTreeSet::new();
-    for fragment in &diff_fragments {
-        let r = fragment_ref_of(fragment)
-            .map_err(|e| format!("fixpoint-resolve: fragment ref failed: {e}"))?;
-        refs.insert(r);
-    }
-    Ok(refs)
+    Ok(output.fragment_refs)
 }
 
 // ── Format helpers ────────────────────────────────────────────────────────────

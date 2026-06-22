@@ -109,52 +109,34 @@
           "findings": [],
           "hash": "rvw1:sha256:a50e92b92514f63202f2efaad239c39a66cabd2d3aa4f35b71614bb6a9236084",
           "at": "2026-06-22T03:11:21Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
-          "at": "2026-06-21T20:24:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
-          "at": "2026-06-21T20:27:29Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f2b03140fcb1b64e00d4cde5b1b4ab22a0a8cdf9d86af7e186f6bd028a729129",
-          "at": "2026-06-22T02:26:46Z"
+          "hash": "rvw1:sha256:24aa0a89c7f0bccf20d81db310220e880a7b3554eb600b9ce1a34c1b7843d5fc",
+          "at": "2026-06-22T03:49:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f2b03140fcb1b64e00d4cde5b1b4ab22a0a8cdf9d86af7e186f6bd028a729129",
-          "at": "2026-06-22T02:30:40Z"
+          "hash": "rvw1:sha256:24aa0a89c7f0bccf20d81db310220e880a7b3554eb600b9ce1a34c1b7843d5fc",
+          "at": "2026-06-22T03:55:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2d27feb1f97d68426b22036effc749502b78e9b61975913af3e15181f6b7c099",
-          "at": "2026-06-22T03:03:13Z"
+          "hash": "rvw1:sha256:578f075e84d55731ec821ad7fd0d64399ef848915e85bedd2ae723f541ea4b9a",
+          "at": "2026-06-22T04:08:31Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2d27feb1f97d68426b22036effc749502b78e9b61975913af3e15181f6b7c099",
-          "at": "2026-06-22T03:11:26Z"
+          "hash": "rvw1:sha256:578f075e84d55731ec821ad7fd0d64399ef848915e85bedd2ae723f541ea4b9a",
+          "at": "2026-06-22T04:12:21Z"
         }
       ]
     },
@@ -203,259 +185,6 @@
           "findings": [],
           "hash": "rvw1:sha256:41c28cb50db4a6857743b5b705d9f90109c91da500d21324bfe00b1ef88034e5",
           "at": "2026-06-22T00:11:33Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
-          "at": "2026-06-21T20:24:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`emit` creates and opens the telemetry path with plain `create_dir_all`/`OpenOptions::open`, so a symlinked `telemetry_dir` component or pre-existing `telemetry.jsonl` symlink is followed instead of being rejected. This adapter is the infrastructure I/O boundary for the injected telemetry path; when it is wired to archived-track logs, a symlink under the trusted archive tree can redirect appends outside that tree instead of failing closed. Match the existing CN-04/scope_config_loader symlink-rejection pattern, or use a trusted-root guard plus no-follow open before writing.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/telemetry/archived_track.rs",
-              "line": 71,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
-          "at": "2026-06-21T20:28:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:668de97b8087e893c5e23aa36e429b42930dfa0f04faa423cca7db5ad910e637",
-          "at": "2026-06-21T20:33:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Path containment is never enforced after deriving `canonical_root`, so a crafted `items_dir` like `../other/track/items` can escape the intended trusted root before `review.json` / `.commit_hash` are opened. `reject_symlinks_below` only rejects symlinks; it does not replace the `canonical_path.starts_with(&canonical_root)` check used in `scope_config_loader.rs`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
-              "line": 140,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "The same trusted-root gap exists in the ref-verify adapter: `items_dir_abs` is built and used without proving it stays under `canonical_root`, so `RefVerifyScopeResolver` / `RefVerifyCacheAdapter` can be pointed at an escaped directory tree via a relative `items_dir`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
-              "line": 256,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:0f1a35db3eb162277c4fae5eee11eb1e95c1a296b5452a8dcad082e6bfa6ec5b",
-          "at": "2026-06-21T21:18:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`review_status` no longer verifies that `track/items/<track-id>` exists before reading `review.json` and `.commit_hash`. Because both stores treat missing files as empty/`None`, a missing or mistyped track directory can now fall through to `Approved`/`ApprovedWithBypass` instead of failing like the original `build_v2_shared` path. Restore the `track_dir.is_dir()` guard here.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/gate_state.rs",
-              "line": 189,
-              "category": "missing error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:ac6220eb2ec2d785f648c20a5ba128b011a823316a0b108ec16ce21388658616",
-          "at": "2026-06-21T21:32:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_gate_path_context()` anchors git discovery to `items_dir` itself for absolute paths. If that path sits under a nested checkout, `SystemGitRepo::discover_from(items_dir)` can select the nested repo as the trusted root, so these adapters read `review-scope.json`, `review.json`, `.commit_hash`, and ref-verify caches from the wrong repository instead of the caller's repo root. Anchor discovery to the caller's repo root first, as the composition layer did.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/gate_state.rs",
-              "line": 73,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:75c803204d2cc74b0e8372a5a34ced427392c0e8d9fbca90576d41fc91ced3f2",
-          "at": "2026-06-21T21:40:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_gate_path_context()` anchors git discovery on `SystemGitRepo::discover()` from the process cwd, so the gate adapters no longer root `.commit_hash` ancestry checks in the validated `items_dir`/`canonical_root`. If the command runs from another repo, or from outside a repo, `FsCommitHashStore::read()` can consult the wrong repository or fail for a valid project. The previous implementation wrapped the same read in `with_repo_cwd(&canonical_root, ...)` to keep this I/O bounded to the trusted root.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
-              "line": 76,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "`items_dir_abs.canonicalize()` follows a symlinked `items_dir` root, but this helper never rejects that root with a `symlink_metadata().file_type().is_symlink()` check. Other infrastructure adapters explicitly refuse to use a symlinked `items_dir` before treating it as the trusted anchor, because `reject_symlinks_below()` only protects descendants. As written, a symlinked `items_dir` can become the gate's trust root.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
-              "line": 82,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:18b5345fc1ebaeadb023d8da62c995f55a712f1d3433a26bcd4ffb39bc37163f",
-          "at": "2026-06-21T21:56:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_gate_path_context` only rejects a symlink when the leaf `items_dir` path itself is a symlink. A symlinked ancestor (for example `track/` under the caller repo) can still redirect the canonicalized path into a different subtree, and the adapter will then treat that subtree as the project root. This should reject symlinks along the full path below the caller's trusted root, matching the repo's existing `reject_symlinks_below` boundary checks.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
-              "line": 129,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:941015692849ca0b15a9f4f0337c9303badca3b3b1cf7dfad9513c20b2d5a204",
-          "at": "2026-06-21T22:05:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `absolute items_dir` branch stops anchoring to the current repo: any absolute path outside the caller repo is accepted as long as its derived project root is a git root. That means the adapter can be pointed at a different repository instead of failing closed under the caller's trusted root.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
-              "line": 182,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:8ec9e0a04c972e33e34eb7665ee04f263066b7e1f1ddf4d423eaeb73bca7a241",
-          "at": "2026-06-21T22:14:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`reject_symlinks_below()` is only applied when `items_dir_abs.starts_with(&canonical_repo_root)`, so an absolute `items_dir` that reaches the repo through a symlink outside the repo can bypass the symlink check and still be accepted after `canonicalize()`. The repo’s own loader pattern (`scope_config_loader.rs`) rejects symlinks on the original path unconditionally before trusting the result.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
-              "line": 128,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:f5de8c29505eb33bf25a378c783a3e901980c3eeded215ab07fc201b57489290",
-          "at": "2026-06-21T22:26:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsReviewGateStateAdapter::review_status` only re-anchors the `.commit_hash` lookup; the subsequent `ReviewCycle::evaluate_approval` still runs with the caller's ambient CWD, but `GitDiffGetter` and `SystemReviewHasher` discover the repo from that CWD. In nested-checkout or subdirectory invocations this can make the adapter read diff/hash data from the wrong repository instead of the validated `canonical_root`. Anchor the whole evaluation on `canonical_root` (the way `build_v2_shared` does) before calling `evaluate_approval`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
-              "line": 290,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:3c0afa449397cafd508087919cebbe157cf02506cf0d09ede2f7b641dffe8968",
-          "at": "2026-06-21T22:37:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80b9e6a0f5b73ec2f0d31392fc0861388d44780d13ac818d8fc43a3e140d31f8",
-          "at": "2026-06-21T22:47:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80b9e6a0f5b73ec2f0d31392fc0861388d44780d13ac818d8fc43a3e140d31f8",
-          "at": "2026-06-21T22:52:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8f4ec9cf8e6b7fc1435688d92a5add00b6b3579e803e9f84961d0125a0ffff84",
-          "at": "2026-06-21T23:49:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`OpenOptions::open(&lock_path)` will follow an existing `<db_path>.lock` symlink, so a caller can end up locking an attacker-controlled target outside the intended index sidecar. This is an infrastructure I/O boundary; add a `symlink_metadata(&lock_path)` check before opening and reject `file_type().is_symlink()` like the existing real-file boundary checks.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/null_insert_proxy.rs",
-              "line": 61,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:8f4ec9cf8e6b7fc1435688d92a5add00b6b3579e803e9f84961d0125a0ffff84",
-          "at": "2026-06-21T23:52:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:74dc983b793e948f4ce1bc80f94124a8042aa1904f7fb9d94f63416f7ce810a6",
-          "at": "2026-06-21T23:56:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8b9824803090b4a37fc14a8998acb2b8efdf670dda72ff01e4e22a203af384b",
-          "at": "2026-06-22T00:25:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8b9824803090b4a37fc14a8998acb2b8efdf670dda72ff01e4e22a203af384b",
-          "at": "2026-06-22T00:31:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e9d97c1301578e002751840d25ce10418a6c13be61d329bd2bed5df6b913d7d",
-          "at": "2026-06-22T03:04:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_spec_json` reads the caller-supplied `spec.json` with `std::fs::read_to_string` directly, so a symlink at the file or any parent component is followed before decoding. `spec.json` has existing real-file semantics in the repo (`FsSpecFileLoader` and `verify/spec_states.rs` reject symlinks before reads, matching the symlink-rejection boundary pattern covered by `scope_config_loader.rs` tests). This new adapter reintroduces an unguarded spec load path for `signal calc-spec-adr`; add the same `reject_symlinks_below`/trusted-root guard before reading.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/spec/writer.rs",
-              "line": 54,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:0e9d97c1301578e002751840d25ce10418a6c13be61d329bd2bed5df6b913d7d",
-          "at": "2026-06-22T03:11:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4e878b315aa863b7435309e65009caa282645fe8984299eed06278405d4cedf",
-          "at": "2026-06-22T03:19:26Z"
         }
       ]
     },
@@ -981,6 +710,545 @@
           "findings": [],
           "hash": "rvw1:sha256:659ccd69b0e19eb5fc6302084aa6dcf3522e24f5d490cac3f6e46d40236f3a9e",
           "at": "2026-06-22T03:21:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodeFragmentExtractorPort::extract` takes `std::path::Path` by value in the catalogue, which is not a valid implementable Rust parameter type because `Path` is unsized. The same invalid signature is mirrored in the rendered markdown. This needs to be `&Path` or `PathBuf` before the port can be implemented as described.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 994,
+              "category": "factual error"
+            },
+            {
+              "message": "T007 is internally inconsistent about `dry_write` record aggregation. The plan and the interactor/service docs say T007 moves `dry_write` metrics aggregation into `DryFragmentPipeline*`, but `DryFragmentPipelineOutput` says `records_before/after/appended` are always 0 in this service and that aggregation lives in the dry-write path. The ownership of those counters needs to be made consistent across the plan artifacts.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 328,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e07303fba8ccdeffdacafd7fa9f3536b1d7d6f7d928bd4a600a8564b36e0c0c",
+          "at": "2026-06-22T03:47:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93d71ede85c1f0c89dddc7dc4c3d81389faa591fc96f272f68b8d8d9d673777a",
+          "at": "2026-06-22T03:52:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The catalogue says `DryFragmentPipelineService` covers the `dry_check_approved` fragment-ref derivation moved out of `cli_composition`, but the implementation still derives `current_fragment_refs` inline in `apps/cli-composition/src/dry.rs` and only delegates the fixpoint `build_current_fragment_refs` path. This makes the plan artifact semantically overstate the completed D4 extraction and can let the plan signal Blue for a responsibility that still remains in the CLI composition layer. Update the catalogue/plan wording to match the current source, or complete the `dry_check_approved` delegation before marking this coverage as moved.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 587,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:93d71ede85c1f0c89dddc7dc4c3d81389faa591fc96f272f68b8d8d9d673777a",
+          "at": "2026-06-22T03:56:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74098ffc6e84ff5073550f49655450a7f1c13fecd250b07fdfb26f4409986fe0",
+          "at": "2026-06-22T04:08:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryFragmentPipelineInteractor` still claims its private dependencies are only existing dry-check/diff ports and that no new infrastructure adapter edge is introduced, but the same catalogue now adds `CodeFragmentExtractorPort`, adds `CodeFragmentExtractorAdapter`, and declares the interactor constructor dependency on `Arc<dyn CodeFragmentExtractorPort>`. That is a semantic contradiction in the plan artifacts and can mislead the implementation boundary for T007; update this docs field to acknowledge the new fragment-extractor secondary port/adapter edge.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 348,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:74098ffc6e84ff5073550f49655450a7f1c13fecd250b07fdfb26f4409986fe0",
+          "at": "2026-06-22T04:12:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfa27342937f0a7d2645fef89c2bd336623bc509bd2c57be37f8cdecf67d5217",
+          "at": "2026-06-22T04:16:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryFragmentPipelineCommand` still tells callers to set the CWD to `repo_root`, but the paired `DryCheckDiffSource` change explicitly removes the ambient CWD dependency by taking `repo_root` as an argument and calling `SystemGitRepo::discover_from(repo_root)`. Those requirements conflict: the command no longer needs the caller to `chdir` just to satisfy the diff source, so the command contract is stale and will mislead the T007/T008 handoff.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 563,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0eebfe4a4283985f4e625af1197e78259d0feaf76ef1edc1148cb67833b9f10d",
+          "at": "2026-06-22T04:24:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f3ab7b3b0902859b6dbf6bf300fcaff7ab6b8d7d93af7d7bcd40ee0268c88bb",
+          "at": "2026-06-22T04:29:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckDiffSource` is modified for T007 and its docs say the adapter now uses `SystemGitRepo::discover_from(repo_root)`, but the scoped artifacts never catalogue the corresponding diff-source adapter or its `impl DryCheckDiffSource` edge. The infrastructure catalogue only adds `CodeFragmentExtractorAdapter`, and the contract map shows `DryCheckDiffSource` as an unattached secondary port. That leaves the T007 pipeline wiring semantically incomplete in the plan artifacts.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 1753,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7f3ab7b3b0902859b6dbf6bf300fcaff7ab6b8d7d93af7d7bcd40ee0268c88bb",
+          "at": "2026-06-22T04:34:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckDiffSource` is added as the T007 modified diff-source port, but this catalogue entry omits the `module_path` and `spec_refs` that the neighboring T007 usecase entries have. The rendered artifacts therefore place it directly under `usecase`, while the adapter side says it implements `usecase::dry_check::ports::DryCheckDiffSource`, and `usecase-types.md` marks the same port Cat-Spec 🔴. That leaves the repo-root diff-source change inconsistently located and ungrounded in the plan artifacts.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 1723,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c974a985dc2f61f4d4b2cb494311508c956210adaf4d87551a0d70061b3323be",
+          "at": "2026-06-22T04:40:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab7e6f7099301ee6fb4287bd44f3b8e71d45d23d780aad61136b239b68dac6b8",
+          "at": "2026-06-22T04:45:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 still describes `SpecAdrSignalInteractor` as owning the read→decode→evaluate→set→write cycle, but the updated port contract moved JSON decode/encode behind `SpecFileWriterPort` and now returns/accepts `SpecDocument`. That means the task text is pointing implementers at the wrong layer boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-composition-split-presentation-layer-2026-06-21/plan.md",
+              "line": 29,
+              "category": "contradiction"
+            },
+            {
+              "message": "`DryFragmentPipelineOutput` is documented as carrying `records_*` aggregate counts, but the same T007 plan says those fields are compatibility counters fixed at 0 and that the real aggregation stays in `dry_write`. The DTO contract is internally inconsistent about whether these fields are meaningful metrics or placeholders.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 608,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a55bf1a64e7fdc8117cfed4089675ed50976ce4542a5a088ddb1bbe847dd5aba",
+          "at": "2026-06-22T05:03:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cec36490f257fd1dd1ade13530d7896fd005308c5e4ec01eed1892162a4d659",
+          "at": "2026-06-22T05:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cec36490f257fd1dd1ade13530d7896fd005308c5e4ec01eed1892162a4d659",
+          "at": "2026-06-22T05:11:50Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
+          "at": "2026-06-21T20:24:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
+          "at": "2026-06-21T20:27:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2b03140fcb1b64e00d4cde5b1b4ab22a0a8cdf9d86af7e186f6bd028a729129",
+          "at": "2026-06-22T02:26:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2b03140fcb1b64e00d4cde5b1b4ab22a0a8cdf9d86af7e186f6bd028a729129",
+          "at": "2026-06-22T02:30:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d27feb1f97d68426b22036effc749502b78e9b61975913af3e15181f6b7c099",
+          "at": "2026-06-22T03:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d27feb1f97d68426b22036effc749502b78e9b61975913af3e15181f6b7c099",
+          "at": "2026-06-22T03:11:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5537b3feb94468acbcd2eac7a91e3c2ba2b389491237e0759b4785370166ec3",
+          "at": "2026-06-22T03:48:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_current_refs` still relies on the caller having mutated the process CWD before invocation, even though `repo_root` is carried in the command and the diff-source port does not receive it. That makes this usecase flow depend on ambient process state through `DryCheckDiffSource`/`GitDryCheckDiffGetter::discover()`: a caller with a different CWD, or concurrent code changing CWD, can list hunks from the wrong repository while fragments are normalized against `cmd.repo_root`. This is an implicit process dependency in the usecase orchestration boundary; bind the diff source to `repo_root` explicitly or pass the root through the port instead of relying on global CWD.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/fragment_pipeline.rs",
+              "line": 150,
+              "category": "implicit process dependency"
+            }
+          ],
+          "hash": "rvw1:sha256:e5537b3feb94468acbcd2eac7a91e3c2ba2b389491237e0759b4785370166ec3",
+          "at": "2026-06-22T03:57:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da08af761a7710e4e78a6012b5004b1acc92e383cf14229b8e1eb3682d134036",
+          "at": "2026-06-22T04:09:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da08af761a7710e4e78a6012b5004b1acc92e383cf14229b8e1eb3682d134036",
+          "at": "2026-06-22T04:12:54Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
+          "at": "2026-06-21T20:24:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`emit` creates and opens the telemetry path with plain `create_dir_all`/`OpenOptions::open`, so a symlinked `telemetry_dir` component or pre-existing `telemetry.jsonl` symlink is followed instead of being rejected. This adapter is the infrastructure I/O boundary for the injected telemetry path; when it is wired to archived-track logs, a symlink under the trusted archive tree can redirect appends outside that tree instead of failing closed. Match the existing CN-04/scope_config_loader symlink-rejection pattern, or use a trusted-root guard plus no-follow open before writing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/telemetry/archived_track.rs",
+              "line": 71,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b3bf804972e84938e1a1cb26c8a99053e347a3f885034d840c10c9fbfa07992b",
+          "at": "2026-06-21T20:28:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:668de97b8087e893c5e23aa36e429b42930dfa0f04faa423cca7db5ad910e637",
+          "at": "2026-06-21T20:33:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Path containment is never enforced after deriving `canonical_root`, so a crafted `items_dir` like `../other/track/items` can escape the intended trusted root before `review.json` / `.commit_hash` are opened. `reject_symlinks_below` only rejects symlinks; it does not replace the `canonical_path.starts_with(&canonical_root)` check used in `scope_config_loader.rs`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 140,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The same trusted-root gap exists in the ref-verify adapter: `items_dir_abs` is built and used without proving it stays under `canonical_root`, so `RefVerifyScopeResolver` / `RefVerifyCacheAdapter` can be pointed at an escaped directory tree via a relative `items_dir`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 256,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:0f1a35db3eb162277c4fae5eee11eb1e95c1a296b5452a8dcad082e6bfa6ec5b",
+          "at": "2026-06-21T21:18:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review_status` no longer verifies that `track/items/<track-id>` exists before reading `review.json` and `.commit_hash`. Because both stores treat missing files as empty/`None`, a missing or mistyped track directory can now fall through to `Approved`/`ApprovedWithBypass` instead of failing like the original `build_v2_shared` path. Restore the `track_dir.is_dir()` guard here.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/gate_state.rs",
+              "line": 189,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ac6220eb2ec2d785f648c20a5ba128b011a823316a0b108ec16ce21388658616",
+          "at": "2026-06-21T21:32:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_gate_path_context()` anchors git discovery to `items_dir` itself for absolute paths. If that path sits under a nested checkout, `SystemGitRepo::discover_from(items_dir)` can select the nested repo as the trusted root, so these adapters read `review-scope.json`, `review.json`, `.commit_hash`, and ref-verify caches from the wrong repository instead of the caller's repo root. Anchor discovery to the caller's repo root first, as the composition layer did.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/gate_state.rs",
+              "line": 73,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:75c803204d2cc74b0e8372a5a34ced427392c0e8d9fbca90576d41fc91ced3f2",
+          "at": "2026-06-21T21:40:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_gate_path_context()` anchors git discovery on `SystemGitRepo::discover()` from the process cwd, so the gate adapters no longer root `.commit_hash` ancestry checks in the validated `items_dir`/`canonical_root`. If the command runs from another repo, or from outside a repo, `FsCommitHashStore::read()` can consult the wrong repository or fail for a valid project. The previous implementation wrapped the same read in `with_repo_cwd(&canonical_root, ...)` to keep this I/O bounded to the trusted root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 76,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`items_dir_abs.canonicalize()` follows a symlinked `items_dir` root, but this helper never rejects that root with a `symlink_metadata().file_type().is_symlink()` check. Other infrastructure adapters explicitly refuse to use a symlinked `items_dir` before treating it as the trusted anchor, because `reject_symlinks_below()` only protects descendants. As written, a symlinked `items_dir` can become the gate's trust root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 82,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:18b5345fc1ebaeadb023d8da62c995f55a712f1d3433a26bcd4ffb39bc37163f",
+          "at": "2026-06-21T21:56:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_gate_path_context` only rejects a symlink when the leaf `items_dir` path itself is a symlink. A symlinked ancestor (for example `track/` under the caller repo) can still redirect the canonicalized path into a different subtree, and the adapter will then treat that subtree as the project root. This should reject symlinks along the full path below the caller's trusted root, matching the repo's existing `reject_symlinks_below` boundary checks.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 129,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:941015692849ca0b15a9f4f0337c9303badca3b3b1cf7dfad9513c20b2d5a204",
+          "at": "2026-06-21T22:05:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `absolute items_dir` branch stops anchoring to the current repo: any absolute path outside the caller repo is accepted as long as its derived project root is a git root. That means the adapter can be pointed at a different repository instead of failing closed under the caller's trusted root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 182,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:8ec9e0a04c972e33e34eb7665ee04f263066b7e1f1ddf4d423eaeb73bca7a241",
+          "at": "2026-06-21T22:14:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_symlinks_below()` is only applied when `items_dir_abs.starts_with(&canonical_repo_root)`, so an absolute `items_dir` that reaches the repo through a symlink outside the repo can bypass the symlink check and still be accepted after `canonicalize()`. The repo’s own loader pattern (`scope_config_loader.rs`) rejects symlinks on the original path unconditionally before trusting the result.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 128,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:f5de8c29505eb33bf25a378c783a3e901980c3eeded215ab07fc201b57489290",
+          "at": "2026-06-21T22:26:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsReviewGateStateAdapter::review_status` only re-anchors the `.commit_hash` lookup; the subsequent `ReviewCycle::evaluate_approval` still runs with the caller's ambient CWD, but `GitDiffGetter` and `SystemReviewHasher` discover the repo from that CWD. In nested-checkout or subdirectory invocations this can make the adapter read diff/hash data from the wrong repository instead of the validated `canonical_root`. Anchor the whole evaluation on `canonical_root` (the way `build_v2_shared` does) before calling `evaluate_approval`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/gate_state.rs",
+              "line": 290,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:3c0afa449397cafd508087919cebbe157cf02506cf0d09ede2f7b641dffe8968",
+          "at": "2026-06-21T22:37:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80b9e6a0f5b73ec2f0d31392fc0861388d44780d13ac818d8fc43a3e140d31f8",
+          "at": "2026-06-21T22:47:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80b9e6a0f5b73ec2f0d31392fc0861388d44780d13ac818d8fc43a3e140d31f8",
+          "at": "2026-06-21T22:52:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f4ec9cf8e6b7fc1435688d92a5add00b6b3579e803e9f84961d0125a0ffff84",
+          "at": "2026-06-21T23:49:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OpenOptions::open(&lock_path)` will follow an existing `<db_path>.lock` symlink, so a caller can end up locking an attacker-controlled target outside the intended index sidecar. This is an infrastructure I/O boundary; add a `symlink_metadata(&lock_path)` check before opening and reject `file_type().is_symlink()` like the existing real-file boundary checks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/null_insert_proxy.rs",
+              "line": 61,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:8f4ec9cf8e6b7fc1435688d92a5add00b6b3579e803e9f84961d0125a0ffff84",
+          "at": "2026-06-21T23:52:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74dc983b793e948f4ce1bc80f94124a8042aa1904f7fb9d94f63416f7ce810a6",
+          "at": "2026-06-21T23:56:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8b9824803090b4a37fc14a8998acb2b8efdf670dda72ff01e4e22a203af384b",
+          "at": "2026-06-22T00:25:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8b9824803090b4a37fc14a8998acb2b8efdf670dda72ff01e4e22a203af384b",
+          "at": "2026-06-22T00:31:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e9d97c1301578e002751840d25ce10418a6c13be61d329bd2bed5df6b913d7d",
+          "at": "2026-06-22T03:04:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_spec_json` reads the caller-supplied `spec.json` with `std::fs::read_to_string` directly, so a symlink at the file or any parent component is followed before decoding. `spec.json` has existing real-file semantics in the repo (`FsSpecFileLoader` and `verify/spec_states.rs` reject symlinks before reads, matching the symlink-rejection boundary pattern covered by `scope_config_loader.rs` tests). This new adapter reintroduces an unguarded spec load path for `signal calc-spec-adr`; add the same `reject_symlinks_below`/trusted-root guard before reading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/writer.rs",
+              "line": 54,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:0e9d97c1301578e002751840d25ce10418a6c13be61d329bd2bed5df6b913d7d",
+          "at": "2026-06-22T03:11:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4e878b315aa863b7435309e65009caa282645fe8984299eed06278405d4cedf",
+          "at": "2026-06-22T03:19:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdbc16d091223dbed7573bf7462f294ca3d027ec00c7df529908ba880f6367b9",
+          "at": "2026-06-22T03:46:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodeFragmentExtractorAdapter::extract` only delegates to `extract_code_fragments` and never applies the CWD guard that the T007 briefing assigns to this adapter. The caller path now restores CWD before invoking the fragment pipeline, while the diff side still relies on `SystemGitRepo::discover()` being rooted at `repo_root`; with this implementation, discovery depends on the ambient process CWD and can diff the wrong repo or fail in nested/monorepo layouts. The adapter/port boundary needs to carry `repo_root` and restore the original CWD on all paths, or the CWD guard must remain at the caller.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/fragment_extractor_adapter.rs",
+              "line": 32,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fdbc16d091223dbed7573bf7462f294ca3d027ec00c7df529908ba880f6367b9",
+          "at": "2026-06-22T03:56:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:477e0ea18819bf497703d851329ba65dd9b3537a5f08ff8359b672ebd9319da2",
+          "at": "2026-06-22T04:07:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:477e0ea18819bf497703d851329ba65dd9b3537a5f08ff8359b672ebd9319da2",
+          "at": "2026-06-22T04:12:29Z"
         }
       ]
     }

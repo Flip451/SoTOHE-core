@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a4ca1f909e888c9ff11c5fbc2af5434d6cee673c58573d12757d3d13eff707e7",
+  "catalogue_declaration_hash": "d83cdd94ef114d1f045b1cb50261fa7dd32a5a463b0fce283eda13a16fb4aee3",
   "signals": [
+    {
+      "type_name": "CodeFragmentExtractorAdapter",
+      "signal": "blue",
+      "entry_hash": "72467b17a93234387cbc8c68a466d6eb0794b72cca95ea7d21ad55d5416edf82"
+    },
     {
       "type_name": "FsArchivedTrackTelemetryAdapter",
       "signal": "blue",
@@ -21,6 +26,11 @@
       "type_name": "FsSpecFileWriterAdapter",
       "signal": "blue",
       "entry_hash": "43ddb7f3c0d172da5850a38c24814f1872030afd7b37b9da42105ef730d6ee3f"
+    },
+    {
+      "type_name": "GitDryCheckDiffGetter",
+      "signal": "blue",
+      "entry_hash": "7688e35d139e45636bfa624325f52b096a9e5e3dc4d0c2a96353eb32d9c8b433"
     },
     {
       "type_name": "NoOpDryApprovalService",

@@ -12,6 +12,7 @@ mod approval_interactor;
 mod calibration;
 mod config;
 mod errors;
+pub mod fragment_pipeline;
 mod interactor;
 mod judgment;
 mod known_bad;
@@ -24,6 +25,10 @@ pub(crate) mod shared;
 pub use approval_interactor::DryCheckApprovalInteractor;
 pub use config::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
 pub use errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
+pub use fragment_pipeline::{
+    CodeFragmentExtractorPort, DryFragmentPipelineCommand, DryFragmentPipelineInteractor,
+    DryFragmentPipelineOutput, DryFragmentPipelineService,
+};
 pub use interactor::DryCheckInteractor;
 pub use judgment::DryCheckAgentJudgment;
 pub use ports::{DryCheckAgentPort, DryCheckCoveragePort, DryCheckDiffSource, DryCheckJudgeTier};

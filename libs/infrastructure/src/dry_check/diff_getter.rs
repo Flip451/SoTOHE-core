@@ -34,8 +34,9 @@ impl DryCheckDiffSource for GitDryCheckDiffGetter {
     fn list_changed_hunks(
         &self,
         base: &CommitHash,
+        repo_root: &std::path::Path,
     ) -> Result<Vec<DiffFileHunks>, DryCheckDiffError> {
-        let git = SystemGitRepo::discover()
+        let git = SystemGitRepo::discover_from(repo_root)
             .map_err(|e| DryCheckDiffError::Failed(format!("git discover: {e}")))?;
 
         // Find merge-base between HEAD and base commit.
@@ -349,7 +350,7 @@ mod tests {
 
         let _cwd = CurrentDirGuard::enter(dir.path());
         let getter = super::GitDryCheckDiffGetter;
-        let result = getter.list_changed_hunks(&base).unwrap();
+        let result = getter.list_changed_hunks(&base, dir.path()).unwrap();
 
         for expected in ["src/committed.rs", "src/staged.rs", "src/lib.rs", "src/untracked.rs"] {
             assert!(
@@ -383,7 +384,7 @@ mod tests {
         let _cwd = CurrentDirGuard::enter(dir.path());
         let getter = super::GitDryCheckDiffGetter;
         let base = CommitHash::try_new("abcdef1").unwrap();
-        let result = getter.list_changed_hunks(&base);
+        let result = getter.list_changed_hunks(&base, dir.path());
 
         assert!(result.is_err(), "invalid merge-base should return an error");
     }

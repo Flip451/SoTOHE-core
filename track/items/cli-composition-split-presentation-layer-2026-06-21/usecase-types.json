@@ -5,15 +5,26 @@
   "types": {
     "SignalGateCommand": {
       "action": "add",
-      "role": { "Command": {} },
+      "role": {
+        "Command": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "gate_label", "ty": "String" },
-            { "name": "items_dir", "ty": "std::path::PathBuf" },
-            { "name": "track_id", "ty": "domain::track::TrackId" }
+            {
+              "name": "gate_label",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "domain::track::TrackId"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -22,22 +33,39 @@
       "module_path": "signal_gate",
       "docs": "CQRS command for the signal-gate chain-sequencing use case. Carries the gate label, items directory, and active track id. Created pre-baseline; action add.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "SignalGateOutput": {
       "action": "add",
-      "role": { "Dto": {} },
+      "role": {
+        "Dto": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "gate_label", "ty": "String" },
-            { "name": "passed", "ty": "bool" },
-            { "name": "chain_outputs", "ty": "Vec<SignalChainOutput>" }
+            {
+              "name": "gate_label",
+              "ty": "String"
+            },
+            {
+              "name": "passed",
+              "ty": "bool"
+            },
+            {
+              "name": "chain_outputs",
+              "ty": "Vec<SignalChainOutput>"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -46,23 +74,43 @@
       "module_path": "signal_gate",
       "docs": "Output DTO for the signal-gate use case. Aggregated result of the 4-chain sequencing. Consumed by cli_driver render layer.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "SignalChainOutput": {
       "action": "add",
-      "role": { "Dto": {} },
+      "role": {
+        "Dto": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "chain_label", "ty": "String" },
-            { "name": "passed", "ty": "bool" },
-            { "name": "stdout", "ty": "Option<String>" },
-            { "name": "stderr", "ty": "Option<String>" }
+            {
+              "name": "chain_label",
+              "ty": "String"
+            },
+            {
+              "name": "passed",
+              "ty": "bool"
+            },
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -71,32 +119,73 @@
       "module_path": "signal_gate",
       "docs": "Per-chain output DTO inside a signal-gate run. One entry per SoT-chain evaluated. `stdout`/`stderr` are opaque output strings produced by the chain verifier; they are free-text and not domain-constrained (docs justify raw String per R9).",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        }
       ],
       "informal_grounds": []
     },
     "SignalGateError": {
       "action": "add",
-      "role": { "ErrorType": {} },
+      "role": {
+        "ErrorType": {}
+      },
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "ChainExecutionFailed", "payload": { "kind": "struct", "fields": [{ "name": "chain", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
-          { "name": "InvalidTrackId", "payload": { "kind": "tuple", "fields": ["String"] } },
-          { "name": "StrictnessConfigLoad", "payload": { "kind": "tuple", "fields": ["String"] } }
+          {
+            "name": "ChainExecutionFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "chain",
+                  "ty": "String"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "StrictnessConfigLoad",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
         ]
       },
       "methods": [],
       "module_path": "signal_gate",
       "docs": "Error type for the SignalGateService. ChainExecutionFailed: one chain verifier returned an error. InvalidTrackId: track id could not be resolved. StrictnessConfigLoad: signal-gates config could not be loaded.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        }
       ],
       "informal_grounds": []
     },
     "SignalGateInteractor": {
       "action": "add",
-      "role": { "Interactor": {} },
+      "role": {
+        "Interactor": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -109,20 +198,31 @@
       "module_path": "signal_gate",
       "docs": "Interactor implementing SignalGateService. Holds the injected SignalLayerReader port, SignalGateMatrix strictness source, and chain-runner ports (AdrChainRunnerPort, SpecAdrChainRunnerPort, LayerChainRunnerPort) as private fields. Sequences the 4 SoT chains (adr-user, spec-adr, catalog-spec, impl-catalog), resolves strictness per gate matrix, and aggregates results.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "SpecAdrSignalCommand": {
       "action": "add",
-      "role": { "Command": {} },
+      "role": {
+        "Command": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "spec_json_path", "ty": "std::path::PathBuf" }
+            {
+              "name": "spec_json_path",
+              "ty": "std::path::PathBuf"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -131,22 +231,39 @@
       "module_path": "spec_adr_signal",
       "docs": "CQRS command for the spec-ADR signal calculation use case. Carries the path to the spec.json to be read, evaluated, and re-written.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "SpecAdrSignalOutput": {
       "action": "add",
-      "role": { "Dto": {} },
+      "role": {
+        "Dto": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "blue", "ty": "u32" },
-            { "name": "yellow", "ty": "u32" },
-            { "name": "red", "ty": "u32" }
+            {
+              "name": "blue",
+              "ty": "u32"
+            },
+            {
+              "name": "yellow",
+              "ty": "u32"
+            },
+            {
+              "name": "red",
+              "ty": "u32"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -155,59 +272,131 @@
       "module_path": "spec_adr_signal",
       "docs": "Output DTO for the spec-ADR signal calculation use case. Returns the aggregate blue/yellow/red signal counts after writing the updated spec.json. Counts are unsigned integers; they are truly opaque counters with no domain constraints beyond non-negativity (R9: u32 justified as domain-agnostic counter value).",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "SpecAdrSignalError": {
       "action": "add",
-      "role": { "ErrorType": {} },
+      "role": {
+        "ErrorType": {}
+      },
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Read", "payload": { "kind": "tuple", "fields": ["String"] } },
-          { "name": "Decode", "payload": { "kind": "tuple", "fields": ["String"] } },
-          { "name": "Encode", "payload": { "kind": "tuple", "fields": ["String"] } },
-          { "name": "Write", "payload": { "kind": "tuple", "fields": ["String"] } }
+          {
+            "name": "Read",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "Decode",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "Encode",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "Write",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
         ]
       },
       "methods": [],
       "module_path": "spec_adr_signal",
       "docs": "Error type for the SpecAdrSignalService. All variants carry String payloads for usecase purity (no std::io::Error). Read: I/O failure reading spec.json. Decode: JSON/domain decode failure. Encode: encode failure. Write: atomic-write failure. Infrastructure adapter maps concrete errors to String at the boundary.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        }
       ],
       "informal_grounds": []
     },
     "ArchivedTrackTelemetryError": {
       "action": "add",
-      "role": { "ErrorType": {} },
+      "role": {
+        "ErrorType": {}
+      },
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Io", "payload": { "kind": "tuple", "fields": ["String"] } },
-          { "name": "Serialize", "payload": { "kind": "tuple", "fields": ["String"] } }
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "Serialize",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
         ]
       },
       "methods": [],
       "module_path": "telemetry",
       "docs": "Error type for ArchivedTrackTelemetryPort. Io: filesystem failure creating the telemetry file or directory. Serialize: JSON serialization failure.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-12"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-10"
+        }
       ],
       "informal_grounds": []
     },
     "ArchivedTrackTelemetryCommand": {
       "action": "add",
-      "role": { "Command": {} },
+      "role": {
+        "Command": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "subcommand", "ty": "String" }
+            {
+              "name": "subcommand",
+              "ty": "String"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -216,14 +405,22 @@
       "module_path": "telemetry",
       "docs": "CQRS command for the archived-track telemetry use case. `subcommand` is an opaque CLI subcommand label recorded as free text; it is not a domain value object.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-12"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-10"
+        }
       ],
       "informal_grounds": []
     },
     "ArchivedTrackTelemetryInteractor": {
       "action": "add",
-      "role": { "Interactor": {} },
+      "role": {
+        "Interactor": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -236,15 +433,26 @@
       "module_path": "telemetry",
       "docs": "Interactor implementing ArchivedTrackTelemetryService. Holds the injected ArchivedTrackTelemetryPort as a private field and delegates telemetry persistence through that secondary port, keeping cli_driver from invoking infrastructure adapters directly.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-08" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-12"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-08"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-10"
+        }
       ],
       "informal_grounds": []
     },
     "SpecAdrSignalInteractor": {
       "action": "add",
-      "role": { "Interactor": {} },
+      "role": {
+        "Interactor": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -257,84 +465,164 @@
       "module_path": "spec_adr_signal",
       "docs": "Interactor implementing SpecAdrSignalService. Holds injected file ports as private fields. Executes the read-domain-document->evaluate->set->write-domain-document cycle for spec-ADR signal persistence; JSON decode/encode stays inside the SpecFileWriterPort adapter, extracted from cli_composition per ADR 1328 D4.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "D4OrchestrationError": {
       "action": "add",
-      "role": { "ErrorType": {} },
+      "role": {
+        "ErrorType": {}
+      },
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "DiffFragment", "payload": { "kind": "tuple", "fields": ["String"] } },
-          { "name": "DryGate", "payload": { "kind": "tuple", "fields": ["String"] } },
-          { "name": "PrPolling", "payload": { "kind": "tuple", "fields": ["String"] } }
+          {
+            "name": "DiffFragment",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "DryGate",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "PrPolling",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
         ]
       },
       "methods": [],
       "module_path": "d4_orchestration",
       "docs": "Shared error type for the D4 orchestration extraction services added by this track. String payloads are opaque diagnostic text mapped at the usecase boundary and rendered by cli_driver; they are not domain value objects.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "DryFragmentPipelineCommand": {
       "action": "add",
-      "role": { "Command": {} },
+      "role": {
+        "Command": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "items_dir", "ty": "std::path::PathBuf" },
-            { "name": "track_id", "ty": "domain::track::TrackId" },
-            { "name": "changed_paths", "ty": "Vec<std::path::PathBuf>" }
+            {
+              "name": "canonical_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "base",
+              "ty": "domain::CommitHash"
+            }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "dry_check::fragment_pipeline",
-      "docs": "CQRS command for the D4 diff-fragment and dry-check fragment-ref derivation pipeline. `changed_paths` are filesystem paths supplied by the caller; path semantics stay in existing domain/path types.",
+      "docs": "CQRS command for the D4 diff-fragment pipeline used by the fixpoint dry gate. `canonical_root` is the project root used for fragment extraction; `repo_root` is the git repository root used for explicit diff discovery and path normalization; `base` is the diff base commit. The interactor receives `repo_root` explicitly and does not require caller CWD changes.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "DryFragmentPipelineOutput": {
       "action": "add",
-      "role": { "Dto": {} },
+      "role": {
+        "Dto": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "fragment_refs", "ty": "Vec<domain::dry_check::FragmentRef>" },
-            { "name": "records_before", "ty": "u32" },
-            { "name": "records_after", "ty": "u32" },
-            { "name": "records_appended", "ty": "u32" }
+            {
+              "name": "fragment_refs",
+              "ty": "std::collections::BTreeSet<domain::dry_check::FragmentRef>"
+            },
+            {
+              "name": "records_before",
+              "ty": "u32"
+            },
+            {
+              "name": "records_after",
+              "ty": "u32"
+            },
+            {
+              "name": "records_appended",
+              "ty": "u32"
+            }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "dry_check::fragment_pipeline",
-      "docs": "Output DTO for the D4 dry fragment pipeline. Carries derived FragmentRefs plus dry_write metrics counters; the counters are non-negative aggregate counts and intentionally use u32.",
+      "docs": "Output DTO for the D4 dry fragment pipeline. Carries derived FragmentRefs as a BTreeSet plus legacy records_* compatibility fields. For this service the records_* fields are fixed at 0; record-count aggregation remains in the dry_write path.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "DryFragmentPipelineInteractor": {
       "action": "add",
-      "role": { "Interactor": {} },
+      "role": {
+        "Interactor": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -345,25 +633,45 @@
       },
       "methods": [],
       "module_path": "dry_check::fragment_pipeline",
-      "docs": "Interactor implementing DryFragmentPipelineService. Extracts build_current_fragment_refs, dry_check_approved fragment-ref derivation, and dry_write metrics aggregation from cli_composition into usecase application logic. Private dependencies use existing dry-check and diff ports; no new infrastructure adapter edge is introduced by this catalogue entry.",
+      "docs": "Interactor implementing DryFragmentPipelineService. Extracts the build_current_fragment_refs multi-step orchestration from cli_composition into usecase application logic. The dry_check_approved code path retains only a small one-line loop that calls the usecase free function `fragment_ref_of` per fragment — that is a single-step usecase API call, not multi-step orchestration, so it remains in cli_composition by design. The broader dry-gate orchestration (the dry-gate enabled/disabled branching in fixpoint_resolve) is tracked by T008. dry_write record-count aggregation stays in the dry-write path; DryFragmentPipelineOutput records_* counters remain 0 for catalogue compatibility. Private dependencies use the dry-check diff source and the new CodeFragmentExtractorPort; CodeFragmentExtractorAdapter is the infrastructure adapter edge for fragment extraction.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "FixpointDryGateCommand": {
       "action": "add",
-      "role": { "Command": {} },
+      "role": {
+        "Command": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "items_dir", "ty": "std::path::PathBuf" },
-            { "name": "track_id", "ty": "domain::track::TrackId" },
-            { "name": "dry_enabled", "ty": "bool" }
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "domain::track::TrackId"
+            },
+            {
+              "name": "dry_enabled",
+              "ty": "bool"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -372,21 +680,35 @@
       "module_path": "fixpoint_resolve",
       "docs": "CQRS command for the fixpoint-resolve dry-gate orchestration extracted by D4. The boolean mirrors the existing dry-check enablement switch and is application configuration, not a domain concept.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "FixpointDryGateOutput": {
       "action": "add",
-      "role": { "Dto": {} },
+      "role": {
+        "Dto": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "approved", "ty": "bool" },
-            { "name": "summary", "ty": "Option<String>" }
+            {
+              "name": "approved",
+              "ty": "bool"
+            },
+            {
+              "name": "summary",
+              "ty": "Option<String>"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -395,14 +717,22 @@
       "module_path": "fixpoint_resolve",
       "docs": "Output DTO for the fixpoint dry-gate orchestration. `summary` is opaque free text for cli_driver rendering and is not a domain value object.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "FixpointDryGateInteractor": {
       "action": "add",
-      "role": { "Interactor": {} },
+      "role": {
+        "Interactor": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -415,24 +745,47 @@
       "module_path": "fixpoint_resolve",
       "docs": "Interactor implementing FixpointDryGateService. Owns the dry-gate branching, CWD guard, corpus-root manifest branching, and DryCheckApprovalInteractor construction currently embedded in cli_composition.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "PrReviewPollingCommand": {
       "action": "add",
-      "role": { "Command": {} },
+      "role": {
+        "Command": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "repository", "ty": "String" },
-            { "name": "pull_request_number", "ty": "u64" },
-            { "name": "timeout_secs", "ty": "u64" },
-            { "name": "poll_interval_secs", "ty": "u64" }
+            {
+              "name": "repository",
+              "ty": "String"
+            },
+            {
+              "name": "pull_request_number",
+              "ty": "u64"
+            },
+            {
+              "name": "timeout_secs",
+              "ty": "u64"
+            },
+            {
+              "name": "poll_interval_secs",
+              "ty": "u64"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -441,21 +794,35 @@
       "module_path": "pr_review",
       "docs": "CQRS command for the PR review polling application service. `repository` is an opaque repository label supplied by the CLI path and is rendered as free text.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "PrReviewPollingOutput": {
       "action": "add",
-      "role": { "Dto": {} },
+      "role": {
+        "Dto": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "review_found", "ty": "bool" },
-            { "name": "summary", "ty": "Option<String>" }
+            {
+              "name": "review_found",
+              "ty": "bool"
+            },
+            {
+              "name": "summary",
+              "ty": "Option<String>"
+            }
           ],
           "has_stripped_fields": false
         }
@@ -464,14 +831,22 @@
       "module_path": "pr_review",
       "docs": "Output DTO for the PR review polling loop. `summary` is opaque free text for cli_driver rendering.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "PrReviewPollingInteractor": {
       "action": "add",
-      "role": { "Interactor": {} },
+      "role": {
+        "Interactor": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -484,9 +859,18 @@
       "module_path": "pr_review",
       "docs": "Interactor implementing PrReviewPollingService. Extracts the PR review polling loop from cli_composition into a usecase application service with injected review-provider ports.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     }
@@ -494,12 +878,19 @@
   "traits": {
     "SignalGateService": {
       "action": "add",
-      "role": { "ApplicationService": {} },
+      "role": {
+        "ApplicationService": {}
+      },
       "methods": [
         {
           "name": "run_gate",
           "receiver": "&self",
-          "params": [{ "name": "cmd", "ty": "SignalGateCommand" }],
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "SignalGateCommand"
+            }
+          ],
           "returns": "Result<SignalGateOutput, SignalGateError>",
           "is_async": false,
           "generics": [],
@@ -507,24 +898,43 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "signal_gate",
       "docs": "Application service (primary port) for the signal-gate chain sequencing use case. Implementations sequence the 4 SoT chains and aggregate outcomes. Extracted from cli_composition signal_check_gate per ADR 1328 D4.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "SpecAdrSignalService": {
       "action": "add",
-      "role": { "ApplicationService": {} },
+      "role": {
+        "ApplicationService": {}
+      },
       "methods": [
         {
           "name": "calc_and_persist",
           "receiver": "&self",
-          "params": [{ "name": "cmd", "ty": "SpecAdrSignalCommand" }],
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "SpecAdrSignalCommand"
+            }
+          ],
           "returns": "Result<SpecAdrSignalOutput, SpecAdrSignalError>",
           "is_async": false,
           "generics": [],
@@ -532,24 +942,43 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "spec_adr_signal",
       "docs": "Application service (primary port) for the spec-ADR signal calculation and persistence use case. Runs the read-domain-document->evaluate->set->write-domain-document cycle; JSON decode/encode stays behind the SpecFileWriterPort adapter boundary. Extracted from cli_composition signal_calc_spec_adr per ADR 1328 D4.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "ArchivedTrackTelemetryService": {
       "action": "add",
-      "role": { "ApplicationService": {} },
+      "role": {
+        "ApplicationService": {}
+      },
       "methods": [
         {
           "name": "emit",
           "receiver": "&self",
-          "params": [{ "name": "cmd", "ty": "ArchivedTrackTelemetryCommand" }],
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "ArchivedTrackTelemetryCommand"
+            }
+          ],
           "returns": "Result<(), ArchivedTrackTelemetryError>",
           "is_async": false,
           "generics": [],
@@ -557,24 +986,43 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "telemetry",
       "docs": "Application service (primary port) for archived-track telemetry emission. cli_driver invokes this usecase service; the interactor delegates persistence through ArchivedTrackTelemetryPort so the secondary adapter stays behind the usecase boundary.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-08" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-12"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-08"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-10"
+        }
       ],
       "informal_grounds": []
     },
     "DryFragmentPipelineService": {
       "action": "add",
-      "role": { "ApplicationService": {} },
+      "role": {
+        "ApplicationService": {}
+      },
       "methods": [
         {
           "name": "derive_current_refs",
           "receiver": "&self",
-          "params": [{ "name": "cmd", "ty": "DryFragmentPipelineCommand" }],
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "DryFragmentPipelineCommand"
+            }
+          ],
           "returns": "Result<DryFragmentPipelineOutput, D4OrchestrationError>",
           "is_async": false,
           "generics": [],
@@ -582,24 +1030,43 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "dry_check::fragment_pipeline",
-      "docs": "Application service (primary port) for D4 diff-fragment pipeline extraction. Covers build_current_fragment_refs, dry_check_approved fragment-ref derivation, and dry_write metrics aggregation moved out of cli_composition by T007.",
+      "docs": "Application service (primary port) for D4 diff-fragment pipeline extraction. Covers the build_current_fragment_refs multi-step orchestration moved out of cli_composition by T007. The dry_check_approved code path retains only a small one-line loop that calls the usecase free function `fragment_ref_of` per fragment — that is a single-step usecase API call, not multi-step orchestration, and remains in cli_composition by design. The broader dry-gate orchestration in fixpoint_resolve is tracked by T008. dry_write record-count aggregation stays in the dry-write path; DryFragmentPipelineOutput records_* counters remain 0 for catalogue compatibility.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "FixpointDryGateService": {
       "action": "add",
-      "role": { "ApplicationService": {} },
+      "role": {
+        "ApplicationService": {}
+      },
       "methods": [
         {
           "name": "resolve_dry_gate",
           "receiver": "&self",
-          "params": [{ "name": "cmd", "ty": "FixpointDryGateCommand" }],
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "FixpointDryGateCommand"
+            }
+          ],
           "returns": "Result<FixpointDryGateOutput, D4OrchestrationError>",
           "is_async": false,
           "generics": [],
@@ -607,24 +1074,43 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "fixpoint_resolve",
       "docs": "Application service (primary port) for D4 fixpoint-resolve dry-gate orchestration. Owns the dry-gate branch and related application sequencing moved out of cli_composition by T008.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "PrReviewPollingService": {
       "action": "add",
-      "role": { "ApplicationService": {} },
+      "role": {
+        "ApplicationService": {}
+      },
       "methods": [
         {
           "name": "poll",
           "receiver": "&self",
-          "params": [{ "name": "cmd", "ty": "PrReviewPollingCommand" }],
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "PrReviewPollingCommand"
+            }
+          ],
           "returns": "Result<PrReviewPollingOutput, D4OrchestrationError>",
           "is_async": false,
           "generics": [],
@@ -632,24 +1118,43 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "pr_review",
       "docs": "Application service (primary port) for D4 PR review polling. Extracts the polling loop from cli_composition so cli_driver invokes a single usecase service.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "SpecFileWriterPort": {
       "action": "add",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "read_spec_json",
           "receiver": "&self",
-          "params": [{ "name": "path", "ty": "std::path::PathBuf" }],
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
           "returns": "Result<domain::SpecDocument, SpecAdrSignalError>",
           "is_async": false,
           "generics": [],
@@ -660,8 +1165,14 @@
           "name": "write_spec_json",
           "receiver": "&self",
           "params": [
-            { "name": "path", "ty": "std::path::PathBuf" },
-            { "name": "doc", "ty": "&domain::SpecDocument" }
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "doc",
+              "ty": "&domain::SpecDocument"
+            }
           ],
           "returns": "Result<(), SpecAdrSignalError>",
           "is_async": false,
@@ -670,17 +1181,25 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "spec_adr_signal",
       "docs": "Secondary port for reading and atomically writing spec.json files. Operates on domain::SpecDocument — the infrastructure adapter performs JSON codec internally (decode on read, encode + atomic write on write). This keeps the usecase interactor free of serde_json and infrastructure::spec::codec. Decode/Encode error variants on SpecAdrSignalError are returned by the adapter when codec fails.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        }
       ],
       "informal_grounds": []
     },
     "ReviewGateStatePort": {
       "action": "reference",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "review_status",
@@ -693,18 +1212,29 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "fixpoint_resolve",
       "docs": "Baseline port referenced so that FsReviewGateStateAdapter -.impl.-> ReviewGateStatePort edge is visible in the contract-map (R7).",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "RefVerifyGateStatePort": {
       "action": "reference",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "ref_verify_status",
@@ -717,26 +1247,46 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "fixpoint_resolve",
       "docs": "Baseline port referenced so that FsRefVerifyGateStateAdapter -.impl.-> RefVerifyGateStatePort edge is visible in the contract-map (R7).",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "DryCheckAgentPort": {
       "action": "reference",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "judge",
           "receiver": "&self",
           "params": [
-            { "name": "tier", "ty": "DryCheckJudgeTier" },
-            { "name": "low_path", "ty": "std::path::PathBuf" },
-            { "name": "high_path", "ty": "std::path::PathBuf" }
+            {
+              "name": "tier",
+              "ty": "DryCheckJudgeTier"
+            },
+            {
+              "name": "low_path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "high_path",
+              "ty": "std::path::PathBuf"
+            }
           ],
           "returns": "Result<DryCheckAgentJudgment, DryCheckAgentError>",
           "is_async": false,
@@ -745,25 +1295,42 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "dry_check::ports",
       "docs": "Baseline port referenced so that RecordingDryAgent -.impl.-> DryCheckAgentPort edge is visible in the contract-map (R7).",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "DryCheckApprovalService": {
       "action": "reference",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "check_approved",
           "receiver": "&self",
           "params": [
-            { "name": "current_refs", "ty": "std::collections::BTreeSet<domain::dry_check::FragmentRef>" },
-            { "name": "approval", "ty": "domain::dry_check::DryCheckApprovalVerdict" }
+            {
+              "name": "current_refs",
+              "ty": "std::collections::BTreeSet<domain::dry_check::FragmentRef>"
+            },
+            {
+              "name": "approval",
+              "ty": "domain::dry_check::DryCheckApprovalVerdict"
+            }
           ],
           "returns": "Result<DryCheckApprovalVerdict, DryCheckCycleError>",
           "is_async": false,
@@ -772,25 +1339,42 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "dry_check::services",
       "docs": "Baseline service port referenced so that NoOpDryApprovalService -.impl.-> DryCheckApprovalService edge is visible in the contract-map (R7).",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "SemanticIndexPort": {
       "action": "reference",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "insert",
           "receiver": "&self",
           "params": [
-            { "name": "path", "ty": "std::path::PathBuf" },
-            { "name": "content", "ty": "String" }
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "content",
+              "ty": "String"
+            }
           ],
           "returns": "Result<(), SemanticIndexError>",
           "is_async": false,
@@ -801,7 +1385,12 @@
         {
           "name": "insert_batch",
           "receiver": "&self",
-          "params": [{ "name": "items", "ty": "Vec<(std::path::PathBuf, String)>" }],
+          "params": [
+            {
+              "name": "items",
+              "ty": "Vec<(std::path::PathBuf, String)>"
+            }
+          ],
           "returns": "Result<(), SemanticIndexError>",
           "is_async": false,
           "generics": [],
@@ -811,7 +1400,12 @@
         {
           "name": "delete_by_source_path",
           "receiver": "&self",
-          "params": [{ "name": "path", "ty": "std::path::PathBuf" }],
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
           "returns": "Result<(), SemanticIndexError>",
           "is_async": false,
           "generics": [],
@@ -822,8 +1416,14 @@
           "name": "search",
           "receiver": "&self",
           "params": [
-            { "name": "query", "ty": "String" },
-            { "name": "limit", "ty": "usize" }
+            {
+              "name": "query",
+              "ty": "String"
+            },
+            {
+              "name": "limit",
+              "ty": "usize"
+            }
           ],
           "returns": "Result<Vec<domain::semantic_dup::SearchResult>, SemanticIndexError>",
           "is_async": false,
@@ -832,18 +1432,29 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "semantic_dup::ports",
       "docs": "Baseline port referenced so that NullInsertIndexProxy -.impl.-> SemanticIndexPort and NoopSemanticIndexPort -.impl.-> SemanticIndexPort edges are visible in the contract-map (R7).",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "BranchReaderPort": {
       "action": "reference",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "current_branch",
@@ -856,23 +1467,39 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "track_resolution",
       "docs": "Baseline port referenced so that the LazyBranchReader delete entry is traceable in the contract-map (R7). LazyBranchReader is eliminated; SystemGitRepo directly implements this port.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "ArchivedTrackTelemetryPort": {
       "action": "add",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "emit",
           "receiver": "&self",
-          "params": [{ "name": "subcommand", "ty": "String" }],
+          "params": [
+            {
+              "name": "subcommand",
+              "ty": "String"
+            }
+          ],
           "returns": "Result<(), ArchivedTrackTelemetryError>",
           "is_async": false,
           "generics": [],
@@ -880,26 +1507,46 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "telemetry",
       "docs": "Secondary port for emitting a telemetry event when an archived-track subcommand is dispatched. Abstracts the direct std::fs / serde_json / chrono I/O that previously lived in apps/cli/src/main.rs:247-294. The infrastructure adapter owns timestamp capture and receives the telemetry directory at construction.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-08" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-12"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-08"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-10"
+        }
       ],
       "informal_grounds": []
     },
     "AdrChainRunnerPort": {
       "action": "add",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "run_adr_chain",
           "receiver": "&self",
           "params": [
-            { "name": "project_root", "ty": "std::path::PathBuf" },
-            { "name": "strict", "ty": "bool" }
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "strict",
+              "ty": "bool"
+            }
           ],
           "returns": "Result<SignalChainOutput, String>",
           "is_async": false,
@@ -908,25 +1555,42 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "signal_gate",
       "docs": "Secondary port for chain ⓪ (ADR → user): runs the ADR signal scan for a given project root and strictness setting, returning a chain output. The infrastructure adapter runs execute_verify_adr_signals_with_strict internally; the port exposes only the rendered text outcome.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "SpecAdrChainRunnerPort": {
       "action": "add",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "run_spec_adr_chain",
           "receiver": "&self",
           "params": [
-            { "name": "spec_json_path", "ty": "std::path::PathBuf" },
-            { "name": "strict", "ty": "bool" }
+            {
+              "name": "spec_json_path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "strict",
+              "ty": "bool"
+            }
           ],
           "returns": "Result<SignalChainOutput, String>",
           "is_async": false,
@@ -935,25 +1599,42 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "signal_gate",
       "docs": "Secondary port for chain ① (spec → ADR): reads and evaluates the spec.json signal gate with the resolved strictness, returning a chain output. The infrastructure adapter runs verify_from_spec_json + resolve_trusted_root internally; the port exposes only the rendered text outcome.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "LayerChainRunnerPort": {
       "action": "add",
-      "role": { "SecondaryPort": {} },
+      "role": {
+        "SecondaryPort": {}
+      },
       "methods": [
         {
           "name": "run_catalog_spec_chain",
           "receiver": "&self",
           "params": [
-            { "name": "strict", "ty": "bool" },
-            { "name": "signal_reader", "ty": "&dyn usecase::signal::SignalLayerReader" }
+            {
+              "name": "strict",
+              "ty": "bool"
+            },
+            {
+              "name": "signal_reader",
+              "ty": "&dyn usecase::signal::SignalLayerReader"
+            }
           ],
           "returns": "Result<SignalChainOutput, String>",
           "is_async": false,
@@ -965,8 +1646,14 @@
           "name": "run_impl_catalog_chain",
           "receiver": "&self",
           "params": [
-            { "name": "strict", "ty": "bool" },
-            { "name": "signal_reader", "ty": "&dyn usecase::signal::SignalLayerReader" }
+            {
+              "name": "strict",
+              "ty": "bool"
+            },
+            {
+              "name": "signal_reader",
+              "ty": "&dyn usecase::signal::SignalLayerReader"
+            }
           ],
           "returns": "Result<SignalChainOutput, String>",
           "is_async": false,
@@ -975,12 +1662,109 @@
           "where_predicates": []
         }
       ],
-      "supertrait_bounds": ["Send", "Sync"],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
       "module_path": "signal_gate",
       "docs": "Secondary port for chains ② and ③ (catalog-spec / impl-catalog): runs the argless layer-chain verifier for a given chain label and per-layer parameters. Abstracts signal_check_layer_chain_with_strict composition so the interactor can sequence all four chains without importing infrastructure.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CodeFragmentExtractorPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "extract",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "returns": "Result<Vec<domain::semantic_dup::CodeFragment>, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
+      "module_path": "dry_check::fragment_pipeline",
+      "docs": "Secondary port for extracting code fragments from a workspace root. Abstracts infrastructure::semantic_dup::extractor::extract_code_fragments so the DryFragmentPipelineInteractor does not import from infrastructure directly. The infrastructure adapter (CodeFragmentExtractorAdapter) wraps extract_code_fragments and maps ExtractError to String at the boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckDiffSource": {
+      "action": "modify",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "list_changed_hunks",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "base",
+              "ty": "&domain::CommitHash"
+            },
+            {
+              "name": "repo_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "returns": "Result<Vec<domain::dry_check::DiffFileHunks>, crate::dry_check::errors::DryCheckDiffError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
+      "module_path": "dry_check::ports",
+      "docs": "Dry-check secondary port for diff hunk listing. T007 modified signature to add `repo_root: &Path` parameter (was previously CWD-dependent via SystemGitRepo::discover()). The adapter now uses SystemGitRepo::discover_from(repo_root) explicitly, removing ambient CWD dependency from the usecase orchestration boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     }
@@ -994,11 +1778,26 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "signal_layer_reader", "ty": "std::sync::Arc<dyn usecase::signal::SignalLayerReader>" },
-            { "name": "gate_matrix", "ty": "domain::SignalGateMatrix" },
-            { "name": "adr_runner", "ty": "std::sync::Arc<dyn AdrChainRunnerPort>" },
-            { "name": "spec_adr_runner", "ty": "std::sync::Arc<dyn SpecAdrChainRunnerPort>" },
-            { "name": "layer_chain_runner", "ty": "std::sync::Arc<dyn LayerChainRunnerPort>" }
+            {
+              "name": "signal_layer_reader",
+              "ty": "std::sync::Arc<dyn usecase::signal::SignalLayerReader>"
+            },
+            {
+              "name": "gate_matrix",
+              "ty": "domain::SignalGateMatrix"
+            },
+            {
+              "name": "adr_runner",
+              "ty": "std::sync::Arc<dyn AdrChainRunnerPort>"
+            },
+            {
+              "name": "spec_adr_runner",
+              "ty": "std::sync::Arc<dyn SpecAdrChainRunnerPort>"
+            },
+            {
+              "name": "layer_chain_runner",
+              "ty": "std::sync::Arc<dyn LayerChainRunnerPort>"
+            }
           ],
           "returns": "Self",
           "is_async": false,
@@ -1015,7 +1814,10 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "spec_file_writer", "ty": "std::sync::Arc<dyn SpecFileWriterPort>" }
+            {
+              "name": "spec_file_writer",
+              "ty": "std::sync::Arc<dyn SpecFileWriterPort>"
+            }
           ],
           "returns": "Self",
           "is_async": false,
@@ -1032,7 +1834,34 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "archived_track_telemetry", "ty": "std::sync::Arc<dyn ArchivedTrackTelemetryPort>" }
+            {
+              "name": "archived_track_telemetry",
+              "ty": "std::sync::Arc<dyn ArchivedTrackTelemetryPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryFragmentPipelineInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "diff_source",
+              "ty": "std::sync::Arc<dyn DryCheckDiffSource>"
+            },
+            {
+              "name": "fragment_extractor",
+              "ty": "std::sync::Arc<dyn CodeFragmentExtractorPort>"
+            }
           ],
           "returns": "Self",
           "is_async": false,
@@ -1168,6 +1997,46 @@
       "action": "add",
       "trait_ref": "core::error::Error",
       "for_type": "ArchivedTrackTelemetryError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "D4OrchestrationError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "D4OrchestrationError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "D4OrchestrationError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "D4OrchestrationError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryFragmentPipelineCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryFragmentPipelineCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryFragmentPipelineOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryFragmentPipelineOutput"
     }
   ]
 }

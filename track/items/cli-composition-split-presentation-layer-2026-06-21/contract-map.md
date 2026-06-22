@@ -47,10 +47,16 @@ subgraph usecase["usecase"]
   subgraph T45_usecase_usecase_DryFragmentPipelineInteractor["dry_check::fragment_pipeline::DryFragmentPipelineInteractor"]
     direction TB
     T45_usecase_usecase_DryFragmentPipelineInteractor__self[DryFragmentPipelineInteractor]
+    T45_usecase_usecase_DryFragmentPipelineInteractor_new([new])
   end
   subgraph T41_usecase_usecase_DryFragmentPipelineOutput["dry_check::fragment_pipeline::DryFragmentPipelineOutput"]
     direction TB
     T41_usecase_usecase_DryFragmentPipelineOutput__self[DryFragmentPipelineOutput]
+  end
+  subgraph R41_usecase_usecase_CodeFragmentExtractorPort["dry_check::fragment_pipeline::CodeFragmentExtractorPort"]
+    direction TB
+    R41_usecase_usecase_CodeFragmentExtractorPort__self[CodeFragmentExtractorPort]
+    R41_usecase_usecase_CodeFragmentExtractorPort_extract([extract])
   end
   subgraph R33_usecase_usecase_DryCheckAgentPort["dry_check::ports::DryCheckAgentPort"]
     direction TB
@@ -61,6 +67,11 @@ subgraph usecase["usecase"]
     direction TB
     R39_usecase_usecase_DryCheckApprovalService__self[DryCheckApprovalService]
     R39_usecase_usecase_DryCheckApprovalService_check_approved([check_approved])
+  end
+  subgraph R34_usecase_usecase_DryCheckDiffSource["dry_check::ports::DryCheckDiffSource"]
+    direction TB
+    R34_usecase_usecase_DryCheckDiffSource__self[DryCheckDiffSource]
+    R34_usecase_usecase_DryCheckDiffSource_list_changed_hunks([list_changed_hunks])
   end
   subgraph R42_usecase_usecase_DryFragmentPipelineService["dry_check::fragment_pipeline::DryFragmentPipelineService"]
     direction TB
@@ -253,6 +264,10 @@ subgraph infrastructure["infrastructure"]
   direction TB
   subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
     direction TB
+  subgraph T51_infrastructure_infrastructure_GitDryCheckDiffGetter["dry_check::diff_getter::GitDryCheckDiffGetter"]
+    direction TB
+    T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self[GitDryCheckDiffGetter]
+  end
   subgraph T52_infrastructure_infrastructure_NoOpDryApprovalService["dry_check::noop_approval::NoOpDryApprovalService"]
     direction TB
     T52_infrastructure_infrastructure_NoOpDryApprovalService__self[NoOpDryApprovalService]
@@ -265,6 +280,11 @@ subgraph infrastructure["infrastructure"]
   end
   subgraph infrastructure_infrastructure_module_semantic_dup["infrastructure::semantic_dup"]
     direction TB
+  subgraph T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter["semantic_dup::fragment_extractor_adapter::CodeFragmentExtractorAdapter"]
+    direction TB
+    T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self[CodeFragmentExtractorAdapter]
+    T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter_new([new])
+  end
   subgraph T51_infrastructure_infrastructure_NoopSemanticIndexPort["semantic_dup::noop_adapter::NoopSemanticIndexPort"]
     direction TB
     T51_infrastructure_infrastructure_NoopSemanticIndexPort__self[NoopSemanticIndexPort]
@@ -305,6 +325,7 @@ subgraph infrastructure["infrastructure"]
   end
   end
 end
+T45_usecase_usecase_DryFragmentPipelineInteractor_new --> T45_usecase_usecase_DryFragmentPipelineInteractor__self
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --o T42_usecase_usecase_DryFragmentPipelineCommand__self
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --> T36_usecase_usecase_D4OrchestrationError__self
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --> T41_usecase_usecase_DryFragmentPipelineOutput__self
@@ -340,6 +361,7 @@ T45_usecase_usecase_DryFragmentPipelineInteractor__self -.impl.-> R42_usecase_us
 T41_usecase_usecase_FixpointDryGateInteractor__self -.impl.-> R38_usecase_usecase_FixpointDryGateService__self
 T41_usecase_usecase_PrReviewPollingInteractor__self -.impl.-> R38_usecase_usecase_PrReviewPollingService__self
 T47_infrastructure_infrastructure_RecordingDryAgent_new --> T47_infrastructure_infrastructure_RecordingDryAgent__self
+T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter_new --> T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self
 T50_infrastructure_infrastructure_NullInsertIndexProxy_new --> T50_infrastructure_infrastructure_NullInsertIndexProxy__self
 T53_infrastructure_infrastructure_FsSpecFileWriterAdapter_new --> T53_infrastructure_infrastructure_FsSpecFileWriterAdapter__self
 T61_infrastructure_infrastructure_FsArchivedTrackTelemetryAdapter_new --> T61_infrastructure_infrastructure_FsArchivedTrackTelemetryAdapter__self
@@ -353,17 +375,24 @@ T51_infrastructure_infrastructure_NoopSemanticIndexPort__self -.impl.-> R33_usec
 T52_infrastructure_infrastructure_NoOpDryApprovalService__self -.impl.-> R39_usecase_usecase_DryCheckApprovalService__self
 T61_infrastructure_infrastructure_FsArchivedTrackTelemetryAdapter__self -.impl.-> R42_usecase_usecase_ArchivedTrackTelemetryPort__self
 T53_infrastructure_infrastructure_FsSpecFileWriterAdapter__self -.impl.-> R34_usecase_usecase_SpecFileWriterPort__self
+T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self -.impl.-> R41_usecase_usecase_CodeFragmentExtractorPort__self
+T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self -.impl.-> R34_usecase_usecase_DryCheckDiffSource__self
 class T36_usecase_usecase_D4OrchestrationError_DiffFragment variant_node
 class T36_usecase_usecase_D4OrchestrationError_DryGate variant_node
 class T36_usecase_usecase_D4OrchestrationError_PrPolling variant_node
 class T36_usecase_usecase_D4OrchestrationError__self error_type
 class T42_usecase_usecase_DryFragmentPipelineCommand__self command
+class T45_usecase_usecase_DryFragmentPipelineInteractor_new method_node
 class T45_usecase_usecase_DryFragmentPipelineInteractor__self interactor
 class T41_usecase_usecase_DryFragmentPipelineOutput__self dto
+class R41_usecase_usecase_CodeFragmentExtractorPort_extract method_node
+class R41_usecase_usecase_CodeFragmentExtractorPort__self secondary_port
 class R33_usecase_usecase_DryCheckAgentPort_judge method_node
 class R33_usecase_usecase_DryCheckAgentPort__self secondary_port
 class R39_usecase_usecase_DryCheckApprovalService_check_approved method_node
 class R39_usecase_usecase_DryCheckApprovalService__self secondary_port
+class R34_usecase_usecase_DryCheckDiffSource_list_changed_hunks method_node
+class R34_usecase_usecase_DryCheckDiffSource__self secondary_port
 class R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs method_node
 class R42_usecase_usecase_DryFragmentPipelineService__self app_service
 class T38_usecase_usecase_FixpointDryGateCommand__self command
@@ -429,9 +458,12 @@ class R45_usecase_usecase_ArchivedTrackTelemetryService_emit method_node
 class R45_usecase_usecase_ArchivedTrackTelemetryService__self app_service
 class R32_usecase_usecase_BranchReaderPort_current_branch method_node
 class R32_usecase_usecase_BranchReaderPort__self secondary_port
+class T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self secondary_adapter
 class T52_infrastructure_infrastructure_NoOpDryApprovalService__self secondary_adapter
 class T47_infrastructure_infrastructure_RecordingDryAgent_new method_node
 class T47_infrastructure_infrastructure_RecordingDryAgent__self secondary_adapter
+class T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter_new method_node
+class T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self secondary_adapter
 class T51_infrastructure_infrastructure_NoopSemanticIndexPort__self secondary_adapter
 class T50_infrastructure_infrastructure_NullInsertIndexProxy_new method_node
 class T50_infrastructure_infrastructure_NullInsertIndexProxy__self secondary_adapter

@@ -92,6 +92,7 @@ pub trait DryCheckDiffSource: Send + Sync {
     fn list_changed_hunks(
         &self,
         base: &CommitHash,
+        repo_root: &std::path::Path,
     ) -> Result<Vec<DiffFileHunks>, DryCheckDiffError>;
 }
 

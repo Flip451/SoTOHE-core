@@ -28,6 +28,7 @@ pub mod telemetry;
 pub mod track;
 pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
+pub use semantic_dup::fragment_extractor_adapter::CodeFragmentExtractorAdapter;
 pub use semantic_dup::noop_adapter::NoopSemanticIndexPort;
 pub use semantic_dup::null_insert_proxy::NullInsertIndexProxy;
 pub use telemetry::archived_track::FsArchivedTrackTelemetryAdapter;

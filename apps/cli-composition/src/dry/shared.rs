@@ -131,8 +131,9 @@ pub(super) fn build_diff_and_corpus_fragments(
     use usecase::dry_check::DryCheckDiffSource as _;
 
     let getter = GitDryCheckDiffGetter;
-    let changed_hunks =
-        getter.list_changed_hunks(base).map_err(|e| format!("list_changed_hunks failed: {e}"))?;
+    let changed_hunks = getter
+        .list_changed_hunks(base, repo_root)
+        .map_err(|e| format!("list_changed_hunks failed: {e}"))?;
 
     let raw_fragments = extract_code_fragments(workspace_root)
         .map_err(|e| format!("fragment extraction failed: {e}"))?;

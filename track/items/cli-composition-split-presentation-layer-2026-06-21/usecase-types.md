@@ -5,7 +5,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ArchivedTrackTelemetryError | error_type | — | Io, Serialize | 🔵 | 🔵 |
-| D4OrchestrationError | error_type | — | DiffFragment, DryGate, PrPolling | 🟡 | 🔵 |
+| D4OrchestrationError | error_type | — | DiffFragment, DryGate, PrPolling | 🔵 | 🔵 |
 | SignalGateError | error_type | — | ChainExecutionFailed, InvalidTrackId, StrictnessConfigLoad | 🔵 | 🔵 |
 | SpecAdrSignalError | error_type | — | Read, Decode, Encode, Write | 🔵 | 🔵 |
 
@@ -16,8 +16,10 @@
 | AdrChainRunnerPort | secondary_port | — | fn run_adr_chain(&self, project_root: std::path::PathBuf, strict: bool) -> Result<SignalChainOutput, String> | 🔵 | 🔵 |
 | ArchivedTrackTelemetryPort | secondary_port | — | fn emit(&self, subcommand: String) -> Result<(), ArchivedTrackTelemetryError> | 🔵 | 🔵 |
 | BranchReaderPort | secondary_port | reference | fn current_branch(&self) -> Result<Option<String>, BranchReadError> | 🔵 | 🔵 |
+| CodeFragmentExtractorPort | secondary_port | — | fn extract(&self, workspace_root: &std::path::Path) -> Result<Vec<domain::semantic_dup::CodeFragment>, String> | 🔵 | 🔵 |
 | DryCheckAgentPort | secondary_port | reference | fn judge(&self, tier: DryCheckJudgeTier, low_path: std::path::PathBuf, high_path: std::path::PathBuf) -> Result<DryCheckAgentJudgment, DryCheckAgentError> | 🔵 | 🔵 |
 | DryCheckApprovalService | secondary_port | reference | fn check_approved(&self, current_refs: std::collections::BTreeSet<domain::dry_check::FragmentRef>, approval: domain::dry_check::DryCheckApprovalVerdict) -> Result<DryCheckApprovalVerdict, DryCheckCycleError> | 🔵 | 🔵 |
+| DryCheckDiffSource | secondary_port | modify | fn list_changed_hunks(&self, base: &domain::CommitHash, repo_root: &std::path::Path) -> Result<Vec<domain::dry_check::DiffFileHunks>, crate::dry_check::errors::DryCheckDiffError> | 🔵 | 🔵 |
 | LayerChainRunnerPort | secondary_port | — | fn run_catalog_spec_chain(&self, strict: bool, signal_reader: &dyn usecase::signal::SignalLayerReader) -> Result<SignalChainOutput, String>, fn run_impl_catalog_chain(&self, strict: bool, signal_reader: &dyn usecase::signal::SignalLayerReader) -> Result<SignalChainOutput, String> | 🔵 | 🔵 |
 | RefVerifyGateStatePort | secondary_port | reference | fn ref_verify_status(&self) -> Result<RefVerifyGateStatus, FixpointResolveError> | 🔵 | 🔵 |
 | ReviewGateStatePort | secondary_port | reference | fn review_status(&self) -> Result<ReviewGateStatus, FixpointResolveError> | 🔵 | 🔵 |
@@ -30,7 +32,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ArchivedTrackTelemetryService | application_service | — | fn emit(&self, cmd: ArchivedTrackTelemetryCommand) -> Result<(), ArchivedTrackTelemetryError> | 🔵 | 🔵 |
-| DryFragmentPipelineService | application_service | — | fn derive_current_refs(&self, cmd: DryFragmentPipelineCommand) -> Result<DryFragmentPipelineOutput, D4OrchestrationError> | 🟡 | 🔵 |
+| DryFragmentPipelineService | application_service | — | fn derive_current_refs(&self, cmd: DryFragmentPipelineCommand) -> Result<DryFragmentPipelineOutput, D4OrchestrationError> | 🔵 | 🔵 |
 | FixpointDryGateService | application_service | — | fn resolve_dry_gate(&self, cmd: FixpointDryGateCommand) -> Result<FixpointDryGateOutput, D4OrchestrationError> | 🟡 | 🔵 |
 | PrReviewPollingService | application_service | — | fn poll(&self, cmd: PrReviewPollingCommand) -> Result<PrReviewPollingOutput, D4OrchestrationError> | 🟡 | 🔵 |
 | SignalGateService | application_service | — | fn run_gate(&self, cmd: SignalGateCommand) -> Result<SignalGateOutput, SignalGateError> | 🔵 | 🔵 |
@@ -41,7 +43,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ArchivedTrackTelemetryInteractor | interactor | — | — | 🔵 | 🔵 |
-| DryFragmentPipelineInteractor | interactor | — | — | 🟡 | 🔵 |
+| DryFragmentPipelineInteractor | interactor | — | — | 🔵 | 🔵 |
 | FixpointDryGateInteractor | interactor | — | — | 🟡 | 🔵 |
 | PrReviewPollingInteractor | interactor | — | — | 🟡 | 🔵 |
 | SignalGateInteractor | interactor | — | — | 🔵 | 🔵 |
@@ -51,7 +53,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryFragmentPipelineOutput | dto | — | — | 🟡 | 🔵 |
+| DryFragmentPipelineOutput | dto | — | — | 🔵 | 🔵 |
 | FixpointDryGateOutput | dto | — | — | 🟡 | 🔵 |
 | PrReviewPollingOutput | dto | — | — | 🟡 | 🔵 |
 | SignalChainOutput | dto | — | — | 🔵 | 🔵 |
@@ -63,7 +65,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ArchivedTrackTelemetryCommand | command | — | — | 🔵 | 🔵 |
-| DryFragmentPipelineCommand | command | — | — | 🟡 | 🔵 |
+| DryFragmentPipelineCommand | command | — | — | 🔵 | 🔵 |
 | FixpointDryGateCommand | command | — | — | 🟡 | 🔵 |
 | PrReviewPollingCommand | command | — | — | 🟡 | 🔵 |
 | SignalGateCommand | command | — | — | 🔵 | 🔵 |

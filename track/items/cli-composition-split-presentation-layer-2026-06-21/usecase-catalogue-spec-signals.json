@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "05e8655d26057b4629388a090f066573af49feb7cc19003b9132d386f4ea6822",
+  "catalogue_declaration_hash": "368cb1bd5694ce67a79b677227a0e37180bac249d33e8194d37305cb99418ab4",
   "signals": [
     {
       "type_name": "ArchivedTrackTelemetryCommand",
@@ -25,17 +25,17 @@
     {
       "type_name": "DryFragmentPipelineCommand",
       "signal": "blue",
-      "entry_hash": "8b31630e9925847ced1701a50a00ce14b72716e2bf7a8f1b1297c9b4112db215"
+      "entry_hash": "161215802bfe9fdeb92879a93a3925e772f9fcab15e38436737eb6e0f28b0287"
     },
     {
       "type_name": "DryFragmentPipelineInteractor",
       "signal": "blue",
-      "entry_hash": "1079dec0f453b49c472b41a4f9a2728b9220bf808255d403f65e84125db43a48"
+      "entry_hash": "1f6a3220e306f69ee4f84e1935a2ec03d4e9988808cbd931fa9b87945cae16b3"
     },
     {
       "type_name": "DryFragmentPipelineOutput",
       "signal": "blue",
-      "entry_hash": "776cd29d0f47323f853a53dca7d83deb90a230d3a123a80c007d9bc5b26d9a86"
+      "entry_hash": "85ab02a01a6e5564eded78d52b0c4a830bb51f8faa1da00a25c47dbdc013cf33"
     },
     {
       "type_name": "FixpointDryGateCommand",
@@ -133,6 +133,11 @@
       "entry_hash": "e77ed2174a5742dbb6b1d0ea721bfa7cfc6e9441c68bece10b502ea215f2c8ed"
     },
     {
+      "type_name": "CodeFragmentExtractorPort",
+      "signal": "blue",
+      "entry_hash": "9ea7aaf2bfb107513cfadd4b5248f89ebfe69b1a999de98a53e70ed72e6d2359"
+    },
+    {
       "type_name": "DryCheckAgentPort",
       "signal": "blue",
       "entry_hash": "e19260cbf2a946c19b2979e2622931521d1ac0fcede1396549d97053e329235a"
@@ -143,9 +148,14 @@
       "entry_hash": "8a1fd698f9de9c648e14dd1b52adff9ceceef2c4e3ef8302d26898a45dc6f9ab"
     },
     {
+      "type_name": "DryCheckDiffSource",
+      "signal": "blue",
+      "entry_hash": "05e793d6a40764b6167296c4212aa25593b8f3be70c8decd8967c20b31dc1407"
+    },
+    {
       "type_name": "DryFragmentPipelineService",
       "signal": "blue",
-      "entry_hash": "f62ca0cf910e05b9ed86b05045b55f00df5e081ba89cd13f920b977317dc30eb"
+      "entry_hash": "5157fb21a218e6dec26920b630a70f3647e97adae869fc8a83e95b0baca76fcd"
     },
     {
       "type_name": "FixpointDryGateService",

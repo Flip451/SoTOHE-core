@@ -146,6 +146,42 @@
       ],
       "informal_grounds": []
     },
+    "CodeFragmentExtractorAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup::fragment_extractor_adapter",
+      "docs": "Infrastructure adapter implementing usecase::dry_check::fragment_pipeline::CodeFragmentExtractorPort. Delegates to infrastructure::semantic_dup::extractor::extract_code_fragments and maps ExtractError to String at the usecase boundary. Stateless unit struct.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    },
+    "GitDryCheckDiffGetter": {
+      "action": "modify",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::diff_getter",
+      "docs": "Git-backed adapter implementing usecase::dry_check::ports::DryCheckDiffSource. T007 updates list_changed_hunks to receive repo_root explicitly and bind git discovery with SystemGitRepo::discover_from(repo_root), removing the previous ambient CWD dependency from the diff-fragment pipeline boundary.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    },
     "FsSpecFileWriterAdapter": {
       "action": "add",
       "role": { "SecondaryAdapter": {} },
@@ -265,6 +301,21 @@
           "where_predicates": []
         }
       ]
+    },
+    {
+      "type_name": "CodeFragmentExtractorAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
     }
   ],
   "trait_impls": [
@@ -312,6 +363,31 @@
       "action": "add",
       "trait_ref": "core::default::Default",
       "for_type": "FsSpecFileWriterAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::dry_check::fragment_pipeline::CodeFragmentExtractorPort",
+      "for_type": "CodeFragmentExtractorAdapter"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "usecase::dry_check::ports::DryCheckDiffSource",
+      "for_type": "GitDryCheckDiffGetter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "CodeFragmentExtractorAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CodeFragmentExtractorAdapter"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GitDryCheckDiffGetter"
     }
   ]
 }

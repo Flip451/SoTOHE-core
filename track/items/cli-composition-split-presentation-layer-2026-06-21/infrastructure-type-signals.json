@@ -1,8 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-22T03:22:00Z",
-  "declaration_hash": "a4ca1f909e888c9ff11c5fbc2af5434d6cee673c58573d12757d3d13eff707e7",
+  "generated_at": "2026-06-22T05:12:29Z",
+  "declaration_hash": "d83cdd94ef114d1f045b1cb50261fa7dd32a5a463b0fce283eda13a16fb4aee3",
   "signals": [
+    {
+      "type_name": "CodeFragmentExtractorAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CodeFragmentExtractorPort",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
     {
       "type_name": "FsArchivedTrackTelemetryAdapter",
       "kind_tag": "secondary_adapter",
@@ -38,6 +49,16 @@
       "found_items": [
         "SpecFileWriterPort",
         "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "GitDryCheckDiffGetter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckDiffSource",
+        "core::fmt::Debug"
       ]
     },
     {
