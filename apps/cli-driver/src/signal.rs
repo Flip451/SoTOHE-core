@@ -176,7 +176,7 @@ impl SignalDriver {
         // TODO(T021): invoke infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict
         // and render_outcome("signal calc-adr-user", &outcome) here.
         // Mirrors cli_composition/src/signal/mod.rs SignalCompositionRoot::signal_calc_adr_user.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn signal_check_adr_user(
@@ -189,7 +189,7 @@ impl SignalDriver {
         // TODO(T021): resolve strictness via resolve_strict, then invoke
         // execute_verify_adr_signals_with_strict and render_outcome here.
         // Mirrors cli_composition/src/signal/mod.rs SignalCompositionRoot::signal_check_adr_user.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn signal_calc_spec_adr(
@@ -200,7 +200,7 @@ impl SignalDriver {
         // TODO(T021): resolve spec_json_path, then invoke SpecAdrSignalInteractor::calc_and_persist
         // and render_outcome("signal calc-spec-adr", &VerifyOutcome::pass()) here.
         // Mirrors cli_composition/src/signal/mod.rs SignalCompositionRoot::signal_calc_spec_adr.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn signal_check_spec_adr(
@@ -213,7 +213,7 @@ impl SignalDriver {
         // TODO(T021): resolve strictness + spec_json_path + trusted_root, then invoke
         // infrastructure::verify::spec_states::verify_from_spec_json and render_outcome here.
         // Mirrors cli_composition/src/signal/mod.rs SignalCompositionRoot::signal_check_spec_adr.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn signal_calc_catalog_spec(&self) -> CommandOutcome {
@@ -221,7 +221,7 @@ impl SignalDriver {
         // BindingSignalLayerReader + FsCatalogueSpecSignalsStore, invoke
         // usecase::signal::calc_catalog_spec and render_outcome here.
         // Mirrors cli_composition/src/signal/mod.rs SignalCompositionRoot::signal_calc_catalog_spec.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn signal_check_catalog_spec(
@@ -232,14 +232,14 @@ impl SignalDriver {
     ) -> CommandOutcome {
         // TODO(T021): delegate to signal_check_layer_chain with chain ② parameters.
         // Mirrors cli_composition/src/signal/mod.rs SignalCompositionRoot::signal_check_catalog_spec.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn signal_calc_impl_catalog(&self) -> CommandOutcome {
         // TODO(T021): discover git repo, load layer bindings + TypeSignalsInteractor,
         // invoke usecase::signal::calc_impl_catalog and render_outcome here.
         // Mirrors cli_composition/src/signal/mod.rs SignalCompositionRoot::signal_calc_impl_catalog.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn signal_check_impl_catalog(
@@ -250,7 +250,7 @@ impl SignalDriver {
     ) -> CommandOutcome {
         // TODO(T021): delegate to signal_check_layer_chain with chain ③ parameters.
         // Mirrors cli_composition/src/signal/mod.rs SignalCompositionRoot::signal_check_impl_catalog.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn signal_check_gate(
@@ -264,7 +264,7 @@ impl SignalDriver {
         // LayerChainAdapter, invoke SignalGateInteractor::run_gate,
         // then merge_outcomes(gate_label, chain_outcomes) here.
         // Mirrors cli_composition/src/signal/gate_check.rs SignalCompositionRoot::signal_check_gate.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

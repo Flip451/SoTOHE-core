@@ -102,7 +102,7 @@ impl RefVerifyDriver {
         // On Err(HumanEscalationRequired): exit_code 1 + [ESCALATE] message.
         // Mirrors cli_composition/src/ref_verify.rs RefVerifyCompositionRoot::ref_verify_run
         // (lines 113-190).
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn ref_verify_check_approved(&self, _input: RefVerifyCheckApprovedInput) -> CommandOutcome {
@@ -112,7 +112,7 @@ impl RefVerifyDriver {
         // On missing/non-pass entries: exit_code 1 + [BLOCKED] message.
         // Mirrors cli_composition/src/ref_verify.rs RefVerifyCompositionRoot::ref_verify_check_approved
         // (lines 193-309), including bracketed status formatting.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

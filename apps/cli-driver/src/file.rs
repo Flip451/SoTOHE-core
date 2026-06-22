@@ -69,7 +69,7 @@ impl FileDriver {
     fn file_write_atomic(&self, _path: PathBuf, _content: Vec<u8>) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::track::atomic_write::atomic_write_file here.
         // Mirrors cli_composition/src/file.rs FileCompositionRoot::file_write_atomic.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

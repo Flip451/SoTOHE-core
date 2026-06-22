@@ -133,7 +133,7 @@ impl PrDriver {
         // push branch via SystemGitRepo::push_branch, then format:
         //   format!("[OK] Pushed {}", ctx.branch)
         // Mirrors cli_composition/src/pr.rs PrCompositionRoot::pr_push.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn pr_ensure(&self, _track_id: Option<String>, _base: String) -> CommandOutcome {
@@ -142,7 +142,7 @@ impl PrDriver {
         //   None     → ensure_pr_body_file + pr_title + SystemGhClient::create_pr
         //               "[OK] Created PR #{pr}"
         // Mirrors cli_composition/src/pr.rs PrCompositionRoot::pr_ensure (lines 85-113).
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn pr_status(&self, _pr: String) -> CommandOutcome {
@@ -152,7 +152,7 @@ impl PrDriver {
         //   CheckSummary::Failed(ns) → format!("[FAIL] Failed checks: {}", ns.join(", "))  (exit 1)
         //   CheckSummary::Pending(ns)→ format!("[PENDING] Waiting: {}", ns.join(", "))  (exit 2)
         // Mirrors cli_composition/src/pr.rs PrCompositionRoot::pr_status (lines 129-143).
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn pr_wait_and_merge(
@@ -169,7 +169,7 @@ impl PrDriver {
         //   WaitDecision::Fail(msg) → CommandOutcome::failure(Some(msg))
         //   WaitDecision::Wait{..}  → println!("[{elapsed}s] Pending: …") + thread::sleep
         // Mirrors cli_composition/src/pr.rs PrCompositionRoot::pr_wait_and_merge.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn pr_trigger_review(&self, _pr: String) -> CommandOutcome {
@@ -177,7 +177,7 @@ impl PrDriver {
         // "@codex review" comment via SystemGhClient, save trigger state, then format:
         //   "[OK] Triggered @codex review on PR #{pr}"
         // Mirrors cli_composition/src/pr.rs PrCompositionRoot::pr_trigger_review.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn pr_poll_review(
@@ -193,7 +193,7 @@ impl PrDriver {
         //   ZeroFindings   → r#"{"verdict":"zero_findings","findings":[]}"#
         //   Timeout        → CommandOutcome::failure(None)
         // Mirrors cli_composition/src/pr.rs PrCompositionRoot::pr_poll_review.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn pr_review_cycle(&self, _track_id: Option<String>, _resume: bool) -> CommandOutcome {
@@ -204,7 +204,7 @@ impl PrDriver {
         //   ReviewFound   → format_review_summary(&pr_number, &parsed)
         //   Timeout       → CommandOutcome::failure(None)
         // Mirrors cli_composition/src/pr.rs PrCompositionRoot::pr_review_cycle (lines 469-484).
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

@@ -225,7 +225,7 @@ impl TrackDriver {
         // TODO(T021): invoke infrastructure::track::fs_store::FsTrackStore::init
         // and render the [OK] result here.
         // Mirrors cli_composition/src/track/mod.rs TrackCompositionRoot::track_init.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_transition(
@@ -240,7 +240,7 @@ impl TrackDriver {
         //   format!("[OK] {}: transitioned to {} (track status: {})", task_id, target_status, output.derived_status)
         // followed by sync_views_to_stdout lines.
         // Mirrors cli_composition/src/track/mod.rs lines 225-230.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_resolve(&self, _items_dir: PathBuf, _track_id: Option<String>) -> CommandOutcome {
@@ -251,7 +251,7 @@ impl TrackDriver {
         //   format!("Recommended next command: {}", info.next_command)
         // and optionally format!("Blocker: {blocker}") when present.
         // Mirrors cli_composition/src/track/mod.rs lines 318-325.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_branch_create(&self, _items_dir: PathBuf, _track_id: String) -> CommandOutcome {
@@ -259,7 +259,7 @@ impl TrackDriver {
         // run `git switch -c track/<track_id> main`, then format:
         //   format!("[OK] Created and switched to branch: {branch_name}")
         // Mirrors cli_composition/src/track/mod.rs lines 263-274.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_branch_switch(&self, _items_dir: PathBuf, _track_id: String) -> CommandOutcome {
@@ -267,14 +267,14 @@ impl TrackDriver {
         // run `git switch track/<track_id>`, then format:
         //   format!("[OK] Switched to branch: {branch_name}")
         // Mirrors cli_composition/src/track/mod.rs lines 292-306.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_views_validate(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::track::render::validate_track_snapshots,
         // then return CommandOutcome::success with "[OK] Track metadata is valid".
         // Mirrors cli_composition/src/track/mod.rs lines 342-349.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_views_sync(
@@ -287,7 +287,7 @@ impl TrackDriver {
         //   "[OK] All views already up to date" (if empty)
         //   format!("[OK] Rendered: {}", rel.display()) (per changed path)
         // Mirrors cli_composition/src/track/mod.rs lines 380-396.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_add_task(
@@ -303,7 +303,7 @@ impl TrackDriver {
         //   format!("[OK] Added task {new_task_id}: {description} (track status: {})", output.derived_status)
         // followed by sync_views_to_stdout lines.
         // Mirrors cli_composition/src/track/mod.rs lines 425-454.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_set_override(
@@ -318,7 +318,7 @@ impl TrackDriver {
         //   format!("[OK] Override set to '{}' (track status: {})", status, output.derived_status)
         // followed by sync_views_to_stdout lines.
         // Mirrors cli_composition/src/track/mod.rs lines 460-492.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_clear_override(
@@ -331,7 +331,7 @@ impl TrackDriver {
         //   format!("[OK] Override cleared (track status: {})", output.derived_status)
         // followed by sync_views_to_stdout lines.
         // Mirrors cli_composition/src/track/mod.rs lines 490-524.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_next_task(&self, _items_dir: PathBuf, _track_id: Option<String>) -> CommandOutcome {
@@ -340,7 +340,7 @@ impl TrackDriver {
         //   Some(task) → serde_json::json!({ "task_id": task.task_id, "description": task.description, "status": task_status })
         //   None       → serde_json::json!({ "task_id": null, "description": null, "status": null })
         // Mirrors cli_composition/src/track/ops.rs lines 177-204.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_task_counts(&self, _items_dir: PathBuf, _track_id: Option<String>) -> CommandOutcome {
@@ -350,7 +350,7 @@ impl TrackDriver {
         //   format!(r#"{{"total":{total},"todo":{},"in_progress":{},"done":{},"skipped":{}}}"#,
         //       counts.todo, counts.in_progress, counts.done, counts.skipped)
         // Mirrors cli_composition/src/track/ops.rs lines 215-231.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn track_archive(&self, _items_dir: PathBuf, _track_id: String) -> CommandOutcome {
@@ -358,14 +358,14 @@ impl TrackDriver {
         // create archive_root dir, run git mv, handle optional logs/ rename, then format:
         //   format!("[OK] Archived track '{track_id}': {} → {}", src_dir.display(), dst_dir.display())
         // Mirrors cli_composition/src/track/mod.rs lines 578-645.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn detect_active_track_from_branch(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): discover git repo from project_root, detect active track
         // (only `track/<id>` branches resolve; others return None).
         // Mirrors cli_composition/src/track/ops.rs TrackCompositionRoot::detect_active_track_from_branch.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

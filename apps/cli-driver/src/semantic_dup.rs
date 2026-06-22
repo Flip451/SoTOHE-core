@@ -122,21 +122,21 @@ impl SemanticDupDriver {
         // TODO(T021): build FindSimilarInput, invoke SemanticDupCompositionRoot,
         // propagate CompositionError to exit-code 1.
         // Mirrors cli_composition/src/semantic_dup/find_similar.rs.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn index_build(&self, _workspace_root: PathBuf, _db_path: PathBuf) -> CommandOutcome {
         // TODO(T021): extract_code_fragments, open LanceDB via FastEmbedAdapter,
         // invoke build interactor.
         // Mirrors cli_composition/src/semantic_dup/build.rs.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn index_measure_quality(&self, _workspace_root: PathBuf) -> CommandOutcome {
         // TODO(T021): extract fragments, build FastEmbedAdapter + NoopSemanticIndexPort,
         // invoke MeasureQualityInteractor, then format output via format_measure_quality_json.
         // Mirrors cli_composition/src/semantic_dup/measure_quality.rs lines 39-77.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn dup_check(
@@ -149,7 +149,7 @@ impl SemanticDupDriver {
     ) -> CommandOutcome {
         // TODO(T021): build DupCheckInput, invoke SemanticDupCompositionRoot::semantic_dup_check.
         // Mirrors cli_composition/src/semantic_dup/check.rs.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

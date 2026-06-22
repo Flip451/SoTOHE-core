@@ -85,25 +85,25 @@ impl ArchDriver {
     fn arch_tree(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::arch::render_workspace_tree here.
         // Mirrors cli_composition/src/arch.rs ArchCompositionRoot::arch_tree.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn arch_tree_full(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::arch::render_workspace_tree_full here.
         // Mirrors cli_composition/src/arch.rs ArchCompositionRoot::arch_tree_full.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn arch_members(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::arch::render_workspace_members here.
         // Mirrors cli_composition/src/arch.rs ArchCompositionRoot::arch_members.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn arch_direct_checks(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::arch::render_direct_checks here.
         // Mirrors cli_composition/src/arch.rs ArchCompositionRoot::arch_direct_checks.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

@@ -61,7 +61,7 @@ impl DemoDriver {
     fn demo(&self) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::demo::run_example_demo here.
         // Mirrors cli_composition/src/demo.rs DemoCompositionRoot::demo.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

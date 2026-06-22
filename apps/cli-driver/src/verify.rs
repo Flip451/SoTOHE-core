@@ -181,14 +181,14 @@ impl VerifyDriver {
         // TODO(T021): invoke infrastructure::verify::tech_stack::verify and
         // render_outcome("verify tech stack readiness", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_tech_stack.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_latest_track(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::latest_track::verify and
         // render_outcome("verify latest track files", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_latest_track.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_arch_docs(&self, _project_root: PathBuf) -> CommandOutcome {
@@ -196,91 +196,91 @@ impl VerifyDriver {
         // doc_patterns::verify, conventions::verify_convention_index,
         // and render_outcome("verify architecture docs", &merged_outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_arch_docs.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_layers(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::layers::verify and
         // render_outcome("verify layers", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_layers.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_hooks_path(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::hooks_path::verify and
         // render_outcome("verify hooks path", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_hooks_path.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_spec_attribution(&self, _spec_path: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::spec_attribution::verify and
         // render_outcome("verify spec attribution", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_spec_attribution.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_spec_frontmatter(&self, _spec_path: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::spec_frontmatter::verify and
         // render_outcome("verify spec frontmatter", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_spec_frontmatter.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_canonical_modules(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::canonical_modules::verify and
         // render_outcome("verify canonical modules", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_canonical_modules.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_module_size(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::module_size::verify and
         // render_outcome("verify module size", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_module_size.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_domain_purity(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::domain_purity::verify and
         // render_outcome("verify domain purity", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_domain_purity.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_domain_strings(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::domain_strings::verify and
         // render_outcome("verify domain strings", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_domain_strings.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_usecase_purity(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::usecase_purity::verify and
         // render_outcome("verify usecase purity", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_usecase_purity.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_doc_links(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::doc_links::verify and
         // render_outcome("verify doc links", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_doc_links.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_view_freshness(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::view_freshness::verify and
         // render_outcome("verify view freshness", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_view_freshness.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_spec_signals(&self, _spec_path: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::verify::spec_signals::verify and
         // render_outcome("verify spec signals", &outcome) here.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_spec_signals.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_plan_artifact_refs(&self, _track_dir: Option<PathBuf>) -> CommandOutcome {
@@ -289,7 +289,7 @@ impl VerifyDriver {
         // When track_dir is None, use resolve_ci_verify_track_id() for AC-16 skip path
         // via render_skip("verify plan artifact refs", "not on a track branch; skipping").
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_plan_artifact_refs.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn verify_catalogue_spec_refs(
@@ -302,7 +302,7 @@ impl VerifyDriver {
         // TODO(T021): invoke infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs
         // and render_skip("verify catalogue-spec-refs", "not on a track branch; skipping") for AC-16 path.
         // Mirrors cli_composition/src/verify.rs VerifyCompositionRoot::verify_catalogue_spec_refs.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 
@@ -325,5 +325,5 @@ fn render_skip(_label: &str, _reason: &str) -> CommandOutcome {
     // TODO(T021): implement — format!("--- {label} ---\n[SKIP] {reason}\n--- {label} SKIPPED ---")
     // and CommandOutcome::success(Some(stdout)).
     // Kept as a named stub so callers reference it at the right site.
-    CommandOutcome::success(None)
+    CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
 }

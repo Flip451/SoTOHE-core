@@ -155,7 +155,7 @@ impl DryDriver {
         // TODO(T021): build DryWriteInput, invoke DryCompositionRoot::dry_write,
         // propagate CompositionError to exit-code 1.
         // Mirrors cli_composition/src/dry.rs DryCompositionRoot::dry_write.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn dry_results(
@@ -168,7 +168,7 @@ impl DryDriver {
         // open FsDryCheckStore, invoke DryCheckResultsInteractor::get_results,
         // then format each record via format_dry_results_str.
         // Mirrors cli_composition/src/dry.rs DryCompositionRoot::dry_results (lines 450-512).
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn dry_check_approved(
@@ -180,7 +180,7 @@ impl DryDriver {
         // TODO(T021): resolve diff base, open stores, invoke DryCheckApprovalInteractor,
         // return CommandOutcome reflecting DryCheckApprovedOutcome (exit 0 / 1).
         // Mirrors cli_composition/src/dry.rs DryCompositionRoot::dry_check_approved.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn dry_fix_local(
@@ -192,7 +192,7 @@ impl DryDriver {
         // TODO(T021): resolve dry-fix-lead capability from agent-profiles.json,
         // build RunDryFixLocalInput, invoke fixer, emit terminal status line.
         // Mirrors cli_composition/src/dry.rs DryCompositionRoot::dry_run_fix_local.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

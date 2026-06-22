@@ -118,7 +118,7 @@ impl HookDriver {
 
         // TODO(T021): invoke HookDispatchInteractor here.
         // Placeholder: mirrors the allow path produced by cli_composition::HookCompositionRoot.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     // -----------------------------------------------------------------------

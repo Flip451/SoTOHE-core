@@ -311,7 +311,7 @@ impl ReviewDriver {
         // then invoke run_codex_review_str and outcome_to_command_outcome.
         // Emit ReviewRound + ExternalSubprocess telemetry.
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_run_codex.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -330,7 +330,7 @@ impl ReviewDriver {
         // then invoke run_claude_review_str and outcome_to_command_outcome.
         // Emit ReviewRound + ExternalSubprocess telemetry.
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_run_claude.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -348,7 +348,7 @@ impl ReviewDriver {
         // TODO(T021): resolve reviewer capability from agent-profiles.json, then dispatch to
         // review_run_codex or review_run_claude based on resolved provider.
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_run_local.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn review_run_fix_local(
@@ -362,7 +362,7 @@ impl ReviewDriver {
         // TODO(T021): build RunReviewFixLocalInput, invoke run_fix_local via
         // infrastructure::review_v2 fix-runner adapter.
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_run_fix_local.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn review_check_approved(
@@ -379,7 +379,7 @@ impl ReviewDriver {
         //                         (exit 1)
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_check_approved
         // (lines 465-491).
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -397,7 +397,7 @@ impl ReviewDriver {
         // then invoke render_review_results_str(&track_id, &items_dir, scope.as_deref(),
         //   limit_opt, &round_type, no_hint) and return CommandOutcome::success(Some(output)).
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_results.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn review_classify(
@@ -410,7 +410,7 @@ impl ReviewDriver {
         // build scope query interactor (no-diff variant), classify via ScopeQueryService::classify_by_strings,
         // then format each entry as "{path}\t{scopes_csv}\n".
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_classify.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn review_files(
@@ -423,7 +423,7 @@ impl ReviewDriver {
         // build scope query interactor (with diff), call ScopeQueryService::files_by_string,
         // then format each file as "{file}\n".
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_files.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn review_validate_scope(
@@ -433,9 +433,9 @@ impl ReviewDriver {
         _items_dir: PathBuf,
     ) -> CommandOutcome {
         // TODO(T021): resolve track_id from branch if None, validate scope name via
-        // validate_scope_for_track_str, return CommandOutcome::success(None) on success.
+        // validate_scope_for_track_str, return CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned())) on success.
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_validate_scope.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn review_get_briefing(
@@ -447,7 +447,7 @@ impl ReviewDriver {
         // TODO(T021): resolve track_id from branch if None, call get_briefing_for_scope_str,
         // return CommandOutcome::success(maybe_path) where maybe_path: Option<String>.
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_get_briefing.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn review_persist_commit_hash(
@@ -457,9 +457,9 @@ impl ReviewDriver {
     ) -> CommandOutcome {
         // TODO(T021): resolve track_id from branch if None, invoke
         // persist_commit_hash_for_track(&track_id), emit eprintln("[review] Recorded .commit_hash: …"),
-        // return CommandOutcome::success(None).
+        // return CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned())).
         // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_persist_commit_hash.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

@@ -93,7 +93,7 @@ impl TelemetryDriver {
         // TODO(T021): invoke infrastructure::telemetry::TelemetryReport::aggregate and
         // format_report(&input.track_id, &output) here.
         // Mirrors cli_composition/src/telemetry.rs TelemetryCompositionRoot::telemetry_report.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 
     fn telemetry_emit_archived_track_subcommand(
@@ -106,7 +106,7 @@ impl TelemetryDriver {
         // FsArchivedTrackTelemetryAdapter + ArchivedTrackTelemetryInteractor
         // and call interactor.emit(ArchivedTrackTelemetryCommand { subcommand }) here.
         // Mirrors cli_composition/src/telemetry.rs TelemetryCompositionRoot::telemetry_emit_archived_track_subcommand.
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 

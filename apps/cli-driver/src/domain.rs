@@ -82,7 +82,7 @@ impl DomainDriver {
         // Output shape when `input.output` is None:
         //   stdout = <json>  exit_code = 0
         let _ = (input.crate_name, input.pretty, input.output);
-        CommandOutcome::success(None)
+        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
     }
 }
 
