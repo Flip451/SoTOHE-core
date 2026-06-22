@@ -124,12 +124,13 @@
     {
       "id": "T021",
       "description": "D1/D6 Final flip commit (atomic SSoT update and live cutover): (1) Create `apps/cli-driver/Cargo.toml` for the staged source tree (crate name `cli_driver`, depends on `usecase` only) and add `apps/cli-driver` to `Cargo.toml` workspace members. (2) Add `cli_driver` layer entry to `architecture-rules.json` (`crate: cli_driver, path: apps/cli-driver, may_depend_on: [usecase], tddd.enabled: false`). (3) Update `cli_composition.may_depend_on` and `cli.may_depend_on` to add `cli_driver`. (4) Update `deny.toml`, `apps/cli/Cargo.toml`, and `apps/cli-composition/Cargo.toml` to reflect the new layer boundary; remove stale `chrono` / `serde_json` direct deps from `apps/cli/Cargo.toml` if T009 made them unused. (5) Cut over live wiring: `cli_composition` builds the staged drivers, `apps/cli` calls `driver.handle(input)`, archived-track telemetry dispatch moves from the temporary T009 composition shim to `TelemetryDriver` calling `ArchivedTrackTelemetryService`, and direct bin imports of `usecase` / `domain` are absent. (6) Remove original `cli_composition` render helpers, temporary D4 delegation shims from T005-T008, the temporary D8 telemetry composition shim from T009, and all remaining re-export shims pointing to `infrastructure` adapter types. (7) Confirm `pub struct CliApp;` is absent from `lib.rs` (AC-04). (8) Confirm `Result<CommandOutcome, String>` is absent from all `cli_composition` public methods (AC-05). (9) Verify `cargo make check-layers` and `cargo make deny` pass. This is the only commit that modifies the architecture/Cargo dependency graph; crate manifest, workspace membership, dependency edges, and architecture rules land together per CN-06. Estimated diff: ~450 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "6c81f0a17e635b860ea41f6ae0d15981fa963adc"
     },
     {
       "id": "T022",
       "description": "D6(h) reviewer severity policy: Create `.harness/custom/review-prompts/cli_driver.md` (new file) with primary adapter review rules (categories: adapter performs DI / business logic in adapter / non-CommandOutcome return / handle not delegating to single use case). Update `.harness/custom/review-prompts/cli_composition.md` to pure-DI composition root rules (categories: invoke leak / render leak / Result<_, String> / CliApp god-facade residue / adapter defined here). Update `.harness/custom/review-prompts/cli.md` to thin-bin rules (categories: bin business logic / direct I/O / usecase/domain import / driver coordinate in bin). Each file references ADR D2/D3/D5/D7/D8 review anchors as applicable. Estimated diff: ~120 lines.",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {

@@ -21,6 +21,10 @@
       "patterns": ["apps/cli-composition/**"],
       "briefing_file": ".harness/custom/review-prompts/cli_composition.md"
     },
+    "cli_driver": {
+      "patterns": ["apps/cli-driver/**"],
+      "briefing_file": ".harness/custom/review-prompts/cli_driver.md"
+    },
     "plan-artifacts": {
       "patterns": [
         "track/items/<track-id>/**",

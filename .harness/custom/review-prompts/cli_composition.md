@@ -1,69 +1,64 @@
 # CLI Composition Layer Review: Severity Policy
 
-The reviewer's role is **wiring correctness and DI integrity review** of
-`apps/cli-composition/`. This crate exists to assemble adapters with their
-ports and provide ready-to-use builder / fixture functions to `apps/cli/`.
-It is the seam where infrastructure adapters get bound to domain / usecase
-ports. The reviewer focuses on **mis-wiring** — type-checks pass but the
-runtime is plumbed incorrectly.
+The reviewer's role is **pure-DI wiring correctness review** of
+`apps/cli-composition/`. `cli_composition` is the composition root: it constructs
+secondary adapters (from `infrastructure`), use-case interactors, and driving adapters
+(from `cli_driver`), and hands the fully-wired drivers to `apps/cli`. It must **only
+wire** — it must not invoke use cases, render output, or define adapter
+implementations. Wiring errors (port-adapter mismatch, double-instantiation, panic on
+config load) are in scope; application-logic and presentation concerns always belong
+in `usecase` or `cli_driver` (D2/D7,
+`2026-06-21-1328-cli-composition-split-presentation-layer.md`).
 
 ## What to report
 
 Report findings ONLY for the following categories:
 
-- **port-adapter pairing mistake**: a builder that constructs adapter `A`
-  but binds it to a port that adapter `A` does NOT implement (the code
-  compiles because of a separate impl block but the call site routes to
-  the wrong adapter). Cite `hexagonal-architecture.md` §Adapter Rules and
-  `architecture-rules.json` (`cli_composition` wires domain / usecase /
-  infrastructure).
-- **application logic in composition**: a calculation, validation, or
-  branching that belongs in `usecase` or `domain` performed in the
-  composition wiring. Composition should be a flat sequence of constructor
-  calls, not a state machine. Cite `hexagonal-architecture.md` §CLI as
-  Composition Root and §Usecase Layer Purity Rules.
-- **orchestration leak**: a usecase-level orchestration (port composition,
-  multi-step flow, error mapping, transactional boundary) hand-inlined into
-  a `cli_composition` builder or wiring fn. `cli_composition` binds adapters
-  to ports; **orchestrating those ports is the `usecase` layer's
-  responsibility** (use-case function / Interactor). A wiring fn that calls
-  port methods, threads results between ports, or expresses business-flow
-  ordering is an orchestration leak — extract it into a usecase entrypoint
-  and have `cli_composition` invoke that entrypoint with the wired
-  dependencies. Cite `hexagonal-architecture.md` §CLI as Composition Root
-  and §Usecase Layer Purity Rules.
-- **leaked test fixture in production wiring**: a `pub fn` that returns
-  an adapter with a hard-coded test profile / fake path / in-memory store
-  and is reachable from a real CLI command (production code paths must
-  not call into test-only fixtures). Cite `coding-principles.md` test-code
-  exclusions and `hexagonal-architecture.md` §Adapter Rules.
-- **panic in wiring**: a builder that `unwrap()`s on a config-load result
-  in production code. Wiring errors must propagate as `Result<_, E>` to
-  the CLI command, which decides the ExitCode. Cite `coding-principles.md`
-  §No Panics in Library Code and §Error Handling.
-- **double-instantiation of a stateful adapter**: a builder that creates
-  two instances of an adapter holding shared mutable state (file handle,
-  DB pool, lock) where one was intended — the state pun makes upstream
-  invariants false at runtime. Cite `hexagonal-architecture.md` §Adapter
-  Rules and the wiring responsibility in `architecture-rules.json`.
-- **wiring stale to spec / catalogue**: a builder that wires an
-  adapter to a port surface drifted from the catalogue declaration
-  (e.g., the catalogue says the adapter implements `Foo + Bar` but the
-  wiring assumes only `Foo`). Reviewers should not re-do CI's catalogue
-  check, but a clearly stale wiring that contradicts the catalogue is
-  in scope.
-- **hardcoded path drift**: a `root.join("hardcoded/path")` that should
-  follow a `.harness/config/...` convention path or read from a config
-  loader. Cite the spec's path placement decisions.
+- **invoke leak**: a wiring function or module in `cli_composition` that directly
+  calls a use-case interactor method (e.g., `.run(...)` / `.dispatch(...)` /
+  `.execute(...)`) instead of constructing it and injecting it into a Driver.
+  Composition root wires object graphs at startup; invoking a use case at
+  wiring time is an invoke leak. Cite ADR D2 and `hexagonal-architecture.md`
+  §CLI as Composition Root.
+- **render leak**: a module in `cli_composition` that assembles user-facing
+  strings, formats tables, or performs output templating. Rendering is the
+  `cli_driver` layer's responsibility (ADR D3); string construction in the
+  composition root leaks that responsibility. Cite ADR D2/D3.
+- **`Result<_, String>` in public API**: a public function or method in
+  `cli_composition` that returns `Result<_, String>` (stringly-typed error).
+  All public wiring functions must return a typed error — use `CompositionError`
+  or a bounded typed error enum. Cite ADR D2.
+- **CliApp god-facade residue**: any `pub struct CliApp;` definition or
+  `impl CliApp { ... }` block. The god-facade was superseded by bounded-context
+  `CompositionRoot` structs (one per bounded context / command family). Cite
+  ADR D2 (D2 explicitly abolishes `CliApp`).
+- **adapter defined here**: a `struct` in `cli_composition` that `impl`s a domain
+  or usecase port (secondary adapter implementation). Port implementations belong
+  in `libs/infrastructure`; `cli_composition` only constructs and wires them.
+  Cite ADR D7.
+- **port-adapter pairing mistake**: a wiring function that constructs adapter `A`
+  but binds it to a port that `A` does NOT implement (code may compile via a
+  separate impl block). Cite `hexagonal-architecture.md` §Adapter Rules and
+  `architecture-rules.json`.
+- **panic in wiring**: `unwrap()` / `expect()` on a config-load or constructor
+  call in production wiring. Wiring errors must propagate as `Result<_, CompositionError>`
+  to the CLI caller. Cite `coding-principles.md` §No Panics in Library Code.
+- **double-instantiation of stateful adapter**: a builder that creates two
+  instances of an adapter holding shared mutable state (file handle, DB pool, lock)
+  where one was intended. Cite `hexagonal-architecture.md` §Adapter Rules.
+- **leaked test fixture in production wiring**: a `pub fn` reachable from real CLI
+  commands that returns an adapter with a hard-coded test profile, fake path, or
+  in-memory store. Cite `coding-principles.md` test-code exclusions.
 
 ## What NOT to report
 
-- Naming of builder fns (`new_with_xyz` vs `build_xyz`) — the codebase
-  uses both naturally
-- Adding a `Default` impl that the existing code intentionally omits
-- "You could extract a trait here" when the existing wiring is one-off
-  composition that does not warrant abstraction
-- Renaming fixture modules for "clarity" when the existing names are
-  consistent with adjacent crates
-- Test fixture internals (the test wiring has its own contracts)
+- Naming of wiring functions (`new_with_xyz` vs `build_xyz`) when consistent
+  with adjacent crates
+- Adding a `Default` impl the existing code intentionally omits
+- "You could extract a trait here" suggestions for one-off compositions
+- Renaming `CompositionRoot` structs for "clarity" when names match the bounded
+  context they wire
+- Test fixture internals (test wiring has its own contracts)
 - Adding lifetime annotations the compiler does not require
+- Suggestions to inline or merge two `CompositionRoot` structs when the current
+  split follows bounded-context lines
