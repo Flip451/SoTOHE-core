@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-22T05:12:26Z",
-  "declaration_hash": "368cb1bd5694ce67a79b677227a0e37180bac249d33e8194d37305cb99418ab4",
+  "generated_at": "2026-06-22T07:52:22Z",
+  "declaration_hash": "28a46b187ed2606f2df3861c0a27c468c5b8be16a5382886129a7d773dafcf46",
   "signals": [
     {
       "type_name": "AdrChainRunnerPort",
@@ -66,7 +66,25 @@
       ]
     },
     {
+      "type_name": "DiffBaseResolverPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryApprovalFactoryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "DryCheckDiffSource",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryCorpusMetaPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
@@ -109,29 +127,33 @@
     {
       "type_name": "FixpointDryGateCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "FixpointDryGateInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "FixpointDryGateService"
       ]
     },
     {
       "type_name": "FixpointDryGateOutput",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FixpointDryGateService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "LayerChainRunnerPort",
@@ -140,31 +162,63 @@
       "found_type": true
     },
     {
+      "type_name": "PrListIssueCommentsPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PrListReactionsPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PrListReviewsPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PrRepoNwoPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "PrReviewPollingCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "PrReviewPollingInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "PrReviewPollingService"
       ]
     },
     {
       "type_name": "PrReviewPollingOutput",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "PrReviewPollingService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SignalChainOutput",
@@ -219,6 +273,12 @@
     {
       "type_name": "SignalGateService",
       "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SleepPort",
+      "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
     },

@@ -1,30 +1,33 @@
 //! Fixpoint resolution composition: adapters + `CliApp::fixpoint_resolve`.
 //!
-//! Wires `FsReviewGateStateAdapter` and `FsRefVerifyGateStateAdapter` (secondary
-//! ports for the fixpoint resolver) plus a thin `CliApp` entry point that
-//! constructs `FixpointResolveInteractor` from injected adapters and returns the
-//! next required step as a plain string.
+//! Wires `FsReviewGateStateAdapter`, `FsRefVerifyGateStateAdapter` (secondary
+//! ports for the fixpoint resolver), and the D4 dry-gate port adapters
+//! (`FsDiffBaseResolverAdapter`, `FsDryCorpusMetaAdapter`,
+//! `FsDryApprovalFactoryAdapter`) that implement the three secondary ports
+//! required by `FixpointDryGateInteractor` (T008).
 //!
-//! Design: D2 / IN-02 / AC-03 / CN-02.
+//! Design: D2 / D4 / IN-02 / AC-03 / CN-02 / CN-07.
 
-use std::collections::BTreeSet;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use domain::CommitHash;
 use domain::TrackId;
-use domain::dry_check::FragmentRef;
+use domain::dry_check::{DryCheckConfigFingerprint, DryCheckCorpusFingerprint};
 use infrastructure::dry_check::GitDryCheckDiffGetter;
 use infrastructure::dry_check::{
     DryCheckConfig as InfraDryCheckConfig, FsDryCheckCoverageAdapter, FsDryCheckStore,
+    FsDryCorpusMetaAdapter,
 };
 use infrastructure::semantic_dup::CodeFragmentExtractorAdapter;
 use usecase::dry_check::{
-    DryCheckApprovalInteractor, DryCheckApprovalService, DryFragmentPipelineCommand,
-    DryFragmentPipelineInteractor, DryFragmentPipelineService as _,
+    DryCheckApprovalInteractor, DryCheckApprovalService, DryFragmentPipelineInteractor,
 };
 use usecase::fixpoint_resolve::{
-    FixpointResolveCommand, FixpointResolveInteractor, FixpointResolveService as _,
-    RefVerifyGateStatePort, ReviewGateStatePort,
+    DiffBaseResolverPort, DryApprovalFactoryPort, FixpointDryGateCommand,
+    FixpointDryGateInteractor, FixpointDryGateService as _, FixpointResolveCommand,
+    FixpointResolveInteractor, FixpointResolveService as _, RefVerifyGateStatePort,
+    ReviewGateStatePort,
 };
 // Domain / usecase types used internally by this composition module and
 // its in-crate unit tests. They are intentionally NOT re-exported through
@@ -32,6 +35,7 @@ use usecase::fixpoint_resolve::{
 // primitives across the CN-02 boundary, so the format-shape contract and
 // the domain-validation contract are tested here, not in `apps/cli`.
 use domain::track_phase::FixpointStep;
+use usecase::dry_check::DryCheckConfig;
 use usecase::fixpoint_resolve::{FixpointCurrentBranch, FixpointResolveError};
 
 use crate::{CliApp, CommandOutcome};
@@ -41,6 +45,68 @@ use super::resolve_project_root;
 // ── NoOpDryApprovalService ────────────────────────────────────────────────────
 // Re-export shim: implementation relocated to `libs/infrastructure` per ADR 1328 D7.
 use infrastructure::dry_check::noop_approval::NoOpDryApprovalService;
+
+// ── FsDiffBaseResolverAdapter ─────────────────────────────────────────────────
+
+/// Infrastructure adapter implementing [`DiffBaseResolverPort`].
+///
+/// Wraps `crate::dry::resolve_dry_diff_base_from_store` which reads
+/// `.commit_hash` from the track directory and falls back to
+/// `git rev-parse main`. Stateless unit struct.
+struct FsDiffBaseResolverAdapter;
+
+impl DiffBaseResolverPort for FsDiffBaseResolverAdapter {
+    fn resolve_diff_base(
+        &self,
+        track_dir: &std::path::Path,
+        canonical_root: &std::path::Path,
+        repo_root: &std::path::Path,
+    ) -> Result<CommitHash, String> {
+        let commit_hash_path = track_dir.join(".commit_hash");
+        crate::dry::resolve_dry_diff_base_from_store(
+            &commit_hash_path,
+            canonical_root,
+            Some(repo_root),
+            "fixpoint-resolve",
+        )
+    }
+}
+
+// ── FsDryApprovalFactoryAdapter ───────────────────────────────────────────────
+
+/// Infrastructure adapter implementing [`DryApprovalFactoryPort`].
+///
+/// Constructs a [`DryCheckApprovalInteractor`] from the injected
+/// infrastructure-layer config (used for `current_config_fingerprint`) and the
+/// resolved corpus metadata.
+struct FsDryApprovalFactoryAdapter;
+
+impl DryApprovalFactoryPort for FsDryApprovalFactoryAdapter {
+    fn build_approval(
+        &self,
+        track_dir: &std::path::Path,
+        canonical_root: &std::path::Path,
+        dry_config: DryCheckConfig,
+        config_fingerprint: DryCheckConfigFingerprint,
+        corpus_fingerprint: DryCheckCorpusFingerprint,
+    ) -> Arc<dyn DryCheckApprovalService + Send + Sync> {
+        let dry_check_json_path = track_dir.join("dry-check.json");
+        let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
+        let store =
+            Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.to_path_buf()));
+        let coverage = Arc::new(FsDryCheckCoverageAdapter::new(
+            dry_check_coverage_path,
+            canonical_root.to_path_buf(),
+        ));
+        Arc::new(DryCheckApprovalInteractor::new(
+            dry_config,
+            store,
+            coverage,
+            config_fingerprint,
+            corpus_fingerprint,
+        )) as Arc<dyn DryCheckApprovalService + Send + Sync>
+    }
+}
 
 // ── FixpointResolveInput ──────────────────────────────────────────────────────
 
@@ -67,69 +133,20 @@ pub(crate) use infrastructure::track::gate_state::{
     FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter,
 };
 
-// ── Dry-gate fragment helpers ─────────────────────────────────────────────────
+// ── Dry-gate helper ───────────────────────────────────────────────────────────
 
-/// Resolve the dry-check diff-base commit for the given track directory.
-///
-/// Follows the same three-branch fail-closed policy as `dry check-approved` via
-/// the shared [`crate::dry::resolve_dry_diff_base_from_store`] helper:
-/// 1. Read `.commit_hash` → `Ok(Some(hash))` → use it.
-/// 2. `Ok(None)` → fall back to `git rev-parse main`.
-/// 3. `Err(Format)` / other → warn and fall back to `git rev-parse main`.
-///
-/// `repo_root` is the CWD-discovered git repository root (the caller's trust
-/// anchor).  It is passed as the `git_discovery_root` so that the fallback
-/// `git rev-parse main` uses the same repository as the hunk-discovery in
-/// `build_current_fragment_refs`, even when `canonical_root` (the project root,
-/// derived from `items_dir`) happens to lie inside a nested checkout.
-///
-/// # Errors
-///
-/// Returns `Err` only when `git rev-parse main` fails.
-fn resolve_dry_diff_base_for_track(
-    track_dir: &std::path::Path,
-    canonical_root: &std::path::Path,
-    repo_root: &std::path::Path,
-) -> Result<domain::CommitHash, String> {
-    let commit_hash_path = track_dir.join(".commit_hash");
-    crate::dry::resolve_dry_diff_base_from_store(
-        &commit_hash_path,
-        canonical_root,
-        Some(repo_root),
-        "fixpoint-resolve",
-    )
-}
-
-/// Build the current diff fragment ref set for the dry gate (D5 / IN-05).
-///
-/// Shim: delegates to [`DryFragmentPipelineInteractor`] (D4 orchestration
-/// extraction, T007). The CWD must already be set to `repo_root` by the caller
-/// (same invariant as before — the caller in `CliApp::fixpoint_resolve` sets
-/// CWD before calling this shim and restores it after).
-///
-/// # Errors
-///
-/// Returns `Err` when diff listing or fragment extraction / normalization fails.
-fn build_current_fragment_refs(
-    canonical_root: &std::path::Path,
-    repo_root: &std::path::Path,
-    base: &domain::CommitHash,
-) -> Result<BTreeSet<FragmentRef>, String> {
+/// Build the [`FixpointDryGateInteractor`] wired with all infrastructure adapters.
+fn make_dry_gate_interactor() -> FixpointDryGateInteractor {
     let diff_source = Arc::new(GitDryCheckDiffGetter);
     let extractor = Arc::new(CodeFragmentExtractorAdapter::new());
-    let pipeline = DryFragmentPipelineInteractor::new(diff_source, extractor);
-
-    let cmd = DryFragmentPipelineCommand {
-        canonical_root: canonical_root.to_path_buf(),
-        repo_root: repo_root.to_path_buf(),
-        base: base.clone(),
-    };
-
-    let output = pipeline
-        .derive_current_refs(cmd)
-        .map_err(|e| format!("fixpoint-resolve: fragment pipeline: {e}"))?;
-
-    Ok(output.fragment_refs)
+    let fragment_pipeline = Arc::new(DryFragmentPipelineInteractor::new(diff_source, extractor));
+    FixpointDryGateInteractor::new(
+        Arc::new(NoOpDryApprovalService) as Arc<dyn DryCheckApprovalService + Send + Sync>,
+        Arc::new(FsDiffBaseResolverAdapter),
+        Arc::new(FsDryCorpusMetaAdapter),
+        fragment_pipeline,
+        Arc::new(FsDryApprovalFactoryAdapter),
+    )
 }
 
 // ── Format helpers ────────────────────────────────────────────────────────────
@@ -266,98 +283,38 @@ impl CliApp {
 
         let track_dir = canonical_items_dir.join(track_id.as_ref());
 
-        // ── Build dry-gate dependencies (only when enabled) ───────────────────
-        let (current_fragment_refs, dry_approval): (
-            std::collections::BTreeSet<FragmentRef>,
-            Arc<dyn DryCheckApprovalService + Send + Sync>,
-        ) = if usecase_dry_config.enabled {
-            // ── Build dry-gate fragment refs ──────────────────────────────────
-            //
-            // Anchor all git operations (diff-base ancestry check, diff getter) to
-            // the validated repo root.  Both `resolve_dry_diff_base_for_track`
-            // (through `FsDryCheckCommitHashStore::read` → `SystemGitRepo::discover`)
-            // and `build_current_fragment_refs` (through `GitDryCheckDiffGetter` →
-            // `SystemGitRepo::discover`) rely on CWD for repo discovery.
-            let original_cwd = std::env::current_dir()
-                .map_err(|e| format!("cannot read current directory: {e}"))?;
-            std::env::set_current_dir(&repo_root)
-                .map_err(|e| format!("cannot enter repo root '{}': {e}", repo_root.display()))?;
+        // ── Build dry-gate dependencies via D4 FixpointDryGateInteractor ─────
+        //
+        // CWD guard: set CWD = repo_root before the dry-gate call so that
+        // GitDryCheckDiffGetter (which uses SystemGitRepo::discover()) anchors
+        // to the caller's repository. Restored after the call regardless of
+        // success or failure (CN-07 / usecase purity: CWD guard stays here,
+        // not inside the usecase interactor).
+        let dry_gate = make_dry_gate_interactor();
+        let current_config_fingerprint = dry_infra_config.fingerprint();
 
-            let base_result =
-                resolve_dry_diff_base_for_track(&track_dir, &canonical_root, &repo_root);
+        let original_cwd =
+            std::env::current_dir().map_err(|e| format!("cannot read current directory: {e}"))?;
+        std::env::set_current_dir(&repo_root)
+            .map_err(|e| format!("cannot enter repo root '{}': {e}", repo_root.display()))?;
 
-            // Restore CWD before `build_current_fragment_refs` (which manages its
-            // own CWD guard internally).
-            if let Err(e) = std::env::set_current_dir(&original_cwd) {
-                eprintln!("[warn] fixpoint-resolve: failed to restore CWD after diff-base: {e}");
-            }
+        let dry_gate_result = dry_gate.resolve_dry_gate(FixpointDryGateCommand {
+            track_dir: track_dir.clone(),
+            canonical_root: canonical_root.clone(),
+            repo_root: repo_root.clone(),
+            dry_config: usecase_dry_config.clone(),
+            current_config_fingerprint,
+        });
 
-            let base = base_result?;
-            // Mirror `dry check-approved` for recorded sidecars while preserving
-            // the legacy no-sidecar project-root scan.
-            let corpus_root_manifest_path = track_dir.join("dry-check-corpus-root.json");
-            let (approval_workspace_root, current_corpus_fingerprint) =
-                match std::fs::symlink_metadata(&corpus_root_manifest_path) {
-                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (
-                        canonical_root.clone(),
-                        crate::dry::compute_current_dry_corpus_fingerprint(
-                            &track_dir,
-                            &canonical_root,
-                        ),
-                    ),
-                    _ => {
-                        let workspace_root = match crate::dry::resolve_dry_corpus_fingerprint_root(
-                            &track_dir, &repo_root,
-                        ) {
-                            Ok(workspace_root) => workspace_root,
-                            Err(e) => {
-                                eprintln!(
-                                    "[warn] fixpoint-resolve: {e}; treating corpus fingerprint as stale"
-                                );
-                                repo_root.clone()
-                            }
-                        };
-                        let fingerprint = crate::dry::compute_current_dry_corpus_fingerprint(
-                            &track_dir, &repo_root,
-                        );
-                        (workspace_root, fingerprint)
-                    }
-                };
-            let refs = build_current_fragment_refs(&approval_workspace_root, &repo_root, &base)?;
+        if let Err(e) = std::env::set_current_dir(&original_cwd) {
+            eprintln!("[warn] fixpoint-resolve: failed to restore CWD after dry-gate: {e}");
+        }
 
-            // ── Build dry-gate interactor (read-only) ─────────────────────────
-            let dry_check_json_path = track_dir.join("dry-check.json");
-            let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
+        let dry_gate_output =
+            dry_gate_result.map_err(|e| format!("fixpoint-resolve dry-gate failed: {e}"))?;
 
-            // Use `repo_root` (git repository root) to match `dry check-approved`, which
-            // also loads the config from `root.join(".harness/config/dry-check.json")` where
-            // `root` is the git repo root.  Using `canonical_root` (the project root, derived
-            // from `items_dir`) would load the wrong file in monorepo/nested-project layouts
-            // where the project root differs from the repository root.
-            let current_config_fingerprint = dry_infra_config.fingerprint();
-
-            let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
-            let coverage = Arc::new(FsDryCheckCoverageAdapter::new(
-                dry_check_coverage_path,
-                canonical_root.clone(),
-            ));
-            let approval = Arc::new(DryCheckApprovalInteractor::new(
-                usecase_dry_config.clone(),
-                store,
-                coverage,
-                current_config_fingerprint,
-                current_corpus_fingerprint,
-            )) as Arc<dyn DryCheckApprovalService + Send + Sync>;
-            (refs, approval)
-        } else {
-            // Gate disabled: skip all dry preparation; pass empty fragment refs and
-            // a no-op approval service.  The interactor's `resolve` bypasses the dry
-            // gate call when `dry_config.enabled` is false.
-            (
-                std::collections::BTreeSet::new(),
-                Arc::new(NoOpDryApprovalService) as Arc<dyn DryCheckApprovalService + Send + Sync>,
-            )
-        };
+        let current_fragment_refs = dry_gate_output.current_fragment_refs;
+        let dry_approval = dry_gate_output.dry_approval;
 
         // ── Build review and ref-verify gate adapters ─────────────────────────
         // Use the canonical (absolute, validated) items_dir so that these adapters

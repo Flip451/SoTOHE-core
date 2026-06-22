@@ -182,6 +182,25 @@
       ],
       "informal_grounds": []
     },
+    "FsDryCorpusMetaAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check::corpus_meta",
+      "docs": "Infrastructure adapter implementing usecase::fixpoint_resolve::DryCorpusMetaPort. Reads the dry-check-corpus-root.json sidecar when present, validates the recorded workspace root under repo_root, and computes the current dry-check corpus fingerprint while keeping filesystem access out of FixpointDryGateInteractor.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    },
     "FsSpecFileWriterAdapter": {
       "action": "add",
       "role": { "SecondaryAdapter": {} },
@@ -196,6 +215,25 @@
       "docs": "Infrastructure adapter implementing usecase::spec_adr_signal::SpecFileWriterPort. Uses std::fs::read_to_string and infrastructure::track::atomic_write::atomic_write_file to read and atomically write spec.json files. Stateless unit struct; all file paths are passed per-call.",
       "spec_refs": [
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    },
+    "SystemSleepAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "pr_review",
+      "docs": "Infrastructure adapter implementing usecase::pr_review::SleepPort via std::thread::sleep. Stateless unit struct; used in production wiring of PrReviewPollingInteractor. Tests inject a mock SleepPort (RecordingSleep) to verify sleep calls without blocking.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
       ],
       "informal_grounds": []
@@ -303,6 +341,10 @@
       ]
     },
     {
+      "type_name": "FsDryCorpusMetaAdapter",
+      "methods": []
+    },
+    {
       "type_name": "CodeFragmentExtractorAdapter",
       "methods": [
         {
@@ -316,6 +358,10 @@
           "where_predicates": []
         }
       ]
+    },
+    {
+      "type_name": "SystemSleepAdapter",
+      "methods": []
     }
   ],
   "trait_impls": [
@@ -388,6 +434,36 @@
       "action": "modify",
       "trait_ref": "core::fmt::Debug",
       "for_type": "GitDryCheckDiffGetter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::fixpoint_resolve::DryCorpusMetaPort",
+      "for_type": "FsDryCorpusMetaAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::pr_review::SleepPort",
+      "for_type": "SystemSleepAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SystemSleepAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SystemSleepAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "SystemSleepAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "SystemSleepAdapter"
     }
   ]
 }

@@ -337,6 +337,54 @@
         "kind": "pass",
         "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
       }
+    },
+    {
+      "claim_hash": "c85cfc10c6933d05cb579a27276a29715cadc07d2ecc4de3898c91a46d1f65bc",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。」"
+      }
+    },
+    {
+      "claim_hash": "c85cfc10c6933d05cb579a27276a29715cadc07d2ecc4de3898c91a46d1f65bc",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "ce5d616e9b7e266b04f82b43dae6b515733088a2fe77ca6dcca62dc55e66c274",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "ce5d616e9b7e266b04f82b43dae6b515733088a2fe77ca6dcca62dc55e66c274",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "ce5d616e9b7e266b04f82b43dae6b515733088a2fe77ca6dcca62dc55e66c274",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "c85cfc10c6933d05cb579a27276a29715cadc07d2ecc4de3898c91a46d1f65bc",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
     }
   ]
 }

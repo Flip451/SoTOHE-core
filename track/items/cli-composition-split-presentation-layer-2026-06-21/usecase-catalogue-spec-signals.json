@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "368cb1bd5694ce67a79b677227a0e37180bac249d33e8194d37305cb99418ab4",
+  "catalogue_declaration_hash": "28a46b187ed2606f2df3861c0a27c468c5b8be16a5382886129a7d773dafcf46",
   "signals": [
     {
       "type_name": "ArchivedTrackTelemetryCommand",
@@ -40,22 +40,22 @@
     {
       "type_name": "FixpointDryGateCommand",
       "signal": "blue",
-      "entry_hash": "1821d006e0eae3f2d7b28161253b7567dd070d57ed13adcd5c55503159e3cf89"
+      "entry_hash": "6875c8ebdaacf320ba1e7afa85b70a8a73be61bee81a774a51d7cabc181f6fac"
     },
     {
       "type_name": "FixpointDryGateInteractor",
       "signal": "blue",
-      "entry_hash": "7e6c6878f1eeb33a5e2d920a38e18ea8397f7a4d0bd02f3faf3b4ac58865465d"
+      "entry_hash": "5af4b82ddd7d669741a45d9c948e832e0e1df93e0e92529ba2b42e1366a78c30"
     },
     {
       "type_name": "FixpointDryGateOutput",
       "signal": "blue",
-      "entry_hash": "fe990c48036dde9a4ed816daad7fa511f7e320bb66d4f2a009ccba34045b0bfd"
+      "entry_hash": "7bd1430d282ddb2de64a60dbd9ed2e622641431ecb8a120c87d1f2d9b85216f3"
     },
     {
       "type_name": "PrReviewPollingCommand",
       "signal": "blue",
-      "entry_hash": "62a9c9cb9d58932972d64e495728b22c06b511859a8cf057af7aa5497c544b66"
+      "entry_hash": "b5f0a34cd774d568268884888c1f6a225b57fb1ef0ac434dc9776018565e5802"
     },
     {
       "type_name": "PrReviewPollingInteractor",
@@ -65,7 +65,7 @@
     {
       "type_name": "PrReviewPollingOutput",
       "signal": "blue",
-      "entry_hash": "67b9140c8277a006b0fec65bc59be4b765ec8a056a544187607215b552a8022d"
+      "entry_hash": "7588733540c1c5146f300e3056efa9087ec8939831a5646ac265485cd1f3e98f"
     },
     {
       "type_name": "SignalChainOutput",
@@ -138,6 +138,16 @@
       "entry_hash": "9ea7aaf2bfb107513cfadd4b5248f89ebfe69b1a999de98a53e70ed72e6d2359"
     },
     {
+      "type_name": "DiffBaseResolverPort",
+      "signal": "blue",
+      "entry_hash": "c4a00b07426f8386b45f08e9005656901f9ffb04e8f02f3182ed37cf41d168ff"
+    },
+    {
+      "type_name": "DryApprovalFactoryPort",
+      "signal": "blue",
+      "entry_hash": "75f4283bd8f7c3e0195a4409ed03de56df29544286ee6a74cc600374b38d65ed"
+    },
+    {
       "type_name": "DryCheckAgentPort",
       "signal": "blue",
       "entry_hash": "e19260cbf2a946c19b2979e2622931521d1ac0fcede1396549d97053e329235a"
@@ -153,6 +163,11 @@
       "entry_hash": "05e793d6a40764b6167296c4212aa25593b8f3be70c8decd8967c20b31dc1407"
     },
     {
+      "type_name": "DryCorpusMetaPort",
+      "signal": "blue",
+      "entry_hash": "eaa0cb0fecd06da4bd73b50e3e0147d29523790c080221ca3a88457a328d85aa"
+    },
+    {
       "type_name": "DryFragmentPipelineService",
       "signal": "blue",
       "entry_hash": "5157fb21a218e6dec26920b630a70f3647e97adae869fc8a83e95b0baca76fcd"
@@ -166,6 +181,26 @@
       "type_name": "LayerChainRunnerPort",
       "signal": "blue",
       "entry_hash": "5224ec9e15efa26fe7ebc2df3aabcb76ee57f34accdb439dbdd46747a6ffc9b2"
+    },
+    {
+      "type_name": "PrListIssueCommentsPort",
+      "signal": "blue",
+      "entry_hash": "e376af1971c5843019ab6165398caad393b13db92e4fe6db7436dac068f8d012"
+    },
+    {
+      "type_name": "PrListReactionsPort",
+      "signal": "blue",
+      "entry_hash": "2da522b461d5b81ee70ccca76f56f4a7119f17e8ddb05fed3d3ecb3cc83ce1e3"
+    },
+    {
+      "type_name": "PrListReviewsPort",
+      "signal": "blue",
+      "entry_hash": "4828fc7485c6688f3f93888f135da47e71da9ff465e1e4f7a5bf8526d881b5ba"
+    },
+    {
+      "type_name": "PrRepoNwoPort",
+      "signal": "blue",
+      "entry_hash": "b7605ce63afeefc893d004b23557220d240d58dd1144014440e1853b0f9f9c83"
     },
     {
       "type_name": "PrReviewPollingService",
@@ -191,6 +226,11 @@
       "type_name": "SignalGateService",
       "signal": "blue",
       "entry_hash": "64b45db0268678415ff9a57387437f125b23b0d1e163543c2dfc35b1cb1bc687"
+    },
+    {
+      "type_name": "SleepPort",
+      "signal": "blue",
+      "entry_hash": "46ca8286880b031ce6c3cd2242538831520fbb13d054282b88368aae128ab2a5"
     },
     {
       "type_name": "SpecAdrChainRunnerPort",

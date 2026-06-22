@@ -661,16 +661,24 @@
           "kind": "plain",
           "fields": [
             {
-              "name": "items_dir",
+              "name": "track_dir",
               "ty": "std::path::PathBuf"
             },
             {
-              "name": "track_id",
-              "ty": "domain::track::TrackId"
+              "name": "canonical_root",
+              "ty": "std::path::PathBuf"
             },
             {
-              "name": "dry_enabled",
-              "ty": "bool"
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "dry_config",
+              "ty": "usecase::dry_check::DryCheckConfig"
+            },
+            {
+              "name": "current_config_fingerprint",
+              "ty": "domain::dry_check::DryCheckConfigFingerprint"
             }
           ],
           "has_stripped_fields": false
@@ -678,7 +686,7 @@
       },
       "methods": [],
       "module_path": "fixpoint_resolve",
-      "docs": "CQRS command for the fixpoint-resolve dry-gate orchestration extracted by D4. The boolean mirrors the existing dry-check enablement switch and is application configuration, not a domain concept.",
+      "docs": "CQRS command for the D4 fixpoint-resolve dry-gate orchestration. Carries the validated path trio (track directory, canonical project root, git repository root) and the usecase dry-check configuration. The CLI composition layer resolves all five values before calling FixpointDryGateService::resolve_dry_gate.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -694,7 +702,7 @@
     "FixpointDryGateOutput": {
       "action": "add",
       "role": {
-        "Dto": {}
+        "UseCase": {}
       },
       "kind": {
         "kind": "struct",
@@ -702,12 +710,16 @@
           "kind": "plain",
           "fields": [
             {
-              "name": "approved",
-              "ty": "bool"
+              "name": "current_fragment_refs",
+              "ty": "std::collections::BTreeSet<domain::dry_check::FragmentRef>"
             },
             {
-              "name": "summary",
-              "ty": "Option<String>"
+              "name": "dry_approval",
+              "ty": "std::sync::Arc<dyn usecase::dry_check::DryCheckApprovalService + Send + Sync>"
+            },
+            {
+              "name": "approval_workspace_root",
+              "ty": "std::path::PathBuf"
             }
           ],
           "has_stripped_fields": false
@@ -715,7 +727,7 @@
       },
       "methods": [],
       "module_path": "fixpoint_resolve",
-      "docs": "Output DTO for the fixpoint dry-gate orchestration. `summary` is opaque free text for cli_driver rendering and is not a domain value object.",
+      "docs": "Usecase-owned dry-gate resolution bundle returned by FixpointDryGateService. This is intentionally not a DTO: it carries the current fragment refs, the approval service dependency ready for injection into FixpointResolveInteractor, and the approval workspace root. When dry_config.enabled is false the gate is bypassed: current_fragment_refs is empty and dry_approval is a NoOpDryApprovalService.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -743,7 +755,7 @@
       },
       "methods": [],
       "module_path": "fixpoint_resolve",
-      "docs": "Interactor implementing FixpointDryGateService. Owns the dry-gate branching, CWD guard, corpus-root manifest branching, and DryCheckApprovalInteractor construction currently embedded in cli_composition.",
+      "docs": "Interactor implementing FixpointDryGateService. Owns dry-gate branching, diff-base and corpus metadata sequencing through injected ports, fragment-pipeline delegation, and DryCheckApprovalInteractor construction. The CWD guard remains in the cli_composition caller; repo_root is passed explicitly so std::env state is not owned by the usecase layer.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -771,20 +783,28 @@
           "kind": "plain",
           "fields": [
             {
-              "name": "repository",
+              "name": "pr",
               "ty": "String"
             },
             {
-              "name": "pull_request_number",
+              "name": "repo_nwo",
+              "ty": "String"
+            },
+            {
+              "name": "trigger_timestamp",
+              "ty": "String"
+            },
+            {
+              "name": "interval_secs",
               "ty": "u64"
             },
             {
-              "name": "timeout_secs",
+              "name": "max_iterations",
               "ty": "u64"
             },
             {
-              "name": "poll_interval_secs",
-              "ty": "u64"
+              "name": "head_commit",
+              "ty": "Option<String>"
             }
           ],
           "has_stripped_fields": false
@@ -792,7 +812,7 @@
       },
       "methods": [],
       "module_path": "pr_review",
-      "docs": "CQRS command for the PR review polling application service. `repository` is an opaque repository label supplied by the CLI path and is rendered as free text.",
+      "docs": "CQRS command for the D4 PR review polling application service. `pr` is the PR number string; `repo_nwo` is pre-resolved by the caller; `trigger_timestamp` is RFC 3339; `max_iterations` replaces std::time::Instant for deadline tracking (usecase purity); `head_commit` enables commit-based timeout recovery and zero-findings detection.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -811,25 +831,34 @@
         "Dto": {}
       },
       "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [
-            {
-              "name": "review_found",
-              "ty": "bool"
-            },
-            {
-              "name": "summary",
-              "ty": "Option<String>"
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReviewFound",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "serde_json::Value"
+              ]
             }
-          ],
-          "has_stripped_fields": false
-        }
+          },
+          {
+            "name": "ZeroFindings",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Timeout",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
       },
       "methods": [],
       "module_path": "pr_review",
-      "docs": "Output DTO for the PR review polling loop. `summary` is opaque free text for cli_driver rendering.",
+      "docs": "Outcome variants for a single D4 PR review polling cycle. ReviewFound: a qualifying Codex bot review was found (the latest by submitted_at). ZeroFindings: zero-findings signal detected via bot +1 reaction or comment text fallback. Timeout: the polling deadline (max_iterations) was reached without finding a qualifying review.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -1720,6 +1749,251 @@
       ],
       "informal_grounds": []
     },
+    "SleepPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "sleep",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "duration",
+              "ty": "std::time::Duration"
+            }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
+      "module_path": "pr_review",
+      "docs": "Secondary port abstracting thread::sleep. Allows the PrReviewPollingInteractor to be tested with a mock that records sleep calls rather than blocking, keeping the usecase layer free of thread::sleep (which belongs in infrastructure).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PrListReviewsPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "list_reviews",
+          "receiver": "&self",
+          "params": [
+            { "name": "repo_nwo", "ty": "&str" },
+            { "name": "pr", "ty": "&str" }
+          ],
+          "returns": "Result<String, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pr_review",
+      "docs": "Secondary port for listing GitHub PR reviews. Abstracts GhClient::list_reviews so the PrReviewPollingInteractor does not import from infrastructure directly. Returns raw JSON string.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "PrListReactionsPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "list_reactions",
+          "receiver": "&self",
+          "params": [
+            { "name": "repo_nwo", "ty": "&str" },
+            { "name": "pr", "ty": "&str" }
+          ],
+          "returns": "Result<String, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pr_review",
+      "docs": "Secondary port for listing GitHub PR reactions (zero-findings detection via +1 reactions).",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "PrListIssueCommentsPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "list_issue_comments",
+          "receiver": "&self",
+          "params": [
+            { "name": "repo_nwo", "ty": "&str" },
+            { "name": "pr", "ty": "&str" }
+          ],
+          "returns": "Result<String, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pr_review",
+      "docs": "Secondary port for listing GitHub PR issue comments (bot activity detection and zero-findings comment fallback).",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DiffBaseResolverPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "resolve_diff_base",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_dir", "ty": "&std::path::Path" },
+            { "name": "canonical_root", "ty": "&std::path::Path" },
+            { "name": "repo_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<domain::CommitHash, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "fixpoint_resolve",
+      "docs": "Secondary port for resolving the dry-check diff-base commit for a track. Abstracts the filesystem + git logic that reads the per-track .commit_hash file with a fallback to git rev-parse main, keeping the usecase interactor free of std::fs and std::env.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCorpusMetaPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "resolve_corpus_meta",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_dir", "ty": "&std::path::Path" },
+            { "name": "canonical_root", "ty": "&std::path::Path" },
+            { "name": "repo_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<(std::path::PathBuf, domain::dry_check::DryCheckCorpusFingerprint), String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "fixpoint_resolve",
+      "docs": "Secondary port for resolving the corpus workspace root and current corpus fingerprint given the track's dry-check-corpus-root.json manifest state. Abstracts std::fs::symlink_metadata and corpus fingerprint computation, keeping the usecase interactor free of std::fs.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "PrRepoNwoPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "repo_nwo",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<String, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pr_review",
+      "docs": "Auxiliary PR secondary port present in source for repository NWO resolution. It is not injected into PrReviewPollingInteractor and is not part of the T008 polling-service boundary; production pre-resolves repo_nwo in the composition layer and passes it on PrReviewPollingCommand.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryApprovalFactoryPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "build_approval",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_dir", "ty": "&std::path::Path" },
+            { "name": "canonical_root", "ty": "&std::path::Path" },
+            { "name": "dry_config", "ty": "usecase::dry_check::DryCheckConfig" },
+            { "name": "config_fingerprint", "ty": "domain::dry_check::DryCheckConfigFingerprint" },
+            { "name": "corpus_fingerprint", "ty": "domain::dry_check::DryCheckCorpusFingerprint" }
+          ],
+          "returns": "std::sync::Arc<dyn usecase::dry_check::DryCheckApprovalService + Send + Sync>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "fixpoint_resolve",
+      "docs": "Secondary port that constructs a DryCheckApprovalService from resolved corpus metadata and configuration, keeping infrastructure adapter construction (FsDryCheckStore, FsDryCheckCoverageAdapter) out of the usecase interactor (CN-02 / CN-07).",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
     "DryCheckDiffSource": {
       "action": "modify",
       "role": {
@@ -1861,6 +2135,74 @@
             {
               "name": "fragment_extractor",
               "ty": "std::sync::Arc<dyn CodeFragmentExtractorPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "FixpointDryGateInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "noop_approval",
+              "ty": "std::sync::Arc<dyn usecase::dry_check::DryCheckApprovalService + Send + Sync>"
+            },
+            {
+              "name": "diff_base_resolver",
+              "ty": "std::sync::Arc<dyn DiffBaseResolverPort>"
+            },
+            {
+              "name": "corpus_meta",
+              "ty": "std::sync::Arc<dyn DryCorpusMetaPort>"
+            },
+            {
+              "name": "fragment_pipeline",
+              "ty": "std::sync::Arc<dyn DryFragmentPipelineService>"
+            },
+            {
+              "name": "approval_factory",
+              "ty": "std::sync::Arc<dyn DryApprovalFactoryPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "PrReviewPollingInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "reviews",
+              "ty": "std::sync::Arc<dyn PrListReviewsPort>"
+            },
+            {
+              "name": "reactions",
+              "ty": "std::sync::Arc<dyn PrListReactionsPort>"
+            },
+            {
+              "name": "comments",
+              "ty": "std::sync::Arc<dyn PrListIssueCommentsPort>"
+            },
+            {
+              "name": "sleep",
+              "ty": "std::sync::Arc<dyn SleepPort>"
             }
           ],
           "returns": "Self",
@@ -2037,6 +2379,36 @@
       "action": "add",
       "trait_ref": "core::clone::Clone",
       "for_type": "DryFragmentPipelineOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FixpointDryGateCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "FixpointDryGateCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PrReviewPollingCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "PrReviewPollingCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PrReviewPollingOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "PrReviewPollingOutput"
     }
   ]
 }

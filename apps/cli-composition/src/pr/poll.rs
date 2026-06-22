@@ -2,18 +2,24 @@
 //!
 //! All items in this module are `pub(super)` — they are implementation details
 //! of `apps/cli-composition/src/pr.rs` and must not appear on the public facade.
+//!
+//! Legacy polling helpers are compiled only for the unit-test suite below.
+//! Production polling is delegated to the D4 `PrReviewPollingInteractor`.
 
 use std::fs;
 use std::path::PathBuf;
+#[cfg(test)]
 use std::time::{Duration, Instant};
 
 // ---------------------------------------------------------------------------
 // Known Codex bot login names (case-insensitive comparison).
 // ---------------------------------------------------------------------------
 
+#[cfg(test)]
 pub(super) const CODEX_BOT_LOGINS: &[&str] =
     &["openai-codex[bot]", "codex[bot]", "chatgpt-codex-connector[bot]"];
 
+#[cfg(test)]
 pub(super) fn is_codex_bot(login: &str) -> bool {
     let lower = login.to_lowercase();
     CODEX_BOT_LOGINS.iter().any(|known| *known == lower)
@@ -150,6 +156,7 @@ pub(super) fn ensure_pr_body_file(
 // Zero-findings detection helpers
 // ---------------------------------------------------------------------------
 
+#[cfg(test)]
 pub(super) fn check_reaction_zero_findings<C: infrastructure::gh_cli::GhClient>(
     client: &C,
     repo: &str,
@@ -186,6 +193,7 @@ pub(super) fn check_reaction_zero_findings<C: infrastructure::gh_cli::GhClient>(
     Ok(false)
 }
 
+#[cfg(test)]
 pub(super) fn check_comment_zero_findings<C: infrastructure::gh_cli::GhClient>(
     client: &C,
     repo: &str,
@@ -224,6 +232,7 @@ pub(super) fn check_comment_zero_findings<C: infrastructure::gh_cli::GhClient>(
 // ---------------------------------------------------------------------------
 
 #[allow(clippy::too_many_lines)]
+#[cfg(test)]
 pub(super) fn poll_review_for_cycle<C, Sleep>(
     pr: &str,
     trigger_timestamp: &str,
@@ -398,6 +407,7 @@ where
     Ok(PollReviewResult::Timeout)
 }
 
+#[cfg(test)]
 pub(super) fn find_latest_bot_review_in(
     reviews: &[&serde_json::Value],
 ) -> Option<serde_json::Value> {

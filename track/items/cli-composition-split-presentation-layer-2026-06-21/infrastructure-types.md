@@ -6,6 +6,7 @@
 |------|------|--------|---------|--------|----------|
 | CodeFragmentExtractorAdapter | secondary_adapter | — | impl CodeFragmentExtractorPort, impl Default, impl Debug | 🔵 | 🔵 |
 | FsArchivedTrackTelemetryAdapter | secondary_adapter | — | impl ArchivedTrackTelemetryPort | 🔵 | 🔵 |
+| FsDryCorpusMetaAdapter | secondary_adapter | — | impl DryCorpusMetaPort | 🔵 | 🔵 |
 | FsRefVerifyGateStateAdapter | secondary_adapter | — | impl RefVerifyGateStatePort | 🔵 | 🔵 |
 | FsReviewGateStateAdapter | secondary_adapter | — | impl ReviewGateStatePort | 🔵 | 🔵 |
 | FsSpecFileWriterAdapter | secondary_adapter | — | impl SpecFileWriterPort, impl Default | 🔵 | 🔵 |
@@ -14,4 +15,5 @@
 | NoopSemanticIndexPort | secondary_adapter | — | impl SemanticIndexPort | 🔵 | 🔵 |
 | NullInsertIndexProxy | secondary_adapter | — | impl SemanticIndexPort | 🔵 | 🔵 |
 | RecordingDryAgent | secondary_adapter | — | impl DryCheckAgentPort | 🔵 | 🔵 |
+| SystemSleepAdapter | secondary_adapter | — | impl SleepPort, impl Debug, impl Clone, impl Copy, impl Default | 🔵 | 🔵 |
 

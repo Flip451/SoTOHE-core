@@ -88,10 +88,26 @@ subgraph usecase["usecase"]
   subgraph T41_usecase_usecase_FixpointDryGateInteractor["fixpoint_resolve::FixpointDryGateInteractor"]
     direction TB
     T41_usecase_usecase_FixpointDryGateInteractor__self[FixpointDryGateInteractor]
+    T41_usecase_usecase_FixpointDryGateInteractor_new([new])
   end
   subgraph T37_usecase_usecase_FixpointDryGateOutput["fixpoint_resolve::FixpointDryGateOutput"]
     direction TB
     T37_usecase_usecase_FixpointDryGateOutput__self[FixpointDryGateOutput]
+  end
+  subgraph R36_usecase_usecase_DiffBaseResolverPort["fixpoint_resolve::DiffBaseResolverPort"]
+    direction TB
+    R36_usecase_usecase_DiffBaseResolverPort__self[DiffBaseResolverPort]
+    R36_usecase_usecase_DiffBaseResolverPort_resolve_diff_base([resolve_diff_base])
+  end
+  subgraph R38_usecase_usecase_DryApprovalFactoryPort["fixpoint_resolve::DryApprovalFactoryPort"]
+    direction TB
+    R38_usecase_usecase_DryApprovalFactoryPort__self[DryApprovalFactoryPort]
+    R38_usecase_usecase_DryApprovalFactoryPort_build_approval([build_approval])
+  end
+  subgraph R33_usecase_usecase_DryCorpusMetaPort["fixpoint_resolve::DryCorpusMetaPort"]
+    direction TB
+    R33_usecase_usecase_DryCorpusMetaPort__self[DryCorpusMetaPort]
+    R33_usecase_usecase_DryCorpusMetaPort_resolve_corpus_meta([resolve_corpus_meta])
   end
   subgraph R38_usecase_usecase_FixpointDryGateService["fixpoint_resolve::FixpointDryGateService"]
     direction TB
@@ -118,15 +134,44 @@ subgraph usecase["usecase"]
   subgraph T41_usecase_usecase_PrReviewPollingInteractor["pr_review::PrReviewPollingInteractor"]
     direction TB
     T41_usecase_usecase_PrReviewPollingInteractor__self[PrReviewPollingInteractor]
+    T41_usecase_usecase_PrReviewPollingInteractor_new([new])
   end
   subgraph T37_usecase_usecase_PrReviewPollingOutput["pr_review::PrReviewPollingOutput"]
     direction TB
     T37_usecase_usecase_PrReviewPollingOutput__self[PrReviewPollingOutput]
+    T37_usecase_usecase_PrReviewPollingOutput_ReviewFound[ReviewFound]
+    T37_usecase_usecase_PrReviewPollingOutput_ZeroFindings[ZeroFindings]
+    T37_usecase_usecase_PrReviewPollingOutput_Timeout[Timeout]
+  end
+  subgraph R39_usecase_usecase_PrListIssueCommentsPort["pr_review::PrListIssueCommentsPort"]
+    direction TB
+    R39_usecase_usecase_PrListIssueCommentsPort__self[PrListIssueCommentsPort]
+    R39_usecase_usecase_PrListIssueCommentsPort_list_issue_comments([list_issue_comments])
+  end
+  subgraph R35_usecase_usecase_PrListReactionsPort["pr_review::PrListReactionsPort"]
+    direction TB
+    R35_usecase_usecase_PrListReactionsPort__self[PrListReactionsPort]
+    R35_usecase_usecase_PrListReactionsPort_list_reactions([list_reactions])
+  end
+  subgraph R33_usecase_usecase_PrListReviewsPort["pr_review::PrListReviewsPort"]
+    direction TB
+    R33_usecase_usecase_PrListReviewsPort__self[PrListReviewsPort]
+    R33_usecase_usecase_PrListReviewsPort_list_reviews([list_reviews])
+  end
+  subgraph R29_usecase_usecase_PrRepoNwoPort["pr_review::PrRepoNwoPort"]
+    direction TB
+    R29_usecase_usecase_PrRepoNwoPort__self[PrRepoNwoPort]
+    R29_usecase_usecase_PrRepoNwoPort_repo_nwo([repo_nwo])
   end
   subgraph R38_usecase_usecase_PrReviewPollingService["pr_review::PrReviewPollingService"]
     direction TB
     R38_usecase_usecase_PrReviewPollingService__self[PrReviewPollingService]
     R38_usecase_usecase_PrReviewPollingService_poll([poll])
+  end
+  subgraph R25_usecase_usecase_SleepPort["pr_review::SleepPort"]
+    direction TB
+    R25_usecase_usecase_SleepPort__self[SleepPort]
+    R25_usecase_usecase_SleepPort_sleep([sleep])
   end
   end
   subgraph usecase_usecase_module_semantic_dup["usecase::semantic_dup"]
@@ -264,6 +309,10 @@ subgraph infrastructure["infrastructure"]
   direction TB
   subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
     direction TB
+  subgraph T52_infrastructure_infrastructure_FsDryCorpusMetaAdapter["dry_check::corpus_meta::FsDryCorpusMetaAdapter"]
+    direction TB
+    T52_infrastructure_infrastructure_FsDryCorpusMetaAdapter__self[FsDryCorpusMetaAdapter]
+  end
   subgraph T51_infrastructure_infrastructure_GitDryCheckDiffGetter["dry_check::diff_getter::GitDryCheckDiffGetter"]
     direction TB
     T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self[GitDryCheckDiffGetter]
@@ -276,6 +325,13 @@ subgraph infrastructure["infrastructure"]
     direction TB
     T47_infrastructure_infrastructure_RecordingDryAgent__self[RecordingDryAgent]
     T47_infrastructure_infrastructure_RecordingDryAgent_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_pr_review["infrastructure::pr_review"]
+    direction TB
+  subgraph T48_infrastructure_infrastructure_SystemSleepAdapter["pr_review::SystemSleepAdapter"]
+    direction TB
+    T48_infrastructure_infrastructure_SystemSleepAdapter__self[SystemSleepAdapter]
   end
   end
   subgraph infrastructure_infrastructure_module_semantic_dup["infrastructure::semantic_dup"]
@@ -329,9 +385,11 @@ T45_usecase_usecase_DryFragmentPipelineInteractor_new --> T45_usecase_usecase_Dr
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --o T42_usecase_usecase_DryFragmentPipelineCommand__self
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --> T36_usecase_usecase_D4OrchestrationError__self
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --> T41_usecase_usecase_DryFragmentPipelineOutput__self
+T41_usecase_usecase_FixpointDryGateInteractor_new --> T41_usecase_usecase_FixpointDryGateInteractor__self
 R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate --o T38_usecase_usecase_FixpointDryGateCommand__self
 R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate --> T36_usecase_usecase_D4OrchestrationError__self
 R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate --> T37_usecase_usecase_FixpointDryGateOutput__self
+T41_usecase_usecase_PrReviewPollingInteractor_new --> T41_usecase_usecase_PrReviewPollingInteractor__self
 R38_usecase_usecase_PrReviewPollingService_poll --o T38_usecase_usecase_PrReviewPollingCommand__self
 R38_usecase_usecase_PrReviewPollingService_poll --> T36_usecase_usecase_D4OrchestrationError__self
 R38_usecase_usecase_PrReviewPollingService_poll --> T37_usecase_usecase_PrReviewPollingOutput__self
@@ -377,6 +435,8 @@ T61_infrastructure_infrastructure_FsArchivedTrackTelemetryAdapter__self -.impl.-
 T53_infrastructure_infrastructure_FsSpecFileWriterAdapter__self -.impl.-> R34_usecase_usecase_SpecFileWriterPort__self
 T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self -.impl.-> R41_usecase_usecase_CodeFragmentExtractorPort__self
 T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self -.impl.-> R34_usecase_usecase_DryCheckDiffSource__self
+T52_infrastructure_infrastructure_FsDryCorpusMetaAdapter__self -.impl.-> R33_usecase_usecase_DryCorpusMetaPort__self
+T48_infrastructure_infrastructure_SystemSleepAdapter__self -.impl.-> R25_usecase_usecase_SleepPort__self
 class T36_usecase_usecase_D4OrchestrationError_DiffFragment variant_node
 class T36_usecase_usecase_D4OrchestrationError_DryGate variant_node
 class T36_usecase_usecase_D4OrchestrationError_PrPolling variant_node
@@ -396,8 +456,15 @@ class R34_usecase_usecase_DryCheckDiffSource__self secondary_port
 class R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs method_node
 class R42_usecase_usecase_DryFragmentPipelineService__self app_service
 class T38_usecase_usecase_FixpointDryGateCommand__self command
+class T41_usecase_usecase_FixpointDryGateInteractor_new method_node
 class T41_usecase_usecase_FixpointDryGateInteractor__self interactor
-class T37_usecase_usecase_FixpointDryGateOutput__self dto
+class T37_usecase_usecase_FixpointDryGateOutput__self use_case
+class R36_usecase_usecase_DiffBaseResolverPort_resolve_diff_base method_node
+class R36_usecase_usecase_DiffBaseResolverPort__self secondary_port
+class R38_usecase_usecase_DryApprovalFactoryPort_build_approval method_node
+class R38_usecase_usecase_DryApprovalFactoryPort__self secondary_port
+class R33_usecase_usecase_DryCorpusMetaPort_resolve_corpus_meta method_node
+class R33_usecase_usecase_DryCorpusMetaPort__self secondary_port
 class R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate method_node
 class R38_usecase_usecase_FixpointDryGateService__self app_service
 class R38_usecase_usecase_RefVerifyGateStatePort_ref_verify_status method_node
@@ -405,10 +472,24 @@ class R38_usecase_usecase_RefVerifyGateStatePort__self secondary_port
 class R35_usecase_usecase_ReviewGateStatePort_review_status method_node
 class R35_usecase_usecase_ReviewGateStatePort__self secondary_port
 class T38_usecase_usecase_PrReviewPollingCommand__self command
+class T41_usecase_usecase_PrReviewPollingInteractor_new method_node
 class T41_usecase_usecase_PrReviewPollingInteractor__self interactor
+class T37_usecase_usecase_PrReviewPollingOutput_ReviewFound variant_node
+class T37_usecase_usecase_PrReviewPollingOutput_ZeroFindings variant_node
+class T37_usecase_usecase_PrReviewPollingOutput_Timeout variant_node
 class T37_usecase_usecase_PrReviewPollingOutput__self dto
+class R39_usecase_usecase_PrListIssueCommentsPort_list_issue_comments method_node
+class R39_usecase_usecase_PrListIssueCommentsPort__self secondary_port
+class R35_usecase_usecase_PrListReactionsPort_list_reactions method_node
+class R35_usecase_usecase_PrListReactionsPort__self secondary_port
+class R33_usecase_usecase_PrListReviewsPort_list_reviews method_node
+class R33_usecase_usecase_PrListReviewsPort__self secondary_port
+class R29_usecase_usecase_PrRepoNwoPort_repo_nwo method_node
+class R29_usecase_usecase_PrRepoNwoPort__self secondary_port
 class R38_usecase_usecase_PrReviewPollingService_poll method_node
 class R38_usecase_usecase_PrReviewPollingService__self app_service
+class R25_usecase_usecase_SleepPort_sleep method_node
+class R25_usecase_usecase_SleepPort__self secondary_port
 class R33_usecase_usecase_SemanticIndexPort_insert method_node
 class R33_usecase_usecase_SemanticIndexPort_insert_batch method_node
 class R33_usecase_usecase_SemanticIndexPort_delete_by_source_path method_node
@@ -458,10 +539,12 @@ class R45_usecase_usecase_ArchivedTrackTelemetryService_emit method_node
 class R45_usecase_usecase_ArchivedTrackTelemetryService__self app_service
 class R32_usecase_usecase_BranchReaderPort_current_branch method_node
 class R32_usecase_usecase_BranchReaderPort__self secondary_port
+class T52_infrastructure_infrastructure_FsDryCorpusMetaAdapter__self secondary_adapter
 class T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self secondary_adapter
 class T52_infrastructure_infrastructure_NoOpDryApprovalService__self secondary_adapter
 class T47_infrastructure_infrastructure_RecordingDryAgent_new method_node
 class T47_infrastructure_infrastructure_RecordingDryAgent__self secondary_adapter
+class T48_infrastructure_infrastructure_SystemSleepAdapter__self secondary_adapter
 class T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter_new method_node
 class T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self secondary_adapter
 class T51_infrastructure_infrastructure_NoopSemanticIndexPort__self secondary_adapter

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d83cdd94ef114d1f045b1cb50261fa7dd32a5a463b0fce283eda13a16fb4aee3",
+  "catalogue_declaration_hash": "c6f4b953df5e1e6c6310b1a4743c3e8a1103d8dd86971d2bf2b2d61537458283",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -11,6 +11,11 @@
       "type_name": "FsArchivedTrackTelemetryAdapter",
       "signal": "blue",
       "entry_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984"
+    },
+    {
+      "type_name": "FsDryCorpusMetaAdapter",
+      "signal": "blue",
+      "entry_hash": "c85cfc10c6933d05cb579a27276a29715cadc07d2ecc4de3898c91a46d1f65bc"
     },
     {
       "type_name": "FsRefVerifyGateStateAdapter",
@@ -51,6 +56,11 @@
       "type_name": "RecordingDryAgent",
       "signal": "blue",
       "entry_hash": "b7218e695c2e257911eaec0d357374d8004bdc87aaacea42f73b59bc411b9b2e"
+    },
+    {
+      "type_name": "SystemSleepAdapter",
+      "signal": "blue",
+      "entry_hash": "ce5d616e9b7e266b04f82b43dae6b515733088a2fe77ca6dcca62dc55e66c274"
     }
   ]
 }

@@ -28,6 +28,7 @@ pub mod hook;
 pub mod hook_dispatch;
 pub mod merge_gate;
 pub mod pr_review;
+pub mod pr_review_polling;
 pub mod pr_workflow;
 pub mod pre_commit_type_signals;
 pub mod ref_verify;

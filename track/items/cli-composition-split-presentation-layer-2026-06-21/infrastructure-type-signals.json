@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-22T05:12:29Z",
-  "declaration_hash": "d83cdd94ef114d1f045b1cb50261fa7dd32a5a463b0fce283eda13a16fb4aee3",
+  "generated_at": "2026-06-22T07:52:25Z",
+  "declaration_hash": "c6f4b953df5e1e6c6310b1a4743c3e8a1103d8dd86971d2bf2b2d61537458283",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -21,6 +21,15 @@
       "found_type": true,
       "found_items": [
         "ArchivedTrackTelemetryPort"
+      ]
+    },
+    {
+      "type_name": "FsDryCorpusMetaAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCorpusMetaPort"
       ]
     },
     {
@@ -95,6 +104,19 @@
       "found_type": true,
       "found_items": [
         "DryCheckAgentPort"
+      ]
+    },
+    {
+      "type_name": "SystemSleepAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SleepPort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug",
+        "core::marker::Copy"
       ]
     }
   ]

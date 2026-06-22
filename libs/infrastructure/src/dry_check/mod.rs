@@ -12,12 +12,18 @@
 //!
 //! - [`DryCheckConfig`]: loaded dry-check configuration (threshold, schema_version).
 //! - [`DryCheckConfigError`]: errors from [`DryCheckConfig::load`].
+//!
+//! And the corpus-manifest adapter (D4 / T008):
+//!
+//! - [`FsDryCorpusMetaAdapter`]: implements `DryCorpusMetaPort` via the
+//!   `dry-check-corpus-root.json` sidecar.
 
 mod codec;
 mod codex_dry_checker;
 mod commit_hash_store;
 pub mod config;
 pub mod corpus;
+pub mod corpus_meta;
 mod coverage;
 mod diff_getter;
 pub mod noop_approval;
@@ -28,6 +34,7 @@ pub use codex_dry_checker::CodexDryChecker;
 pub use commit_hash_store::{DryCheckCommitHashError, FsDryCheckCommitHashStore};
 pub use config::{DryCheckConfig, DryCheckConfigError};
 pub use corpus::compute_corpus_fingerprint;
+pub use corpus_meta::FsDryCorpusMetaAdapter;
 pub use coverage::FsDryCheckCoverageAdapter;
 pub use diff_getter::GitDryCheckDiffGetter;
 pub use noop_approval::NoOpDryApprovalService;

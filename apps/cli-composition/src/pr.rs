@@ -8,6 +8,7 @@
 //! Private polling and review helpers are in `poll` (see `pr/poll.rs`).
 
 mod poll;
+mod poll_adapters;
 
 use std::fs;
 use std::thread;
@@ -17,9 +18,10 @@ use crate::{CliApp, CommandOutcome};
 
 use poll::{
     PollReviewResult, checks_summary, cleanup_trigger_state, ensure_pr_body_file,
-    format_review_summary, parse_review, poll_review_for_cycle, resolve_branch_context,
-    resume_trigger_state, trigger_new_review,
+    format_review_summary, parse_review, resolve_branch_context, resume_trigger_state,
+    trigger_new_review,
 };
+use poll_adapters::make_polling_interactor;
 
 // ---------------------------------------------------------------------------
 // CliApp implementations
@@ -291,8 +293,11 @@ impl CliApp {
         interval: u64,
         timeout: u64,
     ) -> Result<CommandOutcome, String> {
-        use infrastructure::gh_cli::SystemGhClient;
+        use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use usecase::pr_review_polling::{
+            PrReviewPollingCommand, PrReviewPollingOutput, PrReviewPollingService as _,
+        };
 
         let head = SystemGitRepo::discover().ok().and_then(|r| {
             r.output(&["rev-parse", "HEAD"])
@@ -301,23 +306,33 @@ impl CliApp {
                 .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
         });
 
-        match poll_review_for_cycle(
-            &pr,
-            &trigger_timestamp,
-            interval,
-            timeout,
-            &SystemGhClient,
-            &thread::sleep,
-            head.as_deref(),
-        )? {
-            PollReviewResult::ReviewFound(review) => {
+        let repo_nwo = SystemGhClient.repo_nwo().map_err(|e| e.to_string())?;
+        let bounded_timeout = timeout.min(86400);
+        let max_iterations = match (bounded_timeout, interval) {
+            (0, _) => 0,
+            (_, 0) => 1,
+            (timeout, interval) => 1 + (timeout - 1) / interval,
+        };
+
+        let interactor = make_polling_interactor();
+        let cmd = PrReviewPollingCommand {
+            pr: pr.clone(),
+            repo_nwo,
+            trigger_timestamp,
+            interval_secs: interval,
+            max_iterations,
+            head_commit: head,
+        };
+
+        match interactor.poll(cmd).map_err(|e| e.to_string())? {
+            PrReviewPollingOutput::ReviewFound(review) => {
                 let review_str = serde_json::to_string(&review).unwrap_or_default();
                 Ok(CommandOutcome::success(Some(review_str)))
             }
-            PollReviewResult::ZeroFindings => Ok(CommandOutcome::success(Some(
+            PrReviewPollingOutput::ZeroFindings => Ok(CommandOutcome::success(Some(
                 r#"{"verdict":"zero_findings","findings":[]}"#.to_owned(),
             ))),
-            PollReviewResult::Timeout => Ok(CommandOutcome::failure(None)),
+            PrReviewPollingOutput::Timeout => Ok(CommandOutcome::failure(None)),
         }
     }
 
@@ -370,15 +385,29 @@ impl CliApp {
         let nwo = client.repo_nwo().map_err(|e| e.to_string())?;
         let head_ref = head_ref_owned.as_deref();
 
-        let poll_result = poll_review_for_cycle(
-            &pr_number,
-            &trigger_timestamp,
-            15,
-            600,
-            &client,
-            &thread::sleep,
-            head_ref,
-        )?;
+        // D4 extraction: delegate to PrReviewPollingInteractor (T008).
+        // Timeout=600s, interval=15s → max_iterations=40.
+        use usecase::pr_review_polling::{
+            PrReviewPollingCommand, PrReviewPollingOutput, PrReviewPollingService as _,
+        };
+        let interactor = make_polling_interactor();
+        let poll_cmd = PrReviewPollingCommand {
+            pr: pr_number.clone(),
+            repo_nwo: nwo.clone(),
+            trigger_timestamp: trigger_timestamp.clone(),
+            interval_secs: 15,
+            max_iterations: 40, // 600s / 15s
+            head_commit: head_ref.map(str::to_owned),
+        };
+        let poll_result_raw = interactor.poll(poll_cmd).map_err(|e| e.to_string())?;
+
+        // Map usecase PrReviewPollingOutput → local PollReviewResult for the
+        // parse_review / format_review_summary path below.
+        let poll_result = match poll_result_raw {
+            PrReviewPollingOutput::ReviewFound(v) => PollReviewResult::ReviewFound(v),
+            PrReviewPollingOutput::ZeroFindings => PollReviewResult::ZeroFindings,
+            PrReviewPollingOutput::Timeout => PollReviewResult::Timeout,
+        };
 
         let result = match poll_result {
             PollReviewResult::ZeroFindings => {

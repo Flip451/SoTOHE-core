@@ -37,9 +37,7 @@ mod persistent_index;
 mod shared;
 mod tier_telemetry;
 
-pub(crate) use corpus_root::{
-    compute_current_dry_corpus_fingerprint, resolve_dry_corpus_fingerprint_root,
-};
+pub(crate) use corpus_root::resolve_dry_corpus_fingerprint_root;
 use corpus_root::{
     compute_dry_corpus_fingerprint_from_fragments, compute_dry_corpus_fingerprint_from_root,
     write_dry_corpus_root_manifest,

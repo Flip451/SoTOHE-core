@@ -196,7 +196,8 @@ pub(crate) fn resolve_dry_corpus_fingerprint_root(
     validate_dry_corpus_root(&manifest.workspace_root, repo_root, &manifest_path)
 }
 
-pub(crate) fn compute_current_dry_corpus_fingerprint(
+#[cfg(test)]
+fn compute_current_dry_corpus_fingerprint(
     track_dir: &Path,
     repo_root: &Path,
 ) -> domain::dry_check::DryCheckCorpusFingerprint {
