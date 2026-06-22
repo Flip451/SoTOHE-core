@@ -22,6 +22,7 @@ pub mod ref_verify;
 pub mod render;
 pub mod signal;
 pub mod telemetry;
+pub mod track;
 pub mod verify;
 
 pub use render::CommandOutcome;
