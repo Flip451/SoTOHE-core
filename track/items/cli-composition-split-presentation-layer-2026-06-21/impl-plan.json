@@ -4,7 +4,8 @@
     {
       "id": "T001",
       "description": "D8 telemetry usecase service + infrastructure adapter: Add `usecase::telemetry` module with `ArchivedTrackTelemetryCommand`, `ArchivedTrackTelemetryError`, `ArchivedTrackTelemetryPort` secondary port, `ArchivedTrackTelemetryService` application-service trait, and `ArchivedTrackTelemetryInteractor` implementing the service. The interactor holds an injected `Arc<dyn ArchivedTrackTelemetryPort>` and delegates persistence through that port so cli_driver invokes a usecase service, not an infrastructure adapter. Add `infrastructure::telemetry::archived_track::FsArchivedTrackTelemetryAdapter` struct implementing `ArchivedTrackTelemetryPort` using `std::fs`, `serde_json`, and `chrono::Utc::now()`; constructor `new(telemetry_dir: PathBuf) -> Self` stores `telemetry_dir` in a private field used by `emit`. Re-export the usecase service/port types and infrastructure adapter from their respective crate roots. Unit tests: service delegates to the port; adapter `emit` writes a well-formed JSONL line; `Io` variant propagates on fs failure; `Serialize` variant propagates on serialization failure. This is a prerequisite for D8 cli-bin I/O removal (T009). Estimated diff: ~220 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d10b1df3464bedc0e5bc9c289a73de3c54c1266b"
     },
     {
       "id": "T002",
@@ -44,12 +45,13 @@
     {
       "id": "T008",
       "description": "D4 orchestration to usecase — fixpoint_resolve dry-gate conditional and PR polling loop: Add `FixpointDryGateCommand`, `FixpointDryGateOutput`, `FixpointDryGateService`, and `FixpointDryGateInteractor` in `usecase::fixpoint_resolve`; add `PrReviewPollingCommand`, `PrReviewPollingOutput`, `PrReviewPollingService`, and `PrReviewPollingInteractor` in `usecase::pr_review`; both services share `usecase::d4_orchestration::D4OrchestrationError`. Extract the large `if usecase_dry_config.enabled { ... } else { ... }` block in `CliApp::fixpoint_resolve` (lines 428-518 of `apps/cli-composition/src/track/fixpoint_resolve.rs`) to `FixpointDryGateService`, which owns the dry-gate branching, corpus-root manifest branching, and `DryCheckApprovalInteractor` construction through explicit `repo_root` inputs and injected ports. The process-global CWD guard remains in the `cli_composition` caller around service invocation. Extract the PR review polling loop (lines 248-396 of `apps/cli-composition/src/pr/poll.rs`) to `PrReviewPollingService`. For both extractions, replace `cli_composition` sites with delegation to the new usecase services plus temporary delegation shims. Unit tests: dry-gate enabled/disabled paths; polling loop exits on review found; timeout path; retry path. Estimated diff: ~400 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "bb81babf85f9fd666f511733ef4879628f093021"
     },
     {
       "id": "T009",
       "description": "D8 cli-bin I/O removal: Remove `emit_archived_track_subcommand` (lines 247-294 of `apps/cli/src/main.rs`) direct `std::fs` / `serde_json` / `chrono::Utc::now()` I/O from the cli bin. Wire `FsArchivedTrackTelemetryAdapter` (from T001) into `ArchivedTrackTelemetryInteractor` through `cli_composition`, and add a temporary composition shim so the existing bin path delegates to `ArchivedTrackTelemetryService` while telemetry persistence remains behind the secondary port. Do not introduce `cli_driver` imports, dependencies, or live driver dispatch in this task; the staged `TelemetryDriver` lands in T016 and the live archived-track driver dispatch cutover happens in T021. The bin is left with only parse + dispatch + emit. Do not edit `apps/cli/Cargo.toml` in this task; if `chrono` / `serde_json` become unused direct dependencies, remove them in T021 with the final Cargo dependency-graph update. Tests: integration-level test that `emit_archived_track_subcommand` path no longer references `std::fs` inline and that the temporary composition shim reaches the telemetry service rather than the adapter directly. Estimated diff: ~180 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T010",

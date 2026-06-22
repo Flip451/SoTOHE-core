@@ -1,16 +1,21 @@
 //! `sotp telemetry` subcommand composition.
 //!
-//! Provides `CliApp::telemetry_report`: constructs `TelemetryReport`, calls
-//! `aggregate`, and formats the result as a human-readable text report.
+//! Provides:
+//! - `CliApp::telemetry_report`: constructs `TelemetryReport`, calls
+//!   `aggregate`, and formats the result as a human-readable text report.
+//! - `CliApp::telemetry_emit_archived_track_subcommand`: wires
+//!   `FsArchivedTrackTelemetryAdapter` + `ArchivedTrackTelemetryInteractor`
+//!   and emits a single archived-track telemetry event (D8 / AC-10).
 //!
-//! This is a pure display command (OS-04 / AC-06): it reads and formats
-//! telemetry data without emitting any `TelemetryEvent` itself.  No telemetry
-//! writer is constructed or invoked here.
+//! `telemetry_report` is a pure display command (OS-04 / AC-06): it reads and
+//! formats telemetry data without emitting any `TelemetryEvent` itself.  No
+//! telemetry writer is constructed or invoked here.
 //!
 //! Aggregation logic lives in `infrastructure::telemetry::TelemetryReport`
 //! (CN-07); this module is a thin formatting + error-mapping layer.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use crate::{CliApp, CommandOutcome};
 
@@ -47,6 +52,57 @@ impl CliApp {
 
         let text = format_report(&input.track_id, &output);
         Ok(CommandOutcome::success(Some(text)))
+    }
+
+    /// Emit a telemetry event for a subcommand dispatched against an archived track.
+    ///
+    /// Constructs the telemetry directory path as
+    /// `<repo_root>/track/archive/<track_id>/logs`, then wires
+    /// `FsArchivedTrackTelemetryAdapter` → `ArchivedTrackTelemetryInteractor`
+    /// and calls `interactor.emit(ArchivedTrackTelemetryCommand { subcommand })`.
+    ///
+    /// This is the D8 composition shim (AC-10): the bin path delegates here so
+    /// that `apps/cli/src/main.rs` contains no direct `std::fs` / `serde_json` /
+    /// `chrono::Utc::now()` I/O for the archived-track telemetry path.
+    ///
+    /// `items_dir` is the track items directory (e.g. `"track/items"`) used to
+    /// derive the project root. `track_id` identifies the archived track.
+    /// `subcommand` is the opaque CLI subcommand label (e.g. `"track archive"`).
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(String)` when:
+    /// - `items_dir` does not have the expected `<root>/track/items` structure.
+    /// - Git repository discovery from the project root fails.
+    /// - The adapter reports an I/O or serialization error.
+    pub fn telemetry_emit_archived_track_subcommand(
+        &self,
+        items_dir: &Path,
+        track_id: &str,
+        subcommand: String,
+    ) -> Result<(), String> {
+        use infrastructure::FsArchivedTrackTelemetryAdapter;
+        use infrastructure::git_cli::GitRepository as _;
+        use usecase::telemetry::{
+            ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryInteractor,
+            ArchivedTrackTelemetryService as _,
+        };
+
+        // Derive the project root, then discover the repo to get an absolute root path.
+        let project_root = crate::track::resolve_project_root(items_dir)?;
+        let repo = infrastructure::git_cli::SystemGitRepo::discover_from(&project_root)
+            .map_err(|e| format!("failed to discover git repository: {e}"))?;
+        let repo_root = repo.root().to_path_buf();
+
+        // Telemetry directory for the archived track.
+        let telemetry_dir = repo_root.join("track").join("archive").join(track_id).join("logs");
+
+        let adapter = FsArchivedTrackTelemetryAdapter::new(telemetry_dir);
+        let interactor = ArchivedTrackTelemetryInteractor::new(Arc::new(adapter));
+
+        interactor
+            .emit(ArchivedTrackTelemetryCommand { subcommand })
+            .map_err(|e: usecase::telemetry::ArchivedTrackTelemetryError| e.to_string())
     }
 }
 

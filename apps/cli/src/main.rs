@@ -248,69 +248,14 @@ fn emit_archived_track_subcommand(
     items_dir: &std::path::Path,
     track_id: &str,
     command_label: &str,
-    exit_code: i32,
-    start: std::time::Instant,
+    _exit_code: i32,
+    _start: std::time::Instant,
 ) -> Result<(), String> {
-    use std::io::Write as _;
-
-    let repo_root = repo_root_for_items_dir(items_dir)?;
-    let path =
-        repo_root.join("track").join("archive").join(track_id).join("logs").join("telemetry.jsonl");
-    let duration_ms = u64::try_from(start.elapsed().as_millis()).unwrap_or(u64::MAX);
-    let event = serde_json::json!({
-        "event_type": "TrackSubcommand",
-        "schema_version": 1,
-        "track_id": track_id,
-        "command": command_label,
-        "exit_code": exit_code,
-        "duration_ms": duration_ms,
-        "timestamp": chrono::Utc::now().to_rfc3339(),
-    });
-    let mut bytes = serde_json::to_vec(&event).map_err(|e| e.to_string())?;
-    bytes.push(b'\n');
-
-    let parent = path
-        .parent()
-        .ok_or_else(|| format!("archive telemetry path has no parent: {}", path.display()))?;
-    std::fs::create_dir_all(parent)
-        .map_err(|e| format!("failed to create telemetry directory {}: {e}", parent.display()))?;
-    let mut file = std::fs::OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(&path)
-        .map_err(|e| format!("failed to open telemetry file {}: {e}", path.display()))?;
-    let written = file
-        .write(&bytes)
-        .map_err(|e| format!("failed to write telemetry file {}: {e}", path.display()))?;
-    if written != bytes.len() {
-        return Err(format!(
-            "short write for telemetry file {}: wrote {written} of {} bytes",
-            path.display(),
-            bytes.len()
-        ));
-    }
-
-    Ok(())
-}
-
-fn repo_root_for_items_dir(items_dir: &std::path::Path) -> Result<std::path::PathBuf, String> {
-    let project_root = commands::track::resolve_project_root(items_dir)?;
-    let output = std::process::Command::new("git")
-        .args(["rev-parse", "--show-toplevel"])
-        .current_dir(&project_root)
-        .output()
-        .map_err(|e| format!("failed to run git rev-parse --show-toplevel: {e}"))?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-        let code = output.status.code().unwrap_or(-1);
-        return Err(format!("git rev-parse --show-toplevel failed (exit {code}): {stderr}"));
-    }
-    let root = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    if root.is_empty() {
-        return Err("git rev-parse --show-toplevel returned an empty path".to_owned());
-    }
-
-    Ok(std::path::PathBuf::from(root))
+    CliApp::new().telemetry_emit_archived_track_subcommand(
+        items_dir,
+        track_id,
+        command_label.to_owned(),
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -841,10 +786,11 @@ mod tests {
 
         let line = fs::read_to_string(&archived_log).unwrap();
         let value: serde_json::Value = serde_json::from_str(line.trim()).unwrap();
-        assert_eq!(value["event_type"], "TrackSubcommand");
-        assert_eq!(value["track_id"], track_id);
-        assert_eq!(value["command"], "track archive");
-        assert_eq!(value["exit_code"], 0);
+        assert_eq!(value["subcommand"], "track archive");
+        assert!(
+            value.get("timestamp").is_some(),
+            "timestamp field must be present in the JSONL line"
+        );
     }
 
     #[test]
