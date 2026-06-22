@@ -84,6 +84,17 @@ pub use signal::SignalGateName;
 pub use telemetry::TelemetryReportInput;
 pub use track::fixpoint_resolve::FixpointResolveInput;
 
+// ---------------------------------------------------------------------------
+// Per-context composition root re-exports (AC-04 / D2)
+// ---------------------------------------------------------------------------
+
+pub use arch::ArchCompositionRoot;
+pub use conventions::ConventionsCompositionRoot;
+pub use demo::DemoCompositionRoot;
+pub use domain::DomainCompositionRoot;
+pub use file::FileCompositionRoot;
+pub use track::composition_root::TrackCompositionRoot;
+
 /// Re-exports [`infrastructure::codex_common::tee_stderr_to_file`] so that
 /// `apps/cli` can use it without importing `infrastructure` directly (which the
 /// architecture disallows for normal `cli` dependencies).

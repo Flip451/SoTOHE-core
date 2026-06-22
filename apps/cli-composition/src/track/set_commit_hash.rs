@@ -3,10 +3,11 @@
 //! Encapsulates the `.commit_hash` write operation and failure-recovery hint output.
 //! The underlying persist logic is provided by `review_v2::persist_commit_hash_for_track`.
 
+use crate::CommandOutcome;
 use crate::error::CompositionError;
-use crate::{CliApp, CommandOutcome};
+use crate::track::composition_root::TrackCompositionRoot;
 
-impl CliApp {
+impl TrackCompositionRoot {
     /// Persist the current HEAD SHA to `.commit_hash` for the given track.
     ///
     /// Delegates to `review_v2::persist_commit_hash_for_track` for all domain type

@@ -1,4 +1,4 @@
-//! Fixpoint resolution composition: adapters + `CliApp::fixpoint_resolve`.
+//! Fixpoint resolution composition: adapters + `TrackCompositionRoot::fixpoint_resolve`.
 //!
 //! Wires `FsReviewGateStateAdapter`, `FsRefVerifyGateStateAdapter` (secondary
 //! ports for the fixpoint resolver), and the D4 dry-gate port adapters
@@ -38,8 +38,9 @@ use domain::track_phase::FixpointStep;
 use usecase::dry_check::DryCheckConfig;
 use usecase::fixpoint_resolve::{FixpointCurrentBranch, FixpointResolveError};
 
+use crate::CommandOutcome;
 use crate::error::CompositionError;
-use crate::{CliApp, CommandOutcome};
+use crate::track::composition_root::TrackCompositionRoot;
 
 use super::resolve_project_root;
 
@@ -171,9 +172,9 @@ pub(crate) fn format_fixpoint_step(step: FixpointStep) -> String {
     }
 }
 
-// ── CliApp::fixpoint_resolve ──────────────────────────────────────────────────
+// ── TrackCompositionRoot::fixpoint_resolve ────────────────────────────────────
 
-impl CliApp {
+impl TrackCompositionRoot {
     /// Resolve the next fixpoint step for the active track.
     ///
     /// Returns a [`CommandOutcome`] whose `stdout` contains one of:
@@ -370,6 +371,7 @@ mod tests {
     use std::process::Command;
 
     use super::*;
+    use crate::CliApp;
 
     // Status types used in test assertions — no longer re-exported from the
     // parent module's use list after the adapter relocation, so imported directly.

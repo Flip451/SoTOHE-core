@@ -1,4 +1,4 @@
-//! `track tddd` subcommands — CliApp impl methods.
+//! `track tddd` subcommands — `TrackCompositionRoot` impl methods.
 //!
 //! Each method accepts `Option<String>` for `track_id` and resolves it internally:
 //! - **WRITE operations** call `super::resolve_track_id_for_write` (branch guard enforced).
@@ -7,10 +7,11 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use crate::CommandOutcome;
 use crate::error::CompositionError;
-use crate::{CliApp, CommandOutcome};
+use crate::track::composition_root::TrackCompositionRoot;
 
-impl CliApp {
+impl TrackCompositionRoot {
     /// Evaluate domain type signals via rustdoc schema export.
     ///
     /// WRITE operation: the current branch must match `track/<track_id>`.
@@ -605,6 +606,7 @@ fn parse_layer_filter_ids(raw: &str) -> Result<Vec<usecase::LayerId>, String> {
 )]
 mod tests {
     use super::*;
+    use crate::CliApp;
 
     #[test]
     fn test_parse_layer_filter_ids_single_value_succeeds() {

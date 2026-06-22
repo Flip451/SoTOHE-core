@@ -1,4 +1,8 @@
-//! `domain` command family — CliApp impl methods and input DTOs.
+//! `domain` command family — `DomainCompositionRoot` impl methods and input DTOs.
+//!
+//! `DomainCompositionRoot` is the per-context composition root for the `domain`
+//! command family.  `CliApp` keeps a shim method that delegates here for
+//! backward compatibility.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -16,7 +20,30 @@ pub struct ExportSchemaInput {
     pub output: Option<PathBuf>,
 }
 
-impl CliApp {
+// ---------------------------------------------------------------------------
+// Per-context composition root
+// ---------------------------------------------------------------------------
+
+/// Composition root for the `domain` command family.
+///
+/// This family has no injectable adapter dependencies; the schema exporter
+/// is constructed inline from the discovered workspace root.
+pub struct DomainCompositionRoot;
+
+impl DomainCompositionRoot {
+    /// Create a new `DomainCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for DomainCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DomainCompositionRoot {
     /// Export the public API schema of a crate as JSON.
     ///
     /// # Errors
@@ -64,6 +91,29 @@ impl CliApp {
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// CliApp compatibility shim
+// ---------------------------------------------------------------------------
+
+impl CliApp {
+    /// Export the public API schema of a crate as JSON.
+    ///
+    /// Delegates to [`DomainCompositionRoot::domain_export_schema`].
+    ///
+    /// # Errors
+    /// Returns `Err` when workspace root discovery or schema export fails.
+    pub fn domain_export_schema(
+        &self,
+        input: ExportSchemaInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        DomainCompositionRoot::new().domain_export_schema(input)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Private helpers
+// ---------------------------------------------------------------------------
 
 fn discover_workspace_root() -> Result<PathBuf, String> {
     let output = std::process::Command::new("cargo")

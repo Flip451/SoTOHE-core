@@ -1,4 +1,4 @@
-//! CliApp methods for task/state operations that accept a pre-resolved track ID,
+//! `TrackCompositionRoot` methods for task/state operations that accept a pre-resolved track ID,
 //! and miscellaneous helpers for views/branch auto-detection.
 //!
 //! The task-state methods skip git-based track ID resolution.  The caller is
@@ -8,14 +8,15 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use crate::CommandOutcome;
 use crate::error::CompositionError;
-use crate::{CliApp, CommandOutcome};
+use crate::track::composition_root::TrackCompositionRoot;
 
 use super::{
     build_branch_reader, resolve_project_root, sync_views_to_stdout, validate_track_id_str,
 };
 
-impl CliApp {
+impl TrackCompositionRoot {
     /// Add a new task to a track using a pre-resolved `track_id`.
     ///
     /// Unlike `track_add_task`, this method does **not** perform git-based ID

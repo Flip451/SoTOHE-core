@@ -1,11 +1,14 @@
-//! `track` command family — core CliApp impl methods.
+//! `track` command family — core composition-root impl methods.
+pub mod composition_root;
 pub mod fixpoint_resolve;
 mod ops;
 mod resolution;
 mod set_commit_hash;
+mod shim;
 mod tddd;
+use crate::CommandOutcome;
 use crate::error::CompositionError;
-use crate::{CliApp, CommandOutcome};
+use crate::track::composition_root::TrackCompositionRoot;
 use infrastructure::git_cli::GitRepository;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -184,7 +187,7 @@ fn describe_archive_rollback(result: Result<(), String>) -> String {
         }
     }
 }
-impl CliApp {
+impl TrackCompositionRoot {
     /// Transition a task to a new status.
     ///
     /// # Errors

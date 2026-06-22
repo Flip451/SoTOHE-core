@@ -1,18 +1,19 @@
 //! Public resolution façade for the `track` command family.
 //!
-//! Wraps the private `resolve_track_id*` helpers in `track/mod.rs` as `CliApp`
-//! methods so that `apps/cli` callers never need to import infra/usecase directly.
+//! Wraps the private `resolve_track_id*` helpers in `track/mod.rs` as
+//! `TrackCompositionRoot` methods so that `apps/cli` callers never need to
+//! import infra/usecase directly.
 
 use std::path::PathBuf;
 
-use crate::CliApp;
+use crate::track::composition_root::TrackCompositionRoot;
 
 use super::{
     resolve_project_root, resolve_track_id, resolve_track_id_for_write, resolve_track_id_from_root,
     resolve_track_id_inner, validate_track_id_str,
 };
 
-impl CliApp {
+impl TrackCompositionRoot {
     /// Resolve a track ID for a READ operation, anchored to `items_dir`.
     ///
     /// When `explicit_id` is `Some`, it is returned as-is (git discovery skipped).

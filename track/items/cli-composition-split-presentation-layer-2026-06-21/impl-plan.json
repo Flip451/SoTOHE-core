@@ -57,12 +57,13 @@
     {
       "id": "T010",
       "description": "D2 typed CompositionError introduction: Add `pub enum CompositionError` in `apps/cli-composition/src/lib.rs` (or `apps/cli-composition/src/error.rs`) covering the construction/wiring failure categories (e.g. `ConfigLoad(String)`, `AdapterInit(String)`, `WiringFailed(String)`) with `Display + Error` impls. Change all public `CliApp` method signatures from `Result<CommandOutcome, String>` to `Result<CommandOutcome, CompositionError>`. Convert all internal `Err(format!(...))` / `.map_err(|e| format!(...))` error-string sites to typed `CompositionError` variants. Update the `apps/cli/src/main.rs` call sites to handle `CompositionError` (pattern-match or `.to_string()` for the exit path). The 51 methods across 27 files all return the typed error; no `String`-returning public method remains. Estimated diff: ~400 lines (signature changes + variant conversions).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "c2a23b0045e4f19f767f61f7e06887cb29b3afb5"
     },
     {
       "id": "T011",
       "description": "D2 CliApp god-facade dissolution — Group 1 (track, arch, domain, file, conventions, demo): Introduce per-context `CompositionRoot` structs for the track, arch, domain, file, conventions, and demo command families. Each `CompositionRoot` struct holds the injected adapters its command family needs (replacing the stateless `CliApp` unit struct for those families). Keep the existing `CliApp` facade in `lib.rs` as a compatibility layer for now (it will forward to the per-context roots). Migrate the `impl CliApp` blocks for the above families to `impl TrackCompositionRoot`, `impl ArchCompositionRoot`, etc. These structs have actual fields (injected adapter `Arc<dyn Port>` or concrete types). Update the wiring in `apps/cli/src/main.rs` to construct the per-context roots and call their methods. CI must stay green. Estimated diff: ~350 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T012",
