@@ -400,6 +400,14 @@
             {
               "name": "track_id",
               "ty": "String"
+            },
+            {
+              "name": "exit_code",
+              "ty": "i32"
+            },
+            {
+              "name": "duration_ms",
+              "ty": "u64"
             }
           ],
           "has_stripped_fields": false
@@ -407,7 +415,7 @@
       },
       "methods": [],
       "module_path": "telemetry",
-      "docs": "CQRS command for the archived-track telemetry use case. `subcommand` is an opaque CLI subcommand label recorded as free text; it is not a domain value object. `track_id` is recorded in the canonical TelemetryEvent::TrackSubcommand.track_id field so archived JSONL rows can be deserialized by TelemetryReport::aggregate.",
+      "docs": "CQRS command for the archived-track telemetry use case. `subcommand` is an opaque CLI subcommand label recorded as free text; it is not a domain value object. `track_id`, `exit_code`, and `duration_ms` are recorded in the canonical TelemetryEvent::TrackSubcommand fields so archived JSONL rows can be deserialized by TelemetryReport::aggregate alongside active-track events (matching duration metrics).",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -1535,6 +1543,14 @@
             {
               "name": "subcommand",
               "ty": "String"
+            },
+            {
+              "name": "exit_code",
+              "ty": "i32"
+            },
+            {
+              "name": "duration_ms",
+              "ty": "u64"
             }
           ],
           "returns": "Result<(), ArchivedTrackTelemetryError>",

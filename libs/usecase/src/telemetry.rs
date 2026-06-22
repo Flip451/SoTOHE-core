@@ -47,6 +47,10 @@ pub struct ArchivedTrackTelemetryCommand {
     /// in the canonical `TelemetryEvent::TrackSubcommand.track_id` field so the
     /// archived JSONL line is parseable by `TelemetryReport::aggregate`.
     pub track_id: String,
+    /// Process exit code (`0` = success).
+    pub exit_code: i32,
+    /// Wall-clock duration of the archive operation in milliseconds.
+    pub duration_ms: u64,
 }
 
 // ── Secondary port ────────────────────────────────────────────────────────────
@@ -72,8 +76,13 @@ pub trait ArchivedTrackTelemetryPort: Send + Sync {
     /// Returns [`ArchivedTrackTelemetryError::Io`] on filesystem failure.
     /// Returns [`ArchivedTrackTelemetryError::Serialize`] on JSON serialization
     /// failure.
-    fn emit(&self, track_id: String, subcommand: String)
-    -> Result<(), ArchivedTrackTelemetryError>;
+    fn emit(
+        &self,
+        track_id: String,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+    ) -> Result<(), ArchivedTrackTelemetryError>;
 }
 
 // ── Application service trait ─────────────────────────────────────────────────
@@ -114,7 +123,7 @@ impl ArchivedTrackTelemetryInteractor {
 
 impl ArchivedTrackTelemetryService for ArchivedTrackTelemetryInteractor {
     fn emit(&self, cmd: ArchivedTrackTelemetryCommand) -> Result<(), ArchivedTrackTelemetryError> {
-        self.port.emit(cmd.track_id, cmd.subcommand)
+        self.port.emit(cmd.track_id, cmd.subcommand, cmd.exit_code, cmd.duration_ms)
     }
 }
 
@@ -143,8 +152,13 @@ mod tests {
             &self,
             track_id: String,
             subcommand: String,
+            exit_code: i32,
+            duration_ms: u64,
         ) -> Result<(), ArchivedTrackTelemetryError> {
-            self.calls.lock().unwrap().push(format!("{track_id}|{subcommand}"));
+            self.calls
+                .lock()
+                .unwrap()
+                .push(format!("{track_id}|{subcommand}|{exit_code}|{duration_ms}"));
             Ok(())
         }
     }
@@ -161,12 +175,14 @@ mod tests {
         let cmd = ArchivedTrackTelemetryCommand {
             subcommand: "track spec-design".to_string(),
             track_id: "t1".to_string(),
+            exit_code: 0,
+            duration_ms: 42,
         };
         interactor.emit(cmd).unwrap();
 
         let calls = mock.calls.lock().unwrap();
         assert_eq!(calls.len(), 1);
-        assert_eq!(calls[0], "t1|track spec-design");
+        assert_eq!(calls[0], "t1|track spec-design|0|42");
     }
 
     #[test]
@@ -177,6 +193,8 @@ mod tests {
                 &self,
                 _track_id: String,
                 _subcommand: String,
+                _exit_code: i32,
+                _duration_ms: u64,
             ) -> Result<(), ArchivedTrackTelemetryError> {
                 Err(ArchivedTrackTelemetryError::Serialize("test failure".to_string()))
             }
@@ -186,6 +204,8 @@ mod tests {
         let cmd = ArchivedTrackTelemetryCommand {
             subcommand: "track impl".to_string(),
             track_id: "t1".to_string(),
+            exit_code: 1,
+            duration_ms: 0,
         };
         let result = interactor.emit(cmd);
 
@@ -207,14 +227,16 @@ mod tests {
             let cmd = ArchivedTrackTelemetryCommand {
                 subcommand: (*label).to_string(),
                 track_id: "t1".to_string(),
+                exit_code: 0,
+                duration_ms: 1,
             };
             interactor.emit(cmd).unwrap();
         }
 
         let calls = mock.calls.lock().unwrap();
         assert_eq!(calls.len(), 3);
-        assert_eq!(calls[0], "t1|track init");
-        assert_eq!(calls[1], "t1|track review");
-        assert_eq!(calls[2], "t1|track commit");
+        assert_eq!(calls[0], "t1|track init|0|1");
+        assert_eq!(calls[1], "t1|track review|0|1");
+        assert_eq!(calls[2], "t1|track commit|0|1");
     }
 }

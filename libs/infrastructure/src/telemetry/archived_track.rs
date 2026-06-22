@@ -58,19 +58,20 @@ impl ArchivedTrackTelemetryPort for FsArchivedTrackTelemetryAdapter {
         &self,
         track_id: String,
         subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
     ) -> Result<(), ArchivedTrackTelemetryError> {
         let timestamp = chrono::Utc::now().to_rfc3339();
         // Emit the canonical TelemetryEvent::TrackSubcommand JSONL schema so the
         // downstream `sotp telemetry report` pipeline can deserialize archived
-        // events alongside active-track events. `exit_code` and `duration_ms`
-        // are not tracked at archive time; default to 0.
+        // events alongside active-track events.
         let event = serde_json::json!({
             "event_type": "TrackSubcommand",
             "schema_version": 1,
             "track_id": track_id,
             "command": subcommand,
-            "exit_code": 0,
-            "duration_ms": 0,
+            "exit_code": exit_code,
+            "duration_ms": duration_ms,
             "timestamp": timestamp,
         });
 
@@ -171,7 +172,9 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let adapter = adapter_in_tempdir(&tmp);
 
-        adapter.emit("archived-2026-06-22".to_string(), "track spec-design".to_string()).unwrap();
+        adapter
+            .emit("archived-2026-06-22".to_string(), "track spec-design".to_string(), 0, 1234)
+            .unwrap();
 
         let path = tmp.path().join("telemetry.jsonl");
         assert!(path.exists(), "telemetry.jsonl must be created after emit");
@@ -194,7 +197,7 @@ mod tests {
             "command must match the emitted subcommand"
         );
         assert_eq!(parsed["exit_code"].as_i64().unwrap(), 0);
-        assert_eq!(parsed["duration_ms"].as_u64().unwrap(), 0);
+        assert_eq!(parsed["duration_ms"].as_u64().unwrap(), 1234);
         assert!(
             parsed.get("timestamp").is_some(),
             "timestamp field must be present in the JSONL line"
@@ -206,9 +209,9 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let adapter = adapter_in_tempdir(&tmp);
 
-        adapter.emit("t1".to_string(), "track init".to_string()).unwrap();
-        adapter.emit("t1".to_string(), "track review".to_string()).unwrap();
-        adapter.emit("t1".to_string(), "track commit".to_string()).unwrap();
+        adapter.emit("t1".to_string(), "track init".to_string(), 0, 0).unwrap();
+        adapter.emit("t1".to_string(), "track review".to_string(), 0, 0).unwrap();
+        adapter.emit("t1".to_string(), "track commit".to_string(), 0, 0).unwrap();
 
         let path = tmp.path().join("telemetry.jsonl");
         let file = std::fs::File::open(&path).unwrap();
@@ -246,7 +249,7 @@ mod tests {
         let bad_dir = blocker.join("sub");
         let adapter = FsArchivedTrackTelemetryAdapter::new(bad_dir);
 
-        let result = adapter.emit("test-track".to_string(), "track init".to_string());
+        let result = adapter.emit("test-track".to_string(), "track init".to_string(), 0, 0);
         assert!(
             result.is_err(),
             "emit must return an error when the telemetry directory cannot be created"
@@ -267,7 +270,7 @@ mod tests {
         std::os::unix::fs::symlink(&real_dir, &link_dir).unwrap();
 
         let adapter = FsArchivedTrackTelemetryAdapter::new(link_dir);
-        let result = adapter.emit("test-track".to_string(), "track init".to_string());
+        let result = adapter.emit("test-track".to_string(), "track init".to_string(), 0, 0);
 
         assert!(
             matches!(result, Err(usecase::telemetry::ArchivedTrackTelemetryError::Io(_))),
@@ -289,7 +292,7 @@ mod tests {
         std::os::unix::fs::symlink(&target, &link).unwrap();
 
         let adapter = adapter_in_tempdir(&tmp);
-        let result = adapter.emit("test-track".to_string(), "track init".to_string());
+        let result = adapter.emit("test-track".to_string(), "track init".to_string(), 0, 0);
 
         assert!(
             matches!(result, Err(usecase::telemetry::ArchivedTrackTelemetryError::Io(_))),
@@ -307,7 +310,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let adapter = adapter_in_tempdir(&tmp);
 
-        adapter.emit("t-impl".to_string(), "track impl".to_string()).unwrap();
+        adapter.emit("t-impl".to_string(), "track impl".to_string(), 0, 0).unwrap();
 
         let content = std::fs::read_to_string(tmp.path().join("telemetry.jsonl")).unwrap();
         let line = content.lines().next().unwrap();

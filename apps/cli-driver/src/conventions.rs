@@ -104,7 +104,12 @@ impl ConventionsDriver {
         // Mirrors cli_composition/src/conventions.rs
         // ConventionsCompositionRoot::conventions_add.
         // Success stdout: "[OK] Convention document added."
-        CommandOutcome::success(Some("[OK] Convention document added.".to_owned()))
+        CommandOutcome::failure(Some(
+            "cli_driver Driver::handle is not yet wired — apps/cli still routes through \
+             cli_composition CompositionRoot dispatch (deferred from T021); call the matching \
+             CompositionRoot method instead"
+                .to_owned(),
+        ))
     }
 
     fn conventions_update_index(&self, _project_root: PathBuf) -> CommandOutcome {
@@ -112,7 +117,12 @@ impl ConventionsDriver {
         // Mirrors cli_composition/src/conventions.rs
         // ConventionsCompositionRoot::conventions_update_index.
         // Success stdout: "[OK] Convention README index updated."
-        CommandOutcome::success(Some("[OK] Convention README index updated.".to_owned()))
+        CommandOutcome::failure(Some(
+            "cli_driver Driver::handle is not yet wired — apps/cli still routes through \
+             cli_composition CompositionRoot dispatch (deferred from T021); call the matching \
+             CompositionRoot method instead"
+                .to_owned(),
+        ))
     }
 
     fn conventions_verify_index(&self, _project_root: PathBuf) -> CommandOutcome {
@@ -121,7 +131,12 @@ impl ConventionsDriver {
         // ConventionsCompositionRoot::conventions_verify_index.
         // Success stdout: "[OK] Convention README index is in sync."
         // Failure: stderr = findings joined by "\n", exit_code = 1.
-        CommandOutcome::success(Some("[OK] Convention README index is in sync.".to_owned()))
+        CommandOutcome::failure(Some(
+            "cli_driver Driver::handle is not yet wired — apps/cli still routes through \
+             cli_composition CompositionRoot dispatch (deferred from T021); call the matching \
+             CompositionRoot method instead"
+                .to_owned(),
+        ))
     }
 }
 

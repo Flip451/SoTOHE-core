@@ -248,13 +248,16 @@ fn emit_archived_track_subcommand(
     items_dir: &std::path::Path,
     track_id: &str,
     command_label: &str,
-    _exit_code: i32,
-    _start: std::time::Instant,
+    exit_code: i32,
+    start: std::time::Instant,
 ) -> Result<(), CompositionError> {
+    let duration_ms = u64::try_from(start.elapsed().as_millis()).unwrap_or(u64::MAX);
     TelemetryCompositionRoot::new().telemetry_emit_archived_track_subcommand(
         items_dir,
         track_id,
         command_label.to_owned(),
+        exit_code,
+        duration_ms,
     )
 }
 
@@ -754,6 +757,7 @@ mod tests {
         fs::create_dir_all(&archived_track_dir).unwrap();
         let nested_cwd = root.join("nested").join("workdir");
         fs::create_dir_all(&nested_cwd).unwrap();
+        let started_at = std::time::Instant::now() - std::time::Duration::from_millis(1);
 
         run_in_dir(&nested_cwd, || {
             super::emit_archived_track_subcommand(
@@ -761,7 +765,7 @@ mod tests {
                 track_id,
                 "track archive",
                 0,
-                std::time::Instant::now(),
+                started_at,
             )
             .unwrap();
         });
@@ -791,7 +795,11 @@ mod tests {
         assert_eq!(value["track_id"], track_id);
         assert_eq!(value["command"], "track archive");
         assert_eq!(value["exit_code"], 0);
-        assert_eq!(value["duration_ms"], 0);
+        let duration_ms = value["duration_ms"].as_u64().expect("duration_ms must be u64");
+        assert!(
+            (1..60_000).contains(&duration_ms),
+            "duration_ms must be recorded and within a sane range: {duration_ms}"
+        );
         assert!(
             value.get("timestamp").is_some(),
             "timestamp field must be present in the JSONL line"

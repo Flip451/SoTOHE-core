@@ -106,6 +106,8 @@ impl TelemetryCompositionRoot {
         items_dir: &Path,
         track_id: &str,
         subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
     ) -> Result<(), CompositionError> {
         use infrastructure::FsArchivedTrackTelemetryAdapter;
         use infrastructure::git_cli::GitRepository as _;
@@ -130,7 +132,12 @@ impl TelemetryCompositionRoot {
         let interactor = ArchivedTrackTelemetryInteractor::new(Arc::new(adapter));
 
         interactor
-            .emit(ArchivedTrackTelemetryCommand { subcommand, track_id: track_id.to_owned() })
+            .emit(ArchivedTrackTelemetryCommand {
+                subcommand,
+                track_id: track_id.to_owned(),
+                exit_code,
+                duration_ms,
+            })
             .map_err(|e: usecase::telemetry::ArchivedTrackTelemetryError| {
                 CompositionError::Infrastructure(e.to_string())
             })

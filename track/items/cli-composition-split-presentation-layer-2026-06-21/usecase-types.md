@@ -20,7 +20,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | AdrChainRunnerPort | secondary_port | — | fn run_adr_chain(&self, project_root: std::path::PathBuf, strict: bool) -> Result<SignalChainOutput, String> | 🔵 | 🔵 |
-| ArchivedTrackTelemetryPort | secondary_port | — | fn emit(&self, track_id: String, subcommand: String) -> Result<(), ArchivedTrackTelemetryError> | 🔵 | 🔵 |
+| ArchivedTrackTelemetryPort | secondary_port | — | fn emit(&self, track_id: String, subcommand: String, exit_code: i32, duration_ms: u64) -> Result<(), ArchivedTrackTelemetryError> | 🔵 | 🔵 |
 | BranchReaderPort | secondary_port | reference | fn current_branch(&self) -> Result<Option<String>, BranchReadError> | 🔵 | 🔵 |
 | CodeFragmentExtractorPort | secondary_port | — | fn extract(&self, workspace_root: &std::path::Path) -> Result<Vec<domain::semantic_dup::CodeFragment>, String> | 🔵 | 🔵 |
 | DiffBaseResolverPort | secondary_port | — | fn resolve_diff_base(&self, track_dir: &std::path::Path, canonical_root: &std::path::Path, repo_root: &std::path::Path) -> Result<domain::CommitHash, String> | 🔵 | 🔵 |
