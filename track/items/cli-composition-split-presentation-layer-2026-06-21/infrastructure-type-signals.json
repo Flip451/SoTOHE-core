@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-22T00:12:39Z",
+  "generated_at": "2026-06-22T00:33:36Z",
   "declaration_hash": "38d9b1c12e70e86b6c66993685731c39447d8355524eda95a721a7fe2fc0b6d7",
   "signals": [
     {
@@ -42,18 +42,18 @@
     {
       "type_name": "NoOpDryApprovalService",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "DryCheckApprovalService"
       ]
     },
     {
       "type_name": "NoopSemanticIndexPort",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "SemanticIndexPort"
       ]
     },

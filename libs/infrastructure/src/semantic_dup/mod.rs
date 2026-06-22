@@ -16,6 +16,8 @@
 pub mod embedding;
 pub mod extractor;
 pub mod index;
+pub mod noop_adapter;
 pub mod null_insert_proxy;
 
+pub use noop_adapter::NoopSemanticIndexPort;
 pub use null_insert_proxy::NullInsertIndexProxy;

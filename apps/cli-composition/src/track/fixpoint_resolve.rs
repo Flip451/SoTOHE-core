@@ -12,13 +12,11 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use domain::TrackId;
-use domain::dry_check::{DryCheckApprovalVerdict, FragmentRef};
+use domain::dry_check::FragmentRef;
 use infrastructure::dry_check::{
     DryCheckConfig as InfraDryCheckConfig, FsDryCheckCoverageAdapter, FsDryCheckStore,
 };
-use usecase::dry_check::{
-    DryCheckApprovalInteractor, DryCheckApprovalService, DryCheckCycleError, fragment_ref_of,
-};
+use usecase::dry_check::{DryCheckApprovalInteractor, DryCheckApprovalService, fragment_ref_of};
 use usecase::fixpoint_resolve::{
     FixpointResolveCommand, FixpointResolveInteractor, FixpointResolveService as _,
     RefVerifyGateStatePort, ReviewGateStatePort,
@@ -36,25 +34,8 @@ use crate::{CliApp, CommandOutcome};
 use super::resolve_project_root;
 
 // ── NoOpDryApprovalService ────────────────────────────────────────────────────
-
-/// A trivial no-op [`DryCheckApprovalService`] that always returns `Approved`.
-///
-/// Used as the dry approval port when `dry_config.enabled` is `false` in T008:
-/// the `FixpointResolveInteractor` never calls `check_approved` in that case
-/// (the interactor itself bypasses the dry gate), but the field is `Arc<dyn
-/// DryCheckApprovalService>` and must be constructed regardless.  This no-op
-/// implementation ensures the construction succeeds without any I/O.
-struct NoOpDryApprovalService;
-
-impl DryCheckApprovalService for NoOpDryApprovalService {
-    fn check_approved(
-        &self,
-        _track_id: &TrackId,
-        _current_fragment_refs: &std::collections::BTreeSet<FragmentRef>,
-    ) -> Result<DryCheckApprovalVerdict, DryCheckCycleError> {
-        Ok(DryCheckApprovalVerdict::Approved)
-    }
-}
+// Re-export shim: implementation relocated to `libs/infrastructure` per ADR 1328 D7.
+use infrastructure::dry_check::noop_approval::NoOpDryApprovalService;
 
 // ── FixpointResolveInput ──────────────────────────────────────────────────────
 

@@ -20,6 +20,7 @@ pub mod config;
 pub mod corpus;
 mod coverage;
 mod diff_getter;
+pub mod noop_approval;
 pub mod recording_agent;
 mod store;
 
@@ -29,5 +30,6 @@ pub use config::{DryCheckConfig, DryCheckConfigError};
 pub use corpus::compute_corpus_fingerprint;
 pub use coverage::FsDryCheckCoverageAdapter;
 pub use diff_getter::GitDryCheckDiffGetter;
+pub use noop_approval::NoOpDryApprovalService;
 pub use recording_agent::RecordingDryAgent;
 pub use store::FsDryCheckStore;

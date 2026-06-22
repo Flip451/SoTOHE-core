@@ -15,12 +15,13 @@
     {
       "id": "T003",
       "description": "D7 adapter relocation Group B (medium priority, re-export shim): Relocate `RecordingDryAgent` from `apps/cli-composition/src/dry/tier_telemetry.rs` and `NullInsertIndexProxy` (plus `PersistentIndexLock`) from `apps/cli-composition/src/dry/persistent_index.rs` to `libs/infrastructure/src/dry_check/recording_agent.rs` and `libs/infrastructure/src/semantic_dup/null_insert_proxy.rs` respectively. `NullInsertIndexProxy::new()` takes the `LanceDbSemanticIndexAdapter` and `PersistentIndexLock` as private fields. Add shim re-exports in `cli_composition` so that the composition wiring continues to compile. Unit/integration tests: `RecordingDryAgent` delegates `judge()` to inner and records telemetry; `NullInsertIndexProxy` suppresses insert but delegates search/delete. Estimated diff: ~250 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "4b6f8bf62cf37a1ec4768b3cad6e52308dc30806"
     },
     {
       "id": "T004",
       "description": "D7 adapter relocation Group C (low priority + LazyBranchReader elimination, re-export shim): Relocate `NoopSemanticIndexPort` from `apps/cli-composition/src/semantic_dup/measure_quality.rs` to `libs/infrastructure/src/semantic_dup/noop_adapter.rs` and `NoOpDryApprovalService` from `apps/cli-composition/src/track/fixpoint_resolve.rs` to `libs/infrastructure/src/dry_check/noop_approval.rs`. Add re-export shims in `cli_composition`. Remove `LazyBranchReader` from `apps/cli-composition/src/track/mod.rs` (lines 101-113) and resolve the UFCS ambiguity at the call site by using a concrete `infrastructure::git_cli::SystemGitRepo` reference instead of the trait-object detour. Verify that `infrastructure::git_cli::SystemGitRepo` already `impl BranchReaderPort`; add the impl if missing. CI must stay green after this commit. Estimated diff: ~180 lines (including removals).",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",

@@ -97,22 +97,15 @@ fn resolve_track_id_inner(
         interactor.resolve_for_read(None).map_err(|e| e.to_string())
     }
 }
-use usecase::track_resolution::{BranchReadError, BranchReaderPort};
-struct LazyBranchReader {
-    project_root: PathBuf,
-}
-impl BranchReaderPort for LazyBranchReader {
-    fn current_branch(&self) -> Result<Option<String>, BranchReadError> {
-        let repo = infrastructure::git_cli::SystemGitRepo::discover_from(&self.project_root)
-            .map_err(|e| {
-                BranchReadError::ReadFailed(format!("failed to discover git repo: {e}"))
-            })?;
-        // Use explicit UFCS to disambiguate between BranchReaderPort and GitRepository.
-        <infrastructure::git_cli::SystemGitRepo as BranchReaderPort>::current_branch(&repo)
+fn build_branch_reader(
+    project_root: &Path,
+) -> Option<Arc<dyn usecase::track_resolution::BranchReaderPort>> {
+    use infrastructure::git_cli::SystemGitRepo;
+    use usecase::track_resolution::BranchReaderPort;
+    match SystemGitRepo::discover_from(project_root) {
+        Ok(repo) => Some(Arc::new(repo) as Arc<dyn BranchReaderPort>),
+        Err(_) => None,
     }
-}
-fn build_branch_reader(project_root: &Path) -> Option<Arc<dyn BranchReaderPort>> {
-    Some(Arc::new(LazyBranchReader { project_root: project_root.to_path_buf() }))
 }
 fn sync_views_to_stdout(project_root: &Path, track_id: &str) -> Vec<String> {
     match infrastructure::track::render::sync_rendered_views(project_root, Some(track_id)) {
