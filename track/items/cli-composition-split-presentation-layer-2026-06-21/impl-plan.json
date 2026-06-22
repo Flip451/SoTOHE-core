@@ -76,12 +76,13 @@
     {
       "id": "T013",
       "description": "D2 CliApp god-facade dissolution — Group 3 (dry, dry_fix_runner, pr, review_v2, semantic_dup): Introduce `DryCompositionRoot`, `DryFixRunnerCompositionRoot`, `PrCompositionRoot`, `ReviewCompositionRoot`, `SemanticDupCompositionRoot`. Each holds injected adapters. Remove corresponding `impl CliApp` blocks. After this task, `CliApp` should have no remaining `impl` blocks carrying command logic — only the compatibility shim forwarding to per-context roots, or removed entirely if all call sites have been updated. Remove `pub struct CliApp;` from `lib.rs` if all usages are gone. Update `apps/cli/src/main.rs` wiring to construct per-context roots directly. CI must stay green. Estimated diff: ~450 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "54f813b6310fbbcde2c2f9163e052e78491adaf6"
     },
     {
       "id": "T014",
       "description": "D3 cli-driver source staging + guard and hook command families: Stage `apps/cli-driver/src/lib.rs`, the `CommandOutcome` relocation target, the `render` module, and `GuardDriver` / `HookDriver` source under `apps/cli-driver/src/` without creating `apps/cli-driver/Cargo.toml` and without adding workspace members, dependency edges, architecture rules, or live wiring. The staged drivers hold injected use-case interactors and expose `handle(input) -> CommandOutcome`; staged render code mirrors the helpers currently in `apps/cli-composition/src/guard.rs` (lines 42-47 JSON formatting) and `apps/cli-composition/src/hook.rs` (lines 241-248 JSON formatting). Leave `cli_composition` and `apps/cli` as the live command path in this commit. T021 materializes the crate manifest, workspace member, dependency graph, and live wiring atomically per CN-06. Estimated diff: ~260 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T015",
