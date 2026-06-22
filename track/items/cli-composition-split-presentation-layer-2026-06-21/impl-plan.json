@@ -63,12 +63,13 @@
     {
       "id": "T011",
       "description": "D2 CliApp god-facade dissolution — Group 1 (track, arch, domain, file, conventions, demo): Introduce per-context `CompositionRoot` structs for the track, arch, domain, file, conventions, and demo command families. Each `CompositionRoot` struct holds the injected adapters its command family needs (replacing the stateless `CliApp` unit struct for those families). Keep the existing `CliApp` facade in `lib.rs` as a compatibility layer for now (it will forward to the per-context roots). Migrate the `impl CliApp` blocks for the above families to `impl TrackCompositionRoot`, `impl ArchCompositionRoot`, etc. These structs have actual fields (injected adapter `Arc<dyn Port>` or concrete types). Update the wiring in `apps/cli/src/main.rs` to construct the per-context roots and call their methods. CI must stay green. Estimated diff: ~350 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3e5ad8e538d41ca0510d1664ae23a2d85742f903"
     },
     {
       "id": "T012",
       "description": "D2 CliApp god-facade dissolution — Group 2 (guard, hook, git, verify, ref_verify, signal, telemetry): Introduce `GuardCompositionRoot`, `HookCompositionRoot`, `GitCompositionRoot`, `VerifyCompositionRoot`, `RefVerifyCompositionRoot`, `SignalCompositionRoot`, `TelemetryCompositionRoot`. Each holds its injected ports and implements the corresponding command handler methods. Remove the corresponding `impl CliApp` blocks and forward calls from the remaining `CliApp` compatibility shim. Update `apps/cli/src/main.rs` wiring. CI must stay green. Estimated diff: ~400 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T013",

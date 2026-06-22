@@ -1,8 +1,30 @@
-//! `verify` command family — CliApp impl methods.
+//! `verify` command family — per-context composition root and CliApp shim.
 
 use std::path::PathBuf;
 
 use crate::{CliApp, CommandOutcome, cmd_outcome::render_outcome, error::CompositionError};
+
+// ---------------------------------------------------------------------------
+// Per-context composition root
+// ---------------------------------------------------------------------------
+
+/// Composition root for the `verify` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct VerifyCompositionRoot;
+
+impl VerifyCompositionRoot {
+    /// Create a new `VerifyCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for VerifyCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Render a skip outcome (non-track branch, AC-16).
 fn render_skip(label: &str, reason: &str) -> CommandOutcome {
@@ -108,7 +130,7 @@ pub fn execute_catalogue_spec_refs(
     }
 }
 
-impl CliApp {
+impl VerifyCompositionRoot {
     /// Check tech-stack.md for unresolved TODO markers.
     ///
     /// # Errors
@@ -399,6 +421,228 @@ impl CliApp {
     /// or the resolved directory does not exist.
     pub fn verify_resolve_active_track_dir(&self) -> Option<PathBuf> {
         resolve_active_track_dir()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CliApp compatibility shim
+// ---------------------------------------------------------------------------
+
+impl CliApp {
+    /// Delegates to [`VerifyCompositionRoot::verify_tech_stack`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_tech_stack(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_tech_stack(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_latest_track`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_latest_track(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_latest_track(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_arch_docs`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_arch_docs(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_arch_docs(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_layers`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_layers(&self, project_root: PathBuf) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_layers(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_hooks_path`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_hooks_path(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_hooks_path(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_spec_attribution`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_spec_attribution(
+        &self,
+        spec_path: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_spec_attribution(spec_path)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_spec_frontmatter`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_spec_frontmatter(
+        &self,
+        spec_path: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_spec_frontmatter(spec_path)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_canonical_modules`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_canonical_modules(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_canonical_modules(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_module_size`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_module_size(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_module_size(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_domain_purity`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_domain_purity(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_domain_purity(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_domain_strings`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_domain_strings(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_domain_strings(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_usecase_purity`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_usecase_purity(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_usecase_purity(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_doc_links`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_doc_links(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_doc_links(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_view_freshness`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_view_freshness(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_view_freshness(project_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_spec_signals`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_spec_signals(
+        &self,
+        spec_path: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_spec_signals(spec_path)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_plan_artifact_refs`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_plan_artifact_refs(
+        &self,
+        track_dir: Option<PathBuf>,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_plan_artifact_refs(track_dir)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_catalogue_spec_refs`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_catalogue_spec_refs(
+        &self,
+        track_id: Option<String>,
+        items_dir: PathBuf,
+        workspace_root: PathBuf,
+        skip_stale: bool,
+    ) -> Result<CommandOutcome, CompositionError> {
+        VerifyCompositionRoot::new().verify_catalogue_spec_refs(
+            track_id,
+            items_dir,
+            workspace_root,
+            skip_stale,
+        )
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_ci_resolve_track_id`].
+    ///
+    /// # Errors
+    /// Returns a human-readable error string for non-skip failures.
+    pub fn verify_ci_resolve_track_id(&self) -> Result<Option<String>, String> {
+        VerifyCompositionRoot::new().verify_ci_resolve_track_id()
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_ci_resolve_track_id_from_root`].
+    ///
+    /// # Errors
+    /// Returns a human-readable error string for non-skip failures.
+    pub fn verify_ci_resolve_track_id_from_root(
+        &self,
+        workspace_root: PathBuf,
+    ) -> Result<Option<String>, String> {
+        VerifyCompositionRoot::new().verify_ci_resolve_track_id_from_root(workspace_root)
+    }
+
+    /// Delegates to [`VerifyCompositionRoot::verify_resolve_active_track_dir`].
+    pub fn verify_resolve_active_track_dir(&self) -> Option<PathBuf> {
+        VerifyCompositionRoot::new().verify_resolve_active_track_dir()
     }
 }
 

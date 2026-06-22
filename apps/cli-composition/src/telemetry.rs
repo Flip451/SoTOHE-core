@@ -1,9 +1,9 @@
-//! `sotp telemetry` subcommand composition.
+//! `sotp telemetry` subcommand composition — per-context composition root and CliApp shim.
 //!
 //! Provides:
-//! - `CliApp::telemetry_report`: constructs `TelemetryReport`, calls
+//! - `TelemetryCompositionRoot::telemetry_report`: constructs `TelemetryReport`, calls
 //!   `aggregate`, and formats the result as a human-readable text report.
-//! - `CliApp::telemetry_emit_archived_track_subcommand`: wires
+//! - `TelemetryCompositionRoot::telemetry_emit_archived_track_subcommand`: wires
 //!   `FsArchivedTrackTelemetryAdapter` + `ArchivedTrackTelemetryInteractor`
 //!   and emits a single archived-track telemetry event (D8 / AC-10).
 //!
@@ -19,6 +19,28 @@ use std::sync::Arc;
 
 use crate::{CliApp, CommandOutcome, error::CompositionError};
 
+// ---------------------------------------------------------------------------
+// Per-context composition root
+// ---------------------------------------------------------------------------
+
+/// Composition root for the `telemetry` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct TelemetryCompositionRoot;
+
+impl TelemetryCompositionRoot {
+    /// Create a new `TelemetryCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for TelemetryCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Input DTO for `sotp telemetry report`.
 #[derive(Debug, Clone)]
 pub struct TelemetryReportInput {
@@ -28,7 +50,7 @@ pub struct TelemetryReportInput {
     pub items_dir: PathBuf,
 }
 
-impl CliApp {
+impl TelemetryCompositionRoot {
     /// Aggregate and format telemetry for `input.track_id`.
     ///
     /// Reads `<items_dir>/<track_id>/logs/telemetry.jsonl`, aggregates phase
@@ -107,6 +129,41 @@ impl CliApp {
         interactor
             .emit(ArchivedTrackTelemetryCommand { subcommand })
             .map_err(|e: usecase::telemetry::ArchivedTrackTelemetryError| e.to_string())
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CliApp compatibility shim
+// ---------------------------------------------------------------------------
+
+impl CliApp {
+    /// Delegates to [`TelemetryCompositionRoot::telemetry_report`].
+    ///
+    /// # Errors
+    /// Returns `Err(String)` for structural errors that prevent even a partial report.
+    pub fn telemetry_report(
+        &self,
+        input: TelemetryReportInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        TelemetryCompositionRoot::new().telemetry_report(input)
+    }
+
+    /// Delegates to [`TelemetryCompositionRoot::telemetry_emit_archived_track_subcommand`].
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(String)` when:
+    /// - `items_dir` does not have the expected `<root>/track/items` structure.
+    /// - Git repository discovery from the project root fails.
+    /// - The adapter reports an I/O or serialization error.
+    pub fn telemetry_emit_archived_track_subcommand(
+        &self,
+        items_dir: &Path,
+        track_id: &str,
+        subcommand: String,
+    ) -> Result<(), String> {
+        TelemetryCompositionRoot::new()
+            .telemetry_emit_archived_track_subcommand(items_dir, track_id, subcommand)
     }
 }
 

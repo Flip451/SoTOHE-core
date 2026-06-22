@@ -1,10 +1,24 @@
-//! `guard` command family — CliApp impl methods.
+//! `guard` command family — per-context composition root and CliApp shim.
 
 use std::sync::Arc;
 
 use crate::{CliApp, CommandOutcome, error::CompositionError};
 
-impl CliApp {
+// ---------------------------------------------------------------------------
+// Per-context composition root
+// ---------------------------------------------------------------------------
+
+/// Composition root for the `guard` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct GuardCompositionRoot;
+
+impl GuardCompositionRoot {
+    /// Create a new `GuardCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+
     /// Check a shell command against the guard policy.
     ///
     /// Returns a JSON verdict (`{"decision":"allow"|"block","reason":"..."}`) in stdout.
@@ -47,5 +61,25 @@ impl CliApp {
         let stdout = json.to_string();
         let exit_code: u8 = if is_blocked { 1 } else { 0 };
         Ok(CommandOutcome { stdout: Some(stdout), stderr: None, exit_code })
+    }
+}
+
+impl Default for GuardCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CliApp compatibility shim
+// ---------------------------------------------------------------------------
+
+impl CliApp {
+    /// Delegates to [`GuardCompositionRoot::guard_check`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn guard_check(&self, command: String) -> Result<CommandOutcome, CompositionError> {
+        GuardCompositionRoot::new().guard_check(command)
     }
 }

@@ -1,4 +1,4 @@
-//! `hook` command family — CliApp impl methods.
+//! `hook` command family — per-context composition root and CliApp shim.
 //!
 //! The composition root owns stdin reading (CN-02): the CLI layer passes the
 //! hook name plus any git hook positional arguments. Claude Code hook JSON
@@ -10,6 +10,28 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use crate::{CliApp, CommandOutcome, error::CompositionError};
+
+// ---------------------------------------------------------------------------
+// Per-context composition root
+// ---------------------------------------------------------------------------
+
+/// Composition root for the `hook` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct HookCompositionRoot;
+
+impl HookCompositionRoot {
+    /// Create a new `HookCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for HookCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// CLI-layer serde type for Claude Code hook JSON envelope.
 /// Security-critical fields (`tool_name`) must NOT use `#[serde(default)]` —
@@ -117,7 +139,7 @@ fn hooks_path_configured() -> bool {
     infrastructure::verify::hooks_path::verify(Path::new(".")).is_ok()
 }
 
-impl CliApp {
+impl HookCompositionRoot {
     /// Dispatch a security-critical hook via Rust logic.
     ///
     /// Reads Claude Code hook JSON from stdin for Claude Code hooks.
@@ -248,6 +270,24 @@ impl CliApp {
         });
 
         Ok(CommandOutcome::success(stdout))
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CliApp compatibility shim
+// ---------------------------------------------------------------------------
+
+impl CliApp {
+    /// Delegates to [`HookCompositionRoot::hook_dispatch`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn hook_dispatch(
+        &self,
+        hook_name: String,
+        hook_args: Vec<String>,
+    ) -> Result<CommandOutcome, CompositionError> {
+        HookCompositionRoot::new().hook_dispatch(hook_name, hook_args)
     }
 }
 

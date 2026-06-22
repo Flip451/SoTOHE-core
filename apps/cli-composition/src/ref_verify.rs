@@ -1,7 +1,31 @@
+//! `ref_verify` command family — per-context composition root and CliApp shim.
+
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use crate::{CliApp, CommandOutcome, error::CompositionError};
+
+// ---------------------------------------------------------------------------
+// Per-context composition root
+// ---------------------------------------------------------------------------
+
+/// Composition root for the `ref_verify` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct RefVerifyCompositionRoot;
+
+impl RefVerifyCompositionRoot {
+    /// Create a new `RefVerifyCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for RefVerifyCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct RefVerifyRunInput {
@@ -85,7 +109,7 @@ fn current_git_branch(project_root: &Path) -> Result<String, String> {
         .ok_or_else(|| "cannot read current branch: HEAD is detached".to_owned())
 }
 
-impl CliApp {
+impl RefVerifyCompositionRoot {
     pub fn ref_verify_run(
         &self,
         input: RefVerifyRunInput,
@@ -282,6 +306,34 @@ impl CliApp {
                 exit_code: 1,
             })
         }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CliApp compatibility shim
+// ---------------------------------------------------------------------------
+
+impl CliApp {
+    /// Delegates to [`RefVerifyCompositionRoot::ref_verify_run`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn ref_verify_run(
+        &self,
+        input: RefVerifyRunInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        RefVerifyCompositionRoot::new().ref_verify_run(input)
+    }
+
+    /// Delegates to [`RefVerifyCompositionRoot::ref_verify_check_approved`].
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn ref_verify_check_approved(
+        &self,
+        input: RefVerifyCheckApprovedInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        RefVerifyCompositionRoot::new().ref_verify_check_approved(input)
     }
 }
 

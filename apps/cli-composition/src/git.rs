@@ -1,4 +1,4 @@
-//! `git` command family — CliApp impl methods.
+//! `git` command family — per-context composition root and CliApp shim.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -7,7 +7,29 @@ use infrastructure::git_cli::GitRepository as _;
 
 use crate::{CliApp, CommandOutcome, error::CompositionError};
 
-impl CliApp {
+// ---------------------------------------------------------------------------
+// Per-context composition root
+// ---------------------------------------------------------------------------
+
+/// Composition root for the `git` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct GitCompositionRoot;
+
+impl GitCompositionRoot {
+    /// Create a new `GitCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for GitCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl GitCompositionRoot {
     /// Stage the whole worktree except transient automation scratch files.
     ///
     /// # Errors
@@ -277,6 +299,81 @@ impl CliApp {
             }
             Err(_) => Ok(None),
         }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CliApp compatibility shim
+// ---------------------------------------------------------------------------
+
+impl CliApp {
+    /// Delegates to [`GitCompositionRoot::git_add_all`].
+    ///
+    /// # Errors
+    /// Returns `Err` when git discovery or staging fails.
+    pub fn git_add_all(&self) -> Result<CommandOutcome, CompositionError> {
+        GitCompositionRoot::new().git_add_all()
+    }
+
+    /// Delegates to [`GitCompositionRoot::git_add_from_file`].
+    ///
+    /// # Errors
+    /// Returns `Err` when git discovery, file reading, or staging fails.
+    pub fn git_add_from_file(
+        &self,
+        path: PathBuf,
+        cleanup: bool,
+    ) -> Result<CommandOutcome, CompositionError> {
+        GitCompositionRoot::new().git_add_from_file(path, cleanup)
+    }
+
+    /// Delegates to [`GitCompositionRoot::git_commit_from_file`].
+    ///
+    /// # Errors
+    /// Returns `Err` when git discovery, branch guard, or commit fails.
+    pub fn git_commit_from_file(
+        &self,
+        path: PathBuf,
+        cleanup: bool,
+        track_dir: Option<PathBuf>,
+    ) -> Result<CommandOutcome, CompositionError> {
+        GitCompositionRoot::new().git_commit_from_file(path, cleanup, track_dir)
+    }
+
+    /// Delegates to [`GitCompositionRoot::git_note_from_file`].
+    ///
+    /// # Errors
+    /// Returns `Err` when git discovery, file reading, or note attachment fails.
+    pub fn git_note_from_file(
+        &self,
+        path: PathBuf,
+        cleanup: bool,
+    ) -> Result<CommandOutcome, CompositionError> {
+        GitCompositionRoot::new().git_note_from_file(path, cleanup)
+    }
+
+    /// Delegates to [`GitCompositionRoot::git_switch_and_pull`].
+    ///
+    /// # Errors
+    /// Returns `Err` when git discovery or checkout fails.
+    pub fn git_switch_and_pull(&self, branch: String) -> Result<CommandOutcome, CompositionError> {
+        GitCompositionRoot::new().git_switch_and_pull(branch)
+    }
+
+    /// Delegates to [`GitCompositionRoot::git_unstage`].
+    ///
+    /// # Errors
+    /// Returns `Err` when git discovery or unstage fails.
+    pub fn git_unstage(&self, paths: Vec<PathBuf>) -> Result<CommandOutcome, CompositionError> {
+        GitCompositionRoot::new().git_unstage(paths)
+    }
+
+    /// Delegates to [`GitCompositionRoot::current_branch_track_id_strict`].
+    ///
+    /// # Errors
+    /// Returns a human-readable error string when validation of the track ID fails.
+    pub fn current_branch_track_id_strict(&self) -> Result<Option<String>, String> {
+        GitCompositionRoot::new().current_branch_track_id_strict()
     }
 }
 

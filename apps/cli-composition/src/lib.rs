@@ -93,7 +93,14 @@ pub use conventions::ConventionsCompositionRoot;
 pub use demo::DemoCompositionRoot;
 pub use domain::DomainCompositionRoot;
 pub use file::FileCompositionRoot;
+pub use git::GitCompositionRoot;
+pub use guard::GuardCompositionRoot;
+pub use hook::HookCompositionRoot;
+pub use ref_verify::RefVerifyCompositionRoot;
+pub use signal::SignalCompositionRoot;
+pub use telemetry::TelemetryCompositionRoot;
 pub use track::composition_root::TrackCompositionRoot;
+pub use verify::VerifyCompositionRoot;
 
 /// Re-exports [`infrastructure::codex_common::tee_stderr_to_file`] so that
 /// `apps/cli` can use it without importing `infrastructure` directly (which the
