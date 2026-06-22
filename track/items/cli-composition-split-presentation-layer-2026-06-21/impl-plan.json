@@ -112,12 +112,13 @@
     {
       "id": "T019",
       "description": "D3 cli-driver staging — dry, semantic_dup command families: Stage `DryDriver` and `SemanticDupDriver` source in `apps/cli-driver/src/`. Stage render helpers from `cli_composition` (dry.rs lines 437-492 `dry_results` per-record formatter, measure_quality.rs lines 92-106 `dup_index_measure_quality` JSON assembly) into `cli_driver::render::dry` and `cli_driver::render::semantic_dup`. After this task, every targeted render family has a staged cli_driver counterpart; AC-06 becomes live when T021 flips wiring and removes the original `cli_composition` render helpers. Estimated diff: ~280 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "536255ac397cec3ff35a398b693c3c32005bc370"
     },
     {
       "id": "T020",
       "description": "D5 thin-bin preparation: Isolate `apps/cli/src/main.rs` dispatch so the final flip can swap from composition method calls to `driver.handle(input)` without leaving direct `usecase::` or `domain::` imports. Remove direct imports that are already made unnecessary by earlier tasks, but do not add a `cli_driver` dependency or import before T021. The final import/dependency replacement and `driver.handle(input)` cutover happen in T021 together with the crate manifest and architecture-rule flip. Estimated diff: ~160 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T021",
