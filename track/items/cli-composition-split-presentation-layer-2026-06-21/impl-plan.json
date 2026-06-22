@@ -106,12 +106,13 @@
     {
       "id": "T018",
       "description": "D3 cli-driver staging — pr, review_v2 command families: Stage `PrDriver` and `ReviewDriver` source in `apps/cli-driver/src/`. Stage render helpers from `cli_composition` (pr.rs lines 101-116/160-203/277-280/385-389 format banners, pr/poll.rs lines 514-547 `format_review_summary`, review_v2/results.rs lines 24-244 `render_review_results_str` ~220-line rendering engine, review_v2/mod.rs lines 424-452 `review_check_approved` message assembly) into `cli_driver::render::pr` and `cli_driver::render::review`. Leave live pr/review roots unchanged until T021. Estimated diff: ~380 lines. (This is the largest staged render family; the review results renderer alone is ~220 lines.)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "05e2c08b99fd74ea4db03738e7732ffa30b5ecaf"
     },
     {
       "id": "T019",
       "description": "D3 cli-driver staging — dry, semantic_dup command families: Stage `DryDriver` and `SemanticDupDriver` source in `apps/cli-driver/src/`. Stage render helpers from `cli_composition` (dry.rs lines 437-492 `dry_results` per-record formatter, measure_quality.rs lines 92-106 `dup_index_measure_quality` JSON assembly) into `cli_driver::render::dry` and `cli_driver::render::semantic_dup`. After this task, every targeted render family has a staged cli_driver counterpart; AC-06 becomes live when T021 flips wiring and removes the original `cli_composition` render helpers. Estimated diff: ~280 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T020",
