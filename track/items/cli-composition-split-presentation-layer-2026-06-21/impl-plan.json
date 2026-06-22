@@ -118,12 +118,13 @@
     {
       "id": "T020",
       "description": "D5 thin-bin preparation: Isolate `apps/cli/src/main.rs` dispatch so the final flip can swap from composition method calls to `driver.handle(input)` without leaving direct `usecase::` or `domain::` imports. Remove direct imports that are already made unnecessary by earlier tasks, but do not add a `cli_driver` dependency or import before T021. The final import/dependency replacement and `driver.handle(input)` cutover happen in T021 together with the crate manifest and architecture-rule flip. Estimated diff: ~160 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "063924b5043c8f8bb49f0c15038330f94f6c060a"
     },
     {
       "id": "T021",
       "description": "D1/D6 Final flip commit (atomic SSoT update and live cutover): (1) Create `apps/cli-driver/Cargo.toml` for the staged source tree (crate name `cli_driver`, depends on `usecase` only) and add `apps/cli-driver` to `Cargo.toml` workspace members. (2) Add `cli_driver` layer entry to `architecture-rules.json` (`crate: cli_driver, path: apps/cli-driver, may_depend_on: [usecase], tddd.enabled: false`). (3) Update `cli_composition.may_depend_on` and `cli.may_depend_on` to add `cli_driver`. (4) Update `deny.toml`, `apps/cli/Cargo.toml`, and `apps/cli-composition/Cargo.toml` to reflect the new layer boundary; remove stale `chrono` / `serde_json` direct deps from `apps/cli/Cargo.toml` if T009 made them unused. (5) Cut over live wiring: `cli_composition` builds the staged drivers, `apps/cli` calls `driver.handle(input)`, archived-track telemetry dispatch moves from the temporary T009 composition shim to `TelemetryDriver` calling `ArchivedTrackTelemetryService`, and direct bin imports of `usecase` / `domain` are absent. (6) Remove original `cli_composition` render helpers, temporary D4 delegation shims from T005-T008, the temporary D8 telemetry composition shim from T009, and all remaining re-export shims pointing to `infrastructure` adapter types. (7) Confirm `pub struct CliApp;` is absent from `lib.rs` (AC-04). (8) Confirm `Result<CommandOutcome, String>` is absent from all `cli_composition` public methods (AC-05). (9) Verify `cargo make check-layers` and `cargo make deny` pass. This is the only commit that modifies the architecture/Cargo dependency graph; crate manifest, workspace membership, dependency edges, and architecture rules land together per CN-06. Estimated diff: ~450 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T022",

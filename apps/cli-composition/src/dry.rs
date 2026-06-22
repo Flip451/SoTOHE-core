@@ -682,7 +682,6 @@ mod tests {
     use super::*;
     use std::ffi::OsString;
 
-    use crate::CliApp;
     use crate::dry_fix_runner::{
         DryFixSessionLogCleanup, build_dry_fix_invocation, dry_fix_build_safe_env,
         dry_fix_build_smoke_env, dry_fix_smoke_test_codex_version, dry_fix_spawn_and_collect,
@@ -1232,11 +1231,13 @@ mod tests {
 
     #[test]
     fn test_dry_run_fix_local_invalid_track_id_returns_error() {
-        let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
-            track_id: "dry-track\nignore-the-prompt".to_owned(),
-            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
-            model: Some("gpt-test".to_owned()),
-        });
+        let result = crate::dry_fix_runner::DryFixRunnerCompositionRoot::new().dry_run_fix_local(
+            RunDryFixLocalInput {
+                track_id: "dry-track\nignore-the-prompt".to_owned(),
+                briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                model: Some("gpt-test".to_owned()),
+            },
+        );
 
         let message = result.unwrap_err().to_string();
         assert!(
@@ -1366,11 +1367,13 @@ exit 0
         let fixture = DryRunFixLocalFixture::new_with_provider("claude", "claude-test-model");
         let _guards = fixture.path_guard();
 
-        let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
-            track_id: "dry-track".to_owned(),
-            briefing_file: fixture.briefing_file.clone(),
-            model: None,
-        });
+        let result = crate::dry_fix_runner::DryFixRunnerCompositionRoot::new().dry_run_fix_local(
+            RunDryFixLocalInput {
+                track_id: "dry-track".to_owned(),
+                briefing_file: fixture.briefing_file.clone(),
+                model: None,
+            },
+        );
 
         let message = result.unwrap_err().to_string();
 
@@ -1416,11 +1419,13 @@ exit 0
         let fixture = DryRunFixLocalFixture::new_with_provider("claude", "claude-test-model");
         let _guards = fixture.path_guard();
 
-        let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
-            track_id: "dry-track".to_owned(),
-            briefing_file: fixture.briefing_file.clone(),
-            model: Some("gpt-explicit-override".to_owned()),
-        });
+        let result = crate::dry_fix_runner::DryFixRunnerCompositionRoot::new().dry_run_fix_local(
+            RunDryFixLocalInput {
+                track_id: "dry-track".to_owned(),
+                briefing_file: fixture.briefing_file.clone(),
+                model: Some("gpt-explicit-override".to_owned()),
+            },
+        );
 
         let message = result.unwrap_err().to_string();
 
@@ -1557,11 +1562,12 @@ exit 0
                 EnvGuard::set("CODEX_HOME", self.codex_home.as_os_str().to_os_string()),
             ];
 
-            let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
-                track_id: "dry-track".to_owned(),
-                briefing_file: self.briefing_file.clone(),
-                model: model.map(|s| s.to_owned()),
-            });
+            let result = crate::dry_fix_runner::DryFixRunnerCompositionRoot::new()
+                .dry_run_fix_local(RunDryFixLocalInput {
+                    track_id: "dry-track".to_owned(),
+                    briefing_file: self.briefing_file.clone(),
+                    model: model.map(|s| s.to_owned()),
+                });
 
             (result, guards)
         }
@@ -1833,7 +1839,7 @@ exit 0
     #[test]
     fn test_dry_results_empty_store_returns_success_exit_zero() {
         let dir = temp_items_dir_under_repo();
-        let outcome = CliApp::new()
+        let outcome = DryCompositionRoot::new()
             .dry_results(DryResultsInput {
                 track_id: "dry-results-empty".to_owned(),
                 filter: "all".to_owned(),
@@ -1849,7 +1855,7 @@ exit 0
     #[test]
     fn test_dry_results_invalid_filter_returns_error() {
         let dir = temp_items_dir_under_repo();
-        let result = CliApp::new().dry_results(DryResultsInput {
+        let result = DryCompositionRoot::new().dry_results(DryResultsInput {
             track_id: "dry-results-invalid-filter".to_owned(),
             filter: "unknown".to_owned(),
             items_dir: dir.path().to_path_buf(),
@@ -1865,7 +1871,7 @@ exit 0
     #[test]
     fn test_dry_results_outside_repo_items_dir_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let result = CliApp::new().dry_results(DryResultsInput {
+        let result = DryCompositionRoot::new().dry_results(DryResultsInput {
             track_id: "dry-results-outside-items-dir".to_owned(),
             filter: "all".to_owned(),
             items_dir: dir.path().to_path_buf(),
@@ -1881,7 +1887,7 @@ exit 0
     #[test]
     fn test_dry_results_escaped_track_id_returns_error() {
         let dir = temp_items_dir_under_repo();
-        let result = CliApp::new().dry_results(DryResultsInput {
+        let result = DryCompositionRoot::new().dry_results(DryResultsInput {
             track_id: "../outside".to_owned(),
             filter: "all".to_owned(),
             items_dir: dir.path().to_path_buf(),
@@ -1900,7 +1906,7 @@ exit 0
         let track_id = "dry-write-invalid-base";
         std::fs::create_dir_all(dir.path().join(track_id)).unwrap();
 
-        let result = CliApp::new().dry_write(DryWriteInput {
+        let result = DryCompositionRoot::new().dry_write(DryWriteInput {
             track_id: track_id.to_owned(),
             base_commit: Some("not-a-hash".to_owned()),
             db_path: dir.path().join("semantic-index"),
@@ -1921,7 +1927,7 @@ exit 0
     #[test]
     fn test_dry_write_public_api_outside_items_dir_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let result = CliApp::new().dry_write(DryWriteInput {
+        let result = DryCompositionRoot::new().dry_write(DryWriteInput {
             track_id: "dry-write-outside-items-dir".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
@@ -1942,7 +1948,7 @@ exit 0
     #[test]
     fn test_dry_write_public_api_escaped_track_id_returns_error() {
         let dir = temp_items_dir_under_repo();
-        let result = CliApp::new().dry_write(DryWriteInput {
+        let result = DryCompositionRoot::new().dry_write(DryWriteInput {
             track_id: "../outside".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
@@ -1964,7 +1970,7 @@ exit 0
     fn test_dry_write_public_api_missing_track_dir_reaches_threshold_validation() {
         let dir = temp_items_dir_under_repo();
 
-        let result = CliApp::new().dry_write(DryWriteInput {
+        let result = DryCompositionRoot::new().dry_write(DryWriteInput {
             track_id: "dry-write-missing-track-invalid-threshold".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
@@ -2019,7 +2025,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(root).unwrap();
 
-        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+        let result = DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some("not-a-hash".to_owned()),
             items_dir: items_dir.clone(),
@@ -2035,7 +2041,7 @@ exit 0
     #[test]
     fn test_dry_check_approved_public_api_outside_items_dir_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+        let result = DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "dry-check-approved-outside-items-dir".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             items_dir: dir.path().to_path_buf(),
@@ -2051,7 +2057,7 @@ exit 0
     #[test]
     fn test_dry_check_approved_public_api_escaped_track_id_returns_error() {
         let dir = temp_items_dir_under_repo();
-        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+        let result = DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "../outside".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             items_dir: dir.path().to_path_buf(),
@@ -2103,7 +2109,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(root).unwrap();
 
-        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+        let result = DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
             track_id: "dry-check-approved-missing-track-advances".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             items_dir: items_dir.clone(),
@@ -2137,7 +2143,7 @@ exit 0
         let track_id = "dry-write-threshold-none";
         std::fs::create_dir_all(dir.path().join(track_id)).unwrap();
 
-        let result = CliApp::new().dry_write(DryWriteInput {
+        let result = DryCompositionRoot::new().dry_write(DryWriteInput {
             track_id: track_id.to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
@@ -2200,7 +2206,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(root).unwrap();
 
-        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+        let result = DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             items_dir: items_dir.clone(),
@@ -2270,7 +2276,7 @@ exit 0
     fn test_dry_write_explicit_model_validates_items_dir_before_agent_profiles_resolution() {
         let dir = tempfile::tempdir().unwrap();
         // Use a known-valid commit hash so base_commit does not fail first.
-        let result = CliApp::new().dry_write(DryWriteInput {
+        let result = DryCompositionRoot::new().dry_write(DryWriteInput {
             track_id: "my-track".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
@@ -2301,7 +2307,7 @@ exit 0
     #[test]
     fn test_dry_write_none_model_resolves_from_agent_profiles_and_fails_on_missing_capability() {
         let dir = tempfile::tempdir().unwrap();
-        let result = CliApp::new().dry_write(DryWriteInput {
+        let result = DryCompositionRoot::new().dry_write(DryWriteInput {
             track_id: "my-track".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
@@ -3341,7 +3347,7 @@ exit 0
         let _telemetry_dir_guard =
             EnvGuard::set("SOTP_TELEMETRY_DIR", telemetry_dir.path().as_os_str().to_os_string());
 
-        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+        let result = DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some(commit_hash),
             items_dir: items_dir.clone(),
@@ -3471,7 +3477,7 @@ exit 0
         let _telemetry_guard = EnvGuard::remove("SOTP_TELEMETRY");
         let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
 
-        let outcome = CliApp::new()
+        let outcome = DryCompositionRoot::new()
             .dry_check_approved(DryCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 base_commit: Some(base_commit),
@@ -3579,7 +3585,7 @@ exit 0
         let _telemetry_dir_guard =
             EnvGuard::set("SOTP_TELEMETRY_DIR", telemetry_dir.path().as_os_str().to_os_string());
 
-        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+        let result = DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
             track_id: track_id.to_owned(),
             base_commit: Some(commit_hash),
             items_dir: items_dir.clone(),

@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use infrastructure::git_cli::GitRepository as _;
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -280,8 +280,8 @@ impl GitCompositionRoot {
     /// Returns `Err` when the branch matches `track/<id>` but the `<id>` fails validation.
     ///
     /// # Errors
-    /// Returns a human-readable error string when validation of the track ID fails.
-    pub fn current_branch_track_id_strict(&self) -> Result<Option<String>, String> {
+    /// Returns a typed composition error when validation of the track ID fails.
+    pub fn current_branch_track_id_strict(&self) -> Result<Option<String>, CompositionError> {
         use infrastructure::git_cli::GitRepository as _;
         use infrastructure::git_cli::SystemGitRepo;
 
@@ -292,88 +292,13 @@ impl GitCompositionRoot {
         match usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)) {
             Ok(id) => Ok(Some(id)),
             Err(usecase::track_resolution::TrackResolutionError::InvalidTrackId(slug, _)) => {
-                Err(format!(
+                Err(CompositionError::Usecase(format!(
                     "current branch 'track/{slug}' has an invalid track id; \
                      rename the branch or switch to a valid track branch before committing"
-                ))
+                )))
             }
             Err(_) => Ok(None),
         }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CliApp compatibility shim
-// ---------------------------------------------------------------------------
-
-impl CliApp {
-    /// Delegates to [`GitCompositionRoot::git_add_all`].
-    ///
-    /// # Errors
-    /// Returns `Err` when git discovery or staging fails.
-    pub fn git_add_all(&self) -> Result<CommandOutcome, CompositionError> {
-        GitCompositionRoot::new().git_add_all()
-    }
-
-    /// Delegates to [`GitCompositionRoot::git_add_from_file`].
-    ///
-    /// # Errors
-    /// Returns `Err` when git discovery, file reading, or staging fails.
-    pub fn git_add_from_file(
-        &self,
-        path: PathBuf,
-        cleanup: bool,
-    ) -> Result<CommandOutcome, CompositionError> {
-        GitCompositionRoot::new().git_add_from_file(path, cleanup)
-    }
-
-    /// Delegates to [`GitCompositionRoot::git_commit_from_file`].
-    ///
-    /// # Errors
-    /// Returns `Err` when git discovery, branch guard, or commit fails.
-    pub fn git_commit_from_file(
-        &self,
-        path: PathBuf,
-        cleanup: bool,
-        track_dir: Option<PathBuf>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        GitCompositionRoot::new().git_commit_from_file(path, cleanup, track_dir)
-    }
-
-    /// Delegates to [`GitCompositionRoot::git_note_from_file`].
-    ///
-    /// # Errors
-    /// Returns `Err` when git discovery, file reading, or note attachment fails.
-    pub fn git_note_from_file(
-        &self,
-        path: PathBuf,
-        cleanup: bool,
-    ) -> Result<CommandOutcome, CompositionError> {
-        GitCompositionRoot::new().git_note_from_file(path, cleanup)
-    }
-
-    /// Delegates to [`GitCompositionRoot::git_switch_and_pull`].
-    ///
-    /// # Errors
-    /// Returns `Err` when git discovery or checkout fails.
-    pub fn git_switch_and_pull(&self, branch: String) -> Result<CommandOutcome, CompositionError> {
-        GitCompositionRoot::new().git_switch_and_pull(branch)
-    }
-
-    /// Delegates to [`GitCompositionRoot::git_unstage`].
-    ///
-    /// # Errors
-    /// Returns `Err` when git discovery or unstage fails.
-    pub fn git_unstage(&self, paths: Vec<PathBuf>) -> Result<CommandOutcome, CompositionError> {
-        GitCompositionRoot::new().git_unstage(paths)
-    }
-
-    /// Delegates to [`GitCompositionRoot::current_branch_track_id_strict`].
-    ///
-    /// # Errors
-    /// Returns a human-readable error string when validation of the track ID fails.
-    pub fn current_branch_track_id_strict(&self) -> Result<Option<String>, String> {
-        GitCompositionRoot::new().current_branch_track_id_strict()
     }
 }
 

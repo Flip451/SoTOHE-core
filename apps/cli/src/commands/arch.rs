@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Subcommand;
-use cli_composition::CliApp;
+use cli_composition::ArchCompositionRoot;
 
 use super::outcome_to_exit;
 
@@ -41,7 +41,7 @@ pub enum ArchCommand {
 }
 
 pub fn execute(cmd: ArchCommand) -> ExitCode {
-    let app = CliApp::new();
+    let app = ArchCompositionRoot::new();
     let result = match cmd {
         ArchCommand::Tree { project_root } => app.arch_tree(&project_root),
         ArchCommand::TreeFull { project_root } => app.arch_tree_full(&project_root),

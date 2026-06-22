@@ -4,7 +4,7 @@
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use super::*;
-use crate::CliApp;
+use crate::signal::SignalCompositionRoot;
 
 /// Minimal `architecture-rules.json` with ALL TDDD layers disabled, so that
 /// the filtered binding list is empty when `include_binding: |_| true` is applied.
@@ -89,7 +89,7 @@ fn test_signal_check_impl_catalog_empty_bindings_fail_closed() {
     let track_id = "T999";
     let dir = setup_workspace(track_id, ARCH_RULES_ALL_TDDD_DISABLED, SIGNAL_GATES_ALL_STRICT);
 
-    let app = CliApp;
+    let app = SignalCompositionRoot::new();
     let result = app.signal_check_impl_catalog(
         false,
         Some(SignalGateName::Commit),
@@ -116,7 +116,7 @@ fn test_signal_check_catalog_spec_empty_bindings_passes() {
     let track_id = "T999";
     let dir = setup_workspace(track_id, ARCH_RULES_ALL_TDDD_DISABLED, SIGNAL_GATES_ALL_STRICT);
 
-    let app = CliApp;
+    let app = SignalCompositionRoot::new();
     let result = app.signal_check_catalog_spec(
         false,
         Some(SignalGateName::Commit),

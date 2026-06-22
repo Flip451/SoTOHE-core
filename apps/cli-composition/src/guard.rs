@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -67,19 +67,5 @@ impl GuardCompositionRoot {
 impl Default for GuardCompositionRoot {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CliApp compatibility shim
-// ---------------------------------------------------------------------------
-
-impl CliApp {
-    /// Delegates to [`GuardCompositionRoot::guard_check`].
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn guard_check(&self, command: String) -> Result<CommandOutcome, CompositionError> {
-        GuardCompositionRoot::new().guard_check(command)
     }
 }

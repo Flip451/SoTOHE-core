@@ -371,7 +371,7 @@ mod tests {
     use std::process::Command;
 
     use super::*;
-    use crate::CliApp;
+    use crate::track::composition_root::TrackCompositionRoot;
 
     // Status types used in test assertions — no longer re-exported from the
     // parent module's use list after the adapter relocation, so imported directly.
@@ -478,7 +478,7 @@ mod tests {
         let outside_items = outside.path().join("track").join("items");
         std::fs::create_dir_all(&outside_items).unwrap();
 
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "my-track-2026".to_owned(),
             current_branch: "track/my-track-2026".to_owned(),
             items_dir: outside_items,
@@ -505,7 +505,7 @@ mod tests {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
         let (dir, items_dir) = seed_track_repo("my-track-2026");
 
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "my-track-2026".to_owned(),
             current_branch: "main".to_owned(),
             items_dir,
@@ -528,7 +528,7 @@ mod tests {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
         let (dir, items_dir) = seed_track_repo("my-track-2026");
 
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "my-track-2026".to_owned(),
             current_branch: "".to_owned(),
             items_dir,
@@ -546,7 +546,7 @@ mod tests {
     /// An invalid `--track-id` (empty string) must be rejected immediately.
     #[test]
     fn test_fixpoint_resolve_invalid_track_id_returns_error() {
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "".to_owned(),
             current_branch: "track/x".to_owned(),
             items_dir: PathBuf::from("track/items"),
@@ -631,7 +631,7 @@ mod tests {
         std::env::set_current_dir(root).expect("set_current_dir to temp repo must succeed");
 
         // No dry-check-coverage.json → dry gate is Blocked → step = "run-dfp".
-        let outcome = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let outcome = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: track_id_str.to_owned(),
             current_branch: format!("track/{track_id_str}"),
             items_dir: items_dir.clone(),
@@ -681,7 +681,7 @@ mod tests {
         let file_path = track_dir.join("items");
         std::fs::write(&file_path, "not a directory").unwrap();
 
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "my-track-2026".to_owned(),
             current_branch: "track/my-track-2026".to_owned(),
             items_dir: file_path,

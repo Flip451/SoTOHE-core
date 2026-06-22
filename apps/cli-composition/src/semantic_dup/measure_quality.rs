@@ -11,7 +11,7 @@ use usecase::semantic_dup::{
 };
 
 use super::SemanticDupCompositionRoot;
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // Re-export shim: implementation relocated to `libs/infrastructure` per ADR 1328 D7.
 pub(crate) use infrastructure::semantic_dup::noop_adapter::NoopSemanticIndexPort;
@@ -74,17 +74,5 @@ impl SemanticDupCompositionRoot {
         })?;
 
         Ok(CommandOutcome::success(Some(json)))
-    }
-}
-
-// ── CliApp delegation shims ───────────────────────────────────────────────────
-
-impl CliApp {
-    /// Delegates to [`SemanticDupCompositionRoot::semantic_dup_index_measure_quality`].
-    pub fn semantic_dup_index_measure_quality(
-        &self,
-        input: DupIndexMeasureQualityInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        SemanticDupCompositionRoot::new().semantic_dup_index_measure_quality(input)
     }
 }

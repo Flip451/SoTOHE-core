@@ -1,5 +1,5 @@
 use crate::dry::RunDryFixLocalInput;
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
@@ -62,18 +62,6 @@ impl DryFixRunnerCompositionRoot {
                 "[ERROR] unsupported dry-fix-lead provider '{other}' (supported: 'codex')"
             ))),
         }
-    }
-}
-
-// ── CliApp delegation shims ───────────────────────────────────────────────────
-
-impl CliApp {
-    /// Delegates to [`DryFixRunnerCompositionRoot::dry_run_fix_local`].
-    pub fn dry_run_fix_local(
-        &self,
-        input: RunDryFixLocalInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        DryFixRunnerCompositionRoot::new().dry_run_fix_local(input)
     }
 }
 

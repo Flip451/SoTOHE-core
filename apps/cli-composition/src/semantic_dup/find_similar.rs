@@ -10,7 +10,7 @@ use infrastructure::semantic_dup::{
 use usecase::semantic_dup::{FindSimilarCommand, FindSimilarInteractor, FindSimilarService as _};
 
 use super::SemanticDupCompositionRoot;
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
 
@@ -135,18 +135,6 @@ impl SemanticDupCompositionRoot {
     }
 }
 
-// ── CliApp delegation shims ───────────────────────────────────────────────────
-
-impl CliApp {
-    /// Delegates to [`SemanticDupCompositionRoot::semantic_dup_find_similar`].
-    pub fn semantic_dup_find_similar(
-        &self,
-        input: FindSimilarInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        SemanticDupCompositionRoot::new().semantic_dup_find_similar(input)
-    }
-}
-
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -264,7 +252,7 @@ mod tests {
         let db_path = dir.path().join("nonexistent_index.db");
         assert!(!db_path.exists(), "pre-condition: db_path must not exist");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input =
             FindSimilarInput { fragment_text: "fn guard_test() {}".to_owned(), top_k: 5, db_path };
 
@@ -297,7 +285,7 @@ mod tests {
             "pre-condition: marker must be absent"
         );
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = FindSimilarInput {
             fragment_text: "fn guard_test_dir() {}".to_owned(),
             top_k: 5,

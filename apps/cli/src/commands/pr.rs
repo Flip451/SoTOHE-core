@@ -6,7 +6,7 @@
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::CliApp;
+use cli_composition::PrCompositionRoot;
 
 use super::outcome_to_exit;
 
@@ -91,9 +91,9 @@ pub struct ReviewCycleArgs {
     pub resume: bool,
 }
 
-/// Dispatch a `PrCommand` to the appropriate `CliApp` method.
+/// Dispatch a `PrCommand` to the appropriate `PrCompositionRoot` method.
 pub fn execute(cmd: PrCommand) -> ExitCode {
-    let app = CliApp::new();
+    let app = PrCompositionRoot::new();
     match cmd {
         PrCommand::Push(args) => outcome_to_exit(app.pr_push(args.track_id)),
         PrCommand::EnsurePr(args) => outcome_to_exit(app.pr_ensure(args.track_id, args.base)),

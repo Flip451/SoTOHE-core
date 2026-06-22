@@ -5,7 +5,7 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::TrackCompositionRoot;
 
 use crate::CliError;
 
@@ -23,7 +23,7 @@ pub fn execute_baseline_capture(
     source_workspace: Option<PathBuf>,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    let outcome = CliApp::new()
+    let outcome = TrackCompositionRoot::new()
         .track_baseline_capture(Some(track_id), workspace_root, source_workspace, layer)
         .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {

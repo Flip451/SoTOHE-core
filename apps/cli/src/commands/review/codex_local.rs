@@ -38,8 +38,9 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
         items_dir: validated.items_dir,
     };
 
-    let outcome =
-        cli_composition::CliApp::new().review_run_codex(input).map_err(|e| e.to_string())?;
+    let outcome = cli_composition::ReviewCompositionRoot::new()
+        .review_run_codex(input)
+        .map_err(|e| e.to_string())?;
 
     emit_outcome_output(outcome.stdout.as_deref(), outcome.exit_code)
 }

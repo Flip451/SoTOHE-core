@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 
 use clap::Args;
-use cli_composition::{CliApp, CommandOutcome, CompositionError};
+use cli_composition::{CommandOutcome, CompositionError, SignalCompositionRoot};
 
 /// Arguments for `signal calc-adr-user`.
 #[derive(Args, Debug)]
@@ -14,6 +14,9 @@ pub struct CalcAdrUserArgs {
 }
 
 /// Execute `signal calc-adr-user`.
-pub fn run(app: &CliApp, args: CalcAdrUserArgs) -> Result<CommandOutcome, CompositionError> {
+pub fn run(
+    app: &SignalCompositionRoot,
+    args: CalcAdrUserArgs,
+) -> Result<CommandOutcome, CompositionError> {
     app.signal_calc_adr_user(args.project_root)
 }

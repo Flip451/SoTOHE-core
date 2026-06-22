@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Subcommand;
-use cli_composition::CliApp;
+use cli_composition::FileCompositionRoot;
 
 use crate::CliError;
 
@@ -48,6 +48,8 @@ fn write_atomic(path: PathBuf) -> Result<ExitCode, CliError> {
         )));
     }
 
-    CliApp::new().file_write_atomic(path, &buf).map_err(|e| CliError::Message(e.to_string()))?;
+    FileCompositionRoot::new()
+        .file_write_atomic(path, &buf)
+        .map_err(|e| CliError::Message(e.to_string()))?;
     Ok(ExitCode::SUCCESS)
 }

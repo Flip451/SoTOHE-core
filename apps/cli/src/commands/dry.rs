@@ -14,7 +14,8 @@ use std::process::ExitCode;
 
 use clap::{Args, Subcommand, ValueEnum};
 use cli_composition::{
-    CliApp, DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput,
+    DryCheckApprovedInput, DryCompositionRoot, DryFixRunnerCompositionRoot, DryResultsInput,
+    DryWriteInput, RunDryFixLocalInput,
 };
 
 use crate::commands::outcome_to_exit;
@@ -87,7 +88,7 @@ pub struct DryWriteArgs {
 
 /// Execute `sotp dry write`.
 pub fn execute_dry_write(args: DryWriteArgs) -> ExitCode {
-    outcome_to_exit(CliApp::new().dry_write(DryWriteInput {
+    outcome_to_exit(DryCompositionRoot::new().dry_write(DryWriteInput {
         track_id: args.track_id,
         base_commit: args.base_commit,
         db_path: args.db_path,
@@ -150,7 +151,7 @@ pub struct DryResultsArgs {
 ///
 /// INFORMATIONAL — always exits 0 on successful read.
 pub fn execute_dry_results(args: DryResultsArgs) -> ExitCode {
-    outcome_to_exit(CliApp::new().dry_results(DryResultsInput {
+    outcome_to_exit(DryCompositionRoot::new().dry_results(DryResultsInput {
         track_id: args.track_id,
         filter: args.filter.as_filter_str().to_owned(),
         items_dir: args.items_dir,
@@ -194,7 +195,7 @@ pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    outcome_to_exit(CliApp::new().dry_check_approved(DryCheckApprovedInput {
+    outcome_to_exit(DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
         track_id,
         base_commit: args.base_commit,
         items_dir: args.items_dir,
@@ -233,7 +234,7 @@ pub fn execute_dry_fix_local(args: DryFixLocalArgs) -> ExitCode {
         briefing_file: args.briefing_file,
         model: args.model,
     };
-    match CliApp::new().dry_run_fix_local(input) {
+    match DryFixRunnerCompositionRoot::new().dry_run_fix_local(input) {
         Ok(outcome) => {
             if let Some(msg) = &outcome.stderr {
                 eprintln!("{msg}");

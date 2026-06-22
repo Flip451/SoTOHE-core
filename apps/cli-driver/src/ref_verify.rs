@@ -132,6 +132,7 @@ impl Default for RefVerifyDriver {
 /// Mirrors the inline formatting in
 /// `cli_composition::ref_verify::RefVerifyCompositionRoot::ref_verify_check_approved`
 /// (lines 264-269).
+#[allow(dead_code)]
 fn format_pair_status(claim_hex: &str, evidence_hex: &str, reason: &str) -> String {
     // TODO(T021): used when iterating over production_pairs to build
     // the missing_or_non_pass vec. Format: "pair ({claim_hex}, {evidence_hex}) {reason}"

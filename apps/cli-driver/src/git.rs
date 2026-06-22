@@ -140,7 +140,9 @@ impl GitDriver {
     fn git_switch_and_pull(&self, branch: String) -> CommandOutcome {
         // TODO(T021): invoke GitWorkflowInteractor here.
         // Mirrors cli_composition/src/git.rs GitCompositionRoot::git_switch_and_pull.
-        let stdout = format!("Switching to {branch}...\nPulling latest from origin/{branch}...\n[OK] On {branch}, up to date.");
+        let stdout = format!(
+            "Switching to {branch}...\nPulling latest from origin/{branch}...\n[OK] On {branch}, up to date."
+        );
         CommandOutcome::success(Some(stdout))
     }
 

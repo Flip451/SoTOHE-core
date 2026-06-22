@@ -1,13 +1,9 @@
 //! `domain` command family — `DomainCompositionRoot` impl methods and input DTOs.
-//!
-//! `DomainCompositionRoot` is the per-context composition root for the `domain`
-//! command family.  `CliApp` keeps a shim method that delegates here for
-//! backward compatibility.
 
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 /// Input DTO for `domain_export_schema`.
 #[derive(Debug, Clone)]
@@ -89,25 +85,6 @@ impl DomainCompositionRoot {
         } else {
             Ok(CommandOutcome::success(Some(json)))
         }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CliApp compatibility shim
-// ---------------------------------------------------------------------------
-
-impl CliApp {
-    /// Export the public API schema of a crate as JSON.
-    ///
-    /// Delegates to [`DomainCompositionRoot::domain_export_schema`].
-    ///
-    /// # Errors
-    /// Returns `Err` when workspace root discovery or schema export fails.
-    pub fn domain_export_schema(
-        &self,
-        input: ExportSchemaInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        DomainCompositionRoot::new().domain_export_schema(input)
     }
 }
 

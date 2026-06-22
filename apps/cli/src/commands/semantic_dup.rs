@@ -11,7 +11,8 @@ use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
 use cli_composition::{
-    CliApp, DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
+    DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
+    SemanticDupCompositionRoot,
 };
 
 use crate::commands::outcome_to_exit;
@@ -51,7 +52,7 @@ pub fn execute_find_similar(args: FindSimilarArgs) -> ExitCode {
         }
     };
 
-    outcome_to_exit(CliApp::new().semantic_dup_find_similar(FindSimilarInput {
+    outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_find_similar(FindSimilarInput {
         fragment_text,
         top_k: args.top_k,
         db_path: args.db_path,
@@ -91,7 +92,7 @@ pub struct DupIndexMeasureQualityArgs {
 
 /// Execute `sotp dup-index <subcommand>`.
 pub fn execute_dup_index(cmd: DupIndexCommand) -> ExitCode {
-    let app = CliApp::new();
+    let app = SemanticDupCompositionRoot::new();
     match cmd {
         DupIndexCommand::Build(args) => {
             outcome_to_exit(app.semantic_dup_index_build(DupIndexBuildInput {
@@ -151,7 +152,7 @@ pub fn execute_dup_check(args: DupCheckArgs) -> ExitCode {
         }
     };
 
-    outcome_to_exit(CliApp::new().semantic_dup_check(DupCheckInput {
+    outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_check(DupCheckInput {
         fragment_files,
         threshold: args.threshold,
         db_path: args.db_path,

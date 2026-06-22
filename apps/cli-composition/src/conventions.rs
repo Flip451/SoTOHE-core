@@ -1,12 +1,8 @@
 //! `conventions` command family — `ConventionsCompositionRoot` impl methods.
-//!
-//! `ConventionsCompositionRoot` is the per-context composition root for the
-//! `conventions` command family.  `CliApp` keeps shim methods that delegate
-//! here for backward compatibility.
 
 use std::path::Path;
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -83,57 +79,5 @@ impl ConventionsCompositionRoot {
             let stderr = messages.join("\n");
             Ok(CommandOutcome { stdout: None, stderr: Some(stderr), exit_code: 1 })
         }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CliApp compatibility shim
-// ---------------------------------------------------------------------------
-
-impl CliApp {
-    /// Create a new convention document and update the README index.
-    ///
-    /// Delegates to [`ConventionsCompositionRoot::conventions_add`].
-    ///
-    /// # Errors
-    /// Returns `Err` when the slug is invalid, README is missing or lacks markers,
-    /// the document already exists, or any I/O operation fails.
-    pub fn conventions_add(
-        &self,
-        project_root: &Path,
-        name: &str,
-        slug: Option<&str>,
-        title: Option<&str>,
-        summary: Option<&str>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        ConventionsCompositionRoot::new().conventions_add(project_root, name, slug, title, summary)
-    }
-
-    /// Regenerate the README.md index from current convention documents.
-    ///
-    /// Delegates to [`ConventionsCompositionRoot::conventions_update_index`].
-    ///
-    /// # Errors
-    /// Returns `Err` when README is missing, markers are absent, or any I/O operation fails.
-    pub fn conventions_update_index(
-        &self,
-        project_root: &Path,
-    ) -> Result<CommandOutcome, CompositionError> {
-        ConventionsCompositionRoot::new().conventions_update_index(project_root)
-    }
-
-    /// Verify that the README.md indexes all convention documents.
-    ///
-    /// Delegates to [`ConventionsCompositionRoot::conventions_verify_index`].
-    ///
-    /// Returns exit 0 when the index is in sync, exit 1 with findings otherwise.
-    ///
-    /// # Errors
-    /// Returns `Err` only on unexpected infrastructure failures.
-    pub fn conventions_verify_index(
-        &self,
-        project_root: &Path,
-    ) -> Result<CommandOutcome, CompositionError> {
-        ConventionsCompositionRoot::new().conventions_verify_index(project_root)
     }
 }

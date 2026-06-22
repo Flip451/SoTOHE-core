@@ -7,7 +7,7 @@
 //!
 //! PreToolUse hooks: any internal error → exit 2 (fail-closed).
 
-use cli_composition::CliApp;
+use cli_composition::HookCompositionRoot;
 
 /// Hook names as CLI value enum (clap layer only — DIP).
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
@@ -85,7 +85,9 @@ pub fn execute_inner(cmd: HookCommand) -> Result<cli_composition::CommandOutcome
             }
 
             let hook_name = hook.hook_name().to_owned();
-            CliApp::new().hook_dispatch(hook_name, git_hook_args).map_err(|e| e.to_string())
+            HookCompositionRoot::new()
+                .hook_dispatch(hook_name, git_hook_args)
+                .map_err(|e| e.to_string())
         }
     }
 }

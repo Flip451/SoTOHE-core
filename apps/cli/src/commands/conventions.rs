@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Subcommand;
-use cli_composition::CliApp;
+use cli_composition::ConventionsCompositionRoot;
 
 use super::outcome_to_exit;
 
@@ -47,19 +47,20 @@ pub enum ConventionsCommand {
 
 pub fn execute(cmd: ConventionsCommand) -> ExitCode {
     let result = match cmd {
-        ConventionsCommand::Add { name, slug, title, summary, project_root } => CliApp::new()
-            .conventions_add(
+        ConventionsCommand::Add { name, slug, title, summary, project_root } => {
+            ConventionsCompositionRoot::new().conventions_add(
                 &project_root,
                 &name,
                 slug.as_deref(),
                 title.as_deref(),
                 summary.as_deref(),
-            ),
+            )
+        }
         ConventionsCommand::UpdateIndex { project_root } => {
-            CliApp::new().conventions_update_index(&project_root)
+            ConventionsCompositionRoot::new().conventions_update_index(&project_root)
         }
         ConventionsCommand::VerifyIndex { project_root } => {
-            CliApp::new().conventions_verify_index(&project_root)
+            ConventionsCompositionRoot::new().conventions_verify_index(&project_root)
         }
     };
     outcome_to_exit(result)

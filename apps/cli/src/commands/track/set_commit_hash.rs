@@ -2,7 +2,7 @@
 
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::TrackCompositionRoot;
 
 use crate::CliError;
 
@@ -17,7 +17,7 @@ use crate::CliError;
 /// Returns `CliError` when the composition layer itself returns an unexpected
 /// `Err` (distinct from a failure `CommandOutcome`).
 pub fn execute_set_commit_hash(track_id: String) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     let outcome =
         app.track_set_commit_hash(&track_id).map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {

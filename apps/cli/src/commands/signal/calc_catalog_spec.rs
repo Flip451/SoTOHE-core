@@ -1,7 +1,7 @@
 //! `signal calc-catalog-spec` — compute and persist catalog-spec signals (chain ②).
 
 use clap::Args;
-use cli_composition::{CliApp, CommandOutcome, CompositionError};
+use cli_composition::{CommandOutcome, CompositionError, SignalCompositionRoot};
 
 /// Arguments for `signal calc-catalog-spec`.
 ///
@@ -11,6 +11,9 @@ use cli_composition::{CliApp, CommandOutcome, CompositionError};
 pub struct CalcCatalogSpecArgs {}
 
 /// Execute `signal calc-catalog-spec`.
-pub fn run(app: &CliApp, _args: CalcCatalogSpecArgs) -> Result<CommandOutcome, CompositionError> {
+pub fn run(
+    app: &SignalCompositionRoot,
+    _args: CalcCatalogSpecArgs,
+) -> Result<CommandOutcome, CompositionError> {
     app.signal_calc_catalog_spec()
 }

@@ -3,7 +3,7 @@
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
-use cli_composition::CliApp;
+use cli_composition::{CompositionError, DemoCompositionRoot, TelemetryCompositionRoot};
 
 mod commands;
 mod error;
@@ -150,7 +150,7 @@ fn run_cli_with(
         Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
         Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
         Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
-        Some(CliCommand::Demo) | None => match CliApp::new().demo() {
+        Some(CliCommand::Demo) | None => match DemoCompositionRoot::new().demo() {
             Ok(outcome) => {
                 if let Some(msg) = outcome.stdout {
                     println!("{msg}");
@@ -250,8 +250,8 @@ fn emit_archived_track_subcommand(
     command_label: &str,
     _exit_code: i32,
     _start: std::time::Instant,
-) -> Result<(), String> {
-    CliApp::new().telemetry_emit_archived_track_subcommand(
+) -> Result<(), CompositionError> {
+    TelemetryCompositionRoot::new().telemetry_emit_archived_track_subcommand(
         items_dir,
         track_id,
         command_label.to_owned(),
@@ -491,7 +491,7 @@ mod tests {
     use std::process::ExitCode;
 
     use clap::Parser as _;
-    use cli_composition::CliApp;
+    use cli_composition::DemoCompositionRoot;
     use tempfile::TempDir;
 
     use super::run_cli_with;
@@ -524,7 +524,7 @@ mod tests {
     fn example_cli_flow_saves_track_successfully() {
         // Delegates to infrastructure::demo::run_example_demo which creates an in-memory
         // track, persists it, derives status "planned", and returns the display string.
-        let result = CliApp::new().demo();
+        let result = DemoCompositionRoot::new().demo();
         assert!(result.is_ok(), "demo failed: {:?}", result.err());
         let outcome = result.unwrap();
         let msg = outcome.stdout.unwrap_or_default();

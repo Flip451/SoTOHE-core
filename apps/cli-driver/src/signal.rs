@@ -144,21 +144,13 @@ impl SignalDriver {
     pub fn handle(&self, input: SignalInput) -> CommandOutcome {
         match input {
             SignalInput::CalcAdrUser { project_root } => self.signal_calc_adr_user(project_root),
-            SignalInput::CheckAdrUser {
-                project_root,
-                strict_override,
-                gate,
-                workspace_root,
-            } => self.signal_check_adr_user(project_root, strict_override, gate, workspace_root),
+            SignalInput::CheckAdrUser { project_root, strict_override, gate, workspace_root } => {
+                self.signal_check_adr_user(project_root, strict_override, gate, workspace_root)
+            }
             SignalInput::CalcSpecAdr { spec_json_path, workspace_root } => {
                 self.signal_calc_spec_adr(spec_json_path, workspace_root)
             }
-            SignalInput::CheckSpecAdr {
-                spec_json_path,
-                strict_override,
-                gate,
-                workspace_root,
-            } => {
+            SignalInput::CheckSpecAdr { spec_json_path, strict_override, gate, workspace_root } => {
                 self.signal_check_spec_adr(spec_json_path, strict_override, gate, workspace_root)
             }
             SignalInput::CalcCatalogSpec => self.signal_calc_catalog_spec(),
@@ -290,6 +282,7 @@ impl Default for SignalDriver {
 /// Merge multiple `CommandOutcome`s into one, with a header/footer label.
 ///
 /// Mirrors `cli_composition::signal::merge_outcomes` (lines ~49 of signal/mod.rs).
+#[allow(dead_code)]
 fn merge_outcomes(label: &str, outcomes: Vec<CommandOutcome>) -> CommandOutcome {
     let mut all_lines: Vec<String> = vec![format!("--- {label} ---")];
     let mut any_failure = false;
@@ -306,8 +299,11 @@ fn merge_outcomes(label: &str, outcomes: Vec<CommandOutcome>) -> CommandOutcome 
         }
     }
 
-    let summary =
-        if any_failure { format!("--- {label} FAILED ---") } else { format!("--- {label} PASSED ---") };
+    let summary = if any_failure {
+        format!("--- {label} FAILED ---")
+    } else {
+        format!("--- {label} PASSED ---")
+    };
     all_lines.push(summary);
     let exit_code = if any_failure { 1 } else { 0 };
     CommandOutcome { stdout: Some(all_lines.join("\n")), stderr: None, exit_code }

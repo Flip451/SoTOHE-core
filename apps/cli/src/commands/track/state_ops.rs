@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::TrackCompositionRoot;
 
 use crate::CliError;
 
@@ -14,7 +14,7 @@ pub(super) fn execute_add_task(
     section: Option<String>,
     after: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     let outcome = app
         .track_add_task_resolved(items_dir, track_id, description, section, after)
         .map_err(|e| CliError::Message(e.to_string()))?;
@@ -30,7 +30,7 @@ pub(super) fn execute_set_override(
     status: String,
     reason: String,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     let outcome = app
         .track_set_override_resolved(items_dir, track_id, status, reason)
         .map_err(|e| CliError::Message(e.to_string()))?;
@@ -44,7 +44,7 @@ pub(super) fn execute_clear_override(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     let outcome = app
         .track_clear_override_resolved(items_dir, track_id)
         .map_err(|e| CliError::Message(e.to_string()))?;
@@ -58,7 +58,7 @@ pub(super) fn execute_next_task(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     let outcome = app
         .track_next_task_resolved(items_dir, track_id)
         .map_err(|e| CliError::Message(e.to_string()))?;
@@ -72,7 +72,7 @@ pub(super) fn execute_task_counts(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     let outcome = app
         .track_task_counts_resolved(items_dir, track_id)
         .map_err(|e| CliError::Message(e.to_string()))?;

@@ -977,7 +977,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let outcome = crate::CliApp::new()
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
             .review_run_codex(crate::review_v2::ReviewRunCodexInput {
                 model: "codex-review-model".to_owned(),
                 timeout_seconds: 10,
@@ -1009,7 +1009,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let outcome = crate::CliApp::new()
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
             .review_run_claude(crate::review_v2::ReviewRunClaudeInput {
                 model: "claude-review-model".to_owned(),
                 timeout_seconds: 10,
@@ -1042,7 +1042,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let outcome = crate::CliApp::new()
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
             .review_run_local(crate::review_v2::ReviewRunLocalInput {
                 model: None,
                 timeout_seconds: 10,
@@ -1084,8 +1084,9 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let outcome =
-            crate::CliApp::new().review_run_fix_local(run_review_fix_input(briefing)).unwrap();
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
+            .review_run_fix_local(run_review_fix_input(briefing))
+            .unwrap();
 
         assert_eq!(outcome.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
         assert_eq!(outcome.stderr, None);
@@ -1105,7 +1106,8 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let result = crate::CliApp::new().review_run_fix_local(run_review_fix_input(briefing));
+        let result = crate::review_v2::ReviewCompositionRoot::new()
+            .review_run_fix_local(run_review_fix_input(briefing));
 
         assert!(result.is_err(), "expected unsupported provider error, got: {result:?}");
         let msg = result.unwrap_err().to_string();
@@ -1127,8 +1129,8 @@ exit 0
         let items_dir = dir.path().join("track/items");
         fs::create_dir_all(&items_dir).unwrap();
 
-        let result =
-            crate::CliApp::new().review_run_claude(crate::review_v2::ReviewRunClaudeInput {
+        let result = crate::review_v2::ReviewCompositionRoot::new().review_run_claude(
+            crate::review_v2::ReviewRunClaudeInput {
                 model: "test-model".to_owned(),
                 timeout_seconds: 10,
                 briefing_file: None,
@@ -1137,7 +1139,8 @@ exit 0
                 round_type: "fast".to_owned(),
                 group: "cli_composition".to_owned(),
                 items_dir,
-            });
+            },
+        );
 
         assert!(result.is_err(), "expected Err on non-track branch, got Ok");
         let msg = result.unwrap_err().to_string();
@@ -1155,16 +1158,18 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let result = crate::CliApp::new().review_run_local(crate::review_v2::ReviewRunLocalInput {
-            model: None,
-            timeout_seconds: 10,
-            briefing_file: None,
-            prompt: Some("Review.".to_owned()),
-            track_id: Some(repo.track_id.clone()),
-            round_type: "fast".to_owned(),
-            group: "cli_composition".to_owned(),
-            items_dir: repo.items_dir.clone(),
-        });
+        let result = crate::review_v2::ReviewCompositionRoot::new().review_run_local(
+            crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            },
+        );
 
         assert!(result.is_err(), "expected unsupported provider error, got: {result:?}");
         let msg = result.unwrap_err().to_string();
@@ -1333,7 +1338,7 @@ exit 0
         let items_dir = dir.path().join("track/items");
         fs::create_dir_all(&items_dir).unwrap();
 
-        let app = crate::CliApp::new();
+        let app = crate::review_v2::ReviewCompositionRoot::new();
         let input = crate::review_v2::ReviewRunCodexInput {
             model: "test-model".to_owned(),
             timeout_seconds: 10,

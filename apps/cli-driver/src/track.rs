@@ -178,18 +178,14 @@ impl TrackDriver {
             TrackInput::Transition { items_dir, track_id, task_id, target_status } => {
                 self.track_transition(items_dir, track_id, task_id, target_status)
             }
-            TrackInput::Resolve { items_dir, track_id } => {
-                self.track_resolve(items_dir, track_id)
-            }
+            TrackInput::Resolve { items_dir, track_id } => self.track_resolve(items_dir, track_id),
             TrackInput::BranchCreate { items_dir, track_id } => {
                 self.track_branch_create(items_dir, track_id)
             }
             TrackInput::BranchSwitch { items_dir, track_id } => {
                 self.track_branch_switch(items_dir, track_id)
             }
-            TrackInput::ViewsValidate { project_root } => {
-                self.track_views_validate(project_root)
-            }
+            TrackInput::ViewsValidate { project_root } => self.track_views_validate(project_root),
             TrackInput::ViewsSync { project_root, track_id } => {
                 self.track_views_sync(project_root, track_id)
             }
@@ -208,9 +204,7 @@ impl TrackDriver {
             TrackInput::TaskCounts { items_dir, track_id } => {
                 self.track_task_counts(items_dir, track_id)
             }
-            TrackInput::Archive { items_dir, track_id } => {
-                self.track_archive(items_dir, track_id)
-            }
+            TrackInput::Archive { items_dir, track_id } => self.track_archive(items_dir, track_id),
             TrackInput::DetectActive { project_root } => {
                 self.detect_active_track_from_branch(project_root)
             }
@@ -249,11 +243,7 @@ impl TrackDriver {
         CommandOutcome::success(None)
     }
 
-    fn track_resolve(
-        &self,
-        _items_dir: PathBuf,
-        _track_id: Option<String>,
-    ) -> CommandOutcome {
+    fn track_resolve(&self, _items_dir: PathBuf, _track_id: Option<String>) -> CommandOutcome {
         // TODO(T021): resolve effective_track_id, build FsTrackStore + TrackPhaseInteractor,
         // invoke resolve(), then format lines:
         //   format!("Current phase: {}", info.phase)
@@ -264,11 +254,7 @@ impl TrackDriver {
         CommandOutcome::success(None)
     }
 
-    fn track_branch_create(
-        &self,
-        _items_dir: PathBuf,
-        _track_id: String,
-    ) -> CommandOutcome {
+    fn track_branch_create(&self, _items_dir: PathBuf, _track_id: String) -> CommandOutcome {
         // TODO(T021): validate track_id, discover git repo, verify branch does not exist,
         // run `git switch -c track/<track_id> main`, then format:
         //   format!("[OK] Created and switched to branch: {branch_name}")
@@ -276,11 +262,7 @@ impl TrackDriver {
         CommandOutcome::success(None)
     }
 
-    fn track_branch_switch(
-        &self,
-        _items_dir: PathBuf,
-        _track_id: String,
-    ) -> CommandOutcome {
+    fn track_branch_switch(&self, _items_dir: PathBuf, _track_id: String) -> CommandOutcome {
         // TODO(T021): validate track_id, discover git repo, verify branch exists,
         // run `git switch track/<track_id>`, then format:
         //   format!("[OK] Switched to branch: {branch_name}")
@@ -288,10 +270,7 @@ impl TrackDriver {
         CommandOutcome::success(None)
     }
 
-    fn track_views_validate(
-        &self,
-        _project_root: PathBuf,
-    ) -> CommandOutcome {
+    fn track_views_validate(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): invoke infrastructure::track::render::validate_track_snapshots,
         // then return CommandOutcome::success with "[OK] Track metadata is valid".
         // Mirrors cli_composition/src/track/mod.rs lines 342-349.
@@ -355,11 +334,7 @@ impl TrackDriver {
         CommandOutcome::success(None)
     }
 
-    fn track_next_task(
-        &self,
-        _items_dir: PathBuf,
-        _track_id: Option<String>,
-    ) -> CommandOutcome {
+    fn track_next_task(&self, _items_dir: PathBuf, _track_id: Option<String>) -> CommandOutcome {
         // TODO(T021): resolve effective_track_id, build FsTrackStore + TaskQueryInteractor,
         // invoke next_task() + task_counts(), then build JSON payload:
         //   Some(task) → serde_json::json!({ "task_id": task.task_id, "description": task.description, "status": task_status })
@@ -368,11 +343,7 @@ impl TrackDriver {
         CommandOutcome::success(None)
     }
 
-    fn track_task_counts(
-        &self,
-        _items_dir: PathBuf,
-        _track_id: Option<String>,
-    ) -> CommandOutcome {
+    fn track_task_counts(&self, _items_dir: PathBuf, _track_id: Option<String>) -> CommandOutcome {
         // TODO(T021): resolve effective_track_id, build FsTrackStore + TaskQueryInteractor,
         // invoke task_counts(), then format JSON string:
         //   let total = counts.todo + counts.in_progress + counts.done + counts.skipped;
@@ -382,11 +353,7 @@ impl TrackDriver {
         CommandOutcome::success(None)
     }
 
-    fn track_archive(
-        &self,
-        _items_dir: PathBuf,
-        _track_id: String,
-    ) -> CommandOutcome {
+    fn track_archive(&self, _items_dir: PathBuf, _track_id: String) -> CommandOutcome {
         // TODO(T021): validate track_id, discover git repo, build src/dst paths,
         // create archive_root dir, run git mv, handle optional logs/ rename, then format:
         //   format!("[OK] Archived track '{track_id}': {} → {}", src_dir.display(), dst_dir.display())
@@ -394,10 +361,7 @@ impl TrackDriver {
         CommandOutcome::success(None)
     }
 
-    fn detect_active_track_from_branch(
-        &self,
-        _project_root: PathBuf,
-    ) -> CommandOutcome {
+    fn detect_active_track_from_branch(&self, _project_root: PathBuf) -> CommandOutcome {
         // TODO(T021): discover git repo from project_root, detect active track
         // (only `track/<id>` branches resolve; others return None).
         // Mirrors cli_composition/src/track/ops.rs TrackCompositionRoot::detect_active_track_from_branch.

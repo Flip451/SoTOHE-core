@@ -55,7 +55,8 @@ skip = [
 # Crate names can be changed, but wrappers must reflect your composition root.
 deny = [
     { crate = "infrastructure", wrappers = ["cli_composition"], reason = "Infrastructure implements usecase ports and domain ports; wired at composition root." },
-    { crate = "usecase", wrappers = ["cli_composition", "infrastructure"], reason = "Usecase crate must only be consumed by the cli layer." },
+    { crate = "usecase", wrappers = ["cli_composition", "cli_driver", "infrastructure"], reason = "Usecase crate must only be consumed by the cli layer." },
     { crate = "domain", wrappers = ["cli_composition", "infrastructure", "usecase"], reason = "Domain dependencies are controlled by layer boundaries." },
     { crate = "cli_composition", wrappers = ["cli"], reason = "CLI composition root owns domain/usecase/infrastructure wiring for the CLI delivery adapter." },
+    { crate = "cli_driver", wrappers = ["cli", "cli_composition"], reason = "CLI primary adapter holds injected use cases, invokes them and renders the result into CommandOutcome." },
 ]

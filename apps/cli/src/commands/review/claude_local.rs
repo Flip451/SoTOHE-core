@@ -36,8 +36,9 @@ fn run_execute_claude_local(args: &ClaudeLocalArgs) -> Result<u8, String> {
         items_dir: validated.items_dir,
     };
 
-    let outcome =
-        cli_composition::CliApp::new().review_run_claude(input).map_err(|e| e.to_string())?;
+    let outcome = cli_composition::ReviewCompositionRoot::new()
+        .review_run_claude(input)
+        .map_err(|e| e.to_string())?;
 
     if let Some(line) = &outcome.stdout {
         writeln!(io::stdout(), "{line}").map_err(|e| format!("failed to write stdout: {e}"))?;

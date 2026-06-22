@@ -3,7 +3,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -309,34 +309,6 @@ impl RefVerifyCompositionRoot {
     }
 }
 
-// ---------------------------------------------------------------------------
-// CliApp compatibility shim
-// ---------------------------------------------------------------------------
-
-impl CliApp {
-    /// Delegates to [`RefVerifyCompositionRoot::ref_verify_run`].
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn ref_verify_run(
-        &self,
-        input: RefVerifyRunInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        RefVerifyCompositionRoot::new().ref_verify_run(input)
-    }
-
-    /// Delegates to [`RefVerifyCompositionRoot::ref_verify_check_approved`].
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn ref_verify_check_approved(
-        &self,
-        input: RefVerifyCheckApprovedInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        RefVerifyCompositionRoot::new().ref_verify_check_approved(input)
-    }
-}
-
 #[cfg(test)]
 #[allow(
     clippy::unwrap_used,
@@ -349,8 +321,9 @@ mod tests {
     use std::ffi::OsString;
     use std::path::{Path, PathBuf};
 
+    use super::RefVerifyCompositionRoot;
     use crate::{
-        CliApp, CommandOutcome, RefVerifyCheckApprovedInput, RefVerifyRunInput,
+        CommandOutcome, RefVerifyCheckApprovedInput, RefVerifyRunInput,
         test_support::repo_root_for_tests,
     };
 
@@ -555,7 +528,7 @@ mod tests {
         let fake_claude_dir = write_fake_claude_into_path_dir(project_root);
 
         with_fake_track_branch_and_path(project_root, track_id, &fake_claude_dir, || {
-            CliApp::new()
+            RefVerifyCompositionRoot::new()
                 .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
                 .unwrap()
         })
@@ -754,10 +727,9 @@ exit 64
     #[test]
     fn test_ref_verify_check_approved_invalid_track_id_returns_error() {
         let (_tmp, items_dir) = temp_project_with_items_dir();
-        let result = CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
-            track_id: "../outside".to_owned(),
-            items_dir,
-        });
+        let result = RefVerifyCompositionRoot::new().ref_verify_check_approved(
+            RefVerifyCheckApprovedInput { track_id: "../outside".to_owned(), items_dir },
+        );
         let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("invalid --track-id") || msg.contains("invalid track"),
@@ -768,10 +740,12 @@ exit 64
     #[test]
     fn test_ref_verify_check_approved_outside_repo_items_dir_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let result = CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
-            track_id: "my-track".to_owned(),
-            items_dir: dir.path().to_path_buf(),
-        });
+        let result = RefVerifyCompositionRoot::new().ref_verify_check_approved(
+            RefVerifyCheckApprovedInput {
+                track_id: "my-track".to_owned(),
+                items_dir: dir.path().to_path_buf(),
+            },
+        );
         let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("items_dir") || msg.contains("project root"),
@@ -789,7 +763,7 @@ exit 64
         write_pass_cache_for_first_chain1_pair(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -824,7 +798,7 @@ exit 64
         write_pass_cache_for_first_chain1_pair(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -850,7 +824,7 @@ exit 64
         write_chain1_fixture(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -891,7 +865,7 @@ exit 64
         );
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -922,7 +896,7 @@ exit 64
         .unwrap();
 
         let err = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -945,7 +919,7 @@ exit 64
         write_chain1_fixture(&items_dir, track_id);
 
         let err = with_fake_git_branch(&project_root, "not-the-track", || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -997,7 +971,7 @@ exit 64
         .unwrap();
 
         let result = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new()
+            RefVerifyCompositionRoot::new()
                 .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
         });
         let msg = result.unwrap_err().to_string();
@@ -1032,7 +1006,7 @@ exit 64
 
         let outcome =
             with_fake_track_branch_and_path(&project_root, track_id, &fake_claude_dir, || {
-                CliApp::new()
+                RefVerifyCompositionRoot::new()
                     .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
                     .unwrap()
             });
@@ -1056,7 +1030,7 @@ exit 64
         std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new()
+            RefVerifyCompositionRoot::new()
                 .ref_verify_check_approved(RefVerifyCheckApprovedInput {
                     track_id: track_id.to_owned(),
                     items_dir,
@@ -1101,7 +1075,7 @@ exit 64
 
         let outcome =
             with_fake_track_branch_and_path(&project_root, track_id, &fake_claude_dir, || {
-                CliApp::new()
+                RefVerifyCompositionRoot::new()
                     .ref_verify_run(RefVerifyRunInput {
                         track_id: track_id.to_owned(),
                         items_dir: items_dir.clone(),
@@ -1143,7 +1117,7 @@ exit 64
     #[test]
     fn test_ref_verify_run_invalid_track_id_returns_error() {
         let (_tmp, items_dir) = temp_project_with_items_dir();
-        let result = CliApp::new()
+        let result = RefVerifyCompositionRoot::new()
             .ref_verify_run(RefVerifyRunInput { track_id: "../outside".to_owned(), items_dir });
         let msg = result.unwrap_err().to_string();
         assert!(
@@ -1155,7 +1129,7 @@ exit 64
     #[test]
     fn test_ref_verify_run_outside_repo_items_dir_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let result = CliApp::new().ref_verify_run(RefVerifyRunInput {
+        let result = RefVerifyCompositionRoot::new().ref_verify_run(RefVerifyRunInput {
             track_id: "my-track".to_owned(),
             items_dir: dir.path().to_path_buf(),
         });

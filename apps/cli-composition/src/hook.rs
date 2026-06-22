@@ -9,7 +9,7 @@ use std::io::Read as _;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -270,24 +270,6 @@ impl HookCompositionRoot {
         });
 
         Ok(CommandOutcome::success(stdout))
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CliApp compatibility shim
-// ---------------------------------------------------------------------------
-
-impl CliApp {
-    /// Delegates to [`HookCompositionRoot::hook_dispatch`].
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn hook_dispatch(
-        &self,
-        hook_name: String,
-        hook_args: Vec<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        HookCompositionRoot::new().hook_dispatch(hook_name, hook_args)
     }
 }
 

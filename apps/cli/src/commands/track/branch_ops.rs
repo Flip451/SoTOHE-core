@@ -5,7 +5,7 @@
 
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::TrackCompositionRoot;
 
 use crate::CliError;
 
@@ -42,7 +42,7 @@ fn execute_branch_create(args: BranchArgs) -> Result<ExitCode, CliError> {
         .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
     resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     let outcome = app
         .track_branch_create(items_dir, track_id)
         .map_err(|e| CliError::Message(e.to_string()))?;
@@ -72,7 +72,7 @@ fn execute_branch_switch(args: BranchArgs) -> Result<ExitCode, CliError> {
         .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
     resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     let outcome = app
         .track_branch_switch(items_dir, track_id)
         .map_err(|e| CliError::Message(e.to_string()))?;

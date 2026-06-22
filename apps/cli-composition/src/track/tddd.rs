@@ -606,7 +606,7 @@ fn parse_layer_filter_ids(raw: &str) -> Result<Vec<usecase::LayerId>, String> {
 )]
 mod tests {
     use super::*;
-    use crate::CliApp;
+    use crate::track::composition_root::TrackCompositionRoot;
 
     #[test]
     fn test_parse_layer_filter_ids_single_value_succeeds() {
@@ -717,7 +717,7 @@ mod tests {
     fn test_track_catalogue_spec_signals_absent_catalogue_returns_ok() {
         let (dir, items_dir, _track_dir) = setup_catalogue_spec_signal_track();
 
-        let app = CliApp::new();
+        let app = TrackCompositionRoot::new();
         let result = app.track_catalogue_spec_signals(
             items_dir,
             Some("test-track".to_owned()),
@@ -751,7 +751,7 @@ mod tests {
         }"#;
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
 
-        let app = CliApp::new();
+        let app = TrackCompositionRoot::new();
         let result = app.track_catalogue_spec_signals(
             items_dir,
             Some("test-track".to_owned()),
@@ -791,7 +791,7 @@ mod tests {
 }"#;
         std::fs::write(track_dir.join("domain-types.json"), v5_catalogue).unwrap();
 
-        let app = CliApp::new();
+        let app = TrackCompositionRoot::new();
         let result = app.track_catalogue_spec_signals(
             items_dir,
             Some("test-track".to_owned()),
@@ -830,7 +830,7 @@ mod tests {
         std::fs::write(&stale_signals_path, r#"{"stale": true}"#).unwrap();
         assert!(stale_signals_path.exists(), "pre-condition: stale signals file must exist");
 
-        let app = CliApp::new();
+        let app = TrackCompositionRoot::new();
         let result = app.track_catalogue_spec_signals(
             items_dir,
             Some("test-track".to_owned()),

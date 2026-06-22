@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::CliApp;
+use cli_composition::VerifyCompositionRoot;
 
 /// Arguments for spec-level verify subcommands.
 #[derive(Args)]
@@ -176,7 +176,7 @@ impl VerifyCommand {
 /// `execute_with_summary` delegates here so the 20-arm match is not duplicated.
 #[allow(clippy::too_many_lines)]
 fn dispatch_to_outcome(
-    app: &CliApp,
+    app: &VerifyCompositionRoot,
     cmd: VerifyCommand,
 ) -> Result<cli_composition::CommandOutcome, cli_composition::CompositionError> {
     match cmd {
@@ -211,7 +211,7 @@ fn dispatch_to_outcome(
 /// in the emitted `TelemetryEvent::GateEval` (T005 contract: `reason_summary` should reflect
 /// actual findings rather than a static label).
 pub fn execute_with_summary(cmd: VerifyCommand) -> (ExitCode, Option<String>) {
-    let app = CliApp::new();
+    let app = VerifyCompositionRoot::new();
     run_capturing(dispatch_to_outcome(&app, cmd).map_err(|e| e.to_string()))
 }
 

@@ -97,9 +97,7 @@ impl HookDriver {
     /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: HookInput) -> CommandOutcome {
         match input {
-            HookInput::Dispatch { hook, git_hook_args } => {
-                self.hook_dispatch(hook, git_hook_args)
-            }
+            HookInput::Dispatch { hook, git_hook_args } => self.hook_dispatch(hook, git_hook_args),
         }
     }
 

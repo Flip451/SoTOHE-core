@@ -14,7 +14,7 @@ use std::fs;
 use std::thread;
 use std::time::{Duration, Instant};
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // ── Per-context composition root ──────────────────────────────────────────────
 
@@ -491,64 +491,5 @@ impl PrCompositionRoot {
         }
 
         result
-    }
-}
-
-// ── CliApp delegation shims ───────────────────────────────────────────────────
-
-impl CliApp {
-    /// Delegates to [`PrCompositionRoot::pr_push`].
-    pub fn pr_push(&self, track_id: Option<String>) -> Result<CommandOutcome, CompositionError> {
-        PrCompositionRoot::new().pr_push(track_id)
-    }
-
-    /// Delegates to [`PrCompositionRoot::pr_ensure`].
-    pub fn pr_ensure(
-        &self,
-        track_id: Option<String>,
-        base: String,
-    ) -> Result<CommandOutcome, CompositionError> {
-        PrCompositionRoot::new().pr_ensure(track_id, base)
-    }
-
-    /// Delegates to [`PrCompositionRoot::pr_status`].
-    pub fn pr_status(&self, pr: String) -> Result<CommandOutcome, CompositionError> {
-        PrCompositionRoot::new().pr_status(pr)
-    }
-
-    /// Delegates to [`PrCompositionRoot::pr_wait_and_merge`].
-    pub fn pr_wait_and_merge(
-        &self,
-        pr: String,
-        interval: u64,
-        timeout: u64,
-        method: String,
-    ) -> Result<CommandOutcome, CompositionError> {
-        PrCompositionRoot::new().pr_wait_and_merge(pr, interval, timeout, method)
-    }
-
-    /// Delegates to [`PrCompositionRoot::pr_trigger_review`].
-    pub fn pr_trigger_review(&self, pr: String) -> Result<CommandOutcome, CompositionError> {
-        PrCompositionRoot::new().pr_trigger_review(pr)
-    }
-
-    /// Delegates to [`PrCompositionRoot::pr_poll_review`].
-    pub fn pr_poll_review(
-        &self,
-        pr: String,
-        trigger_timestamp: String,
-        interval: u64,
-        timeout: u64,
-    ) -> Result<CommandOutcome, CompositionError> {
-        PrCompositionRoot::new().pr_poll_review(pr, trigger_timestamp, interval, timeout)
-    }
-
-    /// Delegates to [`PrCompositionRoot::pr_review_cycle`].
-    pub fn pr_review_cycle(
-        &self,
-        track_id: Option<String>,
-        resume: bool,
-    ) -> Result<CommandOutcome, CompositionError> {
-        PrCompositionRoot::new().pr_review_cycle(track_id, resume)
     }
 }

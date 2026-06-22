@@ -436,7 +436,7 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    match cli_composition::CliApp::new()
+    match cli_composition::ReviewCompositionRoot::new()
         .review_check_approved(Some(track_id), args.items_dir.clone())
     {
         Ok(outcome) => {

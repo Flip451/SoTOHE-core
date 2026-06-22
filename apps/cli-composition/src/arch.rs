@@ -1,14 +1,10 @@
 //! `arch` command family — `ArchCompositionRoot` impl methods.
-//!
-//! `ArchCompositionRoot` is the per-context composition root for the `arch`
-//! command family.  `CliApp` keeps shim methods that delegate here for
-//! backward compatibility.
 
 use std::path::Path;
 
 use infrastructure::arch::ArchRulesError;
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -80,58 +76,5 @@ impl ArchCompositionRoot {
         project_root: &Path,
     ) -> Result<CommandOutcome, CompositionError> {
         render(infrastructure::arch::render_direct_checks, project_root)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CliApp compatibility shim
-// ---------------------------------------------------------------------------
-
-impl CliApp {
-    /// Render the workspace tree (crate paths only).
-    ///
-    /// Delegates to [`ArchCompositionRoot::arch_tree`].
-    ///
-    /// # Errors
-    /// Returns `Err` when the architecture rules file cannot be read, parsed, or is structurally
-    /// invalid.
-    pub fn arch_tree(&self, project_root: &Path) -> Result<CommandOutcome, CompositionError> {
-        ArchCompositionRoot::new().arch_tree(project_root)
-    }
-
-    /// Render the workspace tree including extra_dirs.
-    ///
-    /// Delegates to [`ArchCompositionRoot::arch_tree_full`].
-    ///
-    /// # Errors
-    /// Returns `Err` when the architecture rules file cannot be read, parsed, or is structurally
-    /// invalid.
-    pub fn arch_tree_full(&self, project_root: &Path) -> Result<CommandOutcome, CompositionError> {
-        ArchCompositionRoot::new().arch_tree_full(project_root)
-    }
-
-    /// List workspace member paths (one per line).
-    ///
-    /// Delegates to [`ArchCompositionRoot::arch_members`].
-    ///
-    /// # Errors
-    /// Returns `Err` when the architecture rules file cannot be read, parsed, or is structurally
-    /// invalid.
-    pub fn arch_members(&self, project_root: &Path) -> Result<CommandOutcome, CompositionError> {
-        ArchCompositionRoot::new().arch_members(project_root)
-    }
-
-    /// Print the direct dependency check matrix.
-    ///
-    /// Delegates to [`ArchCompositionRoot::arch_direct_checks`].
-    ///
-    /// # Errors
-    /// Returns `Err` when the architecture rules file cannot be read, parsed, or is structurally
-    /// invalid.
-    pub fn arch_direct_checks(
-        &self,
-        project_root: &Path,
-    ) -> Result<CommandOutcome, CompositionError> {
-        ArchCompositionRoot::new().arch_direct_checks(project_root)
     }
 }

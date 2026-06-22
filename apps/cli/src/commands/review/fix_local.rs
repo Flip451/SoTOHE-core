@@ -44,7 +44,7 @@ pub struct FixLocalArgs {
 
 pub(super) fn execute_fix_local(args: &FixLocalArgs) -> ExitCode {
     let input = build_run_review_fix_local_input(args);
-    match cli_composition::CliApp::new().review_run_fix_local(input) {
+    match cli_composition::ReviewCompositionRoot::new().review_run_fix_local(input) {
         Ok(outcome) => {
             // Smoke-test failures (exit_code 2) and normal outcomes all arrive
             // as Ok(CommandOutcome) — the typed RunReviewFixError::SmokeTestFailed

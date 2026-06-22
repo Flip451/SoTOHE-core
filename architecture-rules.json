@@ -99,10 +99,22 @@
       }
     },
     {
+      "crate": "cli_driver",
+      "path": "apps/cli-driver",
+      "may_depend_on": [
+        "usecase"
+      ],
+      "deny_reason": "CLI primary adapter holds injected use cases, invokes them and renders the result into CommandOutcome.",
+      "tddd": {
+        "enabled": false
+      }
+    },
+    {
       "crate": "cli",
       "path": "apps/cli",
       "may_depend_on": [
-        "cli_composition"
+        "cli_composition",
+        "cli_driver"
       ],
       "deny_reason": "",
       "tddd": {
@@ -115,7 +127,8 @@
       "may_depend_on": [
         "domain",
         "infrastructure",
-        "usecase"
+        "usecase",
+        "cli_driver"
       ],
       "deny_reason": "CLI composition root owns domain/usecase/infrastructure wiring for the CLI delivery adapter.",
       "tddd": {

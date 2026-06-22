@@ -1,14 +1,14 @@
 use std::path::Path;
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::TrackCompositionRoot;
 
 use crate::CliError;
 
 use super::{ViewAction, resolve_track_id_from_root_for_write};
 
 pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     match action {
         ViewAction::Validate { project_root } => {
             let outcome = app
@@ -50,7 +50,7 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
 /// detached HEAD) or git failure resolves to `None` so the caller can fall
 /// back to registry-only mode without surfacing an error.
 fn detect_active_track_from_branch(project_root: &Path) -> Option<String> {
-    CliApp::new().detect_active_track_from_branch(project_root)
+    TrackCompositionRoot::new().detect_active_track_from_branch(project_root)
 }
 
 #[cfg(test)]

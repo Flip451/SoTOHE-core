@@ -124,6 +124,7 @@ impl Default for TelemetryDriver {
 /// Format a `TelemetryReportOutput` as a human-readable text report.
 ///
 /// Mirrors `cli_composition::telemetry::format_report`.
+#[allow(dead_code)]
 fn format_report(track_id: &str, phase_section: &str) -> String {
     // TODO(T021): accept `&infrastructure::telemetry::TelemetryReportOutput` and
     // implement the full section-by-section format:

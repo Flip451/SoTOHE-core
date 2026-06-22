@@ -10,7 +10,7 @@ use infrastructure::semantic_dup::{
 use usecase::semantic_dup::{BuildIndexCommand, BuildIndexService as _};
 
 use super::SemanticDupCompositionRoot;
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
 
@@ -488,18 +488,6 @@ impl SemanticDupCompositionRoot {
     }
 }
 
-// ── CliApp delegation shims ───────────────────────────────────────────────────
-
-impl CliApp {
-    /// Delegates to [`SemanticDupCompositionRoot::semantic_dup_index_build`].
-    pub fn semantic_dup_index_build(
-        &self,
-        input: DupIndexBuildInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        SemanticDupCompositionRoot::new().semantic_dup_index_build(input)
-    }
-}
-
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -770,7 +758,7 @@ mod tests {
         create_tool_owned_index(&temp_path);
         std::fs::write(temp_path.join("stale_temp.txt"), "stale").unwrap();
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input =
             DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
         let outcome = app.semantic_dup_index_build(input).unwrap();
@@ -804,7 +792,7 @@ mod tests {
         assert!(temp_path.exists(), "pre-condition: temp_path must exist");
         assert!(!temp_path.join(LANCEDB_TABLE_MARKER).exists(), "pre-condition: no marker present");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input =
             DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
         let result = app.semantic_dup_index_build(input);
@@ -843,7 +831,7 @@ mod tests {
         assert!(!db_path.exists(), "pre-condition: db_path must be absent");
         assert!(backup_path.exists(), "pre-condition: backup must be present");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input =
             DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
         let outcome = app.semantic_dup_index_build(input).unwrap();
@@ -879,7 +867,7 @@ mod tests {
         assert!(!db_path.exists(), "pre-condition: db_path must be absent");
         assert!(unrelated_old.exists(), "pre-condition: unrelated .old dir must exist");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input =
             DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
         let outcome = app.semantic_dup_index_build(input).unwrap();
@@ -1120,7 +1108,7 @@ mod tests {
         assert!(old_path.exists(), "pre-condition: .old must be present");
         assert!(!is_tool_owned_index(&old_path), "pre-condition: .old must NOT be tool-owned");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input =
             DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
         let outcome = app.semantic_dup_index_build(input).unwrap();
@@ -1159,7 +1147,7 @@ mod tests {
         assert!(old_path.exists(), "pre-condition: .old must be present");
         assert!(is_tool_owned_index(&old_path), "pre-condition: .old must be tool-owned");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input =
             DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
         let outcome = app.semantic_dup_index_build(input).unwrap();
@@ -1239,7 +1227,7 @@ mod tests {
         std::fs::write(temp_path.join("foreign_sentinel.txt"), "foreign_data").unwrap();
         assert!(!is_tool_owned_index(&temp_path), "pre-condition: temp_path must NOT be owned");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input =
             DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
         let result = app.semantic_dup_index_build(input);

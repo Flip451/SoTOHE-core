@@ -17,7 +17,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -97,7 +97,7 @@ impl TelemetryCompositionRoot {
     ///
     /// # Errors
     ///
-    /// Returns `Err(String)` when:
+    /// Returns `Err(CompositionError)` when:
     /// - `items_dir` does not have the expected `<root>/track/items` structure.
     /// - Git repository discovery from the project root fails.
     /// - The adapter reports an I/O or serialization error.
@@ -106,7 +106,7 @@ impl TelemetryCompositionRoot {
         items_dir: &Path,
         track_id: &str,
         subcommand: String,
-    ) -> Result<(), String> {
+    ) -> Result<(), CompositionError> {
         use infrastructure::FsArchivedTrackTelemetryAdapter;
         use infrastructure::git_cli::GitRepository as _;
         use usecase::telemetry::{
@@ -115,9 +115,12 @@ impl TelemetryCompositionRoot {
         };
 
         // Derive the project root, then discover the repo to get an absolute root path.
-        let project_root = crate::track::resolve_project_root(items_dir)?;
-        let repo = infrastructure::git_cli::SystemGitRepo::discover_from(&project_root)
-            .map_err(|e| format!("failed to discover git repository: {e}"))?;
+        let project_root = crate::track::resolve_project_root(items_dir)
+            .map_err(CompositionError::Infrastructure)?;
+        let repo =
+            infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).map_err(|e| {
+                CompositionError::Infrastructure(format!("failed to discover git repository: {e}"))
+            })?;
         let repo_root = repo.root().to_path_buf();
 
         // Telemetry directory for the archived track.
@@ -126,44 +129,11 @@ impl TelemetryCompositionRoot {
         let adapter = FsArchivedTrackTelemetryAdapter::new(telemetry_dir);
         let interactor = ArchivedTrackTelemetryInteractor::new(Arc::new(adapter));
 
-        interactor
-            .emit(ArchivedTrackTelemetryCommand { subcommand })
-            .map_err(|e: usecase::telemetry::ArchivedTrackTelemetryError| e.to_string())
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CliApp compatibility shim
-// ---------------------------------------------------------------------------
-
-impl CliApp {
-    /// Delegates to [`TelemetryCompositionRoot::telemetry_report`].
-    ///
-    /// # Errors
-    /// Returns `Err(String)` for structural errors that prevent even a partial report.
-    pub fn telemetry_report(
-        &self,
-        input: TelemetryReportInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        TelemetryCompositionRoot::new().telemetry_report(input)
-    }
-
-    /// Delegates to [`TelemetryCompositionRoot::telemetry_emit_archived_track_subcommand`].
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err(String)` when:
-    /// - `items_dir` does not have the expected `<root>/track/items` structure.
-    /// - Git repository discovery from the project root fails.
-    /// - The adapter reports an I/O or serialization error.
-    pub fn telemetry_emit_archived_track_subcommand(
-        &self,
-        items_dir: &Path,
-        track_id: &str,
-        subcommand: String,
-    ) -> Result<(), String> {
-        TelemetryCompositionRoot::new()
-            .telemetry_emit_archived_track_subcommand(items_dir, track_id, subcommand)
+        interactor.emit(ArchivedTrackTelemetryCommand { subcommand }).map_err(
+            |e: usecase::telemetry::ArchivedTrackTelemetryError| {
+                CompositionError::Infrastructure(e.to_string())
+            },
+        )
     }
 }
 
@@ -240,7 +210,6 @@ mod tests {
     use std::io::Write;
 
     use super::*;
-    use crate::CliApp;
 
     fn write_jsonl_fixture(tmp: &tempfile::TempDir, track_id: &str, lines: &[&str]) {
         let logs_dir = tmp.path().join(track_id).join("logs");
@@ -263,7 +232,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().unwrap();
         write_jsonl_fixture(&tmp, "t", &[SUBCOMMAND_LINE, NON_ZERO_EXIT_LINE, HOOK_BLOCK_LINE]);
 
-        let result = CliApp::new().telemetry_report(TelemetryReportInput {
+        let result = TelemetryCompositionRoot::new().telemetry_report(TelemetryReportInput {
             track_id: "t".to_owned(),
             items_dir: tmp.path().to_path_buf(),
         });
@@ -285,7 +254,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().unwrap();
         write_jsonl_fixture(&tmp, "t", &[SUBCOMMAND_LINE, "not valid json", HOOK_BLOCK_LINE]);
 
-        let outcome = CliApp::new()
+        let outcome = TelemetryCompositionRoot::new()
             .telemetry_report(TelemetryReportInput {
                 track_id: "t".to_owned(),
                 items_dir: tmp.path().to_path_buf(),
@@ -304,7 +273,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().unwrap();
         std::fs::create_dir_all(tmp.path().join("t")).unwrap();
 
-        let outcome = CliApp::new()
+        let outcome = TelemetryCompositionRoot::new()
             .telemetry_report(TelemetryReportInput {
                 track_id: "t".to_owned(),
                 items_dir: tmp.path().to_path_buf(),
@@ -323,7 +292,7 @@ mod tests {
     fn test_telemetry_report_track_not_found_returns_err() {
         let tmp = tempfile::TempDir::new().unwrap();
 
-        let result = CliApp::new().telemetry_report(TelemetryReportInput {
+        let result = TelemetryCompositionRoot::new().telemetry_report(TelemetryReportInput {
             track_id: "does-not-exist".to_owned(),
             items_dir: tmp.path().to_path_buf(),
         });

@@ -158,24 +158,17 @@ impl VerifyDriver {
             }
             VerifyInput::ModuleSize { project_root } => self.verify_module_size(project_root),
             VerifyInput::DomainPurity { project_root } => self.verify_domain_purity(project_root),
-            VerifyInput::DomainStrings { project_root } => {
-                self.verify_domain_strings(project_root)
-            }
-            VerifyInput::UsecasePurity { project_root } => {
-                self.verify_usecase_purity(project_root)
-            }
+            VerifyInput::DomainStrings { project_root } => self.verify_domain_strings(project_root),
+            VerifyInput::UsecasePurity { project_root } => self.verify_usecase_purity(project_root),
             VerifyInput::DocLinks { project_root } => self.verify_doc_links(project_root),
             VerifyInput::ViewFreshness { project_root } => self.verify_view_freshness(project_root),
             VerifyInput::SpecSignals { spec_path } => self.verify_spec_signals(spec_path),
             VerifyInput::PlanArtifactRefs { track_dir } => {
                 self.verify_plan_artifact_refs(track_dir)
             }
-            VerifyInput::CatalogueSpecRefs {
-                track_id,
-                items_dir,
-                workspace_root,
-                skip_stale,
-            } => self.verify_catalogue_spec_refs(track_id, items_dir, workspace_root, skip_stale),
+            VerifyInput::CatalogueSpecRefs { track_id, items_dir, workspace_root, skip_stale } => {
+                self.verify_catalogue_spec_refs(track_id, items_dir, workspace_root, skip_stale)
+            }
         }
     }
 
@@ -327,6 +320,7 @@ impl Default for VerifyDriver {
 /// Render a skip outcome (non-track branch, AC-16).
 ///
 /// Mirrors `cli_composition::verify::render_skip` (lines 8-11).
+#[allow(dead_code)]
 fn render_skip(_label: &str, _reason: &str) -> CommandOutcome {
     // TODO(T021): implement — format!("--- {label} ---\n[SKIP] {reason}\n--- {label} SKIPPED ---")
     // and CommandOutcome::success(Some(stdout)).

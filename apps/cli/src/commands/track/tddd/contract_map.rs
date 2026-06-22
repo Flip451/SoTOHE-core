@@ -14,7 +14,7 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::TrackCompositionRoot;
 
 use crate::CliError;
 
@@ -31,7 +31,7 @@ pub fn execute_contract_map(
     workspace_root: PathBuf,
     layers: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    let outcome = CliApp::new()
+    let outcome = TrackCompositionRoot::new()
         .track_contract_map(items_dir, Some(track_id), workspace_root, layers)
         .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {

@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Args;
-use cli_composition::{CliApp, FixpointResolveInput};
+use cli_composition::{FixpointResolveInput, TrackCompositionRoot};
 
 use crate::CliError;
 
@@ -30,7 +30,7 @@ pub struct FixpointResolveArgs {
 ///
 /// Returns [`CliError`] when `CliApp::fixpoint_resolve` fails.
 pub fn execute_fixpoint_resolve(args: FixpointResolveArgs) -> Result<ExitCode, CliError> {
-    let outcome = CliApp::new()
+    let outcome = TrackCompositionRoot::new()
         .fixpoint_resolve(FixpointResolveInput {
             track_id: args.track_id,
             current_branch: args.current_branch,
@@ -231,7 +231,7 @@ mod tests {
         // Switch CWD to the temp repo so `SystemGitRepo::discover()` finds this repo.
         // No dry-check-coverage.json → dry gate Blocked → step = "run-dfp".
         let (outcome, exit) = run_in_dir(root, || {
-            let outcome = cli_composition::CliApp::new()
+            let outcome = cli_composition::TrackCompositionRoot::new()
                 .fixpoint_resolve(cli_composition::FixpointResolveInput {
                     track_id: track_id_str.to_owned(),
                     current_branch: format!("track/{track_id_str}"),

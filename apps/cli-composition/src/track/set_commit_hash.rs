@@ -57,7 +57,7 @@ mod tests {
     use std::path::Path;
     use std::process::Command;
 
-    use crate::CliApp;
+    use crate::track::composition_root::TrackCompositionRoot;
 
     fn seed_track_repo(path: &Path) {
         let init = Command::new("git").args(["init", "-q"]).current_dir(path).status().unwrap();
@@ -102,7 +102,7 @@ mod tests {
     #[test]
     fn test_track_set_commit_hash_with_invalid_track_id_returns_failure_outcome() {
         // track_id validation happens before any git operation.
-        let app = CliApp::new();
+        let app = TrackCompositionRoot::new();
         let result = app.track_set_commit_hash("../evil");
         assert!(result.is_ok(), "method must return Ok(outcome), not Err: {result:?}");
         let outcome = result.unwrap();
@@ -124,7 +124,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
 
         let outcome = from_working_dir(dir.path(), || {
-            let app = CliApp::new();
+            let app = TrackCompositionRoot::new();
             let result = app.track_set_commit_hash("my-track-2026");
             assert!(result.is_ok(), "method must return Ok(outcome): {result:?}");
             result.unwrap()

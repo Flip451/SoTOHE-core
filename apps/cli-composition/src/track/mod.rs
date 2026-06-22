@@ -753,7 +753,7 @@ mod tests {
         std::fs::create_dir_all(&subdir).unwrap();
         let _cwd = change_to(&subdir);
 
-        let outcome = crate::CliApp::new()
+        let outcome = crate::track::TrackCompositionRoot::new()
             .track_archive(PathBuf::from("track/items"), track_id.to_owned())
             .unwrap();
 
@@ -782,7 +782,7 @@ mod tests {
         std::fs::create_dir_all(&subdir).unwrap();
         let _cwd = change_to(&subdir);
 
-        let outcome = crate::CliApp::new()
+        let outcome = crate::track::TrackCompositionRoot::new()
             .track_archive(PathBuf::from("track/items"), track_id.to_owned())
             .unwrap();
 
@@ -804,7 +804,7 @@ mod tests {
         std::fs::create_dir_all(&subdir).unwrap();
         let _cwd = change_to(&subdir);
 
-        let err = crate::CliApp::new()
+        let err = crate::track::TrackCompositionRoot::new()
             .track_archive(PathBuf::from("track/items"), "missing-track-2026".to_owned())
             .unwrap_err()
             .to_string();
@@ -828,7 +828,7 @@ mod tests {
         std::fs::create_dir_all(&subdir).unwrap();
         let _cwd = change_to(&subdir);
 
-        let err = crate::CliApp::new()
+        let err = crate::track::TrackCompositionRoot::new()
             .track_archive(PathBuf::from("track/items"), track_id.to_owned())
             .unwrap_err()
             .to_string();

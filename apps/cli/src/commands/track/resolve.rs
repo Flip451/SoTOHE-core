@@ -1,6 +1,6 @@
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::TrackCompositionRoot;
 
 use crate::CliError;
 
@@ -26,7 +26,7 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
     validate_track_id_str(&effective_track_id)
         .map_err(|err| CliError::Message(format!("resolve failed: invalid track id: {err}")))?;
 
-    let app = CliApp::new();
+    let app = TrackCompositionRoot::new();
     let outcome = app
         .track_resolve(items_dir, Some(effective_track_id))
         .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;

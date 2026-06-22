@@ -10,7 +10,7 @@ use infrastructure::semantic_dup::{
 use usecase::semantic_dup::{DupCheckCommand, DupCheckInteractor, DupCheckService as _};
 
 use super::SemanticDupCompositionRoot;
-use crate::{CliApp, CommandOutcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index, truncate_snippet};
 
@@ -233,18 +233,6 @@ impl SemanticDupCompositionRoot {
     }
 }
 
-// ── CliApp delegation shims ───────────────────────────────────────────────────
-
-impl CliApp {
-    /// Delegates to [`SemanticDupCompositionRoot::semantic_dup_check`].
-    pub fn semantic_dup_check(
-        &self,
-        input: DupCheckInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        SemanticDupCompositionRoot::new().semantic_dup_check(input)
-    }
-}
-
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -385,7 +373,7 @@ mod tests {
     fn test_dup_check_with_no_fragment_files_exits_zero_with_success_message() {
         let dir = tempfile::tempdir().unwrap();
         let db_path = dir.path().join("test.db");
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
 
         let input = DupCheckInput {
             fragment_files: vec![],
@@ -407,7 +395,7 @@ mod tests {
     fn test_dup_check_with_ack_but_no_ack_file_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let db_path = dir.path().join("test.db");
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
 
         let input = DupCheckInput {
             fragment_files: vec![],
@@ -438,7 +426,7 @@ mod tests {
         ack_set.insert(hash);
         write_ack_set(&ack_path, &ack_set).unwrap();
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = DupCheckInput {
             fragment_files: vec![frag_path],
             threshold: 0.8,
@@ -477,7 +465,7 @@ mod tests {
         let db_path = dir.path().join("nonexistent_index.db");
         assert!(!db_path.exists(), "pre-condition: db_path must not exist");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = DupCheckInput {
             fragment_files: vec![frag_path],
             threshold: 0.8,
@@ -516,7 +504,7 @@ mod tests {
             "pre-condition: marker must be absent"
         );
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = DupCheckInput {
             fragment_files: vec![frag_path],
             threshold: 0.8,
@@ -553,7 +541,7 @@ mod tests {
         let db_path = dir.path().join("nonexistent_index.db");
         assert!(!db_path.exists(), "pre-condition: db_path must not exist");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = DupCheckInput {
             fragment_files: vec![], // zero fragments → early return before guard
             threshold: 0.8,

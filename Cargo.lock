@@ -861,6 +861,7 @@ dependencies = [
  "chrono",
  "clap",
  "cli_composition",
+ "cli_driver",
  "infrastructure",
  "libc",
  "rstest",
@@ -878,6 +879,7 @@ name = "cli_composition"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "cli_driver",
  "domain",
  "fs4",
  "infrastructure",
@@ -890,6 +892,14 @@ dependencies = [
  "thiserror",
  "tracing",
  "tracing-subscriber",
+ "usecase",
+]
+
+[[package]]
+name = "cli_driver"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
  "usecase",
 ]
 

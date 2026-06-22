@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::{CliApp, ExportSchemaInput};
+use cli_composition::{DomainCompositionRoot, ExportSchemaInput};
 
 use crate::commands::outcome_to_exit;
 
@@ -32,7 +32,7 @@ pub struct ExportSchemaArgs {
 pub fn execute(cmd: DomainCommand) -> ExitCode {
     match cmd {
         DomainCommand::ExportSchema(args) => {
-            outcome_to_exit(CliApp::new().domain_export_schema(ExportSchemaInput {
+            outcome_to_exit(DomainCompositionRoot::new().domain_export_schema(ExportSchemaInput {
                 crate_name: args.crate_name,
                 pretty: args.pretty,
                 output: args.output,

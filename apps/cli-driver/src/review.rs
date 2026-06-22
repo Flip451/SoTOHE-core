@@ -543,12 +543,6 @@ fn format_check_approved_msg(
         let mut display: Vec<String> =
             blocked_scopes.iter().map(|scope| format!("  {scope}")).collect();
         display.sort();
-        (
-            format!(
-                "[BLOCKED] Review not approved. Required scopes:\n{}",
-                display.join("\n")
-            ),
-            1u8,
-        )
+        (format!("[BLOCKED] Review not approved. Required scopes:\n{}", display.join("\n")), 1u8)
     }
 }

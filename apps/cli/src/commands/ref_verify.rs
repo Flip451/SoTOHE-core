@@ -15,7 +15,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::{CliApp, RefVerifyCheckApprovedInput, RefVerifyRunInput};
+use cli_composition::{RefVerifyCheckApprovedInput, RefVerifyCompositionRoot, RefVerifyRunInput};
 
 use crate::commands::outcome_to_exit;
 
@@ -91,7 +91,7 @@ fn execute_run(args: &RunArgs) -> ExitCode {
             }
         };
     outcome_to_exit(
-        CliApp::new()
+        RefVerifyCompositionRoot::new()
             .ref_verify_run(RefVerifyRunInput { track_id, items_dir: args.items_dir.clone() }),
     )
 }
@@ -105,10 +105,9 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    outcome_to_exit(CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
-        track_id,
-        items_dir: args.items_dir.clone(),
-    }))
+    outcome_to_exit(RefVerifyCompositionRoot::new().ref_verify_check_approved(
+        RefVerifyCheckApprovedInput { track_id, items_dir: args.items_dir.clone() },
+    ))
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────

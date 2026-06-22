@@ -2,7 +2,7 @@
 
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::GuardCompositionRoot;
 
 use crate::commands::outcome_to_exit;
 
@@ -20,6 +20,8 @@ pub enum GuardCommand {
 /// Executes a guard subcommand.
 pub fn execute(cmd: GuardCommand) -> ExitCode {
     match cmd {
-        GuardCommand::Check { command } => outcome_to_exit(CliApp::new().guard_check(command)),
+        GuardCommand::Check { command } => {
+            outcome_to_exit(GuardCompositionRoot::new().guard_check(command))
+        }
     }
 }

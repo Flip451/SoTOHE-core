@@ -1,12 +1,12 @@
 //! CLI composition root for the `sotp` binary.
 //!
-//! Provides `CliApp` (the facade) and `CommandOutcome` (the unified return type).
+//! Provides `CommandOutcome` (the unified return type) and per-context composition roots.
 //! All public method arguments and return types use only `String`, `&str`,
 //! `PathBuf`, primitives, `CommandOutcome`, or DTOs defined in this crate —
 //! no `usecase` / `domain` / `infrastructure` types appear on the public face (CN-02).
 
 // ---------------------------------------------------------------------------
-// Submodule declarations (impl blocks for CliApp, grouped by command family)
+// Submodule declarations (grouped by command family)
 // ---------------------------------------------------------------------------
 
 mod arch;
@@ -147,7 +147,7 @@ pub fn build_codex_read_only_invocation(
 // Public API types
 // ---------------------------------------------------------------------------
 
-/// Unified return type for all `CliApp` command methods.
+/// Unified return type for all command methods.
 ///
 /// `bin` reads `stdout` / `stderr` and emits them, then exits with `exit_code`.
 /// All fields are primitives so `bin` never needs to import domain types (CN-02).
@@ -167,32 +167,5 @@ impl CommandOutcome {
     /// Convenience constructor: failure with optional stderr text.
     pub fn failure(stderr: Option<String>) -> Self {
         Self { stdout: None, stderr, exit_code: 1 }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Facade
-// ---------------------------------------------------------------------------
-
-/// Facade for all CLI command families.
-///
-/// Each method corresponds to one CLI subcommand.  T002 provides stub
-/// implementations (`Err("not implemented")`); T003-T005 fill in the real
-/// composition logic.
-///
-/// Public method signatures are fixed in T002 and must not change in T003-T005:
-/// only the bodies are replaced.
-pub struct CliApp;
-
-impl CliApp {
-    /// Create a new `CliApp` instance.
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-impl Default for CliApp {
-    fn default() -> Self {
-        Self::new()
     }
 }
