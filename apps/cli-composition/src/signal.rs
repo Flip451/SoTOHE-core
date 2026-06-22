@@ -169,8 +169,12 @@ impl CliApp {
         spec_json_path: Option<PathBuf>,
         workspace_root: Option<PathBuf>,
     ) -> Result<CommandOutcome, String> {
-        use infrastructure::spec::codec as spec_codec;
-        use infrastructure::track::atomic_write::atomic_write_file;
+        use std::sync::Arc;
+
+        use infrastructure::spec::FsSpecFileWriterAdapter;
+        use usecase::spec_adr_signal::{
+            SpecAdrSignalCommand, SpecAdrSignalInteractor, SpecAdrSignalService,
+        };
 
         let spec_json_path = match resolve_spec_json_path(workspace_root.as_deref(), spec_json_path)
         {
@@ -178,18 +182,11 @@ impl CliApp {
             Err(outcome) => return Ok(outcome),
         };
 
-        let json_content = std::fs::read_to_string(&spec_json_path).map_err(|e| {
-            format!("signal calc-spec-adr: cannot read {}: {e}", spec_json_path.display())
-        })?;
-        let mut doc = spec_codec::decode(&json_content)
-            .map_err(|e| format!("signal calc-spec-adr: spec.json decode error: {e}"))?;
-        let counts = doc.evaluate_signals();
-        doc.set_signals(counts);
-        let encoded = spec_codec::encode(&doc)
-            .map_err(|e| format!("signal calc-spec-adr: spec.json encode error: {e}"))?;
-        atomic_write_file(&spec_json_path, format!("{encoded}\n").as_bytes()).map_err(|e| {
-            format!("signal calc-spec-adr: cannot write {}: {e}", spec_json_path.display())
-        })?;
+        let adapter = FsSpecFileWriterAdapter::new();
+        let interactor = SpecAdrSignalInteractor::new(Arc::new(adapter));
+        interactor
+            .calc_and_persist(SpecAdrSignalCommand { spec_json_path })
+            .map_err(|e| e.to_string())?;
         let outcome = infrastructure::verify::VerifyOutcome::pass();
         Ok(render_outcome("signal calc-spec-adr", &outcome))
     }

@@ -7,7 +7,7 @@
 | ArchivedTrackTelemetryError | error_type | — | Io, Serialize | 🔵 | 🔵 |
 | D4OrchestrationError | error_type | — | DiffFragment, DryGate, PrPolling | 🟡 | 🔵 |
 | SignalGateError | error_type | — | ChainExecutionFailed, InvalidTrackId, StrictnessConfigLoad | 🔵 | 🔵 |
-| SpecAdrSignalError | error_type | — | Read, Decode, Encode, Write | 🟡 | 🔵 |
+| SpecAdrSignalError | error_type | — | Read, Decode, Encode, Write | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -23,7 +23,7 @@
 | ReviewGateStatePort | secondary_port | reference | fn review_status(&self) -> Result<ReviewGateStatus, FixpointResolveError> | 🔵 | 🔵 |
 | SemanticIndexPort | secondary_port | reference | fn insert(&self, path: std::path::PathBuf, content: String) -> Result<(), SemanticIndexError>, fn insert_batch(&self, items: Vec<(std::path::PathBuf, String)>) -> Result<(), SemanticIndexError>, fn delete_by_source_path(&self, path: std::path::PathBuf) -> Result<(), SemanticIndexError>, fn search(&self, query: String, limit: usize) -> Result<Vec<domain::semantic_dup::SearchResult>, SemanticIndexError> | 🔵 | 🔵 |
 | SpecAdrChainRunnerPort | secondary_port | — | fn run_spec_adr_chain(&self, spec_json_path: std::path::PathBuf, strict: bool) -> Result<SignalChainOutput, String> | 🔵 | 🔵 |
-| SpecFileWriterPort | secondary_port | — | fn read_spec_json(&self, path: std::path::PathBuf) -> Result<String, SpecAdrSignalError>, fn write_spec_json(&self, path: std::path::PathBuf, content: String) -> Result<(), SpecAdrSignalError> | 🟡 | 🔵 |
+| SpecFileWriterPort | secondary_port | — | fn read_spec_json(&self, path: std::path::PathBuf) -> Result<domain::SpecDocument, SpecAdrSignalError>, fn write_spec_json(&self, path: std::path::PathBuf, doc: &domain::SpecDocument) -> Result<(), SpecAdrSignalError> | 🔵 | 🔵 |
 
 ## Application Services
 
@@ -34,7 +34,7 @@
 | FixpointDryGateService | application_service | — | fn resolve_dry_gate(&self, cmd: FixpointDryGateCommand) -> Result<FixpointDryGateOutput, D4OrchestrationError> | 🟡 | 🔵 |
 | PrReviewPollingService | application_service | — | fn poll(&self, cmd: PrReviewPollingCommand) -> Result<PrReviewPollingOutput, D4OrchestrationError> | 🟡 | 🔵 |
 | SignalGateService | application_service | — | fn run_gate(&self, cmd: SignalGateCommand) -> Result<SignalGateOutput, SignalGateError> | 🔵 | 🔵 |
-| SpecAdrSignalService | application_service | — | fn calc_and_persist(&self, cmd: SpecAdrSignalCommand) -> Result<SpecAdrSignalOutput, SpecAdrSignalError> | 🟡 | 🔵 |
+| SpecAdrSignalService | application_service | — | fn calc_and_persist(&self, cmd: SpecAdrSignalCommand) -> Result<SpecAdrSignalOutput, SpecAdrSignalError> | 🔵 | 🔵 |
 
 ## Interactors
 
@@ -45,7 +45,7 @@
 | FixpointDryGateInteractor | interactor | — | — | 🟡 | 🔵 |
 | PrReviewPollingInteractor | interactor | — | — | 🟡 | 🔵 |
 | SignalGateInteractor | interactor | — | — | 🔵 | 🔵 |
-| SpecAdrSignalInteractor | interactor | — | — | 🟡 | 🔵 |
+| SpecAdrSignalInteractor | interactor | — | — | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -56,7 +56,7 @@
 | PrReviewPollingOutput | dto | — | — | 🟡 | 🔵 |
 | SignalChainOutput | dto | — | — | 🔵 | 🔵 |
 | SignalGateOutput | dto | — | — | 🔵 | 🔵 |
-| SpecAdrSignalOutput | dto | — | — | 🟡 | 🔵 |
+| SpecAdrSignalOutput | dto | — | — | 🔵 | 🔵 |
 
 ## Commands
 
@@ -67,5 +67,5 @@
 | FixpointDryGateCommand | command | — | — | 🟡 | 🔵 |
 | PrReviewPollingCommand | command | — | — | 🟡 | 🔵 |
 | SignalGateCommand | command | — | — | 🔵 | 🔵 |
-| SpecAdrSignalCommand | command | — | — | 🟡 | 🔵 |
+| SpecAdrSignalCommand | command | — | — | 🔵 | 🔵 |
 

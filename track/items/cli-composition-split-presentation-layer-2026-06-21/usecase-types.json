@@ -166,7 +166,7 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Read", "payload": { "kind": "tuple", "fields": ["std::io::Error"] } },
+          { "name": "Read", "payload": { "kind": "tuple", "fields": ["String"] } },
           { "name": "Decode", "payload": { "kind": "tuple", "fields": ["String"] } },
           { "name": "Encode", "payload": { "kind": "tuple", "fields": ["String"] } },
           { "name": "Write", "payload": { "kind": "tuple", "fields": ["String"] } }
@@ -174,7 +174,7 @@
       },
       "methods": [],
       "module_path": "spec_adr_signal",
-      "docs": "Error type for the SpecAdrSignalService. Read: I/O failure reading spec.json. Decode: JSON/domain decode failure. Encode: encode failure. Write: atomic-write failure.",
+      "docs": "Error type for the SpecAdrSignalService. All variants carry String payloads for usecase purity (no std::io::Error). Read: I/O failure reading spec.json. Decode: JSON/domain decode failure. Encode: encode failure. Write: atomic-write failure. Infrastructure adapter maps concrete errors to String at the boundary.",
       "spec_refs": [
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }
       ],
@@ -255,7 +255,7 @@
       },
       "methods": [],
       "module_path": "spec_adr_signal",
-      "docs": "Interactor implementing SpecAdrSignalService. Holds injected file ports as private fields. Executes the read->decode->evaluate->set->write cycle for spec-ADR signal persistence, extracted from cli_composition per ADR 1328 D4.",
+      "docs": "Interactor implementing SpecAdrSignalService. Holds injected file ports as private fields. Executes the read-domain-document->evaluate->set->write-domain-document cycle for spec-ADR signal persistence; JSON decode/encode stays inside the SpecFileWriterPort adapter, extracted from cli_composition per ADR 1328 D4.",
       "spec_refs": [
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
@@ -534,7 +534,7 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "spec_adr_signal",
-      "docs": "Application service (primary port) for the spec-ADR signal calculation and persistence use case. Runs the read->decode->evaluate->set->write cycle. Extracted from cli_composition signal_calc_spec_adr per ADR 1328 D4.",
+      "docs": "Application service (primary port) for the spec-ADR signal calculation and persistence use case. Runs the read-domain-document->evaluate->set->write-domain-document cycle; JSON decode/encode stays behind the SpecFileWriterPort adapter boundary. Extracted from cli_composition signal_calc_spec_adr per ADR 1328 D4.",
       "spec_refs": [
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
@@ -650,7 +650,7 @@
           "name": "read_spec_json",
           "receiver": "&self",
           "params": [{ "name": "path", "ty": "std::path::PathBuf" }],
-          "returns": "Result<String, SpecAdrSignalError>",
+          "returns": "Result<domain::SpecDocument, SpecAdrSignalError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -661,7 +661,7 @@
           "receiver": "&self",
           "params": [
             { "name": "path", "ty": "std::path::PathBuf" },
-            { "name": "content", "ty": "String" }
+            { "name": "doc", "ty": "&domain::SpecDocument" }
           ],
           "returns": "Result<(), SpecAdrSignalError>",
           "is_async": false,
@@ -672,7 +672,7 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "spec_adr_signal",
-      "docs": "Secondary port for reading and atomically writing spec.json files. Used by SpecAdrSignalInteractor to abstract the file I/O from the business logic.",
+      "docs": "Secondary port for reading and atomically writing spec.json files. Operates on domain::SpecDocument — the infrastructure adapter performs JSON codec internally (decode on read, encode + atomic write on write). This keeps the usecase interactor free of serde_json and infrastructure::spec::codec. Decode/Encode error variants on SpecAdrSignalError are returned by the adapter when codec fails.",
       "spec_refs": [
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }
       ],
@@ -1093,6 +1093,41 @@
       "action": "add",
       "trait_ref": "SignalGateService",
       "for_type": "SignalGateInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecAdrSignalCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SpecAdrSignalCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecAdrSignalOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SpecAdrSignalOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecAdrSignalError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SpecAdrSignalError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "SpecAdrSignalError"
     },
     {
       "action": "add",

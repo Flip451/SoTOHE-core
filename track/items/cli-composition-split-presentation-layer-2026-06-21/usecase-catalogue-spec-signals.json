@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "917d39a539da69c22f72e597ac805fe5c59634a76b1a556da8a6f2d16f7cb7f0",
+  "catalogue_declaration_hash": "05e8655d26057b4629388a090f066573af49feb7cc19003b9132d386f4ea6822",
   "signals": [
     {
       "type_name": "ArchivedTrackTelemetryCommand",
@@ -100,12 +100,12 @@
     {
       "type_name": "SpecAdrSignalError",
       "signal": "blue",
-      "entry_hash": "c6e6b60fcebe8d6dab2ef129777ab62d22c14d6bc80f8d1f97444df3a537f87e"
+      "entry_hash": "bfea0a596976256536036b45278644efe7411453809a6705f4c376b8f6e4a232"
     },
     {
       "type_name": "SpecAdrSignalInteractor",
       "signal": "blue",
-      "entry_hash": "debda9b920e6646c43271e166006f515a394f47cca32467b7ac347335827624a"
+      "entry_hash": "4c82528081a01ba67399b1af89caf5d0265778ac6daedc1b1985305e0b009b1c"
     },
     {
       "type_name": "SpecAdrSignalOutput",
@@ -190,12 +190,12 @@
     {
       "type_name": "SpecAdrSignalService",
       "signal": "blue",
-      "entry_hash": "d262d761e411e5590d912b265a6956d383290c41d8b1160eaeaab1a160f193d6"
+      "entry_hash": "eb1ef9e76a2081dd0c76e8a734053a586bcf2eb4d05a2dcdd95af28637e7cd4c"
     },
     {
       "type_name": "SpecFileWriterPort",
       "signal": "blue",
-      "entry_hash": "25a0f09ba876faced54f85bc881bba9c2715476c383b06ba6a203083bd7606c2"
+      "entry_hash": "722be16a1a409faaf051646abaf05f5e50a9821b7d646fe11083f172bc2cc09d"
     }
   ]
 }

@@ -7,7 +7,7 @@
 | FsArchivedTrackTelemetryAdapter | secondary_adapter | — | impl ArchivedTrackTelemetryPort | 🔵 | 🔵 |
 | FsRefVerifyGateStateAdapter | secondary_adapter | — | impl RefVerifyGateStatePort | 🔵 | 🔵 |
 | FsReviewGateStateAdapter | secondary_adapter | — | impl ReviewGateStatePort | 🔵 | 🔵 |
-| FsSpecFileWriterAdapter | secondary_adapter | — | impl SpecFileWriterPort | 🟡 | 🔵 |
+| FsSpecFileWriterAdapter | secondary_adapter | — | impl SpecFileWriterPort, impl Default | 🔵 | 🔵 |
 | NoOpDryApprovalService | secondary_adapter | — | impl DryCheckApprovalService | 🔵 | 🔵 |
 | NoopSemanticIndexPort | secondary_adapter | — | impl SemanticIndexPort | 🔵 | 🔵 |
 | NullInsertIndexProxy | secondary_adapter | — | impl SemanticIndexPort | 🔵 | 🔵 |

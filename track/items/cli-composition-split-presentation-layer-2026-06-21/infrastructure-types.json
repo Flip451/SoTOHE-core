@@ -250,6 +250,21 @@
           "where_predicates": []
         }
       ]
+    },
+    {
+      "type_name": "FsSpecFileWriterAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
     }
   ],
   "trait_impls": [
@@ -291,6 +306,11 @@
     {
       "action": "add",
       "trait_ref": "usecase::spec_adr_signal::SpecFileWriterPort",
+      "for_type": "FsSpecFileWriterAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
       "for_type": "FsSpecFileWriterAdapter"
     }
   ]

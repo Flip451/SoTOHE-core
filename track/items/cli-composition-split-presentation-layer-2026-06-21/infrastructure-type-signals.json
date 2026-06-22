@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-22T02:37:46Z",
-  "declaration_hash": "38d9b1c12e70e86b6c66993685731c39447d8355524eda95a721a7fe2fc0b6d7",
+  "generated_at": "2026-06-22T03:22:00Z",
+  "declaration_hash": "a4ca1f909e888c9ff11c5fbc2af5434d6cee673c58573d12757d3d13eff707e7",
   "signals": [
     {
       "type_name": "FsArchivedTrackTelemetryAdapter",
@@ -33,10 +33,11 @@
     {
       "type_name": "FsSpecFileWriterAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "SpecFileWriterPort"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SpecFileWriterPort",
+        "core::default::Default"
       ]
     },
     {

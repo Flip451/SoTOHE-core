@@ -1,6 +1,211 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e28ac3318e04d63783ef38ac9844dcfcabdb086c275834c6e22dc028ded27673",
+          "at": "2026-06-21T21:14:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
+          "at": "2026-06-21T22:23:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
+          "at": "2026-06-21T22:50:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
+          "at": "2026-06-21T23:48:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
+          "at": "2026-06-21T23:52:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bde8477585f3c7768b3a40dcf1b40002317f57131097c753de592710d74b17ca",
+          "at": "2026-06-22T00:28:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bde8477585f3c7768b3a40dcf1b40002317f57131097c753de592710d74b17ca",
+          "at": "2026-06-22T00:32:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_catalog_spec_chain` and `run_impl_catalog_chain` swallow `signal_check_layer_chain_with_strict(...)` errors by converting `Err(e)` into `CommandOutcome::failure(Some(e))` and then `Ok(SignalChainOutput)`. That means `SignalGateInteractor::run_gate` can no longer surface `SignalGateError::ChainExecutionFailed` for chains ②/③, so infrastructure/configuration failures are reported as ordinary gate failures instead of propagating to the outer `signal_check_gate` error mapping. The composition layer should propagate the `Err` here and only map it once at the CLI boundary.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 587,
+              "category": "application logic in composition"
+            }
+          ],
+          "hash": "rvw1:sha256:4c456bf942cde00b7e3fcb78370187df350ae21dcea0c88d6e64ca2c50be174e",
+          "at": "2026-06-22T02:14:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1048baec2a2d1b81ca5468b0fda5bf896208003059b2b58ff51e3b49b0cefd5c",
+          "at": "2026-06-22T02:20:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_check_gate` now derives `items_dir` and `TrackId` from the resolved `spec_json_path`, then passes only those into `SignalGateCommand`. That drops the exact `--spec-json` override path: an override like `/tmp/custom.json` is reinterpreted as `items_dir=/`, `track_id=tmp`, so chain ① will evaluate `/tmp/spec.json` or reject the parent name instead of the requested file. This path interpretation/validation belongs in the usecase boundary or should preserve the resolved spec path in the adapter/command, per the CLI-as-composition-root/usecase purity rule.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 493,
+              "category": "application logic in composition"
+            }
+          ],
+          "hash": "rvw1:sha256:1048baec2a2d1b81ca5468b0fda5bf896208003059b2b58ff51e3b49b0cefd5c",
+          "at": "2026-06-22T02:30:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dffbb930eb161c2a6073d521d6de5d2e7dca087793e9fb2db924ca99430a0fee",
+          "at": "2026-06-22T02:36:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a50e92b92514f63202f2efaad239c39a66cabd2d3aa4f35b71614bb6a9236084",
+          "at": "2026-06-22T03:04:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a50e92b92514f63202f2efaad239c39a66cabd2d3aa4f35b71614bb6a9236084",
+          "at": "2026-06-22T03:11:21Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
+          "at": "2026-06-21T20:24:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
+          "at": "2026-06-21T20:27:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2b03140fcb1b64e00d4cde5b1b4ab22a0a8cdf9d86af7e186f6bd028a729129",
+          "at": "2026-06-22T02:26:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2b03140fcb1b64e00d4cde5b1b4ab22a0a8cdf9d86af7e186f6bd028a729129",
+          "at": "2026-06-22T02:30:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d27feb1f97d68426b22036effc749502b78e9b61975913af3e15181f6b7c099",
+          "at": "2026-06-22T03:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d27feb1f97d68426b22036effc749502b78e9b61975913af3e15181f6b7c099",
+          "at": "2026-06-22T03:11:26Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:dry-check` now introduces a `skipped` terminal state at `.claude/commands/track/dry-check.md:15`, but the top-level orchestrator still documents only `completed` / `blocked` / `failed` for the DFP step in `.claude/commands/track/full-cycle.md:43-52`. That leaves the new opt-out outcome unhandled on the main `/track:full-cycle` path, so repositories with `dry-check.enabled: false` can still stall before Review instead of flowing through as intended.",
+              "severity": "medium",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 15,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a1d3453dcf748c5af002c892028a11ce1ba42c76a7d9f5cd4f12c1332b32661f",
+          "at": "2026-06-21T23:59:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0a now short-circuits before the existing `track/<id>` branch check in Step 0b, so when `.harness/config/dry-check.json` is missing or `enabled:false`, `/track:dry-check` can return success even from a non-track branch. That bypasses the command's own branch guard and can let `/track:full-cycle` continue from the wrong workspace.",
+              "severity": "P1",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 11,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:965179d8fd5486f561cdf68ab8d7cd5b77af496c131c54ac19ad109c5f76ac7d",
+          "at": "2026-06-22T00:05:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41c28cb50db4a6857743b5b705d9f90109c91da500d21324bfe00b1ef88034e5",
+          "at": "2026-06-22T00:08:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41c28cb50db4a6857743b5b705d9f90109c91da500d21324bfe00b1ef88034e5",
+          "at": "2026-06-22T00:11:33Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -222,103 +427,35 @@
           "findings": [],
           "hash": "rvw1:sha256:a8b9824803090b4a37fc14a8998acb2b8efdf670dda72ff01e4e22a203af384b",
           "at": "2026-06-22T00:31:10Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e28ac3318e04d63783ef38ac9844dcfcabdb086c275834c6e22dc028ded27673",
-          "at": "2026-06-21T21:14:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
-          "at": "2026-06-21T22:23:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
-          "at": "2026-06-21T22:50:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
-          "at": "2026-06-21T23:48:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
-          "at": "2026-06-21T23:52:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bde8477585f3c7768b3a40dcf1b40002317f57131097c753de592710d74b17ca",
-          "at": "2026-06-22T00:28:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bde8477585f3c7768b3a40dcf1b40002317f57131097c753de592710d74b17ca",
-          "at": "2026-06-22T00:32:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_catalog_spec_chain` and `run_impl_catalog_chain` swallow `signal_check_layer_chain_with_strict(...)` errors by converting `Err(e)` into `CommandOutcome::failure(Some(e))` and then `Ok(SignalChainOutput)`. That means `SignalGateInteractor::run_gate` can no longer surface `SignalGateError::ChainExecutionFailed` for chains ②/③, so infrastructure/configuration failures are reported as ordinary gate failures instead of propagating to the outer `signal_check_gate` error mapping. The composition layer should propagate the `Err` here and only map it once at the CLI boundary.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 587,
-              "category": "application logic in composition"
-            }
-          ],
-          "hash": "rvw1:sha256:4c456bf942cde00b7e3fcb78370187df350ae21dcea0c88d6e64ca2c50be174e",
-          "at": "2026-06-22T02:14:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1048baec2a2d1b81ca5468b0fda5bf896208003059b2b58ff51e3b49b0cefd5c",
-          "at": "2026-06-22T02:20:56Z"
+          "hash": "rvw1:sha256:0e9d97c1301578e002751840d25ce10418a6c13be61d329bd2bed5df6b913d7d",
+          "at": "2026-06-22T03:04:27Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`signal_check_gate` now derives `items_dir` and `TrackId` from the resolved `spec_json_path`, then passes only those into `SignalGateCommand`. That drops the exact `--spec-json` override path: an override like `/tmp/custom.json` is reinterpreted as `items_dir=/`, `track_id=tmp`, so chain ① will evaluate `/tmp/spec.json` or reject the parent name instead of the requested file. This path interpretation/validation belongs in the usecase boundary or should preserve the resolved spec path in the adapter/command, per the CLI-as-composition-root/usecase purity rule.",
+              "message": "`read_spec_json` reads the caller-supplied `spec.json` with `std::fs::read_to_string` directly, so a symlink at the file or any parent component is followed before decoding. `spec.json` has existing real-file semantics in the repo (`FsSpecFileLoader` and `verify/spec_states.rs` reject symlinks before reads, matching the symlink-rejection boundary pattern covered by `scope_config_loader.rs` tests). This new adapter reintroduces an unguarded spec load path for `signal calc-spec-adr`; add the same `reject_symlinks_below`/trusted-root guard before reading.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 493,
-              "category": "application logic in composition"
+              "file": "libs/infrastructure/src/spec/writer.rs",
+              "line": 54,
+              "category": "symlink not rejected at boundary"
             }
           ],
-          "hash": "rvw1:sha256:1048baec2a2d1b81ca5468b0fda5bf896208003059b2b58ff51e3b49b0cefd5c",
-          "at": "2026-06-22T02:30:21Z"
+          "hash": "rvw1:sha256:0e9d97c1301578e002751840d25ce10418a6c13be61d329bd2bed5df6b913d7d",
+          "at": "2026-06-22T03:11:54Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:dffbb930eb161c2a6073d521d6de5d2e7dca087793e9fb2db924ca99430a0fee",
-          "at": "2026-06-22T02:36:41Z"
+          "hash": "rvw1:sha256:c4e878b315aa863b7435309e65009caa282645fe8984299eed06278405d4cedf",
+          "at": "2026-06-22T03:19:26Z"
         }
       ]
     },
@@ -785,86 +922,65 @@
           "findings": [],
           "hash": "rvw1:sha256:bf20f40ed127debb406ab89004eb13ff519473e8e2659d21d85cc68dcb1b95aa",
           "at": "2026-06-22T02:30:30Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`/track:dry-check` now introduces a `skipped` terminal state at `.claude/commands/track/dry-check.md:15`, but the top-level orchestrator still documents only `completed` / `blocked` / `failed` for the DFP step in `.claude/commands/track/full-cycle.md:43-52`. That leaves the new opt-out outcome unhandled on the main `/track:full-cycle` path, so repositories with `dry-check.enabled: false` can still stall before Review instead of flowing through as intended.",
-              "severity": "medium",
-              "file": ".claude/commands/track/dry-check.md",
-              "line": 15,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:a1d3453dcf748c5af002c892028a11ce1ba42c76a7d9f5cd4f12c1332b32661f",
-          "at": "2026-06-21T23:59:43Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 0a now short-circuits before the existing `track/<id>` branch check in Step 0b, so when `.harness/config/dry-check.json` is missing or `enabled:false`, `/track:dry-check` can return success even from a non-track branch. That bypasses the command's own branch guard and can let `/track:full-cycle` continue from the wrong workspace.",
+              "message": "`SpecAdrSignalInteractor` is still described as doing the full `read->decode->evaluate->set->write` cycle, but the updated `SpecFileWriterPort` in the same file now returns/accepts `domain::SpecDocument` and explicitly says JSON codec lives in the adapter. That makes the layer boundary inconsistent: either the interactor still owns decode/encode, or the port docs/signatures need to be updated to match the adapter-owned codec split.",
               "severity": "P1",
-              "file": ".claude/commands/track/dry-check.md",
-              "line": 11,
-              "category": "command wiring breakage"
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 258,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:965179d8fd5486f561cdf68ab8d7cd5b77af496c131c54ac19ad109c5f76ac7d",
-          "at": "2026-06-22T00:05:17Z"
+          "hash": "rvw1:sha256:f40a5430fde10b72f39248ac1f23ad96a16a88dfa6b740bab8f0f482253fd79e",
+          "at": "2026-06-22T03:04:49Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:41c28cb50db4a6857743b5b705d9f90109c91da500d21324bfe00b1ef88034e5",
-          "at": "2026-06-22T00:08:15Z"
+          "hash": "rvw1:sha256:947882f81f9016c93b4dde71a5d66dc7fae4cbe61b6fab2ee36a876c77b5827f",
+          "at": "2026-06-22T03:08:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecAdrSignalService` still describes the application service as running a `read->decode->evaluate->set->write` cycle, but the same catalogue now defines `SpecFileWriterPort` as returning and accepting `domain::SpecDocument` with JSON decode/encode handled inside the infrastructure adapter. That leaves the plan contradictory about which layer owns codec work, and an implementer following the service/task text could put serde/codec behavior back into the usecase interactor despite the updated port contract.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json",
+              "line": 537,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:947882f81f9016c93b4dde71a5d66dc7fae4cbe61b6fab2ee36a876c77b5827f",
+          "at": "2026-06-22T03:11:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T006 plan-artifact delta is supposed to leave `impl-plan.json` byte-identical and avoid scope creep, but this change mutates task state for T005 by marking it `done` and adding a commit hash, with the rendered plan reflecting the same resolved-count change. That makes this catalogue/signal regeneration update carry unrelated task-status changes, so the plan artifacts no longer describe a clean T006-only delta.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e0effa3209d1bb11a1e2674118d340ce36fd88c8154d72d3bfdcfd968b9667f9",
+          "at": "2026-06-22T03:16:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:41c28cb50db4a6857743b5b705d9f90109c91da500d21324bfe00b1ef88034e5",
-          "at": "2026-06-22T00:11:33Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
-          "at": "2026-06-21T20:24:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13c1d4c4cb4d004c3f7c3f2fcd9afff59a19bd5f8a51028fdb280043b37c5f8b",
-          "at": "2026-06-21T20:27:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2b03140fcb1b64e00d4cde5b1b4ab22a0a8cdf9d86af7e186f6bd028a729129",
-          "at": "2026-06-22T02:26:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2b03140fcb1b64e00d4cde5b1b4ab22a0a8cdf9d86af7e186f6bd028a729129",
-          "at": "2026-06-22T02:30:40Z"
+          "hash": "rvw1:sha256:659ccd69b0e19eb5fc6302084aa6dcf3522e24f5d490cac3f6e46d40236f3a9e",
+          "at": "2026-06-22T03:21:03Z"
         }
       ]
     }
