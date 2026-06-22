@@ -10,6 +10,12 @@
 //! structure (Cargo.toml, dependency graph, deny.toml, architecture-rules.json,
 //! apps/cli main.rs wiring) per CN-06.
 
+pub mod arch;
+pub mod conventions;
+pub mod demo;
+pub mod domain;
+pub mod file;
+pub mod git;
 pub mod guard;
 pub mod hook;
 pub mod render;
