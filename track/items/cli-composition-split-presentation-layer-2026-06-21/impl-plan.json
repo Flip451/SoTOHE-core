@@ -21,12 +21,13 @@
     {
       "id": "T004",
       "description": "D7 adapter relocation Group C (low priority + LazyBranchReader elimination, re-export shim): Relocate `NoopSemanticIndexPort` from `apps/cli-composition/src/semantic_dup/measure_quality.rs` to `libs/infrastructure/src/semantic_dup/noop_adapter.rs` and `NoOpDryApprovalService` from `apps/cli-composition/src/track/fixpoint_resolve.rs` to `libs/infrastructure/src/dry_check/noop_approval.rs`. Add re-export shims in `cli_composition`. Remove `LazyBranchReader` from `apps/cli-composition/src/track/mod.rs` (lines 101-113) and resolve the UFCS ambiguity at the call site by using a concrete `infrastructure::git_cli::SystemGitRepo` reference instead of the trait-object detour. Verify that `infrastructure::git_cli::SystemGitRepo` already `impl BranchReaderPort`; add the impl if missing. CI must stay green after this commit. Estimated diff: ~180 lines (including removals).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "aa0caf05b28daf27e36865f687160ac240ef96a9"
     },
     {
       "id": "T005",
-      "description": "D4 orchestration to usecase — SignalGate application service: Add `usecase::signal_gate` module with `SignalGateCommand`, `SignalGateOutput`, `SignalChainOutput`, `SignalGateError`, `SignalGateService` trait, and `SignalGateInteractor` struct (implementing `SignalGateService`). `SignalGateInteractor::new()` takes the injected `SignalLayerReader` port and `SignalGateMatrix` strictness source. The interactor sequences the 4 SoT chains (adr-user, spec-adr, catalog-spec, impl-catalog), resolves strictness per gate matrix, and aggregates results into `SignalGateOutput`. This extracts the multi-step orchestration currently in `apps/cli-composition/src/signal.rs:437-567` (`signal_check_gate`). After adding the interactor, add a re-export shim in `cli_composition::signal` that delegates to the new usecase service. Unit tests: `run_gate` sequences all 4 chains; failed chain propagates to `SignalGateError::ChainExecutionFailed`; `passed` field reflects aggregate result. Estimated diff: ~280 lines.",
-      "status": "todo"
+      "description": "D4 orchestration to usecase — SignalGate application service: Add `usecase::signal_gate` module with `SignalGateCommand`, `SignalGateOutput`, `SignalChainOutput`, `SignalGateError`, `SignalGateService` trait, and `SignalGateInteractor` struct (implementing `SignalGateService`). `SignalGateInteractor::new()` takes the injected `SignalLayerReader` port, `SignalGateMatrix` strictness source, and the three chain-runner ports (`AdrChainRunnerPort`, `SpecAdrChainRunnerPort`, `LayerChainRunnerPort`). The interactor sequences the 4 SoT chains (adr-user, spec-adr, catalog-spec, impl-catalog), resolves strictness per gate matrix, and aggregates results into `SignalGateOutput`. This extracts the multi-step orchestration currently in `apps/cli-composition/src/signal.rs:437-567` (`signal_check_gate`). After adding the interactor, add a re-export shim in `cli_composition::signal` that delegates to the new usecase service. Unit tests: `run_gate` sequences all 4 chains; failed chain propagates to `SignalGateError::ChainExecutionFailed`; `passed` field reflects aggregate result. Estimated diff: ~280 lines.",
+      "status": "in_progress"
     },
     {
       "id": "T006",

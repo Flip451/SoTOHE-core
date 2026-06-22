@@ -107,7 +107,7 @@
       },
       "methods": [],
       "module_path": "signal_gate",
-      "docs": "Interactor implementing SignalGateService. Holds the injected SignalLayerReader port and SignalGateMatrix strictness source as private fields. Sequences the 4 SoT chains (adr-user, spec-adr, catalog-spec, impl-catalog), resolves strictness per gate matrix, and aggregates results.",
+      "docs": "Interactor implementing SignalGateService. Holds the injected SignalLayerReader port, SignalGateMatrix strictness source, and chain-runner ports (AdrChainRunnerPort, SpecAdrChainRunnerPort, LayerChainRunnerPort) as private fields. Sequences the 4 SoT chains (adr-user, spec-adr, catalog-spec, impl-catalog), resolves strictness per gate matrix, and aggregates results.",
       "spec_refs": [
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
@@ -889,6 +889,100 @@
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
       ],
       "informal_grounds": []
+    },
+    "AdrChainRunnerPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "run_adr_chain",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" },
+            { "name": "strict", "ty": "bool" }
+          ],
+          "returns": "Result<SignalChainOutput, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "signal_gate",
+      "docs": "Secondary port for chain ⓪ (ADR → user): runs the ADR signal scan for a given project root and strictness setting, returning a chain output. The infrastructure adapter runs execute_verify_adr_signals_with_strict internally; the port exposes only the rendered text outcome.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    },
+    "SpecAdrChainRunnerPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "run_spec_adr_chain",
+          "receiver": "&self",
+          "params": [
+            { "name": "spec_json_path", "ty": "std::path::PathBuf" },
+            { "name": "strict", "ty": "bool" }
+          ],
+          "returns": "Result<SignalChainOutput, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "signal_gate",
+      "docs": "Secondary port for chain ① (spec → ADR): reads and evaluates the spec.json signal gate with the resolved strictness, returning a chain output. The infrastructure adapter runs verify_from_spec_json + resolve_trusted_root internally; the port exposes only the rendered text outcome.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    },
+    "LayerChainRunnerPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "run_catalog_spec_chain",
+          "receiver": "&self",
+          "params": [
+            { "name": "strict", "ty": "bool" },
+            { "name": "signal_reader", "ty": "&dyn usecase::signal::SignalLayerReader" }
+          ],
+          "returns": "Result<SignalChainOutput, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "run_impl_catalog_chain",
+          "receiver": "&self",
+          "params": [
+            { "name": "strict", "ty": "bool" },
+            { "name": "signal_reader", "ty": "&dyn usecase::signal::SignalLayerReader" }
+          ],
+          "returns": "Result<SignalChainOutput, String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "signal_gate",
+      "docs": "Secondary port for chains ② and ③ (catalog-spec / impl-catalog): runs the argless layer-chain verifier for a given chain label and per-layer parameters. Abstracts signal_check_layer_chain_with_strict composition so the interactor can sequence all four chains without importing infrastructure.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
     }
   },
   "functions": {},
@@ -901,7 +995,10 @@
           "receiver": null,
           "params": [
             { "name": "signal_layer_reader", "ty": "std::sync::Arc<dyn usecase::signal::SignalLayerReader>" },
-            { "name": "gate_matrix", "ty": "domain::SignalGateMatrix" }
+            { "name": "gate_matrix", "ty": "domain::SignalGateMatrix" },
+            { "name": "adr_runner", "ty": "std::sync::Arc<dyn AdrChainRunnerPort>" },
+            { "name": "spec_adr_runner", "ty": "std::sync::Arc<dyn SpecAdrChainRunnerPort>" },
+            { "name": "layer_chain_runner", "ty": "std::sync::Arc<dyn LayerChainRunnerPort>" }
           ],
           "returns": "Self",
           "is_async": false,
@@ -947,6 +1044,51 @@
     }
   ],
   "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalGateCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SignalGateCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalChainOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SignalChainOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalGateOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SignalGateOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalGateError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SignalGateError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "SignalGateError"
+    },
     {
       "action": "add",
       "trait_ref": "SignalGateService",

@@ -155,10 +155,26 @@ subgraph usecase["usecase"]
     direction TB
     T32_usecase_usecase_SignalGateOutput__self[SignalGateOutput]
   end
+  subgraph R34_usecase_usecase_AdrChainRunnerPort["signal_gate::AdrChainRunnerPort"]
+    direction TB
+    R34_usecase_usecase_AdrChainRunnerPort__self[AdrChainRunnerPort]
+    R34_usecase_usecase_AdrChainRunnerPort_run_adr_chain([run_adr_chain])
+  end
+  subgraph R36_usecase_usecase_LayerChainRunnerPort["signal_gate::LayerChainRunnerPort"]
+    direction TB
+    R36_usecase_usecase_LayerChainRunnerPort__self[LayerChainRunnerPort]
+    R36_usecase_usecase_LayerChainRunnerPort_run_catalog_spec_chain([run_catalog_spec_chain])
+    R36_usecase_usecase_LayerChainRunnerPort_run_impl_catalog_chain([run_impl_catalog_chain])
+  end
   subgraph R33_usecase_usecase_SignalGateService["signal_gate::SignalGateService"]
     direction TB
     R33_usecase_usecase_SignalGateService__self[SignalGateService]
     R33_usecase_usecase_SignalGateService_run_gate([run_gate])
+  end
+  subgraph R38_usecase_usecase_SpecAdrChainRunnerPort["signal_gate::SpecAdrChainRunnerPort"]
+    direction TB
+    R38_usecase_usecase_SpecAdrChainRunnerPort__self[SpecAdrChainRunnerPort]
+    R38_usecase_usecase_SpecAdrChainRunnerPort_run_spec_adr_chain([run_spec_adr_chain])
   end
   end
   subgraph usecase_usecase_module_spec_adr_signal["usecase::spec_adr_signal"]
@@ -299,9 +315,13 @@ R38_usecase_usecase_PrReviewPollingService_poll --> T36_usecase_usecase_D4Orches
 R38_usecase_usecase_PrReviewPollingService_poll --> T37_usecase_usecase_PrReviewPollingOutput__self
 T36_usecase_usecase_SignalGateInteractor_new --> T36_usecase_usecase_SignalGateInteractor__self
 T32_usecase_usecase_SignalGateOutput__self --o|chain_outputs| T33_usecase_usecase_SignalChainOutput__self
+R34_usecase_usecase_AdrChainRunnerPort_run_adr_chain --> T33_usecase_usecase_SignalChainOutput__self
+R36_usecase_usecase_LayerChainRunnerPort_run_catalog_spec_chain --> T33_usecase_usecase_SignalChainOutput__self
+R36_usecase_usecase_LayerChainRunnerPort_run_impl_catalog_chain --> T33_usecase_usecase_SignalChainOutput__self
 R33_usecase_usecase_SignalGateService_run_gate --o T33_usecase_usecase_SignalGateCommand__self
 R33_usecase_usecase_SignalGateService_run_gate --> T31_usecase_usecase_SignalGateError__self
 R33_usecase_usecase_SignalGateService_run_gate --> T32_usecase_usecase_SignalGateOutput__self
+R38_usecase_usecase_SpecAdrChainRunnerPort_run_spec_adr_chain --> T33_usecase_usecase_SignalChainOutput__self
 T39_usecase_usecase_SpecAdrSignalInteractor_new --> T39_usecase_usecase_SpecAdrSignalInteractor__self
 R36_usecase_usecase_SpecAdrSignalService_calc_and_persist --o T36_usecase_usecase_SpecAdrSignalCommand__self
 R36_usecase_usecase_SpecAdrSignalService_calc_and_persist --> T34_usecase_usecase_SpecAdrSignalError__self
@@ -372,8 +392,15 @@ class T31_usecase_usecase_SignalGateError__self error_type
 class T36_usecase_usecase_SignalGateInteractor_new method_node
 class T36_usecase_usecase_SignalGateInteractor__self interactor
 class T32_usecase_usecase_SignalGateOutput__self dto
+class R34_usecase_usecase_AdrChainRunnerPort_run_adr_chain method_node
+class R34_usecase_usecase_AdrChainRunnerPort__self secondary_port
+class R36_usecase_usecase_LayerChainRunnerPort_run_catalog_spec_chain method_node
+class R36_usecase_usecase_LayerChainRunnerPort_run_impl_catalog_chain method_node
+class R36_usecase_usecase_LayerChainRunnerPort__self secondary_port
 class R33_usecase_usecase_SignalGateService_run_gate method_node
 class R33_usecase_usecase_SignalGateService__self app_service
+class R38_usecase_usecase_SpecAdrChainRunnerPort_run_spec_adr_chain method_node
+class R38_usecase_usecase_SpecAdrChainRunnerPort__self secondary_port
 class T36_usecase_usecase_SpecAdrSignalCommand__self command
 class T34_usecase_usecase_SpecAdrSignalError_Read variant_node
 class T34_usecase_usecase_SpecAdrSignalError_Decode variant_node

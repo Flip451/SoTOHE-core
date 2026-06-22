@@ -34,6 +34,7 @@ pub mod review_v2;
 pub mod review_workflow;
 pub mod semantic_dup;
 pub mod signal;
+pub mod signal_gate;
 pub mod skill_compliance;
 pub mod task_completion;
 pub mod task_ops;

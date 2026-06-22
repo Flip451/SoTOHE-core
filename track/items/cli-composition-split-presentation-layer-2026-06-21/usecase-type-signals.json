@@ -1,8 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-22T00:33:33Z",
-  "declaration_hash": "257fabd3fde10c406493260a66194f466efab4cd89527dbaef0c13750ab10c10",
+  "generated_at": "2026-06-22T02:37:43Z",
+  "declaration_hash": "917d39a539da69c22f72e597ac805fe5c59634a76b1a556da8a6f2d16f7cb7f0",
   "signals": [
+    {
+      "type_name": "AdrChainRunnerPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "ArchivedTrackTelemetryCommand",
       "kind_tag": "command",
@@ -102,6 +108,12 @@
       "found_type": false
     },
     {
+      "type_name": "LayerChainRunnerPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "PrReviewPollingCommand",
       "kind_tag": "command",
       "signal": "yellow",
@@ -131,41 +143,64 @@
     {
       "type_name": "SignalChainOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "SignalGateCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "SignalGateError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
     },
     {
       "type_name": "SignalGateInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "SignalGateService"
       ]
     },
     {
       "type_name": "SignalGateOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "SignalGateService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecAdrChainRunnerPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SpecAdrSignalCommand",

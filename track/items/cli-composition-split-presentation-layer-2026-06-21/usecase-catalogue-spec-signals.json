@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "257fabd3fde10c406493260a66194f466efab4cd89527dbaef0c13750ab10c10",
+  "catalogue_declaration_hash": "917d39a539da69c22f72e597ac805fe5c59634a76b1a556da8a6f2d16f7cb7f0",
   "signals": [
     {
       "type_name": "ArchivedTrackTelemetryCommand",
@@ -85,7 +85,7 @@
     {
       "type_name": "SignalGateInteractor",
       "signal": "blue",
-      "entry_hash": "839527c65a19fe39b28ae3fe423b95c9069528225e86104897cf866c1a7bd9a3"
+      "entry_hash": "d2d548edc6d19405e797141f3b597defdd97182969125a818295d179aaab4dc8"
     },
     {
       "type_name": "SignalGateOutput",
@@ -111,6 +111,11 @@
       "type_name": "SpecAdrSignalOutput",
       "signal": "blue",
       "entry_hash": "f7c7515d5ce502de70c0e07d6323a06fe1fd8e6e00e049051db905556d2fb83d"
+    },
+    {
+      "type_name": "AdrChainRunnerPort",
+      "signal": "blue",
+      "entry_hash": "ab6d9b08c72976170e794ecf02676a1cef08d9fecd4c39d0c50ecca7c03695c4"
     },
     {
       "type_name": "ArchivedTrackTelemetryPort",
@@ -148,6 +153,11 @@
       "entry_hash": "333484f73cb9ec2c294eab3779d52efbcad8a3dc39fe4217c3f7d1fc38b979c3"
     },
     {
+      "type_name": "LayerChainRunnerPort",
+      "signal": "blue",
+      "entry_hash": "5224ec9e15efa26fe7ebc2df3aabcb76ee57f34accdb439dbdd46747a6ffc9b2"
+    },
+    {
       "type_name": "PrReviewPollingService",
       "signal": "blue",
       "entry_hash": "786a571d30ce27b6311119345afeeba2022f453abc19af719f51b68a9d59446b"
@@ -171,6 +181,11 @@
       "type_name": "SignalGateService",
       "signal": "blue",
       "entry_hash": "64b45db0268678415ff9a57387437f125b23b0d1e163543c2dfc35b1cb1bc687"
+    },
+    {
+      "type_name": "SpecAdrChainRunnerPort",
+      "signal": "blue",
+      "entry_hash": "74ebf0b9cc0fc44955d8587b8ec60c917988e725e7de24c536b7ae3f76266aba"
     },
     {
       "type_name": "SpecAdrSignalService",
