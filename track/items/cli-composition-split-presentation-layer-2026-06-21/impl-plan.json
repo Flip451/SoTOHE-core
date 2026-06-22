@@ -88,12 +88,13 @@
     {
       "id": "T015",
       "description": "D3 cli-driver staging — git, arch, domain, file, conventions, demo command families: Stage `GitDriver`, `ArchDriver`, `DomainDriver`, `FileDriver`, `ConventionsDriver`, and `DemoDriver` source in `apps/cli-driver/src/`. Each staged driver holds the injected use-case or composition-facing service and has a `handle(input) -> CommandOutcome` method. Stage the corresponding render logic from `cli_composition` (git.rs lines 179-201, domain.rs lines 51-55, etc.) into `cli_driver::render` sub-modules, but do not update `cli_composition`, `apps/cli`, workspace membership, or dependency wiring before T021. Estimated diff: ~320 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d31a975f699fe3154a9c46e291fd805bbd647904"
     },
     {
       "id": "T016",
       "description": "D3 cli-driver staging — verify, ref_verify, signal, telemetry command families: Stage `VerifyDriver`, `RefVerifyDriver`, `SignalDriver`, and `TelemetryDriver` source in `apps/cli-driver/src/`. Stage render helpers from `cli_composition` (verify.rs lines 8-11 render_skip, ref_verify.rs lines 135-158 / 264-269 bracketed status formatting, signal.rs lines 23-47 merge_outcomes, cmd_outcome.rs lines 12-33 render_outcome, signal_layer_chain.rs render helpers) into `cli_driver::render`. Leave live `cli_composition` wiring and `apps/cli` dispatch unchanged until the atomic cutover in T021. Estimated diff: ~320 lines.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T017",

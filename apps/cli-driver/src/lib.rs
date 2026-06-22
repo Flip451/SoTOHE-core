@@ -18,6 +18,10 @@ pub mod file;
 pub mod git;
 pub mod guard;
 pub mod hook;
+pub mod ref_verify;
 pub mod render;
+pub mod signal;
+pub mod telemetry;
+pub mod verify;
 
 pub use render::CommandOutcome;
