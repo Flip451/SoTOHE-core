@@ -68,19 +68,17 @@ impl GuardDriver {
     // -----------------------------------------------------------------------
 
     fn guard_check(&self, _command: String) -> CommandOutcome {
-        // TODO(T021): invoke HookDispatchInteractor here.
-        // Placeholder: mirrors the JSON shape produced by cli_composition::GuardCompositionRoot.
-        let decision_str = "allow";
-        let reason = String::new();
-
-        // JSON formatting — mirrors cli_composition/src/guard.rs lines ~56-63.
-        let json = serde_json::json!({
-            "decision": decision_str,
-            "reason": reason,
-        });
-
-        let stdout = json.to_string();
-        CommandOutcome { stdout: Some(stdout), stderr: None, exit_code: 0 }
+        // Stub: cli_driver Driver::handle is not yet wired (deferred from T021).
+        // Returning failure is the safe choice here — silently returning
+        // `{"decision":"allow"}` would bypass the git-operation guard for any
+        // caller that switches to this primary-adapter path before the
+        // HookDispatchInteractor wiring lands.
+        CommandOutcome::failure(Some(
+            "cli_driver Driver::handle is not yet wired — apps/cli still routes through \
+             cli_composition CompositionRoot dispatch (deferred from T021); call the matching \
+             CompositionRoot method instead"
+                .to_owned(),
+        ))
     }
 }
 
