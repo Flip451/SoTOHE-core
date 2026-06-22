@@ -786,7 +786,12 @@ mod tests {
 
         let line = fs::read_to_string(&archived_log).unwrap();
         let value: serde_json::Value = serde_json::from_str(line.trim()).unwrap();
-        assert_eq!(value["subcommand"], "track archive");
+        assert_eq!(value["event_type"], "TrackSubcommand");
+        assert_eq!(value["schema_version"], 1);
+        assert_eq!(value["track_id"], track_id);
+        assert_eq!(value["command"], "track archive");
+        assert_eq!(value["exit_code"], 0);
+        assert_eq!(value["duration_ms"], 0);
         assert!(
             value.get("timestamp").is_some(),
             "timestamp field must be present in the JSONL line"

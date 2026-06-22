@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # CLI delivery 側の責務分離 — composition root と primary adapter への分解
 
-## Tasks (21/22 resolved)
+## Tasks (22/22 resolved)
 
 ### S1 — D8 Prep: Telemetry Usecase Service + Infrastructure Adapter
 
@@ -80,4 +80,4 @@
 
 > Finalize the `.harness/custom/review-prompts/` files to match the new 3-layer architecture: new `cli_driver.md` for primary adapter rules, updated `cli_composition.md` for pure-DI rules, updated `cli.md` for thin-bin rules. Satisfies AC-11 and completes the D6(h) requirement.
 
-- [~] **T022**: D6(h) reviewer severity policy: Create `.harness/custom/review-prompts/cli_driver.md` (new file) with primary adapter review rules (categories: adapter performs DI / business logic in adapter / non-CommandOutcome return / handle not delegating to single use case). Update `.harness/custom/review-prompts/cli_composition.md` to pure-DI composition root rules (categories: invoke leak / render leak / Result<_, String> / CliApp god-facade residue / adapter defined here). Update `.harness/custom/review-prompts/cli.md` to thin-bin rules (categories: bin business logic / direct I/O / usecase/domain import / driver coordinate in bin). Each file references ADR D2/D3/D5/D7/D8 review anchors as applicable. Estimated diff: ~120 lines.
+- [x] **T022**: D6(h) reviewer severity policy: Create `.harness/custom/review-prompts/cli_driver.md` (new file) with primary adapter review rules (categories: adapter performs DI / business logic in adapter / non-CommandOutcome return / handle not delegating to single use case). Update `.harness/custom/review-prompts/cli_composition.md` to pure-DI composition root rules (categories: invoke leak / render leak / Result<_, String> / CliApp god-facade residue / adapter defined here). Update `.harness/custom/review-prompts/cli.md` to thin-bin rules (categories: bin business logic / direct I/O / usecase/domain import / driver coordinate in bin). Each file references ADR D2/D3/D5/D7/D8 review anchors as applicable. Estimated diff: ~120 lines. (`d1b2141f520bdd34cdf45889ec5e04f06b93c395`)

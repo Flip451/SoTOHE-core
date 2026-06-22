@@ -130,7 +130,8 @@
     {
       "id": "T022",
       "description": "D6(h) reviewer severity policy: Create `.harness/custom/review-prompts/cli_driver.md` (new file) with primary adapter review rules (categories: adapter performs DI / business logic in adapter / non-CommandOutcome return / handle not delegating to single use case). Update `.harness/custom/review-prompts/cli_composition.md` to pure-DI composition root rules (categories: invoke leak / render leak / Result<_, String> / CliApp god-facade residue / adapter defined here). Update `.harness/custom/review-prompts/cli.md` to thin-bin rules (categories: bin business logic / direct I/O / usecase/domain import / driver coordinate in bin). Each file references ADR D2/D3/D5/D7/D8 review anchors as applicable. Estimated diff: ~120 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d1b2141f520bdd34cdf45889ec5e04f06b93c395"
     }
   ],
   "plan": {

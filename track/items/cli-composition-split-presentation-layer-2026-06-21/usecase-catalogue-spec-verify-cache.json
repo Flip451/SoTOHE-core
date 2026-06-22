@@ -1177,6 +1177,46 @@
         "kind": "pass",
         "citation": "PR polling loop など）の usecase application service への移譲"
       }
+    },
+    {
+      "claim_hash": "05455cc5bbc74b9116eef5ee433b5afd09576d71bf73d4979cc7f2ad182b9b15",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "05455cc5bbc74b9116eef5ee433b5afd09576d71bf73d4979cc7f2ad182b9b15",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "9bd133f2e05f71a33834064e148a08d50170639837ae3b4c6f598fc0eb9f8cf0",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "9bd133f2e05f71a33834064e148a08d50170639837ae3b4c6f598fc0eb9f8cf0",
+      "evidence_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin に直接 I/O（`std::fs` / `serde_json` / `chrono::Utc::now()` 相当のシステムコール）を持ってはならない。telemetry 永続化を含む全 I/O は infrastructure adapter + driver 経由にする。"
+      }
+    },
+    {
+      "claim_hash": "9bd133f2e05f71a33834064e148a08d50170639837ae3b4c6f598fc0eb9f8cf0",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` に `std::fs` / `serde_json` / `chrono::Utc::now()` を使った直接 I/O が存在しない。cli-bin-business-logic カテゴリ（audit: `main.rs:247-294`）の 1 件が解消されており、telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
     }
   ]
 }

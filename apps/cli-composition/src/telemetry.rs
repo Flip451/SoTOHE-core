@@ -129,11 +129,11 @@ impl TelemetryCompositionRoot {
         let adapter = FsArchivedTrackTelemetryAdapter::new(telemetry_dir);
         let interactor = ArchivedTrackTelemetryInteractor::new(Arc::new(adapter));
 
-        interactor.emit(ArchivedTrackTelemetryCommand { subcommand }).map_err(
-            |e: usecase::telemetry::ArchivedTrackTelemetryError| {
+        interactor
+            .emit(ArchivedTrackTelemetryCommand { subcommand, track_id: track_id.to_owned() })
+            .map_err(|e: usecase::telemetry::ArchivedTrackTelemetryError| {
                 CompositionError::Infrastructure(e.to_string())
-            },
-        )
+            })
     }
 }
 

@@ -813,9 +813,16 @@ mod tests {
                 let fallback_dir = items_dir.join(fallback_id);
                 std::fs::create_dir_all(&fallback_dir).unwrap();
                 let id = TrackId::try_new(fallback_id.to_owned()).unwrap();
-                // Return early after cleanup; adapt test below to use fallback.
-                // Actually just continue with the fallback path.
                 drop(track_temp);
+                // Write .commit_hash anchored at HEAD so the adapter doesn't fall
+                // back to `git rev-parse main` (which is unavailable on shallow CI
+                // checkouts that fetch only the PR branch).
+                let git = SystemGitRepo::discover_from(workspace_root)
+                    .expect("outer workspace must be a git repo");
+                let head_output = git.output(&["rev-parse", "HEAD"]).expect("git rev-parse HEAD");
+                assert!(head_output.status.success(), "git rev-parse HEAD failed");
+                let head_sha = String::from_utf8_lossy(&head_output.stdout).trim().to_owned();
+                std::fs::write(fallback_dir.join(".commit_hash"), &head_sha).unwrap();
                 let adapter = FsReviewGateStateAdapter::new(items_dir.clone());
                 let result = adapter.review_status(&id);
                 let _ = std::fs::remove_dir_all(&fallback_dir);

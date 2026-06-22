@@ -396,6 +396,10 @@
             {
               "name": "subcommand",
               "ty": "String"
+            },
+            {
+              "name": "track_id",
+              "ty": "String"
             }
           ],
           "has_stripped_fields": false
@@ -403,7 +407,7 @@
       },
       "methods": [],
       "module_path": "telemetry",
-      "docs": "CQRS command for the archived-track telemetry use case. `subcommand` is an opaque CLI subcommand label recorded as free text; it is not a domain value object.",
+      "docs": "CQRS command for the archived-track telemetry use case. `subcommand` is an opaque CLI subcommand label recorded as free text; it is not a domain value object. `track_id` is recorded in the canonical TelemetryEvent::TrackSubcommand.track_id field so archived JSONL rows can be deserialized by TelemetryReport::aggregate.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -1524,6 +1528,10 @@
           "name": "emit",
           "receiver": "&self",
           "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
             {
               "name": "subcommand",
               "ty": "String"

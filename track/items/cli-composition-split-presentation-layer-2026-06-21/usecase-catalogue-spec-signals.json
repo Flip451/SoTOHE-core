@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "28a46b187ed2606f2df3861c0a27c468c5b8be16a5382886129a7d773dafcf46",
+  "catalogue_declaration_hash": "84c501e7edac1f51ba5914a9cb54e9476a139f3564721ea261e3376f009005da",
   "signals": [
     {
       "type_name": "ArchivedTrackTelemetryCommand",
       "signal": "blue",
-      "entry_hash": "54fce6fcdf9c1e5ea6d23ca01f9059691bdf3ac85aa411df40067fe5bf79f9cd"
+      "entry_hash": "05455cc5bbc74b9116eef5ee433b5afd09576d71bf73d4979cc7f2ad182b9b15"
     },
     {
       "type_name": "ArchivedTrackTelemetryError",
@@ -120,7 +120,7 @@
     {
       "type_name": "ArchivedTrackTelemetryPort",
       "signal": "blue",
-      "entry_hash": "4e2215f7a105d7db8f60041663e9242040643915914287c9088a3233519741f6"
+      "entry_hash": "9bd133f2e05f71a33834064e148a08d50170639837ae3b4c6f598fc0eb9f8cf0"
     },
     {
       "type_name": "ArchivedTrackTelemetryService",

@@ -43,6 +43,10 @@ pub enum ArchivedTrackTelemetryError {
 pub struct ArchivedTrackTelemetryCommand {
     /// The CLI subcommand label to record in the telemetry event.
     pub subcommand: String,
+    /// The archived track identifier (e.g. `"my-feature-2026-01-01"`); recorded
+    /// in the canonical `TelemetryEvent::TrackSubcommand.track_id` field so the
+    /// archived JSONL line is parseable by `TelemetryReport::aggregate`.
+    pub track_id: String,
 }
 
 // ── Secondary port ────────────────────────────────────────────────────────────
@@ -68,7 +72,8 @@ pub trait ArchivedTrackTelemetryPort: Send + Sync {
     /// Returns [`ArchivedTrackTelemetryError::Io`] on filesystem failure.
     /// Returns [`ArchivedTrackTelemetryError::Serialize`] on JSON serialization
     /// failure.
-    fn emit(&self, subcommand: String) -> Result<(), ArchivedTrackTelemetryError>;
+    fn emit(&self, track_id: String, subcommand: String)
+    -> Result<(), ArchivedTrackTelemetryError>;
 }
 
 // ── Application service trait ─────────────────────────────────────────────────
@@ -109,7 +114,7 @@ impl ArchivedTrackTelemetryInteractor {
 
 impl ArchivedTrackTelemetryService for ArchivedTrackTelemetryInteractor {
     fn emit(&self, cmd: ArchivedTrackTelemetryCommand) -> Result<(), ArchivedTrackTelemetryError> {
-        self.port.emit(cmd.subcommand)
+        self.port.emit(cmd.track_id, cmd.subcommand)
     }
 }
 
@@ -134,8 +139,12 @@ mod tests {
     }
 
     impl ArchivedTrackTelemetryPort for MockPort {
-        fn emit(&self, subcommand: String) -> Result<(), ArchivedTrackTelemetryError> {
-            self.calls.lock().unwrap().push(subcommand);
+        fn emit(
+            &self,
+            track_id: String,
+            subcommand: String,
+        ) -> Result<(), ArchivedTrackTelemetryError> {
+            self.calls.lock().unwrap().push(format!("{track_id}|{subcommand}"));
             Ok(())
         }
     }
@@ -149,25 +158,35 @@ mod tests {
             Arc::clone(&mock) as Arc<dyn ArchivedTrackTelemetryPort>
         );
 
-        let cmd = ArchivedTrackTelemetryCommand { subcommand: "track spec-design".to_string() };
+        let cmd = ArchivedTrackTelemetryCommand {
+            subcommand: "track spec-design".to_string(),
+            track_id: "t1".to_string(),
+        };
         interactor.emit(cmd).unwrap();
 
         let calls = mock.calls.lock().unwrap();
         assert_eq!(calls.len(), 1);
-        assert_eq!(calls[0], "track spec-design");
+        assert_eq!(calls[0], "t1|track spec-design");
     }
 
     #[test]
     fn interactor_propagates_port_error() {
         struct FailingPort;
         impl ArchivedTrackTelemetryPort for FailingPort {
-            fn emit(&self, _subcommand: String) -> Result<(), ArchivedTrackTelemetryError> {
+            fn emit(
+                &self,
+                _track_id: String,
+                _subcommand: String,
+            ) -> Result<(), ArchivedTrackTelemetryError> {
                 Err(ArchivedTrackTelemetryError::Serialize("test failure".to_string()))
             }
         }
 
         let interactor = ArchivedTrackTelemetryInteractor::new(Arc::new(FailingPort));
-        let cmd = ArchivedTrackTelemetryCommand { subcommand: "track impl".to_string() };
+        let cmd = ArchivedTrackTelemetryCommand {
+            subcommand: "track impl".to_string(),
+            track_id: "t1".to_string(),
+        };
         let result = interactor.emit(cmd);
 
         assert!(result.is_err(), "interactor must propagate port error");
@@ -185,14 +204,17 @@ mod tests {
         );
 
         for label in &["track init", "track review", "track commit"] {
-            let cmd = ArchivedTrackTelemetryCommand { subcommand: (*label).to_string() };
+            let cmd = ArchivedTrackTelemetryCommand {
+                subcommand: (*label).to_string(),
+                track_id: "t1".to_string(),
+            };
             interactor.emit(cmd).unwrap();
         }
 
         let calls = mock.calls.lock().unwrap();
         assert_eq!(calls.len(), 3);
-        assert_eq!(calls[0], "track init");
-        assert_eq!(calls[1], "track review");
-        assert_eq!(calls[2], "track commit");
+        assert_eq!(calls[0], "t1|track init");
+        assert_eq!(calls[1], "t1|track review");
+        assert_eq!(calls[2], "t1|track commit");
     }
 }
