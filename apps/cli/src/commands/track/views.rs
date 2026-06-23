@@ -2,22 +2,19 @@ use std::path::Path;
 use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
+use cli_driver::track::TrackInput;
 
 use crate::CliError;
 
+use super::state_ops::track_driver_outcome_to_result;
 use super::{ViewAction, resolve_track_id_from_root_for_write};
 
 pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
-    let app = TrackCompositionRoot::new();
+    let driver = TrackCompositionRoot::new().track_driver();
     match action {
         ViewAction::Validate { project_root } => {
-            let outcome = app
-                .track_views_validate(project_root)
-                .map_err(|e| CliError::Message(e.to_string()))?;
-            if let Some(ref s) = outcome.stdout {
-                println!("{s}");
-            }
-            Ok(ExitCode::from(outcome.exit_code))
+            let outcome = driver.handle(TrackInput::ViewsValidate { project_root });
+            track_driver_outcome_to_result(outcome)
         }
         ViewAction::Sync { project_root, track_id } => {
             // When an explicit --track-id is given, the WRITE guard validates
@@ -33,13 +30,9 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
                 }
                 None => detect_active_track_from_branch(&project_root),
             };
-            let outcome = app
-                .track_views_sync(project_root, resolved_track_id)
-                .map_err(|err| CliError::Message(format!("sync-views failed: {err}")))?;
-            if let Some(ref s) = outcome.stdout {
-                println!("{s}");
-            }
-            Ok(ExitCode::from(outcome.exit_code))
+            let outcome =
+                driver.handle(TrackInput::ViewsSync { project_root, track_id: resolved_track_id });
+            track_driver_outcome_to_result(outcome)
         }
     }
 }

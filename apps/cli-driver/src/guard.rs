@@ -2,17 +2,13 @@
 //
 //! `guard` command family — primary adapter driver.
 //!
-//! `GuardDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The JSON formatting helpers here
-//! mirror those in `apps/cli-composition/src/guard.rs` (lines ~56-63);
-//! T021 removes the `cli_composition` duplicate when the live path is flipped.
+//! `GuardDriver` holds an injected [`usecase::guard::GuardCheckService`] and exposes
+//! `handle(input) -> CommandOutcome`.  JSON formatting is performed here at the
+//! driver boundary; the usecase layer never sees JSON.
 
-// TODO(T021): add use-case + infrastructure imports once Cargo.toml is materialized.
-// use std::sync::Arc;
-// use usecase::hook_dispatch::{
-//     HookDispatchCommand, HookDispatchInteractor, HookDispatchService, HookVerdictDecision,
-// };
-// use infrastructure::shell::ConchShellParser;
+use std::sync::Arc;
+
+use usecase::guard::{GuardCheckService, GuardDecision};
 
 use crate::render::CommandOutcome;
 
@@ -35,27 +31,21 @@ pub enum GuardInput {
 
 /// Primary adapter driver for the `guard` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`GuardCheckService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct GuardDriver {
-    // TODO(T021): inject use-case interactors here.
-    // hook_dispatch_service: Arc<dyn usecase::hook_dispatch::HookDispatchService>,
+    service: Arc<dyn GuardCheckService>,
 }
 
 impl GuardDriver {
-    /// Create a new `GuardDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `GuardDriver` with the given service.
+    pub fn new(service: Arc<dyn GuardCheckService>) -> Self {
+        Self { service }
     }
 
     /// Handle a guard command.
     ///
     /// Returns a JSON verdict (`{"decision":"allow"|"block","reason":"..."}`) in stdout.
     /// Exit code 0 = allow, 1 = block.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: GuardInput) -> CommandOutcome {
         match input {
             GuardInput::Check { command } => self.guard_check(command),
@@ -63,27 +53,23 @@ impl GuardDriver {
     }
 
     // -----------------------------------------------------------------------
-    // JSON formatting helpers (duplicated from cli_composition/src/guard.rs
-    // lines ~56-63; T021 removes the cli_composition copy).
+    // Internal helpers
     // -----------------------------------------------------------------------
 
-    fn guard_check(&self, _command: String) -> CommandOutcome {
-        // Stub: cli_driver Driver::handle is not yet wired (deferred from T021).
-        // Returning failure is the safe choice here — silently returning
-        // `{"decision":"allow"}` would bypass the git-operation guard for any
-        // caller that switches to this primary-adapter path before the
-        // HookDispatchInteractor wiring lands.
-        CommandOutcome::failure(Some(
-            "cli_driver Driver::handle is not yet wired — apps/cli still routes through \
-             cli_composition CompositionRoot dispatch (deferred from T021); call the matching \
-             CompositionRoot method instead"
-                .to_owned(),
-        ))
-    }
-}
+    fn guard_check(&self, command: String) -> CommandOutcome {
+        let output = self.service.check(command);
 
-impl Default for GuardDriver {
-    fn default() -> Self {
-        Self::new()
+        let (decision_str, is_blocked) = match output.decision {
+            GuardDecision::Allow => ("allow", false),
+            GuardDecision::Block => ("block", true),
+        };
+
+        let json = serde_json::json!({
+            "decision": decision_str,
+            "reason": output.reason,
+        });
+
+        let exit_code: u8 = if is_blocked { 1 } else { 0 };
+        CommandOutcome { stdout: Some(json.to_string()), stderr: None, exit_code }
     }
 }

@@ -37,20 +37,6 @@ Report findings ONLY for the following categories:
   use-case interactor directly (bypassing both `cli_composition::*CompositionRoot`
   and `cli_driver::*Driver`). Argument parsing should produce a typed `Input`; the
   bin calls `driver.handle(input)` and emits the `CommandOutcome`. Cite ADR D5.
-
-  **Transitional acceptance (until the Driver::handle cutover lands):**
-  `cli_driver` was materialized as a workspace crate in T021 (commit `6c81f0a1`,
-  D1/D6 final flip) but its `Driver::handle` methods are still stubs that return
-  failure with the message `"cli_driver Driver::handle is not yet wired — apps/cli
-  still routes through cli_composition CompositionRoot dispatch (deferred from
-  T021); call the matching CompositionRoot method instead"`. During this
-  transitional state, the bin layer is permitted to call
-  `*CompositionRoot::new().<method>(...)` directly from `apps/cli/src/main.rs` and
-  `apps/cli/src/commands/*.rs` instead of `*Driver::new().handle(input)`. Do NOT
-  flag `*CompositionRoot::new().<method>(...)` call sites as `driver coordinate
-  violated` until the Driver wiring is complete and the stubs no longer return the
-  "not yet wired" failure message. The full Driver::handle cutover is scheduled
-  for the downstream `2026-06-21-1420` follow-up track.
 - **ExitCode mapping inconsistency**: a command that on the unhappy path prints
   an error but returns `ExitCode::SUCCESS` (or vice-versa). Scripted callers
   will misinterpret the result.

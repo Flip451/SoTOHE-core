@@ -23,7 +23,8 @@ use crate::hook::{
 /// CQRS command object for the hook dispatch use case.
 ///
 /// Carries the raw `tool_name`, optional `command` string, optional `file_path`,
-/// and optional `content` string from the Claude Code hook JSON envelope.
+/// optional `content` string from the Claude Code hook JSON envelope, and
+/// `git_hook_args` (positional arguments from process-level git hooks).
 /// The CLI parses the envelope into this command so that the hook dispatcher
 /// (usecase) never requires `domain::hook::HookInput` to be constructed at the
 /// CLI boundary.
@@ -38,6 +39,9 @@ pub struct HookDispatchCommand {
     /// The file content (for Write tool: used by test-file deletion guard to detect
     /// empty-content writes, which are equivalent to file truncation/deletion).
     pub content: Option<String>,
+    /// Positional arguments supplied by git process hooks (e.g. "committed" / "aborted"
+    /// for git-ref-update). Empty for non-git-process hooks.
+    pub git_hook_args: Vec<String>,
 }
 
 /// Enum representing the hook verdict outcome at the usecase boundary.
@@ -57,12 +61,22 @@ pub enum HookVerdictDecision {
 /// Wraps the verdict outcome ([`HookVerdictDecision`]) and a reason string
 /// without exposing `domain::hook::HookVerdict` across the usecase boundary.
 /// The CLI maps [`HookVerdictDecision::Block`] to exit 2, Allow to exit 0.
+///
+/// `skill_compliance_output` is set (non-None) only for the `skill-compliance`
+/// hook when compliance guidance should be forwarded to Claude Code as a
+/// UserPromptSubmit JSON payload. It is `None` when no guidance is needed.
+/// The CLI must render this field as stdout instead of treating it as a verdict
+/// reason — it carries the pre-formatted JSON `hookSpecificOutput` object string.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HookVerdictOutput {
     /// The hook verdict decision.
     pub decision: HookVerdictDecision,
     /// Human-readable reason for the decision (None when allowed).
     pub reason: Option<String>,
+    /// Pre-formatted JSON output for the `skill-compliance` (UserPromptSubmit)
+    /// hook. `Some(json_string)` when guidance should be injected; `None` when
+    /// no guidance is needed or the hook is not `skill-compliance`.
+    pub skill_compliance_output: Option<String>,
 }
 
 /// Error type for [`HookDispatchService`].
@@ -90,6 +104,12 @@ pub enum HookDispatchError {
 /// a hook name string, dispatches to the appropriate `HookHandler`, and returns
 /// [`HookVerdictOutput`] so the CLI never imports `domain::hook::HookContext`,
 /// `domain::hook::HookInput`, or `domain::hook::HookVerdict` directly.
+///
+/// `check_skill_compliance` covers the `skill-compliance` UserPromptSubmit hook:
+/// it returns `None` when no compliance guidance is needed, or `Some(context)`
+/// with the rendered `additionalContext` string when guidance should be injected.
+/// This keeps `cli_driver` from importing `usecase::skill_compliance` directly
+/// (D3/D4 cli_driver policy).
 pub trait HookDispatchService: Send + Sync {
     /// Dispatches the hook identified by `hook_name` with the given `command`.
     ///
@@ -101,6 +121,16 @@ pub trait HookDispatchService: Send + Sync {
         hook_name: String,
         command: HookDispatchCommand,
     ) -> Result<HookVerdictOutput, HookDispatchError>;
+
+    /// Run the skill-compliance check for a `UserPromptSubmit` hook prompt.
+    ///
+    /// Returns `None` when no compliance guidance is needed (prompt has no
+    /// recognized `/track:*` command or no advice to inject). Returns
+    /// `Some(additional_context)` with the rendered `additionalContext` string
+    /// that should be forwarded to Claude Code.
+    ///
+    /// Advisory only — never blocks.
+    fn check_skill_compliance(&self, prompt: &str) -> Option<String>;
 }
 
 // ---------------------------------------------------------------------------
@@ -268,11 +298,58 @@ impl HookDispatchInteractor {
 }
 
 impl HookDispatchService for HookDispatchInteractor {
+    fn check_skill_compliance(&self, prompt: &str) -> Option<String> {
+        let has_track_command = prompt.to_lowercase().contains("/track:");
+        if !has_track_command && !crate::skill_compliance::has_skill_command(prompt) {
+            return None;
+        }
+        crate::skill_compliance::check_compliance_render(prompt)
+    }
+
     fn dispatch(
         &self,
         hook_name: String,
         command: HookDispatchCommand,
     ) -> Result<HookVerdictOutput, HookDispatchError> {
+        // Handle skill-compliance (UserPromptSubmit) entirely here — advisory, never blocks.
+        // `command.content` carries the prompt text parsed from stdin by the driver.
+        if hook_name == "skill-compliance" {
+            let prompt = command.content.as_deref().unwrap_or("");
+            let skill_compliance_output = if prompt.is_empty() {
+                None
+            } else {
+                self.check_skill_compliance(prompt).map(|ctx| {
+                    serde_json::json!({
+                        "hookSpecificOutput": {
+                            "hookEventName": "UserPromptSubmit",
+                            "additionalContext": ctx,
+                        }
+                    })
+                    .to_string()
+                })
+            };
+            return Ok(HookVerdictOutput {
+                decision: HookVerdictDecision::Allow,
+                reason: None,
+                skill_compliance_output,
+            });
+        }
+
+        // Handle git-ref-update final notifications (committed / aborted):
+        // these are informational only — no handler needed.
+        if hook_name == "git-ref-update"
+            && command
+                .git_hook_args
+                .first()
+                .is_some_and(|s| matches!(s.as_str(), "committed" | "aborted"))
+        {
+            return Ok(HookVerdictOutput {
+                decision: HookVerdictDecision::Allow,
+                reason: None,
+                skill_compliance_output: None,
+            });
+        }
+
         let handler = self
             .resolve_handler(&hook_name)
             .ok_or(HookDispatchError::UnknownHookName(hook_name))?;
@@ -298,7 +375,7 @@ impl HookDispatchService for HookDispatchInteractor {
             Decision::Allow => HookVerdictDecision::Allow,
             Decision::Block => HookVerdictDecision::Block,
         };
-        Ok(HookVerdictOutput { decision, reason: verdict.reason })
+        Ok(HookVerdictOutput { decision, reason: verdict.reason, skill_compliance_output: None })
     }
 }
 
@@ -370,6 +447,7 @@ mod tests {
             command: Some(cmd.to_owned()),
             file_path: None,
             content: None,
+            git_hook_args: vec![],
         }
     }
 
@@ -379,6 +457,7 @@ mod tests {
             command: None,
             file_path: None,
             content: None,
+            git_hook_args: vec![],
         }
     }
 
@@ -395,9 +474,14 @@ mod tests {
 
     #[test]
     fn test_hook_verdict_output_fields_accessible() {
-        let output = HookVerdictOutput { decision: HookVerdictDecision::Allow, reason: None };
+        let output = HookVerdictOutput {
+            decision: HookVerdictDecision::Allow,
+            reason: None,
+            skill_compliance_output: None,
+        };
         assert_eq!(output.decision, HookVerdictDecision::Allow);
         assert!(output.reason.is_none());
+        assert!(output.skill_compliance_output.is_none());
     }
 
     // --- HookDispatchError ---
@@ -448,6 +532,7 @@ mod tests {
             command: None,
             file_path: None,
             content: None,
+            git_hook_args: vec![],
         };
         let result = interactor.dispatch("block-direct-git-ops".to_owned(), cmd);
         assert!(matches!(result, Err(HookDispatchError::HandlerFailed(_))));
@@ -517,6 +602,7 @@ mod tests {
             command: None,
             file_path: Some(std::path::PathBuf::from("tests/foo_test.rs")),
             content: Some(String::new()),
+            git_hook_args: vec![],
         };
         let result = interactor.dispatch("block-test-file-deletion".to_owned(), cmd);
         assert!(result.is_ok());
@@ -533,6 +619,7 @@ mod tests {
             ),
             file_path: None,
             content: None,
+            git_hook_args: vec![],
         };
         let result = interactor.dispatch("block-test-file-deletion".to_owned(), cmd);
         assert!(result.is_ok());
@@ -550,6 +637,7 @@ mod tests {
             ),
             file_path: None,
             content: None,
+            git_hook_args: vec![],
         };
         let result = interactor.dispatch("block-test-file-deletion".to_owned(), cmd);
         assert!(result.is_ok());
@@ -620,10 +708,14 @@ mod tests {
             command: None,
             file_path: None,
             content: None,
+            git_hook_args: vec![],
         };
         let result = interactor.dispatch("skill-compliance".to_owned(), cmd);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap().decision, HookVerdictDecision::Allow);
+        let output = result.unwrap();
+        assert_eq!(output.decision, HookVerdictDecision::Allow);
+        // No prompt content → no skill_compliance_output
+        assert!(output.skill_compliance_output.is_none());
     }
 
     // --- HookDispatchCommand fields ---
@@ -635,10 +727,12 @@ mod tests {
             command: Some("cargo build".to_owned()),
             file_path: Some(std::path::PathBuf::from("/tmp/test.txt")),
             content: Some("content".to_owned()),
+            git_hook_args: vec!["committed".to_owned()],
         };
         assert_eq!(cmd.tool_name, "Bash");
         assert_eq!(cmd.command.as_deref(), Some("cargo build"));
         assert!(cmd.file_path.is_some());
         assert_eq!(cmd.content.as_deref(), Some("content"));
+        assert_eq!(cmd.git_hook_args.first().map(String::as_str), Some("committed"));
     }
 }

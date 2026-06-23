@@ -1,14 +1,11 @@
-// STAGED FOR T021 — not yet compiled; Cargo.toml + workspace member added atomically in T021 per CN-06.
-//
 //! `demo` command family — primary adapter driver.
 //!
-//! `DemoDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The render helpers here mirror
-//! `apps/cli-composition/src/demo.rs`; T021 removes the `cli_composition`
-//! duplicate when the live path is flipped.
+//! `DemoDriver` holds an injected [`usecase::demo::DemoService`] and exposes
+//! `handle(input) -> CommandOutcome`.
 
-// TODO(T021): add infrastructure imports once Cargo.toml is materialized.
-// use infrastructure::demo::run_example_demo;
+use std::sync::Arc;
+
+use usecase::demo::DemoService;
 
 use crate::render::CommandOutcome;
 
@@ -28,45 +25,28 @@ pub enum DemoInput {
 
 /// Primary adapter driver for the `demo` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`DemoService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct DemoDriver {
-    // TODO(T021): inject use-case interactors here (currently this family has
-    // no injectable adapter dependencies — infrastructure::demo::run_example_demo
-    // is called inline, same as cli_composition::DemoCompositionRoot).
+    service: Arc<dyn DemoService>,
 }
 
 impl DemoDriver {
-    /// Create a new `DemoDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `DemoDriver` with the given service.
+    pub fn new(service: Arc<dyn DemoService>) -> Self {
+        Self { service }
     }
 
     /// Handle a demo command.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: DemoInput) -> CommandOutcome {
         match input {
             DemoInput::Run => self.demo(),
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Render helpers (logic duplicated from cli_composition/src/demo.rs;
-    // T021 removes the cli_composition copy).
-    // -----------------------------------------------------------------------
-
     fn demo(&self) -> CommandOutcome {
-        // TODO(T021): invoke infrastructure::demo::run_example_demo here.
-        // Mirrors cli_composition/src/demo.rs DemoCompositionRoot::demo.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
-    }
-}
-
-impl Default for DemoDriver {
-    fn default() -> Self {
-        Self::new()
+        match self.service.run() {
+            Ok(msg) => CommandOutcome::success(Some(msg)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 }

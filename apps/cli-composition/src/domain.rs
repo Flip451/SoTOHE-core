@@ -40,7 +40,29 @@ impl Default for DomainCompositionRoot {
 }
 
 impl DomainCompositionRoot {
+    /// Build a wired [`cli_driver::domain::DomainDriver`] for the domain family.
+    ///
+    /// # Errors
+    /// Returns `Err` when workspace root discovery fails.
+    pub fn domain_driver(
+        &self,
+    ) -> Result<cli_driver::domain::DomainDriver, crate::error::CompositionError> {
+        use infrastructure::file_port::FsFileWriteAdapter;
+        use infrastructure::schema_export::RustdocSchemaExporter;
+        use usecase::export_schema::ExportSchemaInteractor;
+
+        let workspace_root =
+            discover_workspace_root().map_err(crate::error::CompositionError::AdapterInit)?;
+        let exporter = Arc::new(RustdocSchemaExporter::new(workspace_root));
+        let file_port = Arc::new(FsFileWriteAdapter::new());
+        let service = Arc::new(ExportSchemaInteractor::new(exporter, file_port));
+        Ok(cli_driver::domain::DomainDriver::new(service))
+    }
+
     /// Export the public API schema of a crate as JSON.
+    ///
+    /// Delegates to `domain_driver()` so that the file-write side effect is
+    /// handled by the usecase layer via [`FileWritePort`].
     ///
     /// # Errors
     /// Returns `Err` when workspace root discovery or schema export fails.
@@ -48,43 +70,16 @@ impl DomainCompositionRoot {
         &self,
         input: ExportSchemaInput,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::schema_export::RustdocSchemaExporter;
-        use usecase::export_schema::{
-            ExportSchemaCommand, ExportSchemaInteractor, ExportSchemaService,
-        };
+        use cli_driver::domain::{DomainInput, ExportSchemaInput as DriverInput};
 
-        let workspace_root = discover_workspace_root().map_err(CompositionError::AdapterInit)?;
-
-        let exporter = Arc::new(RustdocSchemaExporter::new(workspace_root));
-        let service = ExportSchemaInteractor::new(exporter);
-
-        let raw_json = service
-            .export(ExportSchemaCommand { crate_name: input.crate_name })
-            .map_err(|e| CompositionError::Usecase(e.to_string()))?;
-
-        let json = if input.pretty {
-            raw_json
-        } else {
-            let value: serde_json::Value = serde_json::from_str(&raw_json).map_err(|e| {
-                CompositionError::Infrastructure(format!("failed to parse schema JSON: {e}"))
-            })?;
-            serde_json::to_string(&value).map_err(|e| {
-                CompositionError::Infrastructure(format!("failed to compact schema JSON: {e}"))
-            })?
-        };
-
-        if let Some(path) = &input.output {
-            std::fs::write(path, &json).map_err(|e| {
-                CompositionError::Infrastructure(format!("failed to write {}: {e}", path.display()))
-            })?;
-            Ok(CommandOutcome {
-                stdout: None,
-                stderr: Some(format!("[OK] Schema written to {}", path.display())),
-                exit_code: 0,
-            })
-        } else {
-            Ok(CommandOutcome::success(Some(json)))
-        }
+        let driver = self.domain_driver()?;
+        let out = driver.handle(DomainInput::ExportSchema(DriverInput {
+            crate_name: input.crate_name,
+            pretty: input.pretty,
+            output: input.output,
+        }));
+        // Convert cli_driver::CommandOutcome → cli_composition::CommandOutcome.
+        Ok(CommandOutcome { stdout: out.stdout, stderr: out.stderr, exit_code: out.exit_code })
     }
 }
 

@@ -1,19 +1,12 @@
-// STAGED FOR T021 — not yet compiled; Cargo.toml + workspace member added atomically in T021 per CN-06.
-//
 //! `conventions` command family — primary adapter driver.
 //!
-//! `ConventionsDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The render helpers here mirror
-//! `apps/cli-composition/src/conventions.rs`; T021 removes the
-//! `cli_composition` duplicate when the live path is flipped.
-
-// TODO(T021): add infrastructure imports once Cargo.toml is materialized.
-// use std::path::Path;
-// use infrastructure::conventions::{
-//     add_convention_doc, update_convention_index, verify_convention_index,
-// };
+//! `ConventionsDriver` holds an injected [`usecase::conventions::ConventionsPort`]
+//! and exposes `handle(input) -> CommandOutcome`.
 
 use std::path::PathBuf;
+use std::sync::Arc;
+
+use usecase::conventions::ConventionsPort;
 
 use crate::render::CommandOutcome;
 
@@ -54,25 +47,18 @@ pub enum ConventionsInput {
 
 /// Primary adapter driver for the `conventions` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`ConventionsPort`]; exposes `handle(input) -> CommandOutcome`.
 pub struct ConventionsDriver {
-    // TODO(T021): inject use-case interactors here (currently this family has
-    // no injectable adapter dependencies — infrastructure functions are called
-    // inline, same as cli_composition::ConventionsCompositionRoot).
+    port: Arc<dyn ConventionsPort>,
 }
 
 impl ConventionsDriver {
-    /// Create a new `ConventionsDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `ConventionsDriver` with the given port.
+    pub fn new(port: Arc<dyn ConventionsPort>) -> Self {
+        Self { port }
     }
 
     /// Handle a conventions command.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: ConventionsInput) -> CommandOutcome {
         match input {
             ConventionsInput::Add { project_root, name, slug, title, summary } => {
@@ -87,61 +73,46 @@ impl ConventionsDriver {
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Render helpers (logic duplicated from cli_composition/src/conventions.rs;
-    // T021 removes the cli_composition copy).
-    // -----------------------------------------------------------------------
-
     fn conventions_add(
         &self,
-        _project_root: PathBuf,
-        _name: String,
-        _slug: Option<String>,
-        _title: Option<String>,
-        _summary: Option<String>,
+        project_root: PathBuf,
+        name: String,
+        slug: Option<String>,
+        title: Option<String>,
+        summary: Option<String>,
     ) -> CommandOutcome {
-        // TODO(T021): invoke infrastructure::conventions::add_convention_doc here.
-        // Mirrors cli_composition/src/conventions.rs
-        // ConventionsCompositionRoot::conventions_add.
-        // Success stdout: "[OK] Convention document added."
-        CommandOutcome::failure(Some(
-            "cli_driver Driver::handle is not yet wired — apps/cli still routes through \
-             cli_composition CompositionRoot dispatch (deferred from T021); call the matching \
-             CompositionRoot method instead"
-                .to_owned(),
-        ))
+        match self.port.add_convention(
+            project_root.as_path(),
+            &name,
+            slug.as_deref(),
+            title.as_deref(),
+            summary.as_deref(),
+        ) {
+            Ok(msg) => CommandOutcome::success(Some(msg)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn conventions_update_index(&self, _project_root: PathBuf) -> CommandOutcome {
-        // TODO(T021): invoke infrastructure::conventions::update_convention_index here.
-        // Mirrors cli_composition/src/conventions.rs
-        // ConventionsCompositionRoot::conventions_update_index.
-        // Success stdout: "[OK] Convention README index updated."
-        CommandOutcome::failure(Some(
-            "cli_driver Driver::handle is not yet wired — apps/cli still routes through \
-             cli_composition CompositionRoot dispatch (deferred from T021); call the matching \
-             CompositionRoot method instead"
-                .to_owned(),
-        ))
+    fn conventions_update_index(&self, project_root: PathBuf) -> CommandOutcome {
+        match self.port.update_index(project_root.as_path()) {
+            Ok(msg) => CommandOutcome::success(Some(msg)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn conventions_verify_index(&self, _project_root: PathBuf) -> CommandOutcome {
-        // TODO(T021): invoke infrastructure::conventions::verify_convention_index here.
-        // Mirrors cli_composition/src/conventions.rs
-        // ConventionsCompositionRoot::conventions_verify_index.
-        // Success stdout: "[OK] Convention README index is in sync."
-        // Failure: stderr = findings joined by "\n", exit_code = 1.
-        CommandOutcome::failure(Some(
-            "cli_driver Driver::handle is not yet wired — apps/cli still routes through \
-             cli_composition CompositionRoot dispatch (deferred from T021); call the matching \
-             CompositionRoot method instead"
-                .to_owned(),
-        ))
-    }
-}
-
-impl Default for ConventionsDriver {
-    fn default() -> Self {
-        Self::new()
+    fn conventions_verify_index(&self, project_root: PathBuf) -> CommandOutcome {
+        match self.port.verify_index(project_root.as_path()) {
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+            Ok(result) => {
+                if result.ok {
+                    CommandOutcome::success(Some(
+                        "[OK] Convention README index is in sync.".to_owned(),
+                    ))
+                } else {
+                    let stderr = result.findings.join("\n");
+                    CommandOutcome { stdout: None, stderr: Some(stderr), exit_code: 1 }
+                }
+            }
+        }
     }
 }

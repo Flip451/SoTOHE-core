@@ -53,7 +53,9 @@ pub(super) fn resolve_track_id_or_branch_write(
     track_id: Option<String>,
     items_dir: &std::path::Path,
 ) -> Result<String, String> {
-    crate::TrackCompositionRoot::new().track_resolve_id_for_write(track_id, items_dir.to_path_buf())
+    crate::TrackCompositionRoot::new()
+        .track_resolve_id_for_write(track_id, items_dir.to_path_buf())
+        .map_err(|e| e.to_string())
 }
 
 /// Resolves the current track ID from the active git branch (`track/<id>`).

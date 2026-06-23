@@ -914,6 +914,1032 @@
         }
       ],
       "informal_grounds": []
+    },
+    "HookDispatchCommand": {
+      "action": "modify",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "tool_name", "ty": "String" },
+          { "name": "command", "ty": "Option<String>" },
+          { "name": "file_path", "ty": "Option<std::path::PathBuf>" },
+          { "name": "content", "ty": "Option<String>" },
+          { "name": "git_hook_args", "ty": "Vec<String>" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "hook_dispatch",
+      "docs": "CQRS command for the hook dispatch use case. Carries raw tool_name, optional command, file_path, content from the Claude Code hook JSON envelope, and positional git hook arguments (for git-ref-update / git-pre-push final notification routing).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "HookVerdictDecision": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Allow", "payload": { "kind": "unit" } },
+          { "name": "Block", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook_dispatch",
+      "docs": "Enum representing the hook verdict outcome at the usecase boundary. Mirrors domain::hook::HookVerdict without exposing the domain type.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "HookVerdictOutput": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "decision", "ty": "HookVerdictDecision" },
+          { "name": "reason", "ty": "Option<String>" },
+          { "name": "skill_compliance_output", "ty": "Option<String>" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "hook_dispatch",
+      "docs": "DTO returned by the hook dispatch service to the CLI. Wraps the verdict outcome without exposing domain::hook::HookVerdict across the usecase boundary. skill_compliance_output carries the rendered UserPromptSubmit JSON when the skill-compliance hook produced guidance.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "HookDispatchError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "UnknownHookName", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "HandlerFailed", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook_dispatch",
+      "docs": "Error type for HookDispatchService. Wraps unknown hook name and handler execution failures without leaking domain::hook::HookError.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "HookDispatchInteractor": {
+      "action": "modify",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "parser_port", "ty": "std::sync::Arc<dyn HookShellParserPort>" },
+            { "name": "project_dir", "ty": "Option<std::path::PathBuf>" },
+            { "name": "guarded_git_token_present", "ty": "bool" },
+            { "name": "hooks_path_configured", "ty": "bool" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "hook_dispatch",
+      "docs": "Interactor implementing HookDispatchService. Delegates each tool call to the appropriate domain hook handler.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "VerifyOutcome": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "stdout", "ty": "Option<String>" },
+          { "name": "stderr", "ty": "Option<String>" },
+          { "name": "exit_code", "ty": "u8" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "verify",
+      "docs": "Outcome of a single verify subcommand. Contains stdout, stderr, and exit_code.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "VerifyIndexResult": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "ok", "ty": "bool" },
+          { "name": "findings", "ty": "Vec<String>" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "conventions",
+      "docs": "Result of verifying the convention README index. ok is false when findings are present.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-08" }],
+      "informal_grounds": []
+    },
+    "ArchInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "arch",
+      "docs": "Interactor implementing ArchService by delegating to the injected ArchPort and returning rendered strings for cli_driver presentation.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ConventionsInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "conventions",
+      "docs": "Interactor implementing ConventionsService by delegating convention document operations to the injected ConventionsPort.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "VerifyInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "verify",
+      "docs": "Interactor implementing VerifyService by delegating verify subcommands to the injected VerifyPort.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DemoInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "demo",
+      "docs": "Interactor implementing DemoService by delegating to the injected DemoPort.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DryWriteDriverInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "track_id", "ty": "String" },
+          { "name": "base_commit", "ty": "Option<String>" },
+          { "name": "db_path", "ty": "std::path::PathBuf" },
+          { "name": "threshold", "ty": "Option<f32>" },
+          { "name": "workspace_root", "ty": "std::path::PathBuf" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" },
+          { "name": "model", "ty": "Option<String>" },
+          { "name": "capability_name", "ty": "String" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Input for sotp dry write (driver boundary).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DryResultsDriverInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "track_id", "ty": "String" },
+          { "name": "filter", "ty": "String" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Input for sotp dry results (driver boundary).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DryCheckApprovedDriverInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "track_id", "ty": "String" },
+          { "name": "base_commit", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Input for sotp dry check-approved (driver boundary).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DryFixLocalDriverInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "track_id", "ty": "String" },
+          { "name": "briefing_file", "ty": "std::path::PathBuf" },
+          { "name": "model", "ty": "Option<String>" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Input for sotp dry fix-local (driver boundary).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DryDriverOutcome": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "stdout", "ty": "Option<String>" },
+          { "name": "stderr", "ty": "Option<String>" },
+          { "name": "exit_code", "ty": "u8" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Unified command outcome returned to the dry driver. Mirrors cli_driver::render::CommandOutcome without importing cli_driver.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DryDriverInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Interactor implementing DryDriverService. It may use DryDriverPort for external effects, but T023 must keep the dry command path, including dry_fix_local, in usecase-owned service logic rather than delegating back to DryCompositionRoot or DryFixRunnerCompositionRoot.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "FindSimilarDriverInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "fragment_text", "ty": "String" },
+          { "name": "top_k", "ty": "usize" },
+          { "name": "db_path", "ty": "std::path::PathBuf" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "semantic_dup_driver",
+      "docs": "Input for sotp find-similar (driver boundary).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "IndexBuildDriverInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "workspace_root", "ty": "std::path::PathBuf" },
+          { "name": "db_path", "ty": "std::path::PathBuf" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "semantic_dup_driver",
+      "docs": "Input for sotp dup-index build (driver boundary).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "IndexMeasureQualityDriverInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "workspace_root", "ty": "std::path::PathBuf" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "semantic_dup_driver",
+      "docs": "Input for sotp dup-index measure-quality (driver boundary).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DupCheckDriverInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "fragment_files", "ty": "Vec<std::path::PathBuf>" },
+          { "name": "threshold", "ty": "f32" },
+          { "name": "db_path", "ty": "std::path::PathBuf" },
+          { "name": "ack_file", "ty": "Option<std::path::PathBuf>" },
+          { "name": "ack", "ty": "bool" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "semantic_dup_driver",
+      "docs": "Input for sotp dup-check (driver boundary).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "SemanticDupDriverOutcome": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "stdout", "ty": "Option<String>" },
+          { "name": "stderr", "ty": "Option<String>" },
+          { "name": "exit_code", "ty": "u8" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "semantic_dup_driver",
+      "docs": "Unified command outcome returned to the semantic_dup driver. Mirrors cli_driver::render::CommandOutcome without importing cli_driver.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "SemanticDupDriverInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "semantic_dup_driver",
+      "docs": "Interactor implementing SemanticDupDriverService. It may use SemanticDupDriverPort for external effects, but T023 must keep the semantic_dup command path in usecase-owned service logic rather than delegating back to SemanticDupCompositionRoot.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "SignalCommandOutput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "stdout", "ty": "Option<String>" },
+          { "name": "stderr", "ty": "Option<String>" },
+          { "name": "exit_code", "ty": "u8" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "docs": "Unified output DTO for all signal subcommands. Mirrors cli_driver::render::CommandOutcome field-for-field.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "SignalGateName": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Commit", "payload": { "kind": "unit" } },
+          { "name": "Merge", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "docs": "Selects the gate context when resolving strictness from signal-gates.json. Re-defined in usecase so cli_driver does not import domain directly.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "TelemetryPhaseDuration": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "phase_name", "ty": "String" },
+          { "name": "total_ms", "ty": "u64" },
+          { "name": "event_count", "ty": "usize" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Report record for a single telemetry phase duration.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-08" }],
+      "informal_grounds": []
+    },
+    "TelemetryErrorEntry": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "timestamp", "ty": "String" },
+          { "name": "command", "ty": "String" },
+          { "name": "exit_code", "ty": "i32" },
+          { "name": "error_chain", "ty": "String" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "A single error entry from telemetry.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-08" }],
+      "informal_grounds": []
+    },
+    "TelemetryHookBlockEntry": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "timestamp", "ty": "String" },
+          { "name": "hook_name", "ty": "String" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "A single hook block entry from telemetry.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-08" }],
+      "informal_grounds": []
+    },
+    "TelemetryReportOutput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "phase_durations", "ty": "Vec<TelemetryPhaseDuration>" },
+          { "name": "errors", "ty": "Vec<TelemetryErrorEntry>" },
+          { "name": "hook_blocks", "ty": "Vec<TelemetryHookBlockEntry>" },
+          { "name": "skipped_lines", "ty": "usize" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Aggregated telemetry output for a track.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-08" }],
+      "informal_grounds": []
+    },
+    "TelemetryReportError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "TrackNotFound", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "ReportUnavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Error type for TelemetryReportPort. TrackNotFound: track directory does not exist. ReportUnavailable: report could not be loaded.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" }],
+      "informal_grounds": []
+    },
+    "TelemetryReportInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Interactor for telemetry reporting that delegates to a TelemetryReportPort.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "TelemetryAggregateInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Driver-facing telemetry interactor implementing TelemetryAggregateService by delegating report work to TelemetryReportPort and archived telemetry emission to TelemetryEmitDynamicPort.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "PrCommandOutput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "stdout", "ty": "Option<String>" },
+          { "name": "stderr", "ty": "Option<String>" },
+          { "name": "exit_code", "ty": "u8" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "docs": "Primitive output from a PR command operation. Uses only stdlib types so the driver and usecase layers never import infrastructure or domain types.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "PrCommandInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "docs": "Function bundle injected by cli_composition to implement PrCommandService. Uses function-pointer pattern so usecase never imports infrastructure directly.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "CheckApprovedOutcome": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "NoPairs", "payload": { "kind": "unit" } },
+          { "name": "AllApproved", "payload": { "kind": "unit" } },
+          { "name": "NotApproved", "payload": { "kind": "struct", "fields": [
+            { "name": "missing_or_non_pass", "ty": "Vec<String>" }
+          ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::check_approved",
+      "docs": "Outcome of the check-approved gate. NoPairs: no production reference pairs found. AllApproved: all pairs have Pass cache entries. NotApproved: one or more pairs lack a Pass entry.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-08" }],
+      "informal_grounds": []
+    },
+    "RefVerifyCheckApprovedInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "ref_verify::check_approved",
+      "docs": "Default RefVerifyCheckApprovedService implementation. Loads production pairs and reads per-scope verify-cache artifacts to verify all pairs are Pass.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "RefVerifyAggregateInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Usecase-owned aggregate wrapper over the ref_verify secondary port contract. Holds injected run/check-approved service boundaries and delegates both methods; T023 reuses the existing port trait while composition can still place this interactor between infrastructure and cli_driver.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "RefVerifyDriverError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "Wiring", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "Usecase", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Failure modes for RefVerifyRunService and RefVerifyCheckApprovedDriverService.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "RefVerifyRunOutcome": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Passed", "payload": { "kind": "unit" } },
+          { "name": "SemanticFailuresConfirmed", "payload": { "kind": "struct", "fields": [
+            { "name": "pair_count", "ty": "usize" }
+          ] } },
+          { "name": "HumanEscalationRequired", "payload": { "kind": "struct", "fields": [
+            { "name": "pair_count", "ty": "usize" }
+          ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Outcome of the ref-verify run operation, ready for driver rendering.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "RefVerifyCheckApprovedOutcome": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "NoPairs", "payload": { "kind": "unit" } },
+          { "name": "AllApproved", "payload": { "kind": "unit" } },
+          { "name": "NotApproved", "payload": { "kind": "struct", "fields": [
+            { "name": "missing_or_non_pass", "ty": "Vec<String>" }
+          ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Outcome of the ref-verify check-approved operation, ready for driver rendering.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewRunInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "model", "ty": "String" },
+          { "name": "timeout_seconds", "ty": "u64" },
+          { "name": "briefing_file", "ty": "Option<std::path::PathBuf>" },
+          { "name": "prompt", "ty": "Option<String>" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "round_type", "ty": "String" },
+          { "name": "group", "ty": "String" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "review_v2::aggregate_service",
+      "docs": "Input for the RunCodex / RunClaude review variants.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewRunFixInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "scope", "ty": "String" },
+          { "name": "briefing_file", "ty": "std::path::PathBuf" },
+          { "name": "track_id", "ty": "String" },
+          { "name": "round_type", "ty": "String" },
+          { "name": "model", "ty": "Option<String>" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "review_v2::aggregate_service",
+      "docs": "Input for the RunFixLocal review variant.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewClassifyInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "docs": "Function-pointer interactor implementing ReviewClassifyService.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewFilesInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "docs": "Function-pointer interactor implementing ReviewFilesService.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewResultsInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "docs": "Function-pointer interactor implementing ReviewResultsService.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewValidateScopeInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "docs": "Function-pointer interactor implementing ReviewValidateScopeService.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewGetBriefingInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "docs": "Function-pointer interactor implementing ReviewGetBriefingService.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewRunLocalOutput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "stdout", "ty": "Option<String>" },
+          { "name": "stderr", "ty": "Option<String>" },
+          { "name": "exit_code", "ty": "u8" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "docs": "Output DTO from ReviewRunLocalService. Uses stdlib-only types so cli_driver never imports domain or infrastructure review types.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewRunLocalInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "docs": "Function-pointer interactor implementing ReviewRunLocalService.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "TrackCommandOutput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "stdout", "ty": "Option<String>" },
+          { "name": "stderr", "ty": "Option<String>" },
+          { "name": "exit_code", "ty": "u8" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "track_service",
+      "docs": "Unified output DTO for all track subcommands. Mirrors cli_driver::render::CommandOutcome field-for-field.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "GitWorkflowResult": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Type alias Result<T, GitWorkflowError> for git workflow operations. Defined as pub type GitWorkflowResult<T> = Result<T, GitWorkflowError>. Refactored from Result<T, String> to typed error enum to surface I/O failure category (Unavailable variant) at the usecase boundary.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-08" }],
+      "informal_grounds": []
+    },
+    "GitWorkflowError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Validation", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "NoBranch", "payload": { "kind": "unit" } },
+          { "name": "DetachedHead", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "BranchMismatch", "payload": { "kind": "struct", "fields": [
+            { "name": "current", "ty": "String" },
+            { "name": "expected", "ty": "String" }
+          ] } },
+          { "name": "Message", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Error type for GitWorkflowService and git workflow validation helpers. Unavailable variant added by T023 refactor to represent I/O or infrastructure failures (git process errors, file read failures) previously expressed as plain String in GitWorkflowResult.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "TelemetryEmitDynamicPortError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "EmitUnavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Error type for TelemetryEmitDynamicPort. EmitUnavailable: resolution or I/O failure when emitting the archived-track telemetry event. Replaces plain String error for typed usecase boundary.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" }],
+      "informal_grounds": []
+    },
+    "TelemetryAggregateServiceError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ReportUnavailable", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "EmitUnavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Error type for TelemetryAggregateService. ReportUnavailable: report could not be produced (track not found or I/O failure). EmitUnavailable: archived-track telemetry event could not be emitted. Replaces plain String error for typed usecase boundary.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" }],
+      "informal_grounds": []
+    },
+    "GitWorkflowInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Concrete interactor wrapper over the GitWorkflowService secondary port. Holds an injected Arc<dyn GitWorkflowService> and delegates every method through it, enabling composition to wrap FsGitWorkflowAdapter without classifying the filesystem adapter as an application service.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ArchPortError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "arch",
+      "docs": "Error returned by ArchPort methods when the infrastructure layer cannot fulfill the request. Derives Debug via #[derive(Debug)] and Display + Error via thiserror::Error.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "ConventionsPortError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "conventions",
+      "docs": "Error returned by ConventionsPort methods when the infrastructure layer cannot fulfill the request. Derives Debug via #[derive(Debug)] and Display + Error via thiserror::Error.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "DemoPortError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "demo",
+      "docs": "Error returned by DemoPort methods when the infrastructure layer cannot fulfill the request. Derives Debug via #[derive(Debug)] and Display + Error via thiserror::Error.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "FilePortError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "file",
+      "docs": "Error returned by FileWritePort methods on I/O failure. Derives Debug via #[derive(Debug)] and Display + Error via thiserror::Error.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" }],
+      "informal_grounds": []
+    },
+    "VerifyPortError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify",
+      "docs": "Error returned by VerifyPort methods for adapter-level failures distinct from verify findings encoded in VerifyOutcome. Derives Debug via #[derive(Debug)] and Display + Error via thiserror::Error.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" }],
+      "informal_grounds": []
+    },
+    "ExportSchemaCommand": {
+      "action": "modify",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [
+          { "name": "crate_name", "ty": "String" },
+          { "name": "output_path", "ty": "Option<std::path::PathBuf>" }
+        ], "has_stripped_fields": false }
+      },
+      "methods": [],
+      "module_path": "export_schema",
+      "docs": "CQRS command for the schema export use case. Carries crate name and optional output file path; when output_path is Some, the interactor writes via FileWritePort instead of returning the JSON string.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" }],
+      "informal_grounds": []
+    },
+    "ExportSchemaError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ExportFailed", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "SerializationFailed", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "FileWriteFailed", "payload": { "kind": "tuple", "fields": ["FilePortError"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "export_schema",
+      "docs": "Error type for ExportSchemaService. Added FileWriteFailed variant to cover atomic file write failures via FileWritePort.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" }],
+      "informal_grounds": []
+    },
+    "ExportSchemaInteractor": {
+      "action": "modify",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "port", "ty": "std::sync::Arc<dyn SchemaExporterPort>" },
+            { "name": "file_port", "ty": "std::sync::Arc<dyn FileWritePort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "export_schema",
+      "docs": "Concrete implementation of ExportSchemaService. Now accepts FileWritePort in addition to SchemaExporterPort so file-write side effects are handled inside the usecase boundary.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-06" }],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -2065,9 +3091,722 @@
         }
       ],
       "informal_grounds": []
+    },
+    "HookDispatchService": {
+      "action": "modify",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "dispatch",
+          "receiver": "&self",
+          "params": [
+            { "name": "hook_name", "ty": "String" },
+            { "name": "command", "ty": "HookDispatchCommand" }
+          ],
+          "returns": "Result<HookVerdictOutput, HookDispatchError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": []
+        },
+        {
+          "name": "check_skill_compliance",
+          "receiver": "&self",
+          "params": [{ "name": "prompt", "ty": "&str" }],
+          "returns": "Option<String>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "hook_dispatch",
+      "docs": "Application service trait for the hook dispatch use case. Dispatches to the appropriate HookHandler and returns HookVerdictOutput so the CLI never imports domain::hook types directly.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "VerifyPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "verify_tech_stack", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_latest_track", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_arch_docs", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_layers", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_hooks_path", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_canonical_modules", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_module_size", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_domain_purity", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_domain_strings", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_usecase_purity", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_doc_links", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_view_freshness", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_plan_artifact_refs", "receiver": "&self", "params": [{ "name": "track_dir", "ty": "Option<&std::path::Path>" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_catalogue_spec_refs", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "Option<&str>" },
+          { "name": "items_dir", "ty": "&std::path::Path" },
+          { "name": "workspace_root", "ty": "&std::path::Path" },
+          { "name": "skip_stale", "ty": "bool" }
+        ], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "verify",
+      "docs": "Secondary port for all verify subcommands. Infrastructure implements this port by delegating to the infrastructure::verify::* submodules.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "VerifyService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "verify_tech_stack", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_latest_track", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_arch_docs", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_layers", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_hooks_path", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_canonical_modules", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_module_size", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_domain_purity", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_domain_strings", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_usecase_purity", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_doc_links", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_view_freshness", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_plan_artifact_refs", "receiver": "&self", "params": [{ "name": "track_dir", "ty": "Option<&std::path::Path>" }], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_catalogue_spec_refs", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "Option<&str>" },
+          { "name": "items_dir", "ty": "&std::path::Path" },
+          { "name": "workspace_root", "ty": "&std::path::Path" },
+          { "name": "skip_stale", "ty": "bool" }
+        ], "returns": "VerifyOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "verify",
+      "docs": "Application service trait for the verify command family. VerifyInteractor delegates each operation to VerifyPort so cli_driver injects a usecase boundary, not a secondary port.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ConventionsPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "add_convention", "receiver": "&self", "params": [
+          { "name": "root", "ty": "&std::path::Path" },
+          { "name": "name", "ty": "&str" },
+          { "name": "slug", "ty": "Option<&str>" },
+          { "name": "title", "ty": "Option<&str>" },
+          { "name": "summary", "ty": "Option<&str>" }
+        ], "returns": "Result<String, ConventionsPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "update_index", "receiver": "&self", "params": [{ "name": "root", "ty": "&std::path::Path" }], "returns": "Result<String, ConventionsPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_index", "receiver": "&self", "params": [{ "name": "root", "ty": "&std::path::Path" }], "returns": "Result<VerifyIndexResult, ConventionsPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "conventions",
+      "docs": "Secondary port for convention document management.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ConventionsService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "add_convention", "receiver": "&self", "params": [
+          { "name": "root", "ty": "&std::path::Path" },
+          { "name": "name", "ty": "&str" },
+          { "name": "slug", "ty": "Option<&str>" },
+          { "name": "title", "ty": "Option<&str>" },
+          { "name": "summary", "ty": "Option<&str>" }
+        ], "returns": "Result<String, ConventionsPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "update_index", "receiver": "&self", "params": [{ "name": "root", "ty": "&std::path::Path" }], "returns": "Result<String, ConventionsPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "verify_index", "receiver": "&self", "params": [{ "name": "root", "ty": "&std::path::Path" }], "returns": "Result<VerifyIndexResult, ConventionsPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "conventions",
+      "docs": "Application service trait for convention document commands. ConventionsInteractor delegates to ConventionsPort so cli_driver injects a usecase boundary.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DemoPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "run", "receiver": "&self", "params": [], "returns": "Result<String, DemoPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "demo",
+      "docs": "Secondary port for the built-in demo.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-02" }],
+      "informal_grounds": []
+    },
+    "DemoService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "run", "receiver": "&self", "params": [], "returns": "Result<String, DemoPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "demo",
+      "docs": "Application service trait for the demo use case.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "FileWritePort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "write_atomic", "receiver": "&self", "params": [
+          { "name": "path", "ty": "&std::path::Path" },
+          { "name": "content", "ty": "&[u8]" }
+        ], "returns": "Result<(), FilePortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "file",
+      "docs": "Secondary port for atomic file write operations.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" }],
+      "informal_grounds": []
+    },
+    "ArchPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "render_tree", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "Result<String, ArchPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "render_tree_full", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "Result<String, ArchPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "render_members", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "Result<String, ArchPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "render_direct_checks", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "Result<String, ArchPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "arch",
+      "docs": "Secondary port for workspace architecture rendering. Methods return rendered strings for direct presentation by cli_driver.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-02" }],
+      "informal_grounds": []
+    },
+    "ArchService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "render_tree", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "Result<String, ArchPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "render_tree_full", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "Result<String, ArchPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "render_members", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "Result<String, ArchPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "render_direct_checks", "receiver": "&self", "params": [{ "name": "project_root", "ty": "&std::path::Path" }], "returns": "Result<String, ArchPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "arch",
+      "docs": "Application service trait for architecture inspection commands. ArchInteractor delegates to ArchPort and returns rendered strings for cli_driver presentation.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "DryDriverPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "dry_write", "receiver": "&self", "params": [{ "name": "input", "ty": "DryWriteDriverInput" }], "returns": "DryDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "dry_results", "receiver": "&self", "params": [{ "name": "input", "ty": "DryResultsDriverInput" }], "returns": "DryDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "dry_check_approved", "receiver": "&self", "params": [{ "name": "input", "ty": "DryCheckApprovedDriverInput" }], "returns": "DryDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "dry_fix_local", "receiver": "&self", "params": [{ "name": "input", "ty": "DryFixLocalDriverInput" }], "returns": "DryDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_driver",
+      "docs": "Secondary port for dry command-family external effects used by DryDriverService. Any bridge implementation that delegates to DryCompositionRoot / DryFixRunnerCompositionRoot is transitional only; T023 must replace it with a non-root usecase/infrastructure path or remove the indirection before T024 deletes those originals.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-02" }],
+      "informal_grounds": []
+    },
+    "DryDriverService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "dry_write", "receiver": "&self", "params": [{ "name": "input", "ty": "DryWriteDriverInput" }], "returns": "DryDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "dry_results", "receiver": "&self", "params": [{ "name": "input", "ty": "DryResultsDriverInput" }], "returns": "DryDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "dry_check_approved", "receiver": "&self", "params": [{ "name": "input", "ty": "DryCheckApprovedDriverInput" }], "returns": "DryDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "dry_fix_local", "receiver": "&self", "params": [{ "name": "input", "ty": "DryFixLocalDriverInput" }], "returns": "DryDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_driver",
+      "docs": "Application service trait for the dry command family.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "SemanticDupDriverPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "find_similar", "receiver": "&self", "params": [{ "name": "input", "ty": "FindSimilarDriverInput" }], "returns": "SemanticDupDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "index_build", "receiver": "&self", "params": [{ "name": "input", "ty": "IndexBuildDriverInput" }], "returns": "SemanticDupDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "index_measure_quality", "receiver": "&self", "params": [{ "name": "input", "ty": "IndexMeasureQualityDriverInput" }], "returns": "SemanticDupDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "dup_check", "receiver": "&self", "params": [{ "name": "input", "ty": "DupCheckDriverInput" }], "returns": "SemanticDupDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "semantic_dup_driver",
+      "docs": "Secondary port for semantic_dup command-family external effects used by SemanticDupDriverService. Any bridge implementation that delegates to SemanticDupCompositionRoot is transitional only; T023 must replace it with a non-root usecase/infrastructure path or remove the indirection before T024 deletes that original.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-02" }],
+      "informal_grounds": []
+    },
+    "SemanticDupDriverService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "find_similar", "receiver": "&self", "params": [{ "name": "input", "ty": "FindSimilarDriverInput" }], "returns": "SemanticDupDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "index_build", "receiver": "&self", "params": [{ "name": "input", "ty": "IndexBuildDriverInput" }], "returns": "SemanticDupDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "index_measure_quality", "receiver": "&self", "params": [{ "name": "input", "ty": "IndexMeasureQualityDriverInput" }], "returns": "SemanticDupDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "dup_check", "receiver": "&self", "params": [{ "name": "input", "ty": "DupCheckDriverInput" }], "returns": "SemanticDupDriverOutcome", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "semantic_dup_driver",
+      "docs": "Application service trait for the semantic_dup command family.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "SignalService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "calc_adr_user", "receiver": "&self", "params": [{ "name": "project_root", "ty": "std::path::PathBuf" }], "returns": "SignalCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "check_adr_user", "receiver": "&self", "params": [
+          { "name": "project_root", "ty": "std::path::PathBuf" },
+          { "name": "strict_override", "ty": "bool" },
+          { "name": "gate", "ty": "Option<SignalGateName>" },
+          { "name": "workspace_root", "ty": "Option<std::path::PathBuf>" }
+        ], "returns": "SignalCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "calc_spec_adr", "receiver": "&self", "params": [
+          { "name": "spec_json_path", "ty": "Option<std::path::PathBuf>" },
+          { "name": "workspace_root", "ty": "Option<std::path::PathBuf>" }
+        ], "returns": "SignalCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "check_spec_adr", "receiver": "&self", "params": [
+          { "name": "spec_json_path", "ty": "Option<std::path::PathBuf>" },
+          { "name": "strict_override", "ty": "bool" },
+          { "name": "gate", "ty": "Option<SignalGateName>" },
+          { "name": "workspace_root", "ty": "Option<std::path::PathBuf>" }
+        ], "returns": "SignalCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "calc_catalog_spec", "receiver": "&self", "params": [], "returns": "SignalCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "check_catalog_spec", "receiver": "&self", "params": [
+          { "name": "strict_override", "ty": "bool" },
+          { "name": "gate", "ty": "Option<SignalGateName>" },
+          { "name": "workspace_root", "ty": "Option<std::path::PathBuf>" }
+        ], "returns": "SignalCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "calc_impl_catalog", "receiver": "&self", "params": [], "returns": "SignalCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "check_impl_catalog", "receiver": "&self", "params": [
+          { "name": "strict_override", "ty": "bool" },
+          { "name": "gate", "ty": "Option<SignalGateName>" },
+          { "name": "workspace_root", "ty": "Option<std::path::PathBuf>" }
+        ], "returns": "SignalCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "check_gate", "receiver": "&self", "params": [
+          { "name": "project_root", "ty": "Option<std::path::PathBuf>" },
+          { "name": "spec_json_path", "ty": "Option<std::path::PathBuf>" },
+          { "name": "gate", "ty": "SignalGateName" },
+          { "name": "workspace_root", "ty": "Option<std::path::PathBuf>" }
+        ], "returns": "SignalCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "signal_service",
+      "docs": "Primary port for the signal command family. Each method corresponds to one sotp signal <subcommand> invocation.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "TelemetryEmitDynamicPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "emit_archived", "receiver": "&self", "params": [
+          { "name": "items_dir", "ty": "&std::path::Path" },
+          { "name": "track_id", "ty": "&str" },
+          { "name": "subcommand", "ty": "String" },
+          { "name": "exit_code", "ty": "i32" },
+          { "name": "duration_ms", "ty": "u64" }
+        ], "returns": "Result<(), TelemetryEmitDynamicPortError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "telemetry",
+      "docs": "Secondary port for emitting archived-track telemetry with dynamic path resolution. Accepts the full context at call time so the driver does not need to know the repo root at construction time. emit_archived now returns Result<(), TelemetryEmitDynamicPortError> (refactored from Result<(), String> by T023).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-02" }],
+      "informal_grounds": []
+    },
+    "TelemetryReportPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "aggregate", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "&str" },
+          { "name": "items_dir", "ty": "&std::path::Path" }
+        ], "returns": "Result<TelemetryReportOutput, TelemetryReportError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "telemetry",
+      "docs": "Secondary port for aggregating telemetry JSONL data for a track. items_dir is passed per-call so the same port implementation can serve multiple track items directories.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-02" }],
+      "informal_grounds": []
+    },
+    "TelemetryReportService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "report", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "&str" },
+          { "name": "items_dir", "ty": "&std::path::Path" }
+        ], "returns": "Result<String, String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "telemetry",
+      "docs": "Transitional application service for telemetry reporting. It currently returns a formatted string report; T024 removes or retypes this path so telemetry reporting returns DTO data for cli_driver rendering.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "TelemetryAggregateService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "report", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "&str" },
+          { "name": "items_dir", "ty": "&std::path::Path" }
+        ], "returns": "Result<String, TelemetryAggregateServiceError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "emit_archived", "receiver": "&self", "params": [
+          { "name": "items_dir", "ty": "&std::path::Path" },
+          { "name": "track_id", "ty": "&str" },
+          { "name": "subcommand", "ty": "String" },
+          { "name": "exit_code", "ty": "i32" },
+          { "name": "duration_ms", "ty": "u64" }
+        ], "returns": "Result<(), TelemetryAggregateServiceError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "telemetry",
+      "docs": "Aggregate primary port for the telemetry command family. TelemetryDriver holds exactly one Arc<dyn TelemetryAggregateService>. During T023, report still returns Result<String, TelemetryAggregateServiceError> as a transitional formatted-report path and emit_archived returns Result<(), TelemetryAggregateServiceError>; both use typed errors. T024 must retype report so telemetry reporting returns DTO/report data to cli_driver for final rendering.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "PrCommandService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "push", "receiver": "&self", "params": [{ "name": "track_id", "ty": "Option<String>" }], "returns": "PrCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "ensure", "receiver": "&self", "params": [{ "name": "track_id", "ty": "Option<String>" }, { "name": "base", "ty": "String" }], "returns": "PrCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "status", "receiver": "&self", "params": [{ "name": "pr", "ty": "String" }], "returns": "PrCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "wait_and_merge", "receiver": "&self", "params": [
+          { "name": "pr", "ty": "String" },
+          { "name": "interval", "ty": "u64" },
+          { "name": "timeout", "ty": "u64" },
+          { "name": "method", "ty": "String" }
+        ], "returns": "PrCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "trigger_review", "receiver": "&self", "params": [{ "name": "pr", "ty": "String" }], "returns": "PrCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "poll_review", "receiver": "&self", "params": [
+          { "name": "pr", "ty": "String" },
+          { "name": "trigger_timestamp", "ty": "String" },
+          { "name": "interval", "ty": "u64" },
+          { "name": "timeout", "ty": "u64" }
+        ], "returns": "PrCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "review_cycle", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "resume", "ty": "bool" }
+        ], "returns": "PrCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pr",
+      "docs": "Application service (primary port) for the PR command family. Covers all non-polling operations.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "RefVerifyCheckApprovedService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "check_approved", "receiver": "&self", "params": [
+          { "name": "cmd", "ty": "&usecase::ref_verify::RefVerifyCommand" }
+        ], "returns": "Result<CheckApprovedOutcome, usecase::ref_verify::RefVerifyError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify::check_approved",
+      "docs": "Primary port for the ref-verify check-approved use case.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "RefVerifyRunService": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "run", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "&str" },
+          { "name": "items_dir", "ty": "&std::path::Path" }
+        ], "returns": "Result<RefVerifyRunOutcome, RefVerifyDriverError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Secondary port implemented by infrastructure for the ref-verify run subcommand. It remains the filesystem-side contract in T023; composition may wrap it with a usecase interactor before injecting a driver-facing object.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "RefVerifyCheckApprovedDriverService": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "check_approved", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "&str" },
+          { "name": "items_dir", "ty": "&std::path::Path" }
+        ], "returns": "Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Secondary port implemented by infrastructure for the ref-verify check-approved subcommand. It remains the filesystem-side contract in T023; composition may wrap it with a usecase interactor before injecting a driver-facing object.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "RefVerifyAggregateService": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "run", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "&str" },
+          { "name": "items_dir", "ty": "&std::path::Path" }
+        ], "returns": "Result<RefVerifyRunOutcome, RefVerifyDriverError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "check_approved", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "&str" },
+          { "name": "items_dir", "ty": "&std::path::Path" }
+        ], "returns": "Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Aggregate secondary port for the ref_verify command family. Infrastructure provides the filesystem-backed adapter and composition may wrap it with RefVerifyAggregateInteractor so the object graph can keep a usecase-owned hop without misclassifying infrastructure as an application service.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-02" }],
+      "informal_grounds": []
+    },
+    "ReviewService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "run_codex", "receiver": "&self", "params": [{ "name": "input", "ty": "ReviewRunInput" }], "returns": "Result<usecase::review_v2::RunReviewOutput, usecase::review_v2::RunReviewError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "run_claude", "receiver": "&self", "params": [{ "name": "input", "ty": "ReviewRunInput" }], "returns": "Result<usecase::review_v2::RunReviewOutput, usecase::review_v2::RunReviewError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "run_local", "receiver": "&self", "params": [
+          { "name": "model", "ty": "Option<String>" },
+          { "name": "timeout_seconds", "ty": "u64" },
+          { "name": "briefing_file", "ty": "Option<std::path::PathBuf>" },
+          { "name": "prompt", "ty": "Option<String>" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "round_type", "ty": "String" },
+          { "name": "group", "ty": "String" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "ReviewRunLocalOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "run_fix_local", "receiver": "&self", "params": [{ "name": "input", "ty": "ReviewRunFixInput" }], "returns": "Result<usecase::review_v2::RunReviewFixOutput, usecase::review_v2::RunReviewFixError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "check_approved", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "String" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<usecase::review_v2::ReviewApprovalOutput, usecase::review_v2::ReviewCheckApprovedError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "results", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" },
+          { "name": "scope", "ty": "Option<String>" },
+          { "name": "all", "ty": "bool" },
+          { "name": "limit", "ty": "u32" },
+          { "name": "round_type", "ty": "String" },
+          { "name": "no_hint", "ty": "bool" }
+        ], "returns": "Result<String, String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "classify", "receiver": "&self", "params": [
+          { "name": "paths", "ty": "Vec<String>" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<Vec<(String, String)>, String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "files", "receiver": "&self", "params": [
+          { "name": "scope", "ty": "String" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<Vec<String>, String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "validate_scope", "receiver": "&self", "params": [
+          { "name": "scope", "ty": "String" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<(), String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "get_briefing", "receiver": "&self", "params": [
+          { "name": "scope", "ty": "String" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<Option<String>, String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "persist_commit_hash", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "String" },
+          { "name": "workspace_root", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<String, usecase::commit_hash_persistence::CommitHashPersistenceError>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::aggregate_service",
+      "docs": "Aggregate primary port for the review command family. ReviewDriver holds exactly one Arc<dyn ReviewService>.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewClassifyService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "classify", "receiver": "&self", "params": [
+          { "name": "paths", "ty": "Vec<String>" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<Vec<(String, String)>, String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::review_aux",
+      "docs": "Application service (primary port) for sotp review classify.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewFilesService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "files", "receiver": "&self", "params": [
+          { "name": "scope", "ty": "String" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<Vec<String>, String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::review_aux",
+      "docs": "Application service (primary port) for sotp review files.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewResultsService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "results", "receiver": "&self", "params": [
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" },
+          { "name": "scope", "ty": "Option<String>" },
+          { "name": "all", "ty": "bool" },
+          { "name": "limit", "ty": "u32" },
+          { "name": "round_type", "ty": "String" },
+          { "name": "no_hint", "ty": "bool" }
+        ], "returns": "Result<String, String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::review_aux",
+      "docs": "Application service (primary port) for sotp review results.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewValidateScopeService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "validate_scope", "receiver": "&self", "params": [
+          { "name": "scope", "ty": "String" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<(), String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::review_aux",
+      "docs": "Application service (primary port) for sotp review validate-scope.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewGetBriefingService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "get_briefing", "receiver": "&self", "params": [
+          { "name": "scope", "ty": "String" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "Result<Option<String>, String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::review_aux",
+      "docs": "Application service (primary port) for sotp review get-briefing.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "ReviewRunLocalService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "run_local", "receiver": "&self", "params": [
+          { "name": "model", "ty": "Option<String>" },
+          { "name": "timeout_seconds", "ty": "u64" },
+          { "name": "briefing_file", "ty": "Option<std::path::PathBuf>" },
+          { "name": "prompt", "ty": "Option<String>" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "round_type", "ty": "String" },
+          { "name": "group", "ty": "String" },
+          { "name": "items_dir", "ty": "std::path::PathBuf" }
+        ], "returns": "ReviewRunLocalOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::review_aux",
+      "docs": "Application service (primary port) for sotp review local (provider-resolved).",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "TrackService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        { "name": "init", "receiver": "&self", "params": [
+          { "name": "items_dir", "ty": "std::path::PathBuf" },
+          { "name": "track_id", "ty": "String" },
+          { "name": "description", "ty": "String" }
+        ], "returns": "TrackCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "transition", "receiver": "&self", "params": [
+          { "name": "items_dir", "ty": "std::path::PathBuf" },
+          { "name": "track_id", "ty": "Option<String>" },
+          { "name": "task_id", "ty": "String" },
+          { "name": "target_status", "ty": "String" },
+          { "name": "commit_hash", "ty": "Option<String>" }
+        ], "returns": "TrackCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "resolve", "receiver": "&self", "params": [
+          { "name": "items_dir", "ty": "std::path::PathBuf" },
+          { "name": "track_id", "ty": "Option<String>" }
+        ], "returns": "TrackCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "views_sync", "receiver": "&self", "params": [
+          { "name": "project_root", "ty": "std::path::PathBuf" },
+          { "name": "track_id", "ty": "Option<String>" }
+        ], "returns": "TrackCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "archive", "receiver": "&self", "params": [
+          { "name": "items_dir", "ty": "std::path::PathBuf" },
+          { "name": "track_id", "ty": "String" }
+        ], "returns": "TrackCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "detect_active", "receiver": "&self", "params": [
+          { "name": "project_root", "ty": "std::path::PathBuf" }
+        ], "returns": "TrackCommandOutput", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "track_service",
+      "docs": "Primary port for the track command family. Each method corresponds to one sotp track <subcommand> invocation.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
+    },
+    "GitWorkflowService": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        { "name": "stage_all", "receiver": "&self", "params": [], "returns": "GitWorkflowResult<()>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "stage_from_file", "receiver": "&self", "params": [
+          { "name": "path", "ty": "&std::path::Path" },
+          { "name": "cleanup", "ty": "bool" }
+        ], "returns": "GitWorkflowResult<()>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "commit_from_file", "receiver": "&self", "params": [
+          { "name": "path", "ty": "&std::path::Path" },
+          { "name": "cleanup", "ty": "bool" },
+          { "name": "track_dir", "ty": "Option<&std::path::Path>" }
+        ], "returns": "GitWorkflowResult<()>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "note_from_file", "receiver": "&self", "params": [
+          { "name": "path", "ty": "&std::path::Path" },
+          { "name": "cleanup", "ty": "bool" }
+        ], "returns": "GitWorkflowResult<()>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "switch_and_pull", "receiver": "&self", "params": [{ "name": "branch", "ty": "&str" }], "returns": "GitWorkflowResult<String>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "unstage", "receiver": "&self", "params": [{ "name": "paths", "ty": "&[std::path::PathBuf]" }], "returns": "GitWorkflowResult<()>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] },
+        { "name": "current_branch_track_id", "receiver": "&self", "params": [], "returns": "GitWorkflowResult<Option<String>>", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "git_workflow",
+      "docs": "Secondary port for guarded local git operations. GitWorkflowResult<T> now resolves to Result<T, GitWorkflowError> after T023 refactor (was Result<T, String>). FsGitWorkflowAdapter implements this contract; GitWorkflowInteractor wraps it at composition time.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-03" }],
+      "informal_grounds": []
     }
   },
-  "functions": {},
+  "functions": {
+    "usecase::telemetry::format_report": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_id", "ty": "&str" },
+        { "name": "output", "ty": "&TelemetryReportOutput" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "docs": "Transitional presentation helper discovered during T023 wiring. It is catalogued to keep impl signals honest, but T024 must move this formatter into cli_driver or delete it after cli_driver renders TelemetryReportOutput; it is not part of the final usecase API.",
+      "spec_refs": [{ "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-09" }],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [
     {
       "type_name": "SignalGateInteractor",
@@ -2433,6 +4172,601 @@
       "action": "add",
       "trait_ref": "core::clone::Clone",
       "for_type": "PrReviewPollingOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CheckApprovedOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "CheckApprovedOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "CheckApprovedOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CheckApprovedOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "DemoService",
+      "for_type": "DemoInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckApprovedDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckApprovedDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "DryDriverService",
+      "for_type": "DryDriverInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryDriverOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryDriverOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryFixLocalDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryFixLocalDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryResultsDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryResultsDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryWriteDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryWriteDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DupCheckDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DupCheckDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "FindSimilarDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FindSimilarDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "GitWorkflowService",
+      "for_type": "GitWorkflowInteractor"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookDispatchCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookDispatchCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "HookDispatchError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookDispatchError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "HookDispatchError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "HookVerdictDecision"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "HookVerdictOutput"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "HookVerdictOutput"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "HookVerdictOutput"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "HookVerdictOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "IndexBuildDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "IndexBuildDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "IndexMeasureQualityDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "IndexMeasureQualityDriverInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "PrCommandService",
+      "for_type": "PrCommandInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "PrCommandOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PrCommandOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "RefVerifyCheckApprovedService",
+      "for_type": "RefVerifyCheckApprovedInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "RefVerifyAggregateService",
+      "for_type": "RefVerifyAggregateInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RefVerifyCheckApprovedOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RefVerifyCheckApprovedOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RefVerifyCheckApprovedOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyCheckApprovedOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "RefVerifyDriverError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyDriverError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RefVerifyDriverError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RefVerifyRunOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RefVerifyRunOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RefVerifyRunOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyRunOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ReviewClassifyService",
+      "for_type": "ReviewClassifyInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ReviewFilesService",
+      "for_type": "ReviewFilesInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ReviewGetBriefingService",
+      "for_type": "ReviewGetBriefingInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ReviewResultsService",
+      "for_type": "ReviewResultsInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ReviewRunLocalService",
+      "for_type": "ReviewRunLocalInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ReviewValidateScopeService",
+      "for_type": "ReviewValidateScopeInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "SemanticDupDriverService",
+      "for_type": "SemanticDupDriverInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SemanticDupDriverOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SemanticDupDriverOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SignalCommandOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalCommandOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SignalGateName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "SignalGateName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "SignalGateName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SignalGateName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "SignalGateName"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TelemetryErrorEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryErrorEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TelemetryHookBlockEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryHookBlockEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TelemetryPhaseDuration"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryPhaseDuration"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "TelemetryReportError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryReportError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TelemetryReportError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ArchService",
+      "for_type": "ArchInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ConventionsService",
+      "for_type": "ConventionsInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "VerifyService",
+      "for_type": "VerifyInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "TelemetryReportService",
+      "for_type": "TelemetryReportInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "TelemetryAggregateService",
+      "for_type": "TelemetryAggregateInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TelemetryReportOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryReportOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TrackCommandOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TrackCommandOutput"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "HookDispatchService",
+      "for_type": "HookDispatchInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ArchPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ArchPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ArchPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ConventionsPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ConventionsPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ConventionsPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DemoPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DemoPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DemoPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FilePortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "FilePortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "FilePortError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GitWorkflowError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "GitWorkflowError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "GitWorkflowError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryAggregateServiceError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TelemetryAggregateServiceError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "TelemetryAggregateServiceError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryEmitDynamicPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TelemetryEmitDynamicPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "TelemetryEmitDynamicPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "VerifyPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "VerifyPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "VerifyPortError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "ExportSchemaError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ExportSchemaError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ExportSchemaError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<FilePortError>",
+      "for_type": "ExportSchemaError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "ExportSchemaService",
+      "for_type": "ExportSchemaInteractor"
     }
   ]
 }

@@ -4,9 +4,10 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::{DomainCompositionRoot, ExportSchemaInput};
+use cli_composition::DomainCompositionRoot;
+use cli_driver::domain::{DomainInput, ExportSchemaInput as DriverExportSchemaInput};
 
-use crate::commands::outcome_to_exit;
+use crate::commands::driver_outcome_to_exit;
 
 #[derive(Debug, Subcommand)]
 pub enum DomainCommand {
@@ -32,11 +33,20 @@ pub struct ExportSchemaArgs {
 pub fn execute(cmd: DomainCommand) -> ExitCode {
     match cmd {
         DomainCommand::ExportSchema(args) => {
-            outcome_to_exit(DomainCompositionRoot::new().domain_export_schema(ExportSchemaInput {
-                crate_name: args.crate_name,
-                pretty: args.pretty,
-                output: args.output,
-            }))
+            let driver = match DomainCompositionRoot::new().domain_driver() {
+                Ok(d) => d,
+                Err(e) => {
+                    eprintln!("{e}");
+                    return ExitCode::FAILURE;
+                }
+            };
+            driver_outcome_to_exit(driver.handle(DomainInput::ExportSchema(
+                DriverExportSchemaInput {
+                    crate_name: args.crate_name,
+                    pretty: args.pretty,
+                    output: args.output,
+                },
+            )))
         }
     }
 }

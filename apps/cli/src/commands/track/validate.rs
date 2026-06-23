@@ -11,7 +11,7 @@ use cli_composition::TrackCompositionRoot;
 ///
 /// Returns an error string describing the failure.
 pub(crate) fn validate_track_id_str(value: &str) -> Result<(), String> {
-    TrackCompositionRoot::new().track_validate_id(value)
+    TrackCompositionRoot::new().track_validate_id(value).map_err(|e| e.to_string())
 }
 
 /// Validates a track branch name string (`track/<valid-track-id>`).
@@ -48,7 +48,9 @@ pub(crate) fn resolve_track_id(
     explicit_id: Option<String>,
     items_dir: &std::path::Path,
 ) -> Result<String, String> {
-    TrackCompositionRoot::new().track_resolve_id(explicit_id, items_dir.to_path_buf())
+    TrackCompositionRoot::new()
+        .track_resolve_id(explicit_id, items_dir.to_path_buf())
+        .map_err(|e| e.to_string())
 }
 
 /// Resolves a track ID for a READ operation, anchored to `workspace_root`.
@@ -62,6 +64,7 @@ pub(crate) fn resolve_track_id_from_root(
 ) -> Result<String, String> {
     TrackCompositionRoot::new()
         .track_resolve_id_from_root(explicit_id, workspace_root.to_path_buf())
+        .map_err(|e| e.to_string())
 }
 
 /// Resolves a track ID for a WRITE operation, anchored to `items_dir`.
@@ -77,7 +80,9 @@ pub(crate) fn resolve_track_id_for_write(
     explicit_id: Option<String>,
     items_dir: &std::path::Path,
 ) -> Result<String, String> {
-    TrackCompositionRoot::new().track_resolve_id_for_write(explicit_id, items_dir.to_path_buf())
+    TrackCompositionRoot::new()
+        .track_resolve_id_for_write(explicit_id, items_dir.to_path_buf())
+        .map_err(|e| e.to_string())
 }
 
 /// Resolves a track ID for a WRITE operation, anchored to `workspace_root`.
@@ -91,6 +96,7 @@ pub(crate) fn resolve_track_id_from_root_for_write(
 ) -> Result<String, String> {
     TrackCompositionRoot::new()
         .track_resolve_id_from_root_for_write(explicit_id, workspace_root.to_path_buf())
+        .map_err(|e| e.to_string())
 }
 
 pub(crate) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {

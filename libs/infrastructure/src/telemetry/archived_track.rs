@@ -50,9 +50,9 @@ impl ArchivedTrackTelemetryPort for FsArchivedTrackTelemetryAdapter {
     ///
     /// # Errors
     ///
-    /// Returns [`ArchivedTrackTelemetryError::Io`] on directory creation failure,
+    /// Returns [`ArchivedTrackTelemetryError::EmitUnavailable`] on directory creation failure,
     /// file open failure, or a short write.
-    /// Returns [`ArchivedTrackTelemetryError::Serialize`] when `serde_json`
+    /// Returns [`ArchivedTrackTelemetryError::EmitUnavailable`] when `serde_json`
     /// fails to serialize the event object.
     fn emit(
         &self,
@@ -76,24 +76,25 @@ impl ArchivedTrackTelemetryPort for FsArchivedTrackTelemetryAdapter {
         });
 
         let mut bytes = serde_json::to_vec(&event)
-            .map_err(|e| ArchivedTrackTelemetryError::Serialize(e.to_string()))?;
+            .map_err(|e| ArchivedTrackTelemetryError::EmitUnavailable(e.to_string()))?;
         bytes.push(b'\n');
 
         let path = self.telemetry_dir.join("telemetry.jsonl");
         reject_symlinks_from_root(&self.telemetry_dir)
-            .map_err(|e| ArchivedTrackTelemetryError::Io(e.to_string()))?;
+            .map_err(|e| ArchivedTrackTelemetryError::EmitUnavailable(e.to_string()))?;
         std::fs::create_dir_all(&self.telemetry_dir)
-            .map_err(|e| ArchivedTrackTelemetryError::Io(e.to_string()))?;
+            .map_err(|e| ArchivedTrackTelemetryError::EmitUnavailable(e.to_string()))?;
         reject_symlinks_from_root(&path)
-            .map_err(|e| ArchivedTrackTelemetryError::Io(e.to_string()))?;
+            .map_err(|e| ArchivedTrackTelemetryError::EmitUnavailable(e.to_string()))?;
 
         let mut file = open_append_no_follow(&path)
-            .map_err(|e| ArchivedTrackTelemetryError::Io(e.to_string()))?;
+            .map_err(|e| ArchivedTrackTelemetryError::EmitUnavailable(e.to_string()))?;
 
-        let written =
-            file.write(&bytes).map_err(|e| ArchivedTrackTelemetryError::Io(e.to_string()))?;
+        let written = file
+            .write(&bytes)
+            .map_err(|e| ArchivedTrackTelemetryError::EmitUnavailable(e.to_string()))?;
         if written != bytes.len() {
-            return Err(ArchivedTrackTelemetryError::Io(format!(
+            return Err(ArchivedTrackTelemetryError::EmitUnavailable(format!(
                 "short write for telemetry file {}: wrote {written} of {} bytes",
                 path.display(),
                 bytes.len()
@@ -255,7 +256,10 @@ mod tests {
             "emit must return an error when the telemetry directory cannot be created"
         );
         assert!(
-            matches!(result, Err(usecase::telemetry::ArchivedTrackTelemetryError::Io(_))),
+            matches!(
+                result,
+                Err(usecase::telemetry::ArchivedTrackTelemetryError::EmitUnavailable(_))
+            ),
             "error must be the Io variant"
         );
     }
@@ -273,7 +277,10 @@ mod tests {
         let result = adapter.emit("test-track".to_string(), "track init".to_string(), 0, 0);
 
         assert!(
-            matches!(result, Err(usecase::telemetry::ArchivedTrackTelemetryError::Io(_))),
+            matches!(
+                result,
+                Err(usecase::telemetry::ArchivedTrackTelemetryError::EmitUnavailable(_))
+            ),
             "symlinked telemetry directory must be rejected as an Io error"
         );
         assert!(
@@ -295,7 +302,10 @@ mod tests {
         let result = adapter.emit("test-track".to_string(), "track init".to_string(), 0, 0);
 
         assert!(
-            matches!(result, Err(usecase::telemetry::ArchivedTrackTelemetryError::Io(_))),
+            matches!(
+                result,
+                Err(usecase::telemetry::ArchivedTrackTelemetryError::EmitUnavailable(_))
+            ),
             "symlinked telemetry file must be rejected as an Io error"
         );
         assert_eq!(

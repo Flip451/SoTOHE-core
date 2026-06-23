@@ -1,6 +1,7 @@
 //! `sotp file` subcommands — `FileCompositionRoot`.
 
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use crate::{CommandOutcome, error::CompositionError};
 
@@ -28,6 +29,14 @@ impl Default for FileCompositionRoot {
 }
 
 impl FileCompositionRoot {
+    /// Build a wired [`cli_driver::file::FileDriver`] for the file family.
+    pub fn file_driver(&self) -> cli_driver::file::FileDriver {
+        use infrastructure::file_port::FsFileWriteAdapter;
+
+        let port = Arc::new(FsFileWriteAdapter::new());
+        cli_driver::file::FileDriver::new(port)
+    }
+
     /// Atomically write `content` to `path` (tmp + fsync + rename).
     ///
     /// # Errors

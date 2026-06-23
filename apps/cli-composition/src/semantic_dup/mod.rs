@@ -36,3 +36,21 @@ impl Default for SemanticDupCompositionRoot {
         Self::new()
     }
 }
+
+impl SemanticDupCompositionRoot {
+    /// Construct a wired [`cli_driver::semantic_dup::SemanticDupDriver`] for injection into the CLI.
+    ///
+    /// Builds `SemanticDupDriverAdapter`, wraps it in `SemanticDupDriverInteractor`,
+    /// and returns a `SemanticDupDriver` ready to handle all `semantic_dup` subcommands.
+    pub fn semantic_dup_driver(&self) -> cli_driver::semantic_dup::SemanticDupDriver {
+        use std::sync::Arc;
+
+        use usecase::semantic_dup_driver::SemanticDupDriverInteractor;
+
+        use crate::semantic_dup_driver_adapter::SemanticDupDriverAdapter;
+
+        let port = Arc::new(SemanticDupDriverAdapter::new());
+        let service = Arc::new(SemanticDupDriverInteractor::new(port));
+        cli_driver::semantic_dup::SemanticDupDriver::new(service)
+    }
+}

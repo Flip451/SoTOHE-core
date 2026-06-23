@@ -10,12 +10,10 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::{
-    DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
-    SemanticDupCompositionRoot,
-};
+use cli_composition::SemanticDupCompositionRoot;
+use cli_driver::semantic_dup::SemanticDupInput;
 
-use crate::commands::outcome_to_exit;
+use crate::commands::driver_outcome_to_exit;
 
 // ── sotp find-similar ─────────────────────────────────────────────────────────
 
@@ -52,11 +50,9 @@ pub fn execute_find_similar(args: FindSimilarArgs) -> ExitCode {
         }
     };
 
-    outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_find_similar(FindSimilarInput {
-        fragment_text,
-        top_k: args.top_k,
-        db_path: args.db_path,
-    }))
+    driver_outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_driver().handle(
+        SemanticDupInput::FindSimilar { fragment_text, top_k: args.top_k, db_path: args.db_path },
+    ))
 }
 
 // ── sotp dup-index ────────────────────────────────────────────────────────────
@@ -92,16 +88,16 @@ pub struct DupIndexMeasureQualityArgs {
 
 /// Execute `sotp dup-index <subcommand>`.
 pub fn execute_dup_index(cmd: DupIndexCommand) -> ExitCode {
-    let app = SemanticDupCompositionRoot::new();
+    let driver = SemanticDupCompositionRoot::new().semantic_dup_driver();
     match cmd {
         DupIndexCommand::Build(args) => {
-            outcome_to_exit(app.semantic_dup_index_build(DupIndexBuildInput {
+            driver_outcome_to_exit(driver.handle(SemanticDupInput::IndexBuild {
                 workspace_root: args.workspace_root,
                 db_path: args.db_path,
             }))
         }
         DupIndexCommand::MeasureQuality(args) => {
-            outcome_to_exit(app.semantic_dup_index_measure_quality(DupIndexMeasureQualityInput {
+            driver_outcome_to_exit(driver.handle(SemanticDupInput::IndexMeasureQuality {
                 workspace_root: args.workspace_root,
             }))
         }
@@ -152,13 +148,15 @@ pub fn execute_dup_check(args: DupCheckArgs) -> ExitCode {
         }
     };
 
-    outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_check(DupCheckInput {
-        fragment_files,
-        threshold: args.threshold,
-        db_path: args.db_path,
-        ack_file: args.ack_file,
-        ack: args.ack,
-    }))
+    driver_outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_driver().handle(
+        SemanticDupInput::DupCheck {
+            fragment_files,
+            threshold: args.threshold,
+            db_path: args.db_path,
+            ack_file: args.ack_file,
+            ack: args.ack,
+        },
+    ))
 }
 
 // ── Internal helpers ──────────────────────────────────────────────────────────

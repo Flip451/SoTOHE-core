@@ -48,6 +48,88 @@ use poll_adapters::make_polling_interactor;
 // ---------------------------------------------------------------------------
 
 impl PrCompositionRoot {
+    /// Build a wired [`cli_driver::pr::PrDriver`] for the `pr` family.
+    ///
+    /// Constructs a [`usecase::pr::PrCommandInteractor`] with closures that
+    /// delegate to the existing `PrCompositionRoot` methods, wraps it in an
+    /// `Arc`, and passes it to [`cli_driver::pr::PrDriver::new`].
+    pub fn pr_driver(&self) -> cli_driver::pr::PrDriver {
+        use std::sync::Arc;
+        use usecase::pr::{PrCommandInteractor, PrCommandOutput};
+
+        let push_fn = Arc::new(|track_id: Option<String>| {
+            let root = PrCompositionRoot::new();
+            match root.pr_push(track_id) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let ensure_fn = Arc::new(|track_id: Option<String>, base: String| {
+            let root = PrCompositionRoot::new();
+            match root.pr_ensure(track_id, base) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let status_fn = Arc::new(|pr: String| {
+            let root = PrCompositionRoot::new();
+            match root.pr_status(pr) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let wait_fn = Arc::new(|pr: String, interval: u64, timeout: u64, method: String| {
+            let root = PrCompositionRoot::new();
+            match root.pr_wait_and_merge(pr, interval, timeout, method) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let trigger_fn = Arc::new(|pr: String| {
+            let root = PrCompositionRoot::new();
+            match root.pr_trigger_review(pr) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let poll_fn =
+            Arc::new(|pr: String, trigger_timestamp: String, interval: u64, timeout: u64| {
+                let root = PrCompositionRoot::new();
+                match root.pr_poll_review(pr, trigger_timestamp, interval, timeout) {
+                    Ok(o) => PrCommandOutput {
+                        stdout: o.stdout,
+                        stderr: o.stderr,
+                        exit_code: o.exit_code,
+                    },
+                    Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+                }
+            });
+        let cycle_fn = Arc::new(|track_id: Option<String>, resume: bool| {
+            let root = PrCompositionRoot::new();
+            match root.pr_review_cycle(track_id, resume) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+
+        let service = Arc::new(PrCommandInteractor::new(
+            push_fn, ensure_fn, status_fn, wait_fn, trigger_fn, poll_fn, cycle_fn,
+        ));
+        cli_driver::pr::PrDriver::new(service)
+    }
+
     /// Push the current track branch to origin.
     ///
     /// # Errors

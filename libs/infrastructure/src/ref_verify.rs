@@ -1,3 +1,8 @@
+pub mod driver_adapter;
+pub use driver_adapter::{
+    FsRefVerifyAggregateAdapter, FsRefVerifyCheckApprovedAdapter, FsRefVerifyRunAdapter,
+};
+
 mod guarded_io;
 mod pair_source;
 mod pair_source_chain2;

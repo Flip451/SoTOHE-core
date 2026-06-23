@@ -1,30 +1,15 @@
-// STAGED FOR T021 — not yet compiled; Cargo.toml + workspace member added atomically in T021 per CN-06.
-//
 //! `review` command family — primary adapter driver.
 //!
-//! `ReviewDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The render helpers here mirror those in
-//! `apps/cli-composition/src/review_v2/results.rs` (lines 24-244
-//! `render_review_results_str` — the ~220-line rendering engine) and
-//! `apps/cli-composition/src/review_v2/mod.rs` (lines 465-491
-//! `review_check_approved` message assembly);
-//! T021 removes the `cli_composition` duplicates when the live path is flipped.
-
-// TODO(T021): add use-case + infrastructure imports once Cargo.toml is materialized.
-// use std::path::{Path, PathBuf};
-// use std::collections::HashMap;
-// use std::fmt::Write as _;
-// use std::time::Duration;
-// use domain::TrackId;
-// use domain::review_v2::{
-//     NotRequiredReason, ReviewApprovalVerdict, ReviewApprovalDecision,
-//     ReviewExistsPort as _, ReviewReader, ReviewState,
-//     ReviewerFinding, RoundType, ScopeName, ScopeRound, Verdict,
-// };
-// use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
-// use usecase::review_v2::ReviewApprovalDecision;
+//! `ReviewDriver` holds a single injected `ReviewService` aggregate and exposes
+//! `handle(input) -> CommandOutcome`. Each operation delegates to the
+//! appropriate method on the service without importing `infrastructure` or
+//! `domain`.
 
 use std::path::PathBuf;
+use std::sync::Arc;
+
+use usecase::review_v2::ReviewService;
+use usecase::review_v2::aggregate_service::{ReviewRunFixInput, ReviewRunInput};
 
 use crate::render::CommandOutcome;
 
@@ -106,8 +91,8 @@ pub enum ReviewInput {
     },
     /// Check if the review state is approved and code hash is current.
     CheckApproved {
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
+        /// Resolved track ID.
+        track_id: String,
         /// Items directory (`track/items`).
         items_dir: PathBuf,
     },
@@ -166,10 +151,10 @@ pub enum ReviewInput {
     },
     /// Persist a commit hash for the review cycle.
     PersistCommitHash {
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
+        /// Resolved track ID.
+        track_id: String,
+        /// Workspace root (the repo root where `.git` lives).
+        workspace_root: PathBuf,
     },
 }
 
@@ -179,25 +164,20 @@ pub enum ReviewInput {
 
 /// Primary adapter driver for the `review` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds a single injected `ReviewService` aggregate; exposes
+/// `handle(input) -> CommandOutcome`. One injected interactor — no per-service
+/// fields (D3/D4 cli_driver policy).
 pub struct ReviewDriver {
-    // TODO(T021): inject use-case interactors here (currently this family has
-    // no injectable adapter dependencies — infrastructure functions are called
-    // inline, same as cli_composition::ReviewCompositionRoot).
+    service: Arc<dyn ReviewService>,
 }
 
 impl ReviewDriver {
-    /// Create a new `ReviewDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `ReviewDriver` with a single injected aggregate service.
+    pub fn new(service: Arc<dyn ReviewService>) -> Self {
+        Self { service }
     }
 
     /// Handle a review command.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: ReviewInput) -> CommandOutcome {
         match input {
             ReviewInput::RunCodex {
@@ -284,265 +264,274 @@ impl ReviewDriver {
             ReviewInput::GetBriefing { scope, track_id, items_dir } => {
                 self.review_get_briefing(scope, track_id, items_dir)
             }
-            ReviewInput::PersistCommitHash { track_id, items_dir } => {
-                self.review_persist_commit_hash(track_id, items_dir)
+            ReviewInput::PersistCommitHash { track_id, workspace_root } => {
+                self.review_persist_commit_hash(track_id, workspace_root)
             }
         }
     }
 
     // -----------------------------------------------------------------------
-    // Render helpers (logic duplicated from cli_composition/src/review_v2/mod.rs
-    // and review_v2/results.rs; T021 removes the cli_composition copies).
+    // Operation implementations
     // -----------------------------------------------------------------------
 
     #[allow(clippy::too_many_arguments)]
     fn review_run_codex(
         &self,
-        _model: String,
-        _timeout_seconds: u64,
-        _briefing_file: Option<PathBuf>,
-        _prompt: Option<String>,
-        _track_id: Option<String>,
-        _round_type: String,
-        _group: String,
-        _items_dir: PathBuf,
+        model: String,
+        timeout_seconds: u64,
+        briefing_file: Option<PathBuf>,
+        prompt: Option<String>,
+        track_id: Option<String>,
+        round_type: String,
+        group: String,
+        items_dir: PathBuf,
     ) -> CommandOutcome {
-        // TODO(T021): resolve track_id for write, validate group name, build CodexReviewer,
-        // then invoke run_codex_review_str and outcome_to_command_outcome.
-        // Emit ReviewRound + ExternalSubprocess telemetry.
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_run_codex.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        // Pass briefing_file and prompt through to the service; prompt resolution
+        // (briefing_file → "Read <path> and perform..." expansion) is the
+        // usecase layer's responsibility.
+        let input = ReviewRunInput {
+            model,
+            timeout_seconds,
+            briefing_file,
+            prompt,
+            track_id,
+            round_type,
+            group,
+            items_dir,
+        };
+        match self.service.run_codex(input) {
+            Ok(out) => run_review_output_to_outcome(out),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
     #[allow(clippy::too_many_arguments)]
     fn review_run_claude(
         &self,
-        _model: String,
-        _timeout_seconds: u64,
-        _briefing_file: Option<PathBuf>,
-        _prompt: Option<String>,
-        _track_id: Option<String>,
-        _round_type: String,
-        _group: String,
-        _items_dir: PathBuf,
+        model: String,
+        timeout_seconds: u64,
+        briefing_file: Option<PathBuf>,
+        prompt: Option<String>,
+        track_id: Option<String>,
+        round_type: String,
+        group: String,
+        items_dir: PathBuf,
     ) -> CommandOutcome {
-        // TODO(T021): resolve track_id for write, validate group name, build ClaudeReviewer,
-        // then invoke run_claude_review_str and outcome_to_command_outcome.
-        // Emit ReviewRound + ExternalSubprocess telemetry.
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_run_claude.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        // Pass briefing_file and prompt through to the service; prompt resolution
+        // is the usecase layer's responsibility (mirrors review_run_codex).
+        let input = ReviewRunInput {
+            model,
+            timeout_seconds,
+            briefing_file,
+            prompt,
+            track_id,
+            round_type,
+            group,
+            items_dir,
+        };
+        match self.service.run_claude(input) {
+            Ok(out) => run_review_output_to_outcome(out),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
     #[allow(clippy::too_many_arguments)]
     fn review_run_local(
         &self,
-        _model: Option<String>,
-        _timeout_seconds: u64,
-        _briefing_file: Option<PathBuf>,
-        _prompt: Option<String>,
-        _track_id: Option<String>,
-        _round_type: String,
-        _group: String,
-        _items_dir: PathBuf,
+        model: Option<String>,
+        timeout_seconds: u64,
+        briefing_file: Option<PathBuf>,
+        prompt: Option<String>,
+        track_id: Option<String>,
+        round_type: String,
+        group: String,
+        items_dir: PathBuf,
     ) -> CommandOutcome {
-        // TODO(T021): resolve reviewer capability from agent-profiles.json, then dispatch to
-        // review_run_codex or review_run_claude based on resolved provider.
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_run_local.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        let out = self.service.run_local(
+            model,
+            timeout_seconds,
+            briefing_file,
+            prompt,
+            track_id,
+            round_type,
+            group,
+            items_dir,
+        );
+        CommandOutcome { stdout: out.stdout, stderr: out.stderr, exit_code: out.exit_code }
     }
 
     fn review_run_fix_local(
         &self,
-        _scope: String,
-        _briefing_file: PathBuf,
-        _track_id: String,
-        _round_type: String,
-        _model: Option<String>,
+        scope: String,
+        briefing_file: PathBuf,
+        track_id: String,
+        round_type: String,
+        model: Option<String>,
     ) -> CommandOutcome {
-        // TODO(T021): build RunReviewFixLocalInput, invoke run_fix_local via
-        // infrastructure::review_v2 fix-runner adapter.
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_run_fix_local.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        let input = ReviewRunFixInput { scope, briefing_file, track_id, round_type, model };
+        match self.service.run_fix_local(input) {
+            Ok(out) => {
+                // exit_code in RunReviewFixOutput is i32; map valid range to u8.
+                let exit_code: u8 = match out.exit_code {
+                    0 => 0,
+                    2 => 2,
+                    _ => 1,
+                };
+                CommandOutcome {
+                    stdout: Some(format!("REVIEW_FIX_STATUS: {}", out.status)),
+                    stderr: None,
+                    exit_code,
+                }
+            }
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn review_check_approved(
-        &self,
-        _track_id: Option<String>,
-        _items_dir: PathBuf,
-    ) -> CommandOutcome {
-        // TODO(T021): resolve track_id from branch if None, invoke check_approved_str, then
-        // build message from ReviewApprovalDecision:
-        //   Approved            → "[OK] Review is approved and code hash is current"  (exit 0)
-        //   ApprovedWithBypass  → format!("[WARN] No review.json found. Allowing commit for \
-        //                           PR-based review ({count} scope(s)).")  (exit 0)
-        //   Blocked             → format!("[BLOCKED] Review not approved. Required scopes:\n{}", …)
-        //                         (exit 1)
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_check_approved
-        // (lines 465-491).
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn review_check_approved(&self, track_id: String, items_dir: PathBuf) -> CommandOutcome {
+        use usecase::review_v2::ReviewApprovalDecision;
+
+        match self.service.check_approved(track_id, items_dir) {
+            Ok(output) => {
+                let (msg, exit_code) = match output.decision {
+                    ReviewApprovalDecision::Approved => {
+                        ("[OK] Review is approved and code hash is current".to_owned(), 0u8)
+                    }
+                    ReviewApprovalDecision::ApprovedWithBypass => {
+                        let count = output.bypass_scope_count.unwrap_or(0);
+                        (
+                            format!(
+                                "[WARN] No review.json found. Allowing commit for PR-based review \
+                                 ({count} scope(s))."
+                            ),
+                            0u8,
+                        )
+                    }
+                    ReviewApprovalDecision::Blocked => {
+                        let mut display: Vec<_> =
+                            output.blocked_scopes.iter().map(|s| format!("  {s}")).collect();
+                        display.sort();
+                        (
+                            format!(
+                                "[BLOCKED] Review not approved. Required scopes:\n{}",
+                                display.join("\n")
+                            ),
+                            1u8,
+                        )
+                    }
+                };
+                CommandOutcome { stdout: None, stderr: Some(msg), exit_code }
+            }
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
     #[allow(clippy::too_many_arguments)]
     fn review_results(
         &self,
-        _track_id: Option<String>,
-        _items_dir: PathBuf,
-        _scope: Option<String>,
-        _all: bool,
-        _limit: u32,
-        _round_type: String,
-        _no_hint: bool,
+        track_id: Option<String>,
+        items_dir: PathBuf,
+        scope: Option<String>,
+        all: bool,
+        limit: u32,
+        round_type: String,
+        no_hint: bool,
     ) -> CommandOutcome {
-        // TODO(T021): resolve track_id from branch if None; convert limit: u32 == 0 → None,
-        // then invoke render_review_results_str(&track_id, &items_dir, scope.as_deref(),
-        //   limit_opt, &round_type, no_hint) and return CommandOutcome::success(Some(output)).
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_results.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        match self.service.results(track_id, items_dir, scope, all, limit, round_type, no_hint) {
+            Ok(output) => CommandOutcome::success(Some(output)),
+            Err(e) => CommandOutcome::failure(Some(e)),
+        }
     }
 
     fn review_classify(
         &self,
-        _paths: Vec<String>,
-        _track_id: Option<String>,
-        _items_dir: PathBuf,
+        paths: Vec<String>,
+        track_id: Option<String>,
+        items_dir: PathBuf,
     ) -> CommandOutcome {
-        // TODO(T021): resolve track_id from branch if None, validate all paths,
-        // build scope query interactor (no-diff variant), classify via ScopeQueryService::classify_by_strings,
-        // then format each entry as "{path}\t{scopes_csv}\n".
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_classify.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        match self.service.classify(paths, track_id, items_dir) {
+            Ok(entries) => {
+                let output: String = entries
+                    .into_iter()
+                    .map(|(path, scopes)| format!("{path}\t{scopes}\n"))
+                    .collect();
+                CommandOutcome::success(Some(output))
+            }
+            Err(e) => CommandOutcome::failure(Some(e)),
+        }
     }
 
     fn review_files(
         &self,
-        _scope: String,
-        _track_id: Option<String>,
-        _items_dir: PathBuf,
+        scope: String,
+        track_id: Option<String>,
+        items_dir: PathBuf,
     ) -> CommandOutcome {
-        // TODO(T021): resolve track_id from branch if None, validate scope name,
-        // build scope query interactor (with diff), call ScopeQueryService::files_by_string,
-        // then format each file as "{file}\n".
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_files.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        match self.service.files(scope, track_id, items_dir) {
+            Ok(files) => {
+                let output: String = files.into_iter().map(|f| format!("{f}\n")).collect();
+                CommandOutcome::success(Some(output))
+            }
+            Err(e) => CommandOutcome::failure(Some(e)),
+        }
     }
 
     fn review_validate_scope(
         &self,
-        _scope: String,
-        _track_id: Option<String>,
-        _items_dir: PathBuf,
+        scope: String,
+        track_id: Option<String>,
+        items_dir: PathBuf,
     ) -> CommandOutcome {
-        // TODO(T021): resolve track_id from branch if None, validate scope name via
-        // validate_scope_for_track_str, return CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned())) on success.
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_validate_scope.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        match self.service.validate_scope(scope, track_id, items_dir) {
+            Ok(()) => CommandOutcome::success(None),
+            Err(e) => CommandOutcome::failure(Some(e)),
+        }
     }
 
     fn review_get_briefing(
         &self,
-        _scope: String,
-        _track_id: Option<String>,
-        _items_dir: PathBuf,
+        scope: String,
+        track_id: Option<String>,
+        items_dir: PathBuf,
     ) -> CommandOutcome {
-        // TODO(T021): resolve track_id from branch if None, call get_briefing_for_scope_str,
-        // return CommandOutcome::success(maybe_path) where maybe_path: Option<String>.
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_get_briefing.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        match self.service.get_briefing(scope, track_id, items_dir) {
+            Ok(maybe_path) => CommandOutcome::success(maybe_path),
+            Err(e) => CommandOutcome::failure(Some(e)),
+        }
     }
 
     fn review_persist_commit_hash(
         &self,
-        _track_id: Option<String>,
-        _items_dir: PathBuf,
+        track_id: String,
+        workspace_root: PathBuf,
     ) -> CommandOutcome {
-        // TODO(T021): resolve track_id from branch if None, invoke
-        // persist_commit_hash_for_track(&track_id), emit eprintln("[review] Recorded .commit_hash: …"),
-        // return CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned())).
-        // Mirrors cli_composition/src/review_v2/mod.rs ReviewCompositionRoot::review_persist_commit_hash.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
-    }
-}
-
-impl Default for ReviewDriver {
-    fn default() -> Self {
-        Self::new()
+        match self.service.persist_commit_hash(track_id, workspace_root) {
+            Ok(sha) => {
+                eprintln!("[review] Recorded .commit_hash: {sha}");
+                CommandOutcome::success(None)
+            }
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 }
 
 // ---------------------------------------------------------------------------
-// Render helpers (duplicated from cli_composition/src/review_v2/results.rs
-// lines 24-244 and mod.rs lines 465-491;
-// T021 removes the cli_composition copies and moves these to cli_driver::render).
+// Helpers
 // ---------------------------------------------------------------------------
 
-/// Renders the `sotp review results` output as a string, given string-typed parameters.
-///
-/// Mirrors `cli_composition::review_v2::results::render_review_results_str`
-/// (results.rs lines 24-244 — the ~220-line rendering engine).
-///
-/// TODO(T021): wire real domain types (`domain::TrackId`, `domain::review_v2::*`,
-/// `infrastructure::review_v2::*`) once the dependency graph is materialized.
-/// Currently returns a placeholder so the staged file is self-consistent.
-///
-/// # Errors
-/// Returns a human-readable error string on any I/O or domain failure.
-#[allow(dead_code)]
-fn render_review_results_str(
-    _track_id_str: &str,
-    _items_dir: &std::path::Path,
-    _scope_filter: Option<&str>,
-    _limit: Option<u32>,
-    _round_type: &str,
-    _no_hint: bool,
-) -> Result<String, String> {
-    // TODO(T021): Paste full implementation from
-    // cli_composition/src/review_v2/results.rs lines 32-243 once `domain` and
-    // `infrastructure` crates are available as dependencies. The implementation:
-    //
-    //   1. TrackId::try_new(track_id_str) → validate track id
-    //   2. build_review_v2(&track_id, items_dir) → ReviewV2Composition { cycle, review_store, base }
-    //   3. cycle.get_review_states(&review_store) → HashMap<ScopeName, ReviewState>
-    //   4. review_store.review_json_exists() → bool
-    //   5. cycle.evaluate_approval(&review_store, review_json_exists) → ReviewApprovalVerdict
-    //   6. Sort scope_universe alphabetically; optionally filter by scope_filter
-    //   7. Load all rounds per scope via review_store.read_all_rounds(scope)
-    //   8. Render per-scope state lines with indicator ([+]/[-]/[.]) and
-    //      round-type@timestamp suffix from state_line_suffix(rounds)
-    //   9. For displayed rounds (filtered by limit + round_type): render_findings_block
-    //  10. Append summary: "Summary: {approved} approved, {empty} empty, {required} required, {total} total"
-    //  11. If Approved + review_json_exists + !no_hint: emit commit hint
-    Ok(String::new())
-}
-
-/// Format the `review check-approved` stderr message from decision fields.
-///
-/// Mirrors the inline message assembly in
-/// `cli_composition::review_v2::mod::ReviewCompositionRoot::review_check_approved`
-/// (mod.rs lines 465-491).
-///
-/// TODO(T021): call with real `usecase::review_v2::ReviewApprovalDecision` once the
-/// dependency graph is materialized.
-#[allow(dead_code)]
-fn format_check_approved_msg(
-    is_approved: bool,
-    is_approved_with_bypass: bool,
-    bypass_scope_count: usize,
-    blocked_scopes: &[&str],
-) -> (String, u8) {
-    if is_approved {
-        ("[OK] Review is approved and code hash is current".to_owned(), 0u8)
-    } else if is_approved_with_bypass {
-        (
-            format!(
-                "[WARN] No review.json found. Allowing commit for PR-based review \
-                 ({bypass_scope_count} scope(s))."
-            ),
-            0u8,
-        )
-    } else {
-        let mut display: Vec<String> =
-            blocked_scopes.iter().map(|scope| format!("  {scope}")).collect();
-        display.sort();
-        (format!("[BLOCKED] Review not approved. Required scopes:\n{}", display.join("\n")), 1u8)
+fn run_review_output_to_outcome(out: usecase::review_v2::RunReviewOutput) -> CommandOutcome {
+    if out.skipped {
+        return CommandOutcome::success(Some(
+            r#"{"verdict":"zero_findings","findings":[]}"#.to_owned(),
+        ));
+    }
+    match out.summary {
+        Some(summary) => {
+            let exit_code: u8 = if out.verdict_kind == "rejected" { 1 } else { 0 };
+            CommandOutcome { stdout: Some(summary), stderr: None, exit_code }
+        }
+        None => {
+            let exit_code: u8 = if out.verdict_kind == "rejected" { 1 } else { 0 };
+            CommandOutcome { stdout: None, stderr: None, exit_code }
+        }
     }
 }

@@ -5,33 +5,277 @@
 //! against an archived track. The infrastructure adapter
 //! (`FsArchivedTrackTelemetryAdapter`) lives in `libs/infrastructure` and is
 //! injected at composition time.
+//!
+//! Also defines `TelemetryReportPort` — the secondary port for reading and
+//! aggregating telemetry JSONL files, used by `cli_driver::TelemetryDriver`.
 
+use std::path::Path;
 use std::sync::Arc;
 
 use thiserror::Error;
+
+// ── TelemetryReportPort ───────────────────────────────────────────────────────
+
+/// Report record for a single telemetry phase duration.
+#[derive(Debug, Clone)]
+pub struct TelemetryPhaseDuration {
+    /// Phase name (command label).
+    pub phase_name: String,
+    /// Total milliseconds.
+    pub total_ms: u64,
+    /// Number of events.
+    pub event_count: usize,
+}
+
+/// A single error entry from telemetry.
+#[derive(Debug, Clone)]
+pub struct TelemetryErrorEntry {
+    /// ISO-8601 timestamp.
+    pub timestamp: String,
+    /// Command label.
+    pub command: String,
+    /// Exit code.
+    pub exit_code: i32,
+    /// Error chain text.
+    pub error_chain: String,
+}
+
+/// A single hook block entry from telemetry.
+#[derive(Debug, Clone)]
+pub struct TelemetryHookBlockEntry {
+    /// ISO-8601 timestamp.
+    pub timestamp: String,
+    /// Hook name.
+    pub hook_name: String,
+}
+
+/// Aggregated telemetry output for a track.
+#[derive(Debug, Clone)]
+pub struct TelemetryReportOutput {
+    /// Phase duration summaries sorted by phase name.
+    pub phase_durations: Vec<TelemetryPhaseDuration>,
+    /// Error entries.
+    pub errors: Vec<TelemetryErrorEntry>,
+    /// Hook block entries.
+    pub hook_blocks: Vec<TelemetryHookBlockEntry>,
+    /// Count of skipped (unparseable) lines.
+    pub skipped_lines: usize,
+}
+
+/// Error type for [`TelemetryReportPort`].
+#[derive(Debug, thiserror::Error)]
+pub enum TelemetryReportError {
+    /// The specified track directory does not exist.
+    #[error("track not found: {0}")]
+    TrackNotFound(String),
+    /// The telemetry report could not be loaded.
+    #[error("telemetry report unavailable: {0}")]
+    ReportUnavailable(String),
+}
+
+/// Error type for [`TelemetryEmitDynamicPort`].
+#[derive(Debug, Error)]
+pub enum TelemetryEmitDynamicPortError {
+    /// Resolution or I/O failure when emitting the telemetry event.
+    #[error("emit unavailable: {0}")]
+    EmitUnavailable(String),
+}
+
+/// Secondary port for emitting archived-track telemetry with dynamic path resolution.
+///
+/// Unlike [`ArchivedTrackTelemetryPort`], this port accepts the full context at
+/// call time (including `items_dir` and `track_id`) so the driver does not need
+/// to know the repo root at construction time.
+pub trait TelemetryEmitDynamicPort: Send + Sync {
+    /// Emit a telemetry event for an archived-track subcommand.
+    ///
+    /// # Errors
+    /// Returns [`TelemetryEmitDynamicPortError::EmitUnavailable`] on resolution
+    /// or I/O failure.
+    fn emit_archived(
+        &self,
+        items_dir: &Path,
+        track_id: &str,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+    ) -> Result<(), TelemetryEmitDynamicPortError>;
+}
+
+/// Secondary port for aggregating telemetry JSONL data for a track.
+///
+/// Abstracts the infrastructure `TelemetryReport` behind a pure usecase boundary
+/// so that `cli_driver` never imports `infrastructure` directly.
+///
+/// `items_dir` is passed per-call so the same port implementation can serve
+/// multiple track items directories without requiring re-construction.
+pub trait TelemetryReportPort: Send + Sync {
+    /// Aggregate telemetry for `track_id` using `items_dir`.
+    ///
+    /// # Errors
+    /// Returns [`TelemetryReportError::TrackNotFound`] when the track directory
+    /// does not exist. Returns [`TelemetryReportError::ReportUnavailable`] when
+    /// the report cannot be loaded.
+    fn aggregate(
+        &self,
+        track_id: &str,
+        items_dir: &Path,
+    ) -> Result<TelemetryReportOutput, TelemetryReportError>;
+}
+
+/// Application service for telemetry reporting.
+///
+/// Used by `cli_driver::TelemetryDriver` to aggregate and format telemetry data.
+pub trait TelemetryReportService: Send + Sync {
+    /// Aggregate and return a formatted telemetry report string for `track_id`.
+    ///
+    /// # Errors
+    /// Returns an error string when the track is not found or an I/O error occurs.
+    fn report(&self, track_id: &str, items_dir: &Path) -> Result<String, String>;
+}
+
+// ── TelemetryAggregateService ─────────────────────────────────────────────────
+
+/// Error type for [`TelemetryAggregateService`].
+#[derive(Debug, Error)]
+pub enum TelemetryAggregateServiceError {
+    /// The report could not be produced (track not found or I/O failure).
+    #[error("report unavailable: {0}")]
+    ReportUnavailable(String),
+    /// The archived-track telemetry event could not be emitted (resolution or
+    /// I/O failure).
+    #[error("emit unavailable: {0}")]
+    EmitUnavailable(String),
+}
+
+/// Aggregate primary port for the `telemetry` command family.
+///
+/// `TelemetryDriver` holds exactly one `Arc<dyn TelemetryAggregateService>` and
+/// delegates each `TelemetryInput` variant to the corresponding method.
+/// The concrete implementation in `cli_composition` wires both sub-services
+/// internally, keeping the driver free of multi-service injection (D3/D4
+/// cli_driver policy).
+pub trait TelemetryAggregateService: Send + Sync {
+    /// Aggregate and return a formatted telemetry report string for `track_id`.
+    ///
+    /// # Errors
+    /// Returns [`TelemetryAggregateServiceError::ReportUnavailable`] on
+    /// track-not-found or I/O failure.
+    fn report(
+        &self,
+        track_id: &str,
+        items_dir: &Path,
+    ) -> Result<String, TelemetryAggregateServiceError>;
+
+    /// Emit a telemetry event for a subcommand dispatched against an archived track.
+    ///
+    /// # Errors
+    /// Returns [`TelemetryAggregateServiceError::EmitUnavailable`] on resolution
+    /// or I/O failure.
+    fn emit_archived(
+        &self,
+        items_dir: &Path,
+        track_id: &str,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+    ) -> Result<(), TelemetryAggregateServiceError>;
+}
+
+/// Interactor for telemetry reporting that delegates to a [`TelemetryReportPort`].
+pub struct TelemetryReportInteractor {
+    port: Arc<dyn TelemetryReportPort>,
+}
+
+impl TelemetryReportInteractor {
+    /// Construct with the given port.
+    #[must_use]
+    pub fn new(port: Arc<dyn TelemetryReportPort>) -> Self {
+        Self { port }
+    }
+}
+
+impl TelemetryReportService for TelemetryReportInteractor {
+    fn report(&self, track_id: &str, items_dir: &Path) -> Result<String, String> {
+        let output = self
+            .port
+            .aggregate(track_id, items_dir)
+            .map_err(|e| format!("telemetry report: {e}"))?;
+        Ok(format_report(track_id, &output))
+    }
+}
+
+/// Format a `TelemetryReportOutput` into a human-readable string.
+pub fn format_report(track_id: &str, output: &TelemetryReportOutput) -> String {
+    let mut lines: Vec<String> = Vec::new();
+
+    lines.push(format!("Telemetry report for track: {track_id}"));
+    lines.push(String::new());
+
+    lines.push("Phase durations:".to_owned());
+    if output.phase_durations.is_empty() {
+        lines.push("  (no phase data recorded)".to_owned());
+    } else {
+        for pd in &output.phase_durations {
+            lines.push(format!(
+                "  {:<40} {:>8} ms  ({} event(s))",
+                pd.phase_name, pd.total_ms, pd.event_count
+            ));
+        }
+    }
+    lines.push(String::new());
+
+    lines.push(format!("Errors ({}):", output.errors.len()));
+    if output.errors.is_empty() {
+        lines.push("  (none)".to_owned());
+    } else {
+        for err in &output.errors {
+            lines.push(format!(
+                "  [{}] {} (exit {}): {}",
+                err.timestamp, err.command, err.exit_code, err.error_chain
+            ));
+        }
+    }
+    lines.push(String::new());
+
+    lines.push(format!("Hook blocks ({}):", output.hook_blocks.len()));
+    if output.hook_blocks.is_empty() {
+        lines.push("  (none)".to_owned());
+    } else {
+        for hb in &output.hook_blocks {
+            lines.push(format!("  [{}] {}", hb.timestamp, hb.hook_name));
+        }
+    }
+    lines.push(String::new());
+
+    lines.push(format!("Skipped lines: {}", output.skipped_lines));
+    if output.skipped_lines > 0 {
+        lines.push("  (parse failure or unknown schema_version)".to_owned());
+    }
+    lines.push(String::new());
+
+    lines.join("\n")
+}
 
 // ── Error ─────────────────────────────────────────────────────────────────────
 
 /// Error type for [`ArchivedTrackTelemetryPort`].
 ///
-/// Both variants carry `String` payloads so that the usecase layer remains free
-/// of `std::io` and `serde_json` dependencies (hexagonal purity). The adapter
+/// The single `EmitUnavailable` variant collapses both filesystem I/O failures
+/// and JSON serialization failures into a single usecase-level concept so the
+/// public API does not leak storage/serialization categories. The adapter
 /// converts concrete error types to strings at the infrastructure boundary:
 ///
-/// - `io::Error` → `Io(e.to_string())`
-/// - `serde_json::Error` → `Serialize(e.to_string())`
+/// - `io::Error` → `EmitUnavailable(e.to_string())`
+/// - `serde_json::Error` → `EmitUnavailable(e.to_string())`
 #[derive(Debug, Error)]
 pub enum ArchivedTrackTelemetryError {
-    /// A filesystem I/O failure occurred while opening, creating, or writing the
-    /// telemetry file or its parent directory. The payload is the underlying
-    /// `io::Error` converted to `String` at the adapter boundary.
-    #[error("archived-track telemetry I/O error: {0}")]
-    Io(String),
-
-    /// JSON serialization of the telemetry event failed. The payload is the
-    /// `serde_json::Error` message converted to `String` at the adapter boundary.
-    #[error("archived-track telemetry serialize error: {0}")]
-    Serialize(String),
+    /// The archived telemetry event could not be emitted. The payload is a
+    /// human-readable description of the underlying failure (filesystem write
+    /// failure, JSON serialization failure, etc.) converted at the adapter
+    /// boundary.
+    #[error("archived-track telemetry emit unavailable: {0}")]
+    EmitUnavailable(String),
 }
 
 // ── Command ───────────────────────────────────────────────────────────────────
@@ -64,17 +308,17 @@ pub struct ArchivedTrackTelemetryCommand {
 ///
 /// # Error mapping
 ///
-/// Both error variants carry `String` payloads.  The infrastructure adapter
-/// converts concrete error types at the boundary:
-/// - `io::Error` → `Io(e.to_string())`
-/// - `serde_json::Error` → `Serialize(e.to_string())`
+/// The single `EmitUnavailable` variant carries a `String` payload. The
+/// infrastructure adapter converts concrete error types at the boundary:
+/// - `io::Error` → `EmitUnavailable(e.to_string())`
+/// - `serde_json::Error` → `EmitUnavailable(e.to_string())`
 pub trait ArchivedTrackTelemetryPort: Send + Sync {
     /// Emit a single telemetry event for `subcommand`.
     ///
     /// # Errors
     ///
-    /// Returns [`ArchivedTrackTelemetryError::Io`] on filesystem failure.
-    /// Returns [`ArchivedTrackTelemetryError::Serialize`] on JSON serialization
+    /// Returns [`ArchivedTrackTelemetryError::EmitUnavailable`] on filesystem failure.
+    /// Returns [`ArchivedTrackTelemetryError::EmitUnavailable`] on JSON serialization
     /// failure.
     fn emit(
         &self,
@@ -196,7 +440,7 @@ mod tests {
                 _exit_code: i32,
                 _duration_ms: u64,
             ) -> Result<(), ArchivedTrackTelemetryError> {
-                Err(ArchivedTrackTelemetryError::Serialize("test failure".to_string()))
+                Err(ArchivedTrackTelemetryError::EmitUnavailable("test failure".to_string()))
             }
         }
 
@@ -211,8 +455,8 @@ mod tests {
 
         assert!(result.is_err(), "interactor must propagate port error");
         assert!(
-            matches!(result, Err(ArchivedTrackTelemetryError::Serialize(_))),
-            "error variant must be Serialize"
+            matches!(result, Err(ArchivedTrackTelemetryError::EmitUnavailable(_))),
+            "error variant must be EmitUnavailable"
         );
     }
 

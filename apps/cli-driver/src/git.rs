@@ -1,21 +1,12 @@
-// STAGED FOR T021 — not yet compiled; Cargo.toml + workspace member added atomically in T021 per CN-06.
-//
 //! `git` command family — primary adapter driver.
 //!
-//! `GitDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The logic here mirrors
-//! `apps/cli-composition/src/git.rs`; T021 removes the `cli_composition`
-//! duplicate when the live path is flipped.
-
-// TODO(T021): add use-case + infrastructure imports once Cargo.toml is materialized.
-// use std::fs;
-// use std::path::{Path, PathBuf};
-// use std::sync::Arc;
-// use infrastructure::git_cli::GitRepository as _;
-// use infrastructure::git_cli::{SystemGitRepo, collect_track_branch_claims, load_explicit_track_branch};
-// use usecase::git_workflow::{TRANSIENT_AUTOMATION_DIRS, TRANSIENT_AUTOMATION_FILES, ...};
+//! `GitDriver` holds an injected [`usecase::git_workflow::GitWorkflowService`] and
+//! exposes `handle(input) -> CommandOutcome`.
 
 use std::path::PathBuf;
+use std::sync::Arc;
+
+use usecase::git_workflow::GitWorkflowService;
 
 use crate::render::CommandOutcome;
 
@@ -70,24 +61,18 @@ pub enum GitInput {
 
 /// Primary adapter driver for the `git` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`GitWorkflowService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct GitDriver {
-    // TODO(T021): inject use-case interactors here.
-    // git_workflow_service: Arc<dyn usecase::git_workflow::GitWorkflowService>,
+    service: Arc<dyn GitWorkflowService>,
 }
 
 impl GitDriver {
-    /// Create a new `GitDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `GitDriver` with the given git workflow service.
+    pub fn new(service: Arc<dyn GitWorkflowService>) -> Self {
+        Self { service }
     }
 
     /// Handle a git command.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: GitInput) -> CommandOutcome {
         match input {
             GitInput::AddAll => self.git_add_all(),
@@ -103,61 +88,61 @@ impl GitDriver {
     }
 
     // -----------------------------------------------------------------------
-    // Render helpers (logic duplicated from cli_composition/src/git.rs;
-    // T021 removes the cli_composition copy).
+    // Internal helpers
     // -----------------------------------------------------------------------
 
     fn git_add_all(&self) -> CommandOutcome {
-        // TODO(T021): invoke GitWorkflowInteractor here.
-        // Mirrors cli_composition/src/git.rs GitCompositionRoot::git_add_all.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        match self.service.stage_all() {
+            Ok(()) => CommandOutcome::success(None),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn git_add_from_file(&self, _path: PathBuf, _cleanup: bool) -> CommandOutcome {
-        // TODO(T021): invoke GitWorkflowInteractor here.
-        // Mirrors cli_composition/src/git.rs GitCompositionRoot::git_add_from_file.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn git_add_from_file(&self, path: PathBuf, cleanup: bool) -> CommandOutcome {
+        match self.service.stage_from_file(&path, cleanup) {
+            Ok(()) => CommandOutcome::success(None),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
     fn git_commit_from_file(
         &self,
-        _path: PathBuf,
-        _cleanup: bool,
-        _track_dir: Option<PathBuf>,
+        path: PathBuf,
+        cleanup: bool,
+        track_dir: Option<PathBuf>,
     ) -> CommandOutcome {
-        // TODO(T021): invoke GitWorkflowInteractor here.
-        // Mirrors cli_composition/src/git.rs GitCompositionRoot::git_commit_from_file.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        match self.service.commit_from_file(&path, cleanup, track_dir.as_deref()) {
+            Ok(()) => CommandOutcome::success(None),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn git_note_from_file(&self, _path: PathBuf, _cleanup: bool) -> CommandOutcome {
-        // TODO(T021): invoke GitWorkflowInteractor here.
-        // Mirrors cli_composition/src/git.rs GitCompositionRoot::git_note_from_file
-        // (lines ~179-207).
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn git_note_from_file(&self, path: PathBuf, cleanup: bool) -> CommandOutcome {
+        match self.service.note_from_file(&path, cleanup) {
+            Ok(()) => CommandOutcome::success(None),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn git_switch_and_pull(&self, _branch: String) -> CommandOutcome {
-        // TODO(T021): invoke GitWorkflowInteractor here.
-        // Mirrors cli_composition/src/git.rs GitCompositionRoot::git_switch_and_pull.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn git_switch_and_pull(&self, branch: String) -> CommandOutcome {
+        match self.service.switch_and_pull(&branch) {
+            Ok(msg) => CommandOutcome::success(Some(msg)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn git_unstage(&self, _paths: Vec<PathBuf>) -> CommandOutcome {
-        // TODO(T021): invoke GitWorkflowInteractor here.
-        // Mirrors cli_composition/src/git.rs GitCompositionRoot::git_unstage.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn git_unstage(&self, paths: Vec<PathBuf>) -> CommandOutcome {
+        match self.service.unstage(&paths) {
+            Ok(()) => CommandOutcome::success(None),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
     fn current_branch_track_id_strict_outcome(&self) -> CommandOutcome {
-        // TODO(T021): invoke use-case here.
-        // Mirrors cli_composition/src/git.rs GitCompositionRoot::current_branch_track_id_strict.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
-    }
-}
-
-impl Default for GitDriver {
-    fn default() -> Self {
-        Self::new()
+        match self.service.current_branch_track_id() {
+            Ok(Some(id)) => CommandOutcome::success(Some(id)),
+            Ok(None) => CommandOutcome::success(None),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 }

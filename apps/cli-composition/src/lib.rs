@@ -30,7 +30,9 @@ mod telemetry;
 pub mod track;
 pub mod verify;
 
+pub mod dry_driver_adapter;
 mod dry_fix_runner;
+pub mod semantic_dup_driver_adapter;
 
 /// Telemetry wiring for the composition root.
 ///

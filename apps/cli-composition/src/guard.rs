@@ -40,6 +40,7 @@ impl GuardCompositionRoot {
             command: Some(command),
             file_path: None,
             content: None,
+            git_hook_args: vec![],
         };
 
         let (decision_str, reason, is_blocked) =
@@ -67,5 +68,17 @@ impl GuardCompositionRoot {
 impl Default for GuardCompositionRoot {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl GuardCompositionRoot {
+    /// Build a wired [`cli_driver::guard::GuardDriver`] for the guard family.
+    pub fn guard_driver(&self) -> cli_driver::guard::GuardDriver {
+        use infrastructure::shell::ConchShellParser;
+        use usecase::guard::GuardCheckInteractor;
+
+        let parser_port = Arc::new(ConchShellParser);
+        let service = Arc::new(GuardCheckInteractor::new(parser_port));
+        cli_driver::guard::GuardDriver::new(service)
     }
 }

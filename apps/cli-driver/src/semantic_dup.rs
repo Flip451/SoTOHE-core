@@ -1,26 +1,16 @@
-// STAGED FOR T021 — not yet compiled; Cargo.toml + workspace member added atomically in T021 per CN-06.
-//
 //! `semantic_dup` command family — primary adapter driver.
 //!
-//! `SemanticDupDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The render helper here mirrors the
-//! JSON assembly in
-//! `apps/cli-composition/src/semantic_dup/measure_quality.rs` (lines 92-106
-//! `dup_index_measure_quality` JSON output);
-//! T021 removes the `cli_composition` duplicate when the live path is flipped.
-
-// TODO(T021): add use-case + infrastructure imports once Cargo.toml is materialized.
-// use std::path::PathBuf;
-// use std::sync::Arc;
-// use infrastructure::semantic_dup::{
-//     embedding::FastEmbedAdapter, extractor::extract_code_fragments,
-// };
-// use infrastructure::semantic_dup::noop_adapter::NoopSemanticIndexPort;
-// use usecase::semantic_dup::{
-//     MeasureQualityCommand, MeasureQualityInteractor, MeasureQualityService as _,
-// };
+//! `SemanticDupDriver` holds an injected
+//! [`usecase::semantic_dup_driver::SemanticDupDriverService`] and exposes
+//! `handle(input) -> CommandOutcome`.
 
 use std::path::PathBuf;
+use std::sync::Arc;
+
+use usecase::semantic_dup_driver::{
+    DupCheckDriverInput, FindSimilarDriverInput, IndexBuildDriverInput,
+    IndexMeasureQualityDriverInput, SemanticDupDriverOutcome, SemanticDupDriverService,
+};
 
 use crate::render::CommandOutcome;
 
@@ -72,24 +62,18 @@ pub enum SemanticDupInput {
 
 /// Primary adapter driver for the `semantic_dup` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`SemanticDupDriverService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct SemanticDupDriver {
-    // TODO(T021): inject use-case interactors here once the crate dependency
-    // graph is materialized.
+    service: Arc<dyn SemanticDupDriverService>,
 }
 
 impl SemanticDupDriver {
-    /// Create a new `SemanticDupDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `SemanticDupDriver` with the given service.
+    pub fn new(service: Arc<dyn SemanticDupDriverService>) -> Self {
+        Self { service }
     }
 
     /// Handle a semantic_dup command.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: SemanticDupInput) -> CommandOutcome {
         match input {
             SemanticDupInput::FindSimilar { fragment_text, top_k, db_path } => {
@@ -108,105 +92,55 @@ impl SemanticDupDriver {
     }
 
     // -----------------------------------------------------------------------
-    // Render helpers (logic duplicated from
-    // cli_composition/src/semantic_dup/measure_quality.rs lines 92-106;
-    // T021 removes the cli_composition copies).
+    // Private helpers — translate input fields → service calls
     // -----------------------------------------------------------------------
 
     fn find_similar(
         &self,
-        _fragment_text: String,
-        _top_k: usize,
-        _db_path: PathBuf,
+        fragment_text: String,
+        top_k: usize,
+        db_path: PathBuf,
     ) -> CommandOutcome {
-        // TODO(T021): build FindSimilarInput, invoke SemanticDupCompositionRoot,
-        // propagate CompositionError to exit-code 1.
-        // Mirrors cli_composition/src/semantic_dup/find_similar.rs.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        let outcome =
+            self.service.find_similar(FindSimilarDriverInput { fragment_text, top_k, db_path });
+        into_command_outcome(outcome)
     }
 
-    fn index_build(&self, _workspace_root: PathBuf, _db_path: PathBuf) -> CommandOutcome {
-        // TODO(T021): extract_code_fragments, open LanceDB via FastEmbedAdapter,
-        // invoke build interactor.
-        // Mirrors cli_composition/src/semantic_dup/build.rs.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn index_build(&self, workspace_root: PathBuf, db_path: PathBuf) -> CommandOutcome {
+        let outcome = self.service.index_build(IndexBuildDriverInput { workspace_root, db_path });
+        into_command_outcome(outcome)
     }
 
-    fn index_measure_quality(&self, _workspace_root: PathBuf) -> CommandOutcome {
-        // TODO(T021): extract fragments, build FastEmbedAdapter + NoopSemanticIndexPort,
-        // invoke MeasureQualityInteractor, then format output via format_measure_quality_json.
-        // Mirrors cli_composition/src/semantic_dup/measure_quality.rs lines 39-77.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn index_measure_quality(&self, workspace_root: PathBuf) -> CommandOutcome {
+        let outcome =
+            self.service.index_measure_quality(IndexMeasureQualityDriverInput { workspace_root });
+        into_command_outcome(outcome)
     }
 
     fn dup_check(
         &self,
-        _fragment_files: Vec<PathBuf>,
-        _threshold: f32,
-        _db_path: PathBuf,
-        _ack_file: Option<PathBuf>,
-        _ack: bool,
+        fragment_files: Vec<PathBuf>,
+        threshold: f32,
+        db_path: PathBuf,
+        ack_file: Option<PathBuf>,
+        ack: bool,
     ) -> CommandOutcome {
-        // TODO(T021): build DupCheckInput, invoke SemanticDupCompositionRoot::semantic_dup_check.
-        // Mirrors cli_composition/src/semantic_dup/check.rs.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
-    }
-}
-
-impl Default for SemanticDupDriver {
-    fn default() -> Self {
-        Self::new()
+        let outcome = self.service.dup_check(DupCheckDriverInput {
+            fragment_files,
+            threshold,
+            db_path,
+            ack_file,
+            ack,
+        });
+        into_command_outcome(outcome)
     }
 }
 
 // ---------------------------------------------------------------------------
-// Render helpers (duplicated from
-// cli_composition/src/semantic_dup/measure_quality.rs lines 92-106;
-// T021 removes the cli_composition copies and moves these to cli_driver::render).
+// Conversion helper
 // ---------------------------------------------------------------------------
 
-/// Format `sotp dup-index measure-quality` output as a JSON string.
-///
-/// Mirrors the JSON assembly in
-/// `cli_composition::semantic_dup::measure_quality::SemanticDupCompositionRoot::semantic_dup_index_measure_quality`
-/// (measure_quality.rs lines 57-77 — the `serde_json::json!` block and
-/// `serde_json::to_string_pretty` call).
-///
-/// TODO(T021): wire real `usecase::semantic_dup::MeasureQualityMetrics` once
-/// the dependency graph is materialized.
-/// Currently returns a placeholder so the staged file is self-consistent.
-///
-/// # Errors
-///
-/// Returns a human-readable error string on serialization failure.
-#[allow(dead_code)]
-fn format_measure_quality_json(
-    // TODO(T021): replace with real `usecase::semantic_dup::MeasureQualityMetrics`.
-    _mean_cosine: f64,
-    _cosine_std_dev: f64,
-    _cosine_percentiles: &[f64],
-    _above_threshold_rate: f64,
-) -> Result<String, String> {
-    // TODO(T021): paste the JSON assembly from
-    // cli_composition/src/semantic_dup/measure_quality.rs lines 57-77 once
-    // `serde_json` and the metrics type are available as dependencies.
-    // The implementation:
-    //
-    //   let p = cosine_percentiles;
-    //   let json = serde_json::to_string_pretty(&serde_json::json!({
-    //       "mean_cosine": mean_cosine,
-    //       "cosine_std_dev": cosine_std_dev,
-    //       "cosine_percentiles": {
-    //           "p10": p.first().copied().unwrap_or(0.0),
-    //           "p25": p.get(1).copied().unwrap_or(0.0),
-    //           "p50": p.get(2).copied().unwrap_or(0.0),
-    //           "p75": p.get(3).copied().unwrap_or(0.0),
-    //           "p90": p.get(4).copied().unwrap_or(0.0),
-    //           "p95": p.get(5).copied().unwrap_or(0.0),
-    //           "p99": p.get(6).copied().unwrap_or(0.0),
-    //       },
-    //       "above_threshold_rate": above_threshold_rate,
-    //   }))
-    //   .map_err(|e| format!("failed to serialize metrics to JSON: {e}"))
-    Ok(String::new())
+/// Convert a `SemanticDupDriverOutcome` (usecase boundary type) into a `CommandOutcome`.
+fn into_command_outcome(outcome: SemanticDupDriverOutcome) -> CommandOutcome {
+    CommandOutcome { stdout: outcome.stdout, stderr: outcome.stderr, exit_code: outcome.exit_code }
 }

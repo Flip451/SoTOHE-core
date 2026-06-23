@@ -1,19 +1,12 @@
-// STAGED FOR T021 — not yet compiled; Cargo.toml + workspace member added atomically in T021 per CN-06.
-//
 //! `domain` command family — primary adapter driver.
 //!
-//! `DomainDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The render helpers here mirror
-//! `apps/cli-composition/src/domain.rs` (lines ~51-92); T021 removes the
-//! `cli_composition` duplicate when the live path is flipped.
-
-// TODO(T021): add use-case + infrastructure imports once Cargo.toml is materialized.
-// use std::path::PathBuf;
-// use std::sync::Arc;
-// use infrastructure::schema_export::RustdocSchemaExporter;
-// use usecase::export_schema::{ExportSchemaCommand, ExportSchemaInteractor, ExportSchemaService};
+//! `DomainDriver` holds an injected [`usecase::export_schema::ExportSchemaService`]
+//! and exposes `handle(input) -> CommandOutcome`.
 
 use std::path::PathBuf;
+use std::sync::Arc;
+
+use usecase::export_schema::{ExportSchemaCommand, ExportSchemaService};
 
 use crate::render::CommandOutcome;
 
@@ -44,50 +37,60 @@ pub enum DomainInput {
 
 /// Primary adapter driver for the `domain` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`ExportSchemaService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct DomainDriver {
-    // TODO(T021): inject use-case interactors here.
-    // export_schema_service: Arc<dyn usecase::export_schema::ExportSchemaService>,
+    export_schema_service: Arc<dyn ExportSchemaService>,
 }
 
 impl DomainDriver {
-    /// Create a new `DomainDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `DomainDriver` with the given export schema service.
+    pub fn new(export_schema_service: Arc<dyn ExportSchemaService>) -> Self {
+        Self { export_schema_service }
     }
 
     /// Handle a domain command.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: DomainInput) -> CommandOutcome {
         match input {
             DomainInput::ExportSchema(export_input) => self.domain_export_schema(export_input),
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Render helpers (logic duplicated from cli_composition/src/domain.rs
-    // lines ~51-92; T021 removes the cli_composition copy).
-    // -----------------------------------------------------------------------
-
     fn domain_export_schema(&self, input: ExportSchemaInput) -> CommandOutcome {
-        // TODO(T021): invoke ExportSchemaInteractor here.
-        // Mirrors cli_composition/src/domain.rs DomainCompositionRoot::domain_export_schema.
-        //
-        // Output shape when `input.output` is Some:
-        //   stderr = "[OK] Schema written to <path>"  exit_code = 0
-        // Output shape when `input.output` is None:
-        //   stdout = <json>  exit_code = 0
-        let _ = (input.crate_name, input.pretty, input.output);
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
-    }
-}
+        let output_path = input.output.clone();
 
-impl Default for DomainDriver {
-    fn default() -> Self {
-        Self::new()
+        let raw_json = match self
+            .export_schema_service
+            .export(ExportSchemaCommand { crate_name: input.crate_name, output_path: input.output })
+        {
+            Ok(json) => json,
+            Err(e) => return CommandOutcome::failure(Some(e.to_string())),
+        };
+
+        // When output_path was set the service wrote the file and returned "".
+        if let Some(path) = output_path {
+            return CommandOutcome {
+                stdout: None,
+                stderr: Some(format!("[OK] Schema written to {}", path.display())),
+                exit_code: 0,
+            };
+        }
+
+        // No output path: compact if not pretty, then print to stdout.
+        let json = if input.pretty {
+            raw_json
+        } else {
+            match serde_json::from_str::<serde_json::Value>(&raw_json)
+                .and_then(|v| serde_json::to_string(&v))
+            {
+                Ok(compact) => compact,
+                Err(e) => {
+                    return CommandOutcome::failure(Some(format!(
+                        "failed to compact schema JSON: {e}"
+                    )));
+                }
+            }
+        };
+
+        CommandOutcome::success(Some(json))
     }
 }

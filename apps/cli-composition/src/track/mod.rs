@@ -3,6 +3,7 @@ pub mod composition_root;
 pub mod fixpoint_resolve;
 mod ops;
 mod resolution;
+pub(crate) mod service_impl;
 mod set_commit_hash;
 mod shim;
 mod tddd;
@@ -187,7 +188,44 @@ fn describe_archive_rollback(result: Result<(), String>) -> String {
         }
     }
 }
+
 impl TrackCompositionRoot {
+    /// Initialize a new track by writing `metadata.json`.
+    ///
+    /// Creates `track/items/<track_id>/metadata.json` with identity-only content
+    /// (no tasks, no status override) and then syncs rendered views.
+    ///
+    /// # Errors
+    /// Returns `Err` when track ID validation, directory creation, or metadata
+    /// persistence fails.
+    pub fn track_init(
+        &self,
+        items_dir: PathBuf,
+        track_id: String,
+        description: String,
+    ) -> Result<CommandOutcome, CompositionError> {
+        use domain::TrackWriter as _;
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
+
+        let project_root =
+            resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
+
+        let id = domain::TrackId::try_new(&track_id)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
+        let track = domain::TrackMetadata::new(id, description, None)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid track metadata: {e}")))?;
+
+        let store = FsTrackStore::new(items_dir);
+        store.save(&track).map_err(|e| CompositionError::Usecase(format!("init failed: {e}")))?;
+
+        infrastructure::track::render::sync_rendered_views(&project_root, Some(&track_id))
+            .map_err(|e| CompositionError::Usecase(format!("sync-views failed: {e}")))?;
+
+        Ok(CommandOutcome::success(None))
+    }
+
     /// Transition a task to a new status.
     ///
     /// # Errors

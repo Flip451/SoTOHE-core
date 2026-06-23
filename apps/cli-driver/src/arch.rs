@@ -1,17 +1,12 @@
-// STAGED FOR T021 — not yet compiled; Cargo.toml + workspace member added atomically in T021 per CN-06.
-//
 //! `arch` command family — primary adapter driver.
 //!
-//! `ArchDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The render helpers here mirror
-//! `apps/cli-composition/src/arch.rs`; T021 removes the `cli_composition`
-//! duplicate when the live path is flipped.
-
-// TODO(T021): add infrastructure imports once Cargo.toml is materialized.
-// use std::path::Path;
-// use infrastructure::arch::ArchRulesError;
+//! `ArchDriver` holds an injected [`usecase::arch::ArchPort`] and exposes
+//! `handle(input) -> CommandOutcome`.
 
 use std::path::PathBuf;
+use std::sync::Arc;
+
+use usecase::arch::ArchPort;
 
 use crate::render::CommandOutcome;
 
@@ -49,25 +44,18 @@ pub enum ArchInput {
 
 /// Primary adapter driver for the `arch` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`ArchPort`]; exposes `handle(input) -> CommandOutcome`.
 pub struct ArchDriver {
-    // TODO(T021): inject use-case interactors here (currently this family has
-    // no injectable adapter dependencies — infrastructure functions are called
-    // inline, same as cli_composition::ArchCompositionRoot).
+    port: Arc<dyn ArchPort>,
 }
 
 impl ArchDriver {
-    /// Create a new `ArchDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `ArchDriver` with the given port.
+    pub fn new(port: Arc<dyn ArchPort>) -> Self {
+        Self { port }
     }
 
     /// Handle an arch command.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: ArchInput) -> CommandOutcome {
         match input {
             ArchInput::Tree { project_root } => self.arch_tree(project_root),
@@ -77,38 +65,31 @@ impl ArchDriver {
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Render helpers (logic duplicated from cli_composition/src/arch.rs;
-    // T021 removes the cli_composition copy).
-    // -----------------------------------------------------------------------
-
-    fn arch_tree(&self, _project_root: PathBuf) -> CommandOutcome {
-        // TODO(T021): invoke infrastructure::arch::render_workspace_tree here.
-        // Mirrors cli_composition/src/arch.rs ArchCompositionRoot::arch_tree.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn arch_tree(&self, project_root: PathBuf) -> CommandOutcome {
+        match self.port.render_tree(project_root.as_path()) {
+            Ok(output) => CommandOutcome::success(Some(output)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn arch_tree_full(&self, _project_root: PathBuf) -> CommandOutcome {
-        // TODO(T021): invoke infrastructure::arch::render_workspace_tree_full here.
-        // Mirrors cli_composition/src/arch.rs ArchCompositionRoot::arch_tree_full.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn arch_tree_full(&self, project_root: PathBuf) -> CommandOutcome {
+        match self.port.render_tree_full(project_root.as_path()) {
+            Ok(output) => CommandOutcome::success(Some(output)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn arch_members(&self, _project_root: PathBuf) -> CommandOutcome {
-        // TODO(T021): invoke infrastructure::arch::render_workspace_members here.
-        // Mirrors cli_composition/src/arch.rs ArchCompositionRoot::arch_members.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn arch_members(&self, project_root: PathBuf) -> CommandOutcome {
+        match self.port.render_members(project_root.as_path()) {
+            Ok(output) => CommandOutcome::success(Some(output)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn arch_direct_checks(&self, _project_root: PathBuf) -> CommandOutcome {
-        // TODO(T021): invoke infrastructure::arch::render_direct_checks here.
-        // Mirrors cli_composition/src/arch.rs ArchCompositionRoot::arch_direct_checks.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
-    }
-}
-
-impl Default for ArchDriver {
-    fn default() -> Self {
-        Self::new()
+    fn arch_direct_checks(&self, project_root: PathBuf) -> CommandOutcome {
+        match self.port.render_direct_checks(project_root.as_path()) {
+            Ok(output) => CommandOutcome::success(Some(output)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 }

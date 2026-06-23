@@ -1,6 +1,7 @@
 //! `signal` command family — per-context composition root and CliApp shim.
 
 mod gate_check;
+pub(crate) mod service_impl;
 mod shim;
 #[cfg(test)]
 mod tests;
@@ -30,6 +31,18 @@ impl SignalCompositionRoot {
 impl Default for SignalCompositionRoot {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl SignalCompositionRoot {
+    /// Build a wired [`cli_driver::signal::SignalDriver`] for the signal family.
+    pub fn signal_driver(&self) -> cli_driver::signal::SignalDriver {
+        use std::sync::Arc;
+
+        use service_impl::SignalServiceImpl;
+
+        let service = Arc::new(SignalServiceImpl);
+        cli_driver::signal::SignalDriver::new(service)
     }
 }
 

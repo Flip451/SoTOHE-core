@@ -65,11 +65,29 @@ struct ExtraDirEntry {
 // ---------------------------------------------------------------------------
 
 pub(crate) fn load_rules(root: &Path) -> Result<ArchRules, ArchRulesError> {
+    ensure_trusted_root(root)?;
     let rules_path = root.join(ARCH_RULES_FILE);
+    crate::track::symlink_guard::reject_symlinks_below(&rules_path, root)
+        .map_err(|source| ArchRulesError::Io { path: ARCH_RULES_FILE.to_owned(), source })?;
     let content = std::fs::read_to_string(&rules_path)
         .map_err(|e| ArchRulesError::Io { path: ARCH_RULES_FILE.to_owned(), source: e })?;
     let value: Value = serde_json::from_str(&content)?;
     parse_rules(&value)
+}
+
+fn ensure_trusted_root(root: &Path) -> Result<(), ArchRulesError> {
+    match root.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => Err(ArchRulesError::Io {
+            path: root.display().to_string(),
+            source: std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("refusing to use symlinked root: {}", root.display()),
+            ),
+        }),
+        Ok(_) => Ok(()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(source) => Err(ArchRulesError::Io { path: root.display().to_string(), source }),
+    }
 }
 
 fn invalid_rules(message: impl Into<String>) -> ArchRulesError {
@@ -421,6 +439,64 @@ pub fn render_direct_checks(root: &Path) -> Result<String, ArchRulesError> {
 }
 
 // ---------------------------------------------------------------------------
+// Port adapter (T023)
+// ---------------------------------------------------------------------------
+
+/// Filesystem adapter that implements [`usecase::arch::ArchPort`].
+///
+/// Delegates to the module-level `render_workspace_*` / `render_direct_checks`
+/// free functions and converts `ArchRulesError` to `String`.
+pub struct FsArchAdapter;
+
+impl FsArchAdapter {
+    /// Create a new `FsArchAdapter`.
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for FsArchAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl usecase::arch::ArchPort for FsArchAdapter {
+    fn render_tree(
+        &self,
+        project_root: &std::path::Path,
+    ) -> Result<String, usecase::arch::ArchPortError> {
+        render_workspace_tree(project_root)
+            .map_err(|e| usecase::arch::ArchPortError::Unavailable(e.to_string()))
+    }
+
+    fn render_tree_full(
+        &self,
+        project_root: &std::path::Path,
+    ) -> Result<String, usecase::arch::ArchPortError> {
+        render_workspace_tree_full(project_root)
+            .map_err(|e| usecase::arch::ArchPortError::Unavailable(e.to_string()))
+    }
+
+    fn render_members(
+        &self,
+        project_root: &std::path::Path,
+    ) -> Result<String, usecase::arch::ArchPortError> {
+        render_workspace_members(project_root)
+            .map_err(|e| usecase::arch::ArchPortError::Unavailable(e.to_string()))
+    }
+
+    fn render_direct_checks(
+        &self,
+        project_root: &std::path::Path,
+    ) -> Result<String, usecase::arch::ArchPortError> {
+        render_direct_checks(project_root)
+            .map_err(|e| usecase::arch::ArchPortError::Unavailable(e.to_string()))
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -596,6 +672,33 @@ mod tests {
         let err = render_workspace_members(dir.path()).unwrap_err();
         assert!(!err.to_string().contains(&dir.path().display().to_string()));
         assert!(err.to_string().contains("architecture-rules.json"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn symlinked_architecture_rules_returns_io_error() {
+        let dir = TempDir::new().unwrap();
+        let real = dir.path().join("real-rules.json");
+        let link = dir.path().join("architecture-rules.json");
+        fs::write(&real, MINIMAL_RULES).unwrap();
+        std::os::unix::fs::symlink(&real, &link).unwrap();
+
+        let err = render_workspace_members(dir.path()).unwrap_err();
+        assert!(matches!(&err, ArchRulesError::Io { .. }), "unexpected: {err:?}");
+        assert!(err.to_string().contains("refusing to follow symlink"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn symlinked_root_returns_io_error() {
+        let real_root = setup_dir(MINIMAL_RULES);
+        let link_parent = TempDir::new().unwrap();
+        let root_link = link_parent.path().join("workspace-link");
+        std::os::unix::fs::symlink(real_root.path(), &root_link).unwrap();
+
+        let err = render_workspace_members(&root_link).unwrap_err();
+        assert!(matches!(&err, ArchRulesError::Io { .. }), "unexpected: {err:?}");
+        assert!(err.to_string().contains("refusing to use symlinked root"));
     }
 
     #[test]

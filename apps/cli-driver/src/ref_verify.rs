@@ -1,29 +1,16 @@
-// STAGED FOR T021 — not yet compiled; Cargo.toml + workspace member added atomically in T021 per CN-06.
-//
 //! `ref_verify` command family — primary adapter driver.
 //!
-//! `RefVerifyDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The render helpers here mirror
-//! `apps/cli-composition/src/ref_verify.rs` (lines 135-158 and 264-269);
-//! T021 removes the `cli_composition` duplicate when the live path is flipped.
-
-// TODO(T021): add use-case + infrastructure imports once Cargo.toml is materialized.
-// use std::path::PathBuf;
-// use std::sync::Arc;
-// use domain::{ContentHash, TrackId};
-// use domain::tddd::semantic_verify::SemanticVerdict;
-// use usecase::ref_verify::{
-//     RefVerifyApplicationService as _, RefVerifyCachePort as _, RefVerifyCacheScope,
-//     RefVerifyCommand, RefVerifyConfig, RefVerifyError, RefVerifyPairSourcePort as _,
-//     RefVerifyScope, VerifySemanticRefsInteractor,
-// };
-// use infrastructure::ref_verify::{
-//     AgentRefVerifierAdapter, RefVerifyCacheAdapter, RefVerifyPairSourceAdapter,
-//     RefVerifyScopeResolver, make_ref_verifier_process_runner,
-// };
-// use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles};
+//! `RefVerifyDriver` holds a single injected `RefVerifyAggregateService` and
+//! exposes `handle(input) -> CommandOutcome`. One injected interactor — no
+//! per-service fields (D3/D4 cli_driver policy).
 
 use std::path::PathBuf;
+use std::sync::Arc;
+
+use usecase::ref_verify::{
+    RefVerifyAggregateService, RefVerifyCheckApprovedOutcome, RefVerifyDriverError,
+    RefVerifyRunOutcome,
+};
 
 use crate::render::CommandOutcome;
 
@@ -63,26 +50,20 @@ pub enum RefVerifyInput {
 
 /// Primary adapter driver for the `ref_verify` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds a single injected `RefVerifyAggregateService`; exposes
+/// `handle(input) -> CommandOutcome`. One injected interactor — no per-service
+/// fields (D3/D4 cli_driver policy).
 pub struct RefVerifyDriver {
-    // TODO(T021): inject use-case interactors here.
-    // pair_source: Arc<dyn usecase::ref_verify::RefVerifyPairSourcePort>,
-    // cache: Arc<dyn usecase::ref_verify::RefVerifyCachePort>,
-    // verifier: Arc<dyn usecase::ref_verify::AgentRefVerifierPort>,
+    service: Arc<dyn RefVerifyAggregateService>,
 }
 
 impl RefVerifyDriver {
-    /// Create a new `RefVerifyDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `RefVerifyDriver` with a single injected aggregate service.
+    pub fn new(service: Arc<dyn RefVerifyAggregateService>) -> Self {
+        Self { service }
     }
 
     /// Handle a ref_verify command.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: RefVerifyInput) -> CommandOutcome {
         match input {
             RefVerifyInput::Run(input) => self.ref_verify_run(input),
@@ -91,50 +72,70 @@ impl RefVerifyDriver {
     }
 
     // -----------------------------------------------------------------------
-    // Render helpers (logic duplicated from cli_composition/src/ref_verify.rs
-    // lines 135-158 and 264-269; T021 removes the cli_composition copy).
+    // Internal helpers
     // -----------------------------------------------------------------------
 
-    fn ref_verify_run(&self, _input: RefVerifyRunInput) -> CommandOutcome {
-        // TODO(T021): invoke VerifySemanticRefsInteractor::execute here.
-        // On Ok(()): CommandOutcome::success(Some("[OK] Semantic reference verification passed…"))
-        // On Err(SemanticFailuresConfirmed): exit_code 1 + [BLOCKED] message.
-        // On Err(HumanEscalationRequired): exit_code 1 + [ESCALATE] message.
-        // Mirrors cli_composition/src/ref_verify.rs RefVerifyCompositionRoot::ref_verify_run
-        // (lines 113-190).
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn ref_verify_run(&self, input: RefVerifyRunInput) -> CommandOutcome {
+        match self.service.run(&input.track_id, &input.items_dir) {
+            Ok(RefVerifyRunOutcome::Passed) => CommandOutcome::success(Some(
+                "[OK] Semantic reference verification passed — all pairs verified.".to_owned(),
+            )),
+            Ok(RefVerifyRunOutcome::SemanticFailuresConfirmed { pair_count }) => CommandOutcome {
+                stdout: None,
+                stderr: Some(format!(
+                    "[BLOCKED] Semantic review confirmed {pair_count} production failure(s). \
+                     Resolve the failures before committing."
+                )),
+                exit_code: 1,
+            },
+            Ok(RefVerifyRunOutcome::HumanEscalationRequired { pair_count }) => CommandOutcome {
+                stdout: None,
+                stderr: Some(format!(
+                    "[ESCALATE] Human review required for {pair_count} unresolved pair(s) \
+                     or known-bad detection failure."
+                )),
+                exit_code: 1,
+            },
+            Err(RefVerifyDriverError::Wiring(msg)) => {
+                CommandOutcome::failure(Some(format!("ref-verify run failed (wiring): {msg}")))
+            }
+            Err(e) => CommandOutcome::failure(Some(format!("ref-verify run failed: {e}"))),
+        }
     }
 
-    fn ref_verify_check_approved(&self, _input: RefVerifyCheckApprovedInput) -> CommandOutcome {
-        // TODO(T021): invoke RefVerifyCacheAdapter + RefVerifyPairSourceAdapter here.
-        // On zero production pairs: CommandOutcome::success("[OK] No production reference…")
-        // On all Pass cache entries: CommandOutcome::success("[OK] All production…")
-        // On missing/non-pass entries: exit_code 1 + [BLOCKED] message.
-        // Mirrors cli_composition/src/ref_verify.rs RefVerifyCompositionRoot::ref_verify_check_approved
-        // (lines 193-309), including bracketed status formatting.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn ref_verify_check_approved(&self, input: RefVerifyCheckApprovedInput) -> CommandOutcome {
+        match self.service.check_approved(&input.track_id, &input.items_dir) {
+            Ok(RefVerifyCheckApprovedOutcome::NoPairs) => CommandOutcome::success(Some(
+                "[OK] No production reference pairs found — check-approved gate passes.".to_owned(),
+            )),
+            Ok(RefVerifyCheckApprovedOutcome::AllApproved) => CommandOutcome::success(Some(
+                "[OK] All production reference pairs have verified Pass cache entries.".to_owned(),
+            )),
+            Ok(RefVerifyCheckApprovedOutcome::NotApproved { missing_or_non_pass }) => {
+                CommandOutcome {
+                    stdout: None,
+                    stderr: Some(format!(
+                        "[BLOCKED] ref-verify check-approved failed: {} pair(s) without Pass cache:\n{}",
+                        missing_or_non_pass.len(),
+                        missing_or_non_pass.join("\n")
+                    )),
+                    exit_code: 1,
+                }
+            }
+            Err(RefVerifyDriverError::Wiring(msg)) => CommandOutcome::failure(Some(format!(
+                "ref-verify check-approved failed (wiring): {msg}"
+            ))),
+            Err(e) => {
+                CommandOutcome::failure(Some(format!("ref-verify check-approved failed: {e}")))
+            }
+        }
     }
 }
-
-impl Default for RefVerifyDriver {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Bracketed status formatting helpers (duplicated from cli_composition/src/ref_verify.rs
-// lines 264-269; T021 removes the cli_composition copy).
-// ---------------------------------------------------------------------------
 
 /// Format a missing-or-non-pass pair entry as a bracketed status string.
 ///
-/// Mirrors the inline formatting in
-/// `cli_composition::ref_verify::RefVerifyCompositionRoot::ref_verify_check_approved`
-/// (lines 264-269).
-#[allow(dead_code)]
-fn format_pair_status(claim_hex: &str, evidence_hex: &str, reason: &str) -> String {
-    // TODO(T021): used when iterating over production_pairs to build
-    // the missing_or_non_pass vec. Format: "pair ({claim_hex}, {evidence_hex}) {reason}"
+/// Used when iterating over production_pairs to build the missing_or_non_pass vec.
+/// Format: `"pair ({claim_hex}, {evidence_hex}) {reason}"`
+pub fn format_pair_status(claim_hex: &str, evidence_hex: &str, reason: &str) -> String {
     format!("pair ({claim_hex}, {evidence_hex}) {reason}")
 }

@@ -9,6 +9,39 @@ use std::sync::Arc;
 use crate::InMemoryTrackStore;
 use usecase::SaveTrackUseCase;
 
+// ---------------------------------------------------------------------------
+// Port adapter (T023)
+// ---------------------------------------------------------------------------
+
+/// Filesystem adapter that implements [`usecase::demo::DemoPort`].
+///
+/// Wraps the module-level [`run_example_demo`] free function.
+pub struct FsDemoAdapter;
+
+impl FsDemoAdapter {
+    /// Create a new `FsDemoAdapter`.
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for FsDemoAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl usecase::demo::DemoPort for FsDemoAdapter {
+    fn run(&self) -> Result<String, usecase::demo::DemoPortError> {
+        run_example_demo().map_err(usecase::demo::DemoPortError::Unavailable)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Infrastructure function
+// ---------------------------------------------------------------------------
+
 /// Runs the example track state machine demo.
 ///
 /// Creates an in-memory track, persists it via `SaveTrackUseCase`, derives

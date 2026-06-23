@@ -237,6 +237,149 @@
         { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
       ],
       "informal_grounds": []
+    },
+    "FsArchAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "arch",
+      "docs": "Filesystem adapter implementing usecase::arch::ArchPort. Delegates to bin/sotp arch subcommands via subprocess calls. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "FsConventionsAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "conventions",
+      "docs": "Filesystem adapter implementing usecase::conventions::ConventionsPort. Delegates to bin/sotp conventions subcommands. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDemoAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "demo",
+      "docs": "Filesystem adapter implementing usecase::demo::DemoPort. Runs the built-in demo. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "FsFileWriteAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "file_port",
+      "docs": "Filesystem adapter implementing usecase::file::FileWritePort. Uses atomic_write for safe file writes. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "FsGitWorkflowAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "git_cli::workflow_adapter",
+      "docs": "Filesystem adapter implementing usecase::git_workflow::GitWorkflowService. Delegates to SystemGitRepo for guarded local git operations. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "FsRefVerifyRunAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "ref_verify::driver_adapter",
+      "docs": "Filesystem adapter implementing usecase::ref_verify::driver_service::RefVerifyRunService. Delegates to the ref_verify run workflow. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "FsRefVerifyCheckApprovedAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "ref_verify::driver_adapter",
+      "docs": "Filesystem adapter implementing usecase::ref_verify::driver_service::RefVerifyCheckApprovedDriverService. Delegates to the ref_verify check-approved workflow. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "FsTelemetryEmitDynamicAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "telemetry::report_adapter",
+      "docs": "Filesystem adapter implementing usecase::telemetry::TelemetryEmitDynamicPort. Emits archived-track telemetry by discovering the repo root dynamically. Extracted from apps/cli/src/main.rs per IN-12/CN-08; placed in libs/infrastructure per CN-05.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-08" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+      ],
+      "informal_grounds": []
+    },
+    "FsTelemetryReportAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "telemetry::report_adapter",
+      "docs": "Filesystem adapter implementing usecase::telemetry::TelemetryReportPort. Aggregates telemetry JSONL data from the items directory. Extracted from apps/cli/src/main.rs per IN-12/CN-08; placed in libs/infrastructure per CN-05.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-08" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+      ],
+      "informal_grounds": []
+    },
+    "FsVerifyAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "verify_adapter",
+      "docs": "Filesystem adapter implementing usecase::verify::VerifyPort. Delegates each verify_* method to the corresponding infrastructure::verify submodule. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "FsRefVerifyAggregateAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "methods": [],
+      "module_path": "ref_verify::driver_adapter",
+      "docs": "Filesystem-backed aggregate adapter implementing the ref_verify secondary port for run/check-approved operations. Composition may wrap this adapter with the usecase-owned RefVerifyAggregateInteractor, but the adapter itself remains an infrastructure secondary adapter per CN-05.",
+      "spec_refs": [
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {},
@@ -464,6 +607,121 @@
       "action": "add",
       "trait_ref": "core::default::Default",
       "for_type": "SystemSleepAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::arch::ArchPort",
+      "for_type": "FsArchAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsArchAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::conventions::ConventionsPort",
+      "for_type": "FsConventionsAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsConventionsAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::demo::DemoPort",
+      "for_type": "FsDemoAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsDemoAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::file::FileWritePort",
+      "for_type": "FsFileWriteAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsFileWriteAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::git_workflow::GitWorkflowService",
+      "for_type": "FsGitWorkflowAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsGitWorkflowAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::ref_verify::driver_service::RefVerifyCheckApprovedDriverService",
+      "for_type": "FsRefVerifyCheckApprovedAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsRefVerifyCheckApprovedAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::ref_verify::driver_service::RefVerifyRunService",
+      "for_type": "FsRefVerifyRunAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsRefVerifyRunAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::telemetry::TelemetryEmitDynamicPort",
+      "for_type": "FsTelemetryEmitDynamicAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsTelemetryEmitDynamicAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::telemetry::TelemetryReportPort",
+      "for_type": "FsTelemetryReportAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsTelemetryReportAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::verify::VerifyPort",
+      "for_type": "FsVerifyAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsVerifyAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsVerifyAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::ref_verify::driver_service::RefVerifyAggregateService",
+      "for_type": "FsRefVerifyAggregateAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsRefVerifyAggregateAdapter"
     }
   ]
 }

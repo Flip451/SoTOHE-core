@@ -104,6 +104,7 @@ pub fn add_convention_doc(
     title: Option<&str>,
     summary: Option<&str>,
 ) -> Result<(), ConventionDocsError> {
+    guard_convention_root(root)?;
     let conventions_dir = root.join("knowledge").join("conventions");
     let readme_path = conventions_dir.join("README.md");
 
@@ -111,10 +112,11 @@ pub fn add_convention_doc(
     let resolved_title = resolve_title(name, &resolved_slug, title);
 
     // Verify README and markers before touching the filesystem.
-    let content = read_readme(&readme_path)?;
+    let content = read_readme(root, &readme_path)?;
     ensure_readme_markers(&content, &readme_path)?;
 
     let target = conventions_dir.join(format!("{resolved_slug}.md"));
+    guard_convention_path(root, &target, format!("knowledge/conventions/{resolved_slug}.md"))?;
     if target.is_file() {
         return Err(ConventionDocsError::AlreadyExists(format!(
             "knowledge/conventions/{resolved_slug}.md"
@@ -129,6 +131,7 @@ pub fn add_convention_doc(
     }
 
     let template = build_template(&resolved_title, summary);
+    guard_convention_path(root, &target, format!("knowledge/conventions/{resolved_slug}.md"))?;
     std::fs::write(&target, template).map_err(|e| ConventionDocsError::Io {
         path: format!("knowledge/conventions/{resolved_slug}.md"),
         source: e,
@@ -148,18 +151,21 @@ pub fn add_convention_doc(
 /// - Index markers are absent from `README.md`
 /// - Any I/O operation fails while scanning or writing
 pub fn update_convention_index(root: &Path) -> Result<(), ConventionDocsError> {
+    guard_convention_root(root)?;
     let conventions_dir = root.join("knowledge").join("conventions");
     let readme_path = conventions_dir.join("README.md");
 
-    let content = read_readme(&readme_path)?;
+    let content = read_readme(root, &readme_path)?;
     ensure_readme_markers(&content, &readme_path)?;
 
-    let new_block = render_index_block(&conventions_dir).map_err(|e| ConventionDocsError::Io {
-        path: "knowledge/conventions".to_owned(),
-        source: std::io::Error::other(e),
-    })?;
+    let new_block =
+        render_index_block(root, &conventions_dir).map_err(|e| ConventionDocsError::Io {
+            path: "knowledge/conventions".to_owned(),
+            source: std::io::Error::other(e),
+        })?;
 
     let updated = replace_marker_block(&content, &new_block);
+    guard_convention_path(root, &readme_path, "knowledge/conventions/README.md")?;
     std::fs::write(&readme_path, updated).map_err(|e| ConventionDocsError::Io {
         path: "knowledge/conventions/README.md".to_owned(),
         source: e,
@@ -175,8 +181,16 @@ pub fn update_convention_index(root: &Path) -> Result<(), ConventionDocsError> {
 /// Returns a passing `VerifyOutcome` when no convention documents exist yet
 /// (bootstrapping) or when the index is in sync with the actual files.
 pub fn verify_convention_index(root: &Path) -> VerifyOutcome {
+    if let Err(e) = guard_convention_root(root) {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(e.to_string())]);
+    }
+
     let conventions_dir = root.join("knowledge").join("conventions");
     let readme_path = conventions_dir.join("README.md");
+
+    if let Err(e) = guard_convention_path(root, &conventions_dir, "knowledge/conventions") {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(e.to_string())]);
+    }
 
     // If the conventions directory does not exist at all, there is nothing to
     // verify — return pass (bootstrapping case).
@@ -186,6 +200,9 @@ pub fn verify_convention_index(root: &Path) -> VerifyOutcome {
 
     // README.md is only required once convention documents exist.
     // An empty conventions directory is the bootstrapping case — pass.
+    if let Err(e) = guard_convention_path(root, &readme_path, "knowledge/conventions/README.md") {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(e.to_string())]);
+    }
     if !readme_path.is_file() {
         let has_convention_docs = std::fs::read_dir(&conventions_dir).is_ok_and(|entries| {
             entries.flatten().any(|e| {
@@ -236,7 +253,7 @@ pub fn verify_convention_index(root: &Path) -> VerifyOutcome {
         }
     };
 
-    let expected = match render_index_block(&conventions_dir) {
+    let expected = match render_index_block(root, &conventions_dir) {
         Ok(block) => block,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(e)]);
@@ -257,7 +274,33 @@ pub fn verify_convention_index(root: &Path) -> VerifyOutcome {
 // Private helpers
 // ---------------------------------------------------------------------------
 
-fn read_readme(readme_path: &Path) -> Result<String, ConventionDocsError> {
+fn guard_convention_root(root: &Path) -> Result<(), ConventionDocsError> {
+    match root.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => Err(ConventionDocsError::Io {
+            path: root.display().to_string(),
+            source: std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("refusing to use symlinked root: {}", root.display()),
+            ),
+        }),
+        Ok(_) => Ok(()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(source) => Err(ConventionDocsError::Io { path: root.display().to_string(), source }),
+    }
+}
+
+fn guard_convention_path(
+    root: &Path,
+    path: &Path,
+    display_path: impl Into<String>,
+) -> Result<(), ConventionDocsError> {
+    crate::track::symlink_guard::reject_symlinks_below(path, root)
+        .map(|_| ())
+        .map_err(|source| ConventionDocsError::Io { path: display_path.into(), source })
+}
+
+fn read_readme(root: &Path, readme_path: &Path) -> Result<String, ConventionDocsError> {
+    guard_convention_path(root, readme_path, "knowledge/conventions/README.md")?;
     if !readme_path.is_file() {
         return Err(ConventionDocsError::MissingReadme(
             "knowledge/conventions/README.md".to_owned(),
@@ -408,9 +451,11 @@ fn build_template(title: &str, summary: Option<&str>) -> String {
 ///
 /// Returns an error string when `conventions_dir` cannot be read or a
 /// convention document file cannot be read.
-fn render_index_block(conventions_dir: &Path) -> Result<String, String> {
+fn render_index_block(root: &Path, conventions_dir: &Path) -> Result<String, String> {
     let mut entries: Vec<(String, String)> = Vec::new();
 
+    crate::track::symlink_guard::reject_symlinks_below(conventions_dir, root)
+        .map_err(|e| format!("Cannot validate directory knowledge/conventions: {e}"))?;
     if conventions_dir.is_dir() {
         let read_dir = std::fs::read_dir(conventions_dir)
             .map_err(|e| format!("Cannot read directory knowledge/conventions: {e}"))?;
@@ -432,6 +477,9 @@ fn render_index_block(conventions_dir: &Path) -> Result<String, String> {
         for path in &paths {
             let file_name =
                 path.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
+            crate::track::symlink_guard::reject_symlinks_below(path, root).map_err(|e| {
+                format!("Cannot validate convention doc knowledge/conventions/{file_name}: {e}")
+            })?;
             let heading = extract_heading(path).map_err(|e| {
                 format!("Cannot read convention doc knowledge/conventions/{file_name}: {e}")
             })?;
@@ -472,6 +520,66 @@ fn sort_key(path: &Path) -> (u32, String) {
 }
 
 // ---------------------------------------------------------------------------
+// Port adapter (T023)
+// ---------------------------------------------------------------------------
+
+/// Filesystem adapter that implements [`usecase::conventions::ConventionsPort`].
+///
+/// Delegates to the module-level `add_convention_doc`, `update_convention_index`,
+/// and `verify_convention_index` free functions.
+pub struct FsConventionsAdapter;
+
+impl FsConventionsAdapter {
+    /// Create a new `FsConventionsAdapter`.
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for FsConventionsAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl usecase::conventions::ConventionsPort for FsConventionsAdapter {
+    fn add_convention(
+        &self,
+        root: &std::path::Path,
+        name: &str,
+        slug: Option<&str>,
+        title: Option<&str>,
+        summary: Option<&str>,
+    ) -> Result<String, usecase::conventions::ConventionsPortError> {
+        add_convention_doc(root, name, slug, title, summary)
+            .map(|()| "[OK] Convention document added.".to_owned())
+            .map_err(|e| usecase::conventions::ConventionsPortError::Unavailable(e.to_string()))
+    }
+
+    fn update_index(
+        &self,
+        root: &std::path::Path,
+    ) -> Result<String, usecase::conventions::ConventionsPortError> {
+        update_convention_index(root)
+            .map(|()| "[OK] Convention README index updated.".to_owned())
+            .map_err(|e| usecase::conventions::ConventionsPortError::Unavailable(e.to_string()))
+    }
+
+    fn verify_index(
+        &self,
+        root: &std::path::Path,
+    ) -> Result<usecase::conventions::VerifyIndexResult, usecase::conventions::ConventionsPortError>
+    {
+        let outcome = verify_convention_index(root);
+        Ok(usecase::conventions::VerifyIndexResult {
+            ok: outcome.is_ok(),
+            findings: outcome.findings().iter().map(|f| f.to_string()).collect(),
+        })
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -495,8 +603,8 @@ mod tests {
         }
     }
 
-    fn make_readme_with_block(dir: &Path) -> String {
-        let block = render_index_block(dir).unwrap();
+    fn make_readme_with_block(root: &Path, dir: &Path) -> String {
+        let block = render_index_block(root, dir).unwrap();
         format!("# Conventions\n\n{block}\n")
     }
 
@@ -518,7 +626,7 @@ mod tests {
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("security.md"), "# Security\nRules here.\n").unwrap();
 
-        let readme = make_readme_with_block(&dir);
+        let readme = make_readme_with_block(tmp.path(), &dir);
         std::fs::write(dir.join("README.md"), &readme).unwrap();
 
         let outcome = verify_convention_index(tmp.path());
@@ -709,6 +817,37 @@ mod tests {
         );
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn test_update_convention_index_symlinked_conventions_dir_errors() {
+        let tmp = TempDir::new().unwrap();
+        let outside = TempDir::new().unwrap();
+        let knowledge_dir = tmp.path().join("knowledge");
+        std::fs::create_dir_all(&knowledge_dir).unwrap();
+        std::fs::create_dir_all(outside.path()).unwrap();
+        std::os::unix::fs::symlink(outside.path(), knowledge_dir.join("conventions")).unwrap();
+
+        let result = update_convention_index(tmp.path());
+        let err = result.unwrap_err();
+        assert!(matches!(&err, ConventionDocsError::Io { .. }), "{err:?}");
+        assert!(err.to_string().contains("refusing to follow symlink"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_update_convention_index_symlinked_root_errors() {
+        let real_root = TempDir::new().unwrap();
+        make_synced_conventions_dir(&real_root, &[]);
+        let link_parent = TempDir::new().unwrap();
+        let root_link = link_parent.path().join("workspace-link");
+        std::os::unix::fs::symlink(real_root.path(), &root_link).unwrap();
+
+        let result = update_convention_index(&root_link);
+        let err = result.unwrap_err();
+        assert!(matches!(&err, ConventionDocsError::Io { .. }), "{err:?}");
+        assert!(err.to_string().contains("refusing to use symlinked root"));
+    }
+
     // -----------------------------------------------------------------------
     // add_convention_doc
     // -----------------------------------------------------------------------
@@ -719,7 +858,7 @@ mod tests {
         for (name, content) in docs {
             std::fs::write(dir.join(name), content).unwrap();
         }
-        let readme = make_readme_with_block(&dir);
+        let readme = make_readme_with_block(tmp.path(), &dir);
         std::fs::write(dir.join("README.md"), readme).unwrap();
     }
 
@@ -759,6 +898,23 @@ mod tests {
             matches!(result, Err(ConventionDocsError::AlreadyExists(_))),
             "expected AlreadyExists, got: {result:?}"
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_add_convention_doc_symlinked_target_errors_before_write() {
+        let tmp = TempDir::new().unwrap();
+        let outside = TempDir::new().unwrap();
+        make_synced_conventions_dir(&tmp, &[]);
+        let target = tmp.path().join("knowledge").join("conventions").join("testing.md");
+        let outside_target = outside.path().join("testing.md");
+        std::fs::write(&outside_target, "# Outside\n").unwrap();
+        std::os::unix::fs::symlink(&outside_target, &target).unwrap();
+
+        let result = add_convention_doc(tmp.path(), "testing", None, None, None);
+        let err = result.unwrap_err();
+        assert!(matches!(&err, ConventionDocsError::Io { .. }), "{err:?}");
+        assert!(err.to_string().contains("refusing to follow symlink"));
     }
 
     #[test]

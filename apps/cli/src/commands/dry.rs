@@ -8,17 +8,14 @@
 //! No domain types are imported here (CN-02). The `filter` arg is passed as
 //! a string to `DryResultsInput`; cli-composition parses it to `VerdictFilter`.
 
-use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand, ValueEnum};
-use cli_composition::{
-    DryCheckApprovedInput, DryCompositionRoot, DryFixRunnerCompositionRoot, DryResultsInput,
-    DryWriteInput, RunDryFixLocalInput,
-};
+use cli_composition::DryCompositionRoot;
+use cli_driver::dry::DryInput;
 
-use crate::commands::outcome_to_exit;
+use crate::commands::driver_outcome_to_exit;
 
 // ── sotp dry ──────────────────────────────────────────────────────────────────
 
@@ -88,7 +85,7 @@ pub struct DryWriteArgs {
 
 /// Execute `sotp dry write`.
 pub fn execute_dry_write(args: DryWriteArgs) -> ExitCode {
-    outcome_to_exit(DryCompositionRoot::new().dry_write(DryWriteInput {
+    driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::Write {
         track_id: args.track_id,
         base_commit: args.base_commit,
         db_path: args.db_path,
@@ -151,7 +148,7 @@ pub struct DryResultsArgs {
 ///
 /// INFORMATIONAL — always exits 0 on successful read.
 pub fn execute_dry_results(args: DryResultsArgs) -> ExitCode {
-    outcome_to_exit(DryCompositionRoot::new().dry_results(DryResultsInput {
+    driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::Results {
         track_id: args.track_id,
         filter: args.filter.as_filter_str().to_owned(),
         items_dir: args.items_dir,
@@ -195,7 +192,7 @@ pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    outcome_to_exit(DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
+    driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::CheckApproved {
         track_id,
         base_commit: args.base_commit,
         items_dir: args.items_dir,
@@ -229,29 +226,11 @@ pub struct DryFixLocalArgs {
 /// the DRY gate passes, the loop is exhausted, or a tooling error occurs.
 /// Emits exactly one of: `completed`, `blocked`, or `failed`.
 pub fn execute_dry_fix_local(args: DryFixLocalArgs) -> ExitCode {
-    let input = RunDryFixLocalInput {
+    driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::FixLocal {
         track_id: args.track_id,
         briefing_file: args.briefing_file,
         model: args.model,
-    };
-    match DryFixRunnerCompositionRoot::new().dry_run_fix_local(input) {
-        Ok(outcome) => {
-            if let Some(msg) = &outcome.stderr {
-                eprintln!("{msg}");
-            }
-            if let Some(line) = &outcome.stdout {
-                if let Err(e) = writeln!(io::stdout(), "{line}") {
-                    eprintln!("failed to write stdout: {e}");
-                    return ExitCode::from(1);
-                }
-            }
-            ExitCode::from(outcome.exit_code)
-        }
-        Err(msg) => {
-            eprintln!("{msg}");
-            ExitCode::from(1)
-        }
-    }
+    }))
 }
 
 // ── Dispatch ──────────────────────────────────────────────────────────────────

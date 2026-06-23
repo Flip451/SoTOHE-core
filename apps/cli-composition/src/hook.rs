@@ -33,6 +33,31 @@ impl Default for HookCompositionRoot {
     }
 }
 
+impl HookCompositionRoot {
+    /// Build a wired [`cli_driver::hook::HookDriver`] for the hook family.
+    ///
+    /// Reads process environment values here (composition root responsibility per CN-02)
+    /// and passes them to the use-case interactor.
+    pub fn hook_driver(&self) -> cli_driver::hook::HookDriver {
+        use infrastructure::shell::ConchShellParser;
+        use usecase::hook_dispatch::HookDispatchInteractor;
+
+        let guarded_git_token_present = std::env::var("SOTP_GUARDED_GIT").is_ok();
+        let hooks_path_configured = hooks_path_configured();
+        let project_dir = std::env::var("CLAUDE_PROJECT_DIR").ok().map(PathBuf::from);
+
+        let parser_port = Arc::new(ConchShellParser);
+        let service = Arc::new(HookDispatchInteractor::new(
+            parser_port,
+            project_dir,
+            guarded_git_token_present,
+            hooks_path_configured,
+        ));
+
+        cli_driver::hook::HookDriver::new(service)
+    }
+}
+
 /// CLI-layer serde type for Claude Code hook JSON envelope.
 /// Security-critical fields (`tool_name`) must NOT use `#[serde(default)]` —
 /// parse failure is caught at the CLI boundary.
@@ -178,6 +203,7 @@ impl HookCompositionRoot {
                 command: None,
                 file_path: None,
                 content: None,
+                git_hook_args: hook_args.clone(),
             }
         } else {
             // Read stdin JSON
@@ -205,6 +231,7 @@ impl HookCompositionRoot {
                 command: envelope.tool_input.command,
                 file_path: envelope.tool_input.file_path,
                 content: envelope.tool_input.content,
+                git_hook_args: vec![],
             }
         };
 

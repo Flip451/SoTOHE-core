@@ -1,7 +1,17 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b7b2ac6c14598cb7569b277a9aad199c387cb1846ddf5d3ba41df0272d40110e",
+  "catalogue_declaration_hash": "ad424f87c3e9356e320083d283c8c91b4eb6dd89ec30dbd72122ae0d35e6da5b",
   "signals": [
+    {
+      "type_name": "ArchInteractor",
+      "signal": "blue",
+      "entry_hash": "ce0d635d422535dd653922220e56c954f491cdcb13f66d5b327d4e5419dcce93"
+    },
+    {
+      "type_name": "ArchPortError",
+      "signal": "blue",
+      "entry_hash": "858f34999d509009303f66eaa5a2cb8fb94c3be5f12d17fdc2ad4efff9b3430d"
+    },
     {
       "type_name": "ArchivedTrackTelemetryCommand",
       "signal": "blue",
@@ -18,9 +28,54 @@
       "entry_hash": "c2bb1949dede04ea097b94bdc0eef576b6460ab68635b2560fb649b8d09b7988"
     },
     {
+      "type_name": "CheckApprovedOutcome",
+      "signal": "blue",
+      "entry_hash": "cb6b5500250131c272ab792e9f507ba3d890486a62762e49142eb472a9d3e0a8"
+    },
+    {
+      "type_name": "ConventionsInteractor",
+      "signal": "blue",
+      "entry_hash": "bfd2b5210ee3923a694225df8e3240e3737f8a1ea4ca0dc01db7df92e8091a97"
+    },
+    {
+      "type_name": "ConventionsPortError",
+      "signal": "blue",
+      "entry_hash": "746d7c2b16a68bfc73490530c50d3d5e8e055bdac61aac40f7ed23bb67de3552"
+    },
+    {
       "type_name": "D4OrchestrationError",
       "signal": "blue",
       "entry_hash": "0c8d486901cac67352006a3ee9798698bec97dbcbf009288bfd33029b98447aa"
+    },
+    {
+      "type_name": "DemoInteractor",
+      "signal": "blue",
+      "entry_hash": "5e8275f04a7e985b4279909c095b73b58f086a2d02609e21e330eaff1ecf2176"
+    },
+    {
+      "type_name": "DemoPortError",
+      "signal": "blue",
+      "entry_hash": "f9c3ffe90eb8c27e49b8d2a517efa112680d37708b81363fdd72732565867f16"
+    },
+    {
+      "type_name": "DryCheckApprovedDriverInput",
+      "signal": "blue",
+      "entry_hash": "692c9f0041e573499b0f8c365414b2d70d1b97901c9a67d9f90f008879f982ef"
+    },
+    {
+      "type_name": "DryDriverInteractor",
+      "signal": "blue",
+      "entry_hash": "56a3a2998371efd944e80de196866a9d1eefdd69c0f609ef17ceb0ede1ccb04e"
+    },
+    {
+      "type_name": "DryDriverOutcome",
+      "signal": "blue",
+      "entry_hash": "ede823905bc171d2e083f279468a4b5c1b71962da11a8d7ecb3f311eed7af930"
+    },
+    {
+      "type_name": "DryFixLocalDriverInput",
+      "signal": "blue",
+      "entry_hash": "eb3c98d053beee760178fac356a24ea48c9752aec32c72baed939168d73a8040"
     },
     {
       "type_name": "DryFragmentPipelineCommand",
@@ -38,6 +93,46 @@
       "entry_hash": "85ab02a01a6e5564eded78d52b0c4a830bb51f8faa1da00a25c47dbdc013cf33"
     },
     {
+      "type_name": "DryResultsDriverInput",
+      "signal": "blue",
+      "entry_hash": "84dcba81085bed53c14fdf628d4c0d36d6e2489906e25ac440fbbe7f80aff0c1"
+    },
+    {
+      "type_name": "DryWriteDriverInput",
+      "signal": "blue",
+      "entry_hash": "59fa8e5f708f4b2c4e201b4a51fd69b7aebd53cfa7eb988ba97314c4f0f8641c"
+    },
+    {
+      "type_name": "DupCheckDriverInput",
+      "signal": "blue",
+      "entry_hash": "f6e6f31cd888a5b6dfeee095835204317f6d82fe4941863c9ef63029f441500d"
+    },
+    {
+      "type_name": "ExportSchemaCommand",
+      "signal": "blue",
+      "entry_hash": "cf95515f3072efeba958787f8ca34000ed52f0c81aa43a744751da24be61da8b"
+    },
+    {
+      "type_name": "ExportSchemaError",
+      "signal": "blue",
+      "entry_hash": "94d383fc9c89cbbf2a3c786b7c222c754b4e0cfec003fc9448c6a24cd06bd949"
+    },
+    {
+      "type_name": "ExportSchemaInteractor",
+      "signal": "blue",
+      "entry_hash": "594306de03685b34b4109677415baf5ad2d7e176498baa50529643f45c3e4960"
+    },
+    {
+      "type_name": "FilePortError",
+      "signal": "blue",
+      "entry_hash": "32377301c3f81a799f51741e59d0ee03611ccaf177aef554cd97a3dcf60000b4"
+    },
+    {
+      "type_name": "FindSimilarDriverInput",
+      "signal": "blue",
+      "entry_hash": "ad7f82dc5ea7614545864382173a52a9c47a566d6f08cc31cb749c82048feb2d"
+    },
+    {
       "type_name": "FixpointDryGateCommand",
       "signal": "blue",
       "entry_hash": "6875c8ebdaacf320ba1e7afa85b70a8a73be61bee81a774a51d7cabc181f6fac"
@@ -51,6 +146,66 @@
       "type_name": "FixpointDryGateOutput",
       "signal": "blue",
       "entry_hash": "7bd1430d282ddb2de64a60dbd9ed2e622641431ecb8a120c87d1f2d9b85216f3"
+    },
+    {
+      "type_name": "GitWorkflowError",
+      "signal": "blue",
+      "entry_hash": "e78a17c5e177580da388f852f7cd11b0b5a63b7e5c5a8bd554d6197739722210"
+    },
+    {
+      "type_name": "GitWorkflowInteractor",
+      "signal": "blue",
+      "entry_hash": "9059a1454f9e5ce84106a426d11759f75ce09593dd3e11d9581d800efc8e38bf"
+    },
+    {
+      "type_name": "GitWorkflowResult",
+      "signal": "blue",
+      "entry_hash": "043bfda852d0d27a90edc990f452e2738dae34f5934c3780eaff268db67cde0c"
+    },
+    {
+      "type_name": "HookDispatchCommand",
+      "signal": "blue",
+      "entry_hash": "728fa4609f1f4de0ba2e1fab4bdffeb90cd951ce38df400ff8b1f845e07b6a3f"
+    },
+    {
+      "type_name": "HookDispatchError",
+      "signal": "blue",
+      "entry_hash": "1652a5acbf1bf96f039d8655f8326197c82da363b3039e8b953e2bdb7a977cc0"
+    },
+    {
+      "type_name": "HookDispatchInteractor",
+      "signal": "blue",
+      "entry_hash": "ada633730c263ab6aef4a2b3772bc71ae37754bd8e3f6fcc8004fd24469673b2"
+    },
+    {
+      "type_name": "HookVerdictDecision",
+      "signal": "blue",
+      "entry_hash": "b41ee119962ee40180a70ef30530f8f88264967626e95cc2557c60066f05774a"
+    },
+    {
+      "type_name": "HookVerdictOutput",
+      "signal": "blue",
+      "entry_hash": "1390c3328f9f49a54d8ca37062d30e2234664e956d292042d1ac219fc1fa5b65"
+    },
+    {
+      "type_name": "IndexBuildDriverInput",
+      "signal": "blue",
+      "entry_hash": "ba54cc73517f5df3d5b060a54a36313ddaf722c9ebbec9424ea4be39ef28b36e"
+    },
+    {
+      "type_name": "IndexMeasureQualityDriverInput",
+      "signal": "blue",
+      "entry_hash": "06df61de70869e6d402524243f4b2b5cca6d1714c625fa23df7702ae764ab1d7"
+    },
+    {
+      "type_name": "PrCommandInteractor",
+      "signal": "blue",
+      "entry_hash": "4acb5979f9c92d961c1797de39c57d4238f3b974a375743800135f4dcad29de6"
+    },
+    {
+      "type_name": "PrCommandOutput",
+      "signal": "blue",
+      "entry_hash": "85420ddf1e021d679a55bb547cf957c2dd429c26a9ce114b753a642384f281a9"
     },
     {
       "type_name": "PrReviewPollingCommand",
@@ -68,9 +223,94 @@
       "entry_hash": "7588733540c1c5146f300e3056efa9087ec8939831a5646ac265485cd1f3e98f"
     },
     {
+      "type_name": "RefVerifyAggregateInteractor",
+      "signal": "blue",
+      "entry_hash": "28a86a7c8dfc1a9d6c68ff4f828f83331daa59e72a869eb5e73ffb4277d7e230"
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInteractor",
+      "signal": "blue",
+      "entry_hash": "f81b4afdf1bb6905648b08e737669c1dd01422427f1ab995d5f26ec01c4973a2"
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedOutcome",
+      "signal": "blue",
+      "entry_hash": "172e97496a2778e22d02883f1fd460f3d46b77aeff254e65712893e047d53bec"
+    },
+    {
+      "type_name": "RefVerifyDriverError",
+      "signal": "blue",
+      "entry_hash": "8773177a57ffdefea474a65a4a951896d906ae51d325b4e2ae2154330ac9f46b"
+    },
+    {
+      "type_name": "RefVerifyRunOutcome",
+      "signal": "blue",
+      "entry_hash": "93d30ff7198d964e0d0eee92f256b141f9efa80d071aad03ae35bf4e61e4005f"
+    },
+    {
+      "type_name": "ReviewClassifyInteractor",
+      "signal": "blue",
+      "entry_hash": "9689b24ae7e0e89bd9317464b4902ad2e484111101ffa789db4690398137e599"
+    },
+    {
+      "type_name": "ReviewFilesInteractor",
+      "signal": "blue",
+      "entry_hash": "730f3b9d086638eaa8ffd565955c4c6b5ba4c459f865237c9fa67f1c7f2546cf"
+    },
+    {
+      "type_name": "ReviewGetBriefingInteractor",
+      "signal": "blue",
+      "entry_hash": "3f4cf6531a94b2671f4af16094a3e0a5c4a4d45dc435dd9957c83f3c4928830f"
+    },
+    {
+      "type_name": "ReviewResultsInteractor",
+      "signal": "blue",
+      "entry_hash": "1881aeb8eee91ede32601d5672af979e6b94ea3070a6e7e0d4a9b99d28d61beb"
+    },
+    {
+      "type_name": "ReviewRunFixInput",
+      "signal": "blue",
+      "entry_hash": "15352267549a9ced31d7297430690d171a6a141f48d49faee3cec8e73f9502d7"
+    },
+    {
+      "type_name": "ReviewRunInput",
+      "signal": "blue",
+      "entry_hash": "1009727f2164dc75990c26fafe40b2400d662fa202b2df2fb0ae9591fe0dbb2e"
+    },
+    {
+      "type_name": "ReviewRunLocalInteractor",
+      "signal": "blue",
+      "entry_hash": "aa4bf16157c19d4ef89ad5c1211dd776461e50a845ae4303bbf711ad56bc8d81"
+    },
+    {
+      "type_name": "ReviewRunLocalOutput",
+      "signal": "blue",
+      "entry_hash": "bba5aa0a28f0dd937070ce930a6b69ead5f18049b98d12551c9b8e5475d84eaf"
+    },
+    {
+      "type_name": "ReviewValidateScopeInteractor",
+      "signal": "blue",
+      "entry_hash": "11b861574801426a202d802b10f9035635a8cb06182b9590ab16c8bac75f3386"
+    },
+    {
+      "type_name": "SemanticDupDriverInteractor",
+      "signal": "blue",
+      "entry_hash": "28dc42943d5f7c7f769783420cf354f0c94a88d277b4cd32b9a5bbf0de91faf4"
+    },
+    {
+      "type_name": "SemanticDupDriverOutcome",
+      "signal": "blue",
+      "entry_hash": "4b92a36ad9169de9b3605739dd85aa40a264a452971f93a44a26d50c321ea577"
+    },
+    {
       "type_name": "SignalChainOutput",
       "signal": "blue",
       "entry_hash": "3fa572ea86eecec90605a43de50a4d911dfabc185896a5993a8f4913601df194"
+    },
+    {
+      "type_name": "SignalCommandOutput",
+      "signal": "blue",
+      "entry_hash": "56805a0a5efe51e61b73b33f39d244587b01c8ebe0d3a92161311d1ca221c4cf"
     },
     {
       "type_name": "SignalGateCommand",
@@ -86,6 +326,11 @@
       "type_name": "SignalGateInteractor",
       "signal": "blue",
       "entry_hash": "d2d548edc6d19405e797141f3b597defdd97182969125a818295d179aaab4dc8"
+    },
+    {
+      "type_name": "SignalGateName",
+      "signal": "blue",
+      "entry_hash": "7da10fb4f59914bad2753919898048d9c8f37fbcf1e32dd4a81f6182a7d8ff3b"
     },
     {
       "type_name": "SignalGateOutput",
@@ -113,9 +358,89 @@
       "entry_hash": "f7c7515d5ce502de70c0e07d6323a06fe1fd8e6e00e049051db905556d2fb83d"
     },
     {
+      "type_name": "TelemetryAggregateInteractor",
+      "signal": "blue",
+      "entry_hash": "8a771311499d1d15d1aaeda7609ae34fb79b3844f2ac591bd79d535c51564262"
+    },
+    {
+      "type_name": "TelemetryAggregateServiceError",
+      "signal": "blue",
+      "entry_hash": "4f77286dd1924737ef5a82ce645996a271ed3d1e4c8098b75e59305db9e9041e"
+    },
+    {
+      "type_name": "TelemetryEmitDynamicPortError",
+      "signal": "blue",
+      "entry_hash": "4534d3f0b7f4ae16bd267963b0a4e6e5de551d75286be20a7dee26341a6ba7c3"
+    },
+    {
+      "type_name": "TelemetryErrorEntry",
+      "signal": "blue",
+      "entry_hash": "7adbae8b76728c950dfe51df61f299a24c8b531815d626dabb98520c8ec76030"
+    },
+    {
+      "type_name": "TelemetryHookBlockEntry",
+      "signal": "blue",
+      "entry_hash": "9301937762e9563b84437697a8333a42788256e5b8d351b3f3f6e47e1f26af9d"
+    },
+    {
+      "type_name": "TelemetryPhaseDuration",
+      "signal": "blue",
+      "entry_hash": "1416ed8e53ba788563b12832200c7b45595cad24cd23e2dd52d7f477857c1aa0"
+    },
+    {
+      "type_name": "TelemetryReportError",
+      "signal": "blue",
+      "entry_hash": "2fd2324f2245427be19901c97c18e8379428df6c6c6f6c5119da15dc9960de5f"
+    },
+    {
+      "type_name": "TelemetryReportInteractor",
+      "signal": "blue",
+      "entry_hash": "79d80b5b752a059c33ab57ec269bcde55de1321ed4954316f8fe8c01c54866ec"
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "signal": "blue",
+      "entry_hash": "229c88be3272ce0ac3f938f22c136c83043da9808629661ba9d0c221b455747d"
+    },
+    {
+      "type_name": "TrackCommandOutput",
+      "signal": "blue",
+      "entry_hash": "f52ee3f7cae1e2789c5b98bc432aa5cb038ea87227789a15e3d90d9bc61be1aa"
+    },
+    {
+      "type_name": "VerifyIndexResult",
+      "signal": "blue",
+      "entry_hash": "e78c6d7850ab3837abcdc44d7700dd3706367e0a3e4ae188012e97e6190c8204"
+    },
+    {
+      "type_name": "VerifyInteractor",
+      "signal": "blue",
+      "entry_hash": "ad6a07372737663fc57e1b7f83e7ed594341af159d68250c012ebb2e41b78617"
+    },
+    {
+      "type_name": "VerifyOutcome",
+      "signal": "blue",
+      "entry_hash": "57e7480449f942abdd6c7022ab1bb3fc62f27305d8608b2dbf681b4dc8453cdb"
+    },
+    {
+      "type_name": "VerifyPortError",
+      "signal": "blue",
+      "entry_hash": "9b3a1c5289210640b9417fedfb0fd7d2a0694380d523a3f23347801cff8066b4"
+    },
+    {
       "type_name": "AdrChainRunnerPort",
       "signal": "blue",
       "entry_hash": "ab6d9b08c72976170e794ecf02676a1cef08d9fecd4c39d0c50ecca7c03695c4"
+    },
+    {
+      "type_name": "ArchPort",
+      "signal": "blue",
+      "entry_hash": "c1a4279124c42c6897369b6b8c137130469b92fcfab91bdfd2ec423e49075261"
+    },
+    {
+      "type_name": "ArchService",
+      "signal": "blue",
+      "entry_hash": "1b7980a543ab93ae12f767c4d8364aa7078caa69d0d93526d0435a95d86e61ad"
     },
     {
       "type_name": "ArchivedTrackTelemetryPort",
@@ -136,6 +461,26 @@
       "type_name": "CodeFragmentExtractorPort",
       "signal": "blue",
       "entry_hash": "9ea7aaf2bfb107513cfadd4b5248f89ebfe69b1a999de98a53e70ed72e6d2359"
+    },
+    {
+      "type_name": "ConventionsPort",
+      "signal": "blue",
+      "entry_hash": "da1e8b09d8ecb1dbfaaefb1a2ecd5b11bdf9f0ed0180b0d221ebc869a4b71c94"
+    },
+    {
+      "type_name": "ConventionsService",
+      "signal": "blue",
+      "entry_hash": "0b5c8afe71511a9a583011328637a0e9857dbc7a304d944cda45dee28e588eed"
+    },
+    {
+      "type_name": "DemoPort",
+      "signal": "blue",
+      "entry_hash": "7a5364f38c7c2a2ef4098b8bc13d1839ffa4921e48206adcb1b8871c25ab8955"
+    },
+    {
+      "type_name": "DemoService",
+      "signal": "blue",
+      "entry_hash": "f90337295c50867213e6a53d1220e95de621cf194dfd4663142bb1dc1b642a0d"
     },
     {
       "type_name": "DiffBaseResolverPort",
@@ -168,9 +513,24 @@
       "entry_hash": "eaa0cb0fecd06da4bd73b50e3e0147d29523790c080221ca3a88457a328d85aa"
     },
     {
+      "type_name": "DryDriverPort",
+      "signal": "blue",
+      "entry_hash": "0ebbe295c98f5116b052573617b32499c36dc9b287706e39de86df36d15f26fd"
+    },
+    {
+      "type_name": "DryDriverService",
+      "signal": "blue",
+      "entry_hash": "e60071dfa1f1f41ff276a397f619692b32127579dfa7fe17bc7c4f16687ba254"
+    },
+    {
       "type_name": "DryFragmentPipelineService",
       "signal": "blue",
       "entry_hash": "5157fb21a218e6dec26920b630a70f3647e97adae869fc8a83e95b0baca76fcd"
+    },
+    {
+      "type_name": "FileWritePort",
+      "signal": "blue",
+      "entry_hash": "0e0b015ed7c3e28bc79b7a61e2869917e1e32c74a8ec978d97acf1c0df6b5380"
     },
     {
       "type_name": "FixpointDryGateService",
@@ -178,9 +538,24 @@
       "entry_hash": "333484f73cb9ec2c294eab3779d52efbcad8a3dc39fe4217c3f7d1fc38b979c3"
     },
     {
+      "type_name": "GitWorkflowService",
+      "signal": "blue",
+      "entry_hash": "4146e3eb1cf1820a67b08b5da899b1230c21122f366cb776d08bc3cc01d48cda"
+    },
+    {
+      "type_name": "HookDispatchService",
+      "signal": "blue",
+      "entry_hash": "7b1bdcfad4f5e4d48fd5378b7a27c74f22b6624162a87161fee129ff6c304915"
+    },
+    {
       "type_name": "LayerChainRunnerPort",
       "signal": "blue",
       "entry_hash": "5224ec9e15efa26fe7ebc2df3aabcb76ee57f34accdb439dbdd46747a6ffc9b2"
+    },
+    {
+      "type_name": "PrCommandService",
+      "signal": "blue",
+      "entry_hash": "ce85fddcead7714aeeb1597f68bd6309c0fcb12a546df8bb51479a0705ae0c84"
     },
     {
       "type_name": "PrListIssueCommentsPort",
@@ -208,14 +583,79 @@
       "entry_hash": "786a571d30ce27b6311119345afeeba2022f453abc19af719f51b68a9d59446b"
     },
     {
+      "type_name": "RefVerifyAggregateService",
+      "signal": "blue",
+      "entry_hash": "a6d3c7f4bee89789a7cfaa4265638afb3fdafb74633e0dd099485317b7bb7f97"
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedDriverService",
+      "signal": "blue",
+      "entry_hash": "8d25b6a7cf882ffbbdcfbedabc3e79e6c3b227cdedd2ff16bf13102891bc4abc"
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedService",
+      "signal": "blue",
+      "entry_hash": "c221d21e8173e0fa799cf96139ff78958b24406946e979fef4ccdf8214be305c"
+    },
+    {
       "type_name": "RefVerifyGateStatePort",
       "signal": "blue",
       "entry_hash": "552554e2dd4a506cb228d15477a15bc170c5a79e7cbb222aa946c37fe102adfe"
     },
     {
+      "type_name": "RefVerifyRunService",
+      "signal": "blue",
+      "entry_hash": "851ebf3cc0aeec00c523f65f8f422124198def87b1e0d56293eb81769545a7f9"
+    },
+    {
+      "type_name": "ReviewClassifyService",
+      "signal": "blue",
+      "entry_hash": "5a91346c4a353aa50b1901c15e8e16b7bb0f8bb00fb689fe8723f497f61336d3"
+    },
+    {
+      "type_name": "ReviewFilesService",
+      "signal": "blue",
+      "entry_hash": "bfa1af1eaa43028ce5a3f36a2390af642c6dc4e607f5d664e7e0aef4d472c578"
+    },
+    {
       "type_name": "ReviewGateStatePort",
       "signal": "blue",
       "entry_hash": "9e0920b0a8172e0c1c436c17a723fbe32974c89b1945d153b875252e7eb20c01"
+    },
+    {
+      "type_name": "ReviewGetBriefingService",
+      "signal": "blue",
+      "entry_hash": "bb4cd6ed6e11635fa52e25a2f229a6138311093c980b30ba963ade9af8bb921f"
+    },
+    {
+      "type_name": "ReviewResultsService",
+      "signal": "blue",
+      "entry_hash": "b91eef3ab1d9dd077ce30b6c2188e16c42e4ce7877780cfaf2223dcf185b822a"
+    },
+    {
+      "type_name": "ReviewRunLocalService",
+      "signal": "blue",
+      "entry_hash": "0df2630177ac7b56a197fdfc2a84e84f46a191f6ee06bba5a21ab7c458ad63fb"
+    },
+    {
+      "type_name": "ReviewService",
+      "signal": "blue",
+      "entry_hash": "7cdc118e99c7b98566ec0da73ceb68ae3b761fc497fce8bdec06a73033e3adbe"
+    },
+    {
+      "type_name": "ReviewValidateScopeService",
+      "signal": "blue",
+      "entry_hash": "2320db7f12887614f9c74bba81e71f41674829a141c952b540a8f3faee68023f"
+    },
+    {
+      "type_name": "SemanticDupDriverPort",
+      "signal": "blue",
+      "entry_hash": "14aed4e78b29c0bc665441cbbe7d2860a5296c8e867630526a1fafed7564538e"
+    },
+    {
+      "type_name": "SemanticDupDriverService",
+      "signal": "blue",
+      "entry_hash": "8a914a6e5f7ffd3926e3a22165e1e8dbfeb91c7692060d437a9a6d58ad19272b"
     },
     {
       "type_name": "SemanticIndexPort",
@@ -226,6 +666,11 @@
       "type_name": "SignalGateService",
       "signal": "blue",
       "entry_hash": "64b45db0268678415ff9a57387437f125b23b0d1e163543c2dfc35b1cb1bc687"
+    },
+    {
+      "type_name": "SignalService",
+      "signal": "blue",
+      "entry_hash": "5d22aa68a14606bc37d96660c655c6678c17f574614adba589aab27c3c541628"
     },
     {
       "type_name": "SleepPort",
@@ -246,6 +691,46 @@
       "type_name": "SpecFileWriterPort",
       "signal": "blue",
       "entry_hash": "722be16a1a409faaf051646abaf05f5e50a9821b7d646fe11083f172bc2cc09d"
+    },
+    {
+      "type_name": "TelemetryAggregateService",
+      "signal": "blue",
+      "entry_hash": "d839b7f6b01c5454d4502162efef398ad86f32f94e1c3122ddc620ed7d02da23"
+    },
+    {
+      "type_name": "TelemetryEmitDynamicPort",
+      "signal": "blue",
+      "entry_hash": "3b3abb7d3d2db97631d75ce5591647c58d5d27c978419a3be2392be991f4472c"
+    },
+    {
+      "type_name": "TelemetryReportPort",
+      "signal": "blue",
+      "entry_hash": "18f3c6f36fdb4523929813c78a87293e0258dcdd2cdda7055b3f8f7d6ee272b4"
+    },
+    {
+      "type_name": "TelemetryReportService",
+      "signal": "blue",
+      "entry_hash": "102ccdbe3b5d3feced185b16be728454d4870e649a8030946cecaf11de24a690"
+    },
+    {
+      "type_name": "TrackService",
+      "signal": "blue",
+      "entry_hash": "ec77a74d49531c7365c17dfb11cdc46214f80efd64cedf207be97410146a7ac6"
+    },
+    {
+      "type_name": "VerifyPort",
+      "signal": "blue",
+      "entry_hash": "5017b38c869b6bcee8ad382d560ea88bd63b3b049d38ad1187bc4b885bf14985"
+    },
+    {
+      "type_name": "VerifyService",
+      "signal": "blue",
+      "entry_hash": "e49d0af0e214115a134004f9b047c6901000beaf8f92bc6b274de9f1875898f9"
+    },
+    {
+      "type_name": "usecase::telemetry::format_report",
+      "signal": "blue",
+      "entry_hash": "1c99a59e557c5221e5e16c72a939fce046710a3cfb1f80f69b20e01ce5d4d63b"
     }
   ]
 }

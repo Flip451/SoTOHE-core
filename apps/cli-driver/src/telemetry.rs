@@ -1,24 +1,13 @@
-// STAGED FOR T021 — not yet compiled; Cargo.toml + workspace member added atomically in T021 per CN-06.
-//
 //! `telemetry` command family — primary adapter driver.
 //!
-//! `TelemetryDriver` holds injected use-case interactors and exposes
-//! `handle(input) -> CommandOutcome`.  The formatting helpers here mirror
-//! `apps/cli-composition/src/telemetry.rs`;
-//! T021 removes the `cli_composition` duplicate when the live path is flipped.
+//! `TelemetryDriver` holds a single injected `TelemetryAggregateService` and
+//! exposes `handle(input) -> CommandOutcome`. One injected interactor — no
+//! per-service fields (D3/D4 cli_driver policy).
 
-// TODO(T021): add use-case + infrastructure imports once Cargo.toml is materialized.
-// use std::path::{Path, PathBuf};
-// use std::sync::Arc;
-// use infrastructure::FsArchivedTrackTelemetryAdapter;
-// use infrastructure::git_cli::GitRepository as _;
-// use infrastructure::telemetry::{TelemetryReport, TelemetryReportOutput, PhaseDuration, ...};
-// use usecase::telemetry::{
-//     ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryInteractor,
-//     ArchivedTrackTelemetryService as _,
-// };
+use std::path::PathBuf;
+use std::sync::Arc;
 
-use std::path::{Path, PathBuf};
+use usecase::TelemetryAggregateService;
 
 use crate::render::CommandOutcome;
 
@@ -47,6 +36,10 @@ pub enum TelemetryInput {
         track_id: String,
         /// Opaque CLI subcommand label (e.g. `"track archive"`).
         subcommand: String,
+        /// Process exit code.
+        exit_code: i32,
+        /// Wall-clock duration in milliseconds.
+        duration_ms: u64,
     },
 }
 
@@ -56,84 +49,58 @@ pub enum TelemetryInput {
 
 /// Primary adapter driver for the `telemetry` command family.
 ///
-/// Holds injected use-case interactors; exposes `handle(input) -> CommandOutcome`.
+/// Holds a single injected `TelemetryAggregateService`; exposes
+/// `handle(input) -> CommandOutcome`. One injected interactor — no per-service
+/// fields (D3/D4 cli_driver policy).
 pub struct TelemetryDriver {
-    // TODO(T021): inject use-case interactors here (currently this family has
-    // no injectable adapter dependencies — infrastructure functions are called
-    // inline, same as cli_composition::TelemetryCompositionRoot).
+    service: Arc<dyn TelemetryAggregateService>,
 }
 
 impl TelemetryDriver {
-    /// Create a new `TelemetryDriver`.
-    ///
-    /// TODO(T021): accept injected interactors as parameters once the crate
-    /// dependency graph is materialized.
-    pub fn new() -> Self {
-        Self {}
+    /// Create a new `TelemetryDriver` with a single injected aggregate service.
+    pub fn new(service: Arc<dyn TelemetryAggregateService>) -> Self {
+        Self { service }
     }
 
     /// Handle a telemetry command.
-    ///
-    /// TODO(T021): wire real use-case invocation once Cargo.toml is materialized.
     pub fn handle(&self, input: TelemetryInput) -> CommandOutcome {
         match input {
             TelemetryInput::Report(input) => self.telemetry_report(input),
-            TelemetryInput::EmitArchivedTrackSubcommand { items_dir, track_id, subcommand } => {
-                self.telemetry_emit_archived_track_subcommand(&items_dir, &track_id, subcommand)
-            }
+            TelemetryInput::EmitArchivedTrackSubcommand {
+                items_dir,
+                track_id,
+                subcommand,
+                exit_code,
+                duration_ms,
+            } => self.telemetry_emit_archived(
+                items_dir,
+                track_id,
+                subcommand,
+                exit_code,
+                duration_ms,
+            ),
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Render helpers (logic duplicated from cli_composition/src/telemetry.rs;
-    // T021 removes the cli_composition copy).
-    // -----------------------------------------------------------------------
-
-    fn telemetry_report(&self, _input: TelemetryReportInput) -> CommandOutcome {
-        // TODO(T021): invoke infrastructure::telemetry::TelemetryReport::aggregate and
-        // format_report(&input.track_id, &output) here.
-        // Mirrors cli_composition/src/telemetry.rs TelemetryCompositionRoot::telemetry_report.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+    fn telemetry_report(&self, input: TelemetryReportInput) -> CommandOutcome {
+        match self.service.report(&input.track_id, &input.items_dir) {
+            Ok(text) => CommandOutcome::success(Some(text)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
+        }
     }
 
-    fn telemetry_emit_archived_track_subcommand(
+    fn telemetry_emit_archived(
         &self,
-        _items_dir: &Path,
-        _track_id: &str,
-        _subcommand: String,
+        items_dir: PathBuf,
+        track_id: String,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
     ) -> CommandOutcome {
-        // TODO(T021): derive project root, discover git repo, build
-        // FsArchivedTrackTelemetryAdapter + ArchivedTrackTelemetryInteractor
-        // and call interactor.emit(ArchivedTrackTelemetryCommand { subcommand }) here.
-        // Mirrors cli_composition/src/telemetry.rs TelemetryCompositionRoot::telemetry_emit_archived_track_subcommand.
-        CommandOutcome::failure(Some("cli_driver Driver::handle is not yet wired — apps/cli still routes through cli_composition CompositionRoot dispatch (deferred from T021); call the matching CompositionRoot method instead".to_owned()))
+        match self.service.emit_archived(&items_dir, &track_id, subcommand, exit_code, duration_ms)
+        {
+            Ok(()) => CommandOutcome::success(None),
+            Err(e) => CommandOutcome::failure(Some(format!("archived-track telemetry: {e}"))),
+        }
     }
-}
-
-impl Default for TelemetryDriver {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Formatting helpers (duplicated from cli_composition/src/telemetry.rs;
-// T021 removes the cli_composition copy).
-// ---------------------------------------------------------------------------
-
-/// Format a `TelemetryReportOutput` as a human-readable text report.
-///
-/// Mirrors `cli_composition::telemetry::format_report`.
-#[allow(dead_code)]
-fn format_report(track_id: &str, phase_section: &str) -> String {
-    // TODO(T021): accept `&infrastructure::telemetry::TelemetryReportOutput` and
-    // implement the full section-by-section format:
-    //   "Telemetry report for track: {track_id}"
-    //   "Phase durations:" / "  (no phase data recorded)"
-    //   "Errors ({n}):" / "  (none)" / "  [{timestamp}] {command} (exit {exit_code}): {error_chain}"
-    //   "Hook blocks ({n}):" / "  (none)" / "  [{timestamp}] {hook_name}"
-    //   "Skipped lines: {n}"
-    // Kept as a named stub with placeholder signature until T021.
-    let _ = phase_section;
-    format!("Telemetry report for track: {track_id}\n")
 }

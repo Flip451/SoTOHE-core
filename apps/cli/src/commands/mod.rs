@@ -4,6 +4,7 @@ use std::process::ExitCode;
 use std::time::Duration;
 
 use cli_composition::{CommandOutcome, CompositionError};
+use cli_driver::CommandOutcome as DriverOutcome;
 
 /// Polling interval for subprocess completion checks in CLI command adapters.
 ///
@@ -53,4 +54,18 @@ pub(crate) fn outcome_to_exit(result: Result<CommandOutcome, CompositionError>) 
             ExitCode::FAILURE
         }
     }
+}
+
+/// Convert a driver `CommandOutcome` directly into an `ExitCode`, printing stdout/stderr.
+///
+/// Used by call sites that use the new `<Name>CompositionRoot::new().<name>_driver().handle(...)`
+/// pattern, which returns `cli_driver::CommandOutcome` directly (not wrapped in `Result`).
+pub(crate) fn driver_outcome_to_exit(outcome: DriverOutcome) -> ExitCode {
+    if let Some(stdout) = outcome.stdout {
+        println!("{stdout}");
+    }
+    if let Some(stderr) = outcome.stderr {
+        eprintln!("{stderr}");
+    }
+    ExitCode::from(outcome.exit_code)
 }

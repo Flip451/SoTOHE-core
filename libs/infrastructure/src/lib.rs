@@ -9,6 +9,7 @@ pub mod codex_common;
 pub mod conventions;
 pub mod demo;
 pub mod dry_check;
+pub mod file_port;
 pub mod gh_cli;
 pub mod git_cli;
 pub mod impl_plan_codec;
@@ -29,15 +30,22 @@ pub mod telemetry;
 pub mod track;
 pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
+pub use git_cli::workflow_adapter::FsGitWorkflowAdapter;
 pub use pr_review::SystemSleepAdapter;
 pub use semantic_dup::fragment_extractor_adapter::CodeFragmentExtractorAdapter;
 pub use semantic_dup::noop_adapter::NoopSemanticIndexPort;
 pub use semantic_dup::null_insert_proxy::NullInsertIndexProxy;
 pub use telemetry::archived_track::FsArchivedTrackTelemetryAdapter;
+pub use telemetry::report_adapter::{FsTelemetryEmitDynamicAdapter, FsTelemetryReportAdapter};
 pub use track::fs_symlink_guard::FsSymlinkGuard;
 pub use track::gate_state::{FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter};
 pub mod type_catalogue_render;
 pub mod verify;
+pub mod verify_adapter;
+pub use ref_verify::{
+    FsRefVerifyAggregateAdapter, FsRefVerifyCheckApprovedAdapter, FsRefVerifyRunAdapter,
+};
+pub use verify_adapter::FsVerifyAdapter;
 
 /// Returns a `Timestamp` for the current UTC instant, truncated to whole seconds.
 ///

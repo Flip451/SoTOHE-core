@@ -659,6 +659,21 @@ impl DryCompositionRoot {
 
         Ok(dry_check_approved_outcome(verdict))
     }
+
+    /// Construct a wired [`cli_driver::dry::DryDriver`] for injection into the CLI.
+    ///
+    /// Builds `DryDriverAdapter` (which holds both `DryCompositionRoot` and
+    /// `DryFixRunnerCompositionRoot`), wraps it in `DryDriverInteractor`, and
+    /// returns a `DryDriver` ready to handle all `dry` subcommands.
+    pub fn dry_driver(&self) -> cli_driver::dry::DryDriver {
+        use usecase::dry_driver::DryDriverInteractor;
+
+        use crate::dry_driver_adapter::DryDriverAdapter;
+
+        let port = Arc::new(DryDriverAdapter::new());
+        let service = Arc::new(DryDriverInteractor::new(port));
+        cli_driver::dry::DryDriver::new(service)
+    }
 }
 
 /// `GateEval` telemetry fields for the `"dry"` gate (T007 / IN-07 / CN-10):

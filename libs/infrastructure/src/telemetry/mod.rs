@@ -14,6 +14,7 @@
 pub mod archived_track;
 pub mod config;
 pub mod report;
+pub mod report_adapter;
 pub mod writer;
 
 pub use config::TelemetryConfig;
@@ -21,6 +22,7 @@ pub use report::{
     PhaseDurationSummary, TelemetryErrorEntry, TelemetryHookBlockEntry, TelemetryReport,
     TelemetryReportError, TelemetryReportOutput,
 };
+pub use report_adapter::FsTelemetryReportAdapter;
 pub use writer::TelemetryWriter;
 
 use serde::{Deserialize, Serialize};

@@ -2,6 +2,7 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use infrastructure::git_cli::GitRepository as _;
 
@@ -299,6 +300,16 @@ impl GitCompositionRoot {
             }
             Err(_) => Ok(None),
         }
+    }
+
+    /// Build a wired [`cli_driver::git::GitDriver`] for the git family.
+    pub fn git_driver(&self) -> cli_driver::git::GitDriver {
+        use infrastructure::FsGitWorkflowAdapter;
+        use usecase::git_workflow::GitWorkflowInteractor;
+
+        let port = Arc::new(FsGitWorkflowAdapter::new());
+        let service = Arc::new(GitWorkflowInteractor::new(port));
+        cli_driver::git::GitDriver::new(service)
     }
 }
 

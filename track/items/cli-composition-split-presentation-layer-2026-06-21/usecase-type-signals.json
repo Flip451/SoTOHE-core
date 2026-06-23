@@ -1,13 +1,45 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-22T16:07:52Z",
-  "declaration_hash": "b7b2ac6c14598cb7569b277a9aad199c387cb1846ddf5d3ba41df0272d40110e",
+  "generated_at": "2026-06-23T08:03:24Z",
+  "declaration_hash": "ad424f87c3e9356e320083d283c8c91b4eb6dd89ec30dbd72122ae0d35e6da5b",
   "signals": [
     {
       "type_name": "AdrChainRunnerPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "ArchInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ArchService"
+      ]
+    },
+    {
+      "type_name": "ArchPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ArchPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ArchService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
     },
     {
       "type_name": "ArchivedTrackTelemetryCommand",
@@ -18,7 +50,7 @@
     {
       "type_name": "ArchivedTrackTelemetryError",
       "kind_tag": "error_type",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
         "core::error::Error",
@@ -48,10 +80,54 @@
       "found_type": true
     },
     {
+      "type_name": "CheckApprovedOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "CodeFragmentExtractorPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "ConventionsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ConventionsService"
+      ]
+    },
+    {
+      "type_name": "ConventionsPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ConventionsPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ConventionsService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
     },
     {
       "type_name": "D4OrchestrationError",
@@ -66,6 +142,38 @@
       ]
     },
     {
+      "type_name": "DemoInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "DemoService"
+      ]
+    },
+    {
+      "type_name": "DemoPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DemoPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "DemoService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "DiffBaseResolverPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
@@ -78,6 +186,16 @@
       "found_type": true
     },
     {
+      "type_name": "DryCheckApprovedDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "DryCheckDiffSource",
       "kind_tag": "secondary_port",
       "signal": "blue",
@@ -88,6 +206,47 @@
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "DryDriverInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "DryDriverService"
+      ]
+    },
+    {
+      "type_name": "DryDriverOutcome",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryDriverPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryDriverService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryFixLocalDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "DryFragmentPipelineCommand",
@@ -125,6 +284,90 @@
       "found_type": true
     },
     {
+      "type_name": "DryResultsDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryWriteDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DupCheckDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ExportSchemaCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ExportSchemaError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<FilePortError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ExportSchemaInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ExportSchemaService"
+      ]
+    },
+    {
+      "type_name": "FilePortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "FileWritePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FindSimilarDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "FixpointDryGateCommand",
       "kind_tag": "command",
       "signal": "blue",
@@ -156,8 +399,146 @@
       "found_type": true
     },
     {
+      "type_name": "GitWorkflowError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "GitWorkflowInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "GitWorkflowService"
+      ]
+    },
+    {
+      "type_name": "GitWorkflowResult",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "GitWorkflowService",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookDispatchCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "HookDispatchError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "HookDispatchInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "HookDispatchService"
+      ]
+    },
+    {
+      "type_name": "HookDispatchService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookVerdictDecision",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "HookVerdictOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "IndexBuildDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "IndexMeasureQualityDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "LayerChainRunnerPort",
       "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PrCommandInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "PrCommandService"
+      ]
+    },
+    {
+      "type_name": "PrCommandOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "PrCommandService",
+      "kind_tag": "application_service",
       "signal": "blue",
       "found_type": true
     },
@@ -221,9 +602,241 @@
       "found_type": true
     },
     {
+      "type_name": "RefVerifyAggregateInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "RefVerifyAggregateService"
+      ]
+    },
+    {
+      "type_name": "RefVerifyAggregateService",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedDriverService",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyCheckApprovedService"
+      ]
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyDriverError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RefVerifyRunOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyRunService",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewClassifyInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ReviewClassifyService"
+      ]
+    },
+    {
+      "type_name": "ReviewClassifyService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewFilesInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ReviewFilesService"
+      ]
+    },
+    {
+      "type_name": "ReviewFilesService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewGetBriefingInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ReviewGetBriefingService"
+      ]
+    },
+    {
+      "type_name": "ReviewGetBriefingService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewResultsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ReviewResultsService"
+      ]
+    },
+    {
+      "type_name": "ReviewResultsService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewRunFixInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewRunInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewRunLocalInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ReviewRunLocalService"
+      ]
+    },
+    {
+      "type_name": "ReviewRunLocalOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewRunLocalService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewValidateScopeInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ReviewValidateScopeService"
+      ]
+    },
+    {
+      "type_name": "ReviewValidateScopeService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SemanticDupDriverInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "SemanticDupDriverService"
+      ]
+    },
+    {
+      "type_name": "SemanticDupDriverOutcome",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "SemanticDupDriverPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SemanticDupDriverService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "SignalChainOutput",
       "kind_tag": "dto",
       "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "SignalCommandOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -261,6 +874,19 @@
       ]
     },
     {
+      "type_name": "SignalGateName",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
       "type_name": "SignalGateOutput",
       "kind_tag": "dto",
       "signal": "blue",
@@ -272,6 +898,12 @@
     },
     {
       "type_name": "SignalGateService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalService",
       "kind_tag": "application_service",
       "signal": "blue",
       "found_type": true
@@ -337,6 +969,187 @@
     {
       "type_name": "SpecFileWriterPort",
       "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryAggregateInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "TelemetryAggregateService"
+      ]
+    },
+    {
+      "type_name": "TelemetryAggregateService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryAggregateServiceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TelemetryEmitDynamicPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryEmitDynamicPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TelemetryErrorEntry",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TelemetryHookBlockEntry",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TelemetryPhaseDuration",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TelemetryReportError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TelemetryReportInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "TelemetryReportService"
+      ]
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TelemetryReportPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryReportService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackCommandOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TrackService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyIndexResult",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "VerifyService"
+      ]
+    },
+    {
+      "type_name": "VerifyOutcome",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "VerifyService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "usecase::telemetry::format_report",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     },

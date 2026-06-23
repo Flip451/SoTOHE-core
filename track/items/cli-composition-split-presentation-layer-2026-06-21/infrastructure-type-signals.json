@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-22T16:07:55Z",
-  "declaration_hash": "c6f4b953df5e1e6c6310b1a4743c3e8a1103d8dd86971d2bf2b2d61537458283",
+  "generated_at": "2026-06-23T08:03:27Z",
+  "declaration_hash": "4416fe979a3b202d18ab4d3e8c1953878c9cf85dc65d267b1edda1c60ebae79f",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -15,12 +15,42 @@
       ]
     },
     {
+      "type_name": "FsArchAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ArchPort",
+        "core::default::Default"
+      ]
+    },
+    {
       "type_name": "FsArchivedTrackTelemetryAdapter",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
       "found_type": true,
       "found_items": [
         "ArchivedTrackTelemetryPort"
+      ]
+    },
+    {
+      "type_name": "FsConventionsAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ConventionsPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsDemoAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "DemoPort",
+        "core::default::Default"
       ]
     },
     {
@@ -33,12 +63,62 @@
       ]
     },
     {
+      "type_name": "FsFileWriteAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "FileWritePort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsGitWorkflowAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "GitWorkflowService",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyAggregateService",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyCheckApprovedAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyCheckApprovedDriverService",
+        "core::default::Default"
+      ]
+    },
+    {
       "type_name": "FsRefVerifyGateStateAdapter",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
       "found_type": true,
       "found_items": [
         "RefVerifyGateStatePort"
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyRunAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyRunService",
+        "core::default::Default"
       ]
     },
     {
@@ -58,6 +138,37 @@
       "found_items": [
         "SpecFileWriterPort",
         "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsTelemetryEmitDynamicAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "TelemetryEmitDynamicPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsTelemetryReportAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "TelemetryReportPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsVerifyAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "VerifyPort",
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {

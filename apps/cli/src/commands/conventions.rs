@@ -8,8 +8,9 @@ use std::process::ExitCode;
 
 use clap::Subcommand;
 use cli_composition::ConventionsCompositionRoot;
+use cli_driver::conventions::ConventionsInput;
 
-use super::outcome_to_exit;
+use super::driver_outcome_to_exit;
 
 /// Convention document management subcommands.
 #[derive(Debug, Subcommand)]
@@ -46,24 +47,18 @@ pub enum ConventionsCommand {
 }
 
 pub fn execute(cmd: ConventionsCommand) -> ExitCode {
-    let result = match cmd {
+    let input = match cmd {
         ConventionsCommand::Add { name, slug, title, summary, project_root } => {
-            ConventionsCompositionRoot::new().conventions_add(
-                &project_root,
-                &name,
-                slug.as_deref(),
-                title.as_deref(),
-                summary.as_deref(),
-            )
+            ConventionsInput::Add { project_root, name, slug, title, summary }
         }
         ConventionsCommand::UpdateIndex { project_root } => {
-            ConventionsCompositionRoot::new().conventions_update_index(&project_root)
+            ConventionsInput::UpdateIndex { project_root }
         }
         ConventionsCommand::VerifyIndex { project_root } => {
-            ConventionsCompositionRoot::new().conventions_verify_index(&project_root)
+            ConventionsInput::VerifyIndex { project_root }
         }
     };
-    outcome_to_exit(result)
+    driver_outcome_to_exit(ConventionsCompositionRoot::new().conventions_driver().handle(input))
 }
 
 #[cfg(test)]

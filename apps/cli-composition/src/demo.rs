@@ -1,5 +1,7 @@
 //! `sotp demo` (or default when no subcommand is given) — `DemoCompositionRoot`.
 
+use std::sync::Arc;
+
 use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
@@ -25,6 +27,16 @@ impl Default for DemoCompositionRoot {
 }
 
 impl DemoCompositionRoot {
+    /// Build a wired [`cli_driver::demo::DemoDriver`] for the demo family.
+    pub fn demo_driver(&self) -> cli_driver::demo::DemoDriver {
+        use infrastructure::demo::FsDemoAdapter;
+        use usecase::demo::DemoInteractor;
+
+        let port = Arc::new(FsDemoAdapter::new());
+        let service = Arc::new(DemoInteractor::new(port));
+        cli_driver::demo::DemoDriver::new(service)
+    }
+
     /// Run the built-in demo / default stub (used when no subcommand is given).
     ///
     /// # Errors

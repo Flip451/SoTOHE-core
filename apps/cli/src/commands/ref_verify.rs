@@ -15,9 +15,10 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::{RefVerifyCheckApprovedInput, RefVerifyCompositionRoot, RefVerifyRunInput};
+use cli_composition::RefVerifyCompositionRoot;
+use cli_driver::ref_verify::{RefVerifyCheckApprovedInput, RefVerifyInput, RefVerifyRunInput};
 
-use crate::commands::outcome_to_exit;
+use crate::commands::driver_outcome_to_exit;
 
 // ── sotp ref-verify ───────────────────────────────────────────────────────────
 
@@ -90,10 +91,9 @@ fn execute_run(args: &RunArgs) -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    outcome_to_exit(
-        RefVerifyCompositionRoot::new()
-            .ref_verify_run(RefVerifyRunInput { track_id, items_dir: args.items_dir.clone() }),
-    )
+    driver_outcome_to_exit(RefVerifyCompositionRoot::new().ref_verify_driver().handle(
+        RefVerifyInput::Run(RefVerifyRunInput { track_id, items_dir: args.items_dir.clone() }),
+    ))
 }
 
 fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
@@ -105,8 +105,11 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    outcome_to_exit(RefVerifyCompositionRoot::new().ref_verify_check_approved(
-        RefVerifyCheckApprovedInput { track_id, items_dir: args.items_dir.clone() },
+    driver_outcome_to_exit(RefVerifyCompositionRoot::new().ref_verify_driver().handle(
+        RefVerifyInput::CheckApproved(RefVerifyCheckApprovedInput {
+            track_id,
+            items_dir: args.items_dir.clone(),
+        }),
     ))
 }
 

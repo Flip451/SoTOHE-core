@@ -28,3 +28,15 @@ impl Default for TrackCompositionRoot {
         Self::new()
     }
 }
+
+impl TrackCompositionRoot {
+    /// Build a wired [`cli_driver::track::TrackDriver`] for the track family.
+    pub fn track_driver(&self) -> cli_driver::track::TrackDriver {
+        use std::sync::Arc;
+
+        use super::service_impl::TrackServiceImpl;
+
+        let service = Arc::new(TrackServiceImpl);
+        cli_driver::track::TrackDriver::new(service)
+    }
+}

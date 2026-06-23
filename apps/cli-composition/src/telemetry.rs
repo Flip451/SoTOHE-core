@@ -1,8 +1,9 @@
 //! `sotp telemetry` subcommand composition — per-context composition root and CliApp shim.
 //!
 //! Provides:
-//! - `TelemetryCompositionRoot::telemetry_report`: constructs `TelemetryReport`, calls
-//!   `aggregate`, and formats the result as a human-readable text report.
+//! - `TelemetryCompositionRoot::telemetry_report`: delegates to
+//!   `FsTelemetryReportAdapter` + `usecase::telemetry::format_report` to
+//!   aggregate and format the result as a human-readable text report.
 //! - `TelemetryCompositionRoot::telemetry_emit_archived_track_subcommand`: wires
 //!   `FsArchivedTrackTelemetryAdapter` + `ArchivedTrackTelemetryInteractor`
 //!   and emits a single archived-track telemetry event (D8 / AC-10).
@@ -11,8 +12,9 @@
 //! formats telemetry data without emitting any `TelemetryEvent` itself.  No
 //! telemetry writer is constructed or invoked here.
 //!
-//! Aggregation logic lives in `infrastructure::telemetry::TelemetryReport`
-//! (CN-07); this module is a thin formatting + error-mapping layer.
+//! Output formatting is delegated to `usecase::telemetry::format_report` (no
+//! duplicate formatter in this module); aggregation I/O goes through
+//! `FsTelemetryReportAdapter` (infrastructure boundary).
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -50,7 +52,57 @@ pub struct TelemetryReportInput {
     pub items_dir: PathBuf,
 }
 
+/// Concrete implementation of `TelemetryAggregateService` that delegates to
+/// the `TelemetryCompositionRoot` methods.
+///
+/// Wires both sub-services internally so that `TelemetryDriver` holds only one
+/// `Arc<dyn TelemetryAggregateService>` (D3/D4 cli_driver policy).
+struct TelemetryAggregateServiceImpl;
+
+impl usecase::TelemetryAggregateService for TelemetryAggregateServiceImpl {
+    fn report(
+        &self,
+        track_id: &str,
+        items_dir: &std::path::Path,
+    ) -> Result<String, usecase::telemetry::TelemetryAggregateServiceError> {
+        use infrastructure::FsTelemetryReportAdapter;
+        use usecase::telemetry::{TelemetryAggregateServiceError, TelemetryReportPort as _};
+        let adapter = FsTelemetryReportAdapter::new();
+        let output = adapter.aggregate(track_id, items_dir).map_err(|e| {
+            TelemetryAggregateServiceError::ReportUnavailable(format!("telemetry report: {e}"))
+        })?;
+        Ok(usecase::telemetry::format_report(track_id, &output))
+    }
+
+    fn emit_archived(
+        &self,
+        items_dir: &std::path::Path,
+        track_id: &str,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+    ) -> Result<(), usecase::telemetry::TelemetryAggregateServiceError> {
+        use usecase::telemetry::TelemetryAggregateServiceError;
+        TelemetryCompositionRoot::new()
+            .telemetry_emit_archived_track_subcommand(
+                items_dir,
+                track_id,
+                subcommand,
+                exit_code,
+                duration_ms,
+            )
+            .map_err(|e| TelemetryAggregateServiceError::EmitUnavailable(e.to_string()))
+    }
+}
+
 impl TelemetryCompositionRoot {
+    /// Build a wired [`cli_driver::telemetry::TelemetryDriver`] for the telemetry family.
+    pub fn telemetry_driver(&self) -> cli_driver::telemetry::TelemetryDriver {
+        let service =
+            Arc::new(TelemetryAggregateServiceImpl) as Arc<dyn usecase::TelemetryAggregateService>;
+        cli_driver::telemetry::TelemetryDriver::new(service)
+    }
+
     /// Aggregate and format telemetry for `input.track_id`.
     ///
     /// Reads `<items_dir>/<track_id>/logs/telemetry.jsonl`, aggregates phase
@@ -60,7 +112,7 @@ impl TelemetryCompositionRoot {
     /// Exits 0 when aggregation succeeds (including when corrupted lines were
     /// skipped — AC-08 / AC-09).  Exits 1 when the track directory does not
     /// exist (`TelemetryReportError::TrackNotFound`) or an I/O error occurs
-    /// (`TelemetryReportError::Io`).
+    /// (`TelemetryReportError::ReportUnavailable`).
     ///
     /// # Errors
     /// Returns `Err(String)` for structural errors that prevent even a partial
@@ -69,14 +121,15 @@ impl TelemetryCompositionRoot {
         &self,
         input: TelemetryReportInput,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::telemetry::TelemetryReport;
+        use infrastructure::FsTelemetryReportAdapter;
+        use usecase::telemetry::TelemetryReportPort as _;
 
-        let report = TelemetryReport::new(input.items_dir);
-        let output = report
-            .aggregate(&input.track_id)
+        let adapter = FsTelemetryReportAdapter::new();
+        let output = adapter
+            .aggregate(&input.track_id, &input.items_dir)
             .map_err(|e| CompositionError::Infrastructure(format!("telemetry report: {e}")))?;
 
-        let text = format_report(&input.track_id, &output);
+        let text = usecase::telemetry::format_report(&input.track_id, &output);
         Ok(CommandOutcome::success(Some(text)))
     }
 
@@ -142,69 +195,6 @@ impl TelemetryCompositionRoot {
                 CompositionError::Infrastructure(e.to_string())
             })
     }
-}
-
-// ---------------------------------------------------------------------------
-// Formatting helpers
-// ---------------------------------------------------------------------------
-
-/// Format a `TelemetryReportOutput` as a human-readable text report.
-fn format_report(
-    track_id: &str,
-    output: &infrastructure::telemetry::TelemetryReportOutput,
-) -> String {
-    let mut lines: Vec<String> = Vec::new();
-
-    lines.push(format!("Telemetry report for track: {track_id}"));
-    lines.push(String::new());
-
-    // ── Phase durations ───────────────────────────────────────────────────────
-    lines.push("Phase durations:".to_owned());
-    if output.phase_durations.is_empty() {
-        lines.push("  (no phase data recorded)".to_owned());
-    } else {
-        for pd in &output.phase_durations {
-            lines.push(format!(
-                "  {:<40} {:>8} ms  ({} event(s))",
-                pd.phase_name, pd.total_ms, pd.event_count
-            ));
-        }
-    }
-    lines.push(String::new());
-
-    // ── Errors ────────────────────────────────────────────────────────────────
-    lines.push(format!("Errors ({}):", output.errors.len()));
-    if output.errors.is_empty() {
-        lines.push("  (none)".to_owned());
-    } else {
-        for err in &output.errors {
-            lines.push(format!(
-                "  [{}] {} (exit {}): {}",
-                err.timestamp, err.command, err.exit_code, err.error_chain
-            ));
-        }
-    }
-    lines.push(String::new());
-
-    // ── Hook blocks ───────────────────────────────────────────────────────────
-    lines.push(format!("Hook blocks ({}):", output.hook_blocks.len()));
-    if output.hook_blocks.is_empty() {
-        lines.push("  (none)".to_owned());
-    } else {
-        for hb in &output.hook_blocks {
-            lines.push(format!("  [{}] {}", hb.timestamp, hb.hook_name));
-        }
-    }
-    lines.push(String::new());
-
-    // ── Skipped lines ─────────────────────────────────────────────────────────
-    lines.push(format!("Skipped lines: {}", output.skipped_lines));
-    if output.skipped_lines > 0 {
-        lines.push("  (parse failure or unknown schema_version)".to_owned());
-    }
-    lines.push(String::new());
-
-    lines.join("\n")
 }
 
 // ---------------------------------------------------------------------------

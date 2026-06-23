@@ -131,6 +131,15 @@ pub fn execute_catalogue_spec_refs(
 }
 
 impl VerifyCompositionRoot {
+    /// Build a wired [`cli_driver::verify::VerifyDriver`] for the verify family.
+    pub fn verify_driver(&self) -> cli_driver::verify::VerifyDriver {
+        use infrastructure::FsVerifyAdapter;
+        use std::sync::Arc;
+
+        let port = Arc::new(FsVerifyAdapter::new());
+        cli_driver::verify::VerifyDriver::new(port)
+    }
+
     /// Check tech-stack.md for unresolved TODO markers.
     ///
     /// # Errors

@@ -1,6 +1,7 @@
 //! `conventions` command family — `ConventionsCompositionRoot` impl methods.
 
 use std::path::Path;
+use std::sync::Arc;
 
 use crate::{CommandOutcome, error::CompositionError};
 
@@ -28,6 +29,14 @@ impl Default for ConventionsCompositionRoot {
 }
 
 impl ConventionsCompositionRoot {
+    /// Build a wired [`cli_driver::conventions::ConventionsDriver`] for the conventions family.
+    pub fn conventions_driver(&self) -> cli_driver::conventions::ConventionsDriver {
+        use infrastructure::conventions::FsConventionsAdapter;
+
+        let port = Arc::new(FsConventionsAdapter::new());
+        cli_driver::conventions::ConventionsDriver::new(port)
+    }
+
     /// Create a new convention document and update the README index.
     ///
     /// # Errors

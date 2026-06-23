@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c6f4b953df5e1e6c6310b1a4743c3e8a1103d8dd86971d2bf2b2d61537458283",
+  "catalogue_declaration_hash": "4416fe979a3b202d18ab4d3e8c1953878c9cf85dc65d267b1edda1c60ebae79f",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -8,9 +8,24 @@
       "entry_hash": "72467b17a93234387cbc8c68a466d6eb0794b72cca95ea7d21ad55d5416edf82"
     },
     {
+      "type_name": "FsArchAdapter",
+      "signal": "blue",
+      "entry_hash": "f43de657c125f730d71106a1a622931821268a0ca309ca6556aed4d9001d1f66"
+    },
+    {
       "type_name": "FsArchivedTrackTelemetryAdapter",
       "signal": "blue",
       "entry_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984"
+    },
+    {
+      "type_name": "FsConventionsAdapter",
+      "signal": "blue",
+      "entry_hash": "6114c48f4dea37c731733dea36c4f4a33b6bbd2684373a5b6a5e5bb39f714658"
+    },
+    {
+      "type_name": "FsDemoAdapter",
+      "signal": "blue",
+      "entry_hash": "8b8d05331925c662bd9ad00377d2975a2fb3f0818b813b327d18356de219f68f"
     },
     {
       "type_name": "FsDryCorpusMetaAdapter",
@@ -18,9 +33,34 @@
       "entry_hash": "c85cfc10c6933d05cb579a27276a29715cadc07d2ecc4de3898c91a46d1f65bc"
     },
     {
+      "type_name": "FsFileWriteAdapter",
+      "signal": "blue",
+      "entry_hash": "fa7880d6bd937846235548a6d5895ad770bc61d8086e51e30e8121cdc7963e9a"
+    },
+    {
+      "type_name": "FsGitWorkflowAdapter",
+      "signal": "blue",
+      "entry_hash": "fb061a23e79a31a3c899f9febb165bcdda3ddfc98f880d256eb720114d04e4e8"
+    },
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "signal": "blue",
+      "entry_hash": "9ae29b57112c7bbeeb7500b3a69eb9d3e8addec962693d5f515b24c05acd5efc"
+    },
+    {
+      "type_name": "FsRefVerifyCheckApprovedAdapter",
+      "signal": "blue",
+      "entry_hash": "69a60cca1fd9f1342b525afe5c7570a02aae238546433d242ed0868fa64599ad"
+    },
+    {
       "type_name": "FsRefVerifyGateStateAdapter",
       "signal": "blue",
       "entry_hash": "991eaf65f978403f13f6d86b8db7373e0e7c71610273c271e4314976915a1204"
+    },
+    {
+      "type_name": "FsRefVerifyRunAdapter",
+      "signal": "blue",
+      "entry_hash": "ce97ad6c816178bc1d98e6e7ee6ebf1fe51d373816ce43628d4a823cb51bc4aa"
     },
     {
       "type_name": "FsReviewGateStateAdapter",
@@ -31,6 +71,21 @@
       "type_name": "FsSpecFileWriterAdapter",
       "signal": "blue",
       "entry_hash": "43ddb7f3c0d172da5850a38c24814f1872030afd7b37b9da42105ef730d6ee3f"
+    },
+    {
+      "type_name": "FsTelemetryEmitDynamicAdapter",
+      "signal": "blue",
+      "entry_hash": "ff9d6b9dbe577e7f0c4f1a1f58b0b250a996a8bc14788aee1fdb20f344e3537e"
+    },
+    {
+      "type_name": "FsTelemetryReportAdapter",
+      "signal": "blue",
+      "entry_hash": "dd7690621f77ab16b675968d869369362da8cd09b96dbaa4810d9e000d2a898b"
+    },
+    {
+      "type_name": "FsVerifyAdapter",
+      "signal": "blue",
+      "entry_hash": "2099e29e81444d5eadf73b3b581adbcc00f48b3b79898722b5bd80055501bbdc"
     },
     {
       "type_name": "GitDryCheckDiffGetter",

@@ -422,3 +422,14 @@ pub trait RefVerifyApplicationService: Send + Sync {
 
 mod interactor;
 pub use interactor::VerifySemanticRefsInteractor;
+
+pub mod check_approved;
+pub use check_approved::{
+    CheckApprovedOutcome, RefVerifyCheckApprovedInteractor, RefVerifyCheckApprovedService,
+};
+
+pub mod driver_service;
+pub use driver_service::{
+    RefVerifyAggregateService, RefVerifyCheckApprovedDriverService, RefVerifyCheckApprovedOutcome,
+    RefVerifyDriverError, RefVerifyRunOutcome, RefVerifyRunService,
+};

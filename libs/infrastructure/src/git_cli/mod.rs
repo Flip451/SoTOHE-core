@@ -7,6 +7,7 @@ use thiserror::Error;
 use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
 pub(crate) mod show;
+pub mod workflow_adapter;
 
 const GUARDED_GIT_ENV: &str = "SOTP_GUARDED_GIT";
 const GUARDED_GIT_VALUE: &str = "1";

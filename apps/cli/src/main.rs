@@ -4,6 +4,8 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 use cli_composition::{CompositionError, DemoCompositionRoot, TelemetryCompositionRoot};
+use cli_driver::demo::DemoInput;
+use cli_driver::telemetry::TelemetryInput;
 
 mod commands;
 mod error;
@@ -150,18 +152,16 @@ fn run_cli_with(
         Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
         Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
         Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
-        Some(CliCommand::Demo) | None => match DemoCompositionRoot::new().demo() {
-            Ok(outcome) => {
-                if let Some(msg) = outcome.stdout {
-                    println!("{msg}");
-                }
-                ExitCode::from(outcome.exit_code)
+        Some(CliCommand::Demo) | None => {
+            let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
+            if let Some(msg) = outcome.stdout {
+                println!("{msg}");
             }
-            Err(err) => {
-                eprintln!("{err}");
-                ExitCode::FAILURE
+            if let Some(msg) = outcome.stderr {
+                eprintln!("{msg}");
             }
-        },
+            ExitCode::from(outcome.exit_code)
+        }
     }
 }
 
@@ -252,13 +252,22 @@ fn emit_archived_track_subcommand(
     start: std::time::Instant,
 ) -> Result<(), CompositionError> {
     let duration_ms = u64::try_from(start.elapsed().as_millis()).unwrap_or(u64::MAX);
-    TelemetryCompositionRoot::new().telemetry_emit_archived_track_subcommand(
-        items_dir,
-        track_id,
-        command_label.to_owned(),
-        exit_code,
-        duration_ms,
-    )
+    let outcome = TelemetryCompositionRoot::new().telemetry_driver().handle(
+        TelemetryInput::EmitArchivedTrackSubcommand {
+            items_dir: items_dir.to_path_buf(),
+            track_id: track_id.to_owned(),
+            subcommand: command_label.to_owned(),
+            exit_code,
+            duration_ms,
+        },
+    );
+    if outcome.exit_code == 0 {
+        Ok(())
+    } else {
+        let msg =
+            outcome.stderr.unwrap_or_else(|| "archived-track telemetry emit failed".to_owned());
+        Err(CompositionError::Infrastructure(msg))
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -495,6 +504,7 @@ mod tests {
 
     use clap::Parser as _;
     use cli_composition::DemoCompositionRoot;
+    use cli_driver::demo::DemoInput as DriverDemoInput;
     use tempfile::TempDir;
 
     use super::run_cli_with;
@@ -527,9 +537,8 @@ mod tests {
     fn example_cli_flow_saves_track_successfully() {
         // Delegates to infrastructure::demo::run_example_demo which creates an in-memory
         // track, persists it, derives status "planned", and returns the display string.
-        let result = DemoCompositionRoot::new().demo();
-        assert!(result.is_ok(), "demo failed: {:?}", result.err());
-        let outcome = result.unwrap();
+        let outcome = DemoCompositionRoot::new().demo_driver().handle(DriverDemoInput::Run);
+        assert_eq!(outcome.exit_code, 0, "demo failed: {:?}", outcome.stderr);
         let msg = outcome.stdout.unwrap_or_default();
         assert!(msg.contains("planned"), "expected 'planned' in output: {msg}");
     }

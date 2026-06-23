@@ -110,6 +110,17 @@ fn current_git_branch(project_root: &Path) -> Result<String, String> {
 }
 
 impl RefVerifyCompositionRoot {
+    /// Build a wired [`cli_driver::ref_verify::RefVerifyDriver`] for the ref_verify family.
+    ///
+    /// Delegates to `FsRefVerifyAggregateAdapter` in `infrastructure`, which wires both
+    /// sub-services internally (D3/D4 cli_driver policy).  Adapter impls belong in
+    /// `infrastructure`; `cli_composition` only performs wiring here.
+    pub fn ref_verify_driver(&self) -> cli_driver::ref_verify::RefVerifyDriver {
+        let service = Arc::new(infrastructure::FsRefVerifyAggregateAdapter::new())
+            as Arc<dyn usecase::ref_verify::RefVerifyAggregateService>;
+        cli_driver::ref_verify::RefVerifyDriver::new(service)
+    }
+
     pub fn ref_verify_run(
         &self,
         input: RefVerifyRunInput,

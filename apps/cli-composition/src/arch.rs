@@ -1,6 +1,7 @@
 //! `arch` command family — `ArchCompositionRoot` impl methods.
 
 use std::path::Path;
+use std::sync::Arc;
 
 use infrastructure::arch::ArchRulesError;
 
@@ -39,6 +40,14 @@ fn render(
 }
 
 impl ArchCompositionRoot {
+    /// Build a wired [`cli_driver::arch::ArchDriver`] for the arch family.
+    pub fn arch_driver(&self) -> cli_driver::arch::ArchDriver {
+        use infrastructure::arch::FsArchAdapter;
+
+        let port = Arc::new(FsArchAdapter::new());
+        cli_driver::arch::ArchDriver::new(port)
+    }
+
     /// Render the workspace tree (crate paths only).
     ///
     /// # Errors

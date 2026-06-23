@@ -6,6 +6,7 @@
 
 use std::path::PathBuf;
 
+use crate::error::CompositionError;
 use crate::track::composition_root::TrackCompositionRoot;
 
 use super::{
@@ -20,25 +21,26 @@ impl TrackCompositionRoot {
     /// When `None`, the current branch is used to derive the track ID.
     ///
     /// # Errors
-    /// Returns a human-readable error string on failure.
+    /// Returns [`CompositionError`] on failure.
     pub fn track_resolve_id(
         &self,
         explicit_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<String, String> {
-        resolve_track_id(explicit_id, &items_dir)
+    ) -> Result<String, CompositionError> {
+        resolve_track_id(explicit_id, &items_dir).map_err(CompositionError::WiringFailed)
     }
 
     /// Resolve a track ID for a READ operation, anchored to `workspace_root`.
     ///
     /// # Errors
-    /// Returns a human-readable error string on failure.
+    /// Returns [`CompositionError`] on failure.
     pub fn track_resolve_id_from_root(
         &self,
         explicit_id: Option<String>,
         workspace_root: PathBuf,
-    ) -> Result<String, String> {
+    ) -> Result<String, CompositionError> {
         resolve_track_id_from_root(explicit_id, &workspace_root)
+            .map_err(CompositionError::WiringFailed)
     }
 
     /// Resolve a track ID for a WRITE operation, anchored to `items_dir`.
@@ -46,40 +48,44 @@ impl TrackCompositionRoot {
     /// Branch is always read; explicit ID must match the branch-derived ID.
     ///
     /// # Errors
-    /// Returns a human-readable error string on failure.
+    /// Returns [`CompositionError`] on failure.
     pub fn track_resolve_id_for_write(
         &self,
         explicit_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<String, String> {
-        resolve_track_id_for_write(explicit_id, &items_dir)
+    ) -> Result<String, CompositionError> {
+        resolve_track_id_for_write(explicit_id, &items_dir).map_err(CompositionError::WiringFailed)
     }
 
     /// Resolve a track ID for a WRITE operation, anchored to `workspace_root`.
     ///
     /// # Errors
-    /// Returns a human-readable error string on failure.
+    /// Returns [`CompositionError`] on failure.
     pub fn track_resolve_id_from_root_for_write(
         &self,
         explicit_id: Option<String>,
         workspace_root: PathBuf,
-    ) -> Result<String, String> {
+    ) -> Result<String, CompositionError> {
         resolve_track_id_inner(explicit_id, &workspace_root, true)
+            .map_err(CompositionError::WiringFailed)
     }
 
     /// Validate a track ID string (lowercase slug format).
     ///
     /// # Errors
-    /// Returns an error string when the slug format is invalid.
-    pub fn track_validate_id(&self, value: &str) -> Result<(), String> {
-        validate_track_id_str(value)
+    /// Returns [`CompositionError`] when the slug format is invalid.
+    pub fn track_validate_id(&self, value: &str) -> Result<(), CompositionError> {
+        validate_track_id_str(value).map_err(CompositionError::WiringFailed)
     }
 
     /// Resolve the project root from an items_dir path (`<root>/track/items`).
     ///
     /// # Errors
-    /// Returns an error string when the path structure is not canonical.
-    pub fn track_resolve_project_root(&self, items_dir: PathBuf) -> Result<PathBuf, String> {
-        resolve_project_root(&items_dir)
+    /// Returns [`CompositionError`] when the path structure is not canonical.
+    pub fn track_resolve_project_root(
+        &self,
+        items_dir: PathBuf,
+    ) -> Result<PathBuf, CompositionError> {
+        resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)
     }
 }
