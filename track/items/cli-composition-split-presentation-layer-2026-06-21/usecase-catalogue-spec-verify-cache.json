@@ -6537,6 +6537,38 @@
         "kind": "pass",
         "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
       }
+    },
+    {
+      "claim_hash": "6cc730177e74dc4668aee2e1e424800d8fe51d6be22854ec23f66111d0243c7b",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "8e595a77817dc25c94e8a7394847a1d3f2bfc2ca3566fd7918334a3f0a522855",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "8e595a77817dc25c94e8a7394847a1d3f2bfc2ca3566fd7918334a3f0a522855",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "6fd4baca3511030a52c56d10cc46e8f9e7da04e63b85edcab221ad6fc006c32f",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
     }
   ]
 }

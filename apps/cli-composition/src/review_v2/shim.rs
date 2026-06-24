@@ -78,6 +78,7 @@ impl ReviewService for ReviewServiceImpl {
                 skipped: false,
                 finding_count: 0,
                 summary: outcome.stdout,
+                exit_code: outcome.exit_code,
             }),
             Err(e) => Err(RunReviewError::ReviewerFailed(e.to_string())),
         }
@@ -105,6 +106,7 @@ impl ReviewService for ReviewServiceImpl {
                 skipped: false,
                 finding_count: 0,
                 summary: outcome.stdout,
+                exit_code: outcome.exit_code,
             }),
             Err(e) => Err(RunReviewError::ReviewerFailed(e.to_string())),
         }
@@ -160,9 +162,22 @@ impl ReviewService for ReviewServiceImpl {
         match root.review_run_fix_local(comp_input) {
             Ok(outcome) => {
                 let exit_code = i32::from(outcome.exit_code);
-                let status = match outcome.exit_code {
-                    0 => "completed",
-                    2 => "blocked_cross_scope",
+                // Smoke-test failures from cli_composition::review_v2::run_fix
+                // return exit 2 with `[ERROR] smoke test failed: ...` on stderr
+                // and no stdout sentinel. Distinguish them from genuine
+                // `REVIEW_FIX_STATUS: blocked_cross_scope` (which has the
+                // sentinel on stdout) by inspecting whether the runner emitted
+                // a sentinel — exit 2 alone is ambiguous between "blocked" and
+                // "smoke test failed".
+                let stdout_has_sentinel =
+                    outcome.stdout.as_deref().is_some_and(|s| s.contains("REVIEW_FIX_STATUS:"));
+                let status = match (outcome.exit_code, stdout_has_sentinel) {
+                    (0, _) => "completed",
+                    (2, true) => "blocked_cross_scope",
+                    // exit 2 without a sentinel is the smoke-test path —
+                    // surface it as `failed` so orchestrators do not treat it
+                    // as a repartitionable cross-scope block.
+                    (2, false) => "failed",
                     _ => "failed",
                 }
                 .to_owned();
@@ -191,14 +206,18 @@ impl ReviewService for ReviewServiceImpl {
         round_type: String,
         no_hint: bool,
     ) -> Result<String, ReviewAuxError> {
+        // `all` selects every scope, NOT every history entry. The history
+        // selector is owned by the `ResultsLimit::All` parsing path in cli
+        // (which substitutes `u32::MAX` when the user passes `--limit all`).
+        // Forwarding `limit` unchanged here preserves the default `--limit 0`
+        // summary semantics when only `--all` is set.
         let root = ReviewCompositionRoot::new();
-        let effective_limit = if all { u32::MAX } else { limit };
         let input = super::ReviewResultsInput {
             track_id,
             items_dir,
             scope,
             all,
-            limit: effective_limit,
+            limit,
             round_type,
             no_hint,
         };

@@ -524,14 +524,8 @@ fn run_review_output_to_outcome(out: usecase::review_v2::RunReviewOutput) -> Com
             r#"{"verdict":"zero_findings","findings":[]}"#.to_owned(),
         ));
     }
-    match out.summary {
-        Some(summary) => {
-            let exit_code: u8 = if out.verdict_kind == "rejected" { 1 } else { 0 };
-            CommandOutcome { stdout: Some(summary), stderr: None, exit_code }
-        }
-        None => {
-            let exit_code: u8 = if out.verdict_kind == "rejected" { 1 } else { 0 };
-            CommandOutcome { stdout: None, stderr: None, exit_code }
-        }
-    }
+    // Preserve the underlying reviewer's exit code so the convention that
+    // `findings_remain` returns exit 2 (distinguishing review findings from
+    // subprocess failures) survives the cli_driver boundary.
+    CommandOutcome { stdout: out.summary, stderr: None, exit_code: out.exit_code }
 }

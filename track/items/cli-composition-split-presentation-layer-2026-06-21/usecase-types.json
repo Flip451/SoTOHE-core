@@ -2455,6 +2455,112 @@
       ],
       "informal_grounds": []
     },
+    "RunReviewOutput": {
+      "action": "modify",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "verdict_kind",
+              "ty": "String"
+            },
+            {
+              "name": "skipped",
+              "ty": "bool"
+            },
+            {
+              "name": "finding_count",
+              "ty": "usize"
+            },
+            {
+              "name": "summary",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review",
+      "docs": "DTO returned by ReviewService::run_codex and ReviewService::run_claude — the usecase application service methods that orchestrate the reviewer subprocess. `verdict_kind` is the stringified verdict (`approved` / `rejected` / etc) without leaking domain ReviewOutcome. `skipped` indicates whether the run was skipped (e.g., empty scope). `finding_count` is the reviewer's finding tally. `summary` is the rendered review output. `exit_code` preserves the underlying reviewer subprocess CLI exit code so the contract `findings_remain → exit 2` survives the cli_driver boundary (distinguishing review findings from execution failures).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewError": {
+      "action": "modify",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "InvalidGroupName",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "CompositionFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "ReviewerFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review",
+      "docs": "Error type returned by ReviewService::run_codex and ReviewService::run_claude. InvalidTrackId and InvalidGroupName cover argument validation failures; CompositionFailed and ReviewerFailed wrap wiring or reviewer subprocess failures without leaking lower-layer types.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-13"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
     "RunReviewFixError": {
       "action": "modify",
       "role": {
@@ -9053,6 +9159,21 @@
       "action": "add",
       "trait_ref": "core::error::Error",
       "for_type": "ReviewAuxError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RunReviewError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RunReviewError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "RunReviewError"
     },
     {
       "action": "modify",

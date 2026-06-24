@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-24T07:47:32Z",
-  "declaration_hash": "5008d93b40f878afb6ba38a8831c87ed79f41132522b4c883f2c2e3d73ba7f81",
+  "generated_at": "2026-06-24T08:32:55Z",
+  "declaration_hash": "674cc4dbefd98d3ba65c539c0f26a4c269a5139789fb15e12e7a9095ecf0cb17",
   "signals": [
     {
       "type_name": "AdrChainRunnerPort",
@@ -920,6 +920,17 @@
       ]
     },
     {
+      "type_name": "RunReviewError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "RunReviewFixError",
       "kind_tag": "error_type",
       "signal": "blue",
@@ -932,6 +943,12 @@
     },
     {
       "type_name": "RunReviewFixOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RunReviewOutput",
       "kind_tag": "dto",
       "signal": "blue",
       "found_type": true

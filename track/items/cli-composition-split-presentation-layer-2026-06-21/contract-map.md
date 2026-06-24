@@ -587,6 +587,14 @@ subgraph usecase["usecase"]
     direction TB
     T45_usecase_usecase_ReviewValidateScopeInteractor__self[ReviewValidateScopeInteractor]
   end
+  subgraph T30_usecase_usecase_RunReviewError["review_v2::run_review::RunReviewError"]
+    direction TB
+    T30_usecase_usecase_RunReviewError__self[RunReviewError]
+    T30_usecase_usecase_RunReviewError_InvalidTrackId[InvalidTrackId]
+    T30_usecase_usecase_RunReviewError_InvalidGroupName[InvalidGroupName]
+    T30_usecase_usecase_RunReviewError_CompositionFailed[CompositionFailed]
+    T30_usecase_usecase_RunReviewError_ReviewerFailed[ReviewerFailed]
+  end
   subgraph T33_usecase_usecase_RunReviewFixError["review_v2::run_review_fix::RunReviewFixError"]
     direction TB
     T33_usecase_usecase_RunReviewFixError__self[RunReviewFixError]
@@ -599,6 +607,10 @@ subgraph usecase["usecase"]
   subgraph T34_usecase_usecase_RunReviewFixOutput["review_v2::run_review_fix::RunReviewFixOutput"]
     direction TB
     T34_usecase_usecase_RunReviewFixOutput__self[RunReviewFixOutput]
+  end
+  subgraph T31_usecase_usecase_RunReviewOutput["review_v2::run_review::RunReviewOutput"]
+    direction TB
+    T31_usecase_usecase_RunReviewOutput__self[RunReviewOutput]
   end
   subgraph R37_usecase_usecase_ReviewClassifyService["review_v2::review_aux::ReviewClassifyService"]
     direction TB
@@ -1239,7 +1251,11 @@ R40_usecase_usecase_ReviewGetBriefingService_get_briefing --> T30_usecase_usecas
 R36_usecase_usecase_ReviewResultsService_results --> T30_usecase_usecase_ReviewAuxError__self
 R37_usecase_usecase_ReviewRunLocalService_run_local --> T36_usecase_usecase_ReviewRunLocalOutput__self
 R29_usecase_usecase_ReviewService_run_codex --o T30_usecase_usecase_ReviewRunInput__self
+R29_usecase_usecase_ReviewService_run_codex --> T30_usecase_usecase_RunReviewError__self
+R29_usecase_usecase_ReviewService_run_codex --> T31_usecase_usecase_RunReviewOutput__self
 R29_usecase_usecase_ReviewService_run_claude --o T30_usecase_usecase_ReviewRunInput__self
+R29_usecase_usecase_ReviewService_run_claude --> T30_usecase_usecase_RunReviewError__self
+R29_usecase_usecase_ReviewService_run_claude --> T31_usecase_usecase_RunReviewOutput__self
 R29_usecase_usecase_ReviewService_run_local --> T36_usecase_usecase_ReviewRunLocalOutput__self
 R29_usecase_usecase_ReviewService_run_fix_local --o T33_usecase_usecase_ReviewRunFixInput__self
 R29_usecase_usecase_ReviewService_run_fix_local --> T33_usecase_usecase_RunReviewFixError__self
@@ -1623,6 +1639,11 @@ class T30_usecase_usecase_ReviewRunInput__self dto
 class T40_usecase_usecase_ReviewRunLocalInteractor__self interactor
 class T36_usecase_usecase_ReviewRunLocalOutput__self dto
 class T45_usecase_usecase_ReviewValidateScopeInteractor__self interactor
+class T30_usecase_usecase_RunReviewError_InvalidTrackId variant_node
+class T30_usecase_usecase_RunReviewError_InvalidGroupName variant_node
+class T30_usecase_usecase_RunReviewError_CompositionFailed variant_node
+class T30_usecase_usecase_RunReviewError_ReviewerFailed variant_node
+class T30_usecase_usecase_RunReviewError__self error_type
 class T33_usecase_usecase_RunReviewFixError_InvalidScope variant_node
 class T33_usecase_usecase_RunReviewFixError_InvalidTrackId variant_node
 class T33_usecase_usecase_RunReviewFixError_InvalidRoundType variant_node
@@ -1630,6 +1651,7 @@ class T33_usecase_usecase_RunReviewFixError_SmokeTestFailed variant_node
 class T33_usecase_usecase_RunReviewFixError_FixRunnerFailed variant_node
 class T33_usecase_usecase_RunReviewFixError__self error_type
 class T34_usecase_usecase_RunReviewFixOutput__self dto
+class T31_usecase_usecase_RunReviewOutput__self dto
 class R37_usecase_usecase_ReviewClassifyService_classify method_node
 class R37_usecase_usecase_ReviewClassifyService__self app_service
 class R34_usecase_usecase_ReviewFilesService_files method_node
