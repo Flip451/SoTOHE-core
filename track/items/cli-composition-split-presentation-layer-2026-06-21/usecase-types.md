@@ -43,7 +43,6 @@
 | TelemetryAggregateServiceError | error_type | — | ReportUnavailable, EmitUnavailable | 🔵 | 🔵 |
 | TelemetryEmitDynamicPortError | error_type | — | EmitUnavailable | 🔵 | 🔵 |
 | TelemetryReportError | error_type | — | TrackNotFound, ReportUnavailable | 🔵 | 🔵 |
-| TelemetryReportServiceError | error_type | — | Unavailable | 🔵 | 🔵 |
 | VerifyPortError | error_type | — | Unavailable | 🔵 | 🔵 |
 
 ## Secondary Ports
@@ -113,8 +112,7 @@
 | SignalGateService | application_service | — | fn run_gate(&self, cmd: SignalGateCommand) -> Result<SignalGateOutput, SignalGateError> | 🔵 | 🔵 |
 | SignalService | application_service | — | fn calc_adr_user(&self, project_root: std::path::PathBuf) -> SignalCommandOutput, fn check_adr_user(&self, project_root: std::path::PathBuf, strict_override: bool, gate: Option<SignalGateName>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn calc_spec_adr(&self, spec_json_path: Option<std::path::PathBuf>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn check_spec_adr(&self, spec_json_path: Option<std::path::PathBuf>, strict_override: bool, gate: Option<SignalGateName>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn calc_catalog_spec(&self) -> SignalCommandOutput, fn check_catalog_spec(&self, strict_override: bool, gate: Option<SignalGateName>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn calc_impl_catalog(&self) -> SignalCommandOutput, fn check_impl_catalog(&self, strict_override: bool, gate: Option<SignalGateName>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn check_gate(&self, project_root: Option<std::path::PathBuf>, spec_json_path: Option<std::path::PathBuf>, gate: SignalGateName, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput | 🔵 | 🔵 |
 | SpecAdrSignalService | application_service | — | fn calc_and_persist(&self, cmd: SpecAdrSignalCommand) -> Result<SpecAdrSignalOutput, SpecAdrSignalError> | 🔵 | 🔵 |
-| TelemetryAggregateService | application_service | — | fn report(&self, track_id: &str, items_dir: &std::path::Path) -> Result<String, TelemetryAggregateServiceError>, fn emit_archived(&self, items_dir: &std::path::Path, track_id: &str, subcommand: String, exit_code: i32, duration_ms: u64) -> Result<(), TelemetryAggregateServiceError> | 🔵 | 🔵 |
-| TelemetryReportService | application_service | — | fn report(&self, track_id: &str, items_dir: &std::path::Path) -> Result<String, TelemetryReportServiceError> | 🔵 | 🔵 |
+| TelemetryAggregateService | application_service | — | fn report(&self, track_id: &str, items_dir: &std::path::Path) -> Result<TelemetryReportOutput, TelemetryAggregateServiceError>, fn emit_archived(&self, items_dir: &std::path::Path, track_id: &str, subcommand: String, exit_code: i32, duration_ms: u64) -> Result<(), TelemetryAggregateServiceError> | 🔵 | 🔵 |
 | TrackService | application_service | — | fn init(&self, items_dir: std::path::PathBuf, track_id: String, description: String) -> TrackCommandOutput, fn transition(&self, items_dir: std::path::PathBuf, track_id: Option<String>, task_id: String, target_status: String, commit_hash: Option<String>) -> TrackCommandOutput, fn resolve(&self, items_dir: std::path::PathBuf, track_id: Option<String>) -> TrackCommandOutput, fn views_sync(&self, project_root: std::path::PathBuf, track_id: Option<String>) -> TrackCommandOutput, fn archive(&self, items_dir: std::path::PathBuf, track_id: String) -> TrackCommandOutput, fn detect_active(&self, project_root: std::path::PathBuf) -> TrackCommandOutput | 🟡 | 🔵 |
 | VerifyService | application_service | — | fn verify_tech_stack(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_latest_track(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_arch_docs(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_layers(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_hooks_path(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_canonical_modules(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_module_size(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_domain_purity(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_domain_strings(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_usecase_purity(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_doc_links(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_view_freshness(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_plan_artifact_refs(&self, track_dir: Option<&std::path::Path>) -> VerifyOutcome, fn verify_catalogue_spec_refs(&self, track_id: Option<&str>, items_dir: &std::path::Path, workspace_root: &std::path::Path, skip_stale: bool) -> VerifyOutcome | 🟡 | 🔵 |
 
@@ -152,7 +150,6 @@
 | SignalGateInteractor | interactor | — | — | 🔵 | 🔵 |
 | SpecAdrSignalInteractor | interactor | — | — | 🔵 | 🔵 |
 | TelemetryAggregateInteractor | interactor | — | — | 🟡 | 🔵 |
-| TelemetryReportInteractor | interactor | — | — | 🟡 | 🔵 |
 | VerifyInteractor | interactor | — | — | 🟡 | 🔵 |
 
 ## DTOs
@@ -206,5 +203,4 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | usecase::dry_check::shared::fragment_ref_of | free_function | modify | fn(fragment: &domain::semantic_dup::CodeFragment) -> Result<domain::dry_check::FragmentRef, DryCheckSharedError> | 🔵 | 🔵 |
-| usecase::telemetry::format_report | free_function | — | fn(track_id: &str, output: &TelemetryReportOutput) -> String | 🔵 | 🔵 |
 

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-24T02:48:48Z",
-  "declaration_hash": "07beceaf46078d43f83cfafeac2bac7cadcd8bc9bec4479876becc74dc2edcc0",
+  "generated_at": "2026-06-24T05:19:28Z",
+  "declaration_hash": "40986ff40f8ff031f7f2f8ecc4bf695717117336f8978743552c7d40daac9eb5",
   "signals": [
     {
       "type_name": "AdrChainRunnerPort",
@@ -1218,15 +1218,6 @@
       ]
     },
     {
-      "type_name": "TelemetryReportInteractor",
-      "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": true,
-      "found_items": [
-        "TelemetryReportService"
-      ]
-    },
-    {
       "type_name": "TelemetryReportOutput",
       "kind_tag": "dto",
       "signal": "blue",
@@ -1241,23 +1232,6 @@
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
-    },
-    {
-      "type_name": "TelemetryReportService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "TelemetryReportServiceError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::error::Error",
-        "core::fmt::Debug",
-        "core::fmt::Display"
-      ]
     },
     {
       "type_name": "TrackCommandOutput",
@@ -1321,12 +1295,6 @@
     },
     {
       "type_name": "usecase::dry_check::shared::fragment_ref_of",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "usecase::telemetry::format_report",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

@@ -2,8 +2,6 @@
 
 use std::sync::Arc;
 
-use crate::{CommandOutcome, error::CompositionError};
-
 // ---------------------------------------------------------------------------
 // Per-context composition root
 // ---------------------------------------------------------------------------
@@ -35,16 +33,5 @@ impl DemoCompositionRoot {
         let port = Arc::new(FsDemoAdapter::new());
         let service = Arc::new(DemoInteractor::new(port));
         cli_driver::demo::DemoDriver::new(service)
-    }
-
-    /// Run the built-in demo / default stub (used when no subcommand is given).
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` when the demo fails to create or persist the example track.
-    pub fn demo(&self) -> Result<CommandOutcome, CompositionError> {
-        let msg = infrastructure::demo::run_example_demo()
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        Ok(CommandOutcome::success(Some(msg)))
     }
 }

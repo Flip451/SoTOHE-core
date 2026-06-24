@@ -860,18 +860,9 @@ subgraph usecase["usecase"]
     T36_usecase_usecase_TelemetryReportError_TrackNotFound[TrackNotFound]
     T36_usecase_usecase_TelemetryReportError_ReportUnavailable[ReportUnavailable]
   end
-  subgraph T41_usecase_usecase_TelemetryReportInteractor["telemetry::TelemetryReportInteractor"]
-    direction TB
-    T41_usecase_usecase_TelemetryReportInteractor__self[TelemetryReportInteractor]
-  end
   subgraph T37_usecase_usecase_TelemetryReportOutput["telemetry::TelemetryReportOutput"]
     direction TB
     T37_usecase_usecase_TelemetryReportOutput__self[TelemetryReportOutput]
-  end
-  subgraph T43_usecase_usecase_TelemetryReportServiceError["telemetry::TelemetryReportServiceError"]
-    direction TB
-    T43_usecase_usecase_TelemetryReportServiceError__self[TelemetryReportServiceError]
-    T43_usecase_usecase_TelemetryReportServiceError_Unavailable[Unavailable]
   end
   subgraph R42_usecase_usecase_ArchivedTrackTelemetryPort["telemetry::ArchivedTrackTelemetryPort"]
     direction TB
@@ -899,12 +890,6 @@ subgraph usecase["usecase"]
     R35_usecase_usecase_TelemetryReportPort__self[TelemetryReportPort]
     R35_usecase_usecase_TelemetryReportPort_aggregate([aggregate])
   end
-  subgraph R38_usecase_usecase_TelemetryReportService["telemetry::TelemetryReportService"]
-    direction TB
-    R38_usecase_usecase_TelemetryReportService__self[TelemetryReportService]
-    R38_usecase_usecase_TelemetryReportService_report([report])
-  end
-  F49_usecase_usecase_usecase__telemetry__format_report[[format_report]]
   end
   subgraph usecase_usecase_module_track_resolution["usecase::track_resolution"]
     direction TB
@@ -1307,12 +1292,11 @@ R42_usecase_usecase_ArchivedTrackTelemetryPort_emit --> T43_usecase_usecase_Arch
 R45_usecase_usecase_ArchivedTrackTelemetryService_emit --o T45_usecase_usecase_ArchivedTrackTelemetryCommand__self
 R45_usecase_usecase_ArchivedTrackTelemetryService_emit --> T43_usecase_usecase_ArchivedTrackTelemetryError__self
 R41_usecase_usecase_TelemetryAggregateService_report --> T46_usecase_usecase_TelemetryAggregateServiceError__self
+R41_usecase_usecase_TelemetryAggregateService_report --> T37_usecase_usecase_TelemetryReportOutput__self
 R41_usecase_usecase_TelemetryAggregateService_emit_archived --> T46_usecase_usecase_TelemetryAggregateServiceError__self
 R40_usecase_usecase_TelemetryEmitDynamicPort_emit_archived --> T45_usecase_usecase_TelemetryEmitDynamicPortError__self
 R35_usecase_usecase_TelemetryReportPort_aggregate --> T36_usecase_usecase_TelemetryReportError__self
 R35_usecase_usecase_TelemetryReportPort_aggregate --> T37_usecase_usecase_TelemetryReportOutput__self
-R38_usecase_usecase_TelemetryReportService_report --> T43_usecase_usecase_TelemetryReportServiceError__self
-F49_usecase_usecase_usecase__telemetry__format_report --o T37_usecase_usecase_TelemetryReportOutput__self
 R28_usecase_usecase_TrackService_init --> T34_usecase_usecase_TrackCommandOutput__self
 R28_usecase_usecase_TrackService_transition --> T34_usecase_usecase_TrackCommandOutput__self
 R28_usecase_usecase_TrackService_resolve --> T34_usecase_usecase_TrackCommandOutput__self
@@ -1369,7 +1353,6 @@ T43_usecase_usecase_SemanticDupDriverInteractor__self -.impl.-> R40_usecase_usec
 T30_usecase_usecase_ArchInteractor__self -.impl.-> R27_usecase_usecase_ArchService__self
 T37_usecase_usecase_ConventionsInteractor__self -.impl.-> R34_usecase_usecase_ConventionsService__self
 T32_usecase_usecase_VerifyInteractor__self -.impl.-> R29_usecase_usecase_VerifyService__self
-T41_usecase_usecase_TelemetryReportInteractor__self -.impl.-> R38_usecase_usecase_TelemetryReportService__self
 T44_usecase_usecase_TelemetryAggregateInteractor__self -.impl.-> R41_usecase_usecase_TelemetryAggregateService__self
 T38_usecase_usecase_HookDispatchInteractor__self -.impl.-> R35_usecase_usecase_HookDispatchService__self
 F68_infrastructure_infrastructure_infrastructure__demo__run_example_demo --> T42_infrastructure_infrastructure_DemoRunError__self
@@ -1739,10 +1722,7 @@ class T38_usecase_usecase_TelemetryPhaseDuration__self dto
 class T36_usecase_usecase_TelemetryReportError_TrackNotFound variant_node
 class T36_usecase_usecase_TelemetryReportError_ReportUnavailable variant_node
 class T36_usecase_usecase_TelemetryReportError__self error_type
-class T41_usecase_usecase_TelemetryReportInteractor__self interactor
 class T37_usecase_usecase_TelemetryReportOutput__self dto
-class T43_usecase_usecase_TelemetryReportServiceError_Unavailable variant_node
-class T43_usecase_usecase_TelemetryReportServiceError__self error_type
 class R42_usecase_usecase_ArchivedTrackTelemetryPort_emit method_node
 class R42_usecase_usecase_ArchivedTrackTelemetryPort__self secondary_port
 class R45_usecase_usecase_ArchivedTrackTelemetryService_emit method_node
@@ -1754,10 +1734,6 @@ class R40_usecase_usecase_TelemetryEmitDynamicPort_emit_archived method_node
 class R40_usecase_usecase_TelemetryEmitDynamicPort__self secondary_port
 class R35_usecase_usecase_TelemetryReportPort_aggregate method_node
 class R35_usecase_usecase_TelemetryReportPort__self secondary_port
-class R38_usecase_usecase_TelemetryReportService_report method_node
-class R38_usecase_usecase_TelemetryReportService__self app_service
-class F49_usecase_usecase_usecase__telemetry__format_report free_function
-class F49_usecase_usecase_usecase__telemetry__format_report function_node
 class R32_usecase_usecase_BranchReaderPort_current_branch method_node
 class R32_usecase_usecase_BranchReaderPort__self secondary_port
 class T34_usecase_usecase_TrackCommandOutput__self dto

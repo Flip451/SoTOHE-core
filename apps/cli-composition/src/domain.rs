@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::{CommandOutcome, error::CompositionError};
+use crate::error::CompositionError;
 
 /// Input DTO for `domain_export_schema`.
 #[derive(Debug, Clone)]
@@ -56,29 +56,6 @@ impl DomainCompositionRoot {
         let file_port = Arc::new(FsFileWriteAdapter::new());
         let service = Arc::new(ExportSchemaInteractor::new(exporter, file_port));
         Ok(cli_driver::domain::DomainDriver::new(service))
-    }
-
-    /// Export the public API schema of a crate as JSON.
-    ///
-    /// Delegates to `domain_driver()` so that the file-write side effect is
-    /// handled by the usecase layer via [`FileWritePort`].
-    ///
-    /// # Errors
-    /// Returns `Err` when workspace root discovery or schema export fails.
-    pub fn domain_export_schema(
-        &self,
-        input: ExportSchemaInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use cli_driver::domain::{DomainInput, ExportSchemaInput as DriverInput};
-
-        let driver = self.domain_driver()?;
-        let out = driver.handle(DomainInput::ExportSchema(DriverInput {
-            crate_name: input.crate_name,
-            pretty: input.pretty,
-            output: input.output,
-        }));
-        // Convert cli_driver::CommandOutcome → cli_composition::CommandOutcome.
-        Ok(CommandOutcome { stdout: out.stdout, stderr: out.stderr, exit_code: out.exit_code })
     }
 }
 

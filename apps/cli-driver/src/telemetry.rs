@@ -8,6 +8,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use usecase::TelemetryAggregateService;
+use usecase::telemetry::TelemetryReportOutput;
 
 use crate::render::CommandOutcome;
 
@@ -84,7 +85,10 @@ impl TelemetryDriver {
 
     fn telemetry_report(&self, input: TelemetryReportInput) -> CommandOutcome {
         match self.service.report(&input.track_id, &input.items_dir) {
-            Ok(text) => CommandOutcome::success(Some(text)),
+            Ok(output) => {
+                let text = format_report(&input.track_id, &output);
+                CommandOutcome::success(Some(text))
+            }
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
@@ -103,4 +107,63 @@ impl TelemetryDriver {
             Err(e) => CommandOutcome::failure(Some(format!("archived-track telemetry: {e}"))),
         }
     }
+}
+
+// ---------------------------------------------------------------------------
+// Rendering
+// ---------------------------------------------------------------------------
+
+/// Format a [`TelemetryReportOutput`] DTO into a human-readable report string.
+///
+/// Pure function — no side effects, no I/O. Returns a `String`; the caller
+/// (`TelemetryDriver::telemetry_report`) is responsible for outputting it.
+fn format_report(track_id: &str, output: &TelemetryReportOutput) -> String {
+    let mut lines: Vec<String> = Vec::new();
+
+    lines.push(format!("Telemetry report for track: {track_id}"));
+    lines.push(String::new());
+
+    lines.push("Phase durations:".to_owned());
+    if output.phase_durations.is_empty() {
+        lines.push("  (no phase data recorded)".to_owned());
+    } else {
+        for pd in &output.phase_durations {
+            lines.push(format!(
+                "  {:<40} {:>8} ms  ({} event(s))",
+                pd.phase_name, pd.total_ms, pd.event_count
+            ));
+        }
+    }
+    lines.push(String::new());
+
+    lines.push(format!("Errors ({}):", output.errors.len()));
+    if output.errors.is_empty() {
+        lines.push("  (none)".to_owned());
+    } else {
+        for err in &output.errors {
+            lines.push(format!(
+                "  [{}] {} (exit {}): {}",
+                err.timestamp, err.command, err.exit_code, err.error_chain
+            ));
+        }
+    }
+    lines.push(String::new());
+
+    lines.push(format!("Hook blocks ({}):", output.hook_blocks.len()));
+    if output.hook_blocks.is_empty() {
+        lines.push("  (none)".to_owned());
+    } else {
+        for hb in &output.hook_blocks {
+            lines.push(format!("  [{}] {}", hb.timestamp, hb.hook_name));
+        }
+    }
+    lines.push(String::new());
+
+    lines.push(format!("Skipped lines: {}", output.skipped_lines));
+    if output.skipped_lines > 0 {
+        lines.push("  (parse failure or unknown schema_version)".to_owned());
+    }
+    lines.push(String::new());
+
+    lines.join("\n")
 }

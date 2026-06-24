@@ -60,8 +60,7 @@ pub mod verify_adr_signals;
 pub use telemetry::{
     ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryError, ArchivedTrackTelemetryInteractor,
     ArchivedTrackTelemetryPort, ArchivedTrackTelemetryService, TelemetryAggregateService,
-    TelemetryEmitDynamicPort, TelemetryReportInteractor, TelemetryReportPort,
-    TelemetryReportService,
+    TelemetryEmitDynamicPort, TelemetryReportPort,
 };
 
 use std::sync::Arc;

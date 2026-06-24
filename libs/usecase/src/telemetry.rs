@@ -123,32 +123,6 @@ pub trait TelemetryReportPort: Send + Sync {
     ) -> Result<TelemetryReportOutput, TelemetryReportError>;
 }
 
-// ── TelemetryReportServiceError ───────────────────────────────────────────────
-
-/// Error type for [`TelemetryReportService::report`].
-#[derive(Debug, thiserror::Error)]
-pub enum TelemetryReportServiceError {
-    /// The track was not found or an I/O error occurred while aggregating data.
-    #[error("{0}")]
-    Unavailable(String),
-}
-
-/// Application service for telemetry reporting.
-///
-/// Used by `cli_driver::TelemetryDriver` to aggregate and format telemetry data.
-pub trait TelemetryReportService: Send + Sync {
-    /// Aggregate and return a formatted telemetry report string for `track_id`.
-    ///
-    /// # Errors
-    /// Returns [`TelemetryReportServiceError::Unavailable`] when the track is
-    /// not found or an I/O error occurs.
-    fn report(
-        &self,
-        track_id: &str,
-        items_dir: &Path,
-    ) -> Result<String, TelemetryReportServiceError>;
-}
-
 // ── TelemetryAggregateService ─────────────────────────────────────────────────
 
 /// Error type for [`TelemetryAggregateService`].
@@ -171,7 +145,11 @@ pub enum TelemetryAggregateServiceError {
 /// internally, keeping the driver free of multi-service injection (D3/D4
 /// cli_driver policy).
 pub trait TelemetryAggregateService: Send + Sync {
-    /// Aggregate and return a formatted telemetry report string for `track_id`.
+    /// Aggregate telemetry data for `track_id` and return the structured DTO.
+    ///
+    /// Presentation formatting (the final report string) is the responsibility
+    /// of the driver layer (`cli_driver::telemetry`); this method returns the
+    /// raw `TelemetryReportOutput` so the driver can render it.
     ///
     /// # Errors
     /// Returns [`TelemetryAggregateServiceError::ReportUnavailable`] on
@@ -180,7 +158,7 @@ pub trait TelemetryAggregateService: Send + Sync {
         &self,
         track_id: &str,
         items_dir: &Path,
-    ) -> Result<String, TelemetryAggregateServiceError>;
+    ) -> Result<TelemetryReportOutput, TelemetryAggregateServiceError>;
 
     /// Emit a telemetry event for a subcommand dispatched against an archived track.
     ///
@@ -195,84 +173,6 @@ pub trait TelemetryAggregateService: Send + Sync {
         exit_code: i32,
         duration_ms: u64,
     ) -> Result<(), TelemetryAggregateServiceError>;
-}
-
-/// Interactor for telemetry reporting that delegates to a [`TelemetryReportPort`].
-pub struct TelemetryReportInteractor {
-    port: Arc<dyn TelemetryReportPort>,
-}
-
-impl TelemetryReportInteractor {
-    /// Construct with the given port.
-    #[must_use]
-    pub fn new(port: Arc<dyn TelemetryReportPort>) -> Self {
-        Self { port }
-    }
-}
-
-impl TelemetryReportService for TelemetryReportInteractor {
-    fn report(
-        &self,
-        track_id: &str,
-        items_dir: &Path,
-    ) -> Result<String, TelemetryReportServiceError> {
-        let output = self.port.aggregate(track_id, items_dir).map_err(|e| {
-            TelemetryReportServiceError::Unavailable(format!("telemetry report: {e}"))
-        })?;
-        Ok(format_report(track_id, &output))
-    }
-}
-
-/// Format a `TelemetryReportOutput` into a human-readable string.
-pub fn format_report(track_id: &str, output: &TelemetryReportOutput) -> String {
-    let mut lines: Vec<String> = Vec::new();
-
-    lines.push(format!("Telemetry report for track: {track_id}"));
-    lines.push(String::new());
-
-    lines.push("Phase durations:".to_owned());
-    if output.phase_durations.is_empty() {
-        lines.push("  (no phase data recorded)".to_owned());
-    } else {
-        for pd in &output.phase_durations {
-            lines.push(format!(
-                "  {:<40} {:>8} ms  ({} event(s))",
-                pd.phase_name, pd.total_ms, pd.event_count
-            ));
-        }
-    }
-    lines.push(String::new());
-
-    lines.push(format!("Errors ({}):", output.errors.len()));
-    if output.errors.is_empty() {
-        lines.push("  (none)".to_owned());
-    } else {
-        for err in &output.errors {
-            lines.push(format!(
-                "  [{}] {} (exit {}): {}",
-                err.timestamp, err.command, err.exit_code, err.error_chain
-            ));
-        }
-    }
-    lines.push(String::new());
-
-    lines.push(format!("Hook blocks ({}):", output.hook_blocks.len()));
-    if output.hook_blocks.is_empty() {
-        lines.push("  (none)".to_owned());
-    } else {
-        for hb in &output.hook_blocks {
-            lines.push(format!("  [{}] {}", hb.timestamp, hb.hook_name));
-        }
-    }
-    lines.push(String::new());
-
-    lines.push(format!("Skipped lines: {}", output.skipped_lines));
-    if output.skipped_lines > 0 {
-        lines.push("  (parse failure or unknown schema_version)".to_owned());
-    }
-    lines.push(String::new());
-
-    lines.join("\n")
 }
 
 // ── Error ─────────────────────────────────────────────────────────────────────

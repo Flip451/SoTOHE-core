@@ -1,25 +1,24 @@
-//! `sotp telemetry` subcommand composition — per-context composition root and CliApp shim.
+//! `sotp telemetry` subcommand composition — per-context composition root.
 //!
 //! Provides:
-//! - `TelemetryCompositionRoot::telemetry_report`: delegates to
-//!   `FsTelemetryReportAdapter` + `usecase::telemetry::format_report` to
-//!   aggregate and format the result as a human-readable text report.
-//! - `TelemetryCompositionRoot::telemetry_emit_archived_track_subcommand`: wires
-//!   `FsArchivedTrackTelemetryAdapter` + `ArchivedTrackTelemetryInteractor`
-//!   and emits a single archived-track telemetry event (D8 / AC-10).
+//! - `TelemetryCompositionRoot::telemetry_driver`: builds a wired
+//!   `TelemetryDriver` backed by `TelemetryAggregateServiceImpl`.
 //!
-//! `telemetry_report` is a pure display command (OS-04 / AC-06): it reads and
-//! formats telemetry data without emitting any `TelemetryEvent` itself.  No
-//! telemetry writer is constructed or invoked here.
+//! `TelemetryAggregateServiceImpl` implements both methods of
+//! `TelemetryAggregateService`:
+//!   - `report`: aggregates telemetry data via `FsTelemetryReportAdapter` and
+//!     returns a `TelemetryReportOutput` DTO. Presentation formatting is
+//!     delegated to `cli_driver::telemetry::TelemetryDriver` (OS-04 / AC-06).
+//!   - `emit_archived`: wires `FsArchivedTrackTelemetryAdapter` →
+//!     `ArchivedTrackTelemetryInteractor` and emits a single archived-track
+//!     telemetry event (D8 / AC-10).
 //!
-//! Output formatting is delegated to `usecase::telemetry::format_report` (no
-//! duplicate formatter in this module); aggregation I/O goes through
-//! `FsTelemetryReportAdapter` (infrastructure boundary).
+//! No telemetry writer is constructed or invoked here for `report`; it is a
+//! pure data-aggregation command that reads and returns structured data
+//! without emitting any `TelemetryEvent` itself.
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Arc;
-
-use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -52,11 +51,14 @@ pub struct TelemetryReportInput {
     pub items_dir: PathBuf,
 }
 
-/// Concrete implementation of `TelemetryAggregateService` that delegates to
-/// the `TelemetryCompositionRoot` methods.
+/// Concrete implementation of `TelemetryAggregateService` that wires
+/// the infrastructure adapters for both the `report` and `emit_archived`
+/// service methods.
 ///
-/// Wires both sub-services internally so that `TelemetryDriver` holds only one
-/// `Arc<dyn TelemetryAggregateService>` (D3/D4 cli_driver policy).
+/// `report` returns the aggregated `TelemetryReportOutput` DTO directly;
+/// presentation formatting is performed by `cli_driver::telemetry::TelemetryDriver`.
+/// `emit_archived` wires `FsArchivedTrackTelemetryAdapter` →
+/// `ArchivedTrackTelemetryInteractor` inline (no composition-root helper shim).
 struct TelemetryAggregateServiceImpl;
 
 impl usecase::TelemetryAggregateService for TelemetryAggregateServiceImpl {
@@ -64,14 +66,16 @@ impl usecase::TelemetryAggregateService for TelemetryAggregateServiceImpl {
         &self,
         track_id: &str,
         items_dir: &std::path::Path,
-    ) -> Result<String, usecase::telemetry::TelemetryAggregateServiceError> {
+    ) -> Result<
+        usecase::telemetry::TelemetryReportOutput,
+        usecase::telemetry::TelemetryAggregateServiceError,
+    > {
         use infrastructure::FsTelemetryReportAdapter;
         use usecase::telemetry::{TelemetryAggregateServiceError, TelemetryReportPort as _};
         let adapter = FsTelemetryReportAdapter::new();
-        let output = adapter.aggregate(track_id, items_dir).map_err(|e| {
+        adapter.aggregate(track_id, items_dir).map_err(|e| {
             TelemetryAggregateServiceError::ReportUnavailable(format!("telemetry report: {e}"))
-        })?;
-        Ok(usecase::telemetry::format_report(track_id, &output))
+        })
     }
 
     fn emit_archived(
@@ -82,98 +86,21 @@ impl usecase::TelemetryAggregateService for TelemetryAggregateServiceImpl {
         exit_code: i32,
         duration_ms: u64,
     ) -> Result<(), usecase::telemetry::TelemetryAggregateServiceError> {
-        use usecase::telemetry::TelemetryAggregateServiceError;
-        TelemetryCompositionRoot::new()
-            .telemetry_emit_archived_track_subcommand(
-                items_dir,
-                track_id,
-                subcommand,
-                exit_code,
-                duration_ms,
-            )
-            .map_err(|e| TelemetryAggregateServiceError::EmitUnavailable(e.to_string()))
-    }
-}
-
-impl TelemetryCompositionRoot {
-    /// Build a wired [`cli_driver::telemetry::TelemetryDriver`] for the telemetry family.
-    pub fn telemetry_driver(&self) -> cli_driver::telemetry::TelemetryDriver {
-        let service =
-            Arc::new(TelemetryAggregateServiceImpl) as Arc<dyn usecase::TelemetryAggregateService>;
-        cli_driver::telemetry::TelemetryDriver::new(service)
-    }
-
-    /// Aggregate and format telemetry for `input.track_id`.
-    ///
-    /// Reads `<items_dir>/<track_id>/logs/telemetry.jsonl`, aggregates phase
-    /// durations, error entries, and hook block entries, and returns a
-    /// human-readable report as `CommandOutcome.stdout`.
-    ///
-    /// Exits 0 when aggregation succeeds (including when corrupted lines were
-    /// skipped — AC-08 / AC-09).  Exits 1 when the track directory does not
-    /// exist (`TelemetryReportError::TrackNotFound`) or an I/O error occurs
-    /// (`TelemetryReportError::ReportUnavailable`).
-    ///
-    /// # Errors
-    /// Returns `Err(String)` for structural errors that prevent even a partial
-    /// report (e.g. track directory absent or unreadable file).
-    pub fn telemetry_report(
-        &self,
-        input: TelemetryReportInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::FsTelemetryReportAdapter;
-        use usecase::telemetry::TelemetryReportPort as _;
-
-        let adapter = FsTelemetryReportAdapter::new();
-        let output = adapter
-            .aggregate(&input.track_id, &input.items_dir)
-            .map_err(|e| CompositionError::Infrastructure(format!("telemetry report: {e}")))?;
-
-        let text = usecase::telemetry::format_report(&input.track_id, &output);
-        Ok(CommandOutcome::success(Some(text)))
-    }
-
-    /// Emit a telemetry event for a subcommand dispatched against an archived track.
-    ///
-    /// Constructs the telemetry directory path as
-    /// `<repo_root>/track/archive/<track_id>/logs`, then wires
-    /// `FsArchivedTrackTelemetryAdapter` → `ArchivedTrackTelemetryInteractor`
-    /// and calls `interactor.emit(ArchivedTrackTelemetryCommand { subcommand })`.
-    ///
-    /// This is the D8 composition shim (AC-10): the bin path delegates here so
-    /// that `apps/cli/src/main.rs` contains no direct `std::fs` / `serde_json` /
-    /// `chrono::Utc::now()` I/O for the archived-track telemetry path.
-    ///
-    /// `items_dir` is the track items directory (e.g. `"track/items"`) used to
-    /// derive the project root. `track_id` identifies the archived track.
-    /// `subcommand` is the opaque CLI subcommand label (e.g. `"track archive"`).
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err(CompositionError)` when:
-    /// - `items_dir` does not have the expected `<root>/track/items` structure.
-    /// - Git repository discovery from the project root fails.
-    /// - The adapter reports an I/O or serialization error.
-    pub fn telemetry_emit_archived_track_subcommand(
-        &self,
-        items_dir: &Path,
-        track_id: &str,
-        subcommand: String,
-        exit_code: i32,
-        duration_ms: u64,
-    ) -> Result<(), CompositionError> {
         use infrastructure::FsArchivedTrackTelemetryAdapter;
         use infrastructure::git_cli::GitRepository as _;
         use usecase::telemetry::{
             ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryInteractor,
-            ArchivedTrackTelemetryService as _,
+            ArchivedTrackTelemetryService as _, TelemetryAggregateServiceError,
         };
 
         // Derive the project root, then discover the repo to get an absolute root path.
-        let project_root = crate::track::resolve_project_root(items_dir)?;
+        let project_root = crate::track::resolve_project_root(items_dir)
+            .map_err(|e| TelemetryAggregateServiceError::EmitUnavailable(e.to_string()))?;
         let repo =
             infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).map_err(|e| {
-                CompositionError::Infrastructure(format!("failed to discover git repository: {e}"))
+                TelemetryAggregateServiceError::EmitUnavailable(format!(
+                    "failed to discover git repository: {e}"
+                ))
             })?;
         let repo_root = repo.root().to_path_buf();
 
@@ -191,8 +118,17 @@ impl TelemetryCompositionRoot {
                 duration_ms,
             })
             .map_err(|e: usecase::telemetry::ArchivedTrackTelemetryError| {
-                CompositionError::Infrastructure(e.to_string())
+                TelemetryAggregateServiceError::EmitUnavailable(e.to_string())
             })
+    }
+}
+
+impl TelemetryCompositionRoot {
+    /// Build a wired [`cli_driver::telemetry::TelemetryDriver`] for the telemetry family.
+    pub fn telemetry_driver(&self) -> cli_driver::telemetry::TelemetryDriver {
+        let service =
+            Arc::new(TelemetryAggregateServiceImpl) as Arc<dyn usecase::TelemetryAggregateService>;
+        cli_driver::telemetry::TelemetryDriver::new(service)
     }
 }
 
@@ -228,10 +164,10 @@ mod tests {
     const NON_ZERO_EXIT_LINE: &str = r#"{"event_type":"NonZeroExit","schema_version":1,"track_id":"t","command":"track spec-design","exit_code":1,"error_chain":"gate failed","timestamp":"2026-06-10T01:00:00Z"}"#;
     const HOOK_BLOCK_LINE: &str = r#"{"event_type":"HookBlock","schema_version":1,"track_id":"t","hook_name":"block-direct-git-ops","timestamp":"2026-06-10T02:00:00Z"}"#;
 
-    // ── telemetry_report: happy path ──────────────────────────────────────────
+    // ── telemetry driver: happy path ──────────────────────────────────────────
 
     #[test]
-    fn test_telemetry_report_happy_path_exits_zero_with_output() {
+    fn test_telemetry_driver_report_happy_path_exits_zero_with_output() {
         let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let tmp = setup_repo_with_items("t");
         let items_dir = tmp.path().join("track").join("items");
@@ -242,12 +178,14 @@ mod tests {
         );
 
         let outcome = crate::test_support::run_in_dir(tmp.path(), || {
-            TelemetryCompositionRoot::new()
-                .telemetry_report(TelemetryReportInput {
-                    track_id: "t".to_owned(),
-                    items_dir: std::path::PathBuf::from("track/items"),
-                })
-                .unwrap()
+            TelemetryCompositionRoot::new().telemetry_driver().handle(
+                cli_driver::telemetry::TelemetryInput::Report(
+                    cli_driver::telemetry::TelemetryReportInput {
+                        track_id: "t".to_owned(),
+                        items_dir: std::path::PathBuf::from("track/items"),
+                    },
+                ),
+            )
         });
         assert_eq!(outcome.exit_code, 0);
 
@@ -259,22 +197,24 @@ mod tests {
         assert!(text.contains("Skipped lines: 0"), "skip count must always appear");
     }
 
-    // ── telemetry_report: skipped lines ──────────────────────────────────────
+    // ── telemetry driver: skipped lines ──────────────────────────────────────
 
     #[test]
-    fn test_telemetry_report_shows_skipped_line_count_when_nonzero() {
+    fn test_telemetry_driver_report_shows_skipped_line_count_when_nonzero() {
         let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let tmp = setup_repo_with_items("t");
         let items_dir = tmp.path().join("track").join("items");
         write_jsonl_fixture(&items_dir, "t", &[SUBCOMMAND_LINE, "not valid json", HOOK_BLOCK_LINE]);
 
         let outcome = crate::test_support::run_in_dir(tmp.path(), || {
-            TelemetryCompositionRoot::new()
-                .telemetry_report(TelemetryReportInput {
-                    track_id: "t".to_owned(),
-                    items_dir: std::path::PathBuf::from("track/items"),
-                })
-                .unwrap()
+            TelemetryCompositionRoot::new().telemetry_driver().handle(
+                cli_driver::telemetry::TelemetryInput::Report(
+                    cli_driver::telemetry::TelemetryReportInput {
+                        track_id: "t".to_owned(),
+                        items_dir: std::path::PathBuf::from("track/items"),
+                    },
+                ),
+            )
         });
 
         assert_eq!(outcome.exit_code, 0, "skipped lines must not fail the command (AC-09)");
@@ -282,20 +222,22 @@ mod tests {
         assert!(text.contains("Skipped lines: 1"), "skipped count must be shown; got: {text}");
     }
 
-    // ── telemetry_report: empty log ───────────────────────────────────────────
+    // ── telemetry driver: empty log ───────────────────────────────────────────
 
     #[test]
-    fn test_telemetry_report_missing_log_exits_zero_with_empty_report() {
+    fn test_telemetry_driver_report_missing_log_exits_zero_with_empty_report() {
         let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let tmp = setup_repo_with_items("t");
 
         let outcome = crate::test_support::run_in_dir(tmp.path(), || {
-            TelemetryCompositionRoot::new()
-                .telemetry_report(TelemetryReportInput {
-                    track_id: "t".to_owned(),
-                    items_dir: std::path::PathBuf::from("track/items"),
-                })
-                .unwrap()
+            TelemetryCompositionRoot::new().telemetry_driver().handle(
+                cli_driver::telemetry::TelemetryInput::Report(
+                    cli_driver::telemetry::TelemetryReportInput {
+                        track_id: "t".to_owned(),
+                        items_dir: std::path::PathBuf::from("track/items"),
+                    },
+                ),
+            )
         });
 
         assert_eq!(outcome.exit_code, 0);
@@ -304,24 +246,28 @@ mod tests {
         assert!(text.contains("Skipped lines: 0"), "empty report must still show skip count");
     }
 
-    // ── telemetry_report: track not found ────────────────────────────────────
+    // ── telemetry driver: track not found ────────────────────────────────────
 
     #[test]
-    fn test_telemetry_report_track_not_found_returns_err() {
+    fn test_telemetry_driver_report_track_not_found_returns_failure_outcome() {
         let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let tmp = tempfile::TempDir::new().unwrap();
         crate::test_support::seed_repo(tmp.path(), "track/main-init");
         std::fs::create_dir_all(tmp.path().join("track").join("items")).unwrap();
 
-        let result = crate::test_support::run_in_dir(tmp.path(), || {
-            TelemetryCompositionRoot::new().telemetry_report(TelemetryReportInput {
-                track_id: "does-not-exist".to_owned(),
-                items_dir: std::path::PathBuf::from("track/items"),
-            })
+        let outcome = crate::test_support::run_in_dir(tmp.path(), || {
+            TelemetryCompositionRoot::new().telemetry_driver().handle(
+                cli_driver::telemetry::TelemetryInput::Report(
+                    cli_driver::telemetry::TelemetryReportInput {
+                        track_id: "does-not-exist".to_owned(),
+                        items_dir: std::path::PathBuf::from("track/items"),
+                    },
+                ),
+            )
         });
 
-        assert!(result.is_err(), "missing track must return Err");
-        let msg = result.unwrap_err().to_string();
+        assert_ne!(outcome.exit_code, 0, "missing track must produce a non-zero exit");
+        let msg = outcome.stderr.unwrap_or_default();
         assert!(
             msg.contains("does-not-exist") || msg.contains("track not found"),
             "error must mention track id; got: {msg}"

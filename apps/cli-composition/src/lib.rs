@@ -141,13 +141,27 @@ pub use telemetry::TelemetryCompositionRoot;
 pub use track::composition_root::TrackCompositionRoot;
 pub use verify::VerifyCompositionRoot;
 
-/// Re-exports [`infrastructure::codex_common::tee_stderr_to_file`] so that
-/// `apps/cli` can use it without importing `infrastructure` directly (which the
-/// architecture disallows for normal `cli` dependencies).
+/// Tee the child process's stderr to a log file while also forwarding each
+/// line to the current process's stderr.
 ///
-/// Only `std` types appear in the signature, so no infrastructure types leak
-/// across the boundary.
-pub use infrastructure::codex_common::tee_stderr_to_file;
+/// Implemented natively with stdlib types so that `apps/cli` can call this
+/// helper without importing `infrastructure` directly.  The signature uses
+/// only `std` types; no infrastructure types cross the boundary.
+pub fn tee_stderr_to_file(pipe: std::process::ChildStderr, mut log_file: std::fs::File) {
+    use std::io::{BufRead as _, BufReader, Write as _};
+
+    let reader = BufReader::new(pipe);
+    for line in reader.lines() {
+        match line {
+            Ok(line) => {
+                let _ = writeln!(log_file, "{line}");
+                eprintln!("{line}");
+            }
+            Err(_) => break,
+        }
+    }
+    let _ = log_file.flush();
+}
 
 /// Build the argument vector for a `codex exec --sandbox read-only` invocation.
 ///

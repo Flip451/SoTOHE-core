@@ -6473,6 +6473,14 @@
         "kind": "fail",
         "reason": "New behavioral commitment: the claim catalogs a presentation formatter in the usecase layer and adds a T024 migration/deletion obligation, while IN-14 only grounds usecase secondary port contracts and aggregate services such as TelemetryReportService, not presentation formatting as a usecase API responsibility."
       }
+    },
+    {
+      "claim_hash": "505696d793c439db8b9577771535f7dafb26e6184385582471ad30c297b5df1c",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
     }
   ]
 }

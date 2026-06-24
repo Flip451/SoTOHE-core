@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "07beceaf46078d43f83cfafeac2bac7cadcd8bc9bec4479876becc74dc2edcc0",
+  "catalogue_declaration_hash": "40986ff40f8ff031f7f2f8ecc4bf695717117336f8978743552c7d40daac9eb5",
   "signals": [
     {
       "type_name": "ArchInteractor",
@@ -458,19 +458,9 @@
       "entry_hash": "3ea69ef44dfb5f1febbc19fefcae2ce414012884068d812e69d1eb49ab3c683d"
     },
     {
-      "type_name": "TelemetryReportInteractor",
-      "signal": "blue",
-      "entry_hash": "79d80b5b752a059c33ab57ec269bcde55de1321ed4954316f8fe8c01c54866ec"
-    },
-    {
       "type_name": "TelemetryReportOutput",
       "signal": "blue",
       "entry_hash": "229c88be3272ce0ac3f938f22c136c83043da9808629661ba9d0c221b455747d"
-    },
-    {
-      "type_name": "TelemetryReportServiceError",
-      "signal": "blue",
-      "entry_hash": "d3557997d4bdee1193071fa4bc789759145e9bbee04c84cff46d043557b8c5ae"
     },
     {
       "type_name": "TrackCommandOutput",
@@ -775,7 +765,7 @@
     {
       "type_name": "TelemetryAggregateService",
       "signal": "blue",
-      "entry_hash": "22ae92849ad557072acd995e66bfc38a462ce3d6f896839c6fe3118e43ccadf4"
+      "entry_hash": "505696d793c439db8b9577771535f7dafb26e6184385582471ad30c297b5df1c"
     },
     {
       "type_name": "TelemetryEmitDynamicPort",
@@ -786,11 +776,6 @@
       "type_name": "TelemetryReportPort",
       "signal": "blue",
       "entry_hash": "18f3c6f36fdb4523929813c78a87293e0258dcdd2cdda7055b3f8f7d6ee272b4"
-    },
-    {
-      "type_name": "TelemetryReportService",
-      "signal": "blue",
-      "entry_hash": "0e93110c649367066334a1589374decc9c468b709cd87ed8ecd632163f5f0252"
     },
     {
       "type_name": "TrackService",
@@ -811,11 +796,6 @@
       "type_name": "usecase::dry_check::shared::fragment_ref_of",
       "signal": "blue",
       "entry_hash": "ddd19b0a88631d097c04418e25c840198af401c701f7c549d535c7ce27bb571a"
-    },
-    {
-      "type_name": "usecase::telemetry::format_report",
-      "signal": "blue",
-      "entry_hash": "1c99a59e557c5221e5e16c72a939fce046710a3cfb1f80f69b20e01ce5d4d63b"
     }
   ]
 }

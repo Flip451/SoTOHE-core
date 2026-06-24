@@ -1990,30 +1990,6 @@
       ],
       "informal_grounds": []
     },
-    "TelemetryReportInteractor": {
-      "action": "add",
-      "role": {
-        "Interactor": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [],
-      "module_path": "telemetry",
-      "docs": "Interactor for telemetry reporting that delegates to a TelemetryReportPort.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-03"
-        }
-      ],
-      "informal_grounds": []
-    },
     "TelemetryAggregateInteractor": {
       "action": "add",
       "role": {
@@ -3596,40 +3572,6 @@
       "methods": [],
       "module_path": "guard",
       "docs": "Error returned by ShellParserPort::split_shell. Single variant ParseFailed(String) signals that POSIX shell token splitting failed.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-13"
-        },
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-14"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "TelemetryReportServiceError": {
-      "action": "add",
-      "role": {
-        "ErrorType": {}
-      },
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Unavailable",
-            "payload": {
-              "kind": "tuple",
-              "fields": [
-                "String"
-              ]
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "telemetry",
-      "docs": "Error returned by TelemetryReportService::report. Single variant Unavailable(String) signals that telemetry data cannot be aggregated or formatted.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -6494,46 +6436,6 @@
       ],
       "informal_grounds": []
     },
-    "TelemetryReportService": {
-      "action": "add",
-      "role": {
-        "ApplicationService": {}
-      },
-      "methods": [
-        {
-          "name": "report",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "&str"
-            },
-            {
-              "name": "items_dir",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "Result<String, TelemetryReportServiceError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ],
-      "module_path": "telemetry",
-      "docs": "Aggregate/application service for telemetry reporting named by IN-14. It currently returns a formatted string report during the T023/T026 transition; T024 removes or retypes this path so telemetry reporting returns DTO data for cli_driver rendering.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-14"
-        }
-      ],
-      "informal_grounds": []
-    },
     "TelemetryAggregateService": {
       "action": "add",
       "role": {
@@ -6553,7 +6455,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "Result<String, TelemetryAggregateServiceError>",
+          "returns": "Result<TelemetryReportOutput, TelemetryAggregateServiceError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -6596,7 +6498,7 @@
         "Sync"
       ],
       "module_path": "telemetry",
-      "docs": "Driver-facing aggregate/application service for the telemetry command family. It composes the IN-14 TelemetryReportService-style reporting path with archived telemetry emission so TelemetryDriver can hold one Arc<dyn TelemetryAggregateService>. During T023, report still returns Result<String, TelemetryAggregateServiceError> as a transitional formatted-report path and emit_archived returns Result<(), TelemetryAggregateServiceError>; both use typed errors. T024 must retype report so telemetry reporting returns DTO/report data to cli_driver for final rendering.",
+      "docs": "Driver-facing aggregate/application service for the telemetry command family. Composes the TelemetryReportPort-based aggregation path with archived telemetry emission so TelemetryDriver holds one Arc<dyn TelemetryAggregateService>. report returns Result<TelemetryReportOutput, TelemetryAggregateServiceError> (structured DTO); cli_driver::telemetry owns final string rendering via its local format_report helper. emit_archived returns Result<(), TelemetryAggregateServiceError>.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -7869,30 +7771,6 @@
     }
   },
   "functions": {
-    "usecase::telemetry::format_report": {
-      "action": "add",
-      "role": "FreeFunction",
-      "params": [
-        {
-          "name": "track_id",
-          "ty": "&str"
-        },
-        {
-          "name": "output",
-          "ty": "&TelemetryReportOutput"
-        }
-      ],
-      "returns": "String",
-      "is_async": false,
-      "docs": "Transitional presentation helper discovered during T023 wiring. It is catalogued to keep impl signals honest, but T024 must move this formatter into cli_driver or delete it after cli_driver renders TelemetryReportOutput; it is not part of the final usecase API.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-09"
-        }
-      ],
-      "informal_grounds": []
-    },
     "usecase::dry_check::shared::fragment_ref_of": {
       "action": "modify",
       "role": "FreeFunction",
@@ -8697,11 +8575,6 @@
     },
     {
       "action": "add",
-      "trait_ref": "TelemetryReportService",
-      "for_type": "TelemetryReportInteractor"
-    },
-    {
-      "action": "add",
       "trait_ref": "TelemetryAggregateService",
       "for_type": "TelemetryAggregateInteractor"
     },
@@ -9099,21 +8972,6 @@
       "action": "add",
       "trait_ref": "core::error::Error",
       "for_type": "ShellParserError"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TelemetryReportServiceError"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Display",
-      "for_type": "TelemetryReportServiceError"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::error::Error",
-      "for_type": "TelemetryReportServiceError"
     }
   ]
 }
