@@ -1,4 +1,4 @@
-//! `pr` command family — CliApp impl methods.
+//! `pr` command family composition root methods.
 //!
 //! Implements the full PR workflow: push, ensure-pr, status, wait-and-merge,
 //! trigger-review, poll-review, and review-cycle. All methods use concrete
@@ -50,9 +50,9 @@ use poll_adapters::make_polling_interactor;
 impl PrCompositionRoot {
     /// Build a wired [`cli_driver::pr::PrDriver`] for the `pr` family.
     ///
-    /// Constructs a [`usecase::pr::PrCommandInteractor`] with closures that
-    /// delegate to the existing `PrCompositionRoot` methods, wraps it in an
-    /// `Arc`, and passes it to [`cli_driver::pr::PrDriver::new`].
+    /// Constructs all closures that wire infrastructure + usecase together and
+    /// injects them into a [`usecase::pr::PrCommandInteractor`], which is then
+    /// handed to [`cli_driver::pr::PrDriver`].
     pub fn pr_driver(&self) -> cli_driver::pr::PrDriver {
         use std::sync::Arc;
         use usecase::pr::{PrCommandInteractor, PrCommandOutput};
