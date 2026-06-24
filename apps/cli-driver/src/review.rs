@@ -379,7 +379,7 @@ impl ReviewDriver {
                 };
                 CommandOutcome {
                     stdout: Some(format!("REVIEW_FIX_STATUS: {}", out.status)),
-                    stderr: None,
+                    stderr: out.stderr,
                     exit_code,
                 }
             }

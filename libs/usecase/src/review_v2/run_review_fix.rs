@@ -45,6 +45,10 @@ pub struct RunReviewFixCommand {
 pub struct RunReviewFixOutput {
     pub status: String,
     pub exit_code: i32,
+    /// Optional diagnostic message to surface on stderr when the run is blocked
+    /// or failed (e.g., smoke-test failure detail). Empty when the run completed
+    /// successfully.
+    pub stderr: Option<String>,
 }
 
 // ── ReviewFixRunnerError ──────────────────────────────────────────────────────
@@ -283,7 +287,7 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_empty_scope_returns_invalid_scope_error() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0 })
+            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0, stderr: None })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         let mut cmd = make_valid_command();
@@ -297,7 +301,7 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_empty_track_id_returns_invalid_track_id_error() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0 })
+            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0, stderr: None })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         let mut cmd = make_valid_command();
@@ -311,7 +315,7 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_unknown_round_type_returns_invalid_round_type_error() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0 })
+            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0, stderr: None })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         let mut cmd = make_valid_command();
@@ -327,7 +331,7 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_delegates_completed_to_run_fn() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0 })
+            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0, stderr: None })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         let out = interactor.run(make_valid_command()).unwrap();
@@ -340,7 +344,11 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_delegates_blocked_cross_scope_to_run_fn() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "blocked_cross_scope".to_owned(), exit_code: 2 })
+            Ok(RunReviewFixOutput {
+                status: "blocked_cross_scope".to_owned(),
+                exit_code: 2,
+                stderr: None,
+            })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         let mut cmd = make_valid_command();
@@ -355,7 +363,7 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_delegates_failed_to_run_fn() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "failed".to_owned(), exit_code: 1 })
+            Ok(RunReviewFixOutput { status: "failed".to_owned(), exit_code: 1, stderr: None })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         let out = interactor.run(make_valid_command()).unwrap();
@@ -382,7 +390,11 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_invalid_status_sentinel_returns_fix_runner_failed() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "unknown_sentinel".to_owned(), exit_code: 99 })
+            Ok(RunReviewFixOutput {
+                status: "unknown_sentinel".to_owned(),
+                exit_code: 99,
+                stderr: None,
+            })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         match interactor.run(make_valid_command()) {
@@ -397,7 +409,7 @@ mod tests {
     fn test_run_review_fix_interactor_mismatched_exit_code_returns_fix_runner_failed() {
         // "completed" maps to exit_code=0; returning 2 must be rejected.
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 2 })
+            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 2, stderr: None })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         match interactor.run(make_valid_command()) {
@@ -424,9 +436,11 @@ mod tests {
             _command: RunReviewFixCommand,
         ) -> Result<RunReviewFixOutput, ReviewFixRunnerError> {
             match &self.result {
-                Ok(out) => {
-                    Ok(RunReviewFixOutput { status: out.status.clone(), exit_code: out.exit_code })
-                }
+                Ok(out) => Ok(RunReviewFixOutput {
+                    status: out.status.clone(),
+                    exit_code: out.exit_code,
+                    stderr: out.stderr.clone(),
+                }),
                 Err(e) => Err(match e {
                     ReviewFixRunnerError::SmokeTestFailed(s) => {
                         ReviewFixRunnerError::SmokeTestFailed(s.clone())
@@ -450,6 +464,7 @@ mod tests {
         let runner = MockReviewFixRunner::returning(Ok(RunReviewFixOutput {
             status: "completed".to_owned(),
             exit_code: 0,
+            stderr: None,
         }));
         let out = runner.run_fix(make_valid_command()).unwrap();
         assert_eq!(out.status, "completed");
@@ -461,6 +476,7 @@ mod tests {
         let runner = MockReviewFixRunner::returning(Ok(RunReviewFixOutput {
             status: "blocked_cross_scope".to_owned(),
             exit_code: 2,
+            stderr: None,
         }));
         let out = runner.run_fix(make_valid_command()).unwrap();
         assert_eq!(out.status, "blocked_cross_scope");
@@ -472,6 +488,7 @@ mod tests {
         let runner = MockReviewFixRunner::returning(Ok(RunReviewFixOutput {
             status: "failed".to_owned(),
             exit_code: 1,
+            stderr: None,
         }));
         let out = runner.run_fix(make_valid_command()).unwrap();
         assert_eq!(out.status, "failed");

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "84d014d693b9dc6c337db36bab8834f7452115e12a192f385ed256a0db22418e",
+  "catalogue_declaration_hash": "5008d93b40f878afb6ba38a8831c87ed79f41132522b4c883f2c2e3d73ba7f81",
   "signals": [
     {
       "type_name": "ArchInteractor",
@@ -346,6 +346,16 @@
       "type_name": "ReviewWorkflowError",
       "signal": "blue",
       "entry_hash": "a6e0329497c17b5eef7bbf9a7dfd55ec0ac6f619df1b3f7f338c81e541f5c6fa"
+    },
+    {
+      "type_name": "RunReviewFixError",
+      "signal": "blue",
+      "entry_hash": "5151e7fb7b41efa19c91ac78f74c17ad7d9344151d389037bd20472cac62ad6d"
+    },
+    {
+      "type_name": "RunReviewFixOutput",
+      "signal": "blue",
+      "entry_hash": "879b357d809fbc722aa4e89a5574c4094ed646cd246f3352766d5e7057be1160"
     },
     {
       "type_name": "SchemaExporterError",

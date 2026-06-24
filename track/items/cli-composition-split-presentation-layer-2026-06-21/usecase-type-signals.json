@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-24T06:08:27Z",
-  "declaration_hash": "84d014d693b9dc6c337db36bab8834f7452115e12a192f385ed256a0db22418e",
+  "generated_at": "2026-06-24T07:12:06Z",
+  "declaration_hash": "5008d93b40f878afb6ba38a8831c87ed79f41132522b4c883f2c2e3d73ba7f81",
   "signals": [
     {
       "type_name": "AdrChainRunnerPort",
@@ -918,6 +918,23 @@
         "core::fmt::Debug",
         "core::fmt::Display"
       ]
+    },
+    {
+      "type_name": "RunReviewFixError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RunReviewFixOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SchemaExporterError",

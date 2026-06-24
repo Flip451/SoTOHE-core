@@ -36,6 +36,7 @@
 | ReviewAuxError | error_type | — | Failed | 🔵 | 🔵 |
 | ReviewRoundTypeError | error_type | — | InvalidValue | 🔵 | 🔵 |
 | ReviewWorkflowError | error_type | modify | Serialize, Validation | 🔵 | 🔵 |
+| RunReviewFixError | error_type | modify | InvalidScope, InvalidTrackId, InvalidRoundType, SmokeTestFailed, FixRunnerFailed | 🔵 | 🔵 |
 | SchemaExporterError | error_type | — | ExportFailed | 🔵 | 🔵 |
 | ShellParserError | error_type | — | ParseFailed | 🔵 | 🔵 |
 | SignalGateError | error_type | — | ChainExecutionFailed, InvalidTrackId, StrictnessConfigLoad | 🔵 | 🔵 |
@@ -172,6 +173,7 @@
 | ReviewRunFixInput | dto | — | — | 🔵 | 🔵 |
 | ReviewRunInput | dto | — | — | 🔵 | 🔵 |
 | ReviewRunLocalOutput | dto | — | — | 🔵 | 🔵 |
+| RunReviewFixOutput | dto | modify | — | 🔵 | 🔵 |
 | SemanticDupDriverOutcome | dto | — | — | 🟡 | 🔵 |
 | SignalChainOutput | dto | — | — | 🔵 | 🔵 |
 | SignalCommandOutput | dto | — | — | 🟡 | 🔵 |

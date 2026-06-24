@@ -587,6 +587,19 @@ subgraph usecase["usecase"]
     direction TB
     T45_usecase_usecase_ReviewValidateScopeInteractor__self[ReviewValidateScopeInteractor]
   end
+  subgraph T33_usecase_usecase_RunReviewFixError["review_v2::run_review_fix::RunReviewFixError"]
+    direction TB
+    T33_usecase_usecase_RunReviewFixError__self[RunReviewFixError]
+    T33_usecase_usecase_RunReviewFixError_InvalidScope[InvalidScope]
+    T33_usecase_usecase_RunReviewFixError_InvalidTrackId[InvalidTrackId]
+    T33_usecase_usecase_RunReviewFixError_InvalidRoundType[InvalidRoundType]
+    T33_usecase_usecase_RunReviewFixError_SmokeTestFailed[SmokeTestFailed]
+    T33_usecase_usecase_RunReviewFixError_FixRunnerFailed[FixRunnerFailed]
+  end
+  subgraph T34_usecase_usecase_RunReviewFixOutput["review_v2::run_review_fix::RunReviewFixOutput"]
+    direction TB
+    T34_usecase_usecase_RunReviewFixOutput__self[RunReviewFixOutput]
+  end
   subgraph R37_usecase_usecase_ReviewClassifyService["review_v2::review_aux::ReviewClassifyService"]
     direction TB
     R37_usecase_usecase_ReviewClassifyService__self[ReviewClassifyService]
@@ -1229,6 +1242,8 @@ R29_usecase_usecase_ReviewService_run_codex --o T30_usecase_usecase_ReviewRunInp
 R29_usecase_usecase_ReviewService_run_claude --o T30_usecase_usecase_ReviewRunInput__self
 R29_usecase_usecase_ReviewService_run_local --> T36_usecase_usecase_ReviewRunLocalOutput__self
 R29_usecase_usecase_ReviewService_run_fix_local --o T33_usecase_usecase_ReviewRunFixInput__self
+R29_usecase_usecase_ReviewService_run_fix_local --> T33_usecase_usecase_RunReviewFixError__self
+R29_usecase_usecase_ReviewService_run_fix_local --> T34_usecase_usecase_RunReviewFixOutput__self
 R29_usecase_usecase_ReviewService_results --> T30_usecase_usecase_ReviewAuxError__self
 R29_usecase_usecase_ReviewService_classify --> T30_usecase_usecase_ReviewAuxError__self
 R29_usecase_usecase_ReviewService_files --> T30_usecase_usecase_ReviewAuxError__self
@@ -1608,6 +1623,13 @@ class T30_usecase_usecase_ReviewRunInput__self dto
 class T40_usecase_usecase_ReviewRunLocalInteractor__self interactor
 class T36_usecase_usecase_ReviewRunLocalOutput__self dto
 class T45_usecase_usecase_ReviewValidateScopeInteractor__self interactor
+class T33_usecase_usecase_RunReviewFixError_InvalidScope variant_node
+class T33_usecase_usecase_RunReviewFixError_InvalidTrackId variant_node
+class T33_usecase_usecase_RunReviewFixError_InvalidRoundType variant_node
+class T33_usecase_usecase_RunReviewFixError_SmokeTestFailed variant_node
+class T33_usecase_usecase_RunReviewFixError_FixRunnerFailed variant_node
+class T33_usecase_usecase_RunReviewFixError__self error_type
+class T34_usecase_usecase_RunReviewFixOutput__self dto
 class R37_usecase_usecase_ReviewClassifyService_classify method_node
 class R37_usecase_usecase_ReviewClassifyService__self app_service
 class R34_usecase_usecase_ReviewFilesService_files method_node

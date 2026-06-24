@@ -166,7 +166,7 @@ impl ReviewService for ReviewServiceImpl {
                     _ => "failed",
                 }
                 .to_owned();
-                Ok(RunReviewFixOutput { status, exit_code })
+                Ok(RunReviewFixOutput { status, exit_code, stderr: outcome.stderr })
             }
             Err(e) => Err(RunReviewFixError::FixRunnerFailed(e.to_string())),
         }

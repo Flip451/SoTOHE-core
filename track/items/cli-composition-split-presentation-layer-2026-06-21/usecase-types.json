@@ -2418,6 +2418,113 @@
       ],
       "informal_grounds": []
     },
+    "RunReviewFixOutput": {
+      "action": "modify",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "status",
+              "ty": "String"
+            },
+            {
+              "name": "exit_code",
+              "ty": "i32"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "DTO returned by ReviewService::run_fix_local — the usecase aggregate service method that orchestrates the review-fix-lead runner. `status` carries the sentinel string from the codex output (`completed` | `blocked_cross_scope` | `failed`). `exit_code` maps the sentinel to a CLI exit code (0=completed, 2=blocked_cross_scope, 1=failed). `stderr` carries diagnostic detail (e.g., smoke-test failure message) to surface on stderr when the run is blocked or failed; `None` when the run completed successfully.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewFixError": {
+      "action": "modify",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidScope",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "InvalidRoundType",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "SmokeTestFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "FixRunnerFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Error type returned by ReviewService::run_fix_local. InvalidScope, InvalidTrackId, and InvalidRoundType cover argument validation failures; SmokeTestFailed covers fixer preflight failures; FixRunnerFailed wraps runner failures without leaking infrastructure types.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-13"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
     "ReviewClassifyInteractor": {
       "action": "add",
       "role": {
@@ -8946,6 +9053,21 @@
       "action": "add",
       "trait_ref": "core::error::Error",
       "for_type": "ReviewAuxError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RunReviewFixError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RunReviewFixError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "RunReviewFixError"
     },
     {
       "action": "add",

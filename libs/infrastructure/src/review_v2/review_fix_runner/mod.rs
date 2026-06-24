@@ -191,7 +191,7 @@ impl ReviewFixRunner for CodexReviewFixRunner {
             log_cleanup.keep_for_diagnosis();
         }
         let exit_code = sentinel_to_exit_code(status);
-        Ok(RunReviewFixOutput { status: status.to_owned(), exit_code })
+        Ok(RunReviewFixOutput { status: status.to_owned(), exit_code, stderr: None })
     }
 }
 

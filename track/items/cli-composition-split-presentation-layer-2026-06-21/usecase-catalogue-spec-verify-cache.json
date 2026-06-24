@@ -6497,6 +6497,46 @@
         "kind": "pass",
         "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
       }
+    },
+    {
+      "claim_hash": "5151e7fb7b41efa19c91ac78f74c17ad7d9344151d389037bd20472cac62ad6d",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "5151e7fb7b41efa19c91ac78f74c17ad7d9344151d389037bd20472cac62ad6d",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "6df561797fd35e06babe8adea8f2a6d4e9495261a4422e23933798db800c631e",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines the outward result contract for ReviewService::run_fix_local, including status sentinel values, CLI exit-code mapping, and stderr behavior. The evidence only constrains cli_composition to assemble the object graph and not invoke the use case, so it does not motivate this DTO contract; the reference is semantically unrelated."
+      }
+    },
+    {
+      "claim_hash": "3cb22427427e1f9f53c8c54f44be2e6ae9ec1263aedb5ed9a902dd6c2ef1d551",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "879b357d809fbc722aa4e89a5574c4094ed646cd246f3352766d5e7057be1160",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
     }
   ]
 }
