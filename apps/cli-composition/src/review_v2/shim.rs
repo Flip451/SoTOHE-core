@@ -161,23 +161,28 @@ impl ReviewService for ReviewServiceImpl {
         };
         match root.review_run_fix_local(comp_input) {
             Ok(outcome) => {
-                let exit_code = i32::from(outcome.exit_code);
                 // Smoke-test failures from cli_composition::review_v2::run_fix
                 // return exit 2 with `[ERROR] smoke test failed: ...` on stderr
                 // and no stdout sentinel. Distinguish them from genuine
                 // `REVIEW_FIX_STATUS: blocked_cross_scope` (which has the
                 // sentinel on stdout) by inspecting whether the runner emitted
                 // a sentinel — exit 2 alone is ambiguous between "blocked" and
-                // "smoke test failed".
+                // "smoke test failed". Propagate the smoke-test case as a
+                // typed `SmokeTestFailed` error so the driver can preserve
+                // exit 2 + stderr diagnostic without inventing a fake status
+                // string.
                 let stdout_has_sentinel =
                     outcome.stdout.as_deref().is_some_and(|s| s.contains("REVIEW_FIX_STATUS:"));
-                let status = match (outcome.exit_code, stdout_has_sentinel) {
-                    (0, _) => "completed",
-                    (2, true) => "blocked_cross_scope",
-                    // exit 2 without a sentinel is the smoke-test path —
-                    // surface it as `failed` so orchestrators do not treat it
-                    // as a repartitionable cross-scope block.
-                    (2, false) => "failed",
+                if outcome.exit_code == 2 && !stdout_has_sentinel {
+                    let msg = outcome
+                        .stderr
+                        .unwrap_or_else(|| "smoke test failed (no diagnostic)".to_owned());
+                    return Err(RunReviewFixError::SmokeTestFailed(msg));
+                }
+                let exit_code = i32::from(outcome.exit_code);
+                let status = match outcome.exit_code {
+                    0 => "completed",
+                    2 => "blocked_cross_scope",
                     _ => "failed",
                 }
                 .to_owned();

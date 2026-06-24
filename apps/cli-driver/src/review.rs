@@ -368,6 +368,8 @@ impl ReviewDriver {
         round_type: String,
         model: Option<String>,
     ) -> CommandOutcome {
+        use usecase::review_v2::RunReviewFixError;
+
         let input = ReviewRunFixInput { scope, briefing_file, track_id, round_type, model };
         match self.service.run_fix_local(input) {
             Ok(out) => {
@@ -383,6 +385,15 @@ impl ReviewDriver {
                     exit_code,
                 }
             }
+            // SmokeTestFailed is a preflight failure (not a review outcome).
+            // Preserve exit 2 + diagnostic on stderr without emitting a
+            // `REVIEW_FIX_STATUS:` line so orchestrators do not classify it
+            // as a normal review-fix outcome.
+            Err(RunReviewFixError::SmokeTestFailed(msg)) => CommandOutcome {
+                stdout: None,
+                stderr: Some(format!("[ERROR] smoke test failed: {msg}")),
+                exit_code: 2,
+            },
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
