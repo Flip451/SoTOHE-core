@@ -191,7 +191,9 @@ impl GitWorkflowService for FsGitWorkflowAdapter {
         {
             0 => {}
             code => {
-                return Ok(format!("Failed to checkout {branch} (exit {code})"));
+                return Err(GitWorkflowError::Unavailable(format!(
+                    "Failed to checkout {branch} (exit {code})"
+                )));
             }
         }
 
