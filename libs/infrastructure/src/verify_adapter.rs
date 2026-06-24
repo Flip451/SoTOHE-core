@@ -3,7 +3,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use usecase::verify::{VerifyOutcome, VerifyPort};
+use usecase::verify::{VerifyOutcome, VerifyPort, VerifyPortError};
 
 use crate::verify::VerifyOutcome as InfraVerifyOutcome;
 
@@ -145,6 +145,50 @@ fn reject_unsafe_sibling_spec_json(label: &str, spec_path: &Path) -> Option<Veri
     }
 }
 
+fn reject_unsafe_spec_markdown(label: &str, spec_path: &Path) -> Option<VerifyOutcome> {
+    let absolute_spec = crate::verify::path_safety::lexical_normalize(
+        &crate::verify::trusted_root::absolutize(spec_path),
+    );
+
+    let trusted_root = match crate::verify::trusted_root::resolve_trusted_root(&absolute_spec) {
+        Ok(root) => crate::verify::path_safety::lexical_normalize(&root),
+        Err(e) => {
+            return Some(VerifyOutcome {
+                stdout: None,
+                stderr: Some(format!(
+                    "{label}: trusted root resolution failed before spec.md check at '{}': {e}",
+                    spec_path.display()
+                )),
+                exit_code: 1,
+            });
+        }
+    };
+
+    if !absolute_spec.starts_with(&trusted_root) {
+        return Some(VerifyOutcome {
+            stdout: None,
+            stderr: Some(format!(
+                "{label}: spec.md '{}' resolves outside trusted root '{}'",
+                spec_path.display(),
+                trusted_root.display()
+            )),
+            exit_code: 1,
+        });
+    }
+
+    match crate::track::symlink_guard::reject_symlinks_below(&absolute_spec, &trusted_root) {
+        Ok(_) => None,
+        Err(e) => Some(VerifyOutcome {
+            stdout: None,
+            stderr: Some(format!(
+                "{label}: spec.md rejected before verification at '{}': {e}",
+                spec_path.display()
+            )),
+            exit_code: 1,
+        }),
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Git-resolution helpers (mirrors cli_composition/src/verify.rs)
 // ---------------------------------------------------------------------------
@@ -222,186 +266,198 @@ impl FsVerifyAdapter {
 }
 
 impl VerifyPort for FsVerifyAdapter {
-    fn verify_tech_stack(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_tech_stack(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) =
             reject_symlinked_trusted_root("verify tech stack readiness", project_root)
         {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome(
+        Ok(render_outcome(
             "verify tech stack readiness",
             &crate::verify::tech_stack::verify(project_root),
-        )
+        ))
     }
 
-    fn verify_latest_track(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_latest_track(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) =
             reject_symlinked_trusted_root("verify latest track files", project_root)
         {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome(
+        Ok(render_outcome(
             "verify latest track files",
             &crate::verify::latest_track::verify(project_root),
-        )
+        ))
     }
 
-    fn verify_arch_docs(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_arch_docs(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) =
             reject_symlinked_trusted_root("verify architecture docs", project_root)
         {
-            return outcome;
+            return Ok(outcome);
         }
 
         let mut outcome = crate::verify::architecture_rules::verify(project_root);
         outcome.merge(crate::verify::doc_patterns::verify(project_root));
         outcome.merge(crate::conventions::verify_convention_index(project_root));
-        render_outcome("verify architecture docs", &outcome)
+        Ok(render_outcome("verify architecture docs", &outcome))
     }
 
-    fn verify_layers(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_layers(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_symlinked_trusted_root("verify layers", project_root) {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome("verify layers", &crate::verify::layers::verify(project_root))
+        Ok(render_outcome("verify layers", &crate::verify::layers::verify(project_root)))
     }
 
-    fn verify_hooks_path(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_hooks_path(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_symlinked_trusted_root("verify hooks path", project_root) {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome("verify hooks path", &crate::verify::hooks_path::verify(project_root))
+        Ok(render_outcome("verify hooks path", &crate::verify::hooks_path::verify(project_root)))
     }
 
-    fn verify_spec_attribution(&self, spec_path: &Path) -> VerifyOutcome {
+    fn verify_spec_attribution(&self, spec_path: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_unsafe_sibling_spec_json("verify spec attribution", spec_path)
         {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome(
+        Ok(render_outcome(
             "verify spec attribution",
             &crate::verify::spec_attribution::verify(spec_path),
-        )
+        ))
     }
 
-    fn verify_spec_frontmatter(&self, spec_path: &Path) -> VerifyOutcome {
+    fn verify_spec_frontmatter(&self, spec_path: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_unsafe_sibling_spec_json("verify spec frontmatter", spec_path)
         {
-            return outcome;
+            return Ok(outcome);
+        }
+        if let Some(outcome) = reject_unsafe_spec_markdown("verify spec frontmatter", spec_path) {
+            return Ok(outcome);
         }
 
-        render_outcome(
+        Ok(render_outcome(
             "verify spec frontmatter",
             &crate::verify::spec_frontmatter::verify(spec_path),
-        )
+        ))
     }
 
-    fn verify_canonical_modules(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_canonical_modules(
+        &self,
+        project_root: &Path,
+    ) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) =
             reject_symlinked_trusted_root("verify canonical modules", project_root)
         {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome(
+        Ok(render_outcome(
             "verify canonical modules",
             &crate::verify::canonical_modules::verify(project_root),
-        )
+        ))
     }
 
-    fn verify_module_size(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_module_size(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_symlinked_trusted_root("verify module size", project_root) {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome("verify module size", &crate::verify::module_size::verify(project_root))
+        Ok(render_outcome("verify module size", &crate::verify::module_size::verify(project_root)))
     }
 
-    fn verify_domain_purity(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_domain_purity(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_symlinked_trusted_root("verify domain purity", project_root) {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome("verify domain purity", &crate::verify::domain_purity::verify(project_root))
+        Ok(render_outcome(
+            "verify domain purity",
+            &crate::verify::domain_purity::verify(project_root),
+        ))
     }
 
-    fn verify_domain_strings(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_domain_strings(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_symlinked_trusted_root("verify domain strings", project_root)
         {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome(
+        Ok(render_outcome(
             "verify domain strings",
             &crate::verify::domain_strings::verify(project_root),
-        )
+        ))
     }
 
-    fn verify_usecase_purity(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_usecase_purity(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_symlinked_trusted_root("verify usecase purity", project_root)
         {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome(
+        Ok(render_outcome(
             "verify usecase purity",
             &crate::verify::usecase_purity::verify(project_root),
-        )
+        ))
     }
 
-    fn verify_doc_links(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_doc_links(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_symlinked_trusted_root("verify doc links", project_root) {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome("verify doc links", &crate::verify::doc_links::verify(project_root))
+        Ok(render_outcome("verify doc links", &crate::verify::doc_links::verify(project_root)))
     }
 
-    fn verify_view_freshness(&self, project_root: &Path) -> VerifyOutcome {
+    fn verify_view_freshness(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_symlinked_trusted_root("verify view freshness", project_root)
         {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome(
+        Ok(render_outcome(
             "verify view freshness",
             &crate::verify::view_freshness::verify(project_root),
-        )
+        ))
     }
 
-    fn verify_spec_signals(&self, spec_path: &Path) -> VerifyOutcome {
+    fn verify_spec_signals(&self, spec_path: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_unsafe_sibling_spec_json("verify spec signals", spec_path) {
-            return outcome;
+            return Ok(outcome);
         }
 
-        render_outcome("verify spec signals", &crate::verify::spec_signals::verify(spec_path))
+        Ok(render_outcome("verify spec signals", &crate::verify::spec_signals::verify(spec_path)))
     }
 
-    fn verify_plan_artifact_refs(&self, track_dir: Option<&Path>) -> VerifyOutcome {
+    fn verify_plan_artifact_refs(
+        &self,
+        track_dir: Option<&Path>,
+    ) -> Result<VerifyOutcome, VerifyPortError> {
         use crate::verify::VerifyFinding;
 
         if track_dir.is_none() {
             match resolve_ci_verify_track_id() {
                 Ok(None) => {
-                    return render_skip(
+                    return Ok(render_skip(
                         "verify plan artifact refs",
                         "not on a track branch; skipping",
-                    );
+                    ));
                 }
                 Ok(Some(_)) => {}
                 Err(e) => {
-                    return VerifyOutcome {
+                    return Ok(VerifyOutcome {
                         stdout: None,
                         stderr: Some(format!(
                             "verify plan artifact refs: git resolution failed: {e}"
                         )),
                         exit_code: 1,
-                    };
+                    });
                 }
             }
         }
@@ -421,7 +477,7 @@ impl VerifyPort for FsVerifyAdapter {
                 )]),
             },
         };
-        render_outcome("verify plan artifact refs", &outcome)
+        Ok(render_outcome("verify plan artifact refs", &outcome))
     }
 
     fn verify_catalogue_spec_refs(
@@ -430,40 +486,40 @@ impl VerifyPort for FsVerifyAdapter {
         items_dir: &Path,
         workspace_root: &Path,
         skip_stale: bool,
-    ) -> VerifyOutcome {
+    ) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) =
             reject_symlinked_trusted_root("verify catalogue-spec-refs", workspace_root)
         {
-            return outcome;
+            return Ok(outcome);
         }
         if let Some(outcome) =
             reject_symlinked_trusted_root("verify catalogue-spec-refs", items_dir)
         {
-            return outcome;
+            return Ok(outcome);
         }
         if let Some(outcome) =
             reject_unsafe_items_dir("verify catalogue-spec-refs", items_dir, workspace_root)
         {
-            return outcome;
+            return Ok(outcome);
         }
 
         if track_id.is_none() {
             match resolve_ci_verify_track_id_from_root(workspace_root) {
                 Ok(None) => {
-                    return render_skip(
+                    return Ok(render_skip(
                         "verify catalogue-spec-refs",
                         "not on a track branch; skipping",
-                    );
+                    ));
                 }
                 Ok(Some(_)) => {}
                 Err(e) => {
-                    return VerifyOutcome {
+                    return Ok(VerifyOutcome {
                         stdout: None,
                         stderr: Some(format!(
                             "verify catalogue-spec-refs: git resolution failed: {e}"
                         )),
                         exit_code: 1,
-                    };
+                    });
                 }
             }
         }
@@ -475,19 +531,19 @@ impl VerifyPort for FsVerifyAdapter {
                 match resolve_ci_verify_track_id_from_root(workspace_root) {
                     Ok(Some(id)) => id,
                     Ok(None) => {
-                        return render_skip(
+                        return Ok(render_skip(
                             "verify catalogue-spec-refs",
                             "not on a track branch; skipping",
-                        );
+                        ));
                     }
                     Err(e) => {
-                        return VerifyOutcome {
+                        return Ok(VerifyOutcome {
                             stdout: None,
                             stderr: Some(format!(
                                 "verify catalogue-spec-refs: git resolution failed: {e}"
                             )),
                             exit_code: 1,
-                        };
+                        });
                     }
                 }
             }
@@ -501,14 +557,16 @@ impl VerifyPort for FsVerifyAdapter {
             skip_stale,
             &mut all_formatted_findings,
         ) {
-            Err(e) => VerifyOutcome {
+            Err(e) => Ok(VerifyOutcome {
                 stdout: None,
                 stderr: Some(format!("verify catalogue-spec-refs: infrastructure error: {e}")),
                 exit_code: 1,
-            },
+            }),
             Ok(no_findings) => {
                 if no_findings {
-                    VerifyOutcome::success(Some("[OK] catalogue-spec-refs: no findings".to_owned()))
+                    Ok(VerifyOutcome::success(Some(
+                        "[OK] catalogue-spec-refs: no findings".to_owned(),
+                    )))
                 } else {
                     let stderr = all_formatted_findings
                         .iter()
@@ -519,7 +577,7 @@ impl VerifyPort for FsVerifyAdapter {
                         .cloned()
                         .collect::<Vec<_>>()
                         .join("\n");
-                    VerifyOutcome { stdout: None, stderr: Some(stderr), exit_code: 1 }
+                    Ok(VerifyOutcome { stdout: None, stderr: Some(stderr), exit_code: 1 })
                 }
             }
         }
@@ -540,7 +598,7 @@ mod tests {
         let root_link = link_parent.path().join("workspace-link");
         std::os::unix::fs::symlink(real_root.path(), &root_link).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_tech_stack(&root_link);
+        let outcome = FsVerifyAdapter::new().verify_tech_stack(&root_link).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
@@ -559,7 +617,7 @@ mod tests {
         std::fs::write(&spec_md, "# Spec\n").unwrap();
         std::os::unix::fs::symlink(&target, &spec_json).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_spec_attribution(&spec_md);
+        let outcome = FsVerifyAdapter::new().verify_spec_attribution(&spec_md).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
@@ -578,11 +636,28 @@ mod tests {
         std::fs::write(&spec_md, "# Spec\n").unwrap();
         std::os::unix::fs::symlink(&target, &spec_json).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_spec_frontmatter(&spec_md);
+        let outcome = FsVerifyAdapter::new().verify_spec_frontmatter(&spec_md).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
         assert!(stderr.contains("sibling spec.json rejected before verification"), "{stderr}");
+        assert!(stderr.contains("refusing to follow symlink"), "{stderr}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_verify_spec_frontmatter_symlinked_spec_md_errors() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("real-spec.md");
+        let spec_md = dir.path().join("spec.md");
+        std::fs::write(&target, "---\nversion: \"1.0\"\n---\n# Spec\n").unwrap();
+        std::os::unix::fs::symlink(&target, &spec_md).unwrap();
+
+        let outcome = FsVerifyAdapter::new().verify_spec_frontmatter(&spec_md).unwrap();
+
+        assert_eq!(outcome.exit_code, 1);
+        let stderr = outcome.stderr.unwrap_or_default();
+        assert!(stderr.contains("spec.md rejected before verification"), "{stderr}");
         assert!(stderr.contains("refusing to follow symlink"), "{stderr}");
     }
 
@@ -597,7 +672,7 @@ mod tests {
         std::fs::write(&spec_md, "# Spec\n").unwrap();
         std::os::unix::fs::symlink(&target, &spec_json).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_spec_signals(&spec_md);
+        let outcome = FsVerifyAdapter::new().verify_spec_signals(&spec_md).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
@@ -615,12 +690,9 @@ mod tests {
         std::os::unix::fs::symlink(&real_track, &track_link).unwrap();
 
         let items_dir = track_link.join("items");
-        let outcome = FsVerifyAdapter::new().verify_catalogue_spec_refs(
-            Some("some-track"),
-            &items_dir,
-            workspace.path(),
-            false,
-        );
+        let outcome = FsVerifyAdapter::new()
+            .verify_catalogue_spec_refs(Some("some-track"), &items_dir, workspace.path(), false)
+            .unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();

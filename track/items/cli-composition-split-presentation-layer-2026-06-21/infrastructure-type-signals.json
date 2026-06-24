@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-24T12:34:33Z",
-  "declaration_hash": "c072208a67fa296ab20e812e8f1e26a446806abfd09d601517669162a71a1df3",
+  "generated_at": "2026-06-24T15:12:23Z",
+  "declaration_hash": "74bed58033245c691d5e695d19d725887fd4c66940747a1ccd48c26f72778700",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -28,7 +28,7 @@
     {
       "type_name": "FsArchAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ArchPort",
@@ -47,7 +47,7 @@
     {
       "type_name": "FsConventionsAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ConventionsPort",
@@ -57,7 +57,7 @@
     {
       "type_name": "FsDemoAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "DemoPort",
@@ -76,7 +76,7 @@
     {
       "type_name": "FsFileWriteAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "FileWritePort",
@@ -86,7 +86,7 @@
     {
       "type_name": "FsGitWorkflowAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "GitWorkflowService",
@@ -96,7 +96,7 @@
     {
       "type_name": "FsRefVerifyAggregateAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "RefVerifyAggregateService",
@@ -106,7 +106,7 @@
     {
       "type_name": "FsRefVerifyCheckApprovedAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "RefVerifyCheckApprovedDriverService",
@@ -125,7 +125,7 @@
     {
       "type_name": "FsRefVerifyRunAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "RefVerifyRunService",
@@ -154,7 +154,7 @@
     {
       "type_name": "FsTelemetryEmitDynamicAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "TelemetryEmitDynamicPort",
@@ -164,7 +164,7 @@
     {
       "type_name": "FsTelemetryReportAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "TelemetryReportPort",
@@ -174,7 +174,7 @@
     {
       "type_name": "FsVerifyAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "VerifyPort",

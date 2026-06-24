@@ -44,63 +44,69 @@ pub enum VerifyPortError {
 /// [`VerifyOutcome`]; adapter-level failures use [`VerifyPortError`].
 pub trait VerifyPort: Send + Sync {
     /// Check tech-stack.md for unresolved TODO markers.
-    fn verify_tech_stack(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_tech_stack(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check latest track artifacts for completeness.
-    fn verify_latest_track(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_latest_track(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check architecture docs synchronization and text patterns.
-    fn verify_arch_docs(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_arch_docs(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check workspace layer dependency rules via cargo metadata.
-    fn verify_layers(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_layers(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check local Git config uses `.githooks` as `core.hooksPath`.
-    fn verify_hooks_path(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_hooks_path(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check spec.md requirement lines for `[source: ...]` attribution.
-    fn verify_spec_attribution(&self, spec_path: &Path) -> VerifyOutcome;
+    fn verify_spec_attribution(&self, spec_path: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check spec.md YAML frontmatter for required fields.
-    fn verify_spec_frontmatter(&self, spec_path: &Path) -> VerifyOutcome;
+    fn verify_spec_frontmatter(&self, spec_path: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check canonical module ownership.
-    fn verify_canonical_modules(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_canonical_modules(
+        &self,
+        project_root: &Path,
+    ) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check Rust source file sizes against module_limits thresholds.
-    fn verify_module_size(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_module_size(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check libs/domain/src/ for hexagonal purity violations.
-    fn verify_domain_purity(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_domain_purity(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check libs/domain/src/ for pub String fields (should be enums or newtypes).
-    fn verify_domain_strings(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_domain_strings(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check libs/usecase/src/ for hexagonal purity violations.
-    fn verify_usecase_purity(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_usecase_purity(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check that local file links in Markdown documents resolve to existing files.
-    fn verify_doc_links(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_doc_links(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check that plan.md files are up-to-date with metadata.json renderings.
-    fn verify_view_freshness(&self, project_root: &Path) -> VerifyOutcome;
+    fn verify_view_freshness(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check spec.md source tag signals match frontmatter and red == 0 gate.
-    fn verify_spec_signals(&self, spec_path: &Path) -> VerifyOutcome;
+    fn verify_spec_signals(&self, spec_path: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Validate structured-ref fields per ADR 2026-04-19-1242.
     ///
-    /// Returns `Ok(None)` when the skip path fires (non-track branch).
-    fn verify_plan_artifact_refs(&self, track_dir: Option<&Path>) -> VerifyOutcome;
+    /// Returns a skip outcome (inside `Ok`) when the skip path fires (non-track branch).
+    fn verify_plan_artifact_refs(
+        &self,
+        track_dir: Option<&Path>,
+    ) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Verify catalogue-spec ref integrity (SoT Chain binary gate).
     ///
-    /// Returns a skip outcome when not on a track branch.
+    /// Returns a skip outcome (inside `Ok`) when not on a track branch.
     fn verify_catalogue_spec_refs(
         &self,
         track_id: Option<&str>,
         items_dir: &Path,
         workspace_root: &Path,
         skip_stale: bool,
-    ) -> VerifyOutcome;
+    ) -> Result<VerifyOutcome, VerifyPortError>;
 }

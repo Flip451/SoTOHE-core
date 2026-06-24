@@ -1,12 +1,7 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "eee3b011adf89d8d723ba364e9af2c18d07f4fdf9cd8c884630e0cf3e0990edf",
+  "catalogue_declaration_hash": "c1ac1f68529b4b67fc6c76847604e78ae0cc6361b4f43779d5a2c06be9e3aa5c",
   "signals": [
-    {
-      "type_name": "ArchInteractor",
-      "signal": "blue",
-      "entry_hash": "ce0d635d422535dd653922220e56c954f491cdcb13f66d5b327d4e5419dcce93"
-    },
     {
       "type_name": "ArchPortError",
       "signal": "blue",
@@ -20,7 +15,7 @@
     {
       "type_name": "ArchivedTrackTelemetryError",
       "signal": "blue",
-      "entry_hash": "3237ffe5f1e62d83afb98d158f052a185f82ef4270ecfa3cb4d277623a61276b"
+      "entry_hash": "2bfd8bf3004fd2f56ede0c2709b34c943543cd316fb07e22a7ebc93371ea9a99"
     },
     {
       "type_name": "ArchivedTrackTelemetryInteractor",
@@ -41,11 +36,6 @@
       "type_name": "CodeFragmentExtractorError",
       "signal": "blue",
       "entry_hash": "8ff9615d26036f5f09ac7a5e7e817291529401c549e98b3e6cf4192e7019dc9b"
-    },
-    {
-      "type_name": "ConventionsInteractor",
-      "signal": "blue",
-      "entry_hash": "bfd2b5210ee3923a694225df8e3240e3737f8a1ea4ca0dc01db7df92e8091a97"
     },
     {
       "type_name": "ConventionsPortError",
@@ -175,17 +165,12 @@
     {
       "type_name": "GitWorkflowError",
       "signal": "blue",
-      "entry_hash": "e86df1a4dd5970b178d38bb5f1d8508b272ff0417424ea86b3312c3fe74a43f3"
+      "entry_hash": "64bdf2291933d3548c6740c101a6eabc77d554270acd9c810cc305ae7c59296c"
     },
     {
       "type_name": "GitWorkflowInteractor",
       "signal": "blue",
       "entry_hash": "9059a1454f9e5ce84106a426d11759f75ce09593dd3e11d9581d800efc8e38bf"
-    },
-    {
-      "type_name": "GitWorkflowResult",
-      "signal": "blue",
-      "entry_hash": "043bfda852d0d27a90edc990f452e2738dae34f5934c3780eaff268db67cde0c"
     },
     {
       "type_name": "HookDispatchCommand",
@@ -256,11 +241,6 @@
       "type_name": "PrReviewPollingOutput",
       "signal": "blue",
       "entry_hash": "c554c6b1e995d0cc3d505f2bd0455dd74a5c1bd130403e61f95ea76a424ea242"
-    },
-    {
-      "type_name": "RefVerifyAggregateInteractor",
-      "signal": "blue",
-      "entry_hash": "28a86a7c8dfc1a9d6c68ff4f828f83331daa59e72a869eb5e73ffb4277d7e230"
     },
     {
       "type_name": "RefVerifyCheckApprovedInteractor",
@@ -443,11 +423,6 @@
       "entry_hash": "f7c7515d5ce502de70c0e07d6323a06fe1fd8e6e00e049051db905556d2fb83d"
     },
     {
-      "type_name": "TelemetryAggregateInteractor",
-      "signal": "blue",
-      "entry_hash": "8a771311499d1d15d1aaeda7609ae34fb79b3844f2ac591bd79d535c51564262"
-    },
-    {
       "type_name": "TelemetryAggregateServiceError",
       "signal": "blue",
       "entry_hash": "423b825c30c5932a8037b8c75a416c496a42ff45aaf33f4fb12c7b6f91722ae9"
@@ -493,11 +468,6 @@
       "entry_hash": "e78c6d7850ab3837abcdc44d7700dd3706367e0a3e4ae188012e97e6190c8204"
     },
     {
-      "type_name": "VerifyInteractor",
-      "signal": "blue",
-      "entry_hash": "ad6a07372737663fc57e1b7f83e7ed594341af159d68250c012ebb2e41b78617"
-    },
-    {
       "type_name": "VerifyOutcome",
       "signal": "blue",
       "entry_hash": "57e7480449f942abdd6c7022ab1bb3fc62f27305d8608b2dbf681b4dc8453cdb"
@@ -505,7 +475,7 @@
     {
       "type_name": "VerifyPortError",
       "signal": "blue",
-      "entry_hash": "9b3a1c5289210640b9417fedfb0fd7d2a0694380d523a3f23347801cff8066b4"
+      "entry_hash": "5a3f845166c8ba38881c6bdf6ebfdb99cc7845c6e62fbc35694961570a7b1356"
     },
     {
       "type_name": "AdrChainRunnerPort",
@@ -516,11 +486,6 @@
       "type_name": "ArchPort",
       "signal": "blue",
       "entry_hash": "c1a4279124c42c6897369b6b8c137130469b92fcfab91bdfd2ec423e49075261"
-    },
-    {
-      "type_name": "ArchService",
-      "signal": "blue",
-      "entry_hash": "1b7980a543ab93ae12f767c4d8364aa7078caa69d0d93526d0435a95d86e61ad"
     },
     {
       "type_name": "ArchivedTrackTelemetryPort",
@@ -546,11 +511,6 @@
       "type_name": "ConventionsPort",
       "signal": "blue",
       "entry_hash": "da1e8b09d8ecb1dbfaaefb1a2ecd5b11bdf9f0ed0180b0d221ebc869a4b71c94"
-    },
-    {
-      "type_name": "ConventionsService",
-      "signal": "blue",
-      "entry_hash": "0b5c8afe71511a9a583011328637a0e9857dbc7a304d944cda45dee28e588eed"
     },
     {
       "type_name": "DemoPort",
@@ -620,7 +580,7 @@
     {
       "type_name": "GitWorkflowService",
       "signal": "blue",
-      "entry_hash": "f8ffdf7b9ee387d6227da1b626a4ad422b9483d61422e7e1181b070de015db4f"
+      "entry_hash": "4208042a1da734ac5452f0ca71ff29bc13ca995c80a971540476524f52c7a3c1"
     },
     {
       "type_name": "HookDispatchService",
@@ -665,7 +625,7 @@
     {
       "type_name": "RefVerifyAggregateService",
       "signal": "blue",
-      "entry_hash": "a6d3c7f4bee89789a7cfaa4265638afb3fdafb74633e0dd099485317b7bb7f97"
+      "entry_hash": "5c0b731f0c9891997c6873980841f1c75fd62183c06cd5463d9efa6177b2044c"
     },
     {
       "type_name": "RefVerifyCheckApprovedDriverService",
@@ -785,7 +745,7 @@
     {
       "type_name": "TelemetryAggregateService",
       "signal": "blue",
-      "entry_hash": "505696d793c439db8b9577771535f7dafb26e6184385582471ad30c297b5df1c"
+      "entry_hash": "6ad53f9e2949b997fcc61f2303352abcf63ab7bb08c59ab7d12ab5de8cf0d988"
     },
     {
       "type_name": "TelemetryEmitDynamicPort",
@@ -800,17 +760,12 @@
     {
       "type_name": "TrackService",
       "signal": "blue",
-      "entry_hash": "ec77a74d49531c7365c17dfb11cdc46214f80efd64cedf207be97410146a7ac6"
+      "entry_hash": "4daa490f4b8ca76c05b05e3b8fa749f30c22345b8188e0677dcf837daa2f5696"
     },
     {
       "type_name": "VerifyPort",
       "signal": "blue",
-      "entry_hash": "5017b38c869b6bcee8ad382d560ea88bd63b3b049d38ad1187bc4b885bf14985"
-    },
-    {
-      "type_name": "VerifyService",
-      "signal": "blue",
-      "entry_hash": "e49d0af0e214115a134004f9b047c6901000beaf8f92bc6b274de9f1875898f9"
+      "entry_hash": "a85c2fa0cc258797629bff9436777e16bf4b3db16678ba84a28f739185a6a67b"
     },
     {
       "type_name": "usecase::dry_check::shared::fragment_ref_of",

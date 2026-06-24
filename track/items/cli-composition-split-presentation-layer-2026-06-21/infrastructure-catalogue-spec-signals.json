@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c072208a67fa296ab20e812e8f1e26a446806abfd09d601517669162a71a1df3",
+  "catalogue_declaration_hash": "74bed58033245c691d5e695d19d725887fd4c66940747a1ccd48c26f72778700",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -50,7 +50,7 @@
     {
       "type_name": "FsRefVerifyAggregateAdapter",
       "signal": "blue",
-      "entry_hash": "9ae29b57112c7bbeeb7500b3a69eb9d3e8addec962693d5f515b24c05acd5efc"
+      "entry_hash": "d1c738e8cb2c351c028ebfb499c1809590afa0e92100fc8b3a1d2acabf79055b"
     },
     {
       "type_name": "FsRefVerifyCheckApprovedAdapter",

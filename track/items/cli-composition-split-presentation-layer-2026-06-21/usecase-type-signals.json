@@ -1,22 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-24T12:34:29Z",
-  "declaration_hash": "eee3b011adf89d8d723ba364e9af2c18d07f4fdf9cd8c884630e0cf3e0990edf",
+  "generated_at": "2026-06-24T15:12:19Z",
+  "declaration_hash": "c1ac1f68529b4b67fc6c76847604e78ae0cc6361b4f43779d5a2c06be9e3aa5c",
   "signals": [
     {
       "type_name": "AdrChainRunnerPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
-    },
-    {
-      "type_name": "ArchInteractor",
-      "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "ArchService"
-      ]
     },
     {
       "type_name": "ArchPort",
@@ -36,12 +27,6 @@
       ]
     },
     {
-      "type_name": "ArchService",
-      "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
       "type_name": "ArchivedTrackTelemetryCommand",
       "kind_tag": "command",
       "signal": "blue",
@@ -50,7 +35,7 @@
     {
       "type_name": "ArchivedTrackTelemetryError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::error::Error",
@@ -121,15 +106,6 @@
       "found_type": true
     },
     {
-      "type_name": "ConventionsInteractor",
-      "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "ConventionsService"
-      ]
-    },
-    {
       "type_name": "ConventionsPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
@@ -147,12 +123,6 @@
       ]
     },
     {
-      "type_name": "ConventionsService",
-      "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
       "type_name": "D4OrchestrationError",
       "kind_tag": "error_type",
       "signal": "blue",
@@ -167,7 +137,7 @@
     {
       "type_name": "DemoInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "DemoService"
@@ -268,7 +238,7 @@
     {
       "type_name": "DryDriverInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "DryDriverService"
@@ -277,7 +247,7 @@
     {
       "type_name": "DryDriverOutcome",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -470,17 +440,11 @@
     {
       "type_name": "GitWorkflowInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "GitWorkflowService"
       ]
-    },
-    {
-      "type_name": "GitWorkflowResult",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": true
     },
     {
       "type_name": "GitWorkflowService",
@@ -578,7 +542,7 @@
     {
       "type_name": "PrCommandInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "PrCommandService"
@@ -587,7 +551,7 @@
     {
       "type_name": "PrCommandOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -682,15 +646,6 @@
       "found_type": true
     },
     {
-      "type_name": "RefVerifyAggregateInteractor",
-      "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "RefVerifyAggregateService"
-      ]
-    },
-    {
       "type_name": "RefVerifyAggregateService",
       "kind_tag": "secondary_port",
       "signal": "blue",
@@ -705,7 +660,7 @@
     {
       "type_name": "RefVerifyCheckApprovedInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "RefVerifyCheckApprovedService"
@@ -772,7 +727,7 @@
     {
       "type_name": "ReviewClassifyInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ReviewClassifyService"
@@ -787,7 +742,7 @@
     {
       "type_name": "ReviewFilesInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ReviewFilesService"
@@ -802,7 +757,7 @@
     {
       "type_name": "ReviewGetBriefingInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ReviewGetBriefingService"
@@ -817,7 +772,7 @@
     {
       "type_name": "ReviewResultsInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ReviewResultsService"
@@ -868,7 +823,7 @@
     {
       "type_name": "ReviewRunLocalInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ReviewRunLocalService"
@@ -895,7 +850,7 @@
     {
       "type_name": "ReviewValidateScopeInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ReviewValidateScopeService"
@@ -973,7 +928,7 @@
     {
       "type_name": "SemanticDupDriverInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "SemanticDupDriverService"
@@ -982,7 +937,7 @@
     {
       "type_name": "SemanticDupDriverOutcome",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -1031,7 +986,7 @@
     {
       "type_name": "SignalCommandOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -1168,18 +1123,9 @@
       "found_type": true
     },
     {
-      "type_name": "TelemetryAggregateInteractor",
-      "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "TelemetryAggregateService"
-      ]
-    },
-    {
       "type_name": "TelemetryAggregateService",
       "kind_tag": "application_service",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true
     },
     {
@@ -1270,7 +1216,7 @@
     {
       "type_name": "TrackCommandOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -1280,7 +1226,7 @@
     {
       "type_name": "TrackService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -1290,24 +1236,15 @@
       "found_type": true
     },
     {
-      "type_name": "VerifyInteractor",
-      "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "VerifyService"
-      ]
-    },
-    {
       "type_name": "VerifyOutcome",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "VerifyPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -1320,12 +1257,6 @@
         "core::fmt::Debug",
         "core::fmt::Display"
       ]
-    },
-    {
-      "type_name": "VerifyService",
-      "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
     },
     {
       "type_name": "usecase::dry_check::shared::fragment_ref_of",

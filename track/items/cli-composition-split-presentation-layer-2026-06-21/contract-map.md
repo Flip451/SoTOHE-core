@@ -30,10 +30,6 @@ subgraph usecase["usecase"]
   direction TB
   subgraph usecase_usecase_module_arch["usecase::arch"]
     direction TB
-  subgraph T30_usecase_usecase_ArchInteractor["arch::ArchInteractor"]
-    direction TB
-    T30_usecase_usecase_ArchInteractor__self[ArchInteractor]
-  end
   subgraph T29_usecase_usecase_ArchPortError["arch::ArchPortError"]
     direction TB
     T29_usecase_usecase_ArchPortError__self[ArchPortError]
@@ -47,21 +43,9 @@ subgraph usecase["usecase"]
     R24_usecase_usecase_ArchPort_render_members([render_members])
     R24_usecase_usecase_ArchPort_render_direct_checks([render_direct_checks])
   end
-  subgraph R27_usecase_usecase_ArchService["arch::ArchService"]
-    direction TB
-    R27_usecase_usecase_ArchService__self[ArchService]
-    R27_usecase_usecase_ArchService_render_tree([render_tree])
-    R27_usecase_usecase_ArchService_render_tree_full([render_tree_full])
-    R27_usecase_usecase_ArchService_render_members([render_members])
-    R27_usecase_usecase_ArchService_render_direct_checks([render_direct_checks])
-  end
   end
   subgraph usecase_usecase_module_conventions["usecase::conventions"]
     direction TB
-  subgraph T37_usecase_usecase_ConventionsInteractor["conventions::ConventionsInteractor"]
-    direction TB
-    T37_usecase_usecase_ConventionsInteractor__self[ConventionsInteractor]
-  end
   subgraph T36_usecase_usecase_ConventionsPortError["conventions::ConventionsPortError"]
     direction TB
     T36_usecase_usecase_ConventionsPortError__self[ConventionsPortError]
@@ -77,13 +61,6 @@ subgraph usecase["usecase"]
     R31_usecase_usecase_ConventionsPort_add_convention([add_convention])
     R31_usecase_usecase_ConventionsPort_update_index([update_index])
     R31_usecase_usecase_ConventionsPort_verify_index([verify_index])
-  end
-  subgraph R34_usecase_usecase_ConventionsService["conventions::ConventionsService"]
-    direction TB
-    R34_usecase_usecase_ConventionsService__self[ConventionsService]
-    R34_usecase_usecase_ConventionsService_add_convention([add_convention])
-    R34_usecase_usecase_ConventionsService_update_index([update_index])
-    R34_usecase_usecase_ConventionsService_verify_index([verify_index])
   end
   end
   subgraph usecase_usecase_module_d4_orchestration["usecase::d4_orchestration"]
@@ -101,6 +78,7 @@ subgraph usecase["usecase"]
   subgraph T30_usecase_usecase_DemoInteractor["demo::DemoInteractor"]
     direction TB
     T30_usecase_usecase_DemoInteractor__self[DemoInteractor]
+    T30_usecase_usecase_DemoInteractor_new([new])
   end
   subgraph T29_usecase_usecase_DemoPortError["demo::DemoPortError"]
     direction TB
@@ -180,10 +158,13 @@ subgraph usecase["usecase"]
   subgraph T35_usecase_usecase_DryDriverInteractor["dry_driver::DryDriverInteractor"]
     direction TB
     T35_usecase_usecase_DryDriverInteractor__self[DryDriverInteractor]
+    T35_usecase_usecase_DryDriverInteractor_new([new])
   end
   subgraph T32_usecase_usecase_DryDriverOutcome["dry_driver::DryDriverOutcome"]
     direction TB
     T32_usecase_usecase_DryDriverOutcome__self[DryDriverOutcome]
+    T32_usecase_usecase_DryDriverOutcome_success([success])
+    T32_usecase_usecase_DryDriverOutcome_failure([failure])
   end
   subgraph T38_usecase_usecase_DryFixLocalDriverInput["dry_driver::DryFixLocalDriverInput"]
     direction TB
@@ -327,10 +308,7 @@ subgraph usecase["usecase"]
   subgraph T37_usecase_usecase_GitWorkflowInteractor["git_workflow::GitWorkflowInteractor"]
     direction TB
     T37_usecase_usecase_GitWorkflowInteractor__self[GitWorkflowInteractor]
-  end
-  subgraph T33_usecase_usecase_GitWorkflowResult["git_workflow::GitWorkflowResult"]
-    direction TB
-    T33_usecase_usecase_GitWorkflowResult__self[GitWorkflowResult]
+    T37_usecase_usecase_GitWorkflowInteractor_new([new])
   end
   subgraph R34_usecase_usecase_GitWorkflowService["git_workflow::GitWorkflowService"]
     direction TB
@@ -396,10 +374,14 @@ subgraph usecase["usecase"]
   subgraph T35_usecase_usecase_PrCommandInteractor["pr::PrCommandInteractor"]
     direction TB
     T35_usecase_usecase_PrCommandInteractor__self[PrCommandInteractor]
+    T35_usecase_usecase_PrCommandInteractor_new([new])
   end
   subgraph T31_usecase_usecase_PrCommandOutput["pr::PrCommandOutput"]
     direction TB
     T31_usecase_usecase_PrCommandOutput__self[PrCommandOutput]
+    T31_usecase_usecase_PrCommandOutput_success([success])
+    T31_usecase_usecase_PrCommandOutput_failure([failure])
+    T31_usecase_usecase_PrCommandOutput_with_exit_code([with_exit_code])
   end
   subgraph R32_usecase_usecase_PrCommandService["pr::PrCommandService"]
     direction TB
@@ -481,13 +463,10 @@ subgraph usecase["usecase"]
     T36_usecase_usecase_CheckApprovedOutcome_AllApproved[AllApproved]
     T36_usecase_usecase_CheckApprovedOutcome_NotApproved[NotApproved]
   end
-  subgraph T44_usecase_usecase_RefVerifyAggregateInteractor["ref_verify::driver_service::RefVerifyAggregateInteractor"]
-    direction TB
-    T44_usecase_usecase_RefVerifyAggregateInteractor__self[RefVerifyAggregateInteractor]
-  end
   subgraph T48_usecase_usecase_RefVerifyCheckApprovedInteractor["ref_verify::check_approved::RefVerifyCheckApprovedInteractor"]
     direction TB
     T48_usecase_usecase_RefVerifyCheckApprovedInteractor__self[RefVerifyCheckApprovedInteractor]
+    T48_usecase_usecase_RefVerifyCheckApprovedInteractor_new([new])
   end
   subgraph T45_usecase_usecase_RefVerifyCheckApprovedOutcome["ref_verify::driver_service::RefVerifyCheckApprovedOutcome"]
     direction TB
@@ -542,18 +521,22 @@ subgraph usecase["usecase"]
   subgraph T40_usecase_usecase_ReviewClassifyInteractor["review_v2::review_aux::ReviewClassifyInteractor"]
     direction TB
     T40_usecase_usecase_ReviewClassifyInteractor__self[ReviewClassifyInteractor]
+    T40_usecase_usecase_ReviewClassifyInteractor_new([new])
   end
   subgraph T37_usecase_usecase_ReviewFilesInteractor["review_v2::review_aux::ReviewFilesInteractor"]
     direction TB
     T37_usecase_usecase_ReviewFilesInteractor__self[ReviewFilesInteractor]
+    T37_usecase_usecase_ReviewFilesInteractor_new([new])
   end
   subgraph T43_usecase_usecase_ReviewGetBriefingInteractor["review_v2::review_aux::ReviewGetBriefingInteractor"]
     direction TB
     T43_usecase_usecase_ReviewGetBriefingInteractor__self[ReviewGetBriefingInteractor]
+    T43_usecase_usecase_ReviewGetBriefingInteractor_new([new])
   end
   subgraph T39_usecase_usecase_ReviewResultsInteractor["review_v2::review_aux::ReviewResultsInteractor"]
     direction TB
     T39_usecase_usecase_ReviewResultsInteractor__self[ReviewResultsInteractor]
+    T39_usecase_usecase_ReviewResultsInteractor_new([new])
   end
   subgraph T31_usecase_usecase_ReviewRoundType["review_v2::run_review::ReviewRoundType"]
     direction TB
@@ -578,6 +561,7 @@ subgraph usecase["usecase"]
   subgraph T40_usecase_usecase_ReviewRunLocalInteractor["review_v2::review_aux::ReviewRunLocalInteractor"]
     direction TB
     T40_usecase_usecase_ReviewRunLocalInteractor__self[ReviewRunLocalInteractor]
+    T40_usecase_usecase_ReviewRunLocalInteractor_new([new])
   end
   subgraph T36_usecase_usecase_ReviewRunLocalOutput["review_v2::review_aux::ReviewRunLocalOutput"]
     direction TB
@@ -586,6 +570,7 @@ subgraph usecase["usecase"]
   subgraph T45_usecase_usecase_ReviewValidateScopeInteractor["review_v2::review_aux::ReviewValidateScopeInteractor"]
     direction TB
     T45_usecase_usecase_ReviewValidateScopeInteractor__self[ReviewValidateScopeInteractor]
+    T45_usecase_usecase_ReviewValidateScopeInteractor_new([new])
   end
   subgraph T30_usecase_usecase_RunReviewError["review_v2::run_review::RunReviewError"]
     direction TB
@@ -699,10 +684,13 @@ subgraph usecase["usecase"]
   subgraph T43_usecase_usecase_SemanticDupDriverInteractor["semantic_dup_driver::SemanticDupDriverInteractor"]
     direction TB
     T43_usecase_usecase_SemanticDupDriverInteractor__self[SemanticDupDriverInteractor]
+    T43_usecase_usecase_SemanticDupDriverInteractor_new([new])
   end
   subgraph T40_usecase_usecase_SemanticDupDriverOutcome["semantic_dup_driver::SemanticDupDriverOutcome"]
     direction TB
     T40_usecase_usecase_SemanticDupDriverOutcome__self[SemanticDupDriverOutcome]
+    T40_usecase_usecase_SemanticDupDriverOutcome_success([success])
+    T40_usecase_usecase_SemanticDupDriverOutcome_failure([failure])
   end
   subgraph R37_usecase_usecase_SemanticDupDriverPort["semantic_dup_driver::SemanticDupDriverPort"]
     direction TB
@@ -779,6 +767,8 @@ subgraph usecase["usecase"]
   subgraph T35_usecase_usecase_SignalCommandOutput["signal_service::SignalCommandOutput"]
     direction TB
     T35_usecase_usecase_SignalCommandOutput__self[SignalCommandOutput]
+    T35_usecase_usecase_SignalCommandOutput_success([success])
+    T35_usecase_usecase_SignalCommandOutput_failure([failure])
   end
   subgraph T30_usecase_usecase_SignalGateName["signal_service::SignalGateName"]
     direction TB
@@ -844,17 +834,12 @@ subgraph usecase["usecase"]
   subgraph T43_usecase_usecase_ArchivedTrackTelemetryError["telemetry::ArchivedTrackTelemetryError"]
     direction TB
     T43_usecase_usecase_ArchivedTrackTelemetryError__self[ArchivedTrackTelemetryError]
-    T43_usecase_usecase_ArchivedTrackTelemetryError_Io[Io]
-    T43_usecase_usecase_ArchivedTrackTelemetryError_Serialize[Serialize]
+    T43_usecase_usecase_ArchivedTrackTelemetryError_EmitUnavailable[EmitUnavailable]
   end
   subgraph T48_usecase_usecase_ArchivedTrackTelemetryInteractor["telemetry::ArchivedTrackTelemetryInteractor"]
     direction TB
     T48_usecase_usecase_ArchivedTrackTelemetryInteractor__self[ArchivedTrackTelemetryInteractor]
     T48_usecase_usecase_ArchivedTrackTelemetryInteractor_new([new])
-  end
-  subgraph T44_usecase_usecase_TelemetryAggregateInteractor["telemetry::TelemetryAggregateInteractor"]
-    direction TB
-    T44_usecase_usecase_TelemetryAggregateInteractor__self[TelemetryAggregateInteractor]
   end
   subgraph T46_usecase_usecase_TelemetryAggregateServiceError["telemetry::TelemetryAggregateServiceError"]
     direction TB
@@ -929,6 +914,8 @@ subgraph usecase["usecase"]
   subgraph T34_usecase_usecase_TrackCommandOutput["track_service::TrackCommandOutput"]
     direction TB
     T34_usecase_usecase_TrackCommandOutput__self[TrackCommandOutput]
+    T34_usecase_usecase_TrackCommandOutput_success([success])
+    T34_usecase_usecase_TrackCommandOutput_failure([failure])
   end
   subgraph R28_usecase_usecase_TrackService["track_service::TrackService"]
     direction TB
@@ -937,19 +924,25 @@ subgraph usecase["usecase"]
     R28_usecase_usecase_TrackService_transition([transition])
     R28_usecase_usecase_TrackService_resolve([resolve])
     R28_usecase_usecase_TrackService_views_sync([views_sync])
+    R28_usecase_usecase_TrackService_branch_create([branch_create])
+    R28_usecase_usecase_TrackService_branch_switch([branch_switch])
+    R28_usecase_usecase_TrackService_views_validate([views_validate])
+    R28_usecase_usecase_TrackService_add_task([add_task])
+    R28_usecase_usecase_TrackService_set_override([set_override])
+    R28_usecase_usecase_TrackService_clear_override([clear_override])
+    R28_usecase_usecase_TrackService_next_task([next_task])
+    R28_usecase_usecase_TrackService_task_counts([task_counts])
     R28_usecase_usecase_TrackService_archive([archive])
     R28_usecase_usecase_TrackService_detect_active([detect_active])
   end
   end
   subgraph usecase_usecase_module_verify["usecase::verify"]
     direction TB
-  subgraph T32_usecase_usecase_VerifyInteractor["verify::VerifyInteractor"]
-    direction TB
-    T32_usecase_usecase_VerifyInteractor__self[VerifyInteractor]
-  end
   subgraph T29_usecase_usecase_VerifyOutcome["verify::VerifyOutcome"]
     direction TB
     T29_usecase_usecase_VerifyOutcome__self[VerifyOutcome]
+    T29_usecase_usecase_VerifyOutcome_success([success])
+    T29_usecase_usecase_VerifyOutcome_failure([failure])
   end
   subgraph T31_usecase_usecase_VerifyPortError["verify::VerifyPortError"]
     direction TB
@@ -964,6 +957,8 @@ subgraph usecase["usecase"]
     R26_usecase_usecase_VerifyPort_verify_arch_docs([verify_arch_docs])
     R26_usecase_usecase_VerifyPort_verify_layers([verify_layers])
     R26_usecase_usecase_VerifyPort_verify_hooks_path([verify_hooks_path])
+    R26_usecase_usecase_VerifyPort_verify_spec_attribution([verify_spec_attribution])
+    R26_usecase_usecase_VerifyPort_verify_spec_frontmatter([verify_spec_frontmatter])
     R26_usecase_usecase_VerifyPort_verify_canonical_modules([verify_canonical_modules])
     R26_usecase_usecase_VerifyPort_verify_module_size([verify_module_size])
     R26_usecase_usecase_VerifyPort_verify_domain_purity([verify_domain_purity])
@@ -971,26 +966,9 @@ subgraph usecase["usecase"]
     R26_usecase_usecase_VerifyPort_verify_usecase_purity([verify_usecase_purity])
     R26_usecase_usecase_VerifyPort_verify_doc_links([verify_doc_links])
     R26_usecase_usecase_VerifyPort_verify_view_freshness([verify_view_freshness])
+    R26_usecase_usecase_VerifyPort_verify_spec_signals([verify_spec_signals])
     R26_usecase_usecase_VerifyPort_verify_plan_artifact_refs([verify_plan_artifact_refs])
     R26_usecase_usecase_VerifyPort_verify_catalogue_spec_refs([verify_catalogue_spec_refs])
-  end
-  subgraph R29_usecase_usecase_VerifyService["verify::VerifyService"]
-    direction TB
-    R29_usecase_usecase_VerifyService__self[VerifyService]
-    R29_usecase_usecase_VerifyService_verify_tech_stack([verify_tech_stack])
-    R29_usecase_usecase_VerifyService_verify_latest_track([verify_latest_track])
-    R29_usecase_usecase_VerifyService_verify_arch_docs([verify_arch_docs])
-    R29_usecase_usecase_VerifyService_verify_layers([verify_layers])
-    R29_usecase_usecase_VerifyService_verify_hooks_path([verify_hooks_path])
-    R29_usecase_usecase_VerifyService_verify_canonical_modules([verify_canonical_modules])
-    R29_usecase_usecase_VerifyService_verify_module_size([verify_module_size])
-    R29_usecase_usecase_VerifyService_verify_domain_purity([verify_domain_purity])
-    R29_usecase_usecase_VerifyService_verify_domain_strings([verify_domain_strings])
-    R29_usecase_usecase_VerifyService_verify_usecase_purity([verify_usecase_purity])
-    R29_usecase_usecase_VerifyService_verify_doc_links([verify_doc_links])
-    R29_usecase_usecase_VerifyService_verify_view_freshness([verify_view_freshness])
-    R29_usecase_usecase_VerifyService_verify_plan_artifact_refs([verify_plan_artifact_refs])
-    R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs([verify_catalogue_spec_refs])
   end
   end
 end
@@ -1001,6 +979,7 @@ subgraph infrastructure["infrastructure"]
   subgraph T43_infrastructure_infrastructure_FsArchAdapter["arch::FsArchAdapter"]
     direction TB
     T43_infrastructure_infrastructure_FsArchAdapter__self[FsArchAdapter]
+    T43_infrastructure_infrastructure_FsArchAdapter_new([new])
   end
   end
   subgraph infrastructure_infrastructure_module_conventions["infrastructure::conventions"]
@@ -1008,6 +987,7 @@ subgraph infrastructure["infrastructure"]
   subgraph T50_infrastructure_infrastructure_FsConventionsAdapter["conventions::FsConventionsAdapter"]
     direction TB
     T50_infrastructure_infrastructure_FsConventionsAdapter__self[FsConventionsAdapter]
+    T50_infrastructure_infrastructure_FsConventionsAdapter_new([new])
   end
   end
   subgraph infrastructure_infrastructure_module_demo["infrastructure::demo"]
@@ -1020,6 +1000,7 @@ subgraph infrastructure["infrastructure"]
   subgraph T43_infrastructure_infrastructure_FsDemoAdapter["demo::FsDemoAdapter"]
     direction TB
     T43_infrastructure_infrastructure_FsDemoAdapter__self[FsDemoAdapter]
+    T43_infrastructure_infrastructure_FsDemoAdapter_new([new])
   end
   F68_infrastructure_infrastructure_infrastructure__demo__run_example_demo[[run_example_demo]]
   end
@@ -1048,6 +1029,7 @@ subgraph infrastructure["infrastructure"]
   subgraph T48_infrastructure_infrastructure_FsFileWriteAdapter["file_port::FsFileWriteAdapter"]
     direction TB
     T48_infrastructure_infrastructure_FsFileWriteAdapter__self[FsFileWriteAdapter]
+    T48_infrastructure_infrastructure_FsFileWriteAdapter_new([new])
   end
   end
   subgraph infrastructure_infrastructure_module_git_cli["infrastructure::git_cli"]
@@ -1055,6 +1037,7 @@ subgraph infrastructure["infrastructure"]
   subgraph T50_infrastructure_infrastructure_FsGitWorkflowAdapter["git_cli::workflow_adapter::FsGitWorkflowAdapter"]
     direction TB
     T50_infrastructure_infrastructure_FsGitWorkflowAdapter__self[FsGitWorkflowAdapter]
+    T50_infrastructure_infrastructure_FsGitWorkflowAdapter_new([new])
   end
   subgraph T46_infrastructure_infrastructure_TrackBranchError["git_cli::TrackBranchError"]
     direction TB
@@ -1078,14 +1061,17 @@ subgraph infrastructure["infrastructure"]
   subgraph T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter["ref_verify::driver_adapter::FsRefVerifyAggregateAdapter"]
     direction TB
     T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self[FsRefVerifyAggregateAdapter]
+    T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter_new([new])
   end
   subgraph T61_infrastructure_infrastructure_FsRefVerifyCheckApprovedAdapter["ref_verify::driver_adapter::FsRefVerifyCheckApprovedAdapter"]
     direction TB
     T61_infrastructure_infrastructure_FsRefVerifyCheckApprovedAdapter__self[FsRefVerifyCheckApprovedAdapter]
+    T61_infrastructure_infrastructure_FsRefVerifyCheckApprovedAdapter_new([new])
   end
   subgraph T51_infrastructure_infrastructure_FsRefVerifyRunAdapter["ref_verify::driver_adapter::FsRefVerifyRunAdapter"]
     direction TB
     T51_infrastructure_infrastructure_FsRefVerifyRunAdapter__self[FsRefVerifyRunAdapter]
+    T51_infrastructure_infrastructure_FsRefVerifyRunAdapter_new([new])
   end
   end
   subgraph infrastructure_infrastructure_module_semantic_dup["infrastructure::semantic_dup"]
@@ -1129,10 +1115,12 @@ subgraph infrastructure["infrastructure"]
   subgraph T59_infrastructure_infrastructure_FsTelemetryEmitDynamicAdapter["telemetry::report_adapter::FsTelemetryEmitDynamicAdapter"]
     direction TB
     T59_infrastructure_infrastructure_FsTelemetryEmitDynamicAdapter__self[FsTelemetryEmitDynamicAdapter]
+    T59_infrastructure_infrastructure_FsTelemetryEmitDynamicAdapter_new([new])
   end
   subgraph T54_infrastructure_infrastructure_FsTelemetryReportAdapter["telemetry::report_adapter::FsTelemetryReportAdapter"]
     direction TB
     T54_infrastructure_infrastructure_FsTelemetryReportAdapter__self[FsTelemetryReportAdapter]
+    T54_infrastructure_infrastructure_FsTelemetryReportAdapter_new([new])
   end
   end
   subgraph infrastructure_infrastructure_module_track["infrastructure::track"]
@@ -1153,6 +1141,7 @@ subgraph infrastructure["infrastructure"]
   subgraph T45_infrastructure_infrastructure_FsVerifyAdapter["verify_adapter::FsVerifyAdapter"]
     direction TB
     T45_infrastructure_infrastructure_FsVerifyAdapter__self[FsVerifyAdapter]
+    T45_infrastructure_infrastructure_FsVerifyAdapter_new([new])
   end
   end
 end
@@ -1160,18 +1149,11 @@ R24_usecase_usecase_ArchPort_render_tree --> T29_usecase_usecase_ArchPortError__
 R24_usecase_usecase_ArchPort_render_tree_full --> T29_usecase_usecase_ArchPortError__self
 R24_usecase_usecase_ArchPort_render_members --> T29_usecase_usecase_ArchPortError__self
 R24_usecase_usecase_ArchPort_render_direct_checks --> T29_usecase_usecase_ArchPortError__self
-R27_usecase_usecase_ArchService_render_tree --> T29_usecase_usecase_ArchPortError__self
-R27_usecase_usecase_ArchService_render_tree_full --> T29_usecase_usecase_ArchPortError__self
-R27_usecase_usecase_ArchService_render_members --> T29_usecase_usecase_ArchPortError__self
-R27_usecase_usecase_ArchService_render_direct_checks --> T29_usecase_usecase_ArchPortError__self
 R31_usecase_usecase_ConventionsPort_add_convention --> T36_usecase_usecase_ConventionsPortError__self
 R31_usecase_usecase_ConventionsPort_update_index --> T36_usecase_usecase_ConventionsPortError__self
 R31_usecase_usecase_ConventionsPort_verify_index --> T36_usecase_usecase_ConventionsPortError__self
 R31_usecase_usecase_ConventionsPort_verify_index --> T33_usecase_usecase_VerifyIndexResult__self
-R34_usecase_usecase_ConventionsService_add_convention --> T36_usecase_usecase_ConventionsPortError__self
-R34_usecase_usecase_ConventionsService_update_index --> T36_usecase_usecase_ConventionsPortError__self
-R34_usecase_usecase_ConventionsService_verify_index --> T36_usecase_usecase_ConventionsPortError__self
-R34_usecase_usecase_ConventionsService_verify_index --> T33_usecase_usecase_VerifyIndexResult__self
+T30_usecase_usecase_DemoInteractor_new --> T30_usecase_usecase_DemoInteractor__self
 R24_usecase_usecase_DemoPort_run --> T29_usecase_usecase_DemoPortError__self
 R27_usecase_usecase_DemoService_run --> T29_usecase_usecase_DemoPortError__self
 T45_usecase_usecase_DryFragmentPipelineInteractor_new --> T45_usecase_usecase_DryFragmentPipelineInteractor__self
@@ -1180,6 +1162,9 @@ R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --o T42_useca
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --> T36_usecase_usecase_D4OrchestrationError__self
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --> T41_usecase_usecase_DryFragmentPipelineOutput__self
 F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of --> T35_usecase_usecase_DryCheckSharedError__self
+T35_usecase_usecase_DryDriverInteractor_new --> T35_usecase_usecase_DryDriverInteractor__self
+T32_usecase_usecase_DryDriverOutcome_success --> T32_usecase_usecase_DryDriverOutcome__self
+T32_usecase_usecase_DryDriverOutcome_failure --> T32_usecase_usecase_DryDriverOutcome__self
 R29_usecase_usecase_DryDriverPort_dry_write --o T35_usecase_usecase_DryWriteDriverInput__self
 R29_usecase_usecase_DryDriverPort_dry_write --> T32_usecase_usecase_DryDriverOutcome__self
 R29_usecase_usecase_DryDriverPort_dry_results --o T37_usecase_usecase_DryResultsDriverInput__self
@@ -1206,19 +1191,24 @@ R33_usecase_usecase_DryCorpusMetaPort_resolve_corpus_meta --> T34_usecase_usecas
 R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate --o T38_usecase_usecase_FixpointDryGateCommand__self
 R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate --> T36_usecase_usecase_D4OrchestrationError__self
 R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate --> T37_usecase_usecase_FixpointDryGateOutput__self
-R34_usecase_usecase_GitWorkflowService_stage_all --> T33_usecase_usecase_GitWorkflowResult__self
-R34_usecase_usecase_GitWorkflowService_stage_from_file --> T33_usecase_usecase_GitWorkflowResult__self
-R34_usecase_usecase_GitWorkflowService_commit_from_file --> T33_usecase_usecase_GitWorkflowResult__self
-R34_usecase_usecase_GitWorkflowService_note_from_file --> T33_usecase_usecase_GitWorkflowResult__self
-R34_usecase_usecase_GitWorkflowService_switch_and_pull --> T33_usecase_usecase_GitWorkflowResult__self
-R34_usecase_usecase_GitWorkflowService_unstage --> T33_usecase_usecase_GitWorkflowResult__self
-R34_usecase_usecase_GitWorkflowService_current_branch_track_id --> T33_usecase_usecase_GitWorkflowResult__self
+T37_usecase_usecase_GitWorkflowInteractor_new --> T37_usecase_usecase_GitWorkflowInteractor__self
+R34_usecase_usecase_GitWorkflowService_stage_all --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_stage_from_file --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_commit_from_file --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_note_from_file --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_switch_and_pull --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_unstage --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_current_branch_track_id --> T32_usecase_usecase_GitWorkflowError__self
 R31_usecase_usecase_ShellParserPort_split_shell --> T32_usecase_usecase_ShellParserError__self
 T38_usecase_usecase_HookDispatchInteractor_new --> T38_usecase_usecase_HookDispatchInteractor__self
 T33_usecase_usecase_HookVerdictOutput__self --o|decision| T35_usecase_usecase_HookVerdictDecision__self
 R35_usecase_usecase_HookDispatchService_dispatch --o T35_usecase_usecase_HookDispatchCommand__self
 R35_usecase_usecase_HookDispatchService_dispatch --> T33_usecase_usecase_HookDispatchError__self
 R35_usecase_usecase_HookDispatchService_dispatch --> T33_usecase_usecase_HookVerdictOutput__self
+T35_usecase_usecase_PrCommandInteractor_new --> T35_usecase_usecase_PrCommandInteractor__self
+T31_usecase_usecase_PrCommandOutput_success --> T31_usecase_usecase_PrCommandOutput__self
+T31_usecase_usecase_PrCommandOutput_failure --> T31_usecase_usecase_PrCommandOutput__self
+T31_usecase_usecase_PrCommandOutput_with_exit_code --> T31_usecase_usecase_PrCommandOutput__self
 R32_usecase_usecase_PrCommandService_push --> T31_usecase_usecase_PrCommandOutput__self
 R32_usecase_usecase_PrCommandService_ensure --> T31_usecase_usecase_PrCommandOutput__self
 R32_usecase_usecase_PrCommandService_status --> T31_usecase_usecase_PrCommandOutput__self
@@ -1234,6 +1224,7 @@ R29_usecase_usecase_PrRepoNwoPort_repo_nwo --> T30_usecase_usecase_PrRepoNwoErro
 R38_usecase_usecase_PrReviewPollingService_poll --o T38_usecase_usecase_PrReviewPollingCommand__self
 R38_usecase_usecase_PrReviewPollingService_poll --> T36_usecase_usecase_D4OrchestrationError__self
 R38_usecase_usecase_PrReviewPollingService_poll --> T37_usecase_usecase_PrReviewPollingOutput__self
+T48_usecase_usecase_RefVerifyCheckApprovedInteractor_new --> T48_usecase_usecase_RefVerifyCheckApprovedInteractor__self
 R41_usecase_usecase_RefVerifyAggregateService_run --> T36_usecase_usecase_RefVerifyDriverError__self
 R41_usecase_usecase_RefVerifyAggregateService_run --> T35_usecase_usecase_RefVerifyRunOutcome__self
 R41_usecase_usecase_RefVerifyAggregateService_check_approved --> T45_usecase_usecase_RefVerifyCheckApprovedOutcome__self
@@ -1243,8 +1234,14 @@ R51_usecase_usecase_RefVerifyCheckApprovedDriverService_check_approved --> T36_u
 R45_usecase_usecase_RefVerifyCheckApprovedService_check_approved --> T36_usecase_usecase_CheckApprovedOutcome__self
 R35_usecase_usecase_RefVerifyRunService_run --> T36_usecase_usecase_RefVerifyDriverError__self
 R35_usecase_usecase_RefVerifyRunService_run --> T35_usecase_usecase_RefVerifyRunOutcome__self
+T40_usecase_usecase_ReviewClassifyInteractor_new --> T40_usecase_usecase_ReviewClassifyInteractor__self
+T37_usecase_usecase_ReviewFilesInteractor_new --> T37_usecase_usecase_ReviewFilesInteractor__self
+T43_usecase_usecase_ReviewGetBriefingInteractor_new --> T43_usecase_usecase_ReviewGetBriefingInteractor__self
+T39_usecase_usecase_ReviewResultsInteractor_new --> T39_usecase_usecase_ReviewResultsInteractor__self
 T31_usecase_usecase_ReviewRoundType_parse --> T36_usecase_usecase_ReviewRoundTypeError__self
 T31_usecase_usecase_ReviewRoundType_parse --> T31_usecase_usecase_ReviewRoundType__self
+T40_usecase_usecase_ReviewRunLocalInteractor_new --> T40_usecase_usecase_ReviewRunLocalInteractor__self
+T45_usecase_usecase_ReviewValidateScopeInteractor_new --> T45_usecase_usecase_ReviewValidateScopeInteractor__self
 R37_usecase_usecase_ReviewClassifyService_classify --> T30_usecase_usecase_ReviewAuxError__self
 R34_usecase_usecase_ReviewFilesService_files --> T30_usecase_usecase_ReviewAuxError__self
 R40_usecase_usecase_ReviewGetBriefingService_get_briefing --> T30_usecase_usecase_ReviewAuxError__self
@@ -1266,6 +1263,9 @@ R29_usecase_usecase_ReviewService_files --> T30_usecase_usecase_ReviewAuxError__
 R29_usecase_usecase_ReviewService_validate_scope --> T30_usecase_usecase_ReviewAuxError__self
 R29_usecase_usecase_ReviewService_get_briefing --> T30_usecase_usecase_ReviewAuxError__self
 R42_usecase_usecase_ReviewValidateScopeService_validate_scope --> T30_usecase_usecase_ReviewAuxError__self
+T43_usecase_usecase_SemanticDupDriverInteractor_new --> T43_usecase_usecase_SemanticDupDriverInteractor__self
+T40_usecase_usecase_SemanticDupDriverOutcome_success --> T40_usecase_usecase_SemanticDupDriverOutcome__self
+T40_usecase_usecase_SemanticDupDriverOutcome_failure --> T40_usecase_usecase_SemanticDupDriverOutcome__self
 R37_usecase_usecase_SemanticDupDriverPort_find_similar --o T38_usecase_usecase_FindSimilarDriverInput__self
 R37_usecase_usecase_SemanticDupDriverPort_find_similar --> T40_usecase_usecase_SemanticDupDriverOutcome__self
 R37_usecase_usecase_SemanticDupDriverPort_index_build --o T37_usecase_usecase_IndexBuildDriverInput__self
@@ -1295,6 +1295,8 @@ R33_usecase_usecase_SignalGateService_run_gate --> T31_usecase_usecase_SignalGat
 R33_usecase_usecase_SignalGateService_run_gate --> T32_usecase_usecase_SignalGateOutput__self
 R38_usecase_usecase_SpecAdrChainRunnerPort_run_spec_adr_chain --> T32_usecase_usecase_ChainRunnerError__self
 R38_usecase_usecase_SpecAdrChainRunnerPort_run_spec_adr_chain --> T33_usecase_usecase_SignalChainOutput__self
+T35_usecase_usecase_SignalCommandOutput_success --> T35_usecase_usecase_SignalCommandOutput__self
+T35_usecase_usecase_SignalCommandOutput_failure --> T35_usecase_usecase_SignalCommandOutput__self
 R29_usecase_usecase_SignalService_calc_adr_user --> T35_usecase_usecase_SignalCommandOutput__self
 R29_usecase_usecase_SignalService_check_adr_user --o T30_usecase_usecase_SignalGateName__self
 R29_usecase_usecase_SignalService_check_adr_user --> T35_usecase_usecase_SignalCommandOutput__self
@@ -1323,45 +1325,62 @@ R42_usecase_usecase_ArchivedTrackTelemetryPort_emit --> T43_usecase_usecase_Arch
 R45_usecase_usecase_ArchivedTrackTelemetryService_emit --o T45_usecase_usecase_ArchivedTrackTelemetryCommand__self
 R45_usecase_usecase_ArchivedTrackTelemetryService_emit --> T43_usecase_usecase_ArchivedTrackTelemetryError__self
 R41_usecase_usecase_TelemetryAggregateService_report --> T46_usecase_usecase_TelemetryAggregateServiceError__self
-R41_usecase_usecase_TelemetryAggregateService_report --> T37_usecase_usecase_TelemetryReportOutput__self
 R41_usecase_usecase_TelemetryAggregateService_emit_archived --> T46_usecase_usecase_TelemetryAggregateServiceError__self
 R40_usecase_usecase_TelemetryEmitDynamicPort_emit_archived --> T45_usecase_usecase_TelemetryEmitDynamicPortError__self
 R35_usecase_usecase_TelemetryReportPort_aggregate --> T36_usecase_usecase_TelemetryReportError__self
 R35_usecase_usecase_TelemetryReportPort_aggregate --> T37_usecase_usecase_TelemetryReportOutput__self
+T34_usecase_usecase_TrackCommandOutput_success --> T34_usecase_usecase_TrackCommandOutput__self
+T34_usecase_usecase_TrackCommandOutput_failure --> T34_usecase_usecase_TrackCommandOutput__self
 R28_usecase_usecase_TrackService_init --> T34_usecase_usecase_TrackCommandOutput__self
 R28_usecase_usecase_TrackService_transition --> T34_usecase_usecase_TrackCommandOutput__self
 R28_usecase_usecase_TrackService_resolve --> T34_usecase_usecase_TrackCommandOutput__self
 R28_usecase_usecase_TrackService_views_sync --> T34_usecase_usecase_TrackCommandOutput__self
+R28_usecase_usecase_TrackService_branch_create --> T34_usecase_usecase_TrackCommandOutput__self
+R28_usecase_usecase_TrackService_branch_switch --> T34_usecase_usecase_TrackCommandOutput__self
+R28_usecase_usecase_TrackService_views_validate --> T34_usecase_usecase_TrackCommandOutput__self
+R28_usecase_usecase_TrackService_add_task --> T34_usecase_usecase_TrackCommandOutput__self
+R28_usecase_usecase_TrackService_set_override --> T34_usecase_usecase_TrackCommandOutput__self
+R28_usecase_usecase_TrackService_clear_override --> T34_usecase_usecase_TrackCommandOutput__self
+R28_usecase_usecase_TrackService_next_task --> T34_usecase_usecase_TrackCommandOutput__self
+R28_usecase_usecase_TrackService_task_counts --> T34_usecase_usecase_TrackCommandOutput__self
 R28_usecase_usecase_TrackService_archive --> T34_usecase_usecase_TrackCommandOutput__self
 R28_usecase_usecase_TrackService_detect_active --> T34_usecase_usecase_TrackCommandOutput__self
+T29_usecase_usecase_VerifyOutcome_success --> T29_usecase_usecase_VerifyOutcome__self
+T29_usecase_usecase_VerifyOutcome_failure --> T29_usecase_usecase_VerifyOutcome__self
 R26_usecase_usecase_VerifyPort_verify_tech_stack --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_tech_stack --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_latest_track --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_latest_track --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_arch_docs --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_arch_docs --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_layers --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_layers --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_hooks_path --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_hooks_path --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_spec_attribution --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_spec_attribution --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_spec_frontmatter --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_spec_frontmatter --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_canonical_modules --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_canonical_modules --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_module_size --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_module_size --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_domain_purity --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_domain_purity --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_domain_strings --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_domain_strings --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_usecase_purity --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_usecase_purity --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_doc_links --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_doc_links --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_view_freshness --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_view_freshness --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_spec_signals --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_spec_signals --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_plan_artifact_refs --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_plan_artifact_refs --> T31_usecase_usecase_VerifyPortError__self
 R26_usecase_usecase_VerifyPort_verify_catalogue_spec_refs --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_tech_stack --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_latest_track --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_arch_docs --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_layers --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_hooks_path --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_canonical_modules --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_module_size --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_domain_purity --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_domain_strings --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_usecase_purity --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_doc_links --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_view_freshness --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_plan_artifact_refs --> T29_usecase_usecase_VerifyOutcome__self
-R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_catalogue_spec_refs --> T31_usecase_usecase_VerifyPortError__self
 T36_usecase_usecase_SignalGateInteractor__self -.impl.-> R33_usecase_usecase_SignalGateService__self
 T39_usecase_usecase_SpecAdrSignalInteractor__self -.impl.-> R36_usecase_usecase_SpecAdrSignalService__self
 T48_usecase_usecase_ArchivedTrackTelemetryInteractor__self -.impl.-> R45_usecase_usecase_ArchivedTrackTelemetryService__self
@@ -1373,7 +1392,6 @@ T35_usecase_usecase_DryDriverInteractor__self -.impl.-> R32_usecase_usecase_DryD
 T37_usecase_usecase_GitWorkflowInteractor__self -.impl.-> R34_usecase_usecase_GitWorkflowService__self
 T35_usecase_usecase_PrCommandInteractor__self -.impl.-> R32_usecase_usecase_PrCommandService__self
 T48_usecase_usecase_RefVerifyCheckApprovedInteractor__self -.impl.-> R45_usecase_usecase_RefVerifyCheckApprovedService__self
-T44_usecase_usecase_RefVerifyAggregateInteractor__self -.impl.-> R41_usecase_usecase_RefVerifyAggregateService__self
 T40_usecase_usecase_ReviewClassifyInteractor__self -.impl.-> R37_usecase_usecase_ReviewClassifyService__self
 T37_usecase_usecase_ReviewFilesInteractor__self -.impl.-> R34_usecase_usecase_ReviewFilesService__self
 T43_usecase_usecase_ReviewGetBriefingInteractor__self -.impl.-> R40_usecase_usecase_ReviewGetBriefingService__self
@@ -1381,22 +1399,29 @@ T39_usecase_usecase_ReviewResultsInteractor__self -.impl.-> R36_usecase_usecase_
 T40_usecase_usecase_ReviewRunLocalInteractor__self -.impl.-> R37_usecase_usecase_ReviewRunLocalService__self
 T45_usecase_usecase_ReviewValidateScopeInteractor__self -.impl.-> R42_usecase_usecase_ReviewValidateScopeService__self
 T43_usecase_usecase_SemanticDupDriverInteractor__self -.impl.-> R40_usecase_usecase_SemanticDupDriverService__self
-T30_usecase_usecase_ArchInteractor__self -.impl.-> R27_usecase_usecase_ArchService__self
-T37_usecase_usecase_ConventionsInteractor__self -.impl.-> R34_usecase_usecase_ConventionsService__self
-T32_usecase_usecase_VerifyInteractor__self -.impl.-> R29_usecase_usecase_VerifyService__self
-T44_usecase_usecase_TelemetryAggregateInteractor__self -.impl.-> R41_usecase_usecase_TelemetryAggregateService__self
 T38_usecase_usecase_HookDispatchInteractor__self -.impl.-> R35_usecase_usecase_HookDispatchService__self
+T43_infrastructure_infrastructure_FsArchAdapter_new --> T43_infrastructure_infrastructure_FsArchAdapter__self
+T50_infrastructure_infrastructure_FsConventionsAdapter_new --> T50_infrastructure_infrastructure_FsConventionsAdapter__self
+T43_infrastructure_infrastructure_FsDemoAdapter_new --> T43_infrastructure_infrastructure_FsDemoAdapter__self
 F68_infrastructure_infrastructure_infrastructure__demo__run_example_demo --> T42_infrastructure_infrastructure_DemoRunError__self
 T47_infrastructure_infrastructure_RecordingDryAgent_new --> T47_infrastructure_infrastructure_RecordingDryAgent__self
+T48_infrastructure_infrastructure_FsFileWriteAdapter_new --> T48_infrastructure_infrastructure_FsFileWriteAdapter__self
+T50_infrastructure_infrastructure_FsGitWorkflowAdapter_new --> T50_infrastructure_infrastructure_FsGitWorkflowAdapter__self
 F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims --> T46_infrastructure_infrastructure_TrackBranchError__self
 F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch --> T46_infrastructure_infrastructure_TrackBranchError__self
 F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir --> T46_infrastructure_infrastructure_TrackBranchError__self
+T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter_new --> T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self
+T61_infrastructure_infrastructure_FsRefVerifyCheckApprovedAdapter_new --> T61_infrastructure_infrastructure_FsRefVerifyCheckApprovedAdapter__self
+T51_infrastructure_infrastructure_FsRefVerifyRunAdapter_new --> T51_infrastructure_infrastructure_FsRefVerifyRunAdapter__self
 T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter_new --> T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self
 T50_infrastructure_infrastructure_NullInsertIndexProxy_new --> T50_infrastructure_infrastructure_NullInsertIndexProxy__self
 T53_infrastructure_infrastructure_FsSpecFileWriterAdapter_new --> T53_infrastructure_infrastructure_FsSpecFileWriterAdapter__self
 T61_infrastructure_infrastructure_FsArchivedTrackTelemetryAdapter_new --> T61_infrastructure_infrastructure_FsArchivedTrackTelemetryAdapter__self
+T59_infrastructure_infrastructure_FsTelemetryEmitDynamicAdapter_new --> T59_infrastructure_infrastructure_FsTelemetryEmitDynamicAdapter__self
+T54_infrastructure_infrastructure_FsTelemetryReportAdapter_new --> T54_infrastructure_infrastructure_FsTelemetryReportAdapter__self
 T57_infrastructure_infrastructure_FsRefVerifyGateStateAdapter_new --> T57_infrastructure_infrastructure_FsRefVerifyGateStateAdapter__self
 T54_infrastructure_infrastructure_FsReviewGateStateAdapter_new --> T54_infrastructure_infrastructure_FsReviewGateStateAdapter__self
+T45_infrastructure_infrastructure_FsVerifyAdapter_new --> T45_infrastructure_infrastructure_FsVerifyAdapter__self
 T54_infrastructure_infrastructure_FsReviewGateStateAdapter__self -.impl.-> R35_usecase_usecase_ReviewGateStatePort__self
 T57_infrastructure_infrastructure_FsRefVerifyGateStateAdapter__self -.impl.-> R38_usecase_usecase_RefVerifyGateStatePort__self
 T47_infrastructure_infrastructure_RecordingDryAgent__self -.impl.-> R33_usecase_usecase_DryCheckAgentPort__self
@@ -1420,7 +1445,6 @@ T59_infrastructure_infrastructure_FsTelemetryEmitDynamicAdapter__self -.impl.-> 
 T54_infrastructure_infrastructure_FsTelemetryReportAdapter__self -.impl.-> R35_usecase_usecase_TelemetryReportPort__self
 T45_infrastructure_infrastructure_FsVerifyAdapter__self -.impl.-> R26_usecase_usecase_VerifyPort__self
 T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self -.impl.-> R41_usecase_usecase_RefVerifyAggregateService__self
-class T30_usecase_usecase_ArchInteractor__self interactor
 class T29_usecase_usecase_ArchPortError_Unavailable variant_node
 class T29_usecase_usecase_ArchPortError__self error_type
 class R24_usecase_usecase_ArchPort_render_tree method_node
@@ -1428,12 +1452,6 @@ class R24_usecase_usecase_ArchPort_render_tree_full method_node
 class R24_usecase_usecase_ArchPort_render_members method_node
 class R24_usecase_usecase_ArchPort_render_direct_checks method_node
 class R24_usecase_usecase_ArchPort__self secondary_port
-class R27_usecase_usecase_ArchService_render_tree method_node
-class R27_usecase_usecase_ArchService_render_tree_full method_node
-class R27_usecase_usecase_ArchService_render_members method_node
-class R27_usecase_usecase_ArchService_render_direct_checks method_node
-class R27_usecase_usecase_ArchService__self app_service
-class T37_usecase_usecase_ConventionsInteractor__self interactor
 class T36_usecase_usecase_ConventionsPortError_Unavailable variant_node
 class T36_usecase_usecase_ConventionsPortError__self error_type
 class T33_usecase_usecase_VerifyIndexResult__self dto
@@ -1441,14 +1459,11 @@ class R31_usecase_usecase_ConventionsPort_add_convention method_node
 class R31_usecase_usecase_ConventionsPort_update_index method_node
 class R31_usecase_usecase_ConventionsPort_verify_index method_node
 class R31_usecase_usecase_ConventionsPort__self secondary_port
-class R34_usecase_usecase_ConventionsService_add_convention method_node
-class R34_usecase_usecase_ConventionsService_update_index method_node
-class R34_usecase_usecase_ConventionsService_verify_index method_node
-class R34_usecase_usecase_ConventionsService__self app_service
 class T36_usecase_usecase_D4OrchestrationError_DiffFragment variant_node
 class T36_usecase_usecase_D4OrchestrationError_DryGate variant_node
 class T36_usecase_usecase_D4OrchestrationError_PrPolling variant_node
 class T36_usecase_usecase_D4OrchestrationError__self error_type
+class T30_usecase_usecase_DemoInteractor_new method_node
 class T30_usecase_usecase_DemoInteractor__self interactor
 class T29_usecase_usecase_DemoPortError_Unavailable variant_node
 class T29_usecase_usecase_DemoPortError__self error_type
@@ -1478,7 +1493,10 @@ class R42_usecase_usecase_DryFragmentPipelineService__self app_service
 class F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of free_function
 class F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of function_node
 class T43_usecase_usecase_DryCheckApprovedDriverInput__self dto
+class T35_usecase_usecase_DryDriverInteractor_new method_node
 class T35_usecase_usecase_DryDriverInteractor__self interactor
+class T32_usecase_usecase_DryDriverOutcome_success method_node
+class T32_usecase_usecase_DryDriverOutcome_failure method_node
 class T32_usecase_usecase_DryDriverOutcome__self dto
 class T38_usecase_usecase_DryFixLocalDriverInput__self dto
 class T37_usecase_usecase_DryResultsDriverInput__self dto
@@ -1535,8 +1553,8 @@ class T32_usecase_usecase_GitWorkflowError_BranchMismatch variant_node
 class T32_usecase_usecase_GitWorkflowError_Message variant_node
 class T32_usecase_usecase_GitWorkflowError_Unavailable variant_node
 class T32_usecase_usecase_GitWorkflowError__self error_type
+class T37_usecase_usecase_GitWorkflowInteractor_new method_node
 class T37_usecase_usecase_GitWorkflowInteractor__self interactor
-class T33_usecase_usecase_GitWorkflowResult__self dto
 class R34_usecase_usecase_GitWorkflowService_stage_all method_node
 class R34_usecase_usecase_GitWorkflowService_stage_from_file method_node
 class R34_usecase_usecase_GitWorkflowService_commit_from_file method_node
@@ -1562,7 +1580,11 @@ class T33_usecase_usecase_HookVerdictOutput__self dto
 class R35_usecase_usecase_HookDispatchService_dispatch method_node
 class R35_usecase_usecase_HookDispatchService_check_skill_compliance method_node
 class R35_usecase_usecase_HookDispatchService__self app_service
+class T35_usecase_usecase_PrCommandInteractor_new method_node
 class T35_usecase_usecase_PrCommandInteractor__self interactor
+class T31_usecase_usecase_PrCommandOutput_success method_node
+class T31_usecase_usecase_PrCommandOutput_failure method_node
+class T31_usecase_usecase_PrCommandOutput_with_exit_code method_node
 class T31_usecase_usecase_PrCommandOutput__self dto
 class R32_usecase_usecase_PrCommandService_push method_node
 class R32_usecase_usecase_PrCommandService_ensure method_node
@@ -1599,7 +1621,7 @@ class T36_usecase_usecase_CheckApprovedOutcome_NoPairs variant_node
 class T36_usecase_usecase_CheckApprovedOutcome_AllApproved variant_node
 class T36_usecase_usecase_CheckApprovedOutcome_NotApproved variant_node
 class T36_usecase_usecase_CheckApprovedOutcome__self dto
-class T44_usecase_usecase_RefVerifyAggregateInteractor__self interactor
+class T48_usecase_usecase_RefVerifyCheckApprovedInteractor_new method_node
 class T48_usecase_usecase_RefVerifyCheckApprovedInteractor__self interactor
 class T45_usecase_usecase_RefVerifyCheckApprovedOutcome_NoPairs variant_node
 class T45_usecase_usecase_RefVerifyCheckApprovedOutcome_AllApproved variant_node
@@ -1624,9 +1646,13 @@ class R35_usecase_usecase_RefVerifyRunService_run method_node
 class R35_usecase_usecase_RefVerifyRunService__self secondary_port
 class T30_usecase_usecase_ReviewAuxError_Failed variant_node
 class T30_usecase_usecase_ReviewAuxError__self error_type
+class T40_usecase_usecase_ReviewClassifyInteractor_new method_node
 class T40_usecase_usecase_ReviewClassifyInteractor__self interactor
+class T37_usecase_usecase_ReviewFilesInteractor_new method_node
 class T37_usecase_usecase_ReviewFilesInteractor__self interactor
+class T43_usecase_usecase_ReviewGetBriefingInteractor_new method_node
 class T43_usecase_usecase_ReviewGetBriefingInteractor__self interactor
+class T39_usecase_usecase_ReviewResultsInteractor_new method_node
 class T39_usecase_usecase_ReviewResultsInteractor__self interactor
 class T31_usecase_usecase_ReviewRoundType_Fast variant_node
 class T31_usecase_usecase_ReviewRoundType_Final variant_node
@@ -1636,8 +1662,10 @@ class T36_usecase_usecase_ReviewRoundTypeError_InvalidValue variant_node
 class T36_usecase_usecase_ReviewRoundTypeError__self error_type
 class T33_usecase_usecase_ReviewRunFixInput__self dto
 class T30_usecase_usecase_ReviewRunInput__self dto
+class T40_usecase_usecase_ReviewRunLocalInteractor_new method_node
 class T40_usecase_usecase_ReviewRunLocalInteractor__self interactor
 class T36_usecase_usecase_ReviewRunLocalOutput__self dto
+class T45_usecase_usecase_ReviewValidateScopeInteractor_new method_node
 class T45_usecase_usecase_ReviewValidateScopeInteractor__self interactor
 class T30_usecase_usecase_RunReviewError_InvalidTrackId variant_node
 class T30_usecase_usecase_RunReviewError_InvalidGroupName variant_node
@@ -1688,7 +1716,10 @@ class T35_usecase_usecase_DupCheckDriverInput__self dto
 class T38_usecase_usecase_FindSimilarDriverInput__self dto
 class T37_usecase_usecase_IndexBuildDriverInput__self dto
 class T46_usecase_usecase_IndexMeasureQualityDriverInput__self dto
+class T43_usecase_usecase_SemanticDupDriverInteractor_new method_node
 class T43_usecase_usecase_SemanticDupDriverInteractor__self interactor
+class T40_usecase_usecase_SemanticDupDriverOutcome_success method_node
+class T40_usecase_usecase_SemanticDupDriverOutcome_failure method_node
 class T40_usecase_usecase_SemanticDupDriverOutcome__self dto
 class R37_usecase_usecase_SemanticDupDriverPort_find_similar method_node
 class R37_usecase_usecase_SemanticDupDriverPort_index_build method_node
@@ -1720,6 +1751,8 @@ class R33_usecase_usecase_SignalGateService_run_gate method_node
 class R33_usecase_usecase_SignalGateService__self app_service
 class R38_usecase_usecase_SpecAdrChainRunnerPort_run_spec_adr_chain method_node
 class R38_usecase_usecase_SpecAdrChainRunnerPort__self secondary_port
+class T35_usecase_usecase_SignalCommandOutput_success method_node
+class T35_usecase_usecase_SignalCommandOutput_failure method_node
 class T35_usecase_usecase_SignalCommandOutput__self dto
 class T30_usecase_usecase_SignalGateName_Commit variant_node
 class T30_usecase_usecase_SignalGateName_Merge variant_node
@@ -1749,12 +1782,10 @@ class R34_usecase_usecase_SpecFileWriterPort_read_spec_json method_node
 class R34_usecase_usecase_SpecFileWriterPort_write_spec_json method_node
 class R34_usecase_usecase_SpecFileWriterPort__self secondary_port
 class T45_usecase_usecase_ArchivedTrackTelemetryCommand__self command
-class T43_usecase_usecase_ArchivedTrackTelemetryError_Io variant_node
-class T43_usecase_usecase_ArchivedTrackTelemetryError_Serialize variant_node
+class T43_usecase_usecase_ArchivedTrackTelemetryError_EmitUnavailable variant_node
 class T43_usecase_usecase_ArchivedTrackTelemetryError__self error_type
 class T48_usecase_usecase_ArchivedTrackTelemetryInteractor_new method_node
 class T48_usecase_usecase_ArchivedTrackTelemetryInteractor__self interactor
-class T44_usecase_usecase_TelemetryAggregateInteractor__self interactor
 class T46_usecase_usecase_TelemetryAggregateServiceError_ReportUnavailable variant_node
 class T46_usecase_usecase_TelemetryAggregateServiceError_EmitUnavailable variant_node
 class T46_usecase_usecase_TelemetryAggregateServiceError__self error_type
@@ -1780,15 +1811,26 @@ class R35_usecase_usecase_TelemetryReportPort_aggregate method_node
 class R35_usecase_usecase_TelemetryReportPort__self secondary_port
 class R32_usecase_usecase_BranchReaderPort_current_branch method_node
 class R32_usecase_usecase_BranchReaderPort__self secondary_port
+class T34_usecase_usecase_TrackCommandOutput_success method_node
+class T34_usecase_usecase_TrackCommandOutput_failure method_node
 class T34_usecase_usecase_TrackCommandOutput__self dto
 class R28_usecase_usecase_TrackService_init method_node
 class R28_usecase_usecase_TrackService_transition method_node
 class R28_usecase_usecase_TrackService_resolve method_node
 class R28_usecase_usecase_TrackService_views_sync method_node
+class R28_usecase_usecase_TrackService_branch_create method_node
+class R28_usecase_usecase_TrackService_branch_switch method_node
+class R28_usecase_usecase_TrackService_views_validate method_node
+class R28_usecase_usecase_TrackService_add_task method_node
+class R28_usecase_usecase_TrackService_set_override method_node
+class R28_usecase_usecase_TrackService_clear_override method_node
+class R28_usecase_usecase_TrackService_next_task method_node
+class R28_usecase_usecase_TrackService_task_counts method_node
 class R28_usecase_usecase_TrackService_archive method_node
 class R28_usecase_usecase_TrackService_detect_active method_node
 class R28_usecase_usecase_TrackService__self app_service
-class T32_usecase_usecase_VerifyInteractor__self interactor
+class T29_usecase_usecase_VerifyOutcome_success method_node
+class T29_usecase_usecase_VerifyOutcome_failure method_node
 class T29_usecase_usecase_VerifyOutcome__self dto
 class T31_usecase_usecase_VerifyPortError_Unavailable variant_node
 class T31_usecase_usecase_VerifyPortError__self error_type
@@ -1797,6 +1839,8 @@ class R26_usecase_usecase_VerifyPort_verify_latest_track method_node
 class R26_usecase_usecase_VerifyPort_verify_arch_docs method_node
 class R26_usecase_usecase_VerifyPort_verify_layers method_node
 class R26_usecase_usecase_VerifyPort_verify_hooks_path method_node
+class R26_usecase_usecase_VerifyPort_verify_spec_attribution method_node
+class R26_usecase_usecase_VerifyPort_verify_spec_frontmatter method_node
 class R26_usecase_usecase_VerifyPort_verify_canonical_modules method_node
 class R26_usecase_usecase_VerifyPort_verify_module_size method_node
 class R26_usecase_usecase_VerifyPort_verify_domain_purity method_node
@@ -1804,28 +1848,17 @@ class R26_usecase_usecase_VerifyPort_verify_domain_strings method_node
 class R26_usecase_usecase_VerifyPort_verify_usecase_purity method_node
 class R26_usecase_usecase_VerifyPort_verify_doc_links method_node
 class R26_usecase_usecase_VerifyPort_verify_view_freshness method_node
+class R26_usecase_usecase_VerifyPort_verify_spec_signals method_node
 class R26_usecase_usecase_VerifyPort_verify_plan_artifact_refs method_node
 class R26_usecase_usecase_VerifyPort_verify_catalogue_spec_refs method_node
 class R26_usecase_usecase_VerifyPort__self secondary_port
-class R29_usecase_usecase_VerifyService_verify_tech_stack method_node
-class R29_usecase_usecase_VerifyService_verify_latest_track method_node
-class R29_usecase_usecase_VerifyService_verify_arch_docs method_node
-class R29_usecase_usecase_VerifyService_verify_layers method_node
-class R29_usecase_usecase_VerifyService_verify_hooks_path method_node
-class R29_usecase_usecase_VerifyService_verify_canonical_modules method_node
-class R29_usecase_usecase_VerifyService_verify_module_size method_node
-class R29_usecase_usecase_VerifyService_verify_domain_purity method_node
-class R29_usecase_usecase_VerifyService_verify_domain_strings method_node
-class R29_usecase_usecase_VerifyService_verify_usecase_purity method_node
-class R29_usecase_usecase_VerifyService_verify_doc_links method_node
-class R29_usecase_usecase_VerifyService_verify_view_freshness method_node
-class R29_usecase_usecase_VerifyService_verify_plan_artifact_refs method_node
-class R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs method_node
-class R29_usecase_usecase_VerifyService__self app_service
+class T43_infrastructure_infrastructure_FsArchAdapter_new method_node
 class T43_infrastructure_infrastructure_FsArchAdapter__self secondary_adapter
+class T50_infrastructure_infrastructure_FsConventionsAdapter_new method_node
 class T50_infrastructure_infrastructure_FsConventionsAdapter__self secondary_adapter
 class T42_infrastructure_infrastructure_DemoRunError_Unavailable variant_node
 class T42_infrastructure_infrastructure_DemoRunError__self error_type
+class T43_infrastructure_infrastructure_FsDemoAdapter_new method_node
 class T43_infrastructure_infrastructure_FsDemoAdapter__self secondary_adapter
 class F68_infrastructure_infrastructure_infrastructure__demo__run_example_demo free_function
 class F68_infrastructure_infrastructure_infrastructure__demo__run_example_demo function_node
@@ -1834,7 +1867,9 @@ class T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self secondary_ad
 class T52_infrastructure_infrastructure_NoOpDryApprovalService__self secondary_adapter
 class T47_infrastructure_infrastructure_RecordingDryAgent_new method_node
 class T47_infrastructure_infrastructure_RecordingDryAgent__self secondary_adapter
+class T48_infrastructure_infrastructure_FsFileWriteAdapter_new method_node
 class T48_infrastructure_infrastructure_FsFileWriteAdapter__self secondary_adapter
+class T50_infrastructure_infrastructure_FsGitWorkflowAdapter_new method_node
 class T50_infrastructure_infrastructure_FsGitWorkflowAdapter__self secondary_adapter
 class T46_infrastructure_infrastructure_TrackBranchError_LoadFailed variant_node
 class T46_infrastructure_infrastructure_TrackBranchError_contains method_node
@@ -1846,8 +1881,11 @@ class F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_t
 class F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir free_function
 class F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir function_node
 class T48_infrastructure_infrastructure_SystemSleepAdapter__self secondary_adapter
+class T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter_new method_node
 class T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self secondary_adapter
+class T61_infrastructure_infrastructure_FsRefVerifyCheckApprovedAdapter_new method_node
 class T61_infrastructure_infrastructure_FsRefVerifyCheckApprovedAdapter__self secondary_adapter
+class T51_infrastructure_infrastructure_FsRefVerifyRunAdapter_new method_node
 class T51_infrastructure_infrastructure_FsRefVerifyRunAdapter__self secondary_adapter
 class T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter_new method_node
 class T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self secondary_adapter
@@ -1861,11 +1899,14 @@ class T53_infrastructure_infrastructure_FsSpecFileWriterAdapter_new method_node
 class T53_infrastructure_infrastructure_FsSpecFileWriterAdapter__self secondary_adapter
 class T61_infrastructure_infrastructure_FsArchivedTrackTelemetryAdapter_new method_node
 class T61_infrastructure_infrastructure_FsArchivedTrackTelemetryAdapter__self secondary_adapter
+class T59_infrastructure_infrastructure_FsTelemetryEmitDynamicAdapter_new method_node
 class T59_infrastructure_infrastructure_FsTelemetryEmitDynamicAdapter__self secondary_adapter
+class T54_infrastructure_infrastructure_FsTelemetryReportAdapter_new method_node
 class T54_infrastructure_infrastructure_FsTelemetryReportAdapter__self secondary_adapter
 class T57_infrastructure_infrastructure_FsRefVerifyGateStateAdapter_new method_node
 class T57_infrastructure_infrastructure_FsRefVerifyGateStateAdapter__self secondary_adapter
 class T54_infrastructure_infrastructure_FsReviewGateStateAdapter_new method_node
 class T54_infrastructure_infrastructure_FsReviewGateStateAdapter__self secondary_adapter
+class T45_infrastructure_infrastructure_FsVerifyAdapter_new method_node
 class T45_infrastructure_infrastructure_FsVerifyAdapter__self secondary_adapter
 ```

@@ -17,7 +17,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ArchPortError | error_type | — | Unavailable | 🔵 | 🔵 |
-| ArchivedTrackTelemetryError | error_type | — | Io, Serialize | 🟡 | 🔵 |
+| ArchivedTrackTelemetryError | error_type | — | EmitUnavailable | 🔵 | 🔵 |
 | ChainRunnerError | error_type | — | ExecutionFailed | 🔵 | 🔵 |
 | CodeFragmentExtractorError | error_type | — | ExtractionFailed | 🔵 | 🔵 |
 | ConventionsPortError | error_type | — | Unavailable | 🔵 | 🔵 |
@@ -66,7 +66,7 @@
 | DryCorpusMetaPort | secondary_port | — | fn resolve_corpus_meta(&self, track_dir: &std::path::Path, canonical_root: &std::path::Path, repo_root: &std::path::Path) -> Result<(std::path::PathBuf, domain::dry_check::DryCheckCorpusFingerprint), DryCorpusMetaError> | 🔵 | 🔵 |
 | DryDriverPort | secondary_port | — | fn dry_write(&self, input: DryWriteDriverInput) -> DryDriverOutcome, fn dry_results(&self, input: DryResultsDriverInput) -> DryDriverOutcome, fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryDriverOutcome, fn dry_fix_local(&self, input: DryFixLocalDriverInput) -> DryDriverOutcome | 🔵 | 🔵 |
 | FileWritePort | secondary_port | — | fn write_atomic(&self, path: &std::path::Path, content: &[u8]) -> Result<(), FilePortError> | 🔵 | 🔵 |
-| GitWorkflowService | secondary_port | — | fn stage_all(&self) -> GitWorkflowResult<()>, fn stage_from_file(&self, path: &std::path::Path, cleanup: bool) -> GitWorkflowResult<()>, fn commit_from_file(&self, path: &std::path::Path, cleanup: bool, track_dir: Option<&std::path::Path>) -> GitWorkflowResult<()>, fn note_from_file(&self, path: &std::path::Path, cleanup: bool) -> GitWorkflowResult<()>, fn switch_and_pull(&self, branch: &str) -> GitWorkflowResult<String>, fn unstage(&self, paths: &[std::path::PathBuf]) -> GitWorkflowResult<()>, fn current_branch_track_id(&self) -> GitWorkflowResult<Option<String>> | 🔵 | 🔵 |
+| GitWorkflowService | secondary_port | — | fn stage_all(&self) -> Result<(), GitWorkflowError>, fn stage_from_file(&self, path: &std::path::Path, cleanup: bool) -> Result<(), GitWorkflowError>, fn commit_from_file(&self, path: &std::path::Path, cleanup: bool, track_dir: Option<&std::path::Path>) -> Result<(), GitWorkflowError>, fn note_from_file(&self, path: &std::path::Path, cleanup: bool) -> Result<(), GitWorkflowError>, fn switch_and_pull(&self, branch: &str) -> Result<String, GitWorkflowError>, fn unstage(&self, paths: &[std::path::PathBuf]) -> Result<(), GitWorkflowError>, fn current_branch_track_id(&self) -> Result<Option<String>, GitWorkflowError> | 🔵 | 🔵 |
 | LayerChainRunnerPort | secondary_port | — | fn run_catalog_spec_chain(&self, strict: bool, signal_reader: &dyn usecase::signal::SignalLayerReader) -> Result<SignalChainOutput, ChainRunnerError>, fn run_impl_catalog_chain(&self, strict: bool, signal_reader: &dyn usecase::signal::SignalLayerReader) -> Result<SignalChainOutput, ChainRunnerError> | 🔵 | 🔵 |
 | PrListIssueCommentsPort | secondary_port | — | fn list_issue_comments(&self, repo_nwo: &str, pr: &str) -> Result<String, PrGhApiError> | 🔵 | 🔵 |
 | PrListReactionsPort | secondary_port | — | fn list_reactions(&self, repo_nwo: &str, pr: &str) -> Result<String, PrGhApiError> | 🔵 | 🔵 |
@@ -86,15 +86,13 @@
 | SpecFileWriterPort | secondary_port | — | fn read_spec_json(&self, path: std::path::PathBuf) -> Result<domain::SpecDocument, SpecAdrSignalError>, fn write_spec_json(&self, path: std::path::PathBuf, doc: &domain::SpecDocument) -> Result<(), SpecAdrSignalError> | 🔵 | 🔵 |
 | TelemetryEmitDynamicPort | secondary_port | — | fn emit_archived(&self, items_dir: &std::path::Path, track_id: &str, subcommand: String, exit_code: i32, duration_ms: u64) -> Result<(), TelemetryEmitDynamicPortError> | 🔵 | 🔵 |
 | TelemetryReportPort | secondary_port | — | fn aggregate(&self, track_id: &str, items_dir: &std::path::Path) -> Result<TelemetryReportOutput, TelemetryReportError> | 🔵 | 🔵 |
-| VerifyPort | secondary_port | — | fn verify_tech_stack(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_latest_track(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_arch_docs(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_layers(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_hooks_path(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_canonical_modules(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_module_size(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_domain_purity(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_domain_strings(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_usecase_purity(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_doc_links(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_view_freshness(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_plan_artifact_refs(&self, track_dir: Option<&std::path::Path>) -> VerifyOutcome, fn verify_catalogue_spec_refs(&self, track_id: Option<&str>, items_dir: &std::path::Path, workspace_root: &std::path::Path, skip_stale: bool) -> VerifyOutcome | 🟡 | 🔵 |
+| VerifyPort | secondary_port | — | fn verify_tech_stack(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_latest_track(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_arch_docs(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_layers(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_hooks_path(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_spec_attribution(&self, spec_path: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_spec_frontmatter(&self, spec_path: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_canonical_modules(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_module_size(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_domain_purity(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_domain_strings(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_usecase_purity(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_doc_links(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_view_freshness(&self, project_root: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_spec_signals(&self, spec_path: &std::path::Path) -> Result<VerifyOutcome, VerifyPortError>, fn verify_plan_artifact_refs(&self, track_dir: Option<&std::path::Path>) -> Result<VerifyOutcome, VerifyPortError>, fn verify_catalogue_spec_refs(&self, track_id: Option<&str>, items_dir: &std::path::Path, workspace_root: &std::path::Path, skip_stale: bool) -> Result<VerifyOutcome, VerifyPortError> | 🔵 | 🔵 |
 
 ## Application Services
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ArchService | application_service | — | fn render_tree(&self, project_root: &std::path::Path) -> Result<String, ArchPortError>, fn render_tree_full(&self, project_root: &std::path::Path) -> Result<String, ArchPortError>, fn render_members(&self, project_root: &std::path::Path) -> Result<String, ArchPortError>, fn render_direct_checks(&self, project_root: &std::path::Path) -> Result<String, ArchPortError> | 🟡 | 🔵 |
 | ArchivedTrackTelemetryService | application_service | — | fn emit(&self, cmd: ArchivedTrackTelemetryCommand) -> Result<(), ArchivedTrackTelemetryError> | 🔵 | 🔵 |
-| ConventionsService | application_service | — | fn add_convention(&self, root: &std::path::Path, name: &str, slug: Option<&str>, title: Option<&str>, summary: Option<&str>) -> Result<String, ConventionsPortError>, fn update_index(&self, root: &std::path::Path) -> Result<String, ConventionsPortError>, fn verify_index(&self, root: &std::path::Path) -> Result<VerifyIndexResult, ConventionsPortError> | 🟡 | 🔵 |
 | DemoService | application_service | — | fn run(&self) -> Result<String, DemoPortError> | 🔵 | 🔵 |
 | DryDriverService | application_service | — | fn dry_write(&self, input: DryWriteDriverInput) -> DryDriverOutcome, fn dry_results(&self, input: DryResultsDriverInput) -> DryDriverOutcome, fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryDriverOutcome, fn dry_fix_local(&self, input: DryFixLocalDriverInput) -> DryDriverOutcome | 🔵 | 🔵 |
 | DryFragmentPipelineService | application_service | — | fn derive_current_refs(&self, cmd: DryFragmentPipelineCommand) -> Result<DryFragmentPipelineOutput, D4OrchestrationError> | 🔵 | 🔵 |
@@ -114,9 +112,8 @@
 | SignalGateService | application_service | — | fn run_gate(&self, cmd: SignalGateCommand) -> Result<SignalGateOutput, SignalGateError> | 🔵 | 🔵 |
 | SignalService | application_service | — | fn calc_adr_user(&self, project_root: std::path::PathBuf) -> SignalCommandOutput, fn check_adr_user(&self, project_root: std::path::PathBuf, strict_override: bool, gate: Option<SignalGateName>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn calc_spec_adr(&self, spec_json_path: Option<std::path::PathBuf>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn check_spec_adr(&self, spec_json_path: Option<std::path::PathBuf>, strict_override: bool, gate: Option<SignalGateName>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn calc_catalog_spec(&self) -> SignalCommandOutput, fn check_catalog_spec(&self, strict_override: bool, gate: Option<SignalGateName>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn calc_impl_catalog(&self) -> SignalCommandOutput, fn check_impl_catalog(&self, strict_override: bool, gate: Option<SignalGateName>, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput, fn check_gate(&self, project_root: Option<std::path::PathBuf>, spec_json_path: Option<std::path::PathBuf>, gate: SignalGateName, workspace_root: Option<std::path::PathBuf>) -> SignalCommandOutput | 🔵 | 🔵 |
 | SpecAdrSignalService | application_service | — | fn calc_and_persist(&self, cmd: SpecAdrSignalCommand) -> Result<SpecAdrSignalOutput, SpecAdrSignalError> | 🔵 | 🔵 |
-| TelemetryAggregateService | application_service | — | fn report(&self, track_id: &str, items_dir: &std::path::Path) -> Result<TelemetryReportOutput, TelemetryAggregateServiceError>, fn emit_archived(&self, items_dir: &std::path::Path, track_id: &str, subcommand: String, exit_code: i32, duration_ms: u64) -> Result<(), TelemetryAggregateServiceError> | 🔵 | 🔵 |
-| TrackService | application_service | — | fn init(&self, items_dir: std::path::PathBuf, track_id: String, description: String) -> TrackCommandOutput, fn transition(&self, items_dir: std::path::PathBuf, track_id: Option<String>, task_id: String, target_status: String, commit_hash: Option<String>) -> TrackCommandOutput, fn resolve(&self, items_dir: std::path::PathBuf, track_id: Option<String>) -> TrackCommandOutput, fn views_sync(&self, project_root: std::path::PathBuf, track_id: Option<String>) -> TrackCommandOutput, fn archive(&self, items_dir: std::path::PathBuf, track_id: String) -> TrackCommandOutput, fn detect_active(&self, project_root: std::path::PathBuf) -> TrackCommandOutput | 🟡 | 🔵 |
-| VerifyService | application_service | — | fn verify_tech_stack(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_latest_track(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_arch_docs(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_layers(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_hooks_path(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_canonical_modules(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_module_size(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_domain_purity(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_domain_strings(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_usecase_purity(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_doc_links(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_view_freshness(&self, project_root: &std::path::Path) -> VerifyOutcome, fn verify_plan_artifact_refs(&self, track_dir: Option<&std::path::Path>) -> VerifyOutcome, fn verify_catalogue_spec_refs(&self, track_id: Option<&str>, items_dir: &std::path::Path, workspace_root: &std::path::Path, skip_stale: bool) -> VerifyOutcome | 🟡 | 🔵 |
+| TelemetryAggregateService | application_service | — | fn report(&self, track_id: &str, items_dir: &std::path::Path) -> Result<String, TelemetryAggregateServiceError>, fn emit_archived(&self, items_dir: &std::path::Path, track_id: &str, subcommand: String, exit_code: i32, duration_ms: u64) -> Result<(), TelemetryAggregateServiceError> | 🟡 | 🔵 |
+| TrackService | application_service | — | fn init(&self, items_dir: std::path::PathBuf, track_id: String, description: String) -> TrackCommandOutput, fn transition(&self, items_dir: std::path::PathBuf, track_id: Option<String>, task_id: String, target_status: String, commit_hash: Option<String>) -> TrackCommandOutput, fn resolve(&self, items_dir: std::path::PathBuf, track_id: Option<String>) -> TrackCommandOutput, fn views_sync(&self, project_root: std::path::PathBuf, track_id: Option<String>) -> TrackCommandOutput, fn branch_create(&self, items_dir: std::path::PathBuf, track_id: String) -> TrackCommandOutput, fn branch_switch(&self, items_dir: std::path::PathBuf, track_id: String) -> TrackCommandOutput, fn views_validate(&self, project_root: std::path::PathBuf) -> TrackCommandOutput, fn add_task(&self, items_dir: std::path::PathBuf, track_id: Option<String>, description: String, section: Option<String>, after: Option<String>) -> TrackCommandOutput, fn set_override(&self, items_dir: std::path::PathBuf, track_id: Option<String>, status: String, reason: String) -> TrackCommandOutput, fn clear_override(&self, items_dir: std::path::PathBuf, track_id: Option<String>) -> TrackCommandOutput, fn next_task(&self, items_dir: std::path::PathBuf, track_id: Option<String>) -> TrackCommandOutput, fn task_counts(&self, items_dir: std::path::PathBuf, track_id: Option<String>) -> TrackCommandOutput, fn archive(&self, items_dir: std::path::PathBuf, track_id: String) -> TrackCommandOutput, fn detect_active(&self, project_root: std::path::PathBuf) -> TrackCommandOutput | 🔵 | 🔵 |
 
 ## Use Cases
 
@@ -128,66 +125,60 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ArchInteractor | interactor | — | — | 🟡 | 🔵 |
 | ArchivedTrackTelemetryInteractor | interactor | — | — | 🔵 | 🔵 |
-| ConventionsInteractor | interactor | — | — | 🟡 | 🔵 |
-| DemoInteractor | interactor | — | — | 🟡 | 🔵 |
-| DryDriverInteractor | interactor | — | — | 🟡 | 🔵 |
+| DemoInteractor | interactor | — | — | 🔵 | 🔵 |
+| DryDriverInteractor | interactor | — | — | 🔵 | 🔵 |
 | DryFragmentPipelineInteractor | interactor | — | — | 🔵 | 🔵 |
 | ExportSchemaInteractor | interactor | modify | — | 🔵 | 🔵 |
 | FixpointDryGateInteractor | interactor | — | — | 🔵 | 🔵 |
-| GitWorkflowInteractor | interactor | — | — | 🟡 | 🔵 |
+| GitWorkflowInteractor | interactor | — | — | 🔵 | 🔵 |
 | HookDispatchInteractor | interactor | modify | — | 🔵 | 🔵 |
-| PrCommandInteractor | interactor | — | — | 🟡 | 🔵 |
+| PrCommandInteractor | interactor | — | — | 🔵 | 🔵 |
 | PrReviewPollingInteractor | interactor | — | — | 🔵 | 🔵 |
-| RefVerifyAggregateInteractor | interactor | — | — | 🟡 | 🔵 |
-| RefVerifyCheckApprovedInteractor | interactor | — | — | 🟡 | 🔵 |
-| ReviewClassifyInteractor | interactor | — | — | 🟡 | 🔵 |
-| ReviewFilesInteractor | interactor | — | — | 🟡 | 🔵 |
-| ReviewGetBriefingInteractor | interactor | — | — | 🟡 | 🔵 |
-| ReviewResultsInteractor | interactor | — | — | 🟡 | 🔵 |
-| ReviewRunLocalInteractor | interactor | — | — | 🟡 | 🔵 |
-| ReviewValidateScopeInteractor | interactor | — | — | 🟡 | 🔵 |
-| SemanticDupDriverInteractor | interactor | — | — | 🟡 | 🔵 |
+| RefVerifyCheckApprovedInteractor | interactor | — | — | 🔵 | 🔵 |
+| ReviewClassifyInteractor | interactor | — | — | 🔵 | 🔵 |
+| ReviewFilesInteractor | interactor | — | — | 🔵 | 🔵 |
+| ReviewGetBriefingInteractor | interactor | — | — | 🔵 | 🔵 |
+| ReviewResultsInteractor | interactor | — | — | 🔵 | 🔵 |
+| ReviewRunLocalInteractor | interactor | — | — | 🔵 | 🔵 |
+| ReviewValidateScopeInteractor | interactor | — | — | 🔵 | 🔵 |
+| SemanticDupDriverInteractor | interactor | — | — | 🔵 | 🔵 |
 | SignalGateInteractor | interactor | — | — | 🔵 | 🔵 |
 | SpecAdrSignalInteractor | interactor | — | — | 🔵 | 🔵 |
-| TelemetryAggregateInteractor | interactor | — | — | 🟡 | 🔵 |
-| VerifyInteractor | interactor | — | — | 🟡 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | DryCheckApprovedDriverInput | dto | — | — | 🔵 | 🔵 |
-| DryDriverOutcome | dto | — | — | 🟡 | 🔵 |
+| DryDriverOutcome | dto | — | — | 🔵 | 🔵 |
 | DryFixLocalDriverInput | dto | — | — | 🔵 | 🔵 |
 | DryFragmentPipelineOutput | dto | — | — | 🔵 | 🔵 |
 | DryResultsDriverInput | dto | — | — | 🔵 | 🔵 |
 | DryWriteDriverInput | dto | — | — | 🔵 | 🔵 |
 | DupCheckDriverInput | dto | — | — | 🔵 | 🔵 |
 | FindSimilarDriverInput | dto | — | — | 🔵 | 🔵 |
-| GitWorkflowResult | dto | — | — | 🟡 | 🔵 |
 | HookVerdictOutput | dto | modify | — | 🔵 | 🔵 |
 | IndexBuildDriverInput | dto | — | — | 🔵 | 🔵 |
 | IndexMeasureQualityDriverInput | dto | — | — | 🔵 | 🔵 |
-| PrCommandOutput | dto | — | — | 🟡 | 🔵 |
+| PrCommandOutput | dto | — | — | 🔵 | 🔵 |
 | ReviewRunFixInput | dto | — | — | 🔵 | 🔵 |
 | ReviewRunInput | dto | — | — | 🔵 | 🔵 |
 | ReviewRunLocalOutput | dto | — | — | 🔵 | 🔵 |
 | RunReviewFixOutput | dto | modify | — | 🔵 | 🔵 |
 | RunReviewOutput | dto | modify | — | 🔵 | 🔵 |
-| SemanticDupDriverOutcome | dto | — | — | 🟡 | 🔵 |
+| SemanticDupDriverOutcome | dto | — | — | 🔵 | 🔵 |
 | SignalChainOutput | dto | — | — | 🔵 | 🔵 |
-| SignalCommandOutput | dto | — | — | 🟡 | 🔵 |
+| SignalCommandOutput | dto | — | — | 🔵 | 🔵 |
 | SignalGateOutput | dto | — | — | 🔵 | 🔵 |
 | SpecAdrSignalOutput | dto | — | — | 🔵 | 🔵 |
 | TelemetryErrorEntry | dto | — | — | 🔵 | 🔵 |
 | TelemetryHookBlockEntry | dto | — | — | 🔵 | 🔵 |
 | TelemetryPhaseDuration | dto | — | — | 🔵 | 🔵 |
 | TelemetryReportOutput | dto | — | — | 🔵 | 🔵 |
-| TrackCommandOutput | dto | — | — | 🟡 | 🔵 |
+| TrackCommandOutput | dto | — | — | 🔵 | 🔵 |
 | VerifyIndexResult | dto | — | — | 🔵 | 🔵 |
-| VerifyOutcome | dto | — | — | 🟡 | 🔵 |
+| VerifyOutcome | dto | — | — | 🔵 | 🔵 |
 
 ## Commands
 

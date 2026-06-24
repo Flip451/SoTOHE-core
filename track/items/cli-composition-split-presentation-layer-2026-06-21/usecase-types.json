@@ -349,16 +349,7 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "Io",
-            "payload": {
-              "kind": "tuple",
-              "fields": [
-                "String"
-              ]
-            }
-          },
-          {
-            "name": "Serialize",
+            "name": "EmitUnavailable",
             "payload": {
               "kind": "tuple",
               "fields": [
@@ -370,7 +361,7 @@
       },
       "methods": [],
       "module_path": "telemetry",
-      "docs": "Error type for ArchivedTrackTelemetryPort. Io: filesystem failure creating the telemetry file or directory. Serialize: JSON serialization failure.",
+      "docs": "Error type for ArchivedTrackTelemetryPort. Single variant EmitUnavailable(String) wraps any infrastructure failure (filesystem write, JSON serialization, etc.) as a human-readable message converted at the adapter boundary.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -1191,78 +1182,6 @@
       ],
       "informal_grounds": []
     },
-    "ArchInteractor": {
-      "action": "add",
-      "role": {
-        "Interactor": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [],
-      "module_path": "arch",
-      "docs": "Interactor implementing ArchService by delegating to the injected ArchPort and returning rendered strings for cli_driver presentation.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-03"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "ConventionsInteractor": {
-      "action": "add",
-      "role": {
-        "Interactor": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [],
-      "module_path": "conventions",
-      "docs": "Interactor implementing ConventionsService by delegating convention document operations to the injected ConventionsPort.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-03"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "VerifyInteractor": {
-      "action": "add",
-      "role": {
-        "Interactor": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [],
-      "module_path": "verify",
-      "docs": "Interactor implementing VerifyService by delegating verify subcommands to the injected VerifyPort.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-03"
-        }
-      ],
-      "informal_grounds": []
-    },
     "DemoInteractor": {
       "action": "add",
       "role": {
@@ -1994,30 +1913,6 @@
       ],
       "informal_grounds": []
     },
-    "TelemetryAggregateInteractor": {
-      "action": "add",
-      "role": {
-        "Interactor": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [],
-      "module_path": "telemetry",
-      "docs": "Driver-facing telemetry interactor implementing TelemetryAggregateService by delegating report work to TelemetryReportPort and archived telemetry emission to TelemetryEmitDynamicPort.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-03"
-        }
-      ],
-      "informal_grounds": []
-    },
     "PrCommandOutput": {
       "action": "add",
       "role": {
@@ -2140,30 +2035,6 @@
       "methods": [],
       "module_path": "ref_verify::check_approved",
       "docs": "Default RefVerifyCheckApprovedService implementation. Loads production pairs and reads per-scope verify-cache artifacts to verify all pairs are Pass.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-03"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "RefVerifyAggregateInteractor": {
-      "action": "add",
-      "role": {
-        "Interactor": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [],
-      "module_path": "ref_verify::driver_service",
-      "docs": "Usecase-owned aggregate wrapper over the ref_verify secondary port contract. Holds injected run/check-approved service boundaries and delegates both methods; T023 reuses the existing port trait while composition can still place this interactor between infrastructure and cli_driver.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -2446,7 +2317,7 @@
       },
       "methods": [],
       "module_path": "review_v2::run_review_fix",
-      "docs": "DTO returned by ReviewService::run_fix_local — the usecase aggregate service method that orchestrates the review-fix-lead runner. `status` carries the sentinel string from the codex output (`completed` | `blocked_cross_scope` | `failed`). `exit_code` maps the sentinel to a CLI exit code (0=completed, 2=blocked_cross_scope, 1=failed). `stderr` carries diagnostic detail (e.g., smoke-test failure message) to surface on stderr when the run is blocked or failed; `None` when the run completed successfully.",
+      "docs": "DTO returned by ReviewService::run_fix_local \u2014 the usecase aggregate service method that orchestrates the review-fix-lead runner. `status` carries the sentinel string from the codex output (`completed` | `blocked_cross_scope` | `failed`). `exit_code` maps the sentinel to a CLI exit code (0=completed, 2=blocked_cross_scope, 1=failed). `stderr` carries diagnostic detail (e.g., smoke-test failure message) to surface on stderr when the run is blocked or failed; `None` when the run completed successfully.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -2491,7 +2362,7 @@
       },
       "methods": [],
       "module_path": "review_v2::run_review",
-      "docs": "DTO returned by ReviewService::run_codex and ReviewService::run_claude — the usecase application service methods that orchestrate the reviewer subprocess. `verdict_kind` is the stringified verdict (`approved` / `rejected` / etc) without leaking domain ReviewOutcome. `skipped` indicates whether the run was skipped (e.g., empty scope). `finding_count` is the reviewer's finding tally. `summary` is the rendered review output. `exit_code` preserves the underlying reviewer subprocess CLI exit code so the contract `findings_remain → exit 2` survives the cli_driver boundary (distinguishing review findings from execution failures).",
+      "docs": "DTO returned by ReviewService::run_codex and ReviewService::run_claude \u2014 the usecase application service methods that orchestrate the reviewer subprocess. `verdict_kind` is the stringified verdict (`approved` / `rejected` / etc) without leaking domain ReviewOutcome. `skipped` indicates whether the run was skipped (e.g., empty scope). `finding_count` is the reviewer's finding tally. `summary` is the rendered review output. `exit_code` preserves the underlying reviewer subprocess CLI exit code so the contract `findings_remain \u2192 exit 2` survives the cli_driver boundary (distinguishing review findings from execution failures).",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -2849,30 +2720,6 @@
       ],
       "informal_grounds": []
     },
-    "GitWorkflowResult": {
-      "action": "add",
-      "role": {
-        "Dto": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [],
-      "module_path": "git_workflow",
-      "docs": "Type alias Result<T, GitWorkflowError> for git workflow operations. Defined as pub type GitWorkflowResult<T> = Result<T, GitWorkflowError>. Refactored from Result<T, String> to typed error enum to surface I/O failure category (Unavailable variant) at the usecase boundary.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-08"
-        }
-      ],
-      "informal_grounds": []
-    },
     "GitWorkflowError": {
       "action": "modify",
       "role": {
@@ -2943,7 +2790,7 @@
       },
       "methods": [],
       "module_path": "git_workflow",
-      "docs": "Error type for GitWorkflowService and git workflow validation helpers. Unavailable variant added by T026 typed-error refactor to represent I/O or infrastructure failures (git process errors, file read failures) previously expressed as plain String in GitWorkflowResult.",
+      "docs": "Error type for GitWorkflowService and git workflow validation helpers. Unavailable variant added by T026 typed-error refactor to represent I/O or infrastructure failures (git process errors, file read failures) previously expressed as plain String at the boundary.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -3185,36 +3032,6 @@
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
           "anchor": "IN-12"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "VerifyPortError": {
-      "action": "add",
-      "role": {
-        "ErrorType": {}
-      },
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Unavailable",
-            "payload": {
-              "kind": "tuple",
-              "fields": [
-                "String"
-              ]
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "verify",
-      "docs": "Error returned by VerifyPort methods for adapter-level failures distinct from verify findings encoded in VerifyOutcome. Derives Debug via #[derive(Debug)] and Display + Error via thiserror::Error.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-07"
         }
       ],
       "informal_grounds": []
@@ -3801,6 +3618,36 @@
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
           "anchor": "IN-14"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyPortError": {
+      "action": "add",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unavailable",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify",
+      "docs": "Error returned by VerifyPort methods that can fail structurally (adapter-level failures distinct from verify findings). Findings are encoded inside VerifyOutcome via exit_code; Err is reserved for I/O / setup failures. Single variant Unavailable(String) carries adapter-level diagnostic.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-13"
         }
       ],
       "informal_grounds": []
@@ -5140,7 +4987,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5155,7 +5002,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5170,7 +5017,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5185,7 +5032,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5200,7 +5047,37 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_spec_attribution",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_spec_frontmatter",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5215,7 +5092,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5230,7 +5107,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5245,7 +5122,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5260,7 +5137,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5275,7 +5152,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5290,7 +5167,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5305,7 +5182,22 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_spec_signals",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5320,7 +5212,7 @@
               "ty": "Option<&std::path::Path>"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5347,7 +5239,7 @@
               "ty": "bool"
             }
           ],
-          "returns": "VerifyOutcome",
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -5360,249 +5252,6 @@
       ],
       "module_path": "verify",
       "docs": "Secondary port for all verify subcommands. Infrastructure implements this port by delegating to the infrastructure::verify::* submodules.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-03"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "VerifyService": {
-      "action": "add",
-      "role": {
-        "ApplicationService": {}
-      },
-      "methods": [
-        {
-          "name": "verify_tech_stack",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_latest_track",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_arch_docs",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_layers",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_hooks_path",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_canonical_modules",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_module_size",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_domain_purity",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_domain_strings",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_usecase_purity",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_doc_links",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_view_freshness",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_plan_artifact_refs",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "track_dir",
-              "ty": "Option<&std::path::Path>"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_catalogue_spec_refs",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "Option<&str>"
-            },
-            {
-              "name": "items_dir",
-              "ty": "&std::path::Path"
-            },
-            {
-              "name": "workspace_root",
-              "ty": "&std::path::Path"
-            },
-            {
-              "name": "skip_stale",
-              "ty": "bool"
-            }
-          ],
-          "returns": "VerifyOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ],
-      "module_path": "verify",
-      "docs": "Application service trait for the verify command family. VerifyInteractor delegates each operation to VerifyPort so cli_driver injects a usecase boundary, not a secondary port.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -5685,88 +5334,6 @@
       ],
       "module_path": "conventions",
       "docs": "Secondary port for convention document management.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-03"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "ConventionsService": {
-      "action": "add",
-      "role": {
-        "ApplicationService": {}
-      },
-      "methods": [
-        {
-          "name": "add_convention",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "root",
-              "ty": "&std::path::Path"
-            },
-            {
-              "name": "name",
-              "ty": "&str"
-            },
-            {
-              "name": "slug",
-              "ty": "Option<&str>"
-            },
-            {
-              "name": "title",
-              "ty": "Option<&str>"
-            },
-            {
-              "name": "summary",
-              "ty": "Option<&str>"
-            }
-          ],
-          "returns": "Result<String, ConventionsPortError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "update_index",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "Result<String, ConventionsPortError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "verify_index",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "Result<VerifyIndexResult, ConventionsPortError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ],
-      "module_path": "conventions",
-      "docs": "Application service trait for convention document commands. ConventionsInteractor delegates to ConventionsPort so cli_driver injects a usecase boundary.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -5954,87 +5521,6 @@
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
           "anchor": "IN-02"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "ArchService": {
-      "action": "add",
-      "role": {
-        "ApplicationService": {}
-      },
-      "methods": [
-        {
-          "name": "render_tree",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "Result<String, ArchPortError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "render_tree_full",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "Result<String, ArchPortError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "render_members",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "Result<String, ArchPortError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "render_direct_checks",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "returns": "Result<String, ArchPortError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ],
-      "module_path": "arch",
-      "docs": "Application service trait for architecture inspection commands. ArchInteractor delegates to ArchPort and returns rendered strings for cli_driver presentation.",
-      "spec_refs": [
-        {
-          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-03"
         }
       ],
       "informal_grounds": []
@@ -6676,7 +6162,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "Result<TelemetryReportOutput, TelemetryAggregateServiceError>",
+          "returns": "Result<String, TelemetryAggregateServiceError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -6719,7 +6205,7 @@
         "Sync"
       ],
       "module_path": "telemetry",
-      "docs": "Driver-facing aggregate/application service for the telemetry command family. Composes the TelemetryReportPort-based aggregation path with archived telemetry emission so TelemetryDriver holds one Arc<dyn TelemetryAggregateService>. report returns Result<TelemetryReportOutput, TelemetryAggregateServiceError> (structured DTO); cli_driver::telemetry owns final string rendering via its local format_report helper. emit_archived returns Result<(), TelemetryAggregateServiceError>.",
+      "docs": "Driver-facing aggregate/application service for the telemetry command family. Composes the TelemetryReportPort-based aggregation path with archived telemetry emission so TelemetryDriver holds one Arc<dyn TelemetryAggregateService>. report returns Result<String, TelemetryAggregateServiceError> as the rendered telemetry report string. emit_archived returns Result<(), TelemetryAggregateServiceError>.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -7052,7 +6538,7 @@
         "Sync"
       ],
       "module_path": "ref_verify::driver_service",
-      "docs": "Aggregate secondary port for the ref_verify command family. Infrastructure provides the filesystem-backed adapter and composition may wrap it with RefVerifyAggregateInteractor so the object graph can keep a usecase-owned hop without misclassifying infrastructure as an application service.",
+      "docs": "Aggregate secondary port for the ref_verify command family. Infrastructure provides the filesystem-backed adapter that implements this service, allowing composition to inject the adapter through the secondary-port contract without misclassifying infrastructure as an application service.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -7738,6 +7224,174 @@
           "where_predicates": []
         },
         {
+          "name": "branch_create",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "String"
+            }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "branch_switch",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "String"
+            }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "views_validate",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "add_task",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "description",
+              "ty": "String"
+            },
+            {
+              "name": "section",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "after",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "set_override",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "status",
+              "ty": "String"
+            },
+            {
+              "name": "reason",
+              "ty": "String"
+            }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "clear_override",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "next_task",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "task_counts",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
           "name": "archive",
           "receiver": "&self",
           "params": [
@@ -7796,7 +7450,7 @@
           "name": "stage_all",
           "receiver": "&self",
           "params": [],
-          "returns": "GitWorkflowResult<()>",
+          "returns": "Result<(), GitWorkflowError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -7815,7 +7469,7 @@
               "ty": "bool"
             }
           ],
-          "returns": "GitWorkflowResult<()>",
+          "returns": "Result<(), GitWorkflowError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -7838,7 +7492,7 @@
               "ty": "Option<&std::path::Path>"
             }
           ],
-          "returns": "GitWorkflowResult<()>",
+          "returns": "Result<(), GitWorkflowError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -7857,7 +7511,7 @@
               "ty": "bool"
             }
           ],
-          "returns": "GitWorkflowResult<()>",
+          "returns": "Result<(), GitWorkflowError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -7872,7 +7526,7 @@
               "ty": "&str"
             }
           ],
-          "returns": "GitWorkflowResult<String>",
+          "returns": "Result<String, GitWorkflowError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -7887,7 +7541,7 @@
               "ty": "&[std::path::PathBuf]"
             }
           ],
-          "returns": "GitWorkflowResult<()>",
+          "returns": "Result<(), GitWorkflowError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -7897,7 +7551,7 @@
           "name": "current_branch_track_id",
           "receiver": "&self",
           "params": [],
-          "returns": "GitWorkflowResult<Option<String>>",
+          "returns": "Result<Option<String>, GitWorkflowError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -7909,7 +7563,7 @@
         "Sync"
       ],
       "module_path": "git_workflow",
-      "docs": "Secondary port for guarded local git operations. GitWorkflowResult<T> now resolves to Result<T, GitWorkflowError> after T026 typed-error refactor (was Result<T, String>). FsGitWorkflowAdapter implements this contract; GitWorkflowInteractor wraps it at composition time.",
+      "docs": "Secondary port for guarded local git operations. T026 replaces the old Result<T, String> boundary with Result<T, GitWorkflowError>. FsGitWorkflowAdapter implements this contract; GitWorkflowInteractor wraps it at composition time.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
@@ -8172,6 +7826,507 @@
             {
               "name": "sleep",
               "ty": "std::sync::Arc<dyn SleepPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DemoInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn DemoPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryDriverInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn DryDriverPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "GitWorkflowInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn GitWorkflowService>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "PrCommandInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "push_fn",
+              "ty": "std::sync::Arc<dyn Fn(Option<String>) -> PrCommandOutput + Send + Sync>"
+            },
+            {
+              "name": "ensure_fn",
+              "ty": "std::sync::Arc<dyn Fn(Option<String>, String) -> PrCommandOutput + Send + Sync>"
+            },
+            {
+              "name": "status_fn",
+              "ty": "std::sync::Arc<dyn Fn(String) -> PrCommandOutput + Send + Sync>"
+            },
+            {
+              "name": "wait_and_merge_fn",
+              "ty": "std::sync::Arc<dyn Fn(String, u64, u64, String) -> PrCommandOutput + Send + Sync>"
+            },
+            {
+              "name": "trigger_review_fn",
+              "ty": "std::sync::Arc<dyn Fn(String) -> PrCommandOutput + Send + Sync>"
+            },
+            {
+              "name": "poll_review_fn",
+              "ty": "std::sync::Arc<dyn Fn(String, String, u64, u64) -> PrCommandOutput + Send + Sync>"
+            },
+            {
+              "name": "review_cycle_fn",
+              "ty": "std::sync::Arc<dyn Fn(Option<String>, bool) -> PrCommandOutput + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "pair_source",
+              "ty": "std::sync::Arc<dyn RefVerifyPairSourcePort>"
+            },
+            {
+              "name": "cache",
+              "ty": "std::sync::Arc<dyn RefVerifyCachePort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "ReviewClassifyInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "run_fn",
+              "ty": "std::sync::Arc<dyn Fn(Vec<String>, Option<String>, std::path::PathBuf) -> Result<Vec<(String, String)>, ReviewAuxError> + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "ReviewFilesInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "run_fn",
+              "ty": "std::sync::Arc<dyn Fn(String, Option<String>, std::path::PathBuf) -> Result<Vec<String>, ReviewAuxError> + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "ReviewGetBriefingInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "run_fn",
+              "ty": "std::sync::Arc<dyn Fn(String, Option<String>, std::path::PathBuf) -> Result<Option<String>, ReviewAuxError> + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "ReviewResultsInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "run_fn",
+              "ty": "std::sync::Arc<dyn Fn(Option<String>, std::path::PathBuf, Option<String>, bool, u32, String, bool) -> Result<String, ReviewAuxError> + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "ReviewRunLocalInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "run_fn",
+              "ty": "std::sync::Arc<dyn Fn(Option<String>, u64, Option<std::path::PathBuf>, Option<String>, Option<String>, String, String, std::path::PathBuf) -> ReviewRunLocalOutput + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "ReviewValidateScopeInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "run_fn",
+              "ty": "std::sync::Arc<dyn Fn(String, Option<String>, std::path::PathBuf) -> Result<(), ReviewAuxError> + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "SemanticDupDriverInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn SemanticDupDriverPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryDriverOutcome",
+      "methods": [
+        {
+          "name": "success",
+          "receiver": null,
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "failure",
+          "receiver": null,
+          "params": [
+            {
+              "name": "msg",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "PrCommandOutput",
+      "methods": [
+        {
+          "name": "success",
+          "receiver": null,
+          "params": [
+            {
+              "name": "msg",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "failure",
+          "receiver": null,
+          "params": [
+            {
+              "name": "msg",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "with_exit_code",
+          "receiver": null,
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "SemanticDupDriverOutcome",
+      "methods": [
+        {
+          "name": "success",
+          "receiver": null,
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "failure",
+          "receiver": null,
+          "params": [
+            {
+              "name": "msg",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "SignalCommandOutput",
+      "methods": [
+        {
+          "name": "success",
+          "receiver": null,
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "failure",
+          "receiver": null,
+          "params": [
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "TrackCommandOutput",
+      "methods": [
+        {
+          "name": "success",
+          "receiver": null,
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "failure",
+          "receiver": null,
+          "params": [
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "VerifyOutcome",
+      "methods": [
+        {
+          "name": "success",
+          "receiver": null,
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "failure",
+          "receiver": null,
+          "params": [
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
             }
           ],
           "returns": "Self",
@@ -8596,11 +8751,6 @@
     },
     {
       "action": "add",
-      "trait_ref": "RefVerifyAggregateService",
-      "for_type": "RefVerifyAggregateInteractor"
-    },
-    {
-      "action": "add",
       "trait_ref": "core::clone::Clone",
       "for_type": "RefVerifyCheckApprovedOutcome"
     },
@@ -8781,26 +8931,6 @@
     },
     {
       "action": "add",
-      "trait_ref": "ArchService",
-      "for_type": "ArchInteractor"
-    },
-    {
-      "action": "add",
-      "trait_ref": "ConventionsService",
-      "for_type": "ConventionsInteractor"
-    },
-    {
-      "action": "add",
-      "trait_ref": "VerifyService",
-      "for_type": "VerifyInteractor"
-    },
-    {
-      "action": "add",
-      "trait_ref": "TelemetryAggregateService",
-      "for_type": "TelemetryAggregateInteractor"
-    },
-    {
-      "action": "add",
       "trait_ref": "core::clone::Clone",
       "for_type": "TelemetryReportOutput"
     },
@@ -8928,21 +9058,6 @@
       "action": "add",
       "trait_ref": "core::error::Error",
       "for_type": "TelemetryEmitDynamicPortError"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "VerifyPortError"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Display",
-      "for_type": "VerifyPortError"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::error::Error",
-      "for_type": "VerifyPortError"
     },
     {
       "action": "modify",
@@ -9223,6 +9338,21 @@
       "action": "add",
       "trait_ref": "core::error::Error",
       "for_type": "ShellParserError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "VerifyPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "VerifyPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "VerifyPortError"
     }
   ]
 }

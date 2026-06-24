@@ -6601,6 +6601,150 @@
         "kind": "fail",
         "reason": "New behavioral commitment / wrong reference: the evidence is about extracting `emit_archived_track_subcommand` into infrastructure adapters and wiring it through composition/driver, while the claim declares a CQRS command for a separate schema export use case with schema-export inputs. The evidence does not motivate that outward schema export responsibility."
       }
+    },
+    {
+      "claim_hash": "2bfd8bf3004fd2f56ede0c2709b34c943543cd316fb07e22a7ebc93371ea9a99",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "2bfd8bf3004fd2f56ede0c2709b34c943543cd316fb07e22a7ebc93371ea9a99",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "e238d6a716f72b2f9f9afd3c7cf28b3fe46e4eb3e823abeaf2b5fd8eb1a769ff",
+      "evidence_hash": "8769708ccf55f1e10d9643a9fa321ee29723e7aeccc46f96c7bbe5ea7a65174d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 出力 DTO を invoke + render の境界として流用する（`2026-04-30-0848` の DTO を継続利用）。bin は `usecase` / `domain` を import しない（thin-bin 維持）。"
+      }
+    },
+    {
+      "claim_hash": "c62041bb18becd4edd09a918e5fd0837d2654efd03bfc11f7eaf2006715b5e50",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を DI（object graph の組み立て）のみに絞る。secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "4daa490f4b8ca76c05b05e3b8fa749f30c22345b8188e0677dcf837daa2f5696",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "64bdf2291933d3548c6740c101a6eabc77d554270acd9c810cc305ae7c59296c",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "64bdf2291933d3548c6740c101a6eabc77d554270acd9c810cc305ae7c59296c",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "64bdf2291933d3548c6740c101a6eabc77d554270acd9c810cc305ae7c59296c",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "5c3122d6816063bdafcb6605a6562de005150541b8a931fcddfb7869d91d40a4",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を DI（object graph の組み立て）のみに絞る。secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "53b6997efc1987ec4ae664aecf1c17e215331c0a1c1d0465de829af26d1dc418",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "83100b6cd13123b8cee1ab5629574d5665be301470ed67e7b8a61908661d0101",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を DI（object graph の組み立て）のみに絞る。secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "52dd7338d690834710a552276dddb45873ab354d7ce46ac18aedcd71b08eba84",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "4208042a1da734ac5452f0ca71ff29bc13ca995c80a971540476524f52c7a3c1",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "5c0b731f0c9891997c6873980841f1c75fd62183c06cd5463d9efa6177b2044c",
+      "evidence_hash": "d7074da1d1545ff09f0ec2654c7928398b6e506db85440b448af82b9806494b3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver` 層が `usecase` のみに依存すること（`cli_driver → usecase`）。DI はしない（注入される側）。"
+      }
+    },
+    {
+      "claim_hash": "a85c2fa0cc258797629bff9436777e16bf4b3db16678ba84a28f739185a6a67b",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を DI（object graph の組み立て）のみに絞る。secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "968de88aa0fddcda832676ca0084a4fdefb7031b61fc9faed7e6a7b0542b7fd9",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "5a3f845166c8ba38881c6bdf6ebfdb99cc7845c6e62fbc35694961570a7b1356",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "6ad53f9e2949b997fcc61f2303352abcf63ab7bb08c59ab7d12ab5de8cf0d988",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase secondary port コントラクトの新設・修正、および aggregate service の追加。新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
     }
   ]
 }

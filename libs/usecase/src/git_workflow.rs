@@ -218,21 +218,18 @@ pub fn verify_auto_detected_branch(
 use std::path::Path;
 use std::sync::Arc;
 
-/// Result type for git workflow operations.
-pub type GitWorkflowResult<T> = Result<T, GitWorkflowError>;
-
 /// Application service trait for guarded local git operations.
 ///
 /// Abstracts `infrastructure::git_cli::SystemGitRepo` behind the usecase
 /// boundary so that `cli_driver` never imports infrastructure directly.
 pub trait GitWorkflowService: Send + Sync {
     /// Stage the whole worktree except transient automation scratch files.
-    fn stage_all(&self) -> GitWorkflowResult<()>;
+    fn stage_all(&self) -> Result<(), GitWorkflowError>;
 
     /// Stage repo-relative paths listed in a file.
     ///
     /// If `cleanup` is true, the file is removed after staging.
-    fn stage_from_file(&self, path: &Path, cleanup: bool) -> GitWorkflowResult<()>;
+    fn stage_from_file(&self, path: &Path, cleanup: bool) -> Result<(), GitWorkflowError>;
 
     /// Create a commit using the message stored in a file.
     ///
@@ -243,27 +240,27 @@ pub trait GitWorkflowService: Send + Sync {
         path: &Path,
         cleanup: bool,
         track_dir: Option<&Path>,
-    ) -> GitWorkflowResult<()>;
+    ) -> Result<(), GitWorkflowError>;
 
     /// Attach a git note using the contents of a file.
     ///
     /// If `cleanup` is true, the file is removed after attaching.
-    fn note_from_file(&self, path: &Path, cleanup: bool) -> GitWorkflowResult<()>;
+    fn note_from_file(&self, path: &Path, cleanup: bool) -> Result<(), GitWorkflowError>;
 
     /// Switch to a branch and pull latest changes.
     ///
     /// Returns a human-readable status string.
-    fn switch_and_pull(&self, branch: &str) -> GitWorkflowResult<String>;
+    fn switch_and_pull(&self, branch: &str) -> Result<String, GitWorkflowError>;
 
     /// Unstage paths (remove from git index without discarding worktree changes).
-    fn unstage(&self, paths: &[PathBuf]) -> GitWorkflowResult<()>;
+    fn unstage(&self, paths: &[PathBuf]) -> Result<(), GitWorkflowError>;
 
     /// Resolve the track ID from the current git branch (strict mode).
     ///
     /// - `Ok(Some(id))` → on a valid `track/<id>` branch.
     /// - `Ok(None)`     → on a non-track branch.
     /// - `Err(msg)`     → validation failure.
-    fn current_branch_track_id(&self) -> GitWorkflowResult<Option<String>>;
+    fn current_branch_track_id(&self) -> Result<Option<String>, GitWorkflowError>;
 }
 
 // ── GitWorkflowInteractor ─────────────────────────────────────────────────────
@@ -286,11 +283,11 @@ impl GitWorkflowInteractor {
 }
 
 impl GitWorkflowService for GitWorkflowInteractor {
-    fn stage_all(&self) -> GitWorkflowResult<()> {
+    fn stage_all(&self) -> Result<(), GitWorkflowError> {
         self.port.stage_all()
     }
 
-    fn stage_from_file(&self, path: &Path, cleanup: bool) -> GitWorkflowResult<()> {
+    fn stage_from_file(&self, path: &Path, cleanup: bool) -> Result<(), GitWorkflowError> {
         self.port.stage_from_file(path, cleanup)
     }
 
@@ -299,23 +296,23 @@ impl GitWorkflowService for GitWorkflowInteractor {
         path: &Path,
         cleanup: bool,
         track_dir: Option<&Path>,
-    ) -> GitWorkflowResult<()> {
+    ) -> Result<(), GitWorkflowError> {
         self.port.commit_from_file(path, cleanup, track_dir)
     }
 
-    fn note_from_file(&self, path: &Path, cleanup: bool) -> GitWorkflowResult<()> {
+    fn note_from_file(&self, path: &Path, cleanup: bool) -> Result<(), GitWorkflowError> {
         self.port.note_from_file(path, cleanup)
     }
 
-    fn switch_and_pull(&self, branch: &str) -> GitWorkflowResult<String> {
+    fn switch_and_pull(&self, branch: &str) -> Result<String, GitWorkflowError> {
         self.port.switch_and_pull(branch)
     }
 
-    fn unstage(&self, paths: &[PathBuf]) -> GitWorkflowResult<()> {
+    fn unstage(&self, paths: &[PathBuf]) -> Result<(), GitWorkflowError> {
         self.port.unstage(paths)
     }
 
-    fn current_branch_track_id(&self) -> GitWorkflowResult<Option<String>> {
+    fn current_branch_track_id(&self) -> Result<Option<String>, GitWorkflowError> {
         self.port.current_branch_track_id()
     }
 }

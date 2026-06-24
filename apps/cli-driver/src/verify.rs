@@ -130,55 +130,55 @@ impl VerifyDriver {
     pub fn handle(&self, input: VerifyInput) -> CommandOutcome {
         match input {
             VerifyInput::TechStack { project_root } => {
-                map_outcome(self.port.verify_tech_stack(&project_root))
+                map_result(self.port.verify_tech_stack(&project_root))
             }
             VerifyInput::LatestTrack { project_root } => {
-                map_outcome(self.port.verify_latest_track(&project_root))
+                map_result(self.port.verify_latest_track(&project_root))
             }
             VerifyInput::ArchDocs { project_root } => {
-                map_outcome(self.port.verify_arch_docs(&project_root))
+                map_result(self.port.verify_arch_docs(&project_root))
             }
             VerifyInput::Layers { project_root } => {
-                map_outcome(self.port.verify_layers(&project_root))
+                map_result(self.port.verify_layers(&project_root))
             }
             VerifyInput::HooksPath { project_root } => {
-                map_outcome(self.port.verify_hooks_path(&project_root))
+                map_result(self.port.verify_hooks_path(&project_root))
             }
             VerifyInput::SpecAttribution { spec_path } => {
-                map_outcome(self.port.verify_spec_attribution(&spec_path))
+                map_result(self.port.verify_spec_attribution(&spec_path))
             }
             VerifyInput::SpecFrontmatter { spec_path } => {
-                map_outcome(self.port.verify_spec_frontmatter(&spec_path))
+                map_result(self.port.verify_spec_frontmatter(&spec_path))
             }
             VerifyInput::CanonicalModules { project_root } => {
-                map_outcome(self.port.verify_canonical_modules(&project_root))
+                map_result(self.port.verify_canonical_modules(&project_root))
             }
             VerifyInput::ModuleSize { project_root } => {
-                map_outcome(self.port.verify_module_size(&project_root))
+                map_result(self.port.verify_module_size(&project_root))
             }
             VerifyInput::DomainPurity { project_root } => {
-                map_outcome(self.port.verify_domain_purity(&project_root))
+                map_result(self.port.verify_domain_purity(&project_root))
             }
             VerifyInput::DomainStrings { project_root } => {
-                map_outcome(self.port.verify_domain_strings(&project_root))
+                map_result(self.port.verify_domain_strings(&project_root))
             }
             VerifyInput::UsecasePurity { project_root } => {
-                map_outcome(self.port.verify_usecase_purity(&project_root))
+                map_result(self.port.verify_usecase_purity(&project_root))
             }
             VerifyInput::DocLinks { project_root } => {
-                map_outcome(self.port.verify_doc_links(&project_root))
+                map_result(self.port.verify_doc_links(&project_root))
             }
             VerifyInput::ViewFreshness { project_root } => {
-                map_outcome(self.port.verify_view_freshness(&project_root))
+                map_result(self.port.verify_view_freshness(&project_root))
             }
             VerifyInput::SpecSignals { spec_path } => {
-                map_outcome(self.port.verify_spec_signals(&spec_path))
+                map_result(self.port.verify_spec_signals(&spec_path))
             }
             VerifyInput::PlanArtifactRefs { track_dir } => {
-                map_outcome(self.port.verify_plan_artifact_refs(track_dir.as_deref()))
+                map_result(self.port.verify_plan_artifact_refs(track_dir.as_deref()))
             }
             VerifyInput::CatalogueSpecRefs { track_id, items_dir, workspace_root, skip_stale } => {
-                map_outcome(self.port.verify_catalogue_spec_refs(
+                map_result(self.port.verify_catalogue_spec_refs(
                     track_id.as_deref(),
                     &items_dir,
                     &workspace_root,
@@ -189,7 +189,19 @@ impl VerifyDriver {
     }
 }
 
-/// Map a [`usecase::verify::VerifyOutcome`] to a [`CommandOutcome`].
-fn map_outcome(outcome: usecase::verify::VerifyOutcome) -> CommandOutcome {
-    CommandOutcome { stdout: outcome.stdout, stderr: outcome.stderr, exit_code: outcome.exit_code }
+/// Map a `Result<VerifyOutcome, VerifyPortError>` to a [`CommandOutcome`].
+///
+/// Adapter-level errors (`Err`) are rendered as a failing `CommandOutcome` with
+/// the error message in `stderr`.
+fn map_result(
+    result: Result<usecase::verify::VerifyOutcome, usecase::verify::VerifyPortError>,
+) -> CommandOutcome {
+    match result {
+        Ok(outcome) => CommandOutcome {
+            stdout: outcome.stdout,
+            stderr: outcome.stderr,
+            exit_code: outcome.exit_code,
+        },
+        Err(e) => CommandOutcome { stdout: None, stderr: Some(e.to_string()), exit_code: 1 },
+    }
 }

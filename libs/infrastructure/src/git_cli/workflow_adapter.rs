@@ -9,9 +9,9 @@ use std::fs;
 use std::path::{Component, Path, PathBuf};
 
 use usecase::git_workflow::{
-    ExplicitTrackBranch, GitWorkflowError, GitWorkflowResult, GitWorkflowService,
-    TRANSIENT_AUTOMATION_DIRS, TRANSIENT_AUTOMATION_FILES, TrackBranchClaim,
-    validate_stage_path_entries, verify_auto_detected_branch, verify_explicit_track_branch,
+    ExplicitTrackBranch, GitWorkflowError, GitWorkflowService, TRANSIENT_AUTOMATION_DIRS,
+    TRANSIENT_AUTOMATION_FILES, TrackBranchClaim, validate_stage_path_entries,
+    verify_auto_detected_branch, verify_explicit_track_branch,
 };
 use usecase::track_resolution;
 
@@ -44,14 +44,14 @@ impl Default for FsGitWorkflowAdapter {
 }
 
 impl GitWorkflowService for FsGitWorkflowAdapter {
-    fn stage_all(&self) -> GitWorkflowResult<()> {
+    fn stage_all(&self) -> Result<(), GitWorkflowError> {
         let repo =
             SystemGitRepo::discover().map_err(|e| GitWorkflowError::Unavailable(e.to_string()))?;
         repo.stage_all_excluding(TRANSIENT_AUTOMATION_FILES, TRANSIENT_AUTOMATION_DIRS)
             .map_err(|e| GitWorkflowError::Unavailable(e.to_string()))
     }
 
-    fn stage_from_file(&self, path: &Path, cleanup: bool) -> GitWorkflowResult<()> {
+    fn stage_from_file(&self, path: &Path, cleanup: bool) -> Result<(), GitWorkflowError> {
         let repo =
             SystemGitRepo::discover().map_err(|e| GitWorkflowError::Unavailable(e.to_string()))?;
         let resolved = resolve_repo_file_path(repo.root(), path, "stage path list file")?;
@@ -78,7 +78,7 @@ impl GitWorkflowService for FsGitWorkflowAdapter {
         path: &Path,
         cleanup: bool,
         track_dir: Option<&Path>,
-    ) -> GitWorkflowResult<()> {
+    ) -> Result<(), GitWorkflowError> {
         let repo =
             SystemGitRepo::discover().map_err(|e| GitWorkflowError::Unavailable(e.to_string()))?;
         let resolved = resolve_repo_file_path(repo.root(), path, "commit message file")?;
@@ -158,7 +158,7 @@ impl GitWorkflowService for FsGitWorkflowAdapter {
         }
     }
 
-    fn note_from_file(&self, path: &Path, cleanup: bool) -> GitWorkflowResult<()> {
+    fn note_from_file(&self, path: &Path, cleanup: bool) -> Result<(), GitWorkflowError> {
         let repo =
             SystemGitRepo::discover().map_err(|e| GitWorkflowError::Unavailable(e.to_string()))?;
         let resolved = resolve_repo_file_path(repo.root(), path, "git note file")?;
@@ -179,7 +179,7 @@ impl GitWorkflowService for FsGitWorkflowAdapter {
         }
     }
 
-    fn switch_and_pull(&self, branch: &str) -> GitWorkflowResult<String> {
+    fn switch_and_pull(&self, branch: &str) -> Result<String, GitWorkflowError> {
         let repo =
             SystemGitRepo::discover().map_err(|e| GitWorkflowError::Unavailable(e.to_string()))?;
         let mut stdout_lines = Vec::<String>::new();
@@ -213,7 +213,7 @@ impl GitWorkflowService for FsGitWorkflowAdapter {
         Ok(stdout_lines.join("\n"))
     }
 
-    fn unstage(&self, paths: &[PathBuf]) -> GitWorkflowResult<()> {
+    fn unstage(&self, paths: &[PathBuf]) -> Result<(), GitWorkflowError> {
         let repo =
             SystemGitRepo::discover().map_err(|e| GitWorkflowError::Unavailable(e.to_string()))?;
         let mut args = vec!["restore", "--staged", "--"];
@@ -229,7 +229,7 @@ impl GitWorkflowService for FsGitWorkflowAdapter {
         }
     }
 
-    fn current_branch_track_id(&self) -> GitWorkflowResult<Option<String>> {
+    fn current_branch_track_id(&self) -> Result<Option<String>, GitWorkflowError> {
         let branch = match SystemGitRepo::discover()
             .and_then(|r| r.current_branch())
             .map_err(|e| GitWorkflowError::Unavailable(e.to_string()))?
@@ -254,7 +254,11 @@ impl GitWorkflowService for FsGitWorkflowAdapter {
 // Private helpers
 // ---------------------------------------------------------------------------
 
-fn resolve_repo_file_path(root: &Path, path: &Path, label: &str) -> GitWorkflowResult<PathBuf> {
+fn resolve_repo_file_path(
+    root: &Path,
+    path: &Path,
+    label: &str,
+) -> Result<PathBuf, GitWorkflowError> {
     ensure_trusted_root(root)?;
     if path.as_os_str().is_empty() {
         return Err(GitWorkflowError::Unavailable(format!("{label} path must not be empty")));
@@ -291,7 +295,7 @@ fn resolve_repo_file_path(root: &Path, path: &Path, label: &str) -> GitWorkflowR
     Ok(resolved)
 }
 
-fn ensure_trusted_root(root: &Path) -> GitWorkflowResult<()> {
+fn ensure_trusted_root(root: &Path) -> Result<(), GitWorkflowError> {
     match root.symlink_metadata() {
         Ok(meta) if meta.file_type().is_symlink() => Err(GitWorkflowError::Unavailable(format!(
             "refusing to use symlinked repository root: {}",
@@ -305,7 +309,7 @@ fn ensure_trusted_root(root: &Path) -> GitWorkflowResult<()> {
     }
 }
 
-fn ensure_existing_nonempty_file(path: &Path, label: &str) -> GitWorkflowResult<()> {
+fn ensure_existing_nonempty_file(path: &Path, label: &str) -> Result<(), GitWorkflowError> {
     if !path.is_file() {
         return Err(GitWorkflowError::Unavailable(format!("Missing {label}: {}", path.display())));
     }
@@ -318,7 +322,7 @@ fn ensure_existing_nonempty_file(path: &Path, label: &str) -> GitWorkflowResult<
     Ok(())
 }
 
-fn load_stage_paths(path: &Path) -> GitWorkflowResult<Vec<String>> {
+fn load_stage_paths(path: &Path) -> Result<Vec<String>, GitWorkflowError> {
     ensure_existing_nonempty_file(path, "stage path list file")?;
     let content = fs::read_to_string(path).map_err(|err| {
         GitWorkflowError::Unavailable(format!(
