@@ -11,9 +11,7 @@ use domain::guard::{ShellParser, policy};
 use domain::hook::{HookContext, HookError, HookInput, HookVerdict};
 
 use super::HookHandler;
-
-/// Word-boundary exact-match token for the guarded-git bypass scan (D3).
-const SOTP_GUARDED_TOKEN: &str = "SOTP_GUARDED_GIT";
+use crate::guard::{SOTP_GUARDED_TOKEN_REASON, raw_command_contains_guarded_token};
 
 /// Hook handler for `block-direct-git-ops`.
 ///
@@ -38,12 +36,7 @@ impl HookHandler for GuardHookHandler {
             input.command.as_deref().ok_or_else(|| HookError::Input("missing command".into()))?;
 
         if raw_command_contains_guarded_token(command) {
-            return Ok(HookVerdict::block(
-                "[Git Policy] The guarded-git token is present in the Bash command string. \
-                 The token must not be passed inline — it is injected only by the sotp binary \
-                 via its git_cli layer."
-                    .to_string(),
-            ));
+            return Ok(HookVerdict::block(SOTP_GUARDED_TOKEN_REASON.to_owned()));
         }
 
         let commands = match self.parser.split_shell(command) {
@@ -62,29 +55,6 @@ impl HookHandler for GuardHookHandler {
             Ok(HookVerdict::allow())
         }
     }
-}
-
-/// Returns `true` if `command` contains `SOTP_GUARDED_GIT` as a whole word (word-boundary
-/// exact match). Partial identifiers like `SOTP_GUARDED_GITX` do **not** match.
-fn raw_command_contains_guarded_token(command: &str) -> bool {
-    let token = SOTP_GUARDED_TOKEN;
-    let tbytes = token.as_bytes();
-    let bytes = command.as_bytes();
-    let tlen = tbytes.len();
-    if tlen == 0 || bytes.len() < tlen {
-        return false;
-    }
-    bytes.windows(tlen).enumerate().any(|(i, window)| {
-        if window != tbytes {
-            return false;
-        }
-        let before_ok = i == 0
-            || bytes
-                .get(i.wrapping_sub(1))
-                .is_some_and(|b| !b.is_ascii_alphanumeric() && *b != b'_');
-        let after_ok = bytes.get(i + tlen).is_none_or(|b| !b.is_ascii_alphanumeric() && *b != b'_');
-        before_ok && after_ok
-    })
 }
 
 #[cfg(test)]

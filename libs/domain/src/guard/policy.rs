@@ -182,8 +182,9 @@ fn check_argv(argv: &[String], env_split_budget: usize) -> GuardVerdict {
 
     // D3/IN-03 (b): argv-token exact-match scan for the guarded-git token.
     // Blocks attempts to inject the token via quote-splitting (e.g., SOTP_GUARDED_GI"T"=1).
-    // The raw-string scan (stage a) is performed by GuardHookHandler (usecase layer) before
-    // calling this function, since SimpleCommand does not carry the original raw string.
+    // The raw-string scan (stage a) is performed in the usecase layer
+    // (`GuardHookHandler` and `GuardCheckInteractor`) before calling this function,
+    // since `SimpleCommand` does not carry the original raw string.
     if argv_contains_guarded_token(argv) {
         return GuardVerdict::block(SOTP_GUARDED_TOKEN_MESSAGE);
     }
@@ -575,9 +576,9 @@ fn normalize_path(path: &str) -> String {
 /// prevent false positives on unrelated tokens whose names merely contain substrings
 /// of the guarded token.
 ///
-/// The raw-command-string scan (stage a) is performed upstream in `GuardHookHandler`
-/// before `check_commands` is called, because `SimpleCommand` does not retain the
-/// original raw string.
+/// The raw-command-string scan (stage a) is performed upstream in the usecase
+/// layer (`GuardHookHandler` and `GuardCheckInteractor`) before `check_commands`
+/// is called, because `SimpleCommand` does not retain the original raw string.
 fn argv_contains_guarded_token(argv: &[String]) -> bool {
     argv.iter().any(|token| {
         // Bare token: exact match.

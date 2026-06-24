@@ -10,6 +10,47 @@ use std::sync::Arc;
 use domain::guard::{GuardVerdict, SimpleCommand, policy};
 
 // ---------------------------------------------------------------------------
+// Raw-command guarded-token scan (D3/IN-03 stage a)
+// ---------------------------------------------------------------------------
+
+/// Word-boundary exact-match token for the guarded-git bypass scan (D3 stage a).
+pub(crate) const SOTP_GUARDED_TOKEN: &str = "SOTP_GUARDED_GIT";
+
+/// Block reason returned when the raw-command scan finds the guarded-git token.
+pub(crate) const SOTP_GUARDED_TOKEN_REASON: &str = "[Git Policy] The guarded-git token is present in the Bash command string. \
+     The token must not be passed inline — it is injected only by the sotp binary \
+     via its git_cli layer.";
+
+/// Returns `true` if `command` contains the guarded-git token as a whole word
+/// (word-boundary exact match). Partial identifiers like `SOTP_GUARDED_GITX`
+/// do **not** match.
+///
+/// The argv-token scan in `domain::guard::policy::check_commands` cannot see
+/// values inside variable assignments (`FOO=$SOTP_GUARDED_GIT cargo test`
+/// drops the value before argv is constructed). This raw-string scan covers
+/// that gap by inspecting the original Bash command string before any parsing.
+pub(crate) fn raw_command_contains_guarded_token(command: &str) -> bool {
+    let token = SOTP_GUARDED_TOKEN;
+    let tbytes = token.as_bytes();
+    let bytes = command.as_bytes();
+    let tlen = tbytes.len();
+    if tlen == 0 || bytes.len() < tlen {
+        return false;
+    }
+    bytes.windows(tlen).enumerate().any(|(i, window)| {
+        if window != tbytes {
+            return false;
+        }
+        let before_ok = i == 0
+            || bytes
+                .get(i.wrapping_sub(1))
+                .is_some_and(|b| !b.is_ascii_alphanumeric() && *b != b'_');
+        let after_ok = bytes.get(i + tlen).is_none_or(|b| !b.is_ascii_alphanumeric() && *b != b'_');
+        before_ok && after_ok
+    })
+}
+
+// ---------------------------------------------------------------------------
 // Public boundary types
 // ---------------------------------------------------------------------------
 
@@ -184,6 +225,18 @@ impl GuardCheckInteractor {
 
 impl GuardCheckService for GuardCheckInteractor {
     fn check(&self, command: String) -> GuardCheckOutput {
+        // D3/IN-03 stage (a): raw-string scan for the guarded-git token before parsing.
+        // The domain argv-token scan (stage b) cannot see values inside variable
+        // assignments such as `FOO=$SOTP_GUARDED_GIT cargo test`, because the
+        // assignment is stripped from argv before `check_commands` runs. The raw
+        // scan covers that gap.
+        if raw_command_contains_guarded_token(&command) {
+            return GuardCheckOutput {
+                decision: GuardDecision::Block,
+                reason: SOTP_GUARDED_TOKEN_REASON.to_owned(),
+            };
+        }
+
         let adapter = ShellParserPortAdapter { port: self.parser_port.as_ref() };
 
         let verdict = match adapter.parse(&command) {
@@ -272,6 +325,41 @@ mod tests {
         let interactor = make_interactor();
         let output = interactor.check("git log --oneline".to_owned());
         assert_eq!(output.decision, GuardDecision::Allow);
+    }
+
+    // D3/IN-03 stage (a): raw-command scan for SOTP_GUARDED_GIT.
+    // The argv-token scan (stage b in domain) cannot see values inside variable
+    // assignments such as `FOO=$SOTP_GUARDED_GIT cargo test` (the assignment value is
+    // stripped from argv before policy::check_commands runs). GuardCheckInteractor must
+    // catch these via the raw-string scan, matching the GuardHookHandler behavior.
+    #[rstest::rstest]
+    #[case::token_as_env_prefix("SOTP_GUARDED_GIT=1 git commit -m msg")]
+    #[case::token_in_middle("env SOTP_GUARDED_GIT=1 cargo test")]
+    #[case::token_in_assignment_value("FOO=$SOTP_GUARDED_GIT cargo test")]
+    fn test_guard_check_blocks_raw_command_with_guarded_token(#[case] raw_command: &str) {
+        let interactor = make_interactor();
+        let output = interactor.check(raw_command.to_owned());
+        assert_eq!(
+            output.decision,
+            GuardDecision::Block,
+            "raw command containing SOTP_GUARDED_GIT must be blocked (AC-03 stage a): {raw_command}"
+        );
+        assert!(
+            output.reason.contains("guarded-git token"),
+            "block reason must mention the guarded-git token: {}",
+            output.reason
+        );
+    }
+
+    #[test]
+    fn test_guard_check_allows_extended_identifier_containing_token() {
+        let interactor = make_interactor();
+        let output = interactor.check("echo SOTP_GUARDED_GITX".to_owned());
+        assert_eq!(
+            output.decision,
+            GuardDecision::Allow,
+            "extended identifier SOTP_GUARDED_GITX must not be blocked"
+        );
     }
 
     #[test]
