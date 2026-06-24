@@ -147,7 +147,8 @@
     {
       "id": "T025",
       "description": "Bin business-logic extraction (cli.md thin-bin policy compliance). `apps/cli/src/commands/pr.rs` has chrono + serde_json business logic for PR review polling/parsing (~300 lines: DateTime parsing, JSON value walking, body filtering). `apps/cli/src/commands/verify_catalogue_spec_refs.rs` builds JSON rules via serde_json::json!({...}). Both violate the thin-bin policy. Action: move these into existing or new usecase application services (e.g., extend the catalogued usecase::pr::PrCommandService / PrCommandInteractor poll_review path for the polling/parsing logic; usecase or infrastructure side for the verify-rules JSON construction), wire them through the matching cli_driver Driver::handle paths, and remove the now-dead `chrono` + `serde_json` direct deps from apps/cli/Cargo.toml. Estimated diff: ~400 lines.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "5e23be5cba3ac88996c6951b68cf188333cdedba"
     },
     {
       "id": "T026",
