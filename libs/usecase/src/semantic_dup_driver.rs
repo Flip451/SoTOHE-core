@@ -16,7 +16,11 @@ use std::sync::Arc;
 /// Input for `sotp find-similar` (driver boundary).
 #[derive(Debug, Clone)]
 pub struct FindSimilarDriverInput {
-    pub fragment_text: String,
+    /// Inline fragment text to search for.  Mutually exclusive with `file_path`.
+    pub fragment_text: Option<String>,
+    /// Path to a file whose content is used as the query fragment.  Mutually exclusive
+    /// with `fragment_text`.  The file is read by the composition layer.
+    pub file_path: Option<PathBuf>,
     pub top_k: usize,
     pub db_path: PathBuf,
 }
@@ -37,7 +41,9 @@ pub struct IndexMeasureQualityDriverInput {
 /// Input for `sotp dup-check` (driver boundary).
 #[derive(Debug, Clone)]
 pub struct DupCheckDriverInput {
-    pub fragment_files: Vec<PathBuf>,
+    /// Path to a newline-separated file listing fragment file paths to check.
+    /// The file is read by the composition layer.
+    pub files_from: PathBuf,
     pub threshold: f32,
     pub db_path: PathBuf,
     pub ack_file: Option<PathBuf>,

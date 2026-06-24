@@ -6481,6 +6481,22 @@
         "kind": "pass",
         "citation": "usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
       }
+    },
+    {
+      "claim_hash": "761512b4b53c7d75bfa64d316d462dcaa0032f7e4480c16b17cc82ffe43c6afc",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "9b03a56257ef412fb70f5704f9cd2c54adb28ae7c76a9d645b9add7680df0065",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
     }
   ]
 }

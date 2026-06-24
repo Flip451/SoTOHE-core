@@ -44,6 +44,7 @@ impl SemanticDupDriverPort for SemanticDupDriverAdapter {
     fn find_similar(&self, input: FindSimilarDriverInput) -> SemanticDupDriverOutcome {
         let composition_input = FindSimilarInput {
             fragment_text: input.fragment_text,
+            file_path: input.file_path,
             top_k: input.top_k,
             db_path: input.db_path,
         };
@@ -88,7 +89,7 @@ impl SemanticDupDriverPort for SemanticDupDriverAdapter {
 
     fn dup_check(&self, input: DupCheckDriverInput) -> SemanticDupDriverOutcome {
         let composition_input = DupCheckInput {
-            fragment_files: input.fragment_files,
+            files_from: input.files_from,
             threshold: input.threshold,
             db_path: input.db_path,
             ack_file: input.ack_file,

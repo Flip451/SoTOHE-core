@@ -17,8 +17,11 @@ use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
 /// Input DTO for `sotp find-similar`.
 #[derive(Debug, Clone)]
 pub struct FindSimilarInput {
-    /// The query text fragment, or the content read from a file.
-    pub fragment_text: String,
+    /// Inline fragment text to search for.  Mutually exclusive with `file_path`.
+    pub fragment_text: Option<String>,
+    /// Path to a file whose content is used as the query fragment.  Mutually exclusive
+    /// with `fragment_text`.  Read by the composition layer before dispatching.
+    pub file_path: Option<PathBuf>,
     /// Number of top-k results to return. Default: 5.
     pub top_k: usize,
     /// Path to the local LanceDB database.
@@ -82,18 +85,30 @@ impl SemanticDupCompositionRoot {
         &self,
         input: FindSimilarInput,
     ) -> Result<CommandOutcome, CompositionError> {
+        // Resolve fragment text: prefer inline text, fall back to reading from file.
+        let fragment_text = match (input.fragment_text, input.file_path) {
+            (Some(text), _) => text,
+            (None, Some(path)) => std::fs::read_to_string(&path).map_err(|e| {
+                CompositionError::Infrastructure(format!(
+                    "cannot read fragment file {}: {e}",
+                    path.display()
+                ))
+            })?,
+            (None, None) => {
+                return Err(CompositionError::WiringFailed(
+                    "find-similar: provide either an inline fragment argument or --file <path>"
+                        .to_owned(),
+                ));
+            }
+        };
+
         let top_k = TopK::new(input.top_k)
             .map_err(|e| CompositionError::WiringFailed(format!("invalid --top-k value: {e}")))?;
 
         // Query fragments use start_line=1 / end_line=u32::MAX as a sentinel
         // so they are never excluded by hunk-level filtering.
-        let fragment = CodeFragment::new(
-            PathBuf::from("<query>"),
-            input.fragment_text.clone(),
-            1,
-            u32::MAX,
-        )
-        .map_err(|e| CompositionError::WiringFailed(format!("invalid query fragment: {e}")))?;
+        let fragment = CodeFragment::new(PathBuf::from("<query>"), fragment_text, 1, u32::MAX)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid query fragment: {e}")))?;
 
         // Validate that the semantic index exists and is recognizable BEFORE
         // constructing the embedding or index adapters.  An absent or typo'd
@@ -253,8 +268,12 @@ mod tests {
         assert!(!db_path.exists(), "pre-condition: db_path must not exist");
 
         let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
-        let input =
-            FindSimilarInput { fragment_text: "fn guard_test() {}".to_owned(), top_k: 5, db_path };
+        let input = FindSimilarInput {
+            fragment_text: Some("fn guard_test() {}".to_owned()),
+            file_path: None,
+            top_k: 5,
+            db_path,
+        };
 
         let result = app.semantic_dup_find_similar(input);
         assert!(
@@ -287,7 +306,8 @@ mod tests {
 
         let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = FindSimilarInput {
-            fragment_text: "fn guard_test_dir() {}".to_owned(),
+            fragment_text: Some("fn guard_test_dir() {}".to_owned()),
+            file_path: None,
             top_k: 5,
             db_path: db_path.clone(),
         };

@@ -5,8 +5,7 @@
 //! method.  All composition (adapter construction, interactor wiring) is
 //! performed inside `cli_composition::CliApp`, following the existing pattern.
 
-use std::io::BufRead as _;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
@@ -41,17 +40,13 @@ pub struct FindSimilarArgs {
 ///
 /// CN-05: information-only, never blocks (always exits 0).
 pub fn execute_find_similar(args: FindSimilarArgs) -> ExitCode {
-    // Resolve the fragment text: either from the inline argument or a file.
-    let fragment_text = match resolve_fragment_text(args.fragment, args.file) {
-        Ok(t) => t,
-        Err(msg) => {
-            eprintln!("{msg}");
-            return ExitCode::FAILURE;
-        }
-    };
-
     driver_outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_driver().handle(
-        SemanticDupInput::FindSimilar { fragment_text, top_k: args.top_k, db_path: args.db_path },
+        SemanticDupInput::FindSimilar {
+            fragment_text: args.fragment,
+            file_path: args.file,
+            top_k: args.top_k,
+            db_path: args.db_path,
+        },
     ))
 }
 
@@ -139,70 +134,13 @@ pub struct DupCheckArgs {
 /// CN-02/AC-04: soft gate — warnings go to stderr, always exits 0.
 /// AC-05: fragments whose hash appears in `--ack-file` are suppressed.
 pub fn execute_dup_check(args: DupCheckArgs) -> ExitCode {
-    // Read the newline-separated list of fragment file paths.
-    let fragment_files = match read_lines_file(&args.files_from) {
-        Ok(lines) => lines.into_iter().map(PathBuf::from).collect::<Vec<_>>(),
-        Err(msg) => {
-            eprintln!("{msg}");
-            return ExitCode::FAILURE;
-        }
-    };
-
     driver_outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_driver().handle(
         SemanticDupInput::DupCheck {
-            fragment_files,
+            files_from: args.files_from,
             threshold: args.threshold,
             db_path: args.db_path,
             ack_file: args.ack_file,
             ack: args.ack,
         },
     ))
-}
-
-// ── Internal helpers ──────────────────────────────────────────────────────────
-
-/// Resolve the query fragment text from either an inline string or a file path.
-///
-/// # Errors
-///
-/// Returns `CliError` when neither nor both arguments are provided, or
-/// when the file cannot be read.
-fn resolve_fragment_text(
-    inline: Option<String>,
-    file: Option<PathBuf>,
-) -> Result<String, crate::CliError> {
-    match (inline, file) {
-        (Some(text), None) => Ok(text),
-        (None, Some(path)) => std::fs::read_to_string(&path).map_err(|e| {
-            crate::CliError::Message(format!("cannot read fragment file {}: {e}", path.display()))
-        }),
-        (None, None) => Err(crate::CliError::Message(
-            "sotp find-similar: provide either an inline fragment argument or --file <path>"
-                .to_owned(),
-        )),
-        (Some(_), Some(_)) => {
-            // Clap's `conflicts_with` prevents this but keep a safe fallback.
-            Err(crate::CliError::Message(
-                "sotp find-similar: --file and inline fragment are mutually exclusive".to_owned(),
-            ))
-        }
-    }
-}
-
-/// Read a newline-separated list of non-empty lines from `path`.
-///
-/// Empty lines and lines consisting only of whitespace are skipped.
-///
-/// # Errors
-///
-/// Returns `CliError` when the file cannot be opened or read.
-fn read_lines_file(path: &Path) -> Result<Vec<String>, crate::CliError> {
-    let file = std::fs::File::open(path).map_err(|e| {
-        crate::CliError::Message(format!("cannot open --files-from file {}: {e}", path.display()))
-    })?;
-    let reader = std::io::BufReader::new(file);
-    let lines: Vec<String> = reader.lines().collect::<Result<Vec<_>, _>>().map_err(|e| {
-        crate::CliError::Message(format!("error reading --files-from file {}: {e}", path.display()))
-    })?;
-    Ok(lines.into_iter().filter(|l| !l.trim().is_empty()).collect())
 }

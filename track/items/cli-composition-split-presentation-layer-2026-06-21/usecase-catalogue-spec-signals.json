@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "40986ff40f8ff031f7f2f8ecc4bf695717117336f8978743552c7d40daac9eb5",
+  "catalogue_declaration_hash": "84d014d693b9dc6c337db36bab8834f7452115e12a192f385ed256a0db22418e",
   "signals": [
     {
       "type_name": "ArchInteractor",
@@ -130,7 +130,7 @@
     {
       "type_name": "DupCheckDriverInput",
       "signal": "blue",
-      "entry_hash": "f6e6f31cd888a5b6dfeee095835204317f6d82fe4941863c9ef63029f441500d"
+      "entry_hash": "761512b4b53c7d75bfa64d316d462dcaa0032f7e4480c16b17cc82ffe43c6afc"
     },
     {
       "type_name": "ExportSchemaCommand",
@@ -155,7 +155,7 @@
     {
       "type_name": "FindSimilarDriverInput",
       "signal": "blue",
-      "entry_hash": "ad7f82dc5ea7614545864382173a52a9c47a566d6f08cc31cb749c82048feb2d"
+      "entry_hash": "9b03a56257ef412fb70f5704f9cd2c54adb28ae7c76a9d645b9add7680df0065"
     },
     {
       "type_name": "FixpointDryGateCommand",

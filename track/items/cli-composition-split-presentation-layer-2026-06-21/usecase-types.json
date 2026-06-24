@@ -1528,7 +1528,11 @@
           "fields": [
             {
               "name": "fragment_text",
-              "ty": "String"
+              "ty": "Option<String>"
+            },
+            {
+              "name": "file_path",
+              "ty": "Option<std::path::PathBuf>"
             },
             {
               "name": "top_k",
@@ -1626,8 +1630,8 @@
           "kind": "plain",
           "fields": [
             {
-              "name": "fragment_files",
-              "ty": "Vec<std::path::PathBuf>"
+              "name": "files_from",
+              "ty": "std::path::PathBuf"
             },
             {
               "name": "threshold",

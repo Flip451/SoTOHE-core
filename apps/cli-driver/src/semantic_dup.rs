@@ -22,8 +22,11 @@ use crate::render::CommandOutcome;
 pub enum SemanticDupInput {
     /// Run the semantic similarity search for a given fragment.
     FindSimilar {
-        /// Inline fragment text to search for.
-        fragment_text: String,
+        /// Inline fragment text to search for.  Mutually exclusive with `file_path`.
+        fragment_text: Option<String>,
+        /// Path to a file whose content is used as the query fragment.  Mutually exclusive
+        /// with `fragment_text`.  The file is read by the composition layer.
+        file_path: Option<PathBuf>,
         /// Number of top-k similar fragments to return.
         top_k: usize,
         /// Path to the local LanceDB semantic index database.
@@ -43,8 +46,9 @@ pub enum SemanticDupInput {
     },
     /// Soft gate: check fragments for near-duplicates in the semantic index.
     DupCheck {
-        /// List of fragment file paths to check.
-        fragment_files: Vec<PathBuf>,
+        /// Path to a newline-separated file listing fragment file paths to check.
+        /// The file is read by the composition layer.
+        files_from: PathBuf,
         /// Cosine similarity threshold (0.0–1.0) above which a match is flagged.
         threshold: f32,
         /// Path to the local LanceDB semantic index database.
@@ -76,8 +80,8 @@ impl SemanticDupDriver {
     /// Handle a semantic_dup command.
     pub fn handle(&self, input: SemanticDupInput) -> CommandOutcome {
         match input {
-            SemanticDupInput::FindSimilar { fragment_text, top_k, db_path } => {
-                self.find_similar(fragment_text, top_k, db_path)
+            SemanticDupInput::FindSimilar { fragment_text, file_path, top_k, db_path } => {
+                self.find_similar(fragment_text, file_path, top_k, db_path)
             }
             SemanticDupInput::IndexBuild { workspace_root, db_path } => {
                 self.index_build(workspace_root, db_path)
@@ -85,8 +89,8 @@ impl SemanticDupDriver {
             SemanticDupInput::IndexMeasureQuality { workspace_root } => {
                 self.index_measure_quality(workspace_root)
             }
-            SemanticDupInput::DupCheck { fragment_files, threshold, db_path, ack_file, ack } => {
-                self.dup_check(fragment_files, threshold, db_path, ack_file, ack)
+            SemanticDupInput::DupCheck { files_from, threshold, db_path, ack_file, ack } => {
+                self.dup_check(files_from, threshold, db_path, ack_file, ack)
             }
         }
     }
@@ -97,12 +101,17 @@ impl SemanticDupDriver {
 
     fn find_similar(
         &self,
-        fragment_text: String,
+        fragment_text: Option<String>,
+        file_path: Option<PathBuf>,
         top_k: usize,
         db_path: PathBuf,
     ) -> CommandOutcome {
-        let outcome =
-            self.service.find_similar(FindSimilarDriverInput { fragment_text, top_k, db_path });
+        let outcome = self.service.find_similar(FindSimilarDriverInput {
+            fragment_text,
+            file_path,
+            top_k,
+            db_path,
+        });
         into_command_outcome(outcome)
     }
 
@@ -119,14 +128,14 @@ impl SemanticDupDriver {
 
     fn dup_check(
         &self,
-        fragment_files: Vec<PathBuf>,
+        files_from: PathBuf,
         threshold: f32,
         db_path: PathBuf,
         ack_file: Option<PathBuf>,
         ack: bool,
     ) -> CommandOutcome {
         let outcome = self.service.dup_check(DupCheckDriverInput {
-            fragment_files,
+            files_from,
             threshold,
             db_path,
             ack_file,
